@@ -119,6 +119,22 @@ Projects can extend this registry, but UI components and dashboards should rely 
 
 All variable-rate and layer feedback messages use a common payload definition that can travel over both UDP and CAN.
 
+The proposal intentionally stays close to the ongoing community conversation about revamping machine PGNs. The main takeaways
+from that thread were:
+
+- Keep the current UDP + serial transports but recognize their limitations (no built-in acknowledgements, occasional packet
+  loss) and design the layer controllers to tolerate missed frames by exposing health/quality metrics instead of depending on
+  transport-level handshakes.
+- Borrow structure and enumerations from ISO11783/J1939 (e.g., DDI catalogs, condensed work state PGNs 289/290/367) where it
+  improves documentation and interoperability, yet avoid blindly copying CAN framing so the UDP path can stay compact and easy
+  to parse.
+- Maintain the existing CRC byte in the envelope for the serial link while relying on UDP’s native checksum in Ethernet/WiFi
+  deployments.
+- Treat the new PGNs as an evolution rather than a flag day: legacy machine PGNs keep working until firmware catches up, and a
+  layer definition broadcast (PGN 0xE2) communicates capabilities/units so AOG can adapt dynamically.
+
+The sections below describe the wire format that satisfies those goals while staying compatible with both transports.
+
 UDP wraps the payload in AOG’s standard message envelope.
 
 CAN uses an 8-byte data frame with the same contents.

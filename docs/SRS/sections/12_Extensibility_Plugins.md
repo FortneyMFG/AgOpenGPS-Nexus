@@ -38,3 +38,6 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 ## Open questions
 - Which features are safe to expose via scripting vs. compiled plugins?
 - How do we version plugin APIs alongside firmware expectations?
+
+## Related specifications
+- Packaging, distribution, and catalog requirements: see Section 13 `Plugin Packaging, Updates, and Catalog`.

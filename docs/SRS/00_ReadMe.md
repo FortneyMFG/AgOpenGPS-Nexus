@@ -229,7 +229,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
 |-------------|----------------------|----------------------|-----------------|
 | R-GA-000 | Workstream TBD | [Gauge mappings](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-001 (TBD) |
-| R-GA-001 | Workstream TBD | [Gauge PGNs](../04_Interface_Specifications.md) | ADR-GA-002 (TBD) |
+| R-GA-001 | Workstream TBD | [Gauge telemetry PGNs](../options/O-COMM-7_GaugeTelemetryPGNs.md) | ADR-GA-002 (TBD) |
 | R-GA-002 | Workstream TBD | [Gauge configuration JSON](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-003 (TBD) |
 | R-GA-003 | Workstream TBD | [Gauge UI behaviors](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-004 (TBD) |
 | R-GA-004 | Workstream TBD | [Smoothing rules](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-005 (TBD) |

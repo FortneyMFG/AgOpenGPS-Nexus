@@ -10,6 +10,8 @@ Identify how credentials, operator roles, and device access are managed today an
 - R-SEC-003 (SHOULD): Encrypt or obfuscate sensitive config values at rest without breaking existing upgrade paths.
 - R-SEC-004 (SHOULD, proposed-LinuxCore): Run the Linux Core under a dedicated service account with least-privilege access to `/dev` devices and config directories, documenting how credentials are stored for remote clients.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L21-L44】
 - R-SEC-005 (COULD): Add audit logging for configuration changes and remote connections.
+- R-SEC-006 (SHOULD, secrets migration): Define an encrypted storage format, backup/restore workflow, and migration plan for existing plaintext secrets before enabling remote Core access.
+- R-SEC-007 (SHOULD, audit readiness): Establish minimum audit requirements (timestamped operator actions, remote session trails retained for at least one season) so security-sensitive ADRs have clear acceptance criteria.
 
 ## Options
 - O-SEC-0: Status quo — Windows user accounts + stored settings for credentials.

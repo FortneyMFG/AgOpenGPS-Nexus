@@ -10,6 +10,7 @@ Define which operating systems we target for development and field runtime, incl
 - R-OS-003 (SHOULD, current-AgOpenGPS): Continue providing multi-monitor aware window placement so dashboards stay visible across displays.【F:SourceCode/GPS/Helpers/ScreenHelper.cs†L1-L30】
 - R-OS-004 (SHOULD, proposed-LinuxCore): Package a Linux headless “AOG Core” service for Ubuntu/Debian with a `systemd` unit, standard file layout, and dependency management while retaining Windows builds.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L20】
 - R-OS-005 (COULD, proposed-LinuxCore): Offer container images and optional AppImage bundles so power users can deploy the Core or combined UI without bespoke installers.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L20】
+- R-OS-006 (SHOULD, cross-platform pilots): Document and validate baseline hardware capable of sustaining 60 FPS rendering (quad-core 2.0 GHz CPU or better, 8 GB RAM, GPU with 2 GB VRAM/OpenGL 3.3 support) alongside supported architectures (Windows x64, Linux x86_64, Linux ARM64 SBCs) so contributors know when to move a slice from proposal to pilot.
 
 ## Options
 - O-OS-0: Status quo — Windows 10/11 x64 primary with optional experimentation elsewhere.
@@ -38,4 +39,4 @@ Driver support, latency, deployability, developer velocity, end-user setup compl
 
 ## Open questions
 - Which distros to support officially if we invest in Linux parity?
-- Minimum hardware spec for smooth 60 FPS map?
+- How do we certify the baseline hardware targets on ARM64 devices with varying GPU stacks?

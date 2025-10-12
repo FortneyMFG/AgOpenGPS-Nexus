@@ -12,6 +12,8 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - R-FE-011 (SHOULD, proposed-variable-layer): Provide configuration tooling (Layer Definition Manager, section presets) and drill-down dashboards that reuse aggregation metadata while respecting multi-monitor layouts.【F:docs/SRS/options/O-UI-5_MetadataDrivenDashboards.md†L30-L51】
 - R-FE-004 (COULD): Introduce thin clients (web/tablet) that mirror dashboards when networked.
 - R-FE-012 (SHOULD, proposed-LinuxCore): Ensure at least one frontend can operate purely as a remote client over the Core APIs (gRPC/WebSocket) while maintaining offline workflows for Windows rigs.【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L1-L34】
+- R-FE-013 (SHOULD, safety posture): Distinguish monitor-only remote clients from control-capable clients with explicit capability flags so safety-critical actions are disabled on unreliable links by default.
+- R-FE-014 (SHOULD, operator readiness): Capture training, preset migration, and configuration handoff requirements when metadata-heavy dashboards roll out so operators can transition without losing saved layouts.
 
 ## Options
 - O-FE-0: Status quo — Windows desktop suite (AgOpenGPS + AgIO + utilities).

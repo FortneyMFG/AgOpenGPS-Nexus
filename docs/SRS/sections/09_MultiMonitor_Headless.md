@@ -9,6 +9,7 @@ Describe how the suite behaves across multiple displays, kiosk rigs, or headless
 - R-MM-002 (SHOULD): Provide a story for running the backend with no local UI while exposing remote displays or APIs.
 - R-MM-003 (SHOULD, proposed-LinuxCore): Deliver kiosk/headless launchers for the Linux Core + remote clients (auto-login, fullscreen) so rigs boot directly into an operator-ready view.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L23】【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L10-L18】
 - R-MM-004 (COULD): Add locked-down layouts that survive accidental window drags or task-switching.
+- R-MM-005 (SHOULD, resilience): Capture watchdog and auto-recovery expectations for kiosk/headless deployments (service restart policies, layout reset scripts, power-loss recovery steps) so rigs can return to an operator-ready state without manual intervention.
 
 ## Options
 - O-MM-0: Status quo — Desktop windows with manual layout tools and helper checks.

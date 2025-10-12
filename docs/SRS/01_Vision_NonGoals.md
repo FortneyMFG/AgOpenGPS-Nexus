@@ -19,3 +19,8 @@
 - Community consensus on each critical architecture slice captured in ADRs.
 - Reference implementations for headless + remote UI scenarios validated in field tests.
 - Contributor onboarding reduced to <1 hour setup on supported OS baselines.
+
+## Baseline field assumptions
+- GNSS accuracy: Sub-5 cm RTK guidance accuracy for auto-steer workloads, with fallbacks documented for WAAS/EGNOS grade receivers.
+- Compute: Quad-core 2.0 GHz CPU (x86_64 or ARM64), 8 GB RAM, and GPU supporting OpenGL 3.3 with 2 GB VRAM to sustain 60 FPS rendering and replay diagnostics.
+- Latency envelope: Control loops expect <100 ms end-to-end latency; monitoring dashboards tolerate up to 500 ms while buffering offline.

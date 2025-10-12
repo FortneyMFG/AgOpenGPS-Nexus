@@ -12,6 +12,8 @@ Explain how the project is validated (unit, integration, field), packaged, and s
 - R-CI-011 (SHOULD, proposed-variable-layer): Gate new PGNs, UI flows, and persistence behind feature flags with CI validation plus operator documentation for toggles.【F:docs/SRS/options/O-TEST-4_LayerReplayCI.md†L24-L46】
 - R-CI-004 (SHOULD, proposed-LinuxCore): Add Linux (amd64/arm64) CI lanes that build/test the Core service, containers, and PGN bridge alongside Windows artifacts.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L1-L44】
 - R-CI-005 (COULD): Integrate hardware-in-the-loop smoke tests for steering/rate modules.
+- R-CI-012 (SHOULD, release assurance): Define acceptance criteria for cross-platform build artifacts (checksums, signatures, SBOM availability) before they ship to operators.
+- R-CI-013 (SHOULD, fixture governance): Document how hardware-in-the-loop rigs and replay fixtures are versioned and synchronized with firmware/controller changes so tests remain trustworthy over time.
 
 ## Options
 - O-CI-0: Status quo — Manual release pipeline with ad-hoc CI builds.

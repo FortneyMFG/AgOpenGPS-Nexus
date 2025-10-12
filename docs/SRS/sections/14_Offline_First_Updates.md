@@ -10,6 +10,7 @@ Define how operators obtain, install, and roll back software updates when field 
 - R-UPD-003 (SHOULD): Allow staged updates (AgOpenGPS vs. AgIO vs. controllers) without breaking compatibility.
 - R-UPD-004 (SHOULD, proposed-LinuxCore): Provide Debian packages, Docker images, and AppImage builds for the Core/frontends with documented rollback (keep prior version) while preserving zip releases.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L20】
 - R-UPD-005 (COULD): Add delta packages or background downloaders that respect limited connectivity.
+- R-UPD-006 (SHOULD, rollout safety): Capture validation and rollback checklists (hash verification, pre-flight compatibility checks, firmware/controller coordination steps) so staggered desktop/Core releases remain in lockstep with field hardware.
 
 ## Options
 - O-UPD-0: Status quo — Manual zip download/unpack per release.

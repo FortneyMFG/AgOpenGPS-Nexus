@@ -11,6 +11,7 @@ Determine the presentation technologies and layout systems that power both the l
 - R-UI-004 (SHOULD, proposed-Metadata): Deliver metadata-driven widgets so new layers surface in UI panels without code rewrites.【F:docs/SRS/options/O-UI-5_MetadataDrivenDashboards.md†L1-L51】
 - R-UI-005 (SHOULD, proposed-LinuxCore): Provide frontends that can attach to a headless Core over gRPC/WebSocket while keeping Windows UX intact for local rigs.【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L1-L34】
 - R-UI-006 (COULD, proposed-LinuxCore): Evaluate kiosk-friendly cross-platform stacks (Qt, Avalonia, Web) with touch parity and offline theming presets.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L1-L44】【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L1-L34】
+- R-UI-007 (SHOULD, accessibility): Ensure any future UI stack supports high-DPI scaling, configurable color-contrast presets, and localization hooks (fonts, RTL layouts) so metadata-driven dashboards remain operable for diverse operators across cab lighting conditions.
 
 ## Options
 - O-UI-0: Status quo — WinForms primary UI with incremental WPF modernization.

@@ -12,6 +12,8 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - R-COMM-011 (SHOULD, proposed-variable-layer): Enforce monotonic timestamps, bounds checks, and bad-sample counters on layer transports to simplify diagnostics and retries.【F:docs/SRS/options/O-COMM-5_VariableRatePGNs.md†L19-L41】【F:docs/SRS/options/O-TELE-4_LayerDiagnostics.md†L7-L22】
 - R-COMM-004 (SHOULD, proposed-LinuxCore): Stand up a gRPC/WebSocket facade that coexists with legacy PGNs so new clients can attach without rewriting firmware.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L44】【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L1-L34】
 - R-COMM-005 (MUST, proposed-PGNBridge): Preserve byte-for-byte compatibility with the current AgIO PGN framing or provide a deterministic bridge when introducing new transports.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
+- R-COMM-012 (SHOULD, transport-hardening): Establish latency budgets (<100 ms round-trip for control loops, <500 ms for monitoring) and error budgets (≤0.1% packet loss after retries) for any new gRPC/WebSocket channels so contributors know when the slice is ready to graduate from proposal to review.
+- R-COMM-013 (SHOULD, security posture): Document optional encryption/authentication expectations (TLS 1.3, mutual certs or token auth) for modern transports while ensuring PGN bridges can operate offline when credentials are unavailable.
 
 ## Options
 - O-COMM-0: Status quo — AgIO-managed UDP + serial PGN transports with optional NTRIP.

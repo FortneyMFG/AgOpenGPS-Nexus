@@ -16,6 +16,9 @@ Capture how AgOpenGPS and AgIO interface with GNSS, steer, rate, machine, and se
 - R-HW-012 (SHOULD, proposed-ISOBUS-alignment): Introduce ISOBUS-inspired condensed work state PGNs (289-291, 141, 161-162, 367)
   while maintaining legacy message support so section controllers and future ISOBUS bridges share a documented structure.【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】
 
+- R-HW-013 (MUST, safety): Require watchdogs, fail-safe defaults, and manual override paths when introducing modular firmware so richer telemetry cannot block steer/section cutoffs during controller faults.
+- R-HW-014 (SHOULD, compliance): Reserve placeholders for required certifications or field validation (e.g., ISO 25119 functional safety notes) whenever hardware abstractions or PGN bridges change safety envelopes.
+
 ## Options
 - O-HW-0: Status quo — Serial + UDP PGNs managed by AgIO with manual module discovery.
 - O-HW-1: Introduce a hardware abstraction layer with per-device drivers.

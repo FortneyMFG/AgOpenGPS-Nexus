@@ -11,6 +11,11 @@ Builds a deterministic replay and benchmarking suite that validates aggregation 
 - Regression protection compares aggregator outputs (sum/avg/min/max) across releases using the replay suite, failing CI on deviations.
 - Rollout documentation covers inspector workflow, rate-limit guidance, troubleshooting steps, and feature-flag toggles for field ops.
 
+## Readiness & dependencies
+- Anchored by R-CI-010/R-CI-011 requirements plus artifact guarantees in R-CI-012; failure to meet them blocks variable-layer ADRs.
+- Relies on data-model schema hashing (R-DATA-012/R-DATA-014) and transport diagnostics (R-COMM-011/R-TH-010) to produce comparable replay outputs.
+- Hardware validation requires coordination with R-HW-013 safety interlocks and documented fixture versions (R-CI-013).
+
 ## Pros
 - Prevents regression of critical agronomic metrics before they reach the field.
 - Replay-driven validation gives contributors confidence when refactoring aggregation or rendering code.

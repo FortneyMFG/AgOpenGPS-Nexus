@@ -1,87 +1,87 @@
-# AgOpenGPS - Guidance software
+# Variable Rate Application SRS Repository
 
-[![GitHub Release](https://img.shields.io/github/v/release/agopengps-official/AgOpenGPS)](https://github.com/agopengps-official/AgOpenGPS/releases/latest)
-[![Translation status](https://hosted.weblate.org/widget/agopengps/language-badge.svg)](https://hosted.weblate.org/engage/agopengps/)
+This repository now serves as the home for the Software Requirements Specification (SRS)
+for the Variable Rate Application (VRA) control system. The historical AgOpenGPS
+artifacts that were previously maintained here are preserved for reference, but the
+primary focus has shifted to the definition, validation, and traceability of the VRA
+system requirements.
 
-Ag Precision Mapping and Section Control Software
+## Purpose of the SRS
 
-AgOpenGPS is 2 programs. AgIO is the communication hub to the outside world and AgOpenGPS is the 
-application. You can run either and within each, you can run the other.
+The SRS captures the complete set of functional, non-functional, and interface
+requirements for the VRA solution. It is the authoritative source for describing what
+the system must do, the constraints it operates under, and the success criteria for the
+project. Maintaining the SRS in a version-controlled repository allows the whole team to
+collaborate on requirements, review changes, and link specifications directly to
+implementation artifacts.
 
-You only need to run AgOpenGPS if you are using the simulator.
+## Project Overview
 
-The software reads NMEA strings for the purpose of recording and mapping position information 
-for Agricultural use. Also it has up to 16 sections of Section Control that can have unique widths 
-or up to 64 same width sections to control implements application of product preventing 
-over-application.
+The VRA system is intended to deliver precision application of inputs (seed, fertilizer,
+chemicals, etc.) based on spatial data and agronomic prescriptions. Key capabilities
+include:
 
-Also ouputs Pure pursuit steer angles from reference line for AB line, AB Curve and Contour guidance. 
-Auto Headland called UTurn on Curve and AB Line with loops for narrow equipment. 
-Mapping as a background can also be added.
+- Integrating prescription maps and live field telemetry to determine optimal rates.
+- Communicating commands to rate controllers and section hardware.
+- Logging operational data for agronomic analysis and regulatory compliance.
+- Providing operators with feedback on application quality and system status.
 
-Included in this repository is an application, and source folders. 
+These requirements evolve through collaboration between agronomists, operators,
+hardware engineers, and software developers. The SRS records agreed upon expectations so
+implementations can be verified against a stable baseline.
 
-See the PCB repo for PCB layouts, firmware for steering and rate control, machine control, GPS and simulator. 
+## Goals and Non-Goals
 
-## Installation
+**Goals**
 
-1. Download the [Most Stable AgOpenGPS Release](https://github.com/agopengps-official/AgOpenGPS/releases)
-2. Unzip or extract the contents to a folder (folder accessible by user not the root of C:\\)
-Even on your desktop
-3. Run AgOpenGPS.exe
+- Document a complete, testable set of requirements for the VRA control system.
+- Capture assumptions, dependencies, and constraints that inform design decisions.
+- Support traceability between requirements, design artifacts, tests, and releases.
+- Enable iterative refinement of requirements as stakeholder needs change.
 
-## Building
+**Non-Goals**
 
-1. Clone this repository (e.g. use Visual Studio to do so)
-2. Open the solution (`SourceCode/AgOpenGPS.sln`) in Visual Studio
-3. Add your code and (re)build
-4. Execute the following command in the root folder to get a single `AgOpenGPS` folder containing all the applications:
-   ```sh
-   dotnet publish SourceCode/AgOpenGPS.sln
-   ```
+- Replacing the AgOpenGPS software contained in this repository. Existing binaries and
+  source code remain for historical reference only.
+- Providing detailed design or implementation documentation; those are tracked in other
+  artifacts.
+- Serving as an operator manual. End-user documentation will be authored separately.
 
-## Contributing
+## Repository Structure
 
-The `master` branch contains the most stable version of AgOpenGPS, while the `develop` branch
-is actively being worked on and may not be ready for production use.
+- `docs/` – Primary location for the SRS and supporting requirement documentation.
+- `SourceCode/` – Legacy AgOpenGPS solution files, kept to aid requirement discovery and
+  context. These files are not actively maintained.
+- `README.md` (this document) – Overview of the repository purpose, goals, and usage.
 
-In order to contribute to AgOpenGPS, follow these steps:
+Future documentation updates should focus on the SRS located in the `docs/` directory.
+Any modifications to the legacy code should be made only if they support requirement
+analysis or archival needs.
 
-1. Checkout the `develop` branch
-2. Create a new branch named after your feature
-3. Make your changes and commit to this branch
-4. Create a PR targeting the `develop` branch
+## Working With the SRS
 
-## Translation
+1. Clone the repository and create a feature branch for your requirement updates.
+2. Edit the relevant Markdown or diagram sources within the `docs/` folder.
+3. Submit a pull request describing the changes and how they affect the requirements
+   baseline.
+4. Request reviews from stakeholders (product, agronomy, QA, engineering) as
+   appropriate.
 
-We use [Weblate](https://weblate.org) to manage translations for this project.
+Version control history provides a record of requirement evolution. Use semantic commit
+messages and reference issue trackers or change requests to maintain traceability.
 
-If you want to help translate AgOpenGPS, follow these steps:
+## Legacy AgOpenGPS Resources
 
-1. Create (or log in to) your free account on [Weblate](https://hosted.weblate.org)
-2. Go to the [AgOpenGPS Project on Weblate](https://hosted.weblate.org/engage/agopengps)
-3. Select your language (or add a new one if it's missing)
-4. Translate strings directly in the web interface
+The AgOpenGPS materials remain available for teams who need to reference prior
+implementations, hardware interfaces, or mapping workflows. These resources are not
+updated but can inform requirement discussions, especially when adapting proven
+functionality to the VRA context.
 
-### Translation Status
-
-[![Translation status](https://hosted.weblate.org/widget/agopengps/multi-auto.svg)](https://hosted.weblate.org/engage/agopengps/)
-
-## Links
-
-- [AgOpenGPS Documentation](https://docs.agopengps.com/)
-- [AgOpenGPS Forum](https://discourse.agopengps.com/)
-- [PCB and Firmware Repository](https://github.com/agopengps-official/Boards)
-- [SK21 Rate Control Repository](https://github.com/agopengps-official/Rate_Control)
+- Documentation: https://docs.agopengps.com/
+- Community forum: https://discourse.agopengps.com/
+- PCB and firmware repository: https://github.com/agopengps-official/Boards
 
 ## License
 
-If you distribute copies of such a program, whether
-gratis or for a fee, you must pass on to the recipients the same
-freedoms that you received.  You must make sure that they, too, receive
-or can get the source code.  And you must show them these terms so they
-know their rights as Outlined in the GPLv3 License.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+All content in this repository, including the SRS, is distributed under the terms of the
+GNU General Public License v3.0 (GPLv3). See the `LICENSE` file for the full text.

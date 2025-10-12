@@ -5,11 +5,11 @@ Capture read-only engine and machine telemetry (RPM, temperatures, pressures, vo
 
 ## Requirements (from contributors)
 - R-GA-000 (MUST, J1939 alignment): Map core engine gauges to authoritative PGN/SPN sources so third-party controllers and gateways interoperate without custom scaling tables.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L15-L31】
-- R-GA-001 (MUST, transport): Deliver gauge telemetry through dedicated read-only PGNs (0xDA/0xD9/0xD8) that reuse the existing AOG CAN/UDP framing and preserve current layer/section PGNs.【F:docs/SRS/04_Interface_Specifications.md†L1-L48】
+- R-GA-001 (MUST, transport): Deliver gauge telemetry through dedicated read-only PGNs (0xDA/0xD9/0xD8) that reuse the existing AOG CAN/UDP framing and preserve current layer/section PGNs.【F:docs/SRS/options/O-COMM-7_GaugeTelemetryPGNs.md†L1-L54】
 - R-GA-002 (MUST, configuration): Define gauges through JSON metadata—ID, PGN/SPN source, scale/offset, smoothing, target/alarm bands—so operators can add/remove telemetry without recompiling clients.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L33-L92】
 - R-GA-003 (MUST, UI parity): Provide overlay, standalone panel, and mini widget presentations that honor `targetBand`, `alarmBands`, TTL, and quality gating to keep annunciation consistent across layouts.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L94-L128】
 - R-GA-004 (SHOULD, smoothing & stale handling): Support optional EMA smoothing, deadbands, and stale indicators driven by configuration so noisy sensors remain usable without hiding real faults.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L82-L128】
-- R-GA-005 (COULD, capability discovery): Advertise supported gauges via capability bits and validity heartbeats so dashboards can pre-provision tiles and detect publisher outages without bespoke logic.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L130-L156】【F:docs/SRS/04_Interface_Specifications.md†L27-L48】
+- R-GA-005 (COULD, capability discovery): Advertise supported gauges via capability bits and validity heartbeats so dashboards can pre-provision tiles and detect publisher outages without bespoke logic.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L130-L156】【F:docs/SRS/options/O-COMM-7_GaugeTelemetryPGNs.md†L23-L48】
 
 ## Context and scope
 Gauges focus on machine-level telemetry that dashboards consume read-only. They complement, but do not replace, layer-specific rate or steering PGNs.

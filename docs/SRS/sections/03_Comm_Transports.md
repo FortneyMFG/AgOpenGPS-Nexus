@@ -46,3 +46,6 @@ Deterministic latency, message integrity (CRC/sequencing), offline buffering, co
 ## Open questions
 - Do we converge on a single heartbeat/watchdog strategy across transports?
 - Should we adopt protobuf/FlatBuffers for higher-level APIs?
+
+## Related specifications
+- Device identity heartbeat and DFU orchestration: see [Section 13 — Device Firmware Updates](13_Device_Firmware_Updates.md).

@@ -13,6 +13,8 @@ Capture how AgOpenGPS and AgIO interface with GNSS, steer, rate, machine, and se
 - R-HW-004 (SHOULD, proposed-LinuxCore): Offer SocketCAN, udev-based serial naming, and bridge services so Linux SBCs can connect to GNSS/IMU/section hardware without bespoke drivers.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L11-L20】
 - R-HW-005 (MUST, proposed-PGNBridge): Document the existing PGN catalog and ensure any new hardware abstraction keeps backward compatibility or provides adapters.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
 - R-HW-006 (COULD): Add standardized hardware capability discovery (e.g., via PGN handshake) beyond today’s manual settings.
+- R-HW-012 (SHOULD, proposed-ISOBUS-alignment): Introduce ISOBUS-inspired condensed work state PGNs (289-291, 141, 161-162, 367)
+  while maintaining legacy message support so section controllers and future ISOBUS bridges share a documented structure.【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】
 
 ## Options
 - O-HW-0: Status quo — Serial + UDP PGNs managed by AgIO with manual module discovery.
@@ -45,3 +47,5 @@ Field reliability, ease of install, compatibility with existing rigs, firmware u
 ## Open questions
 - How do we validate new hardware in CI without requiring physical rigs?
 - What handshake (if any) should new modules implement to advertise capabilities?
+- How quickly should AgOpenGPS mark ISOBUS-style condensed work state feedback as stale when PGNs are missed, and should UDP keep
+  the legacy CRC for serial parity?【F:docs/SRS/references/ISOBUS_Section_Control.md†L35-L40】

@@ -18,7 +18,7 @@
       "required": ["alg", "sig"],
       "additionalProperties": false,
       "properties": {
-        "alg": { "type": "string", "enum": ["ed25519"] },
+        "alg": { "type": "string", "enum": ["ed25519", "rsa-2048", "rsa-4096"] },
         "sig": { "type": "string" },
         "pub": { "type": "string" }
       }

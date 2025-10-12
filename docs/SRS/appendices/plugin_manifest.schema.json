@@ -110,7 +110,7 @@
       "required": ["alg", "sig"],
       "additionalProperties": false,
       "properties": {
-        "alg": { "type": "string", "enum": ["ed25519"] },
+        "alg": { "type": "string", "enum": ["ed25519", "rsa-2048", "rsa-4096"] },
         "sig": { "type": "string", "description": "Base64 signature of the ZIP payload." },
         "pub": { "type": "string", "description": "Base64 public key if not already trusted." }
       }
@@ -119,7 +119,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "provider": { "type": "string", "enum": ["github"] },
+        "provider": { "type": "string", "enum": ["github", "url", "custom"] },
         "repo": { "type": "string", "description": "GitHub org/repo slug." },
         "assetPattern": { "type": "string", "description": "Glob or regex matching release asset names." },
         "channel": { "type": "string", "enum": ["stable", "beta", "alpha", "pinned"] }
@@ -143,8 +143,7 @@
       "additionalProperties": false,
       "properties": {
         "icons": { "type": "array", "items": { "type": "string" } },
-        "localization": { "type": "array", "items": { "type": "string" } },
-        "schemas": { "type": "array", "items": { "type": "string" } }
+        "localization": { "type": "array", "items": { "type": "string" } }
       }
     }
   }

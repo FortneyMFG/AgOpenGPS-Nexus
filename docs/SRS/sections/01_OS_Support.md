@@ -1,0 +1,41 @@
+# OS Support (Status: collecting proposals)
+
+## Problem statement
+Define which operating systems we target for development and field runtime, including headless, kiosk, and multi-monitor needs.
+
+## Requirements (from contributors)
+- R-OS-000 (MUST, current-AgOpenGPS): Maintain Windows desktop runtimes for AgOpenGPS executables that ship as WinExe targets with Windows desktop tooling enabled.【F:SourceCode/AgOpenGPS.WpfApp/AgOpenGPS.WpfApp.csproj†L1-L15】【F:SourceCode/GPS/AgOpenGPS.csproj†L1-L48】
+- R-OS-001 (MUST, current-AgIO): Keep AgIO’s Windows Forms host viable for serial, UDP, and CAN management on Windows hardware.【F:SourceCode/AgIO/Source/AgIO.csproj†L1-L33】
+- R-OS-002 (SHOULD, current-SK21-ROC): Preserve the Windows-based deployment flow relied on by external controllers such as the SK21 rate-control stack linked from the project docs.【F:README.md†L70-L76】
+- R-OS-003 (SHOULD, current-AgOpenGPS): Continue providing multi-monitor aware window placement so dashboards stay visible across displays.【F:SourceCode/GPS/Helpers/ScreenHelper.cs†L1-L30】
+- R-OS-004 (SHOULD, proposed-LinuxCore): Package a Linux headless “AOG Core” service for Ubuntu/Debian with a `systemd` unit, standard file layout, and dependency management while retaining Windows builds.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L20】
+- R-OS-005 (COULD, proposed-LinuxCore): Offer container images and optional AppImage bundles so power users can deploy the Core or combined UI without bespoke installers.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L20】
+
+## Options
+- O-OS-0: Status quo — Windows 10/11 x64 primary with optional experimentation elsewhere.
+- O-OS-1: Windows 10/11 (x64) primary, Linux optional.
+- O-OS-2: Linux first (Ubuntu/Debian), Windows optional.
+- O-OS-3: Dual-first: Windows + Linux, shared UI toolkit.
+- O-OS-4: Add Android “display client” for remote UI only.
+- O-OS-5: Linux headless Core on Ubuntu/Debian plus Windows/Linux frontends via APIs.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L1-L44】
+
+## Comparison (quick matrix)
+| Option | Pros | Cons | Risks | Borrow from existing |
+|---|---|---|---|---|
+| O-OS-0 | Keeps current installers, drivers, and tooling intact | Continues Windows dependency | Deferred cross-platform progress | Current WinForms/WPF build scripts |
+| O-OS-1 | Driver breadth; current user base | Locks us into Win-only APIs unless careful | Driver changes; kiosk hardening | AgOpenGPS build chain |
+| O-OS-2 | Headless friendly; containerization | Driver pain (USB GNSS on some distros) | Support burden for users | AgIO Linux ports |
+| O-OS-3 | Max portability | Higher CI matrix | Split testing | Keep protocol pure |
+| O-OS-4 | Cheap displays | Fragmentation | Input latency | Use WebSocket telemetry |
+| O-OS-5 | Decouples OS/UI choices, supports headless rigs | Requires Linux packaging expertise + service hardening | API/bridge regressions can strand Windows rigs | Linux Core packaging plan |
+
+## Evaluation criteria
+Driver support, latency, deployability, developer velocity, end-user setup complexity.
+
+## Current sentiment
+- Community leans to dual-first with a strict abstraction for hardware I/O, but nobody wants to drop Windows today.
+- Interest is growing in piloting the Linux Core packaging while validating PGN compatibility before committing to a broader migration.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L21-L44】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
+
+## Open questions
+- Which distros to support officially if we invest in Linux parity?
+- Minimum hardware spec for smooth 60 FPS map?

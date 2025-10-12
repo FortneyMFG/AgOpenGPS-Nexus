@@ -7,6 +7,7 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 - **System slices** map every focus area (OS, UI, comms, storage, etc.) to an individual section document under `sections/`.
 - **Sections** collect requirements and enumerate options. They are intentionally decision-neutral—decisions live in Architecture Decision Records (ADRs).
 - **Options** can be expanded in dedicated files using the `/docs/templates/OPTION.md` template when deeper analysis is needed.
+- **Decision matrices** use `/docs/templates/DECISION_MATRIX.md` to score mutually exclusive option families once requirements are stable.
 - **References** house canonical specs (e.g., PGN catalogs) that new options must remain compatible with unless an ADR says otherwise.
 - **ADRs** document finalized decisions. Each ADR references the section(s) and options involved so we preserve traceability.
 
@@ -14,7 +15,9 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 1. Start discussion in the matching GitHub Discussion for the section.
 2. Open PRs to add or refine requirements (R-IDs) and options (O-IDs).
 3. Maintainers review for clarity and formatting; contributors stay neutral until an ADR is published.
-4. Once the community agrees, capture the outcome in an ADR that links back to the relevant section table.
+4. Cluster options into **decision families** (exclusive vs. composable) inside each section before deep evaluation. Document any sequencing (e.g., "pick OS target before UI skin").
+5. When a family needs structured comparison, spin up a decision-matrix doc, capture scoring data, and link it from the section. This keeps the section readable while preserving analysis artifacts.
+6. Once the community agrees, capture the outcome in an ADR that links back to the relevant section table.
 
 ## Conventions
 - **IDs**: `R-` for requirements, `O-` for options, `Q-` for open questions, and `ADR-` for decisions.

@@ -7,6 +7,7 @@ What this is; where it’s used in the wild.
 - Architecture outline / data flow
 - Dependencies / licenses
 - Performance notes (numbers if available)
+- Compatible with / blocked by other option families
 
 ## Pros
 - …

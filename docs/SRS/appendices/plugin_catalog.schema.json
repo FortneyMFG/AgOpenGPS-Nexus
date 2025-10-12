@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/plugin_catalog.schema.json",
+  "title": "AgOpenGPS Plugin Catalog Index",
+  "type": "object",
+  "required": ["version", "publisher", "updated", "plugins"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "enum": [1],
+      "description": "Catalog schema version."
+    },
+    "publisher": { "type": "string" },
+    "updated": { "type": "string", "format": "date-time" },
+    "signature": {
+      "type": "object",
+      "required": ["alg", "sig"],
+      "additionalProperties": false,
+      "properties": {
+        "alg": { "type": "string", "enum": ["ed25519"] },
+        "sig": { "type": "string" },
+        "pub": { "type": "string" }
+      }
+    },
+    "plugins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "summary",
+          "homepage",
+          "authors",
+          "license",
+          "channels",
+          "compat"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "summary": { "type": "string" },
+          "homepage": { "type": "string", "format": "uri" },
+          "authors": { "type": "array", "items": { "type": "string" } },
+          "license": { "type": "string" },
+          "icons": {
+            "type": "object",
+            "additionalProperties": { "type": "string", "format": "uri" }
+          },
+          "categories": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "permissions": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "compat": {
+            "type": "object",
+            "required": ["core", "ui"],
+            "additionalProperties": false,
+            "properties": {
+              "core": { "type": "string" },
+              "ui": { "type": "string" }
+            }
+          },
+          "channels": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "object",
+              "required": ["version", "download", "sha256"],
+              "additionalProperties": false,
+              "properties": {
+                "version": { "type": "string" },
+                "download": { "type": "string", "format": "uri" },
+                "sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+                "sig": { "type": "string" },
+                "pub": { "type": "string" },
+                "notes": { "type": "string" },
+                "changelog": { "type": "string", "format": "uri" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@
 | PGN | Name | Direction | Transport(s) | Payload summary |
 |---|---|---|---|---|
 | 0xDA | Gauge Block (u16, three signals) | Controller → AOG | CAN (fixed 8-byte), UDP (variable-length) | Packs up to three gauge IDs with 16-bit raw values. |
-| 0xD9 | Gauge Block (u8, six signals) | Controller → AOG | CAN (fixed 8-byte), UDP (variable-length) | Packs up to six gauge IDs with 8-bit raw values. |
+| 0xD9 | Gauge Block (u8, up to six signals) | Controller → AOG | CAN (fixed 8-byte), UDP (variable-length) | Compact transport for gauges that naturally fit in one byte. |
 | 0xD8 | Gauge Heartbeat / Summary | Controller → AOG | CAN/UDP | Publishes uptime, sequence, and validity bitmap for diagnostics. |
 
 ### 0xDA – Gauge Block (u16, three signals)
@@ -19,14 +19,18 @@
 - **Scaling:** Determined by the gauge definition (`scale`, `offset`, `dataType`).
 - **Missing value:** `0xFFFF` denotes unavailable data.
 
-### 0xD9 – Gauge Block (u8, six signals)
+### 0xD9 – Gauge Block (u8, up to six signals)
 - **Layout (CAN):**
-  - Bytes 0–5: `gaugeId0..gaugeId5`
-  - Byte 6: `value0`
-  - Byte 7: `value1`
-- **UDP extension:** For UDP, extend the payload to `[gId0..gIdN][value0..valueN]` with contiguous ID/value arrays. Use this variant for inherently 8-bit gauges (e.g., coolant temp).
-- **Scaling:** Determined by gauge metadata. Missing values use `0xFF`.
-- **Guidance:** Prefer 0xDA unless the signal natively fits in 8 bits.
+  - Bytes 0–5: `segmentPayload`
+    - When `segment` (byte 6) is `0`, the payload contains `gaugeId0..gaugeId5`.
+    - When `segment` is `1`, the payload contains `value0..value5` aligned with the previously delivered IDs.
+  - Byte 6: `segment`
+    - `0`: Gauge ID segment (announces up to six IDs).
+    - `1`: Value segment (delivers the matching byte values).
+  - Byte 7: `count` (number of gauges in this block, 1–6).
+- **CAN sequencing:** Send an ID segment first (segment = 0) followed immediately by a value segment (segment = 1) using the same `count`. Receivers cache the most recent ID segment per source and apply subsequent value segments until a new ID segment arrives. Missing values use `0xFF`.
+- **UDP extension:** Continue to support the variable-length `[gId0..gIdN][value0..valueN]` envelope inside a single datagram; the CAN segmentation rule does not apply to UDP payloads.
+- **Guidance:** Use 0xD9 for gauges that natively fit in 8 bits and reserve 0xDA for wider ranges.
 
 ### 0xD8 – Gauge Heartbeat / Summary
 - **Layout (CAN):**

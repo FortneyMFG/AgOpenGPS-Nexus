@@ -35,5 +35,3 @@ Defines a set of CAN/UDP PGNs and sequencing rules that stream variable-rate lay
 ## Rough effort
 M — Requires firmware updates, AgIO decoding changes, schema negotiation logic, and documentation but reuses the established transport stack.
 
-## References
-- Derived from the historical `docs/variable-layer-plan.md` proposal authored for the variable-rate initiative.

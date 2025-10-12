@@ -33,5 +33,3 @@ Adds observability tooling that tracks packet rates, bad samples, and legend par
 ## Rough effort
 M — Requires coordinated updates to diagnostics overlays, logging, and documentation plus shared libraries for decoding.
 
-## References
-- Derived from the historical `docs/variable-layer-plan.md` proposal authored for the variable-rate initiative.

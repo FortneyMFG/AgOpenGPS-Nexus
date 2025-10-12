@@ -35,5 +35,3 @@ Establishes a layer catalogue and storage model that preserves today’s binary 
 ## Rough effort
 L — Introduces new schema definitions, persistence changes, configuration tooling, and export/replay utilities in addition to the runtime controllers.
 
-## References
-- Derived from the historical `docs/variable-layer-plan.md` proposal authored for the variable-rate initiative.

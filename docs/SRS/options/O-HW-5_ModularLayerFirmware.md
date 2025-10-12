@@ -34,5 +34,3 @@ Expands hardware IO expectations so CAN/UDP modules (e.g., SK21 AOG_RC and futur
 ## Rough effort
 M — Firmware, configuration UI, and discovery protocol changes but largely additive to existing module infrastructure.
 
-## References
-- Derived from the historical `docs/variable-layer-plan.md` proposal authored for the variable-rate initiative.

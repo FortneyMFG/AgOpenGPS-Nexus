@@ -37,5 +37,3 @@ Refactors the backend navigation/mapping services to manage per-section layer co
 ## Rough effort
 L — Touches ingestion, mapping, rendering, and configuration code paths with new controller abstractions and replay harnesses.
 
-## References
-- Derived from the historical `docs/variable-layer-plan.md` proposal authored for the variable-rate initiative.

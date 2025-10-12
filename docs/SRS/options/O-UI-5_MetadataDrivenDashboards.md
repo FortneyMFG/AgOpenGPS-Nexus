@@ -35,5 +35,3 @@ Updates the desktop UI so widgets, charts, and inspectors consume layer metadata
 ## Rough effort
 L — Touches core rendering, inspector UX, dashboard frameworks, and configuration workflows to make them metadata-driven.
 
-## References
-- Derived from the historical `docs/variable-layer-plan.md` proposal authored for the variable-rate initiative.

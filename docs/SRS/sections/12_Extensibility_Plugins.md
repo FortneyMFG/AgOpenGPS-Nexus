@@ -11,6 +11,7 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - R-EXT-010 (SHOULD, proposed-variable-layer): Allow plugins/modules to register new telemetry layers via dependency injection and published ID registries so they appear in dashboards without core code edits.【F:docs/SRS/options/O-BACKEND-4_LayerControllers.md†L19-L33】【F:docs/SRS/options/O-API-5_VersionedLayerSchemas.md†L32-L49】
 - R-EXT-004 (COULD): Support sandboxing or capability declarations for plugins to protect critical operations.
 - R-EXT-011 (SHOULD, governance): Establish contribution governance for community plugins (review queues, namespace reservation, security vetting) before enabling DI registration so unsafe modules cannot bypass safety-critical boundaries.
+- R-EXT-020 (SHOULD, official-bundle): Ship first-party capabilities (desktop UI, AgIO bridge, gauges, variable-rate controllers) as separately versioned plugins that install alongside core but can be disabled for headless or minimal deployments.
 
 ## Options
 - O-EXT-0: Status quo — Extend by modifying source projects and rebuilding.
@@ -34,6 +35,15 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 ## Current sentiment
 - Developers fork today; we need a plugin surface that honors safety-critical boundaries while reducing merge burden.
 - Layer metadata + ID registries are expected to become the bridge for safe third-party modules once DI hooks exist.【F:docs/SRS/options/O-BACKEND-4_LayerControllers.md†L34-L47】【F:docs/SRS/options/O-API-5_VersionedLayerSchemas.md†L32-L64】
+- Treating the UI and advanced agronomy modules as “official plugins” keeps the default install familiar while letting operators toggle them off to run core services headless.【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L7-L58】
+
+## Proposed plugin tiers
+
+| Tier | Examples | Notes |
+|---|---|---|
+| Core services | Headless navigation, guidance solver, settings store | Remains lightweight, always installed. |
+| First-party plugins | Default desktop UI, AgIO transport manager, gauges, variable-rate controllers, ISO-BUS tooling | Bundled by default, versioned independently, can be disabled to run headless. |
+| Community plugins | Enterprise dashboards, specialized device support, analytics | Distributed via catalog governance and permission review. |
 
 ## Open questions
 - Which features are safe to expose via scripting vs. compiled plugins?

@@ -34,5 +34,3 @@ Extends interprocess contracts so JSON/protobuf definitions describe layer metad
 ## Rough effort
 M — Requires schema design, serialization tooling, validation, and contributor education but largely builds on existing configuration exchange mechanisms.
 
-## References
-- Derived from the historical `docs/variable-layer-plan.md` proposal authored for the variable-rate initiative.

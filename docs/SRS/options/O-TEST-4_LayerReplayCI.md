@@ -39,5 +39,3 @@ Builds a deterministic replay and benchmarking suite that validates aggregation 
 ## Rough effort
 M — Significant investment in replay assets, CI scripting, and documentation but amortizes risk for future layer additions.
 
-## References
-- Derived from the historical `docs/variable-layer-plan.md` proposal authored for the variable-rate initiative.

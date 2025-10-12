@@ -40,5 +40,5 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 - How do we version plugin APIs alongside firmware expectations?
 
 ## Related specifications
-- Packaging, distribution, and catalog requirements: see Section 13 `Plugin Packaging, Updates, and Catalog`.
-- Device updater plugins and DFU orchestration surface: see [Section 13 — Device Firmware Updates](13_Device_Firmware_Updates.md).
+- Packaging, distribution, and catalog requirements: see Section 16 `Plugin Packaging, Updates, and Catalog`.
+- Device updater plugins and DFU orchestration surface: see [Section 17 — Device Firmware Updates](17_Device_Firmware_Updates.md).

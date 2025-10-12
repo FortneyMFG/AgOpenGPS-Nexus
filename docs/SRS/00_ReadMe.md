@@ -235,6 +235,20 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-GA-004 | Workstream TBD | [Smoothing rules](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-005 (TBD) |
 | R-GA-005 | Workstream TBD | [Gauge capability discovery](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-006 (TBD) |
 
+### Section 16 – Plugin Packaging, Updates, and Catalog
+| Requirement | Options / Workstreams | References & tooling | ADR placeholder |
+|-------------|----------------------|----------------------|-----------------|
+| R-PKG-000 | Workstream TBD | [Packaging flow](../sections/16_Plugin_Packaging_Updates.md) | ADR-PKG-001 (TBD) |
+| R-PKG-005 | Workstream TBD | [Permission prompts](../sections/16_Plugin_Packaging_Updates.md) | ADR-PKG-002 (TBD) |
+| R-PKG-020 | Workstream TBD | [Catalog schema](../appendices/plugin_catalog.schema.json) | ADR-PKG-003 (TBD) |
+
+### Section 17 – Device Firmware Updates
+| Requirement | Options / Workstreams | References & tooling | ADR placeholder |
+|-------------|----------------------|----------------------|-----------------|
+| DFU-001 | Workstream TBD | [Identity discovery](../sections/17_Device_Firmware_Updates.md) | ADR-DFU-001 (TBD) |
+| DFU-004 | Workstream TBD | [Update orchestration](../sections/17_Device_Firmware_Updates.md) | ADR-DFU-002 (TBD) |
+| DFU-008 | Workstream TBD | [Offline bundles](../sections/17_Device_Firmware_Updates.md) | ADR-DFU-003 (TBD) |
+
 ## Glossary
 - **AgIO**: Companion I/O service that provides network, CAN, and serial connectivity for AgOpenGPS.
 - **ADR**: Architecture Decision Record capturing the context, choice, and consequences of an agreed solution.

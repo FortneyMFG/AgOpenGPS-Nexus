@@ -225,6 +225,16 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-UPD-005 | O-UPD-1 | [Background updates](../sections/14_Offline_First_Updates.md) | ADR-UPD-005 (TBD) |
 | R-UPD-006 | O-UPD-5 | [Validation checklist](../sections/14_Offline_First_Updates.md) | ADR-UPD-006 (TBD) |
 
+### Section 15 – Engine & Machine Gauges
+| Requirement | Options / Workstreams | References & tooling | ADR placeholder |
+|-------------|----------------------|----------------------|-----------------|
+| R-GA-000 | Workstream TBD | [Gauge mappings](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-001 (TBD) |
+| R-GA-001 | Workstream TBD | [Gauge PGNs](../04_Interface_Specifications.md) | ADR-GA-002 (TBD) |
+| R-GA-002 | Workstream TBD | [Gauge configuration JSON](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-003 (TBD) |
+| R-GA-003 | Workstream TBD | [Gauge UI behaviors](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-004 (TBD) |
+| R-GA-004 | Workstream TBD | [Smoothing rules](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-005 (TBD) |
+| R-GA-005 | Workstream TBD | [Gauge capability discovery](../sections/15_Engine_Machine_Gauges.md) | ADR-GA-006 (TBD) |
+
 ## Glossary
 - **AgIO**: Companion I/O service that provides network, CAN, and serial connectivity for AgOpenGPS.
 - **ADR**: Architecture Decision Record capturing the context, choice, and consequences of an agreed solution.

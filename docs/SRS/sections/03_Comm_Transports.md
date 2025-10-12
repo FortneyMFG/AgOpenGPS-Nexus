@@ -48,4 +48,4 @@ Deterministic latency, message integrity (CRC/sequencing), offline buffering, co
 - Should we adopt protobuf/FlatBuffers for higher-level APIs?
 
 ## Related specifications
-- Device identity heartbeat and DFU orchestration: see [Section 13 — Device Firmware Updates](13_Device_Firmware_Updates.md).
+- Device identity heartbeat and DFU orchestration: see [Section 17 — Device Firmware Updates](17_Device_Firmware_Updates.md).

@@ -78,5 +78,5 @@ Core services discover devices via transports, the catalog resolver computes upd
 ## Related specifications
 - Transport discovery and PGN framing: see [Section 03 — Communications & Transports](03_Comm_Transports.md).
 - Plugin surface and updater extensibility: see [Section 12 — Extensibility & Plugins](12_Extensibility_Plugins.md).
-- Packaging for catalogs and offline bundles: see Section 14 `Offline-First Updates` and Section 13 `Plugin Packaging, Updates, and Catalog` for shared distribution policies.
+- Packaging for catalogs and offline bundles: see Section 14 `Offline-First Updates` and Section 16 `Plugin Packaging, Updates, and Catalog` for shared distribution policies.
 - JSON schema definitions for catalogs and bundles: see [Appendix — DFU Catalog Schema](../appendices/DFU_Catalog_Schema.md).

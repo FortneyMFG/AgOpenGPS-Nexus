@@ -12,6 +12,7 @@ Define the data contracts between AgOpenGPS, AgIO, companion tools, and external
 - R-API-011 (SHOULD, proposed-variable-layer): Reserve ID ranges, exchange monotonic timestamps + validity bitmaps, and fail fast on schema mismatches to prevent silent drift.【F:docs/SRS/options/O-API-5_VersionedLayerSchemas.md†L32-L49】
 - R-API-004 (SHOULD, proposed-PGNBridge): Publish the canonical PGN reference and formalize how the bridge exposes versioning, validation, and translation hooks for new APIs.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
 - R-API-005 (COULD): Document handshake messages for capability discovery across processes.
+- R-API-012 (SHOULD, release management): Adopt semantic versioning, deprecation periods, and schema compatibility tests for every published API/registry so contributors know when breaking changes are permitted and how long legacy clients are supported.
 
 ## Options
 - O-API-0: Status quo — Binary PGNs over UDP/serial with tooling to inspect.

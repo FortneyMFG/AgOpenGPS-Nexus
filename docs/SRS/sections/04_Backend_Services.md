@@ -12,6 +12,8 @@ Map the guidance, mapping, field data, and rules services that power the applica
 - R-BE-011 (SHOULD, proposed-variable-layer): Separate IO ingestion, aggregation, and rendering via immutable snapshots to protect frame rate and simplify testing.【F:docs/SRS/options/O-BACKEND-4_LayerControllers.md†L29-L46】【F:docs/SRS/options/O-TEST-4_LayerReplayCI.md†L7-L18】
 - R-BE-004 (SHOULD, proposed-LinuxCore): Extract the business logic into a headless service with defined API boundaries, packaging, and health endpoints while keeping today’s in-process host for Windows builds until parity is proven.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L1-L44】
 - R-BE-012 (COULD, proposed-LinuxCore): Provide compatibility shims (PGN bridge, SocketCAN adapters) managed by the core service rather than each UI.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L16-L44】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
+- R-BE-013 (SHOULD, service health): Define target service health metrics for the Core and layer controllers (steady-state CPU <20% on reference hardware, <500 MB RAM, restart <30 s with persisted state replay) before approving ADRs that depend on them.
+- R-BE-014 (SHOULD, fail-safe): Specify how the system degrades when the Core, PGN bridge, or controller services drop offline (e.g., auto-disable remote control, surface operator alerts, maintain manual override paths) so safety-critical actions remain bounded.
 
 ## Options
 - O-BE-0: Status quo — in-process C# services anchored in `AgOpenGPS.Core` with shared streamers.

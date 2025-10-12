@@ -20,6 +20,12 @@ legacy modules.
 - Provides CLI/REST health endpoints (`/healthz`, `/metrics`) and structured JSONL logs for observability.
 - Includes optional SocketCAN ↔ PGN bridge and remote logging.
 
+## Readiness & dependencies
+- Requires OS baseline R-OS-006 hardware profiles and supported architectures to scope pilot devices.
+- Depends on transport hardening (R-COMM-012/013) and PGN bridge compatibility (R-COMM-005) before exposing production traffic.
+- Service health metrics (R-BE-013) and fail-safe behavior (R-BE-014) must be documented with CI coverage (R-CI-010, R-CI-013) prior to ADR approval.
+- Secrets handling and audit expectations from security slice (R-SEC-006/R-SEC-007) are prerequisites for remote API access.
+
 ## Pros
 - Decouples UI evolution from real-time control logic.
 - Enables headless deployments, remote dashboards, and multi-frontend setups.

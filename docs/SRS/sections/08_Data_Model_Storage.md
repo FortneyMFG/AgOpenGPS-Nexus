@@ -12,6 +12,8 @@ Clarify how fields, boundaries, tram lines, tiles, and telemetry are stored, syn
 - R-DATA-011 (MUST, proposed-variable-layer): Ship a layer catalogue, units registry, and configuration schema that can be extended without code changes while keeping exports (CSV/GeoTIFF) consistent.【F:docs/SRS/options/O-DATA-5_MetadataDrivenLayers.md†L30-L58】
 - R-DATA-012 (SHOULD, proposed-variable-layer): Bundle chunked, compressed map tiles with quantization metadata and schema hashes so replay and analytics can reconstruct engineering values exactly.【F:docs/SRS/options/O-DATA-5_MetadataDrivenLayers.md†L59-L78】
 - R-DATA-004 (COULD): Add compression and delta sync for large telemetry sets without breaking existing file readers.
+- R-DATA-013 (SHOULD, retention): Define minimum retention/archival windows for agronomic history (e.g., three seasons accessible offline, long-term archives exportable to cold storage) so future requirements inherit a shared performance envelope.
+- R-DATA-014 (SHOULD, schema integrity): Clarify how schema hashes flow through export/import tooling (including mismatch detection and operator prompts) to prevent silent drift between machines running different Core or firmware versions.
 
 ## Options
 - O-DATA-0: Status quo — Local file storage with SQLite + custom binary/JSON field artifacts.

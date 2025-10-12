@@ -12,6 +12,7 @@ Detail how we observe system health, log events, and surface telemetry (packet r
 - R-TH-010 (SHOULD, proposed-variable-layer): Surface packet-rate monitors, legend parity tests, and bad-sample counters tied to layer metadata so operators can spot telemetry degradation quickly.【F:docs/SRS/options/O-TELE-4_LayerDiagnostics.md†L1-L27】
 - R-TH-011 (COULD, proposed-variable-layer): Publish operator guidance and overlays that borrow AgDiag tooling while gating heavy diagnostics behind opt-in toggles.【F:docs/SRS/options/O-TELE-4_LayerDiagnostics.md†L28-L57】
 - R-TH-005 (COULD): Add health scoring/alerting that correlates GNSS quality, network status, and module firmware levels.
+- R-TH-012 (SHOULD, governance): Define log retention periods, alert routing expectations (local alarms vs. remote notifications), and privacy constraints when structured telemetry leaves the cab so future monitoring features align with operator consent and regional regulations.
 
 ## Options
 - O-TH-0: Status quo — Manual monitors/logs with operator-driven analysis.

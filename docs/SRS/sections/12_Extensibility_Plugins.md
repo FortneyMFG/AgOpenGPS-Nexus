@@ -10,6 +10,7 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - R-EXT-003 (SHOULD): Provide guidelines or templates for third-party modules so they integrate with packaging and settings.
 - R-EXT-010 (SHOULD, proposed-variable-layer): Allow plugins/modules to register new telemetry layers via dependency injection and published ID registries so they appear in dashboards without core code edits.【F:docs/SRS/options/O-BACKEND-4_LayerControllers.md†L19-L33】【F:docs/SRS/options/O-API-5_VersionedLayerSchemas.md†L32-L49】
 - R-EXT-004 (COULD): Support sandboxing or capability declarations for plugins to protect critical operations.
+- R-EXT-011 (SHOULD, governance): Establish contribution governance for community plugins (review queues, namespace reservation, security vetting) before enabling DI registration so unsafe modules cannot bypass safety-critical boundaries.
 
 ## Options
 - O-EXT-0: Status quo — Extend by modifying source projects and rebuilding.

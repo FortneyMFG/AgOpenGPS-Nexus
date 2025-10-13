@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            x:Class="Aog.UI.Avalonia.Controls.SimBar">
+  <Border Padding="16"
+          CornerRadius="8"
+          Background="#1F000000">
+    <StackPanel Spacing="16">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" VerticalAlignment="Center">
+        <Button Content="{Binding PlayPauseLabel}"
+                Command="{Binding TogglePlayPauseCommand}"
+                MinWidth="96"
+                HorizontalAlignment="Left"/>
+        <StackPanel Grid.Column="1" Spacing="4">
+          <Slider Minimum="0"
+                  Maximum="{Binding DurationSeconds}"
+                  Value="{Binding CurrentPositionSeconds, Mode=TwoWay}"
+                  TickFrequency="10"
+                  TickPlacement="BottomRight"/>
+          <TextBlock Text="{Binding TimelineSummary}" FontSize="12" Foreground="#CCFFFFFF"/>
+        </StackPanel>
+      </Grid>
+      <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+        <TextBlock Text="Playback rate" FontWeight="Bold" VerticalAlignment="Center"/>
+        <ItemsControl ItemsSource="{Binding PlaybackRates}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal" Spacing="8"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <RadioButton Content="{Binding Label}"
+                           GroupName="SimBarPlaybackRates"
+                           IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+      <ItemsControl ItemsSource="{Binding StreamRoutes}" Margin="0,8,0,0">
+        <ItemsControl.Header>
+          <TextBlock Text="Stream routing" FontWeight="Bold"/>
+        </ItemsControl.Header>
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Spacing="8"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="2*,Auto" ColumnSpacing="12">
+              <TextBlock Text="{Binding StreamName}" VerticalAlignment="Center"/>
+              <ComboBox Grid.Column="1"
+                        ItemsSource="{Binding AvailableSources}"
+                        SelectedItem="{Binding SelectedSource, Mode=TwoWay}"
+                        MinWidth="160"/>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </Border>
+</UserControl>

@@ -2,20 +2,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
         xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
         x:Class="Aog.UI.Avalonia.MainWindow"
         Title="{Binding Title}"
-        Width="800"
-        Height="600"
+        Width="960"
+        Height="640"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
-  <Grid RowDefinitions="Auto,*" Margin="24">
-    <TextBlock Text="{Binding Title}" FontSize="28" FontWeight="Bold"/>
-    <Border Grid.Row="1" Margin="0,24,0,0" Padding="16" CornerRadius="8" Background="#0F000000">
-      <StackPanel Spacing="8">
+  <Grid RowDefinitions="Auto,Auto,*" Margin="24" RowSpacing="16">
+    <TextBlock Text="{Binding Title}" FontSize="32" FontWeight="Bold"/>
+    <controls:SimBar Grid.Row="1"
+                     DataContext="{Binding SimBar}"/>
+    <Border Grid.Row="2" Padding="20" CornerRadius="8" Background="#0F000000">
+      <StackPanel Spacing="12">
         <TextBlock Text="Welcome to the AgOpenGPS Nexus shell" FontSize="18"/>
-        <TextBlock Text="{Binding PlatformDescription}"/>
-        <TextBlock Text="This bootstrap window is backed by dependency injection."/>
+        <TextBlock Text="{Binding PlatformDescription}" TextWrapping="Wrap"/>
+        <TextBlock Text="The simulation bar above exposes play/pause, timeline seek, playback rate, and per-stream source routing controls so downstream work can bind against a stable MVVM surface." TextWrapping="Wrap"/>
       </StackPanel>
     </Border>
   </Grid>

@@ -42,6 +42,18 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - **NX-015 Parquet logger (Pose/Imu/Can/Io/Plugin topics)**
   - Output: writer + schema
   - Done: file created; replay reads
+- **NX-016 Core health interval hot reload**
+  - Output: options monitor + background service
+  - Done: runtime config updates heartbeat cadence
+- **NX-017 Source routing service**
+  - Output: topic router prioritising sim/hardware/replay sources
+  - Done: unit tests cover overrides and fallbacks
+- **NX-018 Source routing map + options binder**
+  - Output: routing map applying `SourceRoutingOptions`
+  - Done: publishes stream change events
+- **NX-019 Duplicate guard + change events for routing map**
+  - Output: change event model + duplicate detection
+  - Done: tests enforce unique streams per snapshot
 
 ### Section C — AGiO & Backends
 - **NX-020 AGiO host skeleton + backend loader**
@@ -208,6 +220,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-015 | B | Telemetry Parquet logger | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Writes plugin telemetry via TelemetryParquetLogger |
 | NX-016 | B | Core health interval hot reload | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Runtime config adjusts heartbeat cadence |
 | NX-017 | B | Source routing service | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Routes topics across sim/hardware/replay |
+| NX-018 | B | Source routing map + options binder | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Applies SourceRoutingOptions snapshots and emits events |
+| NX-019 | B | Stream route change events + duplicate guard | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Publishes StreamRouteChangedEvent and rejects duplicate streams |
 | NX-020 | C | AGiO host skeleton + backend loader | Done |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Loads Agio.Sim by config |
 | NX-021 | C | Agio.Sim adapter to gRPC services | Planned |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) |  |
 | NX-028 | B | Core capabilities handshake service | Done |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | gRPC client/service negotiates capabilities |

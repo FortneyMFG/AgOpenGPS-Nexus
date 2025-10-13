@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
@@ -52,6 +53,60 @@ public sealed class SourceRoutingMapTests
             new StreamRouteChangedEvent("pose", initial[0], updated[0]),
             new StreamRouteChangedEvent("imu", initial[1], null)
         });
+    }
+
+    [Fact]
+    public async Task ApplyAsync_FromOptions_BuildsRoutesAndEmitsChanges()
+    {
+        var bus = new InMemoryEventBus();
+        var map = new SourceRoutingMap(bus);
+        var changes = new List<StreamRouteChangedEvent>();
+
+        bus.Subscribe<StreamRouteChangedEvent>(message =>
+        {
+            changes.Add(message);
+            return ValueTask.CompletedTask;
+        });
+
+        var options = new SourceRoutingOptions();
+        options.Routes.Add(new StreamRouteOptions
+        {
+            Stream = "pose",
+            Source = "gnss-hw",
+            Mode = RouteSourceMode.Hardware
+        });
+        options.Routes.Add(new StreamRouteOptions
+        {
+            Stream = "imu",
+            Source = "sim-imu",
+            Mode = RouteSourceMode.Simulation
+        });
+
+        await map.ApplyAsync(options);
+
+        var expected = new[]
+        {
+            new StreamRoute("pose", "gnss-hw", RouteSourceMode.Hardware),
+            new StreamRoute("imu", "sim-imu", RouteSourceMode.Simulation)
+        };
+
+        map.Routes.Should().BeEquivalentTo(expected);
+        changes.Should().BeEquivalentTo(new[]
+        {
+            new StreamRouteChangedEvent("pose", null, expected[0]),
+            new StreamRouteChangedEvent("imu", null, expected[1])
+        });
+    }
+
+    [Fact]
+    public async Task ApplyAsync_FromOptions_ThrowsOnDuplicateStreams()
+    {
+        var map = new SourceRoutingMap(new InMemoryEventBus());
+        var options = new SourceRoutingOptions();
+        options.Routes.Add(new StreamRouteOptions { Stream = "pose", Source = "sim-a" });
+        options.Routes.Add(new StreamRouteOptions { Stream = "pose", Source = "sim-b" });
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => map.ApplyAsync(options));
     }
 
     [Fact]

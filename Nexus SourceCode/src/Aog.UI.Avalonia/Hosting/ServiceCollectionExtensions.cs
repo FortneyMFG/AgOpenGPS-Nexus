@@ -1,5 +1,7 @@
 using Aog.Core.Replay;
 using Aog.UI.Avalonia.Settings;
+using Aog.UI.Avalonia.Telemetry;
+using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -20,7 +22,12 @@ public static class ServiceCollectionExtensions
     {
         services.TryAddSingleton<App>();
         services.TryAddSingleton<IConnectionSettingsStore, JsonConnectionSettingsStore>();
+        services.TryAddSingleton<IUiPreferencesStore, JsonUiPreferencesStore>();
+        services.TryAddSingleton<IUiPreferencesService, UiPreferencesService>();
+        services.TryAddSingleton<IThemeManager, ThemeManager>();
+        services.TryAddSingleton<ICrashTelemetryService, CrashTelemetryService>();
         services.TryAddSingleton<ConnectionSettingsViewModel>();
+        services.TryAddSingleton<TelemetryPrivacyViewModel>();
         services.TryAddSingleton<IReplayController, NullReplayController>();
         services.TryAddSingleton<MainWindow>();
         services.TryAddSingleton<MainWindowViewModel>();

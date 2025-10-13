@@ -15,6 +15,29 @@ The host reads configuration from `appsettings.json` and environment variables p
 `NEXUS_`. A background health service emits periodic heartbeat logs (`Core host heartbeat OK.`)
 that higher-level orchestration or smoke tests can watch for successful startup/shutdown.
 
+When the host starts it performs a capabilities handshake with the configured AGiO endpoint.
+The handshake endpoint and advertised capabilities can be customised under the
+`CoreHost:Agio` and `CoreHost:Capabilities` sections. The following excerpt demonstrates the
+available settings:
+
+```json
+{
+  "CoreHost": {
+    "Agio": {
+      "Endpoint": "https://localhost:5105"
+    },
+    "Capabilities": {
+      "NodeId": "core-host",
+      "SessionPrefix": "core-",
+      "AdvertisedCapabilities": [
+        "nav.pose",
+        "nav.imu"
+      ]
+    }
+  }
+}
+```
+
 ### Configuration
 
 `CoreHost:Health:IntervalSeconds` controls how frequently the heartbeat message is emitted. The

@@ -33,6 +33,13 @@ and the broader Software Requirements Specification (SRS) set under `/docs/SRS`.
 4. **Log discoveries in the SRS notes.** When clarifying requirements or implementation
    constraints, append them to `docs/SRS/NOTES.md` so the next contributor benefits.
 
+## Architecture Decision Records (ADRs)
+
+- [ADR-001: Adopt .NET 8 C# stack for Nexus runtime](docs/ADR/ADR-001-dotnet8-runtime.md)
+- [ADR-002: Expose Nexus services over gRPC/protobuf contracts](docs/ADR/ADR-002-grpc-contracts.md)
+- [ADR-003: Use Avalonia for the cross-platform Nexus UI shell](docs/ADR/ADR-003-avalonia-ui.md)
+- [ADR-004: Establish the composite simulation fabric (SimClock + SimBus)](docs/ADR/ADR-004-composite-simulation.md)
+
 ## Repository Layout
 
 ```text
@@ -60,6 +67,21 @@ and the broader Software Requirements Specification (SRS) set under `/docs/SRS`.
    short-lived feature branch (`feat/NX-###-short-label`).
 4. Ship code, docs, and tests together. Every change should leave the repo runnable and
    well-documented.
+
+### Dev scripts
+
+Cross-platform helpers live under `tools/scripts`:
+
+- `./tools/scripts/nexus.sh run core` (or `agio`/`ui`) runs the relevant host via
+  `dotnet run` on Unix-like systems. Pass additional arguments after `--` to forward them
+  to the underlying host.
+- `pwsh ./tools/scripts/nexus.ps1 sim` launches the simulation entry point on Windows
+  PowerShell (Core or Desktop).
+
+Override default project locations by exporting `NEXUS_CORE_PROJECT`,
+`NEXUS_AGIO_PROJECT`, `NEXUS_UI_PROJECT`, or `NEXUS_SIM_PROJECT`. All paths are resolved
+relative to the repository root so future solution files can slot in without editing the
+scripts.
 
 When Wave 0 tickets (NX-001, NX-002, NX-006) are completed the repository skeleton will be
 ready for the broader contract and simulation work described in the phase plan. Tag

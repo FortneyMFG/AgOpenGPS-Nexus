@@ -178,7 +178,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | NX-001 | A | Repo skeleton + solutions | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Tag v0.1.0-bootstrap after completion |
 | NX-002 | A | ADRs: language/runtime, gRPC, Avalonia, simulation model | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Link from README |
-| NX-006 | G | CI matrix (Win x64 + Linux arm64) | Planned |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Include lint + headless sim |
+| NX-006 | G | CI matrix (Win x64 + Linux arm64) | In Review | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Include lint + headless sim |
 
 ## Wave 1 – Contracts & Scaffolds
 

@@ -1,0 +1,167 @@
+syntax = "proto3";
+
+package aog.core.v1;
+
+option csharp_namespace = "Aog.Core.V1";
+
+import "google/protobuf/timestamp.proto";
+
+// Header captures metadata about a published message such as ordering and
+// timestamping information. All core Nexus telemetry should embed this header
+// as the first field to maintain consistent auditing semantics across
+// transports.
+message Header {
+  // Monotonically increasing sequence number for the publisher.
+  uint64 sequence = 1;
+
+  // Best known timestamp at which the associated measurement was created.
+  google.protobuf.Timestamp timestamp = 2;
+
+  // Identifies the coordinate frame for position/pose data. Examples: "earth",
+  // "vehicle".
+  string frame = 3;
+
+  // Free-form source identifier (e.g. "sim", "gps", "autosteer").
+  string source = 4;
+}
+
+// Pose represents the fused navigation solution for the vehicle in WGS84 and
+// vehicle-local references. Angles follow the right-hand rule and are in
+// radians.
+message Pose {
+  Header header = 1;
+
+  // Latitude in decimal degrees (WGS84).
+  double latitude_deg = 2;
+
+  // Longitude in decimal degrees (WGS84).
+  double longitude_deg = 3;
+
+  // Altitude above mean sea level in meters.
+  double altitude_m = 4;
+
+  // Heading in radians, measured clockwise from true north.
+  double heading_rad = 5;
+
+  // Vehicle roll (radians), positive when the right side is lower.
+  double roll_rad = 6;
+
+  // Vehicle pitch (radians), positive when the nose is up.
+  double pitch_rad = 7;
+
+  // Forward speed in meters per second.
+  double speed_mps = 8;
+
+  // Angular velocity around the vertical axis in radians per second.
+  double yaw_rate_radps = 9;
+}
+
+// Imu captures unprocessed measurements from an inertial measurement unit.
+message Imu {
+  Header header = 1;
+
+  // Linear accelerations in the IMU body frame (m/s^2).
+  double accel_x_mps2 = 2;
+  double accel_y_mps2 = 3;
+  double accel_z_mps2 = 4;
+
+  // Angular rates in the IMU body frame (rad/s).
+  double gyro_x_radps = 5;
+  double gyro_y_radps = 6;
+  double gyro_z_radps = 7;
+
+  // Magnetic field estimates in microtesla.
+  double mag_x_ut = 8;
+  double mag_y_ut = 9;
+  double mag_z_ut = 10;
+
+  // Optional board temperature in degrees Celsius.
+  double temperature_c = 11;
+}
+
+// SectionMask communicates which boom/section outputs should currently be
+// active. Bits are mapped least-significant-bit first.
+message SectionMask {
+  Header header = 1;
+
+  // Number of valid bits within the mask.
+  uint32 section_count = 2;
+
+  // Packed bit mask; bit N corresponds to section N (0-based).
+  uint32 mask = 3;
+}
+
+// SteerCmd requests a steering controller action from AGiO hardware.
+message SteerCmd {
+  Header header = 1;
+
+  // Desired wheel angle in degrees (positive = turn right).
+  double target_wheel_angle_deg = 2;
+
+  // Feed-forward term supplied by the controller for host-side logging.
+  double feed_forward = 3;
+
+  // Closed-loop PID output or equivalent control effort.
+  double controller_output = 4;
+
+  // When true, the controller should actively control steering actuators.
+  bool enable = 5;
+}
+
+// SteerState reports measured steering information from hardware back to Core.
+message SteerState {
+  Header header = 1;
+
+  // Measured wheel angle in degrees.
+  double measured_wheel_angle_deg = 2;
+
+  // Last command effort applied by the actuator (scaled 0-1).
+  double applied_effort = 3;
+
+  // Current lateral error of the guidance solution in meters.
+  double lateral_error_m = 4;
+
+  // Current heading error in radians (positive = vehicle heading clockwise
+  // relative to path heading).
+  double heading_error_rad = 5;
+
+  // Indicates whether the hardware is currently engaged.
+  bool engaged = 6;
+}
+
+// CanFrame represents a single CAN bus frame exchanged with legacy hardware.
+message CanFrame {
+  Header header = 1;
+
+  // CAN arbitration identifier (11 or 29 bit depending on extended flag).
+  uint32 arbitration_id = 2;
+
+  // Raw CAN payload bytes (0-8 bytes).
+  bytes payload = 3;
+
+  // True when the frame uses the extended 29-bit identifier format.
+  bool is_extended_id = 4;
+
+  // Remote Transmission Request flag.
+  bool is_remote_request = 5;
+}
+
+// TimingCaps summarises the timing/clock capabilities detected on the host.
+message TimingCaps {
+  Header header = 1;
+
+  // Host observes a 1PPS reference pulse.
+  bool has_pps = 2;
+
+  // Host is synchronized via Precision Time Protocol (PTP).
+  bool has_ptp = 3;
+
+  // Host can provide a GNSS-derived time base.
+  bool has_gnss_time = 4;
+
+  // Estimated oscillator skew in parts-per-million relative to reference.
+  double estimated_skew_ppm = 5;
+
+  // Uncertainty of the system clock in nanoseconds (1-sigma).
+  double clock_uncertainty_ns = 6;
+}

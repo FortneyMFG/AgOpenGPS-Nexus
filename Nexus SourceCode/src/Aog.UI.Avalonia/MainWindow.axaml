@@ -124,6 +124,85 @@
             </Grid>
           </Border>
 
+          <!-- Plugin panels -->
+          <Border Padding="16" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
+            <StackPanel Spacing="16">
+              <StackPanel Spacing="8" DataContext="{Binding SteerPanel}" x:DataType="vm:SteerPanelViewModel">
+                <TextBlock Text="Steer" FontSize="20" FontWeight="SemiBold"/>
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                  <ToggleSwitch Content="Enable" IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
+                  <TextBlock Text="Target" VerticalAlignment="Center"/>
+                  <Slider Width="160"
+                          Minimum="{Binding MinimumWheelAngleDegrees}"
+                          Maximum="{Binding MaximumWheelAngleDegrees}"
+                          Value="{Binding TargetWheelAngleDegrees, Mode=TwoWay}"
+                          SmallChange="0.5"
+                          LargeChange="2"/>
+                  <TextBlock Text="{Binding TargetWheelAngleDegrees, StringFormat='{}{0:F1}°'}"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                  <StackPanel>
+                    <TextBlock Text="Feed-forward" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding FeedForward, StringFormat='{}{0:F2}'}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1">
+                    <TextBlock Text="Controller output" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding ControllerOutput, StringFormat='{}{0:F2}'}"/>
+                  </StackPanel>
+                </Grid>
+              </StackPanel>
+
+              <StackPanel Spacing="8" DataContext="{Binding SectionsPanel}" x:DataType="vm:SectionsPanelViewModel">
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                  <TextBlock Text="Sections" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                  <ToggleSwitch Content="Auto" IsChecked="{Binding IsAutoEnabled, Mode=TwoWay}"/>
+                  <TextBlock Text="{Binding MaskDisplay}" Foreground="#99000000" VerticalAlignment="Center"/>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Sections}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel Spacing="8"/>
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SectionToggleViewModel">
+                      <ToggleButton Content="{Binding Label}"
+                                    IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                    Width="72"
+                                    HorizontalAlignment="Center"
+                                    IsVisible="{Binding IsVisible}"/>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="8" DataContext="{Binding PlanterPanel}" x:DataType="vm:PlanterPanelViewModel">
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                  <TextBlock Text="Planter" FontSize="20" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding Summary}" Foreground="#99000000" TextWrapping="Wrap" MaxWidth="320"/>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Rows}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:PlanterRowViewModel">
+                      <Border Padding="8" Margin="0,0,0,6" Background="#05000000" BorderBrush="#19000000" BorderThickness="1" CornerRadius="4">
+                        <Grid ColumnDefinitions="Auto,*,*,*,*,*,*" ColumnSpacing="8">
+                          <TextBlock Text="{Binding RowLabel}" FontWeight="SemiBold"/>
+                          <TextBlock Grid.Column="1" Text="{Binding TargetPopulationDisplay}"/>
+                          <TextBlock Grid.Column="2" Text="{Binding ActualPopulationDisplay}"/>
+                          <TextBlock Grid.Column="3" Text="{Binding PopulationErrorDisplay}"/>
+                          <TextBlock Grid.Column="4" Text="{Binding SkipRateDisplay}"/>
+                          <TextBlock Grid.Column="5" Text="{Binding DoubleRateDisplay}"/>
+                          <TextBlock Grid.Column="6" Text="{Binding QualityDisplay}" FontWeight="SemiBold"/>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
           <!-- Simulation graph summary -->
           <Border Padding="16" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
             <Grid RowDefinitions="Auto,*" RowSpacing="8">

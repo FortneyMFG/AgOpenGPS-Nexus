@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using Aog.UI.Avalonia.Models;                 // VehiclePose, SimulationBarViewModel
 using Aog.Core.Replay;
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
+using Aog.Core.V1;
+using Aog.UI.Avalonia.Models;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -20,6 +21,11 @@ public class MainWindowViewModel
     private readonly List<SimulationScenarioConfiguration> _scenarioDefinitions = new();
     private readonly SimulationConfiguration? _simulationConfiguration;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MainWindowViewModel"/> class.
+    /// </summary>
+    /// <param name="connectionSettings">Connection settings view-model injected from DI.</param>
+    /// <param name="replayController">Optional replay controller for transport control.</param>
     public MainWindowViewModel(ConnectionSettingsViewModel connectionSettings, IReplayController? replayController = null)
     {
         ArgumentNullException.ThrowIfNull(connectionSettings);
@@ -33,13 +39,17 @@ public class MainWindowViewModel
         var configuration = TryLoadSimulationConfiguration(out var summary);
         _simulationConfiguration = configuration;
         SimulationGraphSummary = summary;
-         SimulationBar = new SimulationBarViewModel(configuration, replayController);
+        SimulationBar = new SimulationBarViewModel(configuration, replayController);
 
-if (configuration?.Scenarios is not null)
-{
-    _scenarioDefinitions.AddRange(configuration.Scenarios);
-}
+        SteerPanel = new SteerPanelViewModel();
+        SectionsPanel = new SectionsPanelViewModel();
+        PlanterPanel = new PlanterPanelViewModel();
+        ApplySamplePluginState();
 
+        if (configuration?.Scenarios is not null)
+        {
+            _scenarioDefinitions.AddRange(configuration.Scenarios);
+        }
     }
 
     /// <summary>Gets the title displayed in the main window.</summary>
@@ -59,6 +69,15 @@ if (configuration?.Scenarios is not null)
 
     /// <summary>Gets the simulation bar view-model bound to the UI.</summary>
     public SimulationBarViewModel SimulationBar { get; }
+
+    /// <summary>Gets the view-model describing the steer panel.</summary>
+    public SteerPanelViewModel SteerPanel { get; }
+
+    /// <summary>Gets the view-model describing the sections panel.</summary>
+    public SectionsPanelViewModel SectionsPanel { get; }
+
+    /// <summary>Gets the view-model describing the planter panel.</summary>
+    public PlanterPanelViewModel PlanterPanel { get; }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.
@@ -91,7 +110,9 @@ if (configuration?.Scenarios is not null)
             var configuration = SimulationConfigurationLoader.Load(json);
             var catalog = new SimulationCatalog();
             foreach (var descriptor in configuration.CreateProviderDescriptors())
+            {
                 catalog.Register(descriptor);
+            }
 
             summary = catalog.BuildGraph().FormatSummary().TrimEnd();
             return configuration;
@@ -101,5 +122,65 @@ if (configuration?.Scenarios is not null)
             summary = $"Failed to load simulation sample: {ex.Message}";
             return null;
         }
+    }
+
+    private void ApplySamplePluginState()
+    {
+        var steerSample = new SteerCmd
+        {
+            Enable = true,
+            TargetWheelAngleDeg = 2.5,
+            FeedForward = 0.18,
+            ControllerOutput = 0.42,
+        };
+        SteerPanel.ApplySteerCommand(steerSample);
+
+        var sectionSample = new SectionMask
+        {
+            SectionCount = 8,
+            Mask = 0b0011_1100,
+        };
+        SectionsPanel.ApplySectionMask(sectionSample);
+
+        var planterSamples = new[]
+        {
+            new PlanterRowStatus
+            {
+                RowIndex = 0,
+                TargetPopulationPerMeter = 10.0,
+                ActualPopulationPerMeter = 10.1,
+                SkipRate = 0.0,
+                DoubleRate = 0.0,
+                Quality = PlanterRowQuality.Ok,
+            },
+            new PlanterRowStatus
+            {
+                RowIndex = 1,
+                TargetPopulationPerMeter = 10.0,
+                ActualPopulationPerMeter = 9.1,
+                SkipRate = 0.15,
+                DoubleRate = 0.0,
+                Quality = PlanterRowQuality.Skip,
+            },
+            new PlanterRowStatus
+            {
+                RowIndex = 2,
+                TargetPopulationPerMeter = 10.0,
+                ActualPopulationPerMeter = 10.8,
+                SkipRate = 0.0,
+                DoubleRate = 0.2,
+                Quality = PlanterRowQuality.Double,
+            },
+            new PlanterRowStatus
+            {
+                RowIndex = 3,
+                TargetPopulationPerMeter = 10.0,
+                ActualPopulationPerMeter = 10.0,
+                SkipRate = 0.0,
+                DoubleRate = 0.0,
+                Quality = PlanterRowQuality.Ok,
+            },
+        };
+        PlanterPanel.ApplyRowStatuses(planterSamples);
     }
 }

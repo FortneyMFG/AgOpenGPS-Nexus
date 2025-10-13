@@ -15,59 +15,46 @@ public sealed class SimulationBarViewModel : ObservableObject
 {
     private readonly ReadOnlyCollection<SimulationPlaybackRateOptionViewModel> _playbackRates;
     private readonly ObservableCollection<SimulationStreamRouteViewModel> _routes;
-private readonly SimulationConfiguration? _configuration;
-private readonly TimeSpan _defaultDuration = TimeSpan.FromMinutes(5);
-private readonly TimeSpan _duration;
+    private readonly SimulationConfiguration? _configuration;
+    private readonly TimeSpan _defaultDuration = TimeSpan.FromMinutes(5);
+    private readonly TimeSpan _duration;
 
-private readonly DelegateCommand _togglePlaybackCommand;
-private readonly IReplayController? _replayController;
-private ReplayState _state;
-private double _selectedPlaybackRate;
-private TimeSpan _position;
-private double _seekFraction;
-private bool _suppressSeekSync;
-private string _activeScenarioTitle = "Scenario: configuration defaults";
-private string _activeScenarioDescription = "Using routes from the loaded configuration.";
-private string _activeScenarioOptions = "—";
-
+    private readonly DelegateCommand _togglePlaybackCommand;
+    private readonly IReplayController? _replayController;
+    private ReplayState _state;
+    private double _selectedPlaybackRate;
+    private TimeSpan _position;
+    private double _seekFraction;
+    private bool _suppressSeekSync;
+    private string _activeScenarioTitle = "Scenario: configuration defaults";
+    private string _activeScenarioDescription = "Using routes from the loaded configuration.";
+    private string _activeScenarioOptions = "—";
 
     public SimulationBarViewModel(SimulationConfiguration? configuration, IReplayController? replayController = null)
     {
         _configuration = configuration;
+        _duration = configuration?.Duration ?? _defaultDuration;
+
         _togglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
-        _state = new ReplayState(isPlaying: false, position: TimeSpan.Zero, _defaultDuration, playbackRate: 1.0);
+        _state = new ReplayState(isPlaying: false, position: TimeSpan.Zero, duration: _duration, playbackRate: 1.0);
         _selectedPlaybackRate = _state.PlaybackRate;
 
         _playbackRates = BuildPlaybackRateOptions();
-public SimulationBarViewModel(SimulationConfiguration? configuration, IReplayController? replayController = null)
-{
-    _configuration = configuration;
-    _duration = configuration?.Duration ?? _defaultDuration;
+        var initialRoutes = configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>();
+        _routes = new ObservableCollection<SimulationStreamRouteViewModel>(
+            SimulationRouteViewModelBuilder.BuildRoutes(configuration, initialRoutes));
 
-    _togglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
+        SyncPlaybackRateSelection(_selectedPlaybackRate);
 
-    _state = new ReplayState(isPlaying: false, position: TimeSpan.Zero, duration: _duration, playbackRate: 1.0);
-    _selectedPlaybackRate = _state.PlaybackRate;
-
-    _playbackRates = BuildPlaybackRateOptions();
-
-    var initialRoutes = configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>();
-    _routes = new ObservableCollection<SimulationStreamRouteViewModel>(
-        SimulationRouteViewModelBuilder.BuildRoutes(configuration, initialRoutes));
-
-    SyncPlaybackRateSelection(_selectedPlaybackRate);
-
-    _replayController = replayController;
-    if (_replayController is not null)
-    {
-        var controllerState = NormalizeState(_replayController.State);
-        _state = controllerState;
-        SyncPlaybackRateSelection(controllerState.PlaybackRate);
-        Position = controllerState.Position;
-        _replayController.StateChanged += OnReplayStateChanged;
-    }
-}
-
+        _replayController = replayController;
+        if (_replayController is not null)
+        {
+            var controllerState = NormalizeState(_replayController.State);
+            _state = controllerState;
+            SyncPlaybackRateSelection(controllerState.PlaybackRate);
+            Position = controllerState.Position;
+            _replayController.StateChanged += OnReplayStateChanged;
+        }
     }
 
     /// <summary>

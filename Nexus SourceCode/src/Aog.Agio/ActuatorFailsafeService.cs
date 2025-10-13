@@ -1,4 +1,5 @@
 using System;
+using Aog.Agio.Safety;
 using Aog.Core.V1;
 using Microsoft.Extensions.Options;
 
@@ -12,19 +13,25 @@ public sealed class ActuatorFailsafeService : IActuatorFailsafeService, IDisposa
     private readonly object _syncRoot = new();
     private readonly TimeProvider _timeProvider;
     private readonly IDisposable? _optionsSubscription;
+    private readonly ISafetyLog _safetyLog;
 
     private OptionsSnapshot _options;
     private DateTimeOffset? _lastHeartbeatUtc;
     private SteerCmd? _lastSteerCommand;
     private SectionMask? _lastSectionMask;
+    private bool _heartbeatActive;
 
-    public ActuatorFailsafeService(IOptionsMonitor<AgioSafetyOptions> optionsMonitor, TimeProvider? timeProvider = null)
+    public ActuatorFailsafeService(
+        IOptionsMonitor<AgioSafetyOptions> optionsMonitor,
+        TimeProvider? timeProvider = null,
+        ISafetyLog? safetyLog = null)
     {
         ArgumentNullException.ThrowIfNull(optionsMonitor);
 
         _timeProvider = timeProvider ?? TimeProvider.System;
         _options = CreateSnapshot(optionsMonitor.CurrentValue);
         _optionsSubscription = optionsMonitor.OnChange((options, _) => UpdateOptions(options));
+        _safetyLog = safetyLog ?? NullSafetyLog.Instance;
     }
 
     /// <inheritdoc />
@@ -68,7 +75,10 @@ public sealed class ActuatorFailsafeService : IActuatorFailsafeService, IDisposa
     {
         lock (_syncRoot)
         {
-            _lastHeartbeatUtc = _timeProvider.GetUtcNow();
+            var snapshot = _options;
+            var now = _timeProvider.GetUtcNow();
+            _lastHeartbeatUtc = now;
+            LogHeartbeatReceivedLocked(now, snapshot);
         }
     }
 
@@ -78,6 +88,9 @@ public sealed class ActuatorFailsafeService : IActuatorFailsafeService, IDisposa
         lock (_syncRoot)
         {
             _lastHeartbeatUtc = null;
+            var now = _timeProvider.GetUtcNow();
+            EnsureHeartbeatExpiredLocked(now, _options, SafetyLogEvents.HeartbeatReasons.Cleared);
+            _safetyLog.Record(SafetyLogEntry.HeartbeatCleared(now));
         }
     }
 
@@ -97,6 +110,11 @@ public sealed class ActuatorFailsafeService : IActuatorFailsafeService, IDisposa
                 return command;
             }
 
+            EnsureHeartbeatExpiredLocked(now, snapshot, SafetyLogEvents.HeartbeatReasons.Timeout);
+            _safetyLog.Record(SafetyLogEntry.FailsafeApplied(
+                now,
+                SafetyLogEvents.Actuators.Steer,
+                snapshot.SteerFailsafe.ToString().ToLowerInvariant()));
             return BuildSafeSteerCommand(command, snapshot);
         }
     }
@@ -117,6 +135,11 @@ public sealed class ActuatorFailsafeService : IActuatorFailsafeService, IDisposa
                 return mask;
             }
 
+            EnsureHeartbeatExpiredLocked(now, snapshot, SafetyLogEvents.HeartbeatReasons.Timeout);
+            _safetyLog.Record(SafetyLogEntry.FailsafeApplied(
+                now,
+                SafetyLogEvents.Actuators.Sections,
+                snapshot.SectionFailsafe.ToString().ToLowerInvariant()));
             return BuildSafeSectionMask(mask, snapshot);
         }
     }
@@ -143,6 +166,22 @@ public sealed class ActuatorFailsafeService : IActuatorFailsafeService, IDisposa
         }
 
         return now - _lastHeartbeatUtc <= snapshot.HeartbeatTimeout;
+    }
+
+    private void LogHeartbeatReceivedLocked(DateTimeOffset now, OptionsSnapshot snapshot)
+    {
+        var resumed = !_heartbeatActive;
+        _heartbeatActive = true;
+        _safetyLog.Record(SafetyLogEntry.HeartbeatReceived(now, snapshot.HeartbeatTimeout, resumed));
+    }
+
+    private void EnsureHeartbeatExpiredLocked(DateTimeOffset now, OptionsSnapshot snapshot, string reason)
+    {
+        if (_heartbeatActive)
+        {
+            _heartbeatActive = false;
+            _safetyLog.Record(SafetyLogEntry.HeartbeatExpired(now, snapshot.HeartbeatTimeout, reason));
+        }
     }
 
     private SteerCmd BuildSafeSteerCommand(SteerCmd? template, OptionsSnapshot snapshot)
@@ -199,4 +238,15 @@ public sealed class ActuatorFailsafeService : IActuatorFailsafeService, IDisposa
         TimeSpan HeartbeatTimeout,
         AgioSafetyOptions.FailsafeAction SteerFailsafe,
         AgioSafetyOptions.FailsafeAction SectionFailsafe);
+
+    private sealed class NullSafetyLog : ISafetyLog
+    {
+        public static NullSafetyLog Instance { get; } = new();
+
+        public void Record(SafetyLogEntry entry)
+        {
+        }
+
+        public string Export(string destinationDirectory) => throw new InvalidOperationException("Safety log export is not configured.");
+    }
 }

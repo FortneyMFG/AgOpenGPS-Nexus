@@ -1,6 +1,9 @@
+using System;
 using System.Linq;
 using Aog.Core.V1;
 using Aog.UI.Avalonia.Settings;
+using Aog.UI.Avalonia.Telemetry;
+using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
 using Xunit;
@@ -45,11 +48,36 @@ public sealed class MainWindowViewModelTests
         viewModel.PlanterPanel.Summary.Should().Contain("Rows:");
     }
 
+    [Fact]
+    public void MapOverlays_ExposeCoverageAndGuidance()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.CoverageCells.Should().NotBeEmpty();
+        viewModel.GuidanceTracks.Should().NotBeEmpty();
+        viewModel.GuidanceTracks.Select(track => track.Points.Count).Max().Should().BeGreaterThan(1);
+    }
+
+    [Fact]
+    public void Dashboards_SurfaceSampleHistory()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.SteerDashboard.CrossTrackErrorHistory.Should().NotBeEmpty();
+        viewModel.ReplayTimeline.Bookmarks.Should().NotBeEmpty();
+        viewModel.ReplayTimeline.SpeedSamples.Should().HaveCountGreaterThan(10);
+    }
+
     private static MainWindowViewModel CreateViewModel()
     {
-        var store = new InMemoryConnectionSettingsStore();
-        var connection = new ConnectionSettingsViewModel(store);
-        return new MainWindowViewModel(connection);
+        var connectionStore = new InMemoryConnectionSettingsStore();
+        var connection = new ConnectionSettingsViewModel(connectionStore);
+        var preferencesStore = new InMemoryUiPreferencesStore();
+        var preferencesService = new UiPreferencesService(preferencesStore);
+        var themeManager = new TestThemeManager();
+        var telemetryService = new TestCrashTelemetryService();
+        var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
+        return new MainWindowViewModel(connection, null, preferencesService, themeManager, telemetryViewModel);
     }
 
     private sealed class InMemoryConnectionSettingsStore : IConnectionSettingsStore
@@ -62,5 +90,64 @@ public sealed class MainWindowViewModelTests
         {
             _settings = settings.Clone();
         }
+    }
+
+    private sealed class InMemoryUiPreferencesStore : IUiPreferencesStore
+    {
+        private UiPreferences _preferences = new();
+
+        public UiPreferences Load() => _preferences.Clone();
+
+        public void Save(UiPreferences preferences)
+        {
+            _preferences = preferences.Clone();
+        }
+    }
+
+    private sealed class TestThemeManager : IThemeManager
+    {
+        public UiTheme CurrentTheme { get; private set; } = UiTheme.Light;
+
+        public event EventHandler<UiTheme>? ThemeChanged;
+
+        public void ApplyTheme(UiTheme theme)
+        {
+            if (CurrentTheme != theme)
+            {
+                CurrentTheme = theme;
+                ThemeChanged?.Invoke(this, theme);
+            }
+        }
+    }
+
+    private sealed class TestCrashTelemetryService : ICrashTelemetryService
+    {
+        private CrashTelemetryState _state = new()
+        {
+            IsTelemetryOptedIn = false,
+            PendingReports = Array.Empty<CrashReportSummary>(),
+        };
+
+        public CrashTelemetryState GetState() => _state;
+
+        public void SetTelemetryOptIn(bool isOptedIn)
+        {
+            _state = new CrashTelemetryState
+            {
+                IsTelemetryOptedIn = isOptedIn,
+                PendingReports = _state.PendingReports,
+            };
+        }
+
+        public void ClearPendingReports()
+        {
+            _state = new CrashTelemetryState
+            {
+                IsTelemetryOptedIn = _state.IsTelemetryOptedIn,
+                PendingReports = Array.Empty<CrashReportSummary>(),
+            };
+        }
+
+        public IReadOnlyList<CrashReportSummary> UploadPendingReports() => Array.Empty<CrashReportSummary>();
     }
 }

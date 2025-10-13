@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Aog.UI.Avalonia.Models;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
 using SkiaSharp;
 using SkiaSharp.Views.Avalonia;
 
@@ -30,12 +33,44 @@ public sealed class MapView : SKElement
             notifying: static (sender, _) => sender.InvalidateVisual());
 
     /// <summary>
+    /// Identifies the <see cref="CoverageCells"/> styled property.
+    /// </summary>
+    public static readonly StyledProperty<IReadOnlyList<CoverageCell>> CoverageCellsProperty =
+        AvaloniaProperty.Register<MapView, IReadOnlyList<CoverageCell>>(
+            nameof(CoverageCells),
+            Array.Empty<CoverageCell>(),
+            notifying: static (sender, _) => sender.InvalidateVisual());
+
+    /// <summary>
+    /// Identifies the <see cref="GuidanceTracks"/> styled property.
+    /// </summary>
+    public static readonly StyledProperty<IReadOnlyList<GuidanceTrack>> GuidanceTracksProperty =
+        AvaloniaProperty.Register<MapView, IReadOnlyList<GuidanceTrack>>(
+            nameof(GuidanceTracks),
+            Array.Empty<GuidanceTrack>(),
+            notifying: static (sender, _) => sender.InvalidateVisual());
+
+    /// <summary>
     /// Gets or sets the pose to render on the map.
     /// </summary>
     public VehiclePose VehiclePose
     {
         get => GetValue(VehiclePoseProperty);
         set => SetValue(VehiclePoseProperty, value);
+    }
+
+    /// <summary>Gets or sets the coverage cells visualised on the map.</summary>
+    public IReadOnlyList<CoverageCell> CoverageCells
+    {
+        get => GetValue(CoverageCellsProperty);
+        set => SetValue(CoverageCellsProperty, value);
+    }
+
+    /// <summary>Gets or sets the guidance tracks rendered on top of the map.</summary>
+    public IReadOnlyList<GuidanceTrack> GuidanceTracks
+    {
+        get => GetValue(GuidanceTracksProperty);
+        set => SetValue(GuidanceTracksProperty, value);
     }
 
     /// <summary>
@@ -78,9 +113,96 @@ public sealed class MapView : SKElement
         canvas.Clear(new SKColor(24, 31, 36));
 
         canvas.Save();
+        DrawCoverage(canvas);
+        DrawGuidance(canvas);
         DrawAxes(canvas);
         DrawVehicle(canvas);
         canvas.Restore();
+    }
+
+    private void DrawCoverage(SKCanvas canvas)
+    {
+        var cells = CoverageCells;
+        if (cells is null || cells.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var cell in cells)
+        {
+            var half = cell.SizeMeters / 2.0;
+            var topLeft = _viewport.WorldToScreen(new Point(cell.Center.X - half, cell.Center.Y + half));
+            var bottomRight = _viewport.WorldToScreen(new Point(cell.Center.X + half, cell.Center.Y - half));
+
+            var left = Math.Min(topLeft.X, bottomRight.X);
+            var right = Math.Max(topLeft.X, bottomRight.X);
+            var top = Math.Min(topLeft.Y, bottomRight.Y);
+            var bottom = Math.Max(topLeft.Y, bottomRight.Y);
+
+            var rect = new SKRect((float)left, (float)top, (float)right, (float)bottom);
+            var coverage = (float)cell.ClampedCoverage;
+            var fillColor = new SKColor(
+                (byte)(40 + coverage * 60),
+                (byte)(110 + coverage * 100),
+                (byte)(60 + coverage * 80),
+                (byte)(160 + coverage * 80));
+
+            using var fillPaint = new SKPaint
+            {
+                Color = fillColor,
+                IsStroke = false,
+                IsAntialias = true,
+            };
+
+            using var outlinePaint = new SKPaint
+            {
+                Color = new SKColor(33, 46, 51, 180),
+                StrokeWidth = 1,
+                IsStroke = true,
+                IsAntialias = true,
+            };
+
+            canvas.DrawRect(rect, fillPaint);
+            canvas.DrawRect(rect, outlinePaint);
+        }
+    }
+
+    private void DrawGuidance(SKCanvas canvas)
+    {
+        var tracks = GuidanceTracks;
+        if (tracks is null || tracks.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var track in tracks.Where(t => t.Points.Count >= 2))
+        {
+            using var paint = new SKPaint
+            {
+                Color = ToSkColor(track.Color),
+                StrokeWidth = Math.Max((float)track.Thickness, 1f),
+                IsStroke = true,
+                IsAntialias = true,
+                StrokeCap = SKStrokeCap.Round,
+            };
+
+            using var path = new SKPath();
+            for (var index = 0; index < track.Points.Count; index++)
+            {
+                var point = track.Points[index];
+                var screen = ToSkPoint(_viewport.WorldToScreen(point));
+                if (index == 0)
+                {
+                    path.MoveTo(screen);
+                }
+                else
+                {
+                    path.LineTo(screen);
+                }
+            }
+
+            canvas.DrawPath(path, paint);
+        }
     }
 
     private void DrawAxes(SKCanvas canvas)
@@ -246,6 +368,8 @@ public sealed class MapView : SKElement
     }
 
     private static SKPoint ToSkPoint(Point point) => new((float)point.X, (float)point.Y);
+
+    private static SKColor ToSkColor(Color color) => new(color.A, color.R, color.G, color.B);
 
     private static SKPoint Rotate(SKPoint vector, float radians)
     {

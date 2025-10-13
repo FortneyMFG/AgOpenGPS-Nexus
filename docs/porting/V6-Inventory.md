@@ -28,6 +28,7 @@ This note captures the legacy (V6) math assets that need assessment during the N
 - **BoundaryBuilder & CBoundary** — `Legacy SourceCode -V6/GPS/Classes/BoundaryBuilder.cs`, `CBoundary.cs`, `CHead.cs`
   - BoundaryBuilder extends track polylines, computes self-intersections, and emits finalized polygon fences for field boundaries/headlands.【F:Legacy SourceCode -V6/GPS/Classes/BoundaryBuilder.cs†L11-L214】
   - CBoundary stores the resulting boundary lists and headland control switches, while `CHead` evaluates tool corners/look-ahead points against the polygons to drive hydraulic lift cues and audio alerts.【F:Legacy SourceCode -V6/GPS/Classes/CBoundary.cs†L6-L23】【F:Legacy SourceCode -V6/GPS/Classes/CHead.cs†L1-L108】【F:Legacy SourceCode -V6/GPS/Classes/CHead.cs†L109-L204】
+  - See `LegacyDataIngest.md` for the Nexus importer that consumes `TrackLines.txt`, `Boundary.txt`, and `Headland.txt` to materialise these structures.
 - **glm helpers** — `Legacy SourceCode -V6/GPS/Classes/CGLM.cs`
   - Provides shared computational geometry utilities (point-in-polygon, spline interpolation, unit conversions) used by coverage, boundary, and path modules.【F:Legacy SourceCode -V6/GPS/Classes/CGLM.cs†L10-L200】
 

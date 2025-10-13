@@ -50,7 +50,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-038 Simulation performance harness _(In Progress)_
 - [ ] NX-039 Plugin compatibility CI gate _(In Progress)_
 - [ ] NX-098 ISOBUS communications plugin _(Planned)_
-- [ ] NX-100 Combine yield monitoring plugin _(Planned)_
+- [x] NX-100 Combine yield monitoring plugin _(Done)_
 
 ### Section E — UI (Avalonia) + Sim Bar
 - [x] NX-040 Avalonia app bootstrap
@@ -185,7 +185,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-038 | Simulation performance and stress harness covering plugin combinations | In Progress |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | CI run ensures deterministic timing under load |
 | NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | In Progress |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
 | NX-098 | ISOBUS communications plugin bridging CAN/UDP transports into Nexus routing | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Implement ISO 11783 PGN ingest + emit, handshake, and diagnostics |
-| NX-100 | Combine yield monitoring plugin with layer overlays and data export | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Capture live yield/moisture feeds and expose UI dashboards |
+| NX-100 | Combine yield monitoring plugin with layer overlays and data export | Done | AI | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Capture live yield/moisture feeds and expose UI dashboards |
 
 ### Section E — UI (Avalonia) + Sim Bar
 

@@ -116,7 +116,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-085 Teensy bridge regression test suite
 - [ ] NX-086 Legacy migration guide & training set
 - [x] NX-087 Dealer deployment toolkit
-- [ ] NX-088 Multi-machine sync & licensing workflow
+- [x] NX-088 Multi-machine sync workflow
 - [x] NX-089 High-rate serial/UDP stress testing
 - [x] NX-090 Legacy auto-run scenario pack
 - [ ] NX-091 Legacy coverage export verification
@@ -266,7 +266,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-085 | Teensy bridge regression test suite with recorded PGN sessions | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Automate nightly bench playback |
 | NX-086 | Legacy migration guide and training materials for operators | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Video + step-by-step guide |
 | NX-087 | Dealer deployment toolkit with scripts and checklists | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Bundled script set |
-| NX-088 | Multi-machine synchronization and licensing workflow definition | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Document license + sync process |
+| NX-088 | Multi-machine synchronization and licensing workflow definition | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Document license + sync process |
 | NX-089 | High-rate serial and UDP stress testing with soak reports | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | 24 h soak logs |
 | NX-090 | Legacy auto-run scenario pack with verification logs | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Provide sample fields |
 | NX-091 | Legacy coverage export verification against Nexus outputs | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Compare shapefile + CSV exports |

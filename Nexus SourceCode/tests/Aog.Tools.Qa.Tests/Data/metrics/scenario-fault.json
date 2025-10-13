@@ -1,0 +1,8 @@
+{
+  "scenario": "Network dropout",
+  "source": "fault",
+  "metrics": [
+    { "name": "network.reconnect_time", "category": "connectivity", "value": 3.4, "unit": "s", "status": "warn" },
+    { "name": "sections.dropout_count", "category": "sections", "value": 2, "unit": "count", "status": "fail" }
+  ]
+}

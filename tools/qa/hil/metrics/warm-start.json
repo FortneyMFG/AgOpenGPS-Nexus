@@ -1,0 +1,7 @@
+{
+  "metrics": [
+    { "name": "pose.rms_error", "value": 0.05 },
+    { "name": "steer.engage_latency_ms", "value": 132 },
+    { "name": "sections.dropout_count", "value": 0 }
+  ]
+}

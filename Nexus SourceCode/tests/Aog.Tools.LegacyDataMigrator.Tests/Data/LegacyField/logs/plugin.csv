@@ -1,0 +1,2 @@
+sequence,timestamp_utc,source,plugin_id,topic,payload_base64
+1,2024-04-01T12:30:00Z,plugin-bus,sections,heartbeat,SGVsbG8=

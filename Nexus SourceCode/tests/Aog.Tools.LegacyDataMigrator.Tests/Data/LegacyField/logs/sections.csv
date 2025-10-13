@@ -1,0 +1,2 @@
+sequence,timestamp_utc,frame,source,section_count,mask_hex
+1,2024-04-01T12:30:00Z,,sections,8,FF

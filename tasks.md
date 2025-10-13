@@ -51,7 +51,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-038 Simulation performance harness _(In Progress)_
 - [ ] NX-039 Plugin compatibility CI gate _(In Progress)_
 - [ ] NX-098 ISOBUS communications plugin _(Planned)_
-- [ ] NX-100 Combine yield monitoring plugin _(Planned)_
+- [X] NX-100 Combine yield monitoring plugin 
 - [ ] NX-114 Variable-rate controller plugin _(Planned)_
 
 ### Section E — UI (Avalonia) + Sim Bar
@@ -125,17 +125,17 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-083 Legacy AB line/boundary import wizard
 - [x] NX-084 Legacy configuration translation CLI
 - [x] NX-085 Teensy bridge regression test suite
-- [ ] NX-086 Legacy migration guide & training set
+- [x] NX-086 Legacy migration guide & training set
 - [x] NX-087 Dealer deployment toolkit
-- [ ] NX-088 Multi-machine sync & licensing workflow
+- [x] NX-088 Multi-machine sync workflow
 - [x] NX-089 High-rate serial/UDP stress testing
 - [x] NX-090 Legacy auto-run scenario pack
 - [ ] NX-091 Legacy coverage export verification
 - [ ] NX-092 Legacy data migration utility
 - [ ] NX-093 Bridging workflow knowledge base
-- [ ] NX-094 Field feedback telemetry aggregator
-- [ ] NX-095 Dealer support escalation process
-- [ ] NX-096 Community preview program
+- [x] NX-094 Field feedback telemetry aggregator
+- [x] NX-095 Dealer support escalation process
+- [x] NX-096 Community preview program
 - [ ] NX-097 1.0 launch readiness review
 
 ## Detailed Tables by Section
@@ -197,7 +197,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-038 | Simulation performance and stress harness covering plugin combinations | In Progress |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | CI run ensures deterministic timing under load |
 | NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | In Progress |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
 | NX-098 | ISOBUS communications plugin bridging CAN/UDP transports into Nexus routing | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Implement ISO 11783 PGN ingest + emit, handshake, and diagnostics |
-| NX-100 | Combine yield monitoring plugin with layer overlays and data export | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Capture live yield/moisture feeds and expose UI dashboards |
+| NX-100 | Combine yield monitoring plugin with layer overlays and data export | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Capture live yield/moisture feeds and expose UI dashboards |
 | NX-114 | Variable-rate controller plugin consuming layer APIs | Planned |  | — | [SRS §3.7 Sections Control](docs/SRS/NOTES.md#srs-37-sections-control) | Converts imported layers into commanded rates |
 
 ### Section E — UI (Avalonia) + Sim Bar
@@ -286,17 +286,17 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-083 | Legacy AB line and boundary import wizard feeding Core routes | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Support shape + CSV inputs |
 | NX-084 | Legacy configuration translation CLI for profiles and machine settings | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Convert V6 config bundles |
 | NX-085 | Teensy bridge regression test suite with recorded PGN sessions | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Automate nightly bench playback |
-| NX-086 | Legacy migration guide and training materials for operators | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Video + step-by-step guide |
+| NX-086 | Legacy migration guide and training materials for operators | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Docs/howto + training kit |
 | NX-087 | Dealer deployment toolkit with scripts and checklists | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Bundled script set |
-| NX-088 | Multi-machine synchronization and licensing workflow definition | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Document license + sync process |
+| NX-088 | Multi-machine synchronization and licensing workflow definition | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Document license + sync process |
 | NX-089 | High-rate serial and UDP stress testing with soak reports | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | 24 h soak logs |
 | NX-090 | Legacy auto-run scenario pack with verification logs | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Provide sample fields |
 | NX-091 | Legacy coverage export verification against Nexus outputs | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Compare shapefile + CSV exports |
 | NX-092 | Legacy data migration utility for logs and field histories | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | CLI for migrating archives |
 | NX-093 | Support knowledge base for bridging workflows and troubleshooting | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Publish to docs/support |
-| NX-094 | Field feedback telemetry aggregator feeding support dashboards | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Collect anonymized feedback |
-| NX-095 | Dealer support escalation process and SLA tracking | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Runbook + contacts |
-| NX-096 | Community preview program with opt-in builds and survey loop | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Capture structured feedback |
+| NX-094 | Field feedback telemetry aggregator feeding support dashboards | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Collect anonymized feedback |
+| NX-095 | Dealer support escalation process and SLA tracking | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Runbook + contacts |
+| NX-096 | Community preview program with opt-in builds and survey loop | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Capture structured feedback |
 | NX-097 | 1.0 launch readiness review and sign-off checklist | Planned |  | — | [SRS §1.4 Release Management](docs/SRS/NOTES.md#srs-14-release-management) | Cross-team go/no-go |
 
 ## Legend

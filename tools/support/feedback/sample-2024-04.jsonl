@@ -1,0 +1,4 @@
+{"timestamp":"2024-04-05T14:22:00Z","tractorId":"tractor-101","build":"1.0.5","component":"Guidance","event":"line-shift","severity":"warning","notes":"Operator reported AB line shifting after terrain change."}
+{"timestamp":"2024-04-06T09:41:00Z","tractorId":"tractor-108","build":"1.0.4","component":"Sections","event":"coverage-gap","severity":"critical","notes":"Left outer section stuck off until restart."}
+{"timestamp":"2024-04-06T10:05:00Z","tractorId":"tractor-101","build":"1.0.5","component":"Guidance","event":"line-shift","severity":"info","notes":"Stabilised after recalculating headland."}
+{"timestamp":"2024-04-07T18:13:00Z","tractorId":"tractor-115","build":"1.0.6","component":"Telemetry","event":"upload-failed","severity":"warning","notes":"Poor LTE coverage caused retries."}

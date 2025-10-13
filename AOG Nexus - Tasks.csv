@@ -29,11 +29,11 @@ NX-027,FALSE,FALSE,"NX-020, NX-003, NX-005",Ready,Legacy UDP gateway skeleton tr
 NX-028,FALSE,TRUE,"NX-003, NX-010",,TBD – add detailed scope in tasks.md
 NX-029,FALSE,FALSE,"NX-027, NX-028",NX-027,TBD – add detailed scope in tasks.md
 NX-030,FALSE,TRUE,"NX-010, NX-011",,Plugin loader and manifest handling
-NX-031,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",Ready,AutoSteer-Lite plugin v1 (Pure Pursuit and Stanley controllers)
-NX-032,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",Ready,"Sections plugin v1 with mask, speed gate, and look-ahead"
-NX-033,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",Ready,PlanterMonitor plugin v1 publishing per-row status
-NX-034,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",Ready,Simulation provider registrations bundled per plugin
-NX-035,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",Ready,Replay plugin v1 with Parquet reader and playback controls
+NX-031,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",Ready,AutoSteer-Lite plugin v1 (Pure Pursuit and Stanley controllers)
+NX-032,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",Ready,"Sections plugin v1 with mask, speed gate, and look-ahead"
+NX-033,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",Ready,PlanterMonitor plugin v1 publishing per-row status
+NX-034,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",Ready,Simulation provider registrations bundled per plugin
+NX-035,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",Ready,Replay plugin v1 with Parquet reader and playback controls
 NX-036,FALSE,TRUE,"NX-015, NX-030, NX-003",,TBD – add detailed scope in tasks.md
 NX-037,FALSE,FALSE,"NX-031, NX-032, NX-033, NX-034, NX-035",NX-031,TBD – add detailed scope in tasks.md
 NX-038,FALSE,FALSE,NX-037,NX-037,TBD – add detailed scope in tasks.md

@@ -1,0 +1,493 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using Aog.Core.Eventing;
+using Aog.Core.V1;
+using Google.Protobuf.WellKnownTypes;
+using Parquet;
+using Parquet.Data;
+using Parquet.Schema;
+
+namespace Aog.Core.Logging;
+
+/// <summary>
+/// Subscribes to the in-process event bus and persists telemetry topics to columnar Parquet files.
+/// </summary>
+public sealed class TelemetryParquetLogger : IAsyncDisposable
+{
+    private readonly ParquetTopicWriter<Pose> _poseWriter;
+    private readonly ParquetTopicWriter<Imu> _imuWriter;
+    private readonly ParquetTopicWriter<CanFrame> _canWriter;
+    private readonly ParquetTopicWriter<SectionMask> _ioWriter;
+    private readonly ParquetTopicWriter<PluginTelemetryEvent> _pluginWriter;
+    private readonly IReadOnlyList<IDisposable> _subscriptions;
+
+    private TelemetryParquetLogger(
+        ParquetTopicWriter<Pose> poseWriter,
+        ParquetTopicWriter<Imu> imuWriter,
+        ParquetTopicWriter<CanFrame> canWriter,
+        ParquetTopicWriter<SectionMask> ioWriter,
+        ParquetTopicWriter<PluginTelemetryEvent> pluginWriter,
+        IReadOnlyList<IDisposable> subscriptions)
+    {
+        _poseWriter = poseWriter;
+        _imuWriter = imuWriter;
+        _canWriter = canWriter;
+        _ioWriter = ioWriter;
+        _pluginWriter = pluginWriter;
+        _subscriptions = subscriptions;
+    }
+
+    /// <summary>
+    /// Creates and starts a Parquet logger bound to the supplied <see cref="IEventBus"/>.
+    /// </summary>
+    /// <param name="eventBus">Event bus used to receive telemetry topics.</param>
+    /// <param name="options">Configuration describing where log files should be written.</param>
+    /// <param name="cancellationToken">Token used to cancel initialisation.</param>
+    /// <returns>An active telemetry logger.</returns>
+    public static async Task<TelemetryParquetLogger> CreateAsync(
+        IEventBus eventBus,
+        TelemetryParquetLoggerOptions options,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(eventBus);
+        ArgumentNullException.ThrowIfNull(options);
+
+        options.Validate();
+
+        var poseWriter = await ParquetTopicWriter<Pose>.CreateAsync(
+            options.ResolvePath(options.PoseFileName),
+            TelemetryParquetSchemas.Pose.Schema,
+            TelemetryParquetRowBuilder.CreatePoseColumns,
+            cancellationToken).ConfigureAwait(false);
+
+        var imuWriter = await ParquetTopicWriter<Imu>.CreateAsync(
+            options.ResolvePath(options.ImuFileName),
+            TelemetryParquetSchemas.Imu.Schema,
+            TelemetryParquetRowBuilder.CreateImuColumns,
+            cancellationToken).ConfigureAwait(false);
+
+        var canWriter = await ParquetTopicWriter<CanFrame>.CreateAsync(
+            options.ResolvePath(options.CanFileName),
+            TelemetryParquetSchemas.Can.Schema,
+            TelemetryParquetRowBuilder.CreateCanColumns,
+            cancellationToken).ConfigureAwait(false);
+
+        var ioWriter = await ParquetTopicWriter<SectionMask>.CreateAsync(
+            options.ResolvePath(options.IoFileName),
+            TelemetryParquetSchemas.Io.Schema,
+            TelemetryParquetRowBuilder.CreateIoColumns,
+            cancellationToken).ConfigureAwait(false);
+
+        var pluginWriter = await ParquetTopicWriter<PluginTelemetryEvent>.CreateAsync(
+            options.ResolvePath(options.PluginFileName),
+            TelemetryParquetSchemas.Plugin.Schema,
+            TelemetryParquetRowBuilder.CreatePluginColumns,
+            cancellationToken).ConfigureAwait(false);
+
+        var subscriptions = new List<IDisposable>
+        {
+            eventBus.Subscribe<Pose>((message, token) => poseWriter.WriteAsync(message, token)),
+            eventBus.Subscribe<Imu>((message, token) => imuWriter.WriteAsync(message, token)),
+            eventBus.Subscribe<CanFrame>((message, token) => canWriter.WriteAsync(message, token)),
+            eventBus.Subscribe<SectionMask>((message, token) => ioWriter.WriteAsync(message, token)),
+            eventBus.Subscribe<PluginTelemetryEvent>((message, token) => pluginWriter.WriteAsync(message, token))
+        };
+
+        return new TelemetryParquetLogger(poseWriter, imuWriter, canWriter, ioWriter, pluginWriter, subscriptions);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        foreach (var subscription in _subscriptions)
+        {
+            subscription.Dispose();
+        }
+
+        await _poseWriter.DisposeAsync().ConfigureAwait(false);
+        await _imuWriter.DisposeAsync().ConfigureAwait(false);
+        await _canWriter.DisposeAsync().ConfigureAwait(false);
+        await _ioWriter.DisposeAsync().ConfigureAwait(false);
+        await _pluginWriter.DisposeAsync().ConfigureAwait(false);
+
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Options used to configure the Parquet telemetry logger.
+    /// </summary>
+    public sealed class TelemetryParquetLoggerOptions
+    {
+        /// <summary>
+        /// Gets or sets the directory where Parquet files will be created.
+        /// </summary>
+        public string OutputDirectory { get; init; } = ".";
+
+        /// <summary>
+        /// File name for pose measurements.
+        /// </summary>
+        public string PoseFileName { get; init; } = "pose.parquet";
+
+        /// <summary>
+        /// File name for IMU measurements.
+        /// </summary>
+        public string ImuFileName { get; init; } = "imu.parquet";
+
+        /// <summary>
+        /// File name for CAN frames.
+        /// </summary>
+        public string CanFileName { get; init; } = "can.parquet";
+
+        /// <summary>
+        /// File name for I/O events such as section masks.
+        /// </summary>
+        public string IoFileName { get; init; } = "io.parquet";
+
+        /// <summary>
+        /// File name for plugin-published payloads.
+        /// </summary>
+        public string PluginFileName { get; init; } = "plugin.parquet";
+
+        internal void Validate()
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(OutputDirectory);
+            ArgumentException.ThrowIfNullOrWhiteSpace(PoseFileName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(ImuFileName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(CanFileName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(IoFileName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(PluginFileName);
+        }
+
+        internal string ResolvePath(string fileName)
+        {
+            Directory.CreateDirectory(OutputDirectory);
+            return Path.Combine(OutputDirectory, fileName);
+        }
+    }
+
+    private sealed class ParquetTopicWriter<T> : IAsyncDisposable
+    {
+        private readonly Func<T, DataColumn[]> _columnFactory;
+        private readonly Stream _stream;
+        private readonly ParquetWriter _writer;
+        private readonly SemaphoreSlim _mutex = new(1, 1);
+
+        private ParquetTopicWriter(Func<T, DataColumn[]> columnFactory, Stream stream, ParquetWriter writer)
+        {
+            _columnFactory = columnFactory;
+            _stream = stream;
+            _writer = writer;
+        }
+
+        public static async Task<ParquetTopicWriter<T>> CreateAsync(
+            string path,
+            Schema schema,
+            Func<T, DataColumn[]> columnFactory,
+            CancellationToken cancellationToken)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            var stream = new FileStream(
+                path,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.Read,
+                bufferSize: 4096,
+                FileOptions.Asynchronous | FileOptions.SequentialScan);
+
+            var writer = await ParquetWriter.CreateAsync(schema, stream).ConfigureAwait(false);
+            return new ParquetTopicWriter<T>(columnFactory, stream, writer);
+        }
+
+        public async ValueTask WriteAsync(T message, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await _mutex.WaitAsync(cancellationToken).ConfigureAwait(false);
+            try
+            {
+                using var rowGroup = _writer.CreateRowGroup();
+                foreach (var column in _columnFactory(message))
+                {
+                    rowGroup.WriteColumn(column);
+                }
+            }
+            finally
+            {
+                _mutex.Release();
+            }
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await _mutex.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                _writer.Dispose();
+                if (_stream is FileStream fileStream)
+                {
+                    await fileStream.FlushAsync().ConfigureAwait(false);
+                    fileStream.Dispose();
+                }
+                else
+                {
+                    await _stream.FlushAsync().ConfigureAwait(false);
+                    await _stream.DisposeAsync().ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                _mutex.Release();
+                _mutex.Dispose();
+            }
+        }
+    }
+
+    private static class TelemetryParquetSchemas
+    {
+        internal static class Pose
+        {
+            public static readonly DataField<ulong> Sequence = new("sequence");
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DataField<string?> Frame = new("frame");
+            public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<double> LatitudeDeg = new("latitude_deg");
+            public static readonly DataField<double> LongitudeDeg = new("longitude_deg");
+            public static readonly DataField<double> AltitudeM = new("altitude_m");
+            public static readonly DataField<double> HeadingRad = new("heading_rad");
+            public static readonly DataField<double> RollRad = new("roll_rad");
+            public static readonly DataField<double> PitchRad = new("pitch_rad");
+            public static readonly DataField<double> SpeedMps = new("speed_mps");
+            public static readonly DataField<double> YawRateRadps = new("yaw_rate_radps");
+            public static readonly Schema Schema = new(
+                Sequence,
+                Timestamp,
+                Frame,
+                Source,
+                LatitudeDeg,
+                LongitudeDeg,
+                AltitudeM,
+                HeadingRad,
+                RollRad,
+                PitchRad,
+                SpeedMps,
+                YawRateRadps);
+        }
+
+        internal static class Imu
+        {
+            public static readonly DataField<ulong> Sequence = new("sequence");
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DataField<string?> Frame = new("frame");
+            public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<double> AccelXMps2 = new("accel_x_mps2");
+            public static readonly DataField<double> AccelYMps2 = new("accel_y_mps2");
+            public static readonly DataField<double> AccelZMps2 = new("accel_z_mps2");
+            public static readonly DataField<double> GyroXRadps = new("gyro_x_radps");
+            public static readonly DataField<double> GyroYRadps = new("gyro_y_radps");
+            public static readonly DataField<double> GyroZRadps = new("gyro_z_radps");
+            public static readonly DataField<double> MagXUt = new("mag_x_ut");
+            public static readonly DataField<double> MagYUt = new("mag_y_ut");
+            public static readonly DataField<double> MagZUt = new("mag_z_ut");
+            public static readonly DataField<double> TemperatureC = new("temperature_c");
+            public static readonly Schema Schema = new(
+                Sequence,
+                Timestamp,
+                Frame,
+                Source,
+                AccelXMps2,
+                AccelYMps2,
+                AccelZMps2,
+                GyroXRadps,
+                GyroYRadps,
+                GyroZRadps,
+                MagXUt,
+                MagYUt,
+                MagZUt,
+                TemperatureC);
+        }
+
+        internal static class Can
+        {
+            public static readonly DataField<ulong> Sequence = new("sequence");
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DataField<string?> Frame = new("frame");
+            public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<uint> ArbitrationId = new("arbitration_id");
+            public static readonly DataField<byte[]?> Payload = new("payload");
+            public static readonly DataField<bool> IsExtendedId = new("is_extended_id");
+            public static readonly DataField<bool> IsRemoteRequest = new("is_remote_request");
+            public static readonly Schema Schema = new(
+                Sequence,
+                Timestamp,
+                Frame,
+                Source,
+                ArbitrationId,
+                Payload,
+                IsExtendedId,
+                IsRemoteRequest);
+        }
+
+        internal static class Io
+        {
+            public static readonly DataField<ulong> Sequence = new("sequence");
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DataField<string?> Frame = new("frame");
+            public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<uint> SectionCount = new("section_count");
+            public static readonly DataField<uint> Mask = new("mask");
+            public static readonly Schema Schema = new(
+                Sequence,
+                Timestamp,
+                Frame,
+                Source,
+                SectionCount,
+                Mask);
+        }
+
+        internal static class Plugin
+        {
+            public static readonly DataField<ulong> Sequence = new("sequence");
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<string> PluginId = new("plugin_id");
+            public static readonly DataField<string> Topic = new("topic");
+            public static readonly DataField<byte[]?> Payload = new("payload");
+            public static readonly Schema Schema = new(
+                Sequence,
+                Timestamp,
+                Source,
+                PluginId,
+                Topic,
+                Payload);
+        }
+    }
+
+    private static class TelemetryParquetRowBuilder
+    {
+        public static DataColumn[] CreatePoseColumns(Pose message)
+        {
+            var header = message.Header;
+            return new[]
+            {
+                HeaderColumns.Sequence(TelemetryParquetSchemas.Pose.Sequence, header),
+                HeaderColumns.Timestamp(TelemetryParquetSchemas.Pose.Timestamp, header),
+                HeaderColumns.Frame(TelemetryParquetSchemas.Pose.Frame, header),
+                HeaderColumns.Source(TelemetryParquetSchemas.Pose.Source, header),
+                new DataColumn(TelemetryParquetSchemas.Pose.LatitudeDeg, new[] { message.LatitudeDeg }),
+                new DataColumn(TelemetryParquetSchemas.Pose.LongitudeDeg, new[] { message.LongitudeDeg }),
+                new DataColumn(TelemetryParquetSchemas.Pose.AltitudeM, new[] { message.AltitudeM }),
+                new DataColumn(TelemetryParquetSchemas.Pose.HeadingRad, new[] { message.HeadingRad }),
+                new DataColumn(TelemetryParquetSchemas.Pose.RollRad, new[] { message.RollRad }),
+                new DataColumn(TelemetryParquetSchemas.Pose.PitchRad, new[] { message.PitchRad }),
+                new DataColumn(TelemetryParquetSchemas.Pose.SpeedMps, new[] { message.SpeedMps }),
+                new DataColumn(TelemetryParquetSchemas.Pose.YawRateRadps, new[] { message.YawRateRadps })
+            };
+        }
+
+        public static DataColumn[] CreateImuColumns(Imu message)
+        {
+            var header = message.Header;
+            return new[]
+            {
+                HeaderColumns.Sequence(TelemetryParquetSchemas.Imu.Sequence, header),
+                HeaderColumns.Timestamp(TelemetryParquetSchemas.Imu.Timestamp, header),
+                HeaderColumns.Frame(TelemetryParquetSchemas.Imu.Frame, header),
+                HeaderColumns.Source(TelemetryParquetSchemas.Imu.Source, header),
+                new DataColumn(TelemetryParquetSchemas.Imu.AccelXMps2, new[] { message.AccelXMps2 }),
+                new DataColumn(TelemetryParquetSchemas.Imu.AccelYMps2, new[] { message.AccelYMps2 }),
+                new DataColumn(TelemetryParquetSchemas.Imu.AccelZMps2, new[] { message.AccelZMps2 }),
+                new DataColumn(TelemetryParquetSchemas.Imu.GyroXRadps, new[] { message.GyroXRadps }),
+                new DataColumn(TelemetryParquetSchemas.Imu.GyroYRadps, new[] { message.GyroYRadps }),
+                new DataColumn(TelemetryParquetSchemas.Imu.GyroZRadps, new[] { message.GyroZRadps }),
+                new DataColumn(TelemetryParquetSchemas.Imu.MagXUt, new[] { message.MagXUt }),
+                new DataColumn(TelemetryParquetSchemas.Imu.MagYUt, new[] { message.MagYUt }),
+                new DataColumn(TelemetryParquetSchemas.Imu.MagZUt, new[] { message.MagZUt }),
+                new DataColumn(TelemetryParquetSchemas.Imu.TemperatureC, new[] { message.TemperatureC })
+            };
+        }
+
+        public static DataColumn[] CreateCanColumns(CanFrame message)
+        {
+            var header = message.Header;
+            return new[]
+            {
+                HeaderColumns.Sequence(TelemetryParquetSchemas.Can.Sequence, header),
+                HeaderColumns.Timestamp(TelemetryParquetSchemas.Can.Timestamp, header),
+                HeaderColumns.Frame(TelemetryParquetSchemas.Can.Frame, header),
+                HeaderColumns.Source(TelemetryParquetSchemas.Can.Source, header),
+                new DataColumn(TelemetryParquetSchemas.Can.ArbitrationId, new[] { message.ArbitrationId }),
+                new DataColumn(TelemetryParquetSchemas.Can.Payload, new byte[]?[] { message.Payload.Length == 0 ? Array.Empty<byte>() : message.Payload.ToByteArray() }),
+                new DataColumn(TelemetryParquetSchemas.Can.IsExtendedId, new[] { message.IsExtendedId }),
+                new DataColumn(TelemetryParquetSchemas.Can.IsRemoteRequest, new[] { message.IsRemoteRequest })
+            };
+        }
+
+        public static DataColumn[] CreateIoColumns(SectionMask message)
+        {
+            var header = message.Header;
+            return new[]
+            {
+                HeaderColumns.Sequence(TelemetryParquetSchemas.Io.Sequence, header),
+                HeaderColumns.Timestamp(TelemetryParquetSchemas.Io.Timestamp, header),
+                HeaderColumns.Frame(TelemetryParquetSchemas.Io.Frame, header),
+                HeaderColumns.Source(TelemetryParquetSchemas.Io.Source, header),
+                new DataColumn(TelemetryParquetSchemas.Io.SectionCount, new[] { message.SectionCount }),
+                new DataColumn(TelemetryParquetSchemas.Io.Mask, new[] { message.Mask })
+            };
+        }
+
+        public static DataColumn[] CreatePluginColumns(PluginTelemetryEvent message)
+        {
+            var header = message.Header;
+            return new[]
+            {
+                HeaderColumns.Sequence(TelemetryParquetSchemas.Plugin.Sequence, header),
+                HeaderColumns.Timestamp(TelemetryParquetSchemas.Plugin.Timestamp, header),
+                HeaderColumns.Source(TelemetryParquetSchemas.Plugin.Source, header),
+                new DataColumn(TelemetryParquetSchemas.Plugin.PluginId, new[] { HeaderColumns.NormalizeString(message.PluginId) ?? string.Empty }),
+                new DataColumn(TelemetryParquetSchemas.Plugin.Topic, new[] { HeaderColumns.NormalizeString(message.Topic) ?? string.Empty }),
+                new DataColumn(TelemetryParquetSchemas.Plugin.Payload, new byte[]?[] { message.Payload.Length == 0 ? Array.Empty<byte>() : message.Payload.ToArray() })
+            };
+        }
+
+        private static class HeaderColumns
+        {
+            public static DataColumn Sequence(DataField<ulong> field, Header? header)
+                => new(field, new[] { header?.Sequence ?? 0UL });
+
+            public static DataColumn Timestamp(DateTimeDataField field, Header? header)
+                => new(field, new DateTime?[] { NormalizeTimestamp(header?.Timestamp) });
+
+            public static DataColumn Frame(DataField<string?> field, Header? header)
+                => new(field, new[] { NormalizeString(header?.Frame) });
+
+            public static DataColumn Source(DataField<string?> field, Header? header)
+                => new(field, new[] { NormalizeString(header?.Source) });
+
+            private static DateTime? NormalizeTimestamp(Timestamp? timestamp)
+            {
+                if (timestamp is null)
+                {
+                    return null;
+                }
+
+                var dateTime = timestamp.ToDateTime();
+                return dateTime.Kind == DateTimeKind.Unspecified
+                    ? DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)
+                    : dateTime.ToUniversalTime();
+            }
+
+            public static string? NormalizeString(string? value)
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return null;
+                }
+
+                return value;
+            }
+        }
+    }
+}

@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/simulation.schema.json",
+  "title": "Nexus simulation configuration",
+  "type": "object",
+  "required": ["schemaVersion", "providers", "routes"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the simulation configuration contract."
+    },
+    "providers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/provider"},
+      "description": "Catalog of provider definitions registered with the simulation graph."
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/route"},
+      "description": "Signal graph routing entries mapping logical streams to providers."
+    },
+    "options": {
+      "type": "object",
+      "default": {},
+      "additionalProperties": {"$ref": "#/$defs/optionValue"},
+      "description": "Global simulation tunables shared across providers and plugins."
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/scenario"},
+      "description": "Named scenario presets that bundle providers, routes, and options."
+    }
+  },
+  "$defs": {
+    "provider": {
+      "type": "object",
+      "required": ["providerId", "type", "settings"],
+      "additionalProperties": false,
+      "properties": {
+        "providerId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "description": "Unique identifier referenced by routes and scenarios."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type or manifest-qualified name used to materialize the provider."
+        },
+        "settings": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {"$ref": "#/$defs/optionValue"},
+          "description": "Provider-specific configuration surface."
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "description": "Identifiers for input topics consumed by the provider."
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "description": "Identifiers for topics emitted by the provider."
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "required": ["stream", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "stream": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "description": "Logical stream identifier (e.g., pose, imu, sections)."
+        },
+        "source": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "description": "Provider identifier selected for the stream."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["hardware", "simulation", "replay"],
+          "description": "Preferred routing mode for the stream."
+        }
+      }
+    },
+    "optionValue": {
+      "anyOf": [
+        {"type": "string"},
+        {"type": "number"},
+        {"type": "boolean"},
+        {
+          "type": "array",
+          "items": {"type": "number"}
+        }
+      ],
+      "description": "Primitive configuration values shared across providers and routes."
+    },
+    "scenario": {
+      "type": "object",
+      "required": ["scenarioId", "description", "routes"],
+      "additionalProperties": false,
+      "properties": {
+        "scenarioId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "description": "Stable identifier used to select the scenario at runtime."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human readable summary of the simulated setup."
+        },
+        "routes": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/route"},
+          "minItems": 1
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/optionValue"}
+        }
+      }
+    },
+    "endpointReference": {
+      "type": "object",
+      "required": ["host", "port"],
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "type": "string",
+          "format": "hostname"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "transport": {
+          "type": "string",
+          "enum": ["grpc", "http", "udp"],
+          "default": "grpc"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "simulationSettings": {
+      "type": "object",
+      "required": ["activeScenario", "catalog"],
+      "additionalProperties": false,
+      "properties": {
+        "activeScenario": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "description": "Scenario identifier selected during startup."
+        },
+        "catalog": {
+          "type": "object",
+          "required": ["providers", "routes"],
+          "additionalProperties": false,
+          "properties": {
+            "providers": {
+              "type": "array",
+              "items": {"$ref": "#/$defs/provider"},
+              "minItems": 1
+            },
+            "routes": {
+              "type": "array",
+              "items": {"$ref": "#/$defs/route"},
+              "minItems": 1
+            },
+            "options": {
+              "type": "object",
+              "additionalProperties": {"$ref": "#/$defs/optionValue"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

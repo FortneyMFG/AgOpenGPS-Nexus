@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/ui.schema.json",
+  "title": "Nexus UI configuration",
+  "type": "object",
+  "required": ["schemaVersion", "theme", "panels", "connections"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the UI configuration contract."
+    },
+    "theme": {
+      "type": "object",
+      "required": ["mode", "accent"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["light", "dark"],
+          "description": "Preferred color palette."
+        },
+        "accent": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Accent color expressed as a 6-digit hex code."
+        },
+        "contrast": {
+          "type": "string",
+          "enum": ["standard", "high"],
+          "default": "standard"
+        },
+        "fontScale": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2.0,
+          "default": 1.0
+        }
+      }
+    },
+    "connections": {
+      "type": "object",
+      "required": ["core", "agio"],
+      "additionalProperties": false,
+      "properties": {
+        "core": {
+          "$ref": "simulation.schema.json#/$defs/endpointReference"
+        },
+        "agio": {
+          "$ref": "simulation.schema.json#/$defs/endpointReference"
+        },
+        "autoReconnect": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "panels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/panel"},
+      "description": "Layout definition for dashboard panels."
+    },
+    "gauges": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/gauge"},
+      "description": "Gauge definitions bound to telemetry streams."
+    },
+    "inputBindings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/inputBinding"},
+      "description": "Keyboard or controller bindings exposed to the UI."
+    }
+  },
+  "$defs": {
+    "panel": {
+      "type": "object",
+      "required": ["panelId", "title", "layout"],
+      "additionalProperties": false,
+      "properties": {
+        "panelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "title": {"type": "string"},
+        "layout": {
+          "type": "object",
+          "required": ["rows", "columns"],
+          "additionalProperties": false,
+          "properties": {
+            "rows": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6
+            },
+            "columns": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6
+            }
+          }
+        },
+        "widgets": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/widgetPlacement"}
+        }
+      }
+    },
+    "widgetPlacement": {
+      "type": "object",
+      "required": ["gaugeId", "row", "column", "size"],
+      "additionalProperties": false,
+      "properties": {
+        "gaugeId": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+$"},
+        "row": {"type": "integer", "minimum": 1},
+        "column": {"type": "integer", "minimum": 1},
+        "size": {"type": "string", "enum": ["small", "medium", "large"]}
+      }
+    },
+    "gauge": {
+      "type": "object",
+      "required": ["gaugeId", "title", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "gaugeId": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+$"},
+        "title": {"type": "string"},
+        "source": {
+          "type": "object",
+          "required": ["stream", "field"],
+          "additionalProperties": false,
+          "properties": {
+            "stream": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+$"},
+            "field": {"type": "string"},
+            "units": {"type": "string"}
+          }
+        },
+        "smoothing": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "emaAlpha": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "exclusiveMaximum": 1
+            },
+            "deadband": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "warn": {"type": "number"},
+            "crit": {"type": "number"},
+            "qualityScore": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "ttlMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "inputBinding": {
+      "type": "object",
+      "required": ["action", "binding"],
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "toggleAutoSteer",
+            "toggleSections",
+            "increaseSimSpeed",
+            "decreaseSimSpeed",
+            "pauseSim"
+          ]
+        },
+        "binding": {
+          "type": "string",
+          "description": "Platform-specific binding descriptor (e.g., Key.A, Gamepad.ButtonSouth)."
+        }
+      }
+    }
+  }
+}

@@ -44,6 +44,43 @@ public sealed class CapabilitiesHandshakeTests
     }
 
     [Fact]
+    public async Task AgioServiceUsesHostDescriptorsWhenMetadataDiffers()
+    {
+        var request = new HandshakeRequest
+        {
+            SessionId = "session-456",
+            NodeId = "core-host",
+            Role = CapabilityRole.CapabilityRoleCore,
+        };
+
+        request.Capabilities.Add(new CapabilityDescriptor
+        {
+            Name = "nav.pose",
+            Version = "0.9.0",
+            Summary = "Legacy pose stream",
+        });
+
+        var agioCapabilities = new[]
+        {
+            new CapabilityDescriptor
+            {
+                Name = "nav.pose",
+                Version = "1.2.3",
+                Summary = "Latest pose stream",
+            },
+        };
+
+        var service = new AgioCapabilitiesService("agio-host", agioCapabilities);
+        var response = await service.Handshake(request, CreateContext());
+
+        var accepted = Assert.Single(response.AcceptedCapabilities);
+        Assert.Equal("nav.pose", accepted.Name);
+        Assert.Equal("1.2.3", accepted.Version);
+        Assert.Equal("Latest pose stream", accepted.Summary);
+        Assert.Empty(response.Rejections);
+    }
+
+    [Fact]
     public void CapabilityDescriptorFactorySkipsEmptyNames()
     {
         var factory = new CapabilityDescriptorFactory(defaultVersion: "1.0.0", defaultSummary: "Telemetry");

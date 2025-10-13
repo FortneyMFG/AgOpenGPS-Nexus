@@ -5,12 +5,4 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Aog.Abstractions\Aog.Abstractions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Parquet.Net" Version="5.5.3" />
-  </ItemGroup>
 </Project>

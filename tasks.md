@@ -93,11 +93,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-070 Heartbeats & failsafe watchdogs
 - [x] NX-071 Arming/state machine
 - [x] NX-072 Deterministic sim regression
-- [ ] NX-073 End-to-end failsafe integration tests
+- [x] NX-073 End-to-end failsafe integration tests
 - [ ] NX-074 Field safety validation checklist
 - [ ] NX-075 Hardware-in-the-loop automation rig
 - [ ] NX-076 Fault injection harness
-- [ ] NX-077 Safety log retention & export tooling
+- [x] NX-077 Safety log retention & export tooling
 - [ ] NX-078 QA dashboard aggregating safety metrics
 - [ ] NX-079 Post-run report generator
 
@@ -234,11 +234,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-070 | Heartbeats & failsafe watchdogs | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Timeout <100 ms |
 | NX-071 | Arming/state machine | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Blocks unsafe outputs |
 | NX-072 | Deterministic sim regression (10s golden) | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Locks CI expectation |
-| NX-073 | End-to-end failsafe integration tests in CI and bench rigs | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Combine sim + hardware watchdog validation |
+| NX-073 | End-to-end failsafe integration tests in CI and bench rigs | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Combine sim + hardware watchdog validation |
 | NX-074 | Field safety validation checklist and sign-off workflow | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Operator checklist + approvals |
 | NX-075 | Hardware-in-the-loop automation rig for regression testing | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Bench harness for AGiO + plugins |
 | NX-076 | Fault injection harness for sensors, network, and power events | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Scriptable fault scenarios |
-| NX-077 | Safety log retention and export tooling with retention policy | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Archive for audits |
+| NX-077 | Safety log retention and export tooling with retention policy | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Archive for audits |
 | NX-078 | QA dashboard aggregating simulation, hardware, and safety metrics | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Web dashboard + alerts |
 | NX-079 | Post-run report generator summarizing guidance, coverage, and alarms | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | PDF/CSV outputs |
 

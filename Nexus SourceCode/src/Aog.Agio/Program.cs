@@ -1,3 +1,4 @@
+using Aog.Agio.Safety;
 using Aog.Agio.Timing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,8 +60,15 @@ public static class Program
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+                services
+                    .AddOptions<SafetyLogOptions>()
+                    .BindConfiguration("AgioHost:SafetyLogs")
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
                 services.AddSingleton(TimeProvider.System);
                 services.AddSingleton<IActuatorFailsafeService, ActuatorFailsafeService>();
+                services.AddSingleton<ISafetyLog, FileSafetyLog>();
 
                 if (OperatingSystem.IsLinux())
                 {

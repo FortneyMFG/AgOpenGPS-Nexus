@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Aog.Agio.Safety;
 using Aog.Core.V1;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
@@ -14,7 +16,8 @@ public sealed class ActuatorFailsafeServiceTests
     {
         var optionsMonitor = new TestOptionsMonitor<AgioSafetyOptions>(new AgioSafetyOptions());
         var timeProvider = new FakeTimeProvider();
-        using var service = new ActuatorFailsafeService(optionsMonitor, timeProvider);
+        var safetyLog = new TestSafetyLog();
+        using var service = new ActuatorFailsafeService(optionsMonitor, timeProvider, safetyLog);
 
         var steer = new SteerCmd
         {
@@ -47,7 +50,8 @@ public sealed class ActuatorFailsafeServiceTests
         var options = new AgioSafetyOptions { HeartbeatMs = 200 };
         var optionsMonitor = new TestOptionsMonitor<AgioSafetyOptions>(options);
         var timeProvider = new FakeTimeProvider();
-        using var service = new ActuatorFailsafeService(optionsMonitor, timeProvider);
+        var safetyLog = new TestSafetyLog();
+        using var service = new ActuatorFailsafeService(optionsMonitor, timeProvider, safetyLog);
 
         service.ReportHeartbeat();
 
@@ -81,7 +85,8 @@ public sealed class ActuatorFailsafeServiceTests
         };
         var optionsMonitor = new TestOptionsMonitor<AgioSafetyOptions>(options);
         var timeProvider = new FakeTimeProvider();
-        using var service = new ActuatorFailsafeService(optionsMonitor, timeProvider);
+        var safetyLog = new TestSafetyLog();
+        using var service = new ActuatorFailsafeService(optionsMonitor, timeProvider, safetyLog);
 
         service.ReportHeartbeat();
 
@@ -108,13 +113,33 @@ public sealed class ActuatorFailsafeServiceTests
         var options = new AgioSafetyOptions { HeartbeatMs = 100 };
         var optionsMonitor = new TestOptionsMonitor<AgioSafetyOptions>(options);
         var timeProvider = new FakeTimeProvider();
-        using var service = new ActuatorFailsafeService(optionsMonitor, timeProvider);
+        var safetyLog = new TestSafetyLog();
+        using var service = new ActuatorFailsafeService(optionsMonitor, timeProvider, safetyLog);
 
         Assert.Equal(TimeSpan.FromMilliseconds(100), service.HeartbeatTimeout);
 
         optionsMonitor.Update(new AgioSafetyOptions { HeartbeatMs = 400 });
 
         Assert.Equal(TimeSpan.FromMilliseconds(400), service.HeartbeatTimeout);
+    }
+
+    [Fact]
+    public void Failsafe_Transitions_Are_Logged()
+    {
+        var options = new AgioSafetyOptions { HeartbeatMs = 100 };
+        var optionsMonitor = new TestOptionsMonitor<AgioSafetyOptions>(options);
+        var timeProvider = new FakeTimeProvider();
+        var safetyLog = new TestSafetyLog();
+
+        using var service = new ActuatorFailsafeService(optionsMonitor, timeProvider, safetyLog);
+
+        service.ReportHeartbeat();
+        timeProvider.Advance(TimeSpan.FromMilliseconds(150));
+        service.FilterSteerCommand(new SteerCmd());
+
+        Assert.Contains(safetyLog.Entries, entry => entry.EventType == SafetyLogEvents.HeartbeatReceived);
+        Assert.Contains(safetyLog.Entries, entry => entry.EventType == SafetyLogEvents.HeartbeatExpired);
+        Assert.Contains(safetyLog.Entries, entry => entry.EventType == SafetyLogEvents.FailsafeApplied);
     }
 
     private sealed class TestOptionsMonitor<T> : IOptionsMonitor<T>
@@ -172,5 +197,17 @@ public sealed class ActuatorFailsafeServiceTests
                 _disposed = true;
             }
         }
+    }
+
+    private sealed class TestSafetyLog : ISafetyLog
+    {
+        public List<SafetyLogEntry> Entries { get; } = new();
+
+        public void Record(SafetyLogEntry entry)
+        {
+            Entries.Add(entry);
+        }
+
+        public string Export(string destinationDirectory) => throw new NotSupportedException();
     }
 }

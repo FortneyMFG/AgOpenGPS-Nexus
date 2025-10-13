@@ -29,7 +29,9 @@ This directory contains the modern Nexus solution for AgOpenGPS. The initial mil
 
 - `AgOpenGPS.Nexus.sln` — solution file that groups the UI and accompanying tests.
 - `src/Aog.UI.Avalonia` — Avalonia desktop application providing the shell window and dependency injection bootstrap.
+- `src/Aog.Plugins` — Shared manifest loader and metadata contracts for managed plugins.
 - `tests/Aog.UI.Avalonia.Tests` — unit tests covering the DI registration helpers for the UI shell.
+- `tests/Aog.Plugins.Tests` — tests validating the plugin manifest loader and schema expectations.
 
 ## Prerequisites
 

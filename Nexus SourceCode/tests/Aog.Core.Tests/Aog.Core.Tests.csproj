@@ -25,4 +25,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Aog.Core\Aog.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Simulation\Data\DeterministicSimRegression.golden.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

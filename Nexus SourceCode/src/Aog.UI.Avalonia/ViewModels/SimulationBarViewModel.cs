@@ -12,38 +12,61 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// </summary>
 public sealed class SimulationBarViewModel : ObservableObject
 {
-    private static readonly string[] DefaultModeOptions = new[] { "simulation", "hardware", "replay" };
-
     private readonly ReadOnlyCollection<SimulationPlaybackRateOptionViewModel> _playbackRates;
-    private readonly ReadOnlyCollection<SimulationStreamRouteViewModel> _routes;
-    private readonly TimeSpan _defaultDuration = TimeSpan.FromMinutes(5);
-    private readonly DelegateCommand _togglePlaybackCommand;
-    private readonly IReplayController? _replayController;
-    private ReplayState _state;
-    private double _selectedPlaybackRate;
-    private TimeSpan _position;
-    private double _seekFraction;
-    private bool _suppressSeekSync;
+    private readonly ObservableCollection<SimulationStreamRouteViewModel> _routes;
+private readonly SimulationConfiguration? _configuration;
+private readonly TimeSpan _defaultDuration = TimeSpan.FromMinutes(5);
+private readonly TimeSpan _duration;
+
+private readonly DelegateCommand _togglePlaybackCommand;
+private readonly IReplayController? _replayController;
+private ReplayState _state;
+private double _selectedPlaybackRate;
+private TimeSpan _position;
+private double _seekFraction;
+private bool _suppressSeekSync;
+private string _activeScenarioTitle = "Scenario: configuration defaults";
+private string _activeScenarioDescription = "Using routes from the loaded configuration.";
+private string _activeScenarioOptions = "—";
+
 
     public SimulationBarViewModel(SimulationConfiguration? configuration, IReplayController? replayController = null)
     {
+        _configuration = configuration;
         _togglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
         _state = new ReplayState(isPlaying: false, position: TimeSpan.Zero, _defaultDuration, playbackRate: 1.0);
         _selectedPlaybackRate = _state.PlaybackRate;
 
         _playbackRates = BuildPlaybackRateOptions();
-        _routes = BuildRoutes(configuration);
-        SyncPlaybackRateSelection(_selectedPlaybackRate);
+public SimulationBarViewModel(SimulationConfiguration? configuration, IReplayController? replayController = null)
+{
+    _configuration = configuration;
+    _duration = configuration?.Duration ?? _defaultDuration;
 
-        _replayController = replayController;
-        if (_replayController is not null)
-        {
-            var controllerState = NormalizeState(_replayController.State);
-            _state = controllerState;
-            SyncPlaybackRateSelection(controllerState.PlaybackRate);
-            Position = controllerState.Position;
-            _replayController.StateChanged += OnReplayStateChanged;
-        }
+    _togglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
+
+    _state = new ReplayState(isPlaying: false, position: TimeSpan.Zero, duration: _duration, playbackRate: 1.0);
+    _selectedPlaybackRate = _state.PlaybackRate;
+
+    _playbackRates = BuildPlaybackRateOptions();
+
+    var initialRoutes = configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>();
+    _routes = new ObservableCollection<SimulationStreamRouteViewModel>(
+        SimulationRouteViewModelBuilder.BuildRoutes(configuration, initialRoutes));
+
+    SyncPlaybackRateSelection(_selectedPlaybackRate);
+
+    _replayController = replayController;
+    if (_replayController is not null)
+    {
+        var controllerState = NormalizeState(_replayController.State);
+        _state = controllerState;
+        SyncPlaybackRateSelection(controllerState.PlaybackRate);
+        Position = controllerState.Position;
+        _replayController.StateChanged += OnReplayStateChanged;
+    }
+}
+
     }
 
     /// <summary>
@@ -172,6 +195,61 @@ public sealed class SimulationBarViewModel : ObservableObject
     /// </summary>
     public IReadOnlyList<SimulationStreamRouteViewModel> Routes => _routes;
 
+    /// <summary>
+    /// Gets a short title describing the active scenario selection.
+    /// </summary>
+    public string ActiveScenarioTitle
+    {
+        get => _activeScenarioTitle;
+        private set => SetProperty(ref _activeScenarioTitle, value);
+    }
+
+    /// <summary>
+    /// Gets the description of the active scenario selection.
+    /// </summary>
+    public string ActiveScenarioDescription
+    {
+        get => _activeScenarioDescription;
+        private set => SetProperty(ref _activeScenarioDescription, value);
+    }
+
+    /// <summary>
+    /// Gets a formatted summary of the options applied by the active scenario.
+    /// </summary>
+    public string ActiveScenarioOptions
+    {
+        get => _activeScenarioOptions;
+        private set => SetProperty(ref _activeScenarioOptions, value);
+    }
+
+    /// <summary>
+    /// Applies the provided scenario, updating the routed streams and descriptive metadata.
+    /// </summary>
+    /// <param name="scenario">Scenario definition to activate.</param>
+    public void ApplyScenario(SimulationScenarioConfiguration scenario)
+    {
+        ArgumentNullException.ThrowIfNull(scenario);
+
+        UpdateRoutes(scenario.Routes);
+        ActiveScenarioTitle = $"Scenario: {scenario.ScenarioId}";
+        ActiveScenarioDescription = string.IsNullOrWhiteSpace(scenario.Description)
+            ? "No description provided."
+            : scenario.Description!;
+        ActiveScenarioOptions = FormatScenarioOptions(scenario.Options);
+    }
+
+    /// <summary>
+    /// Reverts the routed streams to the configuration defaults.
+    /// </summary>
+    public void ResetToConfigurationRoutes()
+    {
+        var routes = _configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>();
+        UpdateRoutes(routes);
+        ActiveScenarioTitle = "Scenario: configuration defaults";
+        ActiveScenarioDescription = "Using routes from the loaded configuration.";
+        ActiveScenarioOptions = "—";
+    }
+
     private void TogglePlayback()
     {
         if (_replayController is not null)
@@ -214,60 +292,20 @@ public sealed class SimulationBarViewModel : ObservableObject
         return new ReadOnlyCollection<SimulationPlaybackRateOptionViewModel>(options);
     }
 
-    private ReadOnlyCollection<SimulationStreamRouteViewModel> BuildRoutes(SimulationConfiguration? configuration)
+    private void UpdateRoutes(IEnumerable<SimulationRouteConfiguration> routes)
     {
-        if (configuration is null)
+        _routes.Clear();
+
+        if (routes is null)
         {
-            return new ReadOnlyCollection<SimulationStreamRouteViewModel>(Array.Empty<SimulationStreamRouteViewModel>());
+            return;
         }
 
-        var providersByStream = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-        foreach (var provider in configuration.Providers)
+        var built = SimulationRouteViewModelBuilder.BuildRoutes(_configuration, routes);
+        foreach (var route in built)
         {
-            foreach (var output in provider.Outputs)
-            {
-                if (!providersByStream.TryGetValue(output, out var list))
-                {
-                    list = new List<string>();
-                    providersByStream[output] = list;
-                }
-
-                if (!list.Any(providerId => providerId.Equals(provider.ProviderId, StringComparison.OrdinalIgnoreCase)))
-                {
-                    list.Add(provider.ProviderId);
-                }
-            }
+            _routes.Add(route);
         }
-
-        var modeOptions = new HashSet<string>(DefaultModeOptions, StringComparer.OrdinalIgnoreCase);
-        foreach (var route in configuration.Routes)
-        {
-            modeOptions.Add(route.Mode);
-        }
-
-        var sortedModes = modeOptions
-            .OrderBy(mode => mode, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        var routes = configuration.Routes
-            .Select(route =>
-            {
-                if (!providersByStream.TryGetValue(route.Stream, out var sources) || sources.Count == 0)
-                {
-                    sources = new List<string> { route.Source };
-                }
-
-                return new SimulationStreamRouteViewModel(
-                    route.Stream,
-                    route.Source,
-                    route.Mode,
-                    sources,
-                    sortedModes);
-            })
-            .OrderBy(route => route.Stream, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        return new ReadOnlyCollection<SimulationStreamRouteViewModel>(routes);
     }
 
     private static TimeSpan Clamp(TimeSpan value, TimeSpan minimum, TimeSpan maximum)
@@ -345,5 +383,26 @@ public sealed class SimulationBarViewModel : ObservableObject
         }
 
         return $"{value.Minutes:00}:{value.Seconds:00}";
+    }
+
+    private static string FormatScenarioOptions(SimulationOptionsConfiguration? options)
+    {
+        if (options is null)
+        {
+            return "—";
+        }
+
+        var parts = new List<string>();
+        if (options.Seed.HasValue)
+        {
+            parts.Add($"seed={options.Seed.Value}");
+        }
+
+        if (options.TimeScale.HasValue)
+        {
+            parts.Add($"timeScale={options.TimeScale.Value:0.###}");
+        }
+
+        return parts.Count == 0 ? "—" : string.Join(", ", parts);
     }
 }

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package aog.agio.v1;
+
+option csharp_namespace = "Aog.Protos.Agio.V1";
+
+import "google/protobuf/empty.proto";
+import "core.proto";
+
+service GnssService {
+  rpc SubscribePose(google.protobuf.Empty) returns (stream aog.core.v1.Pose);
+}
+
+service ImuService {
+  rpc SubscribeImu(google.protobuf.Empty) returns (stream aog.core.v1.Imu);
+}
+
+service SteerService {
+  rpc SubscribeSteerState(google.protobuf.Empty) returns (stream aog.core.v1.SteerState);
+}
+
+service SectionsService {
+  rpc SubscribeSectionMask(google.protobuf.Empty) returns (stream aog.core.v1.SectionMask);
+}
+
+service CanBusService {
+  rpc SubscribeFrames(google.protobuf.Empty) returns (stream aog.core.v1.CanFrame);
+}
+
+service TimingService {
+  rpc SubscribeTiming(google.protobuf.Empty) returns (stream aog.core.v1.TimingCaps);
+}

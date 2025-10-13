@@ -83,6 +83,11 @@ The shell displays the current operating system description and exposes a connec
 An embedded simulation sample is parsed at startup and the window prints the ordered provider graph so contributors can verify the new configuration loader logic without additional tooling. The shell also exposes a simulation control bar (NX-043) that provides play/pause, scrub, and playback rate controls alongside combo boxes for selecting the source and mode for each routed stream.
 
 Replay controls are wired to an `IReplayController` service, enabling real telemetry sessions to drive the bar. The default dependency injection registration supplies a no-op controller for design-time usage, while the new `TelemetryReplayController` can be registered to stream Parquet logs with play, pause, seek, and playback rate support.
+### Scenario editor
+
+- Launch the **Edit scenarios...** dialog from the Simulation controls panel to review available simulation presets.
+- Choose provider routes and override seed/time scale options before applying them to the running simulation.
+- Save the active scenario to JSON or load an existing scenario file. Imported scenarios are validated against the simulation schema before being applied.
 
 ## Testing
 

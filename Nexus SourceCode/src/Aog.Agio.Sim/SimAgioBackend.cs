@@ -1,4 +1,5 @@
 using System;
+using Aog.Core.Simulation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aog.Agio.Sim;
@@ -20,6 +21,14 @@ public sealed class SimAgioBackend : IAgioBackend
         }
 
         services.AddSingleton<SimulationBackendMarker>();
+        services.AddSingleton<ISimBus, InMemorySimBus>();
+
+        services.AddSingleton<SimGnssService>();
+        services.AddSingleton<SimImuService>();
+        services.AddSingleton<SimSteerService>();
+        services.AddSingleton<SimSectionsService>();
+        services.AddSingleton<SimCanBusService>();
+        services.AddSingleton<SimTimingService>();
     }
 
     private sealed record SimulationBackendMarker;

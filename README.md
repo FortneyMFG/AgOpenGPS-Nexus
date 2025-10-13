@@ -83,6 +83,11 @@ Override default project locations by exporting `NEXUS_CORE_PROJECT`,
 relative to the repository root so future solution files can slot in without editing the
 scripts.
 
+### Packaging
+
+- `pwsh ./tools/ci/package-windows.ps1` builds the Windows single-file publish, `.zip`,
+  and installer bundle described in [docs/howto/windows-packaging.md](docs/howto/windows-packaging.md).
+
 When Wave 0 tickets (NX-001, NX-002, NX-006) are completed the repository skeleton will be
 ready for the broader contract and simulation work described in the phase plan. Tag
 milestones as outlined in the engineering brief to keep parallel teams aligned.

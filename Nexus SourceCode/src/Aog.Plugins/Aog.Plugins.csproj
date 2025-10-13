@@ -5,4 +5,8 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aog.Core\Aog.Core.csproj" />
+  </ItemGroup>
 </Project>

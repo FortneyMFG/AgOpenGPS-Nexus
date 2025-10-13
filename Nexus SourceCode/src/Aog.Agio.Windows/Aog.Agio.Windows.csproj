@@ -1,17 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net8.0-windows10.0.19041.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Common packages -->
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
   </ItemGroup>
 
+  <!-- Project references from both branches -->
   <ItemGroup>
+    <ProjectReference Include="..\Aog.Abstractions\Aog.Abstractions.csproj" />
     <ProjectReference Include="..\Aog.Agio\Aog.Agio.csproj" />
+  </ItemGroup>
+
+  <!-- Windows-specific targeting -->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net8.0-windows10.0.19041.0'">
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <UseWindowsForms>false</UseWindowsForms>
+    <UseWPF>false</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net8.0-windows10.0.19041.0'">
+    <PackageReference Include="Microsoft.Windows.SDK.NET.Ref" Version="10.0.22621.756" />
   </ItemGroup>
 </Project>

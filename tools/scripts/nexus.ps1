@@ -34,10 +34,10 @@ $scriptDir = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $repoRoot = Resolve-Path (Join-Path $scriptDir '..' '..')
 
 $defaults = @{
-    core = 'Nexus Source Code/src/Aog.Core.Host/Aog.Core.Host.csproj'
-    agio = 'Nexus Source Code/src/Aog.Agio.Host/Aog.Agio.Host.csproj'
-    ui   = 'Nexus Source Code/src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj'
-    sim  = 'Nexus Source Code/src/Aog.Core.SimHost/Aog.Core.SimHost.csproj'
+    core = 'Nexus SourceCode/src/Aog.Core.Host/Aog.Core.Host.csproj'
+    agio = 'Nexus SourceCode/src/Aog.Agio.Host/Aog.Agio.Host.csproj'
+    ui   = 'Nexus SourceCode/src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj'
+    sim  = 'Nexus SourceCode/src/Aog.Core.SimHost/Aog.Core.SimHost.csproj'
 }
 
 function Resolve-Project {

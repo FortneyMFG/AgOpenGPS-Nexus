@@ -53,6 +53,7 @@ public static class Program
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+                services.AddSingleton(TimeProvider.System);
                 services.AddHostedService<CoreHealthService>();
             });
 }

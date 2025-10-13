@@ -10,28 +10,61 @@
         Height="600"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
+
   <ScrollViewer Margin="24">
     <StackPanel Spacing="24">
+
+      <!-- Header -->
       <StackPanel Spacing="4">
         <TextBlock Text="{Binding Title}" FontSize="28" FontWeight="Bold"/>
         <TextBlock Text="{Binding PlatformDescription}" TextWrapping="Wrap"/>
       </StackPanel>
+
+      <!-- Info / Simulation panel -->
+      <Border Padding="16" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
+        <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+          <TextBlock Text="Welcome to the AgOpenGPS Nexus shell" FontSize="18" FontWeight="SemiBold"/>
+          <TextBlock Grid.Row="1" Text="{Binding PlatformDescription}" TextWrapping="Wrap"/>
+          <TextBlock Grid.Row="2" Text="This bootstrap window is backed by dependency injection."/>
+          <StackPanel Grid.Row="3" Spacing="4">
+            <TextBlock Text="Embedded simulation provider graph" FontWeight="SemiBold"/>
+            <TextBox Text="{Binding SimulationGraphSummary}"
+                     IsReadOnly="True"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     MinHeight="160"
+                     FontFamily="Consolas, Courier New, monospace"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- Connection settings -->
       <Border Padding="20" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
         <StackPanel Spacing="16" DataContext="{Binding Connection}" x:DataType="vm:ConnectionSettingsViewModel">
           <StackPanel Spacing="4">
             <TextBlock Text="Connection settings" FontSize="20" FontWeight="SemiBold"/>
-            <TextBlock Text="Configure how Nexus connects to AgIO and chooses GPS sources." Foreground="#99000000" TextWrapping="Wrap"/>
+            <TextBlock Text="Configure how Nexus connects to AGiO and chooses GPS sources."
+                       Foreground="#99000000"
+                       TextWrapping="Wrap"/>
           </StackPanel>
+
           <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="12" ColumnSpacing="12">
             <TextBlock Grid.Column="0" Grid.Row="0" Text="AGiO endpoint" VerticalAlignment="Center"/>
-            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding AgioEndpoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Watermark="e.g. http://localhost:50051"/>
+            <TextBox   Grid.Column="1" Grid.Row="0"
+                       Text="{Binding AgioEndpoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                       Watermark="e.g. http://localhost:50051"/>
 
             <TextBlock Grid.Column="0" Grid.Row="1" Text="Backend" VerticalAlignment="Center"/>
-            <ComboBox Grid.Column="1" Grid.Row="1" Items="{Binding AvailableBackends}" SelectedItem="{Binding SelectedBackend, Mode=TwoWay}"/>
+            <ComboBox  Grid.Column="1" Grid.Row="1"
+                       Items="{Binding AvailableBackends}"
+                       SelectedItem="{Binding SelectedBackend, Mode=TwoWay}"/>
 
             <TextBlock Grid.Column="0" Grid.Row="2" Text="GPS source policy" VerticalAlignment="Center"/>
-            <ComboBox Grid.Column="1" Grid.Row="2" Items="{Binding AvailableGpsSourcePolicies}" SelectedItem="{Binding SelectedGpsSourcePolicy, Mode=TwoWay}"/>
+            <ComboBox  Grid.Column="1" Grid.Row="2"
+                       Items="{Binding AvailableGpsSourcePolicies}"
+                       SelectedItem="{Binding SelectedGpsSourcePolicy, Mode=TwoWay}"/>
           </Grid>
+
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <TextBlock x:Name="StatusText" Text="{Binding StatusMessage}" VerticalAlignment="Center" TextWrapping="Wrap">
               <TextBlock.Styles>
@@ -43,10 +76,16 @@
                 </Style>
               </TextBlock.Styles>
             </TextBlock>
-            <Button Grid.Column="1" Content="Save settings" Command="{Binding SaveCommand}" MinWidth="140" HorizontalAlignment="Right"/>
+
+            <Button Grid.Column="1"
+                    Content="Save settings"
+                    Command="{Binding SaveCommand}"
+                    MinWidth="140"
+                    HorizontalAlignment="Right"/>
           </Grid>
         </StackPanel>
       </Border>
+
     </StackPanel>
   </ScrollViewer>
 </Window>

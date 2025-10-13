@@ -48,10 +48,10 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-035 Replay plugin v1
 - [x] NX-036 Plugin telemetry sink
 - [x] NX-037 Simulation scenario library
-- [ ] NX-038 Simulation performance harness _(In Progress)_
-- [ ] NX-039 Plugin compatibility CI gate _(In Progress)_
-- [ ] NX-098 ISOBUS communications plugin _(Planned)_
-- [X] NX-100 Combine yield monitoring plugin 
+- [x] NX-038 Simulation performance harness _(Done)_
+- [x] NX-039 Plugin compatibility CI gate _(Done)_
+- [x] NX-098 ISOBUS communications plugin _(Done)_
+- [x] NX-100 Combine yield monitoring plugin
 - [ ] NX-114 Variable-rate controller plugin _(Planned)_
 
 ### Section E — UI (Avalonia) + Sim Bar
@@ -101,8 +101,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-064 How-to: Pi/CM5 quick start
 - [x] NX-067 Release pipeline with signing
 - [x] NX-068 Crash & telemetry opt-in service
-- [ ] NX-069 Installer & update channel documentation _(In Progress)_
-- [ ] NX-099 Update SRS for ISOBUS communications plugin _(Planned)_
+- [x] NX-069 Installer & update channel documentation _(Done)_
+- [x] NX-099 Update SRS for ISOBUS communications plugin _(Done)_
 - [x] NX-101 Update SRS for combine yield monitoring plugin _(Done)_
 - [x] NX-103 Sync tasks.md with tasks.csv tracker _(Done)_
 
@@ -111,12 +111,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-071 Arming/state machine
 - [x] NX-072 Deterministic sim regression
 - [x] NX-073 End-to-end failsafe integration tests
-- [ ] NX-074 Field safety validation checklist _(In Progress)_
-- [ ] NX-075 Hardware-in-the-loop automation rig _(In Progress)_
-- [ ] NX-076 Fault injection harness _(In Progress)_
+- [x] NX-074 Field safety validation checklist _(Done)_
+- [x] NX-075 Hardware-in-the-loop automation rig _(Done)_
+- [x] NX-076 Fault injection harness _(Done)_
 - [x] NX-077 Safety log retention & export tooling
-- [ ] NX-078 QA dashboard aggregating safety metrics _(In Progress)_
-- [ ] NX-079 Post-run report generator _(In Progress)_
+- [x] NX-078 QA dashboard aggregating safety metrics _(Done)_
+- [x] NX-079 Post-run report generator _(Done)_
 
 ### Section I — Legacy/Teensy Compatibility
 - [x] NX-080 UDP discovery + capability exchange
@@ -130,8 +130,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-088 Multi-machine sync workflow
 - [x] NX-089 High-rate serial/UDP stress testing
 - [x] NX-090 Legacy auto-run scenario pack
-- [ ] NX-091 Legacy coverage export verification
-- [ ] NX-092 Legacy data migration utility
+- [x] NX-091 Legacy coverage export verification _(Done)_
+- [x] NX-092 Legacy data migration utility _(Done)_
 - [x] NX-093 Bridging workflow knowledge base
 - [x] NX-094 Field feedback telemetry aggregator
 - [x] NX-095 Dealer support escalation process
@@ -194,9 +194,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-035 | Replay plugin v1 | Done |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Telemetry Parquet replay controller with play/pause/seek tests |
 | NX-036 | Plugin telemetry sink | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | EventBus sink streams plugin telemetry |
 | NX-037 | Simulation scenario library with curated sample configs and docs | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Bundle field-ready templates and documentation |
-| NX-038 | Simulation performance and stress harness covering plugin combinations | In Progress |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | CI run ensures deterministic timing under load |
-| NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | In Progress |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
-| NX-098 | ISOBUS communications plugin bridging CAN/UDP transports into Nexus routing | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Implement ISO 11783 PGN ingest + emit, handshake, and diagnostics |
+| NX-038 | Simulation performance and stress harness covering plugin combinations | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | CI run ensures deterministic timing under load |
+| NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | Done |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
+| NX-098 | ISOBUS communications plugin bridging CAN/UDP transports into Nexus routing | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Implement ISO 11783 PGN ingest + emit, handshake, and diagnostics |
 | NX-100 | Combine yield monitoring plugin with layer overlays and data export | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Capture live yield/moisture feeds and expose UI dashboards |
 | NX-114 | Variable-rate controller plugin consuming layer APIs | Planned |  | — | [SRS §3.7 Sections Control](docs/SRS/NOTES.md#srs-37-sections-control) | Converts imported layers into commanded rates |
 
@@ -256,8 +256,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-064 | How-to: Pi/CM5 quick start | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/howto/pi-sim.md |
 | NX-067 | Release pipeline with signing and artifact promotion stages | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Promote nightly → beta → release |
 | NX-068 | Crash and telemetry opt-in service with privacy controls | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Opt-in crash + analytics uploader |
-| NX-069 | Installer and update channel documentation for operators | In Progress |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Covers offline + OTA paths |
-| NX-099 | Update SRS with ISOBUS communications plugin requirements | Planned |  | — | [SRS §12 Extensibility & Plugins](docs/SRS/sections/12_Extensibility_Plugins.md) | Define PGN mappings, diagnostics, and UI references |
+| NX-069 | Installer and update channel documentation for operators | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Covers offline + OTA paths |
+| NX-099 | Update SRS with ISOBUS communications plugin requirements | Done |  | — | [SRS §12 Extensibility & Plugins](docs/SRS/sections/12_Extensibility_Plugins.md) | Define PGN mappings, diagnostics, and UI references |
 | NX-101 | Update SRS with combine yield monitoring plugin requirements | Done | AI | — | [SRS §15 Engine & Machine Gauges](docs/SRS/sections/15_Engine_Machine_Gauges.md) | Capture yield/moisture ingestion, calibration, overlays, and exports |
 | NX-103 | Sync tasks.md with tasks.csv progress tracker | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Align statuses and backlog entries |
 
@@ -269,12 +269,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-071 | Arming/state machine | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Blocks unsafe outputs |
 | NX-072 | Deterministic sim regression (10s golden) | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Locks CI expectation |
 | NX-073 | End-to-end failsafe integration tests in CI and bench rigs | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Combine sim + hardware watchdog validation |
-| NX-074 | Field safety validation checklist and sign-off workflow | In Progress |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Operator checklist + approvals |
-| NX-075 | Hardware-in-the-loop automation rig for regression testing | In Progress |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Bench harness for AGiO + plugins |
-| NX-076 | Fault injection harness for sensors, network, and power events | In Progress |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Scriptable fault scenarios |
+| NX-074 | Field safety validation checklist and sign-off workflow | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Operator checklist + approvals |
+| NX-075 | Hardware-in-the-loop automation rig for regression testing | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Bench harness for AGiO + plugins |
+| NX-076 | Fault injection harness for sensors, network, and power events | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Scriptable fault scenarios |
 | NX-077 | Safety log retention and export tooling with retention policy | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Archive for audits |
-| NX-078 | QA dashboard aggregating simulation, hardware, and safety metrics | In Progress |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Web dashboard + alerts |
-| NX-079 | Post-run report generator summarizing guidance, coverage, and alarms | In Progress |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | PDF/CSV outputs |
+| NX-078 | QA dashboard aggregating simulation, hardware, and safety metrics | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Web dashboard + alerts |
+| NX-079 | Post-run report generator summarizing guidance, coverage, and alarms | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | PDF/CSV outputs |
 
 ### Section I — Legacy/Teensy Compatibility
 
@@ -283,16 +283,16 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-080 | UDP discovery + caps/version exchange | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | AIO responds; caps logged |
 | NX-081 | PGN bridge (steer + sections minimal) | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Drives a real AIO on bench |
 | NX-082 | UART framing (COBS+CRC), 921600 bps option | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Loopback verified |
-| NX-083 | Legacy AB line and boundary import wizard feeding Core routes | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Support shape + CSV inputs |
+| NX-083 | Legacy AB line and boundary import wizard feeding Core routes | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Support shape + CSV inputs |
 | NX-084 | Legacy configuration translation CLI for profiles and machine settings | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Convert V6 config bundles |
-| NX-085 | Teensy bridge regression test suite with recorded PGN sessions | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Automate nightly bench playback |
+| NX-085 | Teensy bridge regression test suite with recorded PGN sessions | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Automate nightly bench playback |
 | NX-086 | Legacy migration guide and training materials for operators | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Docs/howto + training kit |
 | NX-087 | Dealer deployment toolkit with scripts and checklists | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Bundled script set |
 | NX-088 | Multi-machine synchronization and licensing workflow definition | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Document license + sync process |
 | NX-089 | High-rate serial and UDP stress testing with soak reports | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | 24 h soak logs |
 | NX-090 | Legacy auto-run scenario pack with verification logs | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Provide sample fields |
-| NX-091 | Legacy coverage export verification against Nexus outputs | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Compare shapefile + CSV exports |
-| NX-092 | Legacy data migration utility for logs and field histories | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | CLI for migrating archives |
+| NX-091 | Legacy coverage export verification against Nexus outputs | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Compare shapefile + CSV exports |
+| NX-092 | Legacy data migration utility for logs and field histories | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | CLI for migrating archives |
 | NX-093 | Support knowledge base for bridging workflows and troubleshooting | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Publish to docs/support |
 | NX-094 | Field feedback telemetry aggregator feeding support dashboards | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Collect anonymized feedback |
 | NX-095 | Dealer support escalation process and SLA tracking | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Runbook + contacts |

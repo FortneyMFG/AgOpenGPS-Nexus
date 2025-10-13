@@ -109,6 +109,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - **NX-045 Scenario editor (choose providers + options; save/load scenario JSON)**
   - Output: dialog + schema validation
   - Done: loaded scenario reflects in sim
+- **NX-046 Simulation config summary in UI**
+  - Output: Core simulation config loader feeding UI summary panel
+  - Done: Sample scenario renders overview in the main window
 
 ### Section F — Porting from V6 (Algorithms)
 - **NX-050 Inventory V6 math (paths, coverage, filters, sim)**
@@ -125,6 +128,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
   - Done: sim error ≤ target
 
 ### Section G — Packaging, DevEx, Docs
+- **NX-007 SourceCode path normalization**
+  - Output: Canonical `Nexus SourceCode` paths in AGENTS, README, and launch scripts
+  - Done: Developer tooling resolves project defaults without manual fixes
+- **NX-008 Schema validator registry upgrade**
+  - Output: `tools/schemas/validate.py` loads schemas via the `referencing` registry
+  - Done: CLI validates bundled samples and explicit configs with `$id` resolution
+- **NX-009 Tooling SourceCode path fixes**
+  - Output: PowerShell/Bash runner defaults match the `Nexus SourceCode` layout
+  - Done: Contributor docs and scripts point at the correct directories
 - **NX-060 Dev scripts: nexus run core|agio|ui, nexus sim**
   - Output: PowerShell/Bash in /tools/scripts
   - Done: one-line start for each process
@@ -176,38 +188,47 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 | ID | Section | Description | Status | Owner | Human QA | SRS Ref | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| NX-001 | A | Repo skeleton + solutions | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Tag v0.1.0-bootstrap after completion |
-| NX-002 | A | ADRs: language/runtime, gRPC, Avalonia, simulation model | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Link from README |
-| NX-006 | G | CI matrix (Win x64 + Linux arm64) | In Review | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Include lint + headless sim |
+| NX-001 | A | Repo skeleton + solutions | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Tag v0.1.0-bootstrap after completion |
+| NX-002 | A | ADRs: language/runtime, gRPC, Avalonia, simulation model | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Link from README |
+| NX-006 | G | CI matrix (Win x64 + Linux arm64) | Done | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Include lint + headless sim |
+| NX-007 | G | SourceCode path normalization | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Canonical "Nexus SourceCode" references |
+| NX-008 | G | Schema validator registry upgrade | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | `referencing`-based loader resolves `$id` links |
+| NX-009 | G | Tooling SourceCode path fixes | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Run scripts default to SourceCode layout |
 
 ## Wave 1 – Contracts & Scaffolds
 
 | ID | Section | Description | Status | Owner | Human QA | SRS Ref | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| NX-003 | A | Protobuf v1 (Header, Pose, Imu, SectionMask, SteerCmd/State, CanFrame, TimingCaps) | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Start Contracts Freeze 1 |
-| NX-004 | A | JSON schemas (Core, AGiO, UI, Simulation) | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Coordinate with Schema Owner |
-| NX-005 | A | Capabilities handshake proto/service | In Review |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | Smoke test between Core & AGiO |
-| NX-010 | B | Core host skeleton (Generic Host, DI, config, Serilog) | Planned |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) |  |
-| NX-011 | B | Event bus interfaces + tests | Planned |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) |  |
-| NX-014 | B | Settings + hot reload / route config | Planned |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Per-stream routing |
-| NX-020 | C | AGiO host skeleton + backend loader | Planned |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Loads Agio.Sim by config |
+| NX-003 | A | Protobuf v1 (Header, Pose, Imu, SectionMask, SteerCmd/State, CanFrame, TimingCaps) | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Start Contracts Freeze 1 |
+| NX-004 | A | JSON schemas (Core, AGiO, UI, Simulation) | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Coordinate with Schema Owner |
+| NX-005 | A | Capabilities handshake proto/service | Done |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | Smoke test between Core & AGiO |
+| NX-010 | B | Core host skeleton (Generic Host, DI, config, Serilog) | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) |  |
+| NX-011 | B | Event bus interfaces + tests | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) |  |
+| NX-014 | B | Settings + hot reload / route config | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Per-stream routing |
+| NX-015 | B | Telemetry Parquet logger | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Writes plugin telemetry via TelemetryParquetLogger |
+| NX-016 | B | Core health interval hot reload | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Runtime config adjusts heartbeat cadence |
+| NX-017 | B | Source routing service | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Routes topics across sim/hardware/replay |
+| NX-020 | C | AGiO host skeleton + backend loader | Done |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Loads Agio.Sim by config |
 | NX-021 | C | Agio.Sim adapter to gRPC services | Planned |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) |  |
-| NX-040 | E | Avalonia app bootstrap | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Windows + Linux |
-| NX-041 | E | Connection/settings panel | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Persist config |
+| NX-028 | B | Core capabilities handshake service | Done |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | gRPC client/service negotiates capabilities |
+| NX-040 | E | Avalonia app bootstrap | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Windows + Linux |
+| NX-041 | E | Connection/settings panel | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Persist config |
 
 ## Wave 2 – Composite Simulation Core
 
 | ID | Section | Description | Status | Owner | Human QA | SRS Ref | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| NX-012 | B | Sim primitives (ISimClock/Bus/Rng + fixed-step clock) | Planned |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Deterministic tests |
-| NX-013 | B | Sim provider registry + DAG validation | Planned |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Reject circular deps |
+| NX-012 | B | Sim primitives (ISimClock/Bus/Rng + fixed-step clock) | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Deterministic tests |
+| NX-013 | B | Sim provider registry + DAG validation | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Reject circular deps |
 | NX-072 | H | Deterministic sim regression (10s golden) | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Locks CI expectation |
 | NX-034a | D | Sim provider: gnss.basic | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Register via Simulation plugin |
 | NX-034b | D | Sim provider: sections.coverage | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) |  |
 | NX-034c | D | Sim provider: autosteer.vehicle dynamics | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) |  |
 | NX-034d | D | Sim provider: planter.basic | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) |  |
-| NX-043 | E | Sim Bar controls (play/pause/seek/rate + routing UI) | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Requires NX-012/013 |
+| NX-042 | E | Map view (Skia pan/zoom + vehicle pose) | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | MapView control with viewport tests |
+| NX-043 | E | Sim Bar controls (play/pause/seek/rate + routing UI) | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Requires NX-012/013 |
 | NX-045 | E | Scenario editor (providers + options) | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) |  |
+| NX-046 | E | Simulation config summary in UI | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Loader + main window summary panel |
 
 ## Wave 3 – Hardware Abstraction
 
@@ -224,12 +245,13 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 | ID | Section | Description | Status | Owner | Human QA | SRS Ref | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| NX-030 | D | Plugin loader & manifest handling | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Includes JSON manifest |
+| NX-030 | D | Plugin loader & manifest handling | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Includes JSON manifest |
 | NX-031 | D | AutoSteer-Lite plugin v1 | Planned |  | — | [SRS §3.6 AutoSteer](docs/SRS/NOTES.md#srs-36-autosteer) | Unit test holds AB line |
 | NX-032 | D | Sections plugin v1 | Planned |  | — | [SRS §3.7 Sections Control](docs/SRS/NOTES.md#srs-37-sections-control) | Speed gate + look-ahead |
 | NX-033 | D | PlanterMonitor plugin v1 | Planned |  | — | [SRS §3.8 Planter Monitor](docs/SRS/NOTES.md#srs-38-planter-monitor) | Publishes RowStatus |
 | NX-034 | D | Sim provider registrations (bundle) | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Combine with NX-034a–d |
 | NX-035 | D | Replay plugin v1 | Planned |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | UI hooks |
+| NX-036 | D | Plugin telemetry sink | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | EventBus sink streams plugin telemetry |
 
 ## Wave 5 – V6 Porting
 
@@ -244,7 +266,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 | ID | Section | Description | Status | Owner | Human QA | SRS Ref | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| NX-060 | G | Dev scripts (`nexus run core|agio|ui`, `nexus sim`) | Planned |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Bash + PowerShell |
+| NX-060 | G | Dev scripts (`nexus run core|agio|ui`, `nexus sim`) | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Bash + PowerShell |
 | NX-061 | G | Windows packaging | Planned |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Installer artifact |
 | NX-062 | G | Pi/CM5 packaging (deb + systemd) | Planned |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Boots on Pi OS |
 | NX-063 | G | How-to: Windows, no hardware | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/howto/windows-no-hw.md |

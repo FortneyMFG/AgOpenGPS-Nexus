@@ -9,7 +9,7 @@ specific `AGENTS.md`.
    Note the ticket in your commit message and PR body.
 2. **Short-lived branches.** Use `feat/NX-###-slug` for feature work and rebase before
    opening a PR. Keep diffs under ~200 net LOC (tests excluded) to enable fast reviews.
-3. **Contracts-first.** `/Nexus Source Code/proto`, `/Nexus Source Code/src/Aog.Abstractions`,
+3. **Contracts-first.** `/Nexus SourceCode/proto`, `/Nexus SourceCode/src/Aog.Abstractions`,
    and `/tools/schemas` follow a contracts-freeze protocol. When a freeze is active, do not
    merge breaking changes without an ADR and consensus from the area owner.
 4. **Tests + docs required.** Ship unit/integration tests and a short usage note (README or
@@ -21,13 +21,13 @@ specific `AGENTS.md`.
 
 | Area | CODEOWNER | Notes |
 | --- | --- | --- |
-| `/Nexus Source Code/proto/` | Proto Owner | Authoritative protobuf contracts |
+| `/Nexus SourceCode/proto/` | Proto Owner | Authoritative protobuf contracts |
 | `/tools/schemas/` | Schema Owner | JSON schema definitions & validators |
-| `/Nexus Source Code/src/Aog.Abstractions/` | Proto Owner | Generated code only via tooling |
-| `/Nexus Source Code/src/Aog.Core/**` | Core Owner | Core orchestrator & sim primitives |
-| `/Nexus Source Code/src/Aog.Agio/**` | AGiO Owner | Hardware hosts & backends |
-| `/Nexus Source Code/src/Aog.Plugins/**` | Plugins Owner | Feature plugins & sim providers |
-| `/Nexus Source Code/src/Aog.UI.Avalonia/**` | UI Owner | Desktop UI |
+| `/Nexus SourceCode/src/Aog.Abstractions/` | Proto Owner | Generated code only via tooling |
+| `/Nexus SourceCode/src/Aog.Core/**` | Core Owner | Core orchestrator & sim primitives |
+| `/Nexus SourceCode/src/Aog.Agio/**` | AGiO Owner | Hardware hosts & backends |
+| `/Nexus SourceCode/src/Aog.Plugins/**` | Plugins Owner | Feature plugins & sim providers |
+| `/Nexus SourceCode/src/Aog.UI.Avalonia/**` | UI Owner | Desktop UI |
 
 Update this table once owners are formally assigned. Until then, coordinate changes via
 `#nexus-dev`.

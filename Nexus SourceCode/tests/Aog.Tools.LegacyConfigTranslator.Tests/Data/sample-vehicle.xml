@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <userSettings>
+    <AgOpenGPS.Properties.Settings>
+      <setting name="setVehicle_wheelbase" serializeAs="String">
+        <value>3.45</value>
+      </setting>
+      <setting name="setVehicle_trackWidth" serializeAs="String">
+        <value>2.05</value>
+      </setting>
+      <setting name="setVehicle_antennaHeight" serializeAs="String">
+        <value>3.1</value>
+      </setting>
+      <setting name="setVehicle_antennaOffset" serializeAs="String">
+        <value>0.25</value>
+      </setting>
+      <setting name="setVehicle_antennaPivot" serializeAs="String">
+        <value>0.15</value>
+      </setting>
+      <setting name="setVehicle_maxSteerAngle" serializeAs="String">
+        <value>34</value>
+      </setting>
+      <setting name="setVehicle_toolWidth" serializeAs="String">
+        <value>9.2</value>
+      </setting>
+      <setting name="setVehicle_toolOverlap" serializeAs="String">
+        <value>0.35</value>
+      </setting>
+      <setting name="setVehicle_toolOffset" serializeAs="String">
+        <value>-0.1</value>
+      </setting>
+      <setting name="setVehicle_toolLookAheadOn" serializeAs="String">
+        <value>1.5</value>
+      </setting>
+      <setting name="setVehicle_toolLookAheadOff" serializeAs="String">
+        <value>0.75</value>
+      </setting>
+      <setting name="setTool_toolTrailingHitchLength" serializeAs="String">
+        <value>-2.8</value>
+      </setting>
+      <setting name="setVehicle_tankTrailingHitchLength" serializeAs="String">
+        <value>4.5</value>
+      </setting>
+      <setting name="setTool_isToolTrailing" serializeAs="String">
+        <value>true</value>
+      </setting>
+      <setting name="setTool_isToolRearFixed" serializeAs="String">
+        <value>false</value>
+      </setting>
+      <setting name="setTool_isToolFront" serializeAs="String">
+        <value>false</value>
+      </setting>
+      <setting name="setArdMac_isHydEnabled" serializeAs="String">
+        <value>1</value>
+      </setting>
+      <setting name="setArdMac_hydRaiseTime" serializeAs="String">
+        <value>3</value>
+      </setting>
+      <setting name="setArdMac_hydLowerTime" serializeAs="String">
+        <value>4</value>
+      </setting>
+      <setting name="setVehicle_hydraulicLiftLookAhead" serializeAs="String">
+        <value>2.25</value>
+      </setting>
+      <setting name="setVehicle_numSections" serializeAs="String">
+        <value>6</value>
+      </setting>
+      <setting name="setTool_defaultSectionWidth" serializeAs="String">
+        <value>1.8</value>
+      </setting>
+      <setting name="setVehicle_toolOffDelay" serializeAs="String">
+        <value>0.4</value>
+      </setting>
+      <setting name="setVehicle_minCoverage" serializeAs="String">
+        <value>92</value>
+      </setting>
+      <setting name="setTool_isSectionsNotZones" serializeAs="String">
+        <value>false</value>
+      </setting>
+      <setting name="setSection_position1" serializeAs="String">
+        <value>-3.2</value>
+      </setting>
+      <setting name="setSection_position2" serializeAs="String">
+        <value>-1.6</value>
+      </setting>
+      <setting name="setSection_position3" serializeAs="String">
+        <value>0</value>
+      </setting>
+      <setting name="setSection_position4" serializeAs="String">
+        <value>1.6</value>
+      </setting>
+      <setting name="setSection_position5" serializeAs="String">
+        <value>3.2</value>
+      </setting>
+      <setting name="setSection_position6" serializeAs="String">
+        <value>4.8</value>
+      </setting>
+    </AgOpenGPS.Properties.Settings>
+  </userSettings>
+</configuration>

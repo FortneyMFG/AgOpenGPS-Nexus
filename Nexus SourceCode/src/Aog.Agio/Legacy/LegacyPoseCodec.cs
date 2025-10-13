@@ -66,7 +66,7 @@ public sealed class LegacyPoseCodec
             return false;
         }
 
-        if (!ValidateChecksum(datagram))
+        if (!LegacyFrameUtilities.ValidateChecksum(datagram))
         {
             return false;
         }
@@ -199,7 +199,7 @@ public sealed class LegacyPoseCodec
         BinaryPrimitives.WriteInt16LittleEndian(payload.Slice(47, 2), imuPitch);
         BinaryPrimitives.WriteInt16LittleEndian(payload.Slice(49, 2), imuYawRate);
 
-        buffer[^1] = ComputeChecksum(buffer);
+        buffer[^1] = LegacyFrameUtilities.ComputeChecksum(buffer);
         return buffer;
     }
 
@@ -259,20 +259,4 @@ public sealed class LegacyPoseCodec
         return (short)rounded;
     }
 
-    private static bool ValidateChecksum(ReadOnlySpan<byte> frame)
-    {
-        var checksum = ComputeChecksum(frame);
-        return checksum == frame[^1];
-    }
-
-    private static byte ComputeChecksum(ReadOnlySpan<byte> frame)
-    {
-        int sum = 0;
-        for (var i = 2; i < frame.Length - 1; i++)
-        {
-            sum += frame[i];
-        }
-
-        return unchecked((byte)sum);
-    }
 }

@@ -23,6 +23,7 @@ public sealed class LegacyUdpGatewayBackend : IAgioBackend
         }
 
         services.AddSingleton<LegacyPoseCodec>();
+        services.AddSingleton<LegacyAutoSteerCodec>();
         services.AddSingleton<ILegacyUdpTransport, NullLegacyUdpTransport>();
         services.AddSingleton<ILegacyPoseObserver, NullLegacyPoseObserver>();
         services.AddSingleton<LegacyUdpGateway>();

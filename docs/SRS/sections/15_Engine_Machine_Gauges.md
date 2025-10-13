@@ -10,6 +10,10 @@ Capture read-only engine and machine telemetry (RPM, temperatures, pressures, vo
 - R-GA-003 (MUST, UI parity): Provide overlay, standalone panel, and mini widget presentations that honor `targetBand`, `alarmBands`, TTL, and quality gating to keep annunciation consistent across layouts.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L94-L128】
 - R-GA-004 (SHOULD, smoothing & stale handling): Support optional EMA smoothing, deadbands, and stale indicators driven by configuration so noisy sensors remain usable without hiding real faults.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L82-L128】
 - R-GA-005 (COULD, capability discovery): Advertise supported gauges via capability bits and validity heartbeats so dashboards can pre-provision tiles and detect publisher outages without bespoke logic.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L130-L156】【F:docs/SRS/options/O-COMM-7_GaugeTelemetryPGNs.md†L23-L48】
+- R-GA-006 (MUST, combine yield ingestion): Normalize grain flow, moisture, and elevator speed data from OEM CAN (J1939 PGNs 0xF003/0xFECE) or serial payloads into standard `YieldTelemetry` frames so plugins and dashboards share one schema regardless of sensor vendor.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L160-L220】
+- R-GA-007 (MUST, calibration + QA): Persist per-crop calibration coefficients (mass flow, moisture, lag) and expose an operator workflow to confirm calibration state, last validation date, and current header width; block heatmap rendering when calibration is stale or missing.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L222-L277】
+- R-GA-008 (MUST, coverage overlays): Generate yield/moisture heatmaps aligned to harvested coverage polygons with `lagMeters`, `swathWidth`, and `sampleRateHz` metadata so replay and live views share the same tiling and smoothing logic.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L222-L277】
+- R-GA-009 (SHOULD, data export): Stream per-swatch summaries (avg/max/min yield & moisture, wet/dry bushels, harvest time span) through the telemetry recorder and allow CSV/GeoJSON export for FarmOS/Opengrade compatibility.【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L279-L327】
 
 ## Context and scope
 Gauges focus on machine-level telemetry that dashboards consume read-only. They complement, but do not replace, layer-specific rate or steering PGNs.
@@ -106,6 +110,51 @@ Gauges focus on machine-level telemetry that dashboards consume read-only. They 
 ```
 
 The shared [Gauge ID Registry](../appendices/GaugeId_Registry.md) assigns stable `gaugeId` values and raw-to-engineering unit conversions.
+
+### Combine yield monitoring plugin
+
+Combine operators require the same deterministic telemetry pipeline as engine gauges but with harvest-specific semantics—grain flow, grain moisture, elevator speed, and lag-adjusted coverage. The plugin adapts vendor-specific data (e.g., Ag Leader, John Deere, CLAAS) into Nexus' metadata-driven transports so heatmaps and dashboards behave consistently across hardware.
+
+```json
+{
+  "id": "YieldTelemetry",
+  "source": { "pgn": 61443, "fallback": "serial:RS232" },
+  "dataType": "struct",
+  "fields": [
+    { "name": "massFlow", "units": "kg/s", "scale": 0.01 },
+    { "name": "grainMoisture", "units": "%", "scale": 0.1 },
+    { "name": "elevatorSpeed", "units": "rpm", "scale": 1.0 },
+    { "name": "lagMeters", "units": "m", "scale": 0.1 }
+  ],
+  "calibration": {
+    "cropType": "corn",
+    "massFlowGain": 1.07,
+    "moistureOffset": -0.4,
+    "lastValidatedUtc": "2024-04-13T22:10:00Z"
+  },
+  "coverage": {
+    "swathWidth": 9.14,
+    "sampleRateHz": 5.0
+  }
+}
+```
+
+> **Note:** When OEM payloads omit elevator speed, fall back to GPS ground speed for lag compensation and flag reduced quality in telemetry.
+
+#### Calibration workflow
+- Support per-crop calibration sets with mass-flow test loads, moisture meter offsets, and header width verification.
+- Track calibration state transitions (`new`, `validated`, `expired`) and persist operator, timestamp, and validation notes.
+- Warn operators when calibration exceeds `maxHoursSinceValidation` or when crop type mismatches logged calibration.
+
+#### Heatmap generation
+- Delay coverage painting by `lagMeters` to align grain flow readings with harvested area.
+- Tile yield and moisture into the existing coverage grid with configurable kernel smoothing; default to 3×3 kernel and 10% clamp on outliers.
+- Provide live overlays plus a replay mode that replays recorded telemetry using the same smoothing pipeline to ensure deterministic analytics.
+
+#### Data export & persistence
+- Include per-swatch aggregates (wet/dry bushels, avg moisture, productivity) in the telemetry recorder stream.
+- Allow export to CSV (per-swatch rows) and GeoJSON (polygon features with metrics) to support FarmOS, OpenAg, and SMS imports.
+- Retain raw samples for at least 24 hours locally to regenerate maps if calibration changes within that window.
 
 #### Transport & scaling rules
 - Missing codes: `0xFF` (u8) and `0xFFFF` (u16) signal no data. Mark gauges stale when repeated values exceed their TTL.

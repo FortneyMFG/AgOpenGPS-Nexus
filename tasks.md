@@ -103,7 +103,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-068 Crash & telemetry opt-in service
 - [ ] NX-069 Installer & update channel documentation _(In Progress)_
 - [ ] NX-099 Update SRS for ISOBUS communications plugin _(Planned)_
-- [ ] NX-101 Update SRS for combine yield monitoring plugin _(Planned)_
+- [x] NX-101 Update SRS for combine yield monitoring plugin _(Done)_
 - [x] NX-103 Sync tasks.md with tasks.csv tracker _(Done)_
 
 ### Section H — Safety & QA
@@ -258,7 +258,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-068 | Crash and telemetry opt-in service with privacy controls | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Opt-in crash + analytics uploader |
 | NX-069 | Installer and update channel documentation for operators | In Progress |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Covers offline + OTA paths |
 | NX-099 | Update SRS with ISOBUS communications plugin requirements | Planned |  | — | [SRS §12 Extensibility & Plugins](docs/SRS/sections/12_Extensibility_Plugins.md) | Define PGN mappings, diagnostics, and UI references |
-| NX-101 | Update SRS with combine yield monitoring plugin requirements | Planned |  | — | [SRS §15 Engine & Machine Gauges](docs/SRS/sections/15_Engine_Machine_Gauges.md) | Capture yield/moisture data pipelines and overlays |
+| NX-101 | Update SRS with combine yield monitoring plugin requirements | Done | AI | — | [SRS §15 Engine & Machine Gauges](docs/SRS/sections/15_Engine_Machine_Gauges.md) | Capture yield/moisture ingestion, calibration, overlays, and exports |
 | NX-103 | Sync tasks.md with tasks.csv progress tracker | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Align statuses and backlog entries |
 
 ### Section H — Safety & QA

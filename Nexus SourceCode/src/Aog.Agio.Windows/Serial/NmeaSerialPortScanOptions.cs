@@ -7,7 +7,7 @@ public sealed class NmeaSerialPortScanOptions
 {
     private TimeSpan _probeDuration = TimeSpan.FromSeconds(5);
     private TimeSpan _readTimeout = TimeSpan.FromMilliseconds(500);
-    private int[] _baudRates = new[] { 4800, 9600, 19200, 38400, 57600, 115200 };
+    private int[] _baudRates = new[] { 4800, 9600, 19200, 38400, 57600, 115200, 921600 };
     private int _maxReadAttemptsPerPort = 200;
 
     /// <summary>

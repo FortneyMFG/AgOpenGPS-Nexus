@@ -37,3 +37,10 @@ through dependency injection to forward PGNs over UDP and surface decoded poses 
 
 The codec is symmetric—unit tests assert that encoding and decoding round-trip cleanly and
 that corrupt checksums are rejected.
+
+## UART framing helper
+
+`LegacySerialFrameCodec` produces and parses the COBS-framed serial messages used by legacy
+AgIO hardware. Pass it a complete UDP-style frame (sync bytes through checksum) and it
+emits a `0x00`-terminated byte stream suitable for UART links. The helper reuses the legacy
+checksum via `LegacyChecksum`, so callers only need to populate the payload before encoding.

@@ -19,4 +19,10 @@
     <ProjectReference Include="..\..\src\Aog.Agio.Sim\Aog.Agio.Sim.csproj" />
     <ProjectReference Include="..\..\src\Aog.Agio.Windows\Aog.Agio.Windows.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="TestData\teensy_bridge_session1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

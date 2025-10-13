@@ -81,9 +81,9 @@ NX-079,FALSE,FALSE,"NX-073, NX-078",Ready,"Post-run report generator summarizing
 NX-080,FALSE,TRUE,"NX-027, NX-005",,Legacy UDP discovery and capabilities exchange
 NX-081,FALSE,TRUE,"NX-027, NX-005",Ready,Legacy PGN bridge for steer and sections
 NX-082,FALSE,TRUE,NX-027,,Legacy UART framing with COBS+CRC at 921600 bps
-NX-083,FALSE,FALSE,NX-027,Ready,Legacy AB line and boundary import wizard feeding Core routes
+NX-083,FALSE,TRUE,NX-027,Ready,Legacy AB line and boundary import wizard feeding Core routes
 NX-084,FALSE,FALSE,NX-083,Ready,Legacy configuration translation CLI for profiles and machine settings
-NX-085,FALSE,FALSE,NX-081,Ready,Teensy bridge regression test suite with recorded PGN sessions
+NX-085,FALSE,TRUE,NX-081,Ready,Teensy bridge regression test suite with recorded PGN sessions
 NX-086,FALSE,FALSE,"NX-084, NX-085",Ready,Legacy migration guide and training materials for operators
 NX-087,FALSE,FALSE,"NX-067, NX-084",Ready,Dealer deployment toolkit with scripts and checklists
 NX-088,FALSE,FALSE,NX-087,Ready,Multi-machine synchronization and licensing workflow definition

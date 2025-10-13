@@ -22,5 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Aog.Plugins\Aog.Plugins.csproj" />
+    <ProjectReference Include="..\..\src\Aog.Core\Aog.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -17,6 +17,11 @@ An AOG message of length `n` has the following general format:
 * **Data** – Payload associated with the PGN.
 * **CRC** – Checksum of bytes 2 through `n-2`.
 
+Serial transports wrap the frame above using COBS encoding with a trailing `0x00` delimiter
+and reuse the same one-byte checksum. Hardware commonly operates at 115200 bps, but Nexus
+adds a 921600 bps option to match modern legacy-compatible modules. `LegacySerialFrameCodec`
+provides a reference implementation of the encoder/decoder pair.
+
 ## PGN catalog
 
 The tables below mirror today’s UDP/serial catalog grouped by module. Fields marked `***` or `*` represent reserved or currently

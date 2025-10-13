@@ -26,73 +26,73 @@ NX-024,FALSE,TRUE,"NX-022, NX-020",,Agio.Linux serial NMEA auto-scan provider
 NX-025,FALSE,TRUE,"NX-022, NX-020",,Agio.Linux gpsd provider
 NX-026,FALSE,TRUE,NX-020,,Timing capabilities probe for PPS/PTP detection
 NX-027,FALSE,TRUE,"NX-020, NX-003, NX-005",,Legacy UDP gateway skeleton translating PGNs to gRPC
-NX-028,FALSE,TRUE,"NX-003, NX-010",,TBD – add detailed scope in tasks.md
-NX-029,FALSE,FALSE,"NX-003, NX-020",Ready,Agio.Linux SocketCAN backend bridging CAN frames to gRPC services
+NX-028,FALSE,TRUE,"NX-003, NX-010",,Core capabilities handshake service bridging AGiO and Core
+NX-029,FALSE,TRUE,"NX-003, NX-020",Ready,Agio.Linux SocketCAN backend bridging CAN frames to gRPC services
 NX-030,FALSE,TRUE,"NX-010, NX-011",,Plugin loader and manifest handling
 NX-031,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",,AutoSteer-Lite plugin v1 (Pure Pursuit and Stanley controllers)
 NX-032,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",,"Sections plugin v1 with mask, speed gate, and look-ahead"
 NX-033,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",,PlanterMonitor plugin v1 publishing per-row status
 NX-034,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",,Simulation provider registrations bundled per plugin
 NX-035,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",,Replay plugin v1 with Parquet reader and playback controls
-NX-036,FALSE,TRUE,"NX-015, NX-030, NX-003",,TBD – add detailed scope in tasks.md
-NX-037,FALSE,FALSE,"NX-031, NX-032, NX-033, NX-034, NX-035",Ready,TBD – add detailed scope in tasks.md
-NX-038,FALSE,FALSE,NX-037,NX-037,TBD – add detailed scope in tasks.md
-NX-039,FALSE,FALSE,"NX-037, NX-038",NX-037,TBD – add detailed scope in tasks.md
+NX-036,FALSE,TRUE,"NX-015, NX-030, NX-003",,Plugin telemetry sink streaming metrics into Core logging
+NX-037,FALSE,FALSE,"NX-031, NX-032, NX-033, NX-034, NX-035",Ready,Simulation scenario library with curated sample configs and operator docs
+NX-038,FALSE,FALSE,NX-037,Ready,Simulation performance and stress harness covering plugin combinations
+NX-039,FALSE,FALSE,"NX-037, NX-038",Ready,Plugin compatibility CI gate with versioned manifest regression tests
 NX-040,FALSE,TRUE,"NX-001, NX-002, NX-003",,Avalonia app bootstrap shell
 NX-041,FALSE,TRUE,NX-040,,Connection and settings panel for AGiO endpoint selection
 NX-042,FALSE,TRUE,"NX-040, NX-003",,"Map view with pan, zoom, and vehicle visualization"
 NX-043,FALSE,TRUE,"NX-012, NX-013, NX-040",,Simulation bar for clock control and routing UI
 NX-044,FALSE,TRUE,"NX-031, NX-032, NX-033, NX-040",,"Steer, Sections, and Planter panels bound to plugin state"
 NX-045,FALSE,TRUE,"NX-043, NX-034",,Scenario editor for selecting providers and options
-NX-046,FALSE,TRUE,"NX-012, NX-013, NX-040, NX-004",,TBD – add detailed scope in tasks.md
-NX-047,FALSE,FALSE,"NX-044, NX-045",Ready,TBD – add detailed scope in tasks.md
-NX-048,FALSE,FALSE,NX-047,NX-047,TBD – add detailed scope in tasks.md
-NX-049,FALSE,FALSE,"NX-047, NX-048",NX-047,TBD – add detailed scope in tasks.md
+NX-046,FALSE,TRUE,"NX-012, NX-013, NX-040, NX-004",,Simulation configuration summary panel in the UI shell
+NX-047,FALSE,FALSE,"NX-044, NX-045",Ready,UI plugin dashboards with historical charts and tuning controls
+NX-048,FALSE,FALSE,"NX-042, NX-051",Ready,Map overlays for coverage heatmaps and guidance paths
+NX-049,FALSE,FALSE,"NX-035, NX-043",Ready,Replay analysis timeline with bookmarks and export options
 NX-050,FALSE,TRUE,"NX-003, NX-004, NX-005",,Inventory of V6 math assets
 NX-051,FALSE,TRUE,NX-050,,Port coverage math with regression tests
 NX-052,FALSE,TRUE,NX-050,,Port AB/curve/headland generation with tests
 NX-053,FALSE,TRUE,NX-050,,Port and tune controller gains and startup sequences
-NX-054,FALSE,FALSE,"NX-050, NX-031",Ready,TBD – add detailed scope in tasks.md
-NX-055,FALSE,FALSE,"NX-051, NX-052, NX-053",Ready,TBD – add detailed scope in tasks.md
-NX-056,FALSE,FALSE,NX-051,Ready,TBD – add detailed scope in tasks.md
-NX-057,FALSE,FALSE,"NX-051, NX-053",Ready,TBD – add detailed scope in tasks.md
-NX-058,FALSE,FALSE,NX-051,Ready,TBD – add detailed scope in tasks.md
-NX-059,FALSE,FALSE,NX-051,Ready,TBD – add detailed scope in tasks.md
+NX-054,FALSE,FALSE,"NX-050, NX-052",Ready,"Import V6 AB lines, headlands, and boundaries into Nexus formats"
+NX-055,FALSE,FALSE,NX-051,Ready,Coverage analytics parity harness comparing Nexus and V6 CSV outputs
+NX-056,FALSE,FALSE,"NX-050, NX-053",Ready,Machine profile translator for hydraulics and implement settings
+NX-057,FALSE,FALSE,"NX-051, NX-053",Ready,Rate control parity validation for sections and planter algorithms
+NX-058,FALSE,FALSE,"NX-051, NX-052",Ready,Guidance tuning auto-calculations aligned with V6 behavior
+NX-059,FALSE,FALSE,"NX-054, NX-055, NX-057, NX-058",Ready,Ported math verification report and documentation updates
 NX-060,FALSE,TRUE,"NX-010, NX-020, NX-040",,"Developer scripts for running core, agio, ui, and sim flows"
 NX-061,FALSE,TRUE,NX-060,,Windows packaging pipeline producing installer/zip
 NX-062,FALSE,TRUE,"NX-006, NX-060, NX-010, NX-020, NX-040",,Linux Pi packaging with deb and systemd units
 NX-063,FALSE,TRUE,"NX-006, NX-060, NX-010, NX-020",,Documentation: Windows no-hardware quickstart
 NX-064,FALSE,TRUE,"NX-041, NX-043, NX-021",,Documentation: Pi/CM5 quickstart (sim then GPS)
-NX-065,FALSE,FALSE,"NX-041, NX-043, NX-024",Ready,TBD – add detailed scope in tasks.md
+NX-065,FALSE,FALSE,"NX-041, NX-043",Ready,UI theming and layout persistence across sessions
 NX-066,FALSE,TRUE,"NX-020, NX-021, NX-022, NX-024, NX-025",,GNSS provider policy with TCP/UDP stream support via IPositionSource
-NX-067,FALSE,FALSE,"NX-060, NX-061",Ready,TBD – add detailed scope in tasks.md
-NX-068,FALSE,FALSE,NX-062,Ready,TBD – add detailed scope in tasks.md
-NX-069,FALSE,FALSE,"NX-063, NX-064",Ready,TBD – add detailed scope in tasks.md
+NX-067,FALSE,FALSE,"NX-060, NX-061, NX-062",Ready,Release pipeline with signing and artifact promotion stages
+NX-068,FALSE,FALSE,NX-060,Ready,Crash and telemetry opt-in service with privacy controls
+NX-069,FALSE,FALSE,NX-067,Ready,Installer and update channel documentation for operators
 NX-070,FALSE,TRUE,"NX-010, NX-020",,Heartbeats and failsafe watchdog between AGiO and plugins
 NX-071,FALSE,TRUE,"NX-070, NX-010, NX-020",,Arming and state machine gating outputs
 NX-072,FALSE,TRUE,"NX-012, NX-013",,Deterministic simulation regression test (10s run)
-NX-073,FALSE,FALSE,"NX-012, NX-013, NX-034",Ready,TBD – add detailed scope in tasks.md
-NX-074,FALSE,FALSE,"NX-070, NX-071, NX-072, NX-073",Ready,TBD – add detailed scope in tasks.md
-NX-075,FALSE,FALSE,NX-074,NX-074,TBD – add detailed scope in tasks.md
-NX-076,FALSE,FALSE,"NX-074, NX-075",NX-074,TBD – add detailed scope in tasks.md
-NX-077,FALSE,FALSE,NX-074,NX-074,TBD – add detailed scope in tasks.md
-NX-078,FALSE,FALSE,NX-074,NX-074,TBD – add detailed scope in tasks.md
-NX-079,FALSE,FALSE,NX-078,NX-078,TBD – add detailed scope in tasks.md
+NX-073,FALSE,FALSE,"NX-070, NX-071",Ready,End-to-end failsafe integration tests in CI and bench rigs
+NX-074,FALSE,FALSE,NX-073,Ready,Field safety validation checklist and sign-off workflow
+NX-075,FALSE,FALSE,NX-073,Ready,Hardware-in-the-loop automation rig for regression testing
+NX-076,FALSE,FALSE,NX-073,Ready,"Fault injection harness for sensors, network, and power events"
+NX-077,FALSE,FALSE,"NX-070, NX-075",Ready,Safety log retention and export tooling with retention policy
+NX-078,FALSE,FALSE,"NX-073, NX-077",Ready,"QA dashboard aggregating simulation, hardware, and safety metrics"
+NX-079,FALSE,FALSE,"NX-073, NX-078",Ready,"Post-run report generator summarizing guidance, coverage, and alarms"
 NX-080,FALSE,TRUE,"NX-027, NX-005",,Legacy UDP discovery and capabilities exchange
-NX-081,FALSE,FALSE,"NX-027, NX-005",Ready,Legacy PGN bridge for steer and sections
+NX-081,FALSE,TRUE,"NX-027, NX-005",Ready,Legacy PGN bridge for steer and sections
 NX-082,FALSE,TRUE,NX-027,,Legacy UART framing with COBS+CRC at 921600 bps
-NX-083,FALSE,FALSE,NX-027,Ready,TBD – add detailed scope in tasks.md
-NX-084,FALSE,FALSE,"NX-080, NX-081, NX-082, NX-083",Ready,TBD – add detailed scope in tasks.md
-NX-085,FALSE,FALSE,NX-084,NX-084,TBD – add detailed scope in tasks.md
-NX-086,FALSE,FALSE,NX-084,NX-084,TBD – add detailed scope in tasks.md
-NX-087,FALSE,FALSE,"NX-084, NX-085, NX-086",NX-084,TBD – add detailed scope in tasks.md
-NX-088,FALSE,FALSE,NX-084,NX-084,TBD – add detailed scope in tasks.md
-NX-089,FALSE,FALSE,NX-087,NX-087,TBD – add detailed scope in tasks.md
-NX-090,FALSE,FALSE,"NX-087, NX-088",NX-087,TBD – add detailed scope in tasks.md
-NX-091,FALSE,FALSE,NX-087,NX-087,TBD – add detailed scope in tasks.md
-NX-092,FALSE,FALSE,NX-087,NX-087,TBD – add detailed scope in tasks.md
-NX-093,FALSE,FALSE,NX-087,NX-087,TBD – add detailed scope in tasks.md
-NX-094,FALSE,FALSE,NX-087,NX-087,TBD – add detailed scope in tasks.md
-NX-095,FALSE,FALSE,NX-087,NX-087,TBD – add detailed scope in tasks.md
-NX-096,FALSE,FALSE,NX-087,NX-087,TBD – add detailed scope in tasks.md
-NX-097,FALSE,FALSE,NX-087,NX-087,TBD – add detailed scope in tasks.md
+NX-083,FALSE,FALSE,NX-027,Ready,Legacy AB line and boundary import wizard feeding Core routes
+NX-084,FALSE,FALSE,NX-083,Ready,Legacy configuration translation CLI for profiles and machine settings
+NX-085,FALSE,FALSE,NX-081,Ready,Teensy bridge regression test suite with recorded PGN sessions
+NX-086,FALSE,FALSE,"NX-084, NX-085",Ready,Legacy migration guide and training materials for operators
+NX-087,FALSE,FALSE,"NX-067, NX-084",Ready,Dealer deployment toolkit with scripts and checklists
+NX-088,FALSE,FALSE,NX-087,Ready,Multi-machine synchronization and licensing workflow definition
+NX-089,FALSE,FALSE,NX-085,Ready,High-rate serial and UDP stress testing with soak reports
+NX-090,FALSE,FALSE,"NX-085, NX-083",Ready,Legacy auto-run scenario pack with verification logs
+NX-091,FALSE,FALSE,"NX-055, NX-085",Ready,Legacy coverage export verification against Nexus outputs
+NX-092,FALSE,FALSE,NX-084,Ready,Legacy data migration utility for logs and field histories
+NX-093,FALSE,FALSE,NX-092,Ready,Support knowledge base for bridging workflows and troubleshooting
+NX-094,FALSE,FALSE,"NX-078, NX-092",Ready,Field feedback telemetry aggregator feeding support dashboards
+NX-095,FALSE,FALSE,"NX-087, NX-093",Ready,Dealer support escalation process and SLA tracking
+NX-096,FALSE,FALSE,"NX-087, NX-094",Ready,Community preview program with opt-in builds and survey loop
+NX-097,FALSE,FALSE,"NX-095, NX-096",Ready,1.0 launch readiness review and sign-off checklist

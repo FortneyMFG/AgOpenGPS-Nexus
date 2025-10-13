@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Aog.Core.Legacy;
 using Aog.Core.Replay;
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
@@ -167,6 +168,19 @@ public class MainWindowViewModel : INotifyPropertyChanged
             _scenarioDefinitions,
             scenario => SimulationBar.ApplyScenario(scenario),
             () => SimulationBar.ResetToConfigurationRoutes());
+    }
+
+    /// <summary>
+    /// Creates a legacy import wizard view-model wired to update the simulation routes.
+    /// </summary>
+    public LegacyImportWizardViewModel CreateLegacyImportWizardViewModel()
+    {
+        var service = new LegacyGuidanceImportService();
+        return new LegacyImportWizardViewModel(service, result =>
+        {
+            SimulationBar.ApplyLegacyImport(result);
+            return true;
+        });
     }
 
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)

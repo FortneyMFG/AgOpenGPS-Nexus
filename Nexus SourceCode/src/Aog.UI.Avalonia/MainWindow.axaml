@@ -72,8 +72,14 @@
                         Click="OnOpenScenarioEditor"/>
               </Grid>
 
+              <Button Grid.Row="2"
+                      Content="Import legacy guidance..."
+                      Padding="12,4"
+                      HorizontalAlignment="Left"
+                      Click="OnOpenLegacyImportWizard"/>
+
               <!-- Transport + playback rates -->
-              <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+              <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                 <Button Content="{Binding SimulationBar.PlayPauseLabel}"
                         Command="{Binding SimulationBar.TogglePlaybackCommand}"
                         MinWidth="96"/>
@@ -103,7 +109,7 @@
               </StackPanel>
 
               <!-- Scrubber -->
-              <Grid Grid.Row="3" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalAlignment="Center">
+              <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalAlignment="Center">
                 <TextBlock Text="{Binding SimulationBar.PositionDisplay}" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1"
                         Minimum="0" Maximum="1"
@@ -115,7 +121,7 @@
               </Grid>
 
               <!-- Stream routing -->
-              <StackPanel Grid.Row="4" Margin="0,4,0,0" Spacing="8">
+              <StackPanel Grid.Row="5" Margin="0,4,0,0" Spacing="8">
                 <TextBlock Text="Stream routing" FontWeight="SemiBold"/>
                 <ItemsControl ItemsSource="{Binding SimulationBar.Routes}">
                   <ItemsControl.ItemTemplate>

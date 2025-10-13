@@ -123,4 +123,15 @@ public partial class MainWindow : Window
         var window = new ScenarioEditorWindow(viewModel.CreateScenarioEditorViewModel());
         await window.ShowDialog(this);
     }
+
+    private async void OnOpenLegacyImportWizard(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel viewModel)
+        {
+            return;
+        }
+
+        var window = new LegacyImportWizardWindow(viewModel.CreateLegacyImportWizardViewModel());
+        await window.ShowDialog(this);
+    }
 }

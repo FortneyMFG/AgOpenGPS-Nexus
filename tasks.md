@@ -105,9 +105,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-080 UDP discovery + capability exchange
 - [x] NX-081 PGN bridge (steer + sections)
 - [x] NX-082 UART framing utility
-- [ ] NX-083 Legacy AB line/boundary import wizard
+- [x] NX-083 Legacy AB line/boundary import wizard
 - [ ] NX-084 Legacy configuration translation CLI
-- [ ] NX-085 Teensy bridge regression test suite
+- [x] NX-085 Teensy bridge regression test suite
 - [ ] NX-086 Legacy migration guide & training set
 - [ ] NX-087 Dealer deployment toolkit
 - [ ] NX-088 Multi-machine sync & licensing workflow

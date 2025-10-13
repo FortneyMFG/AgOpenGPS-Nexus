@@ -49,6 +49,8 @@ dotnet run --project src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj
 
 The bootstrap window displays the current operating system description to confirm cross-platform execution. Dependency injection wires the application, main window, and view-model using `Microsoft.Extensions.Hosting`.
 
+An embedded simulation sample is parsed at startup and the window prints the ordered provider graph so contributors can verify the new configuration loader logic without additional tooling.
+
 ## Testing
 
 Execute the unit tests with:

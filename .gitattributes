@@ -1,17 +1,25 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Normalize line endings by default while allowing overrides for tooling-specific files.
+* text=auto eol=lf
 
-# Custom for Visual Studio
-*.cs     diff=csharp
+# Solution files retain Windows line endings for Visual Studio compatibility.
+*.sln text eol=crlf
 
-# Standard to msysgit
-*.doc	 diff=astextplain
-*.DOC	 diff=astextplain
+# C# sources/build assets use LF line endings and csharp-aware diffs.
+*.cs text eol=lf diff=csharp
+*.csproj text eol=lf
+
+# Script defaults.
+*.ps1 text eol=crlf
+*.sh text eol=lf
+
+# Keep legacy document diff behaviour.
+*.doc  diff=astextplain
+*.DOC  diff=astextplain
 *.docx diff=astextplain
 *.DOCX diff=astextplain
 *.dot  diff=astextplain
 *.DOT  diff=astextplain
 *.pdf  diff=astextplain
-*.PDF	 diff=astextplain
-*.rtf	 diff=astextplain
-*.RTF	 diff=astextplain
+*.PDF  diff=astextplain
+*.rtf  diff=astextplain
+*.RTF  diff=astextplain

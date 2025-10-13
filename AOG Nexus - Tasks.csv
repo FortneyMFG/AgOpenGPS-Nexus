@@ -100,5 +100,16 @@ NX-098,FALSE,FALSE,"NX-030, NX-029",,ISOBUS communications plugin enabling ISO 1
 NX-099,FALSE,FALSE,NX-098,NX-098,Update SRS for ISOBUS communications plugin coverage
 NX-100,FALSE,TRUE,"NX-030, NX-012, NX-013",,Combine yield monitoring plugin for crop flow sensors and mapping
 NX-101,FALSE,FALSE,NX-100,NX-100,Update SRS for combine yield monitoring plugin details
-NX-102,FALSE,FALSE,,,V6 functionality inventory and gap analysis across Nexus
+NX-102,FALSE,TRUE,,,V6 functionality inventory and gap analysis across Nexus
 NX-103,FALSE,TRUE,,,Sync tasks.md with tasks.csv tracker
+NX-104,FALSE,TRUE,NX-002,,"ADR for metadata-driven variable-rate layer mapping and agronomic imports"
+NX-105,FALSE,FALSE,NX-054,,Extend legacy importer to load BackPic imagery bundles
+NX-106,FALSE,FALSE,NX-054,,Import Field.txt overview metadata into Nexus field records
+NX-107,FALSE,FALSE,"NX-054, NX-104",,Parse Flags.txt markers and expose them in the UI map
+NX-108,FALSE,FALSE,NX-054,,Resume Contour.txt passes within Nexus contour guidance
+NX-109,FALSE,FALSE,"NX-054, NX-035",,Translate RecPath.txt logs into replay-compatible datasets
+NX-110,FALSE,FALSE,NX-054,,Import Tram.txt templates and hook them into tramline planning
+NX-111,FALSE,FALSE,"NX-054, NX-032",,Load Sections.txt history into the layer registry for coverage continuity
+NX-112,FALSE,FALSE,"NX-104, NX-032",,Replace binary section overlay with layer-aware visualization in the UI
+NX-113,FALSE,FALSE,NX-104,,Build GeoTIFF/ISOXML/shapefile importers that normalize agronomic maps into layers
+NX-114,FALSE,FALSE,"NX-104, NX-032",,Variable-rate controller plugin converting layer tiles into commanded section rates

@@ -68,11 +68,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-051 Coverage math port + tests
 - [x] NX-052 AB/curve/headland generation port
 - [x] NX-053 Controller gains/tuners
-- [ ] NX-054 V6 AB/headland import
-- [ ] NX-055 Coverage analytics parity harness
-- [ ] NX-056 Machine profile translator
-- [ ] NX-057 Rate control parity validation
-- [ ] NX-058 Guidance tuning auto-calculations
+- [x] NX-054 V6 AB/headland import
+- [x] NX-055 Coverage analytics parity harness
+- [x] NX-056 Machine profile translator
+- [x] NX-057 Rate control parity validation
+- [x] NX-058 Guidance tuning auto-calculations
 - [ ] NX-059 Ported math verification report
 
 ### Section G — Packaging, DevEx, Docs
@@ -203,11 +203,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-051 | Coverage math port + tests | Done |  | — | [SRS §5.2 Coverage Math](docs/SRS/NOTES.md#srs-52-coverage-math) | Compare vs V6 CSVs |
 | NX-052 | AB/curve/headland generation port | Done |  | — | [SRS §5.3 Path Generation](docs/SRS/NOTES.md#srs-53-path-generation) | Tests green |
 | NX-053 | Controller gains/tuners | Done |  | — | [SRS §5.4 Controller Gains](docs/SRS/NOTES.md#srs-54-controller-gains) | Meets error targets |
-| NX-054 | Import V6 AB lines, headlands, and boundaries into Nexus formats | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | CLI + UI wizard |
-| NX-055 | Coverage analytics parity harness comparing Nexus and V6 CSV outputs | Planned |  | — | [SRS §5.2 Coverage Math](docs/SRS/NOTES.md#srs-52-coverage-math) | Automated diff thresholds |
-| NX-056 | Machine profile translator for hydraulics and implement settings | Planned |  | — | [SRS §5.6 Machine Profiles](docs/SRS/NOTES.md#srs-56-machine-profiles) | Generate Nexus profiles from V6 |
-| NX-057 | Rate control parity validation for sections and planter algorithms | Planned |  | — | [SRS §5.7 Rate Control](docs/SRS/NOTES.md#srs-57-rate-control) | Bench + sim comparison |
-| NX-058 | Guidance tuning auto-calculations aligned with V6 behavior | Planned |  | — | [SRS §5.4 Controller Gains](docs/SRS/NOTES.md#srs-54-controller-gains) | Auto-tune heuristics |
+| NX-054 | Import V6 AB lines, headlands, and boundaries into Nexus formats | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | CLI + UI wizard |
+| NX-055 | Coverage analytics parity harness comparing Nexus and V6 CSV outputs | Done |  | — | [SRS §5.2 Coverage Math](docs/SRS/NOTES.md#srs-52-coverage-math) | Automated diff thresholds |
+| NX-056 | Machine profile translator for hydraulics and implement settings | Done |  | — | [SRS §5.6 Machine Profiles](docs/SRS/NOTES.md#srs-56-machine-profiles) | Generate Nexus profiles from V6 |
+| NX-057 | Rate control parity validation for sections and planter algorithms | Done |  | — | [SRS §5.7 Rate Control](docs/SRS/NOTES.md#srs-57-rate-control) | Bench + sim comparison |
+| NX-058 | Guidance tuning auto-calculations aligned with V6 behavior | Done |  | — | [SRS §5.4 Controller Gains](docs/SRS/NOTES.md#srs-54-controller-gains) | Auto-tune heuristics |
 | NX-059 | Ported math verification report and documentation updates | Planned |  | — | [SRS §5.8 Verification](docs/SRS/NOTES.md#srs-58-verification) | Summarize parity metrics |
 
 ### Section G — Packaging, DevEx, Docs

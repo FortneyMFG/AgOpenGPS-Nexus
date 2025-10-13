@@ -17,6 +17,29 @@ that higher-level orchestration or smoke tests can watch for successful startup/
 Changes to `CoreHost:Health:IntervalSeconds` are applied without restarting the process, and the
 service logs whenever the heartbeat cadence is updated so operators can confirm the new interval.
 
+When the host starts it performs a capabilities handshake with the configured AGiO endpoint.
+The handshake endpoint and advertised capabilities can be customised under the
+`CoreHost:Agio` and `CoreHost:Capabilities` sections. The following excerpt demonstrates the
+available settings:
+
+```json
+{
+  "CoreHost": {
+    "Agio": {
+      "Endpoint": "https://localhost:5105"
+    },
+    "Capabilities": {
+      "NodeId": "core-host",
+      "SessionPrefix": "core-",
+      "AdvertisedCapabilities": [
+        "nav.pose",
+        "nav.imu"
+      ]
+    }
+  }
+}
+```
+
 ### Configuration
 
 `CoreHost:Health:IntervalSeconds` controls how frequently the heartbeat message is emitted. The
@@ -49,7 +72,13 @@ dotnet build AgOpenGPS.Nexus.sln
 dotnet run --project src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj
 ```
 
-The bootstrap window displays the current operating system description to confirm cross-platform execution. Dependency injection wires the application, main window, and view-model using `Microsoft.Extensions.Hosting`.
+The shell displays the current operating system description and exposes a connection settings panel for configuring AgIO. Dependency injection wires the application, main window, and view-model using `Microsoft.Extensions.Hosting`.
+
+### Connection settings panel
+
+- Choose the AGiO endpoint URI, backend target, and GPS source policy from the shell.
+- Settings are persisted to `%AppData%/AgOpenGPS/Nexus/connection-settings.json` on Windows and `$XDG_CONFIG_HOME/AgOpenGPS/Nexus/connection-settings.json` (or `~/.config/AgOpenGPS/Nexus/connection-settings.json`) on Linux.
+- The **Save settings** button activates when changes are detected and the endpoint field is populated.
 
 An embedded simulation sample is parsed at startup and the window prints the ordered provider graph so contributors can verify the new configuration loader logic without additional tooling. The shell also exposes a simulation control bar (NX-043) that provides play/pause, scrub, and playback rate controls alongside combo boxes for selecting the source and mode for each routed stream.
 

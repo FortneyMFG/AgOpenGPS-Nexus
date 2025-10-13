@@ -3,82 +3,175 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
+        xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
         x:Class="Aog.UI.Avalonia.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
         Title="{Binding Title}"
-        Width="800"
-        Height="600"
+        Width="1000"
+        Height="700"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
-  <Grid RowDefinitions="Auto,*" Margin="24">
+
+  <Grid Margin="24">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <!-- Header -->
     <TextBlock Text="{Binding Title}" FontSize="28" FontWeight="Bold"/>
-    <Border Grid.Row="1" Margin="0,24,0,0" Padding="16" CornerRadius="8" Background="#0F000000">
-      <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
-        <TextBlock Text="Welcome to the AgOpenGPS Nexus shell" FontSize="18"/>
-        <TextBlock Grid.Row="1" Margin="0,8,0,0" Text="{Binding PlatformDescription}"/>
-        <TextBlock Grid.Row="2" Margin="0,8,0,0" Text="This bootstrap window is backed by dependency injection."/>
-        <Border Grid.Row="3" Margin="0,16,0,0" Padding="12" CornerRadius="6" Background="#12000000">
-          <Grid RowDefinitions="Auto,Auto,Auto,Auto">
-            <TextBlock Text="Simulation controls" FontWeight="SemiBold"/>
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" Margin="0,8,0,0" VerticalAlignment="Center">
-              <Button Content="{Binding SimulationBar.PlayPauseLabel}" Command="{Binding SimulationBar.TogglePlaybackCommand}" MinWidth="96"/>
-              <TextBlock Text="{Binding SimulationBar.StatusText}" VerticalAlignment="Center"/>
-              <ItemsControl ItemsSource="{Binding SimulationBar.PlaybackRates}" Margin="16,0,0,0">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="8"/>
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <RadioButton Content="{Binding Label}"
-                                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                 Command="{Binding SelectCommand}"
-                                 GroupName="PlaybackRates"
-                                 Padding="12,4"
-                                 HorizontalAlignment="Center"/>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-              <TextBlock Text="{Binding SimulationBar.SelectedPlaybackRateLabel}" Margin="16,0,0,0" VerticalAlignment="Center"/>
-            </StackPanel>
-            <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Margin="0,12,0,0" VerticalAlignment="Center">
-              <TextBlock Text="{Binding SimulationBar.PositionDisplay}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-              <Slider Grid.Column="1"
-                      Minimum="0"
-                      Maximum="1"
-                      Value="{Binding SimulationBar.SeekFraction}"
-                      SmallChange="0.01"
-                      LargeChange="0.1"/>
-              <TextBlock Grid.Column="2" Text="{Binding SimulationBar.DurationDisplay}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+
+    <!-- Content -->
+    <Grid Grid.Row="1" ColumnDefinitions="3*,2*" ColumnSpacing="24" Margin="0,24,0,0">
+      <!-- Left: Map -->
+      <Border Grid.Column="0"
+              CornerRadius="12"
+              Background="#101920"
+              BorderBrush="#1F2D36"
+              BorderThickness="1">
+        <controls:MapView VehiclePose="{Binding VehiclePose}"/>
+      </Border>
+
+      <!-- Right: Info + Controls -->
+      <ScrollViewer Grid.Column="1">
+        <StackPanel Spacing="16">
+          <TextBlock Text="{Binding PlatformDescription}" TextWrapping="Wrap"/>
+          <TextBlock Text="Use the mouse wheel to zoom and drag with the left mouse button to pan the map." TextWrapping="Wrap"/>
+          <TextBlock Text="The highlighted dot shows the current vehicle position and heading." TextWrapping="Wrap"/>
+
+          <!-- Simulation controls -->
+          <Border Padding="16" CornerRadius="8" Background="#0F000000">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8">
+              <TextBlock Text="Simulation controls" FontWeight="SemiBold"/>
+
+              <!-- Transport + playback rates -->
+              <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <Button Content="{Binding SimulationBar.PlayPauseLabel}"
+                        Command="{Binding SimulationBar.TogglePlaybackCommand}"
+                        MinWidth="96"/>
+                <TextBlock Text="{Binding SimulationBar.StatusText}" VerticalAlignment="Center"/>
+
+                <ItemsControl ItemsSource="{Binding SimulationBar.PlaybackRates}" Margin="16,0,0,0">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Horizontal" Spacing="8"/>
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <RadioButton Content="{Binding Label}"
+                                   IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                   Command="{Binding SelectCommand}"
+                                   GroupName="PlaybackRates"
+                                   Padding="12,4"
+                                   HorizontalAlignment="Center"/>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="{Binding SimulationBar.SelectedPlaybackRateLabel}"
+                           Margin="16,0,0,0"
+                           VerticalAlignment="Center"/>
+              </StackPanel>
+
+              <!-- Scrubber -->
+              <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalAlignment="Center">
+                <TextBlock Text="{Binding SimulationBar.PositionDisplay}" VerticalAlignment="Center"/>
+                <Slider Grid.Column="1"
+                        Minimum="0" Maximum="1"
+                        Value="{Binding SimulationBar.SeekFraction}"
+                        SmallChange="0.01" LargeChange="0.1"/>
+                <TextBlock Grid.Column="2"
+                           Text="{Binding SimulationBar.DurationDisplay}"
+                           VerticalAlignment="Center"/>
+              </Grid>
+
+              <!-- Stream routing -->
+              <StackPanel Grid.Row="3" Margin="0,4,0,0" Spacing="8">
+                <TextBlock Text="Stream routing" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding SimulationBar.Routes}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid ColumnDefinitions="2*,3*,2*" Margin="0,4,0,4" ColumnSpacing="8">
+                        <TextBlock Text="{Binding Stream}" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding AvailableSources}"
+                                  SelectedItem="{Binding SelectedSource, Mode=TwoWay}"
+                                  MinWidth="160"/>
+                        <ComboBox Grid.Column="2"
+                                  ItemsSource="{Binding AvailableModes}"
+                                  SelectedItem="{Binding SelectedMode, Mode=TwoWay}"
+                                  MinWidth="140"/>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
             </Grid>
-            <StackPanel Grid.Row="3" Margin="0,16,0,0" Spacing="8">
-              <TextBlock Text="Stream routing" FontWeight="SemiBold"/>
-              <ItemsControl ItemsSource="{Binding SimulationBar.Routes}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <Grid ColumnDefinitions="2*,3*,2*" Margin="0,4,0,4">
-                      <TextBlock Text="{Binding Stream}" VerticalAlignment="Center"/>
-                      <ComboBox Grid.Column="1"
-                                ItemsSource="{Binding AvailableSources}"
-                                SelectedItem="{Binding SelectedSource, Mode=TwoWay}"
-                                MinWidth="160"/>
-                      <ComboBox Grid.Column="2"
-                                ItemsSource="{Binding AvailableModes}"
-                                SelectedItem="{Binding SelectedMode, Mode=TwoWay}"
-                                MinWidth="140"/>
-                    </Grid>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
+          </Border>
+
+          <!-- Simulation graph summary -->
+          <Border Padding="16" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
+            <Grid RowDefinitions="Auto,*" RowSpacing="8">
+              <TextBlock Text="Embedded simulation provider graph" FontWeight="SemiBold"/>
+              <TextBox Text="{Binding SimulationGraphSummary}"
+                       IsReadOnly="True"
+                       AcceptsReturn="True"
+                       TextWrapping="Wrap"
+                       MinHeight="160"
+                       FontFamily="Consolas, Courier New, monospace"/>
+            </Grid>
+          </Border>
+
+          <!-- Connection settings -->
+          <Border Padding="20" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
+            <StackPanel Spacing="16" DataContext="{Binding Connection}" x:DataType="vm:ConnectionSettingsViewModel">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Connection settings" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="Configure how Nexus connects to AGiO and chooses GPS sources."
+                           Foreground="#99000000"
+                           TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="12" ColumnSpacing="12">
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="AGiO endpoint" VerticalAlignment="Center"/>
+                <TextBox   Grid.Column="1" Grid.Row="0"
+                           Text="{Binding AgioEndpoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                           Watermark="e.g. http://localhost:50051"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Backend" VerticalAlignment="Center"/>
+                <ComboBox  Grid.Column="1" Grid.Row="1"
+                           Items="{Binding AvailableBackends}"
+                           SelectedItem="{Binding SelectedBackend, Mode=TwoWay}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="GPS source policy" VerticalAlignment="Center"/>
+                <ComboBox  Grid.Column="1" Grid.Row="2"
+                           Items="{Binding AvailableGpsSourcePolicies}"
+                           SelectedItem="{Binding SelectedGpsSourcePolicy, Mode=TwoWay}"/>
+              </Grid>
+
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock x:Name="StatusText" Text="{Binding StatusMessage}" VerticalAlignment="Center" TextWrapping="Wrap">
+                  <TextBlock.Styles>
+                    <Style Selector="TextBlock#StatusText">
+                      <Setter Property="Foreground" Value="#FF201F1E"/>
+                      <DataTrigger Binding="{Binding HasError}" Value="True">
+                        <Setter Property="Foreground" Value="#D13438"/>
+                      </DataTrigger>
+                    </Style>
+                  </TextBlock.Styles>
+                </TextBlock>
+
+                <Button Grid.Column="1"
+                        Content="Save settings"
+                        Command="{Binding SaveCommand}"
+                        MinWidth="140"
+                        HorizontalAlignment="Right"/>
+              </Grid>
             </StackPanel>
-          </Grid>
-        </Border>
-        <StackPanel Grid.Row="4" Spacing="4">
-          <TextBlock Text="Embedded simulation provider graph" FontWeight="SemiBold"/>
-          <TextBox Text="{Binding SimulationGraphSummary}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
-                   MinHeight="160" FontFamily="Consolas, Courier New, monospace"/>
+          </Border>
         </StackPanel>
-      </Grid>
-    </Border>
+      </ScrollViewer>
+    </Grid>
   </Grid>
 </Window>

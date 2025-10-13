@@ -1,6 +1,7 @@
 using System.Linq;
 using Aog.UI.Avalonia;
 using Aog.UI.Avalonia.Hosting;
+using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,11 @@ public class AvaloniaUiShellServiceCollectionExtensionsTests
             .Which.Lifetime.Should().Be(ServiceLifetime.Singleton);
         services.Should().ContainSingle(descriptor => descriptor.ServiceType == typeof(MainWindowViewModel))
             .Which.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        services.Should().ContainSingle(descriptor => descriptor.ServiceType == typeof(ConnectionSettingsViewModel))
+            .Which.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        services.Should().ContainSingle(descriptor => descriptor.ServiceType == typeof(IConnectionSettingsStore)
+            && descriptor.ImplementationType == typeof(JsonConnectionSettingsStore))
+            .Which.Lifetime.Should().Be(ServiceLifetime.Singleton);
     }
 
     [Fact]
@@ -36,5 +42,7 @@ public class AvaloniaUiShellServiceCollectionExtensionsTests
         services.Count(descriptor => descriptor.ServiceType == typeof(App)).Should().Be(1);
         services.Count(descriptor => descriptor.ServiceType == typeof(MainWindow)).Should().Be(1);
         services.Count(descriptor => descriptor.ServiceType == typeof(MainWindowViewModel)).Should().Be(1);
+        services.Count(descriptor => descriptor.ServiceType == typeof(ConnectionSettingsViewModel)).Should().Be(1);
+        services.Count(descriptor => descriptor.ServiceType == typeof(IConnectionSettingsStore)).Should().Be(1);
     }
 }

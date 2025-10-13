@@ -40,8 +40,12 @@ and the broader Software Requirements Specification (SRS) set under `/docs/SRS`.
 ├── docs/                  # SRS, ADRs, how-tos, templates
 │   ├── SRS/               # System Requirements (single source of truth)
 │   └── NOTES.md           # Living notes about the SRS canon and clarifications
-├── Nexus Source Code/     # New Nexus solution space (empty scaffold today)
-│   └── proto/             # gRPC contracts (to be defined in Wave 1)
+├── Nexus SourceCode/      # Nexus .NET 8 solution (Avalonia UI bootstrap, tests)
+│   ├── AgOpenGPS.Nexus.sln
+│   ├── Directory.Build.props
+│   ├── README.md
+│   ├── src/               # Production projects (Avalonia shell lives here)
+│   └── tests/             # Test projects
 ├── Legacy SourceCode -V6/ # Historical AgOpenGPS materials for reference
 ├── tasks.md               # Active backlog with per-lane ticket tracking
 ├── AGENTS.md              # Contribution conventions and automation guardrails

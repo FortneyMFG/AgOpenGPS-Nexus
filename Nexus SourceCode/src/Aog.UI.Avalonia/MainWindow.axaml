@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
+        x:Class="Aog.UI.Avalonia.MainWindow"
+        Title="{Binding Title}"
+        Width="800"
+        Height="600"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
+  <Grid RowDefinitions="Auto,*" Margin="24">
+    <TextBlock Text="{Binding Title}" FontSize="28" FontWeight="Bold"/>
+    <Border Grid.Row="1" Margin="0,24,0,0" Padding="16" CornerRadius="8" Background="#0F000000">
+      <StackPanel Spacing="8">
+        <TextBlock Text="Welcome to the AgOpenGPS Nexus shell" FontSize="18"/>
+        <TextBlock Text="{Binding PlatformDescription}"/>
+        <TextBlock Text="This bootstrap window is backed by dependency injection."/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

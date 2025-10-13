@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "services": {
+    "host": "0.0.0.0",
+    "grpcPort": 50051,
+    "restPort": 8080,
+    "enableTls": false
+  },
+  "logging": {
+    "minimumLevel": "Information",
+    "sinks": [
+      {
+        "type": "console",
+        "minimumLevel": "Information"
+      },
+      {
+        "type": "file",
+        "path": "logs/core.log",
+        "rollingInterval": "Day",
+        "minimumLevel": "Debug"
+      }
+    ]
+  },
+  "agio": {
+    "primary": {
+      "host": "127.0.0.1",
+      "port": 6050,
+      "transport": "grpc"
+    },
+    "fallback": {
+      "host": "192.168.1.20",
+      "port": 6050,
+      "transport": "grpc"
+    },
+    "capabilityCache": "state/agio-capabilities.json"
+  },
+  "plugins": {
+    "searchPaths": ["plugins", "../shared-plugins"],
+    "autoEnable": false,
+    "allowUnsigned": false
+  },
+  "simulation": {
+    "activeScenario": "sample-scenario",
+    "catalog": {
+      "providers": [
+        {
+          "providerId": "sim.pose.basic",
+          "type": "Aog.Sim.BasicPoseProvider",
+          "settings": {
+            "updateHz": 20,
+            "noiseMeters": 0.05
+          },
+          "outputs": ["pose"]
+        },
+        {
+          "providerId": "sim.vehicle.dynamics",
+          "type": "Aog.Sim.Vehicle.BicycleModel",
+          "settings": {
+            "wheelbaseMeters": 2.8,
+            "maxSteerAngleDeg": 27
+          },
+          "inputs": ["steerCommand"],
+          "outputs": ["steerState"]
+        }
+      ],
+      "routes": [
+        {"stream": "pose", "source": "sim.pose.basic", "mode": "simulation"},
+        {"stream": "steer", "source": "sim.vehicle.dynamics", "mode": "simulation"}
+      ],
+      "options": {
+        "seed": 1337,
+        "timeScale": 1.0
+      }
+    }
+  }
+}

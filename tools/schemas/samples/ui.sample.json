@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0.0",
+  "theme": {
+    "mode": "dark",
+    "accent": "#00AEEF",
+    "contrast": "standard",
+    "fontScale": 1.0
+  },
+  "connections": {
+    "core": {"host": "127.0.0.1", "port": 50051, "transport": "grpc"},
+    "agio": {"host": "127.0.0.1", "port": 6050, "transport": "grpc"},
+    "autoReconnect": true
+  },
+  "panels": [
+    {
+      "panelId": "sim-bar",
+      "title": "Simulation",
+      "layout": {"rows": 1, "columns": 3},
+      "widgets": [
+        {"gaugeId": "sim.clock", "row": 1, "column": 1, "size": "small"},
+        {"gaugeId": "sim.speed", "row": 1, "column": 2, "size": "small"}
+      ]
+    },
+    {
+      "panelId": "vehicle",
+      "title": "Vehicle",
+      "layout": {"rows": 2, "columns": 2},
+      "widgets": [
+        {"gaugeId": "pose.heading", "row": 1, "column": 1, "size": "medium"},
+        {"gaugeId": "pose.lateral", "row": 1, "column": 2, "size": "medium"},
+        {"gaugeId": "steer.status", "row": 2, "column": 1, "size": "medium"}
+      ]
+    }
+  ],
+  "gauges": [
+    {
+      "gaugeId": "sim.clock",
+      "title": "Sim Clock",
+      "source": {"stream": "simulation", "field": "timeScale"},
+      "ttlMs": 2000
+    },
+    {
+      "gaugeId": "sim.speed",
+      "title": "Sim Speed",
+      "source": {"stream": "simulation", "field": "speed"},
+      "smoothing": {"emaAlpha": 0.2},
+      "thresholds": {"warn": 15.0, "crit": 20.0}
+    },
+    {
+      "gaugeId": "pose.heading",
+      "title": "Heading",
+      "source": {"stream": "pose", "field": "headingDegrees", "units": "deg"},
+      "thresholds": {"qualityScore": 0.8}
+    },
+    {
+      "gaugeId": "pose.lateral",
+      "title": "Lateral Error",
+      "source": {"stream": "pose", "field": "crossTrackMeters", "units": "m"},
+      "smoothing": {"emaAlpha": 0.3, "deadband": 0.05},
+      "thresholds": {"warn": 0.3, "crit": 0.6}
+    },
+    {
+      "gaugeId": "steer.status",
+      "title": "Steer Status",
+      "source": {"stream": "steer", "field": "engaged"},
+      "ttlMs": 1000
+    }
+  ],
+  "inputBindings": [
+    {"action": "toggleAutoSteer", "binding": "Key.A"},
+    {"action": "pauseSim", "binding": "Key.Space"},
+    {"action": "increaseSimSpeed", "binding": "Key.Equals"},
+    {"action": "decreaseSimSpeed", "binding": "Key.Minus"}
+  ]
+}

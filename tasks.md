@@ -12,6 +12,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-003 Protobuf v1 contracts
 - [x] NX-004 JSON schema suite
 - [x] NX-005 Capabilities handshake service
+- [x] NX-104 Metadata-driven variable-rate layer mapping ADR _(Done)_
 
 ### Section B — Core (Headless, Sim Graph)
 - [x] NX-010 Core host skeleton
@@ -51,6 +52,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-039 Plugin compatibility CI gate _(In Progress)_
 - [ ] NX-098 ISOBUS communications plugin _(Planned)_
 - [ ] NX-100 Combine yield monitoring plugin _(Planned)_
+- [ ] NX-114 Variable-rate controller plugin _(Planned)_
 
 ### Section E — UI (Avalonia) + Sim Bar
 - [x] NX-040 Avalonia app bootstrap
@@ -64,6 +66,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-048 Coverage & guidance overlays
 - [x] NX-049 Replay analysis timeline
 - [x] NX-065 UI theming + layout persistence
+- [ ] NX-112 Layer-aware section map visualization _(Planned)_
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory
@@ -76,7 +79,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-057 Rate control parity validation
 - [x] NX-058 Guidance tuning auto-calculations
 - [x] NX-059 Ported math verification report
-- [ ] NX-102 V6 functionality inventory & gap analysis _(Planned)_
+- [x] NX-102 V6 functionality inventory & gap analysis _(Done)_
+- [ ] NX-105 Legacy background imagery import _(Planned)_
+- [ ] NX-106 Legacy field overview metadata import _(Planned)_
+- [ ] NX-107 Legacy flag importer & UI surfacing _(Planned)_
+- [ ] NX-108 Legacy contour resume support _(Planned)_
+- [ ] NX-109 Legacy recorded path import & replay _(Planned)_
+- [ ] NX-110 Legacy tram line template import _(Planned)_
+- [ ] NX-111 Legacy worked area history import _(Planned)_
+- [ ] NX-113 External agronomic map ingest pipeline _(Planned)_
 
 ### Section G — Packaging, DevEx, Docs
 - [x] NX-006 CI matrix (Win x64 + Linux arm64)
@@ -138,6 +149,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-003 | Protobuf v1 (Header, Pose, Imu, SectionMask, SteerCmd/State, CanFrame, TimingCaps) | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Start Contracts Freeze 1 |
 | NX-004 | JSON schemas (Core, AGiO, UI, Simulation) | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Coordinate with Schema Owner |
 | NX-005 | Capabilities handshake proto/service | Done |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | Smoke test between Core & AGiO |
+| NX-104 | ADR: Metadata-driven variable-rate layer mapping & imports | Done |  | — | [SRS §8 Data Model & Storage](docs/SRS/sections/08_Data_Model_Storage.md) | Aligns coverage, importer, and plugin contracts per ADR-005 |
 
 ### Section B — Core (Headless, Sim Graph)
 
@@ -186,6 +198,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | In Progress |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
 | NX-098 | ISOBUS communications plugin bridging CAN/UDP transports into Nexus routing | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Implement ISO 11783 PGN ingest + emit, handshake, and diagnostics |
 | NX-100 | Combine yield monitoring plugin with layer overlays and data export | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Capture live yield/moisture feeds and expose UI dashboards |
+| NX-114 | Variable-rate controller plugin consuming layer APIs | Planned |  | — | [SRS §3.7 Sections Control](docs/SRS/NOTES.md#srs-37-sections-control) | Converts imported layers into commanded rates |
 
 ### Section E — UI (Avalonia) + Sim Bar
 
@@ -202,6 +215,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-048 | Map overlays for coverage heatmaps and guidance paths | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Visualize coverage & AB guidance |
 | NX-049 | Replay analysis timeline with bookmarks and export options | Done |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Provide bookmark/export tooling |
 | NX-065 | UI theming and layout persistence across sessions | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Save/restore window layout and theme |
+| NX-112 | Layer-aware section map visualization aligned with layer registry | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Replace binary overlay with metadata-driven layers |
 
 ### Section F — Porting from V6 (Algorithms)
 
@@ -217,7 +231,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-057 | Rate control parity validation for sections and planter algorithms | Done |  | — | [SRS §5.7 Rate Control](docs/SRS/NOTES.md#srs-57-rate-control) | Bench + sim comparison |
 | NX-058 | Guidance tuning auto-calculations aligned with V6 behavior | Done |  | — | [SRS §5.4 Controller Gains](docs/SRS/NOTES.md#srs-54-controller-gains) | Auto-tune heuristics |
 | NX-059 | Ported math verification report and documentation updates | Done |  | — | [SRS §5.8 Verification](docs/SRS/NOTES.md#srs-58-verification) | Summarize parity metrics |
-| NX-102 | V6 functionality inventory & gap analysis across Nexus features | Planned |  | — | [SRS §5.1 V6 Porting Inventory](docs/SRS/NOTES.md#srs-51-v6-porting-inventory) | Document Bing imagery, field outlines, layers, and other legacy flows |
+| NX-102 | V6 functionality inventory & gap analysis across Nexus features | Done |  | — | [SRS §5.1 V6 Porting Inventory](docs/SRS/NOTES.md#srs-51-v6-porting-inventory) | Document Bing imagery, field outlines, layers, and other legacy flows |
+| NX-105 | Legacy background imagery import and persistence | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Extend importer with BackPic.txt/.png handling |
+| NX-106 | Legacy field overview metadata import | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Capture Field.txt origins and operators |
+| NX-107 | Legacy flags and annotations importer + UI exposure | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Surface scouting markers in Nexus |
+| NX-108 | Legacy contour coverage resume support | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Import Contour.txt buffers |
+| NX-109 | Legacy recorded path import feeding replay services | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Map RecPath.txt into Nexus replay |
+| NX-110 | Legacy tram line template import and planner integration | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Translate Tram.txt polygons |
+| NX-111 | Legacy worked area history import for coverage bootstraps | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Bring Sections.txt history into layer registry |
+| NX-113 | External agronomic map ingest pipeline | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Normalize GeoTIFF/ISOXML maps into layers |
 
 ### Section G — Packaging, DevEx, Docs
 

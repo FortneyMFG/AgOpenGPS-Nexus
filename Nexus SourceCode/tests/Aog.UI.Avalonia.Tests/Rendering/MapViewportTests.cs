@@ -1,6 +1,7 @@
 using Aog.UI.Avalonia.Rendering;
 using Avalonia;
 using FluentAssertions;
+using FluentAssertions.Primitives;
 using Xunit;
 
 namespace Aog.UI.Avalonia.Tests.Rendering;
@@ -63,9 +64,14 @@ public class MapViewportTests
 
 internal static class PointAssertionsExtensions
 {
-    public static void BeApproximately(this Point actual, Point expected, double precision)
+    public static AndConstraint<ObjectAssertions<Point>> BeApproximately(
+        this ObjectAssertions<Point> assertions,
+        Point expected,
+        double precision)
     {
-        actual.X.Should().BeApproximately(expected.X, precision);
-        actual.Y.Should().BeApproximately(expected.Y, precision);
+        assertions.Subject.X.Should().BeApproximately(expected.X, precision);
+        assertions.Subject.Y.Should().BeApproximately(expected.Y, precision);
+
+        return new AndConstraint<ObjectAssertions<Point>>(assertions);
     }
 }

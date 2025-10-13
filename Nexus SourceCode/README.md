@@ -14,6 +14,8 @@ dotnet run --project "src/Aog.Core.Host/Aog.Core.Host.csproj"
 The host reads configuration from `appsettings.json` and environment variables prefixed with
 `NEXUS_`. A background health service emits periodic heartbeat logs (`Core host heartbeat OK.`)
 that higher-level orchestration or smoke tests can watch for successful startup/shutdown.
+Changes to `CoreHost:Health:IntervalSeconds` are applied without restarting the process, and the
+service logs whenever the heartbeat cadence is updated so operators can confirm the new interval.
 
 ### Configuration
 

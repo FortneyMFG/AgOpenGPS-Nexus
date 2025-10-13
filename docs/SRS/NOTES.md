@@ -5,6 +5,12 @@ executing the Nexus plan. Keep it concise, reference specific SRS sections, and 
 where applicable. Move resolved items into the canonical SRS when they graduate from notes
 status.
 
+## 2024-xx-xx Windows AGiO Serial Autoscanner
+
+- NX-022 introduces the `Aog.Agio.Windows` backend with a COM port auto-scan service and checksum-validated
+  GGA/RMC/VTG parser. The scanner logs the detected port/baud pair and latest fix metadata while awaiting the
+  upcoming GNSS gRPC wiring.
+
 ## 2024-xx-xx Task Crosswalk Anchors
 
 These anchors map the task tracker sections to the evolving SRS outline so backlog entries

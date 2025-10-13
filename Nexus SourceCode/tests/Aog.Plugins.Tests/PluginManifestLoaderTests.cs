@@ -96,7 +96,8 @@ public sealed class PluginManifestLoaderTests
           "simProviders": [
             {
               "providerId": "disk.sim",
-              "type": "Aog.Plugins.Disk.Provider"
+              "type": "Aog.Plugins.Disk.Provider",
+              "topics": ["disk.topic"]
             }
           ]
         }
@@ -119,5 +120,31 @@ public sealed class PluginManifestLoaderTests
                 File.Delete(tempPath);
             }
         }
+    }
+
+    [Fact]
+    public async Task LoadAsync_ProviderMissingTopics_Throws()
+    {
+        const string json = """
+        {
+          "schemaVersion": "1.0.0",
+          "id": "org.agopengps.plugins.invalid-topics",
+          "name": "Invalid Topics Plugin",
+          "version": "1.0.0",
+          "requiredApis": { "core": ">=1.0.0" },
+          "simProviders": [
+            {
+              "providerId": "invalid.provider",
+              "type": "Aog.Plugins.Invalid.Provider"
+            }
+          ]
+        }
+        """;
+
+        await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        var act = async () => await _loader.LoadAsync(stream);
+
+        await act.Should().ThrowAsync<InvalidDataException>()
+            .WithMessage("*must declare at least one topic*");
     }
 }

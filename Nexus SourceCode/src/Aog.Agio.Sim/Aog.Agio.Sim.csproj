@@ -7,5 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Aog.Agio\Aog.Agio.csproj" />
+    <ProjectReference Include="..\Aog.Core\Aog.Core.csproj" />
   </ItemGroup>
 </Project>

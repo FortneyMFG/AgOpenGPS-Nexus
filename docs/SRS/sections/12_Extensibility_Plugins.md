@@ -49,6 +49,7 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 - **SimBus** — typed publish/subscribe channel with last-value caching for topics such as pose, IMU, sections, and planter row status; plugins publish fake device readings and consume peer outputs through this bus.
 - **Source routing** — Core-owned priority rules pick between hardware, simulation, and replay producers per topic, allowing hardware inputs (e.g., manual section switch) to override simulator outputs without tearing down the scenario.
 - **Plugin sim providers** — plugins declare the topics they produce/consume, configure scenarios, and start/stop alongside the SimClock so agronomy and steering models remain modular.
+  - Manifests register their declared providers with the simulation catalog at load time so the shared registry always lists plugin outputs and wiring metadata.
 - **Hardware-in-the-loop passthrough** — real inputs flow onto the same SimBus topics at higher priority so mixed rigs stay predictable while training operators.
 
 ## Proposed plugin tiers

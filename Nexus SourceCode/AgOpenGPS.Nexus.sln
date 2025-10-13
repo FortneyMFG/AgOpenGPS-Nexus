@@ -1,0 +1,27 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.UI.Avalonia", "src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj", "{06F2DDFB-760F-454D-84D5-2E137CE1B82A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.UI.Avalonia.Tests", "tests/Aog.UI.Avalonia.Tests/Aog.UI.Avalonia.Tests.csproj", "{720AA6AF-5F0D-4D1E-9278-226233190D7E}"
+EndProject
+Global
+    GlobalSection(SolutionConfigurationPlatforms) = preSolution
+        Debug|Any CPU = Debug|Any CPU
+        Release|Any CPU = Release|Any CPU
+    EndGlobalSection
+    GlobalSection(ProjectConfigurationPlatforms) = postSolution
+        {06F2DDFB-760F-454D-84D5-2E137CE1B82A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {06F2DDFB-760F-454D-84D5-2E137CE1B82A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {06F2DDFB-760F-454D-84D5-2E137CE1B82A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {06F2DDFB-760F-454D-84D5-2E137CE1B82A}.Release|Any CPU.Build.0 = Release|Any CPU
+        {720AA6AF-5F0D-4D1E-9278-226233190D7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {720AA6AF-5F0D-4D1E-9278-226233190D7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {720AA6AF-5F0D-4D1E-9278-226233190D7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {720AA6AF-5F0D-4D1E-9278-226233190D7E}.Release|Any CPU.Build.0 = Release|Any CPU
+    EndGlobalSection
+    GlobalSection(SolutionProperties) = preSolution
+        HideSolutionNode = FALSE
+    EndGlobalSection
+EndGlobal

@@ -1,5 +1,6 @@
 using Aog.Agio.Linux.Gpsd;
 using Aog.Agio.Linux.Serial;
+using Aog.Agio.Linux.SocketCan;
 using Aog.Agio.Nmea;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,7 @@ namespace Aog.Agio.Linux;
 public sealed class LinuxAgioBackend : IAgioBackend
 {
     /// <inheritdoc />
-    public string Name => "Linux Serial";
+    public string Name => "Linux Serial & SocketCAN";
 
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
@@ -26,6 +27,7 @@ public sealed class LinuxAgioBackend : IAgioBackend
         services.AddOptions<NmeaSerialPortScanOptions>();
         services.AddOptions<LinuxSerialPortEnumeratorOptions>();
         services.AddOptions<GpsdClientOptions>();
+        services.AddOptions<SocketCanOptions>();
 
         services.AddSingleton<NmeaSentenceParser>();
         services.AddSingleton<ISerialPortEnumerator, LinuxSerialPortEnumerator>();
@@ -36,5 +38,13 @@ public sealed class LinuxAgioBackend : IAgioBackend
         services.AddSingleton<IGpsdConnectionFactory, UnixDomainSocketGpsdConnectionFactory>();
         services.AddSingleton<GpsdClient>();
         services.AddSingleton<IHostedService, GpsdBackgroundService>();
+
+        services.AddSingleton<ICanNetworkInterfaceProvider, SocketCanNetworkInterfaceProvider>();
+        services.AddSingleton<ISocketCanClientFactory, SocketCanClientFactory>();
+        services.AddSingleton<SocketCanFrameChannel>();
+        services.AddSingleton<ISocketCanFramePublisher>(sp => sp.GetRequiredService<SocketCanFrameChannel>());
+        services.AddSingleton<ISocketCanFrameSource>(sp => sp.GetRequiredService<SocketCanFrameChannel>());
+        services.AddSingleton<IHostedService, SocketCanBackgroundService>();
+        services.AddSingleton<SocketCanBusService>();
     }
 }

@@ -1,3 +1,4 @@
+using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -17,6 +18,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAvaloniaUiShell(this IServiceCollection services)
     {
         services.TryAddSingleton<App>();
+        services.TryAddSingleton<IConnectionSettingsStore, JsonConnectionSettingsStore>();
+        services.TryAddSingleton<ConnectionSettingsViewModel>();
         services.TryAddSingleton<MainWindow>();
         services.TryAddSingleton<MainWindowViewModel>();
         return services;

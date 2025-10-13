@@ -5,6 +5,18 @@ executing the Nexus plan. Keep it concise, reference specific SRS sections, and 
 where applicable. Move resolved items into the canonical SRS when they graduate from notes
 status.
 
+## 2024-xx-xx Ported Math Verification Report
+
+- NX-059 packages the parity datasets and regression notes in
+  [`docs/porting/PortedMathVerification.md`](../porting/PortedMathVerification.md) for SRS §5.8.
+- Coverage analytics deltas stay within ±0.10 square metres/percentage points while
+  exercising the tolerance guard-rails added in NX-055.
+- Section control parity scenarios replay V6 captures across speed gating,
+  look-ahead activation, and manual suppression paths, with the CSV harness ready for
+  future regression captures.
+- AutoSteer-Lite tuning checks confirm the translated machine profile reproduces the
+  legacy look-ahead multipliers and scaling heuristics documented in NX-058.
+
 ## 2024-xx-xx Windows AGiO Serial Autoscanner
 
 - NX-022 introduces the `Aog.Agio.Windows` backend with a COM port auto-scan service and checksum-validated
@@ -73,6 +85,11 @@ documents move or headings change.
 
 ### SRS §5.4 Controller Gains
 - Specifies controller tuning expectations for AutoSteer-Lite.
+
+### SRS §5.8 Verification
+- Captures parity datasets and tolerance guard-rails for ported coverage, section
+  control, and AutoSteer math.
+- Reference: [`docs/porting/PortedMathVerification.md`](../porting/PortedMathVerification.md).
 
 ## 2024-xx-xx Bootstrap
 

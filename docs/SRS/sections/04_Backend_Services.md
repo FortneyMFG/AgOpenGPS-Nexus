@@ -23,6 +23,7 @@ Map the guidance, mapping, field data, and rules services that power the applica
 - O-BE-4: Scriptable engine embedded via Lua/Python for business rules.
 - O-BE-5: [Layer controllers with aggregation pipelines](../options/O-BACKEND-4_LayerControllers.md) — Metadata-driven ingestion + mapping snapshots.
 - O-BE-6: [Linux Core service split from UI](../options/O-BACKEND-6_LinuxCoreService.md) — Headless daemon + API bridge + packaging.
+- O-BE-7: AgIO gRPC host with swappable Windows/Linux/Sim backends shipping unified NuGet contracts for Core/UI/Plugins.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L47】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -34,6 +35,7 @@ Map the guidance, mapping, field data, and rules services that power the applica
 | O-BE-4 | Rapid customization | Sandbox & safety concerns | Script mistakes impact field ops | Current headland logic |
 | O-BE-5 | Rich telemetry, deterministic pipelines | Large refactor touching many subsystems | Regression risk in overlap math | Mapping + replay harnesses |
 | O-BE-6 | Decouples UI from real-time control, packages for Linux | Requires new hosting, monitoring, and compatibility testing | API or bridge regression breaks rigs | Linux Core service plan |
+| O-BE-7 | Keeps Core identical across OSes, isolates hardware specifics, supports simulation/replay | Needs disciplined ABI/version governance + CI on both OSes | Backend bugs hit every client; requires vendor SDK wrappers | .NET 8 + Avalonia stack |
 
 ## Evaluation criteria
 Determinism, offline resilience, ease of customization, testability, deployment footprint.
@@ -41,6 +43,7 @@ Determinism, offline resilience, ease of customization, testability, deployment 
 ## Current sentiment
 - Keep the current in-process services while cataloging seams where dedicated processes (e.g., telemetry recorder) make sense.
 - Broad agreement that the layer-controller refactor should land with replay coverage before any microservice work proceeds.【F:docs/SRS/options/O-BACKEND-4_LayerControllers.md†L47-L58】【F:docs/SRS/options/O-TEST-4_LayerReplayCI.md†L7-L27】
+- The AgIO gRPC host with .NET 8 backends is now positioned as the preferred modernization track because it keeps Core logic identical across OSes and rides on shared NuGet contracts for plugins and UI.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L79】
 - Contributors want to scope a Linux Core pilot that keeps the Windows host running in parallel until PGN compatibility and performance targets are proven in the field.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L21-L44】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
 
 ## Open questions

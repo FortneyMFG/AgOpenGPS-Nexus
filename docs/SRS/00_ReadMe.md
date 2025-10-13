@@ -49,25 +49,25 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 ### Section 01 – OS Support
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
 |-------------|----------------------|----------------------|-----------------|
-| R-OS-000 | O-OS-0, O-OS-3 | [AgOpenGPS WinExe](../../SourceCode/GPS/AgOpenGPS.csproj) | ADR-OS-001 (TBD) |
-| R-OS-001 | O-OS-0, O-OS-3 | [AgIO WinForms host](../../SourceCode/AgIO/Source/AgIO.csproj) | ADR-OS-001 (TBD) |
-| R-OS-002 | O-OS-0 | [Project README deployment notes](../../README.md) | ADR-OS-001 (TBD) |
+| R-OS-000 | O-OS-0, O-OS-3, O-OS-6 | [AgOpenGPS WinExe](../../SourceCode/GPS/AgOpenGPS.csproj) | ADR-OS-001 (TBD) |
+| R-OS-001 | O-OS-0, O-OS-3, O-OS-6 | [AgIO WinForms host](../../SourceCode/AgIO/Source/AgIO.csproj) | ADR-OS-001 (TBD) |
+| R-OS-002 | O-OS-0, O-OS-6 | [Project README deployment notes](../../README.md) | ADR-OS-001 (TBD) |
 | R-OS-003 | O-OS-3, O-OS-5 | [Screen helper](../../SourceCode/GPS/Helpers/ScreenHelper.cs) | ADR-OS-002 (TBD) |
-| R-OS-004 | O-OS-5 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-OS-003 (TBD) |
-| R-OS-005 | O-OS-5 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-OS-003 (TBD) |
-| R-OS-006 | O-OS-3, O-OS-5 | [Baseline assumptions](01_Vision_NonGoals.md) | ADR-OS-004 (TBD) |
+| R-OS-004 | O-OS-5, O-OS-6 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-OS-003 (TBD) |
+| R-OS-005 | O-OS-5, O-OS-6 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-OS-003 (TBD) |
+| R-OS-006 | O-OS-3, O-OS-5, O-OS-6 | [Baseline assumptions](01_Vision_NonGoals.md) | ADR-OS-004 (TBD) |
 
 ### Section 02 – UI Framework
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
 |-------------|----------------------|----------------------|-----------------|
 | R-UI-000 | O-UI-0 | [WinForms project](../../SourceCode/GPS/AgOpenGPS.csproj) | ADR-UI-001 (TBD) |
-| R-UI-001 | O-UI-0, O-UI-2 | [WPF shell](../../SourceCode/AgOpenGPS.WpfApp/AgOpenGPS.WpfApp.csproj) | ADR-UI-001 (TBD) |
+| R-UI-001 | O-UI-0, O-UI-2, O-UI-7 | [WPF shell](../../SourceCode/AgOpenGPS.WpfApp/AgOpenGPS.WpfApp.csproj) | ADR-UI-001 (TBD) |
 | R-UI-002 | O-UI-0 | [AgIO dialogs](../../SourceCode/AgIO/Source/Forms/FormUDP.cs) | ADR-UI-002 (TBD) |
 | R-UI-003 | O-UI-0, O-UI-5 | [Screen helper](../../SourceCode/GPS/Helpers/ScreenHelper.cs) | ADR-UI-003 (TBD) |
 | R-UI-004 | O-UI-5 | [Metadata dashboards](../options/O-UI-5_MetadataDrivenDashboards.md) | ADR-UI-004 (TBD) |
-| R-UI-005 | O-UI-6 | [Remote clients](../options/O-FRONT-6_RemoteClients.md) | ADR-UI-005 (TBD) |
-| R-UI-006 | O-UI-1, O-UI-2, O-UI-4 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-UI-006 (TBD) |
-| R-UI-007 | O-UI-2, O-UI-5 | [Accessibility presets](../sections/05_Frontends.md) | ADR-UI-007 (TBD) |
+| R-UI-005 | O-UI-6, O-UI-7 | [Remote clients](../options/O-FRONT-6_RemoteClients.md) | ADR-UI-005 (TBD) |
+| R-UI-006 | O-UI-1, O-UI-2, O-UI-4, O-UI-7 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-UI-006 (TBD) |
+| R-UI-007 | O-UI-2, O-UI-5, O-UI-7 | [Accessibility presets](../sections/05_Frontends.md) | ADR-UI-007 (TBD) |
 
 ### Section 03 – Communications & Transports
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
@@ -78,10 +78,10 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-COMM-003 | O-COMM-0 | [NTRIP UI](../../SourceCode/AgIO/Source/Forms/FormNtrip.cs) | ADR-COMM-003 (TBD) |
 | R-COMM-010 | O-COMM-5 | [Variable-rate PGNs](../options/O-COMM-5_VariableRatePGNs.md) | ADR-COMM-004 (TBD) |
 | R-COMM-011 | O-COMM-5 | [Diagnostics hooks](../options/O-TELE-4_LayerDiagnostics.md) | ADR-COMM-004 (TBD) |
-| R-COMM-004 | O-COMM-2, O-COMM-6 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-COMM-005 (TBD) |
-| R-COMM-005 | O-COMM-6 | [PGN bridge](../options/O-COMM-6_PGNCompatibilityBridge.md) | ADR-COMM-005 (TBD) |
-| R-COMM-012 | O-COMM-2, O-COMM-6 | [Latency budgets](../sections/03_Comm_Transports.md) | ADR-COMM-006 (TBD) |
-| R-COMM-013 | O-COMM-2, O-COMM-6 | [Security slice](../sections/13_Security_Permissions.md) | ADR-COMM-006 (TBD) |
+| R-COMM-004 | O-COMM-2, O-COMM-6, O-COMM-7 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-COMM-005 (TBD) |
+| R-COMM-005 | O-COMM-6, O-COMM-7 | [PGN bridge](../options/O-COMM-6_PGNCompatibilityBridge.md) | ADR-COMM-005 (TBD) |
+| R-COMM-012 | O-COMM-2, O-COMM-6, O-COMM-7 | [Latency budgets](../sections/03_Comm_Transports.md) | ADR-COMM-006 (TBD) |
+| R-COMM-013 | O-COMM-2, O-COMM-6, O-COMM-7 | [Security slice](../sections/13_Security_Permissions.md) | ADR-COMM-006 (TBD) |
 
 ### Section 04 – Backend Services
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
@@ -92,10 +92,10 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-BE-003 | O-BE-1 | [Automation APIs](../../SourceCode/AgOpenGPS.Core) | ADR-BE-003 (TBD) |
 | R-BE-010 | O-BE-5 | [Layer controllers](../options/O-BACKEND-4_LayerControllers.md) | ADR-BE-004 (TBD) |
 | R-BE-011 | O-BE-5 | [Replay CI](../options/O-TEST-4_LayerReplayCI.md) | ADR-BE-004 (TBD) |
-| R-BE-004 | O-BE-6 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-BE-005 (TBD) |
-| R-BE-012 | O-BE-6 | [PGN bridge](../options/O-COMM-6_PGNCompatibilityBridge.md) | ADR-BE-005 (TBD) |
-| R-BE-013 | O-BE-6 | [Service health targets](../sections/04_Backend_Services.md) | ADR-BE-006 (TBD) |
-| R-BE-014 | O-BE-6 | [Fail-safe expectations](../sections/04_Backend_Services.md) | ADR-BE-006 (TBD) |
+| R-BE-004 | O-BE-6, O-BE-7 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-BE-005 (TBD) |
+| R-BE-012 | O-BE-6, O-BE-7 | [PGN bridge](../options/O-COMM-6_PGNCompatibilityBridge.md) | ADR-BE-005 (TBD) |
+| R-BE-013 | O-BE-6, O-BE-7 | [Service health targets](../sections/04_Backend_Services.md) | ADR-BE-006 (TBD) |
+| R-BE-014 | O-BE-6, O-BE-7 | [Fail-safe expectations](../sections/04_Backend_Services.md) | ADR-BE-006 (TBD) |
 
 ### Section 05 – Frontends
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
@@ -103,12 +103,12 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-FE-000 | O-FE-0 | [WinForms project](../../SourceCode/GPS/AgOpenGPS.csproj) | ADR-FE-001 (TBD) |
 | R-FE-001 | O-FE-0 | [AgIO project](../../SourceCode/AgIO/Source/AgIO.csproj) | ADR-FE-001 (TBD) |
 | R-FE-002 | O-FE-0 | [Solution utilities](../../SourceCode/AgOpenGPS.sln) | ADR-FE-002 (TBD) |
-| R-FE-003 | O-FE-6 | [Remote clients option](../options/O-FRONT-6_RemoteClients.md) | ADR-FE-003 (TBD) |
+| R-FE-003 | O-FE-6, O-FE-7 | [Remote clients option](../options/O-FRONT-6_RemoteClients.md) | ADR-FE-003 (TBD) |
 | R-FE-010 | O-FE-5 | [Metadata dashboards](../options/O-UI-5_MetadataDrivenDashboards.md) | ADR-FE-004 (TBD) |
 | R-FE-011 | O-FE-5 | [Metadata dashboards](../options/O-UI-5_MetadataDrivenDashboards.md) | ADR-FE-004 (TBD) |
 | R-FE-004 | O-FE-6 | [Remote clients option](../options/O-FRONT-6_RemoteClients.md) | ADR-FE-003 (TBD) |
-| R-FE-012 | O-FE-6 | [Remote clients option](../options/O-FRONT-6_RemoteClients.md) | ADR-FE-005 (TBD) |
-| R-FE-013 | O-FE-6 | [Safety posture notes](../sections/05_Frontends.md) | ADR-FE-005 (TBD) |
+| R-FE-012 | O-FE-6, O-FE-7 | [Remote clients option](../options/O-FRONT-6_RemoteClients.md) | ADR-FE-005 (TBD) |
+| R-FE-013 | O-FE-6, O-FE-7 | [Safety posture notes](../sections/05_Frontends.md) | ADR-FE-005 (TBD) |
 | R-FE-014 | O-FE-5 | [Training & presets](../sections/05_Frontends.md) | ADR-FE-006 (TBD) |
 
 ### Section 06 – Hardware I/O
@@ -196,11 +196,11 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 |-------------|----------------------|----------------------|-----------------|
 | R-EXT-000 | O-EXT-0 | [Shared projects](../../SourceCode/GPS/AgOpenGPS.csproj) | ADR-EXT-001 (TBD) |
 | R-EXT-001 | O-EXT-0 | [Solution utilities](../../SourceCode/AgOpenGPS.sln) | ADR-EXT-001 (TBD) |
-| R-EXT-002 | O-EXT-1, O-EXT-3 | [Plugin boundary](../sections/12_Extensibility_Plugins.md) | ADR-EXT-002 (TBD) |
-| R-EXT-003 | O-EXT-1, O-EXT-3 | [Templates](../sections/12_Extensibility_Plugins.md) | ADR-EXT-002 (TBD) |
-| R-EXT-010 | O-EXT-3 | [Layer controllers](../options/O-BACKEND-4_LayerControllers.md) | ADR-EXT-003 (TBD) |
+| R-EXT-002 | O-EXT-1, O-EXT-3, O-EXT-5 | [Plugin boundary](../sections/12_Extensibility_Plugins.md) | ADR-EXT-002 (TBD) |
+| R-EXT-003 | O-EXT-1, O-EXT-3, O-EXT-5 | [Templates](../sections/12_Extensibility_Plugins.md) | ADR-EXT-002 (TBD) |
+| R-EXT-010 | O-EXT-3, O-EXT-5 | [Layer controllers](../options/O-BACKEND-4_LayerControllers.md) | ADR-EXT-003 (TBD) |
 | R-EXT-004 | O-EXT-1 | [Sandboxing notes](../sections/12_Extensibility_Plugins.md) | ADR-EXT-004 (TBD) |
-| R-EXT-011 | O-EXT-3 | [Governance requirements](../sections/12_Extensibility_Plugins.md) | ADR-EXT-005 (TBD) |
+| R-EXT-011 | O-EXT-3, O-EXT-5 | [Governance requirements](../sections/12_Extensibility_Plugins.md) | ADR-EXT-005 (TBD) |
 
 ### Section 13 – Security & Permissions
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |

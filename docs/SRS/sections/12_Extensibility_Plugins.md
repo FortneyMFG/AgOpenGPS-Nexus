@@ -19,6 +19,7 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - O-EXT-2: Expose scripting hooks (Python/Lua) for automation and custom workflows.
 - O-EXT-3: Offer gRPC/webhook extension points for out-of-process services.
 - O-EXT-4: Package optional modules as NuGet packages consumed by the desktop apps.
+- O-EXT-5: Managed plugin manifests using `AssemblyLoadContext` + shared gRPC contracts so plugins run identically on Windows and Linux.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L13-L47】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -28,6 +29,7 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 | O-EXT-2 | Rapid prototyping | Performance + safety concerns | Scripts can break guidance | Existing automation | 
 | O-EXT-3 | Language-agnostic | Requires transport layer | Network failures | PGN bridge |
 | O-EXT-4 | Versioned distribution | Package management overhead | Dependency hell | NuGet ecosystem |
+| O-EXT-5 | Consistent plugin surface across OSes, reuse C# skillset | Requires loader governance + ABI testing | Plugin bugs propagate via shared contracts | .NET 8 + Avalonia stack |
 
 ## Evaluation criteria
 Safety, maintainability, ease for contributors, performance impact, packaging complexity.
@@ -35,6 +37,7 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 ## Current sentiment
 - Developers fork today; we need a plugin surface that honors safety-critical boundaries while reducing merge burden.
 - Layer metadata + ID registries are expected to become the bridge for safe third-party modules once DI hooks exist.【F:docs/SRS/options/O-BACKEND-4_LayerControllers.md†L34-L47】【F:docs/SRS/options/O-API-5_VersionedLayerSchemas.md†L32-L64】
+- The unified .NET 8 plugin runtime (shared gRPC contracts + manifest loader) is the leading proposal because it supports cross-platform simulation, replay, and device plugins without per-OS rewrites.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L79】
 - Treating the UI and advanced agronomy modules as “official plugins” keeps the default install familiar while letting operators toggle them off to run core services headless.【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L7-L58】
 
 ## Proposed plugin tiers

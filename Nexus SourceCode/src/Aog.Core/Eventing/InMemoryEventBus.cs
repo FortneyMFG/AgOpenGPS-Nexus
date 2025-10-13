@@ -27,17 +27,17 @@ public sealed class InMemoryEventBus : IEventBus
             await handler(typed, token).ConfigureAwait(false);
         });
 
-        Subscribers subscribers;
         lock (_gate)
         {
-            if (!_subscriptions.TryGetValue(subscription.EventType, out subscribers))
+            if (!_subscriptions.TryGetValue(subscription.EventType, out var subscribers))
             {
                 subscribers = new Subscribers();
                 _subscriptions[subscription.EventType] = subscribers;
             }
+
+            subscribers.Add(subscription);
         }
 
-        subscribers.Add(subscription);
         return new SubscriptionHandle(this, subscription);
     }
 

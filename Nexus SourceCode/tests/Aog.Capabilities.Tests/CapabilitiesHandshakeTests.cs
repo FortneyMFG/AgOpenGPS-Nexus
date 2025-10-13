@@ -1,0 +1,73 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Aog.Agio.Capabilities;
+using Aog.Core.Capabilities;
+using Aog.Protos.Capabilities.V1;
+using Grpc.Core;
+using Grpc.Core.Testing;
+using Xunit;
+
+namespace Aog.Capabilities.Tests;
+
+public sealed class CapabilitiesHandshakeTests
+{
+    [Fact]
+    public async Task AgioServiceEchoesSupportedCapabilitiesAndFlagsUnknownOnes()
+    {
+        var factory = new CapabilityDescriptorFactory(defaultVersion: "1.2.3");
+        var coreClient = new CoreCapabilitiesClient(factory);
+        var request = coreClient.BuildHandshake(
+            nodeId: "core-host",
+            capabilityNames: new[] { "nav.pose", "nav.imu", "nav.pose" },
+            sessionId: "session-123");
+
+        var agioCapabilities = new[]
+        {
+            new CapabilityDescriptor { Name = "nav.pose", Version = "1.2.3" },
+        };
+
+        var service = new AgioCapabilitiesService("agio-host", agioCapabilities);
+        var response = await service.Handshake(request, CreateContext());
+
+        Assert.Equal("session-123", response.SessionId);
+        Assert.Equal("agio-host", response.NodeId);
+        Assert.Equal(CapabilityRole.CapabilityRoleAgio, response.Role);
+
+        Assert.Collection(response.AcceptedCapabilities,
+            descriptor => Assert.Equal("nav.pose", descriptor.Name));
+
+        var rejection = Assert.Single(response.Rejections);
+        Assert.Equal("nav.imu", rejection.Capability.Name);
+        Assert.Equal("Capability not supported by AGiO host.", rejection.Reason);
+    }
+
+    [Fact]
+    public void CapabilityDescriptorFactorySkipsEmptyNames()
+    {
+        var factory = new CapabilityDescriptorFactory(defaultVersion: "1.0.0", defaultSummary: "Telemetry");
+
+        var descriptors = factory.Create(new[] { "  ", "telemetry.pose", "telemetry.pose", null! });
+
+        var descriptor = Assert.Single(descriptors);
+        Assert.Equal("telemetry.pose", descriptor.Name);
+        Assert.Equal("1.0.0", descriptor.Version);
+        Assert.Equal("Telemetry", descriptor.Summary);
+    }
+
+    private static ServerCallContext CreateContext()
+    {
+        return TestServerCallContext.Create(
+            method: "capabilities.v1.CapabilitiesService/Handshake",
+            host: null,
+            deadline: DateTime.UtcNow.AddMinutes(1),
+            requestHeaders: new Metadata(),
+            cancellationToken: CancellationToken.None,
+            peer: "ipv4:127.0.0.1",
+            authContext: null,
+            contextPropagationToken: null,
+            responseTrailers: null,
+            writeHeadersFunc: _ => Task.CompletedTask);
+    }
+}

@@ -25,6 +25,9 @@ documents move or headings change.
 
 ### SRS §3.2 Capabilities Exchange
 - Describes the Core ↔ AGiO capability negotiation contract.
+- Initial proto (`proto/capabilities.proto`) defines `HandshakeRequest`/`HandshakeResponse`
+  with node identity, session identifier, declared capabilities, and rejection metadata to
+  unblock Core↔AGiO smoke tests.
 
 ### SRS §3.3 AGiO Services
 - Defines hardware backends, timing probes, and legacy gateways.

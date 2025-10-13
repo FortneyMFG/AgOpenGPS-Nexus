@@ -86,7 +86,7 @@ NX-084,TRUE,FALSE,NX-083,Ready,Legacy configuration translation CLI for profiles
 NX-085,FALSE,TRUE,NX-081,,Teensy bridge regression test suite with recorded PGN sessions
 NX-086,FALSE,FALSE,"NX-084, NX-085",NX-084,Legacy migration guide and training materials for operators
 NX-087,TRUE,FALSE,"NX-067, NX-084",Ready,Dealer deployment toolkit with scripts and checklists
-NX-088,FALSE,FALSE,NX-087,NX-087,Multi-machine synchronization and licensing workflow definition
+NX-088,FALSE,TRUE,NX-087,NX-087,Multi-machine synchronization workflow definition
 NX-089,TRUE,FALSE,NX-085,Ready,High-rate serial and UDP stress testing with soak reports
 NX-090,TRUE,FALSE,"NX-085, NX-083",Ready,Legacy auto-run scenario pack with verification logs
 NX-091,TRUE,FALSE,"NX-055, NX-085",Ready,Legacy coverage export verification against Nexus outputs

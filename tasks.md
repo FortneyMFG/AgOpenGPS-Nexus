@@ -276,11 +276,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | ID | Section | Description | Status | Owner | Human QA | SRS Ref | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | NX-030 | D | Plugin loader & manifest handling | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Includes JSON manifest |
-| NX-031 | D | AutoSteer-Lite plugin v1 | Planned |  | — | [SRS §3.6 AutoSteer](docs/SRS/NOTES.md#srs-36-autosteer) | Unit test holds AB line |
-| NX-032 | D | Sections plugin v1 | Planned |  | — | [SRS §3.7 Sections Control](docs/SRS/NOTES.md#srs-37-sections-control) | Speed gate + look-ahead |
-| NX-033 | D | PlanterMonitor plugin v1 | Planned |  | — | [SRS §3.8 Planter Monitor](docs/SRS/NOTES.md#srs-38-planter-monitor) | Publishes RowStatus |
-| NX-034 | D | Sim provider registrations (bundle) | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Combine with NX-034a–d |
-| NX-035 | D | Replay plugin v1 | Planned |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | UI hooks |
+| NX-031 | D | AutoSteer-Lite plugin v1 | Done |  | — | [SRS §3.6 AutoSteer](docs/SRS/NOTES.md#srs-36-autosteer) | Pure Pursuit & Stanley controller with straight-line sim test |
+| NX-032 | D | Sections plugin v1 | Done |  | — | [SRS §3.7 Sections Control](docs/SRS/NOTES.md#srs-37-sections-control) | Speed gate + look-ahead mask calculator with unit tests |
+| NX-033 | D | PlanterMonitor plugin v1 | Done |  | — | [SRS §3.8 Planter Monitor](docs/SRS/NOTES.md#srs-38-planter-monitor) | Publishes `PlanterRowStatus` via event bus with telemetry headers |
+| NX-034 | D | Sim provider registrations (bundle) | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Manifest helpers register providers with catalog; provider impls tracked in NX-034a–d |
+| NX-035 | D | Replay plugin v1 | Done |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Telemetry Parquet replay controller with play/pause/seek tests |
 | NX-036 | D | Plugin telemetry sink | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | EventBus sink streams plugin telemetry |
 
 ## Wave 5 – V6 Porting

@@ -122,9 +122,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-091 Legacy coverage export verification
 - [ ] NX-092 Legacy data migration utility
 - [ ] NX-093 Bridging workflow knowledge base
-- [ ] NX-094 Field feedback telemetry aggregator
-- [ ] NX-095 Dealer support escalation process
-- [ ] NX-096 Community preview program
+- [x] NX-094 Field feedback telemetry aggregator
+- [x] NX-095 Dealer support escalation process
+- [x] NX-096 Community preview program
 - [ ] NX-097 1.0 launch readiness review
 
 ## Detailed Tables by Section
@@ -272,9 +272,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-091 | Legacy coverage export verification against Nexus outputs | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Compare shapefile + CSV exports |
 | NX-092 | Legacy data migration utility for logs and field histories | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | CLI for migrating archives |
 | NX-093 | Support knowledge base for bridging workflows and troubleshooting | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Publish to docs/support |
-| NX-094 | Field feedback telemetry aggregator feeding support dashboards | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Collect anonymized feedback |
-| NX-095 | Dealer support escalation process and SLA tracking | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Runbook + contacts |
-| NX-096 | Community preview program with opt-in builds and survey loop | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Capture structured feedback |
+| NX-094 | Field feedback telemetry aggregator feeding support dashboards | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Collect anonymized feedback |
+| NX-095 | Dealer support escalation process and SLA tracking | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Runbook + contacts |
+| NX-096 | Community preview program with opt-in builds and survey loop | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Capture structured feedback |
 | NX-097 | 1.0 launch readiness review and sign-off checklist | Planned |  | — | [SRS §1.4 Release Management](docs/SRS/NOTES.md#srs-14-release-management) | Cross-team go/no-go |
 
 ## Legend

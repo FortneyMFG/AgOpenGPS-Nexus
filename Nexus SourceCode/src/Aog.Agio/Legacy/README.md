@@ -24,6 +24,13 @@ The backend registers `LegacyUdpGateway` with no-op transport and observer insta
 Hardware-specific transports can replace `ILegacyUdpTransport`/`ILegacyPoseObserver`
 through dependency injection to forward PGNs over UDP and surface decoded poses to Core.
 
+`LegacyDiscoveryCodec` handles the identity + capability handshake described in the
+SRS (binary PGN `0xD4`). The gateway exposes `PublishDiscoveryAsync` and surfaces
+decoded announcements through `ILegacyDiscoveryObserver`. Downstream callers can
+convert announcements to `CapabilityDescriptor` records via
+`LegacyDiscoveryAnnouncement.ToCapabilityDescriptors()` to bridge the UDP handshake
+with the gRPC capabilities exchange.
+
 ## Encoding
 
 `LegacyPoseCodec` preserves the legacy framing semantics:

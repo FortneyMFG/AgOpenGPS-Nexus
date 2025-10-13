@@ -23,8 +23,10 @@ public sealed class LegacyUdpGatewayBackend : IAgioBackend
         }
 
         services.AddSingleton<LegacyPoseCodec>();
+        services.AddSingleton<LegacyDiscoveryCodec>();
         services.AddSingleton<ILegacyUdpTransport, NullLegacyUdpTransport>();
         services.AddSingleton<ILegacyPoseObserver, NullLegacyPoseObserver>();
+        services.AddSingleton<ILegacyDiscoveryObserver, NullLegacyDiscoveryObserver>();
         services.AddSingleton<LegacyUdpGateway>();
     }
 
@@ -36,5 +38,10 @@ public sealed class LegacyUdpGatewayBackend : IAgioBackend
     private sealed class NullLegacyPoseObserver : ILegacyPoseObserver
     {
         public ValueTask OnPoseAsync(Pose pose, LegacyPoseMetadata metadata, CancellationToken cancellationToken) => ValueTask.CompletedTask;
+    }
+
+    private sealed class NullLegacyDiscoveryObserver : ILegacyDiscoveryObserver
+    {
+        public ValueTask OnDiscoveryAsync(LegacyDiscoveryAnnouncement announcement, CancellationToken cancellationToken) => ValueTask.CompletedTask;
     }
 }

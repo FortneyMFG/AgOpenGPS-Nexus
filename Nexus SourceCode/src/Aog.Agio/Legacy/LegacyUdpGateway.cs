@@ -12,21 +12,27 @@ namespace Aog.Agio.Legacy;
 public sealed class LegacyUdpGateway
 {
     private const string LegacyGpsSource = "legacy/udp/main_gps";
-    private readonly LegacyPoseCodec _codec;
+    private readonly LegacyPoseCodec _poseCodec;
+    private readonly LegacyDiscoveryCodec _discoveryCodec;
     private readonly ILegacyUdpTransport _transport;
     private readonly ILegacyPoseObserver _poseObserver;
+    private readonly ILegacyDiscoveryObserver _discoveryObserver;
     private readonly TimeProvider _timeProvider;
     private long _sequence;
 
     public LegacyUdpGateway(
-        LegacyPoseCodec codec,
+        LegacyPoseCodec poseCodec,
+        LegacyDiscoveryCodec discoveryCodec,
         ILegacyUdpTransport transport,
         ILegacyPoseObserver poseObserver,
+        ILegacyDiscoveryObserver discoveryObserver,
         TimeProvider timeProvider)
     {
-        _codec = codec ?? throw new ArgumentNullException(nameof(codec));
+        _poseCodec = poseCodec ?? throw new ArgumentNullException(nameof(poseCodec));
+        _discoveryCodec = discoveryCodec ?? throw new ArgumentNullException(nameof(discoveryCodec));
         _transport = transport ?? throw new ArgumentNullException(nameof(transport));
         _poseObserver = poseObserver ?? throw new ArgumentNullException(nameof(poseObserver));
+        _discoveryObserver = discoveryObserver ?? throw new ArgumentNullException(nameof(discoveryObserver));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
@@ -40,7 +46,23 @@ public sealed class LegacyUdpGateway
             throw new ArgumentNullException(nameof(pose));
         }
 
-        var frame = _codec.EncodePose(pose, metadata);
+        var frame = _poseCodec.EncodePose(pose, metadata);
+        await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Publishes a discovery announcement over the UDP transport.
+    /// </summary>
+    /// <param name="announcement">Discovery announcement to broadcast.</param>
+    /// <param name="cancellationToken">Cancellation token for the broadcast operation.</param>
+    public async ValueTask PublishDiscoveryAsync(LegacyDiscoveryAnnouncement announcement, CancellationToken cancellationToken = default)
+    {
+        if (announcement is null)
+        {
+            throw new ArgumentNullException(nameof(announcement));
+        }
+
+        var frame = _discoveryCodec.Encode(announcement);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 
@@ -49,7 +71,13 @@ public sealed class LegacyUdpGateway
     /// </summary>
     public async ValueTask HandleDatagramAsync(ReadOnlyMemory<byte> datagram, CancellationToken cancellationToken = default)
     {
-        if (!_codec.TryDecodePose(datagram.Span, out var pose, out var metadata))
+        if (_discoveryCodec.TryDecode(datagram.Span, out var announcement))
+        {
+            await _discoveryObserver.OnDiscoveryAsync(announcement, cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        if (!_poseCodec.TryDecodePose(datagram.Span, out var pose, out var metadata))
         {
             return;
         }

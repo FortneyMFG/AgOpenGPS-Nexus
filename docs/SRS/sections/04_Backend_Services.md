@@ -14,6 +14,7 @@ Map the guidance, mapping, field data, and rules services that power the applica
 - R-BE-012 (COULD, proposed-LinuxCore): Provide compatibility shims (PGN bridge, SocketCAN adapters) managed by the core service rather than each UI.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L16-L44】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
 - R-BE-013 (SHOULD, service health): Define target service health metrics for the Core and layer controllers (steady-state CPU <20% on reference hardware, <500 MB RAM, restart <30 s with persisted state replay) before approving ADRs that depend on them.
 - R-BE-014 (SHOULD, fail-safe): Specify how the system degrades when the Core, PGN bridge, or controller services drop offline (e.g., auto-disable remote control, surface operator alerts, maintain manual override paths) so safety-critical actions remain bounded.
+- R-BE-020 (SHOULD, proposed-composite-sim): Provide a deterministic composite simulation loop (fixed-step clock + seeded RNG) that can drive all Core services and plugins in lockstep while letting hardware inputs preempt simulated values topic-by-topic.
 
 ## Options
 - O-BE-0: Status quo — in-process C# services anchored in `AgOpenGPS.Core` with shared streamers.
@@ -45,6 +46,7 @@ Determinism, offline resilience, ease of customization, testability, deployment 
 - Broad agreement that the layer-controller refactor should land with replay coverage before any microservice work proceeds.【F:docs/SRS/options/O-BACKEND-4_LayerControllers.md†L47-L58】【F:docs/SRS/options/O-TEST-4_LayerReplayCI.md†L7-L27】
 - The AgIO gRPC host with .NET 8 backends is now positioned as the preferred modernization track because it keeps Core logic identical across OSes and rides on shared NuGet contracts for plugins and UI.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L79】
 - Contributors want to scope a Linux Core pilot that keeps the Windows host running in parallel until PGN compatibility and performance targets are proven in the field.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L21-L44】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
+- Simulation modernization must keep the timeline authoritative inside the Core so replay, plugin simulators, and physical hardware can blend predictably without reimplementing routing logic per executable.
 
 ## Open questions
 - Where do we draw the boundary between UI thread work and background services today?

@@ -1,4 +1,4 @@
-Task,Going,Done,Wait For,Waiting On,"Descritption, find more in Tasks.md"
+Task,Going,Done,Wait For,Waiting On,"Description, find more in Tasks.md"
 NX-001,FALSE,TRUE,,,Repo skeleton and solution scaffolding
 NX-002,FALSE,TRUE,NX-001,,"ADRs covering runtime, gRPC, Avalonia, and simulation model choices"
 NX-003,FALSE,TRUE,"NX-001, NX-002",,"Protobuf v1 contracts for Header, Pose, Imu, SectionMask, Steer, Can, TimingCaps"
@@ -16,8 +16,8 @@ NX-014,FALSE,TRUE,"NX-012, NX-013",,Per-stream source selection config and runti
 NX-015,FALSE,TRUE,"NX-010, NX-004",,"Parquet logger for pose, imu, can, io, and plugin topics"
 NX-016,FALSE,TRUE,NX-010,,Core health interval hot reload service
 NX-017,FALSE,TRUE,"NX-010, NX-011, NX-014, NX-015, NX-016",,Source routing service for sim/hardware/replay
-NX-018,FALSE,TRUE,"NX-017, NX-018",,Aog.Abstractions NuGet packaging and CI publish pipeline
-NX-019,FALSE,TRUE,"NX-003, NX-004, NX-005",,Stream route change events and duplicate guard
+NX-018,FALSE,TRUE,NX-017,,Source routing map and options binder
+NX-019,FALSE,TRUE,"NX-017, NX-018",,Stream route change events and duplicate guard
 NX-020,FALSE,TRUE,"NX-003, NX-005",,AGiO host skeleton with backend loader
 NX-021,FALSE,TRUE,"NX-020, NX-012, NX-013, NX-003",,Agio.Sim adapter exposing SimBus topics over gRPC services
 NX-022,FALSE,TRUE,"NX-020, NX-012, NX-013, NX-003",,Agio.Windows COM NMEA auto-scan and parser

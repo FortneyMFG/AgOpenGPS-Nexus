@@ -45,7 +45,13 @@ dotnet build AgOpenGPS.Nexus.sln
 dotnet run --project src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj
 ```
 
-The bootstrap window displays the current operating system description to confirm cross-platform execution. Dependency injection wires the application, main window, and view-model using `Microsoft.Extensions.Hosting`.
+The shell displays the current operating system description and exposes a connection settings panel for configuring AgIO. Dependency injection wires the application, main window, and view-model using `Microsoft.Extensions.Hosting`.
+
+### Connection settings panel
+
+- Choose the AGiO endpoint URI, backend target, and GPS source policy from the shell.
+- Settings are persisted to `%AppData%/AgOpenGPS/Nexus/connection-settings.json` on Windows and `$XDG_CONFIG_HOME/AgOpenGPS/Nexus/connection-settings.json` (or `~/.config/AgOpenGPS/Nexus/connection-settings.json`) on Linux.
+- The **Save settings** button activates when changes are detected and the endpoint field is populated.
 
 ## Testing
 

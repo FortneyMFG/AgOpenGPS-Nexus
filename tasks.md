@@ -114,7 +114,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-083 Legacy AB line/boundary import wizard
 - [x] NX-084 Legacy configuration translation CLI
 - [x] NX-085 Teensy bridge regression test suite
-- [ ] NX-086 Legacy migration guide & training set
+- [x] NX-086 Legacy migration guide & training set
 - [x] NX-087 Dealer deployment toolkit
 - [ ] NX-088 Multi-machine sync & licensing workflow
 - [x] NX-089 High-rate serial/UDP stress testing
@@ -264,7 +264,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-083 | Legacy AB line and boundary import wizard feeding Core routes | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Support shape + CSV inputs |
 | NX-084 | Legacy configuration translation CLI for profiles and machine settings | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Convert V6 config bundles |
 | NX-085 | Teensy bridge regression test suite with recorded PGN sessions | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Automate nightly bench playback |
-| NX-086 | Legacy migration guide and training materials for operators | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Video + step-by-step guide |
+| NX-086 | Legacy migration guide and training materials for operators | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Docs/howto + training kit |
 | NX-087 | Dealer deployment toolkit with scripts and checklists | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Bundled script set |
 | NX-088 | Multi-machine synchronization and licensing workflow definition | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Document license + sync process |
 | NX-089 | High-rate serial and UDP stress testing with soak reports | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | 24 h soak logs |

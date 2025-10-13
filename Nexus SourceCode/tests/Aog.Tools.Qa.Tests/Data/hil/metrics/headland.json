@@ -1,0 +1,6 @@
+{
+  "metrics": [
+    { "name": "sections.recovery_time_ms", "value": 2050 },
+    { "name": "steer.hold_error_cm", "value": 3.6 }
+  ]
+}

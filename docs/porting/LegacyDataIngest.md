@@ -22,6 +22,9 @@ validation harnesses, and auto-tuning helpers.
   algorithm changes breach configured tolerances.
 - Metrics are matched case-insensitively and the harness surfaces the absolute delta for
   dashboards or developer review.
+- `CoverageExportVerifier` inspects zipped shapefile exports from V6 and Nexus,
+  comparing polygon areas, centroid positions, and symmetric difference area to ensure
+  geometry parity before the analytics CSVs are diffed.
 
 ## Machine Profile Translator (NX-056)
 

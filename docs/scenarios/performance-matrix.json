@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0.0",
+  "providers": [
+    {"providerId": "sim.clock.fixed", "type": "Aog.Sim.Clock.FixedStep", "outputs": ["clock.tick"], "settings": {"stepMs": 50}},
+    {"providerId": "autosteer.controller", "type": "Aog.Plugins.Autosteer.ControllerProvider", "inputs": ["clock.tick"], "outputs": ["guidance.autosteer.command"], "settings": {"maxRateDegPerSecond": 28}},
+    {"providerId": "autosteer.vehicle", "type": "Aog.Plugins.Autosteer.VehicleProvider", "inputs": ["guidance.autosteer.command"], "outputs": ["vehicle.autosteer.pose", "vehicle.autosteer.velocity"], "settings": {"wheelbaseMeters": 2.8}},
+    {"providerId": "autosteer.imu", "type": "Aog.Plugins.Autosteer.ImuProvider", "inputs": ["vehicle.autosteer.pose", "vehicle.autosteer.velocity"], "outputs": ["imu.autosteer"], "settings": {"noise": {"ax": 0.03, "ay": 0.03, "yawRate": 0.5}}},
+    {"providerId": "guidance.mux", "type": "Aog.Sim.Guidance.Multiplexer", "inputs": ["guidance.autosteer.command", "guidance.replay.command"], "outputs": ["guidance.command"]},
+    {"providerId": "pose.mux", "type": "Aog.Sim.Vehicle.PoseMultiplexer", "inputs": ["vehicle.autosteer.pose", "vehicle.replay.pose"], "outputs": ["vehicle.pose"]},
+    {"providerId": "sections.taskGenerator", "type": "Aog.Plugins.Sections.TaskGeneratorProvider", "inputs": ["guidance.command", "vehicle.pose"], "outputs": ["sections.tasking"], "settings": {"coverageWidthMeters": 36}},
+    {"providerId": "sections.rateController", "type": "Aog.Plugins.Sections.RateControllerProvider", "inputs": ["sections.tasking", "vehicle.pose"], "outputs": ["sections.command"], "settings": {"lookAheadMeters": 3.5, "minSpeedKph": 4}},
+    {"providerId": "sections.telemetry", "type": "Aog.Plugins.Sections.TelemetryProvider", "inputs": ["sections.command"], "outputs": ["sections.telemetry"], "settings": {"samplePeriodMs": 200}},
+    {"providerId": "planter.population", "type": "Aog.Plugins.PlanterMonitor.PopulationProvider", "inputs": ["vehicle.pose"], "outputs": ["planter.population"], "settings": {"variancePct": 3}},
+    {"providerId": "planter.seedFlow", "type": "Aog.Plugins.PlanterMonitor.SeedFlowProvider", "inputs": ["vehicle.pose"], "outputs": ["planter.seedFlow"], "settings": {"samplePeriodMs": 150}},
+    {"providerId": "replay.guidance", "type": "Aog.Plugins.Replay.GuidanceProvider", "inputs": ["clock.tick"], "outputs": ["guidance.replay.command"], "settings": {"loop": true}},
+    {"providerId": "replay.pose", "type": "Aog.Plugins.Replay.PoseProvider", "inputs": ["clock.tick"], "outputs": ["vehicle.replay.pose"], "settings": {"timeScale": 1.0}}
+  ],
+  "routes": [
+    {"stream": "clock.tick", "source": "sim.clock.fixed", "mode": "simulation"},
+    {"stream": "vehicle.pose", "source": "pose.mux", "mode": "simulation"},
+    {"stream": "guidance.command", "source": "guidance.mux", "mode": "simulation"}
+  ],
+  "options": {"seed": 2024, "timeScale": 1.0},
+  "scenarios": [
+    {
+      "scenarioId": "autosteer-core",
+      "description": "Exercises the AutoSteer Lite bundle in isolation.",
+      "routes": [
+        {"stream": "guidance.autosteer.command", "source": "autosteer.controller", "mode": "simulation"},
+        {"stream": "vehicle.autosteer.pose", "source": "autosteer.vehicle", "mode": "simulation"},
+        {"stream": "imu.autosteer", "source": "autosteer.imu", "mode": "simulation"}
+      ],
+      "options": {"seed": 1337, "timeScale": 1.0}
+    },
+    {
+      "scenarioId": "autosteer-sections",
+      "description": "AutoSteer with sections tasking and telemetry providers.",
+      "routes": [
+        {"stream": "sections.tasking", "source": "sections.taskGenerator", "mode": "simulation"},
+        {"stream": "sections.command", "source": "sections.rateController", "mode": "simulation"},
+        {"stream": "sections.telemetry", "source": "sections.telemetry", "mode": "simulation"}
+      ],
+      "options": {"seed": 2112, "timeScale": 1.0}
+    },
+    {
+      "scenarioId": "autosteer-planter",
+      "description": "AutoSteer feeding planter monitor diagnostics.",
+      "routes": [
+        {"stream": "planter.population", "source": "planter.population", "mode": "simulation"},
+        {"stream": "planter.seedFlow", "source": "planter.seedFlow", "mode": "simulation"}
+      ],
+      "options": {"seed": 4096, "timeScale": 0.75}
+    },
+    {
+      "scenarioId": "replay-overlay",
+      "description": "Replay guidance and pose overlayed with live mux outputs.",
+      "routes": [
+        {"stream": "guidance.replay.command", "source": "replay.guidance", "mode": "replay"},
+        {"stream": "vehicle.replay.pose", "source": "replay.pose", "mode": "replay"},
+        {"stream": "guidance.command", "source": "guidance.mux", "mode": "simulation"}
+      ],
+      "options": {"seed": 512, "timeScale": 1.25}
+    }
+  ]
+}

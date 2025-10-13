@@ -45,6 +45,26 @@ public sealed class MainWindowViewModelTests
         viewModel.PlanterPanel.Summary.Should().Contain("Rows:");
     }
 
+    [Fact]
+    public void MapOverlays_ExposeCoverageAndGuidance()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.CoverageCells.Should().NotBeEmpty();
+        viewModel.GuidanceTracks.Should().NotBeEmpty();
+        viewModel.GuidanceTracks.Select(track => track.Points.Count).Max().Should().BeGreaterThan(1);
+    }
+
+    [Fact]
+    public void Dashboards_SurfaceSampleHistory()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.SteerDashboard.CrossTrackErrorHistory.Should().NotBeEmpty();
+        viewModel.ReplayTimeline.Bookmarks.Should().NotBeEmpty();
+        viewModel.ReplayTimeline.SpeedSamples.Should().HaveCountGreaterThan(10);
+    }
+
     private static MainWindowViewModel CreateViewModel()
     {
         var store = new InMemoryConnectionSettingsStore();

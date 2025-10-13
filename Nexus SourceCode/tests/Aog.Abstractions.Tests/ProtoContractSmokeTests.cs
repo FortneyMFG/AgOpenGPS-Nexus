@@ -83,4 +83,47 @@ public class ProtoContractSmokeTests
         Assert.Equal(original.DoubleRate, deserialized.DoubleRate);
         Assert.Equal(original.Quality, deserialized.Quality);
     }
+
+    [Fact]
+    public void CombineYieldLayerRoundTripsThroughSerialization()
+    {
+        var timestamp = Timestamp.FromDateTime(DateTime.SpecifyKind(new DateTime(2024, 9, 1, 12, 0, 0), DateTimeKind.Utc));
+        var original = new CombineYieldLayer
+        {
+            Header = new Header
+            {
+                Sequence = 3,
+                Timestamp = timestamp,
+                Frame = "field",
+                Source = "combine"
+            },
+            Crop = "Wheat",
+            CellSizeMeters = 10
+        };
+
+        original.Cells.Add(new CombineYieldCell
+        {
+            Column = 1,
+            Row = 2,
+            AverageYieldKgPerHectare = 9200,
+            AverageMoisturePercent = 17.5,
+            SampleCount = 4
+        });
+
+        var serialized = original.ToByteArray();
+        var deserialized = CombineYieldLayer.Parser.ParseFrom(serialized);
+
+        Assert.Equal(original.Header.Sequence, deserialized.Header.Sequence);
+        Assert.Equal(original.Header.Timestamp, deserialized.Header.Timestamp);
+        Assert.Equal(original.Header.Frame, deserialized.Header.Frame);
+        Assert.Equal(original.Header.Source, deserialized.Header.Source);
+        Assert.Equal(original.Crop, deserialized.Crop);
+        Assert.Equal(original.CellSizeMeters, deserialized.CellSizeMeters);
+        Assert.Equal(original.Cells.Count, deserialized.Cells.Count);
+        Assert.Equal(original.Cells[0].Column, deserialized.Cells[0].Column);
+        Assert.Equal(original.Cells[0].Row, deserialized.Cells[0].Row);
+        Assert.Equal(original.Cells[0].AverageYieldKgPerHectare, deserialized.Cells[0].AverageYieldKgPerHectare);
+        Assert.Equal(original.Cells[0].AverageMoisturePercent, deserialized.Cells[0].AverageMoisturePercent);
+        Assert.Equal(original.Cells[0].SampleCount, deserialized.Cells[0].SampleCount);
+    }
 }

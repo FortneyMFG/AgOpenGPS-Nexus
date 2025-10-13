@@ -205,3 +205,37 @@ message PlanterRowStatus {
   // Evaluated quality classification for the row.
   PlanterRowQuality quality = 7;
 }
+
+// CombineYieldCell summarises the averaged yield/moisture data for a spatial cell.
+message CombineYieldCell {
+  // Column index within the publish grid (0 at field origin east edge).
+  uint32 column = 1;
+
+  // Row index within the publish grid (0 at field origin north edge).
+  uint32 row = 2;
+
+  // Average wet yield scaled to kilograms per hectare for the cell.
+  double average_yield_kg_per_hectare = 3;
+
+  // Average crop moisture percentage (0-100). Zero indicates unavailable.
+  double average_moisture_percent = 4;
+
+  // Number of raw measurements aggregated into the cell.
+  uint32 sample_count = 5;
+}
+
+// CombineYieldLayer aggregates combine yield measurements into a grid suitable
+// for UI overlays and data export workflows.
+message CombineYieldLayer {
+  // Telemetry header describing sequence, timestamp, and source metadata.
+  Header header = 1;
+
+  // Crop name associated with the layer (e.g. "Corn").
+  string crop = 2;
+
+  // Edge length of each grid cell in meters.
+  double cell_size_meters = 3;
+
+  // Averaged cells composing the layer.
+  repeated CombineYieldCell cells = 4;
+}

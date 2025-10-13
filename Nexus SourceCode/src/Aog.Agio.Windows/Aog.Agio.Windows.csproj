@@ -5,6 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <UseLocalAogAbstractions Condition="'$(UseLocalAogAbstractions)' == '' and Exists('..\Aog.Abstractions\Aog.Abstractions.csproj')">true</UseLocalAogAbstractions>
+  </PropertyGroup>
+
   <!-- Common packages -->
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.9" />
@@ -13,8 +17,15 @@
   </ItemGroup>
 
   <!-- Project references from both branches -->
-  <ItemGroup>
+  <ItemGroup Condition="'$(UseLocalAogAbstractions)' == 'true'">
     <ProjectReference Include="..\Aog.Abstractions\Aog.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseLocalAogAbstractions)' != 'true'">
+    <PackageReference Include="AgOpenGPS.Aog.Abstractions" Version="$(AogAbstractionsPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Aog.Agio\Aog.Agio.csproj" />
   </ItemGroup>
 

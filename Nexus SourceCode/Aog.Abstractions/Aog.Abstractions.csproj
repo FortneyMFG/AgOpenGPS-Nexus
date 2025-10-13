@@ -4,6 +4,23 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <VersionPrefix>$(AogAbstractionsBaseVersion)</VersionPrefix>
+    <PackageId>AgOpenGPS.Aog.Abstractions</PackageId>
+    <Authors>AgOpenGPS</Authors>
+    <Product>AgOpenGPS Nexus Contracts</Product>
+    <Description>Shared protobuf/gRPC contracts consumed by AgOpenGPS Nexus components.</Description>
+    <PackageProjectUrl>https://github.com/AgOpenGPS/AgOpenGPS-Nexus</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AgOpenGPS/AgOpenGPS-Nexus</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>agopengps;grpc;protobuf;nexus</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageOutputPath>$(ContractsArtifactsDir)</PackageOutputPath>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">false</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,5 +32,10 @@
 
   <ItemGroup>
     <Protobuf Include="../proto/core.proto" ProtoRoot="../proto" GrpcServices="None" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="../proto/core.proto" Pack="true" PackagePath="proto" Visible="false" />
   </ItemGroup>
 </Project>

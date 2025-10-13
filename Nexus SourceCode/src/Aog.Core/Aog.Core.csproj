@@ -6,8 +6,16 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup>
+    <UseLocalAogAbstractions Condition="'$(UseLocalAogAbstractions)' == '' and Exists('..\Aog.Abstractions\Aog.Abstractions.csproj')">true</UseLocalAogAbstractions>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UseLocalAogAbstractions)' == 'true'">
     <ProjectReference Include="..\Aog.Abstractions\Aog.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseLocalAogAbstractions)' != 'true'">
+    <PackageReference Include="AgOpenGPS.Aog.Abstractions" Version="$(AogAbstractionsPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>

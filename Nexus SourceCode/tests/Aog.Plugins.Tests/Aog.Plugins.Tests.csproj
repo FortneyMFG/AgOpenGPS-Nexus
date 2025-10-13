@@ -24,4 +24,10 @@
     <ProjectReference Include="..\..\src\Aog.Plugins\Aog.Plugins.csproj" />
     <ProjectReference Include="..\..\src\Aog.Core\Aog.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Sections\Data\LegacyRateControlScenarios.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "providers": [
+    {"providerId": "sim.clock.fixed", "type": "Aog.Sim.Clock.FixedStep", "outputs": ["time"], "settings": {"stepMs": 50}},
+    {"providerId": "sim.vehicle.bicycle", "type": "Aog.Sim.Vehicle.BicycleModel", "inputs": ["time", "guidance.command"], "outputs": ["pose"], "settings": {"wheelbaseMeters": 2.8, "maxSteerAngleDeg": 28}},
+    {"providerId": "sim.guidance.abLine", "type": "Aog.Sim.Guidance.AbLine", "inputs": ["pose"], "outputs": ["guidance.command"], "settings": {"lineHeadingDeg": 0, "crossTrackGain": 0.85}},
+    {"providerId": "sim.guidance.headland", "type": "Aog.Sim.Guidance.HeadlandPlanner", "inputs": ["pose"], "outputs": ["guidance.command"], "settings": {"passes": 2, "turnStyle": "loop"}},
+    {"providerId": "replay.guidance.log", "type": "Aog.Replay.GuidanceFromLog", "outputs": ["guidance.command"], "settings": {"path": "~/telemetry/headland-run.parquet"}},
+    {"providerId": "sim.imu.synthetic", "type": "Aog.Sim.Sensors.Imu", "inputs": ["pose", "time"], "outputs": ["imu"], "settings": {"noise": {"ax": 0.03, "ay": 0.03, "yawRate": 0.5}}}
+  ],
+  "routes": [
+    {"stream": "time", "source": "sim.clock.fixed", "mode": "simulation"},
+    {"stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation"},
+    {"stream": "guidance.command", "source": "sim.guidance.abLine", "mode": "simulation"},
+    {"stream": "imu", "source": "sim.imu.synthetic", "mode": "simulation"}
+  ],
+  "options": {"seed": 2024, "timeScale": 1.0},
+  "scenarios": [
+    {
+      "scenarioId": "baseline-guidance",
+      "description": "AB-line follow with deterministic IMU noise for smoke checks.",
+      "routes": [
+        {"stream": "guidance.command", "source": "sim.guidance.abLine", "mode": "simulation"},
+        {"stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation"},
+        {"stream": "imu", "source": "sim.imu.synthetic", "mode": "simulation"}
+      ],
+      "options": {"timeScale": 1.0}
+    },
+    {
+      "scenarioId": "headland-training",
+      "description": "Headland planner routes with slower playback for turn practice.",
+      "routes": [
+        {"stream": "guidance.command", "source": "sim.guidance.headland", "mode": "simulation"},
+        {"stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation"},
+        {"stream": "imu", "source": "sim.imu.synthetic", "mode": "simulation"}
+      ],
+      "options": {"seed": 4096, "timeScale": 0.5}
+    },
+    {
+      "scenarioId": "replay-overlay",
+      "description": "Blend recorded guidance with live vehicle dynamics for debriefs.",
+      "routes": [
+        {"stream": "guidance.command", "source": "replay.guidance.log", "mode": "replay"},
+        {"stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation"},
+        {"stream": "imu", "source": "sim.imu.synthetic", "mode": "simulation"}
+      ],
+      "options": {"timeScale": 1.0}
+    }
+  ]
+}

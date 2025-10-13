@@ -46,7 +46,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-034 Sim provider bundle registrations
 - [x] NX-035 Replay plugin v1
 - [x] NX-036 Plugin telemetry sink
-- [ ] NX-037 Simulation scenario library
+- [x] NX-037 Simulation scenario library
 - [ ] NX-038 Simulation performance harness
 - [ ] NX-039 Plugin compatibility CI gate
 
@@ -68,11 +68,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-051 Coverage math port + tests
 - [x] NX-052 AB/curve/headland generation port
 - [x] NX-053 Controller gains/tuners
-- [ ] NX-054 V6 AB/headland import
-- [ ] NX-055 Coverage analytics parity harness
-- [ ] NX-056 Machine profile translator
-- [ ] NX-057 Rate control parity validation
-- [ ] NX-058 Guidance tuning auto-calculations
+- [x] NX-054 V6 AB/headland import
+- [x] NX-055 Coverage analytics parity harness
+- [x] NX-056 Machine profile translator
+- [x] NX-057 Rate control parity validation
+- [x] NX-058 Guidance tuning auto-calculations
 - [ ] NX-059 Ported math verification report
 
 ### Section G — Packaging, DevEx, Docs
@@ -93,11 +93,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-070 Heartbeats & failsafe watchdogs
 - [x] NX-071 Arming/state machine
 - [x] NX-072 Deterministic sim regression
-- [ ] NX-073 End-to-end failsafe integration tests
+- [x] NX-073 End-to-end failsafe integration tests
 - [ ] NX-074 Field safety validation checklist
 - [ ] NX-075 Hardware-in-the-loop automation rig
 - [ ] NX-076 Fault injection harness
-- [ ] NX-077 Safety log retention & export tooling
+- [x] NX-077 Safety log retention & export tooling
 - [ ] NX-078 QA dashboard aggregating safety metrics
 - [ ] NX-079 Post-run report generator
 
@@ -175,7 +175,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-034 | Sim provider registrations (bundle) | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Manifest helpers register providers with catalog |
 | NX-035 | Replay plugin v1 | Done |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Telemetry Parquet replay controller with play/pause/seek tests |
 | NX-036 | Plugin telemetry sink | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | EventBus sink streams plugin telemetry |
-| NX-037 | Simulation scenario library with curated sample configs and docs | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Bundle field-ready templates and documentation |
+| NX-037 | Simulation scenario library with curated sample configs and docs | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Bundle field-ready templates and documentation |
 | NX-038 | Simulation performance and stress harness covering plugin combinations | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | CI run ensures deterministic timing under load |
 | NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | Planned |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
 
@@ -203,11 +203,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-051 | Coverage math port + tests | Done |  | — | [SRS §5.2 Coverage Math](docs/SRS/NOTES.md#srs-52-coverage-math) | Compare vs V6 CSVs |
 | NX-052 | AB/curve/headland generation port | Done |  | — | [SRS §5.3 Path Generation](docs/SRS/NOTES.md#srs-53-path-generation) | Tests green |
 | NX-053 | Controller gains/tuners | Done |  | — | [SRS §5.4 Controller Gains](docs/SRS/NOTES.md#srs-54-controller-gains) | Meets error targets |
-| NX-054 | Import V6 AB lines, headlands, and boundaries into Nexus formats | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | CLI + UI wizard |
-| NX-055 | Coverage analytics parity harness comparing Nexus and V6 CSV outputs | Planned |  | — | [SRS §5.2 Coverage Math](docs/SRS/NOTES.md#srs-52-coverage-math) | Automated diff thresholds |
-| NX-056 | Machine profile translator for hydraulics and implement settings | Planned |  | — | [SRS §5.6 Machine Profiles](docs/SRS/NOTES.md#srs-56-machine-profiles) | Generate Nexus profiles from V6 |
-| NX-057 | Rate control parity validation for sections and planter algorithms | Planned |  | — | [SRS §5.7 Rate Control](docs/SRS/NOTES.md#srs-57-rate-control) | Bench + sim comparison |
-| NX-058 | Guidance tuning auto-calculations aligned with V6 behavior | Planned |  | — | [SRS §5.4 Controller Gains](docs/SRS/NOTES.md#srs-54-controller-gains) | Auto-tune heuristics |
+| NX-054 | Import V6 AB lines, headlands, and boundaries into Nexus formats | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | CLI + UI wizard |
+| NX-055 | Coverage analytics parity harness comparing Nexus and V6 CSV outputs | Done |  | — | [SRS §5.2 Coverage Math](docs/SRS/NOTES.md#srs-52-coverage-math) | Automated diff thresholds |
+| NX-056 | Machine profile translator for hydraulics and implement settings | Done |  | — | [SRS §5.6 Machine Profiles](docs/SRS/NOTES.md#srs-56-machine-profiles) | Generate Nexus profiles from V6 |
+| NX-057 | Rate control parity validation for sections and planter algorithms | Done |  | — | [SRS §5.7 Rate Control](docs/SRS/NOTES.md#srs-57-rate-control) | Bench + sim comparison |
+| NX-058 | Guidance tuning auto-calculations aligned with V6 behavior | Done |  | — | [SRS §5.4 Controller Gains](docs/SRS/NOTES.md#srs-54-controller-gains) | Auto-tune heuristics |
 | NX-059 | Ported math verification report and documentation updates | Planned |  | — | [SRS §5.8 Verification](docs/SRS/NOTES.md#srs-58-verification) | Summarize parity metrics |
 
 ### Section G — Packaging, DevEx, Docs
@@ -234,11 +234,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-070 | Heartbeats & failsafe watchdogs | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Timeout <100 ms |
 | NX-071 | Arming/state machine | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Blocks unsafe outputs |
 | NX-072 | Deterministic sim regression (10s golden) | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Locks CI expectation |
-| NX-073 | End-to-end failsafe integration tests in CI and bench rigs | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Combine sim + hardware watchdog validation |
+| NX-073 | End-to-end failsafe integration tests in CI and bench rigs | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Combine sim + hardware watchdog validation |
 | NX-074 | Field safety validation checklist and sign-off workflow | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Operator checklist + approvals |
 | NX-075 | Hardware-in-the-loop automation rig for regression testing | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Bench harness for AGiO + plugins |
 | NX-076 | Fault injection harness for sensors, network, and power events | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Scriptable fault scenarios |
-| NX-077 | Safety log retention and export tooling with retention policy | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Archive for audits |
+| NX-077 | Safety log retention and export tooling with retention policy | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Archive for audits |
 | NX-078 | QA dashboard aggregating simulation, hardware, and safety metrics | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Web dashboard + alerts |
 | NX-079 | Post-run report generator summarizing guidance, coverage, and alarms | Planned |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | PDF/CSV outputs |
 

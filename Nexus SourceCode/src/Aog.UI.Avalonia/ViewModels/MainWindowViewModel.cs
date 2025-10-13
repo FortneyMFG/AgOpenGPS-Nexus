@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Aog.UI.Avalonia.Models;
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
 
@@ -24,25 +25,20 @@ public class MainWindowViewModel
         _connectionSettings = connectionSettings;
     }
 
-    /// <summary>
-    /// Gets the title displayed in the main window.
-    /// </summary>
+    /// <summary>Gets the title displayed in the main window.</summary>
     public string Title => "AgOpenGPS Nexus";
 
-    /// <summary>
-    /// Gets a description of the platform the application is currently running on.
-    /// </summary>
+    /// <summary>Gets a description of the runtime platform.</summary>
     public string PlatformDescription =>
         $"Running on {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}) with {RuntimeInformation.FrameworkDescription}";
 
-    /// <summary>
-    /// Gets the connection settings view-model.
-    /// </summary>
+    /// <summary>Gets a sample vehicle pose used to seed the map view.</summary>
+    public VehiclePose VehiclePose { get; } = new(10, 15, 45);
+
+    /// <summary>Gets the connection settings view-model.</summary>
     public ConnectionSettingsViewModel Connection => _connectionSettings;
 
-    /// <summary>
-    /// Gets a summary of the embedded simulation configuration.
-    /// </summary>
+    /// <summary>Gets a summary of the embedded simulation configuration.</summary>
     public string SimulationGraphSummary => SimulationSummary;
 
     private static string BuildSimulationGraphSummary()
@@ -52,9 +48,7 @@ public class MainWindowViewModel
 
         using var stream = assembly.GetManifestResourceStream(resourceName);
         if (stream is null)
-        {
             return "Simulation sample resource not found.";
-        }
 
         using var reader = new StreamReader(stream);
         var json = reader.ReadToEnd();
@@ -64,9 +58,7 @@ public class MainWindowViewModel
             var configuration = SimulationConfigurationLoader.Load(json);
             var catalog = new SimulationCatalog();
             foreach (var descriptor in configuration.CreateProviderDescriptors())
-            {
                 catalog.Register(descriptor);
-            }
 
             return catalog.BuildGraph().FormatSummary().TrimEnd();
         }

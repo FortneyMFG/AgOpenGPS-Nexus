@@ -13,6 +13,7 @@ Adopt a unified C#/.NET 8 stack that runs identically on Windows x64 and Linux A
   - `Aog.Plugins` — managed plugin catalog (auto-steer, sections, simulation, replay) loaded through manifests and `AssemblyLoadContext`.
   - `Aog.UI.Avalonia` — desktop UI consuming the same gRPC contracts on Windows and Linux.
 - **Simulation**: `Agio.Sim` backend injects virtual GNSS/IMU/CAN feeds so Core and UI behave identically in replay or training scenarios. A replay plugin rehydrates Parquet/CSV logs on any platform.
+- **Composite sim fabric**: Core hosts the SimClock (fixed-step, rate/seekable), SimBus (typed pub/sub + last value), and SourceRouter (hardware vs. sim vs. replay priorities) so every plugin simulator and hardware input shares one authoritative timeline.
 - **GPS abstraction**: A single `IPositionSource` interface with providers for NMEA/UBX serial ports, gpsd, Windows Location, and TCP/UDP streams. AgIO policy selects the best available provider and exposes a unified GNSS stream over gRPC.
 - **Backends**:
   - `Agio.Windows` — wraps COM ports, Windows Location API, and optional vendor CAN SDKs (PCAN, Kvaser).
@@ -28,6 +29,7 @@ Leverage `Grpc.Net.Client`, `Grpc.AspNetCore`, `Google.Protobuf`, `Microsoft.Ext
 - Keeps Core logic, simulation, plugins, and UI identical across Windows and Linux deployments.
 - Contains platform-specific complexity inside small AgIO backends, simplifying testing and packaging.
 - Provides a clear migration path: operators start on Windows with auto-detected GPS, then move to Pi/CM5 without rewriting workflows.
+- Enables deterministic multi-plugin simulation (including hardware-in-the-loop overrides) without forking Core logic or duplicating routing rules.
 
 ## Considerations
 - Requires disciplined API versioning across gRPC contracts and plugin manifests.
@@ -39,3 +41,4 @@ Leverage `Grpc.Net.Client`, `Grpc.AspNetCore`, `Google.Protobuf`, `Microsoft.Ext
 - Simulation plugin exercises GNSS/IMU/section flows without hardware.
 - Replay plugin reuses unified gRPC contracts to validate new telemetry features against historical logs.
 - Shared NuGet package enables contract linting and compatibility testing before releases.
+- Composite simulation clock/bus APIs guarantee replay parity across Windows/Linux and keep plugin-provided fake data consistent with hardware override priorities.

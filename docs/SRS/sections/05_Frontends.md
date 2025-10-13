@@ -14,6 +14,7 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - R-FE-012 (SHOULD, proposed-LinuxCore): Ensure at least one frontend can operate purely as a remote client over the Core APIs (gRPC/WebSocket) while maintaining offline workflows for Windows rigs.【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L1-L34】
 - R-FE-013 (SHOULD, safety posture): Distinguish monitor-only remote clients from control-capable clients with explicit capability flags so safety-critical actions are disabled on unreliable links by default.
 - R-FE-014 (SHOULD, operator readiness): Capture training, preset migration, and configuration handoff requirements when metadata-heavy dashboards roll out so operators can transition without losing saved layouts.
+- R-FE-020 (SHOULD, proposed-composite-sim): Surface a unified simulation bar that drives play/pause/seek/speed for the authoritative SimClock so operators, replay, and plugin simulators stay synchronized.
 
 ## Options
 - O-FE-0: Status quo — Windows desktop suite (AgOpenGPS + AgIO + utilities).
@@ -45,6 +46,7 @@ Operator familiarity, deployment friction, offline resilience, latency, maintain
 - Operators welcome metadata-driven dashboards if they ship with presets and inspector upgrades rather than requiring manual wiring per layer.【F:docs/SRS/options/O-UI-5_MetadataDrivenDashboards.md†L52-L64】
 - The Avalonia desktop frontend is now viewed as the preferred successor because it keeps one C# codebase and can slide into the Windows quick-start flow before expanding to Pi/CM5 deployments.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L79】
 - Remote-first clients are attractive if they piggyback on the Core without forcing Windows operators to learn a new UI overnight.【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L21-L34】
+- Simulation tooling should reuse the same controls regardless of data source so operators can blend hardware inputs with plugin-provided scenarios without context switching.
 
 ## Open questions
 - Which screens must be mirrored vs. reimagined for mobile?

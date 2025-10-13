@@ -47,8 +47,9 @@ and the broader Software Requirements Specification (SRS) set under `/docs/SRS`.
 ├── docs/                  # SRS, ADRs, how-tos, templates
 │   ├── SRS/               # System Requirements (single source of truth)
 │   └── NOTES.md           # Living notes about the SRS canon and clarifications
-├── Nexus Source Code/     # New Nexus solution space (empty scaffold today)
-│   └── proto/             # gRPC contracts (to be defined in Wave 1)
+├── Nexus Source Code/     # Nexus solution space (contracts + generated stubs)
+│   ├── Aog.Abstractions/  # Generated protobuf stubs and shared abstractions
+│   └── proto/             # gRPC contracts that define the core telemetry types
 ├── Legacy SourceCode -V6/ # Historical AgOpenGPS materials for reference
 ├── tasks.md               # Active backlog with per-lane ticket tracking
 ├── AGENTS.md              # Contribution conventions and automation guardrails

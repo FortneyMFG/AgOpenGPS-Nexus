@@ -46,6 +46,31 @@ public sealed class SimulationBarViewModelTests
         doubleRate.IsSelected.Should().BeTrue();
     }
 
+    [Fact]
+    public void ApplyScenario_UpdatesMetadataAndRoutes()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        var viewModel = new SimulationBarViewModel(configuration);
+        var scenario = new SimulationScenarioConfiguration(
+            "test",
+            "Scenario for testing",
+            new[]
+            {
+                new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+            },
+            new SimulationOptionsConfiguration(1337, 0.75));
+
+        viewModel.ApplyScenario(scenario);
+
+        viewModel.ActiveScenarioTitle.Should().Be("Scenario: test");
+        viewModel.ActiveScenarioDescription.Should().Contain("Scenario for testing");
+        viewModel.ActiveScenarioOptions.Should().Contain("seed=1337");
+        viewModel.Routes.Should().ContainSingle(route => route.Stream == "pose");
+
+        viewModel.ResetToConfigurationRoutes();
+        viewModel.ActiveScenarioTitle.Should().Be("Scenario: configuration defaults");
+    }
+
     private static SimulationBarViewModel CreateViewModel()
     {
         const string json = """
@@ -67,5 +92,34 @@ public sealed class SimulationBarViewModelTests
 
         var configuration = SimulationConfigurationLoader.Load(json);
         return new SimulationBarViewModel(configuration);
+    }
+
+    private static SimulationConfiguration CreateConfigurationWithScenario()
+    {
+        const string json = """
+{
+  "schemaVersion": "1.0.0",
+  "providers": [
+    { "providerId": "sim.clock.fixed", "outputs": ["time"] },
+    { "providerId": "sim.vehicle.bicycle", "inputs": ["time"], "outputs": ["pose"] }
+  ],
+  "routes": [
+    { "stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation" }
+  ],
+  "options": { "seed": 2024, "timeScale": 1.0 },
+  "scenarios": [
+    {
+      "scenarioId": "default",
+      "description": "Default scenario",
+      "routes": [
+        { "stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation" }
+      ],
+      "options": { "timeScale": 1.0 }
+    }
+  ]
+}
+""";
+
+        return SimulationConfigurationLoader.Load(json);
     }
 }

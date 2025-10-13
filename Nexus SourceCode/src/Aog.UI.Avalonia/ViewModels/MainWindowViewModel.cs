@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Aog.UI.Avalonia.Models;                 // VehiclePose, SimulationBarViewModel
@@ -15,6 +16,8 @@ public class MainWindowViewModel
     private const string SimulationResourceName = "Aog.UI.Avalonia.Resources.SimulationSample.json";
 
     private readonly ConnectionSettingsViewModel _connectionSettings;
+    private readonly List<SimulationScenarioConfiguration> _scenarioDefinitions = new();
+    private readonly SimulationConfiguration? _simulationConfiguration;
 
     public MainWindowViewModel(ConnectionSettingsViewModel connectionSettings)
     {
@@ -27,8 +30,14 @@ public class MainWindowViewModel
 
         // Load simulation configuration + summary and create the bar VM.
         var configuration = TryLoadSimulationConfiguration(out var summary);
+        _simulationConfiguration = configuration;
         SimulationGraphSummary = summary;
         SimulationBar = new SimulationBarViewModel(configuration);
+
+        if (configuration?.Scenarios is not null)
+        {
+            _scenarioDefinitions.AddRange(configuration.Scenarios);
+        }
     }
 
     /// <summary>Gets the title displayed in the main window.</summary>
@@ -48,6 +57,18 @@ public class MainWindowViewModel
 
     /// <summary>Gets the simulation bar view-model bound to the UI.</summary>
     public SimulationBarViewModel SimulationBar { get; }
+
+    /// <summary>
+    /// Creates a scenario editor view-model that can update the simulation routes.
+    /// </summary>
+    public ScenarioEditorViewModel CreateScenarioEditorViewModel()
+    {
+        return new ScenarioEditorViewModel(
+            _simulationConfiguration,
+            _scenarioDefinitions,
+            scenario => SimulationBar.ApplyScenario(scenario),
+            () => SimulationBar.ResetToConfigurationRoutes());
+    }
 
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)
     {

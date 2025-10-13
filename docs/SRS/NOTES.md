@@ -78,6 +78,9 @@ documents move or headings change.
 - Contracts-first policy: define protobuf and JSON schemas before implementing dependent
   services. Once the initial versions land, freeze updates for 72 hours to stabilise
   downstream work.
+- Core host health logging honours configuration reloads; updating
+  `CoreHost:Health:IntervalSeconds` adjusts the heartbeat cadence without restarting the
+  process, and logs confirm when changes are applied.
 
 ## Open Questions
 

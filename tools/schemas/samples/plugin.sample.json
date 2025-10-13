@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.plugins.autosteer-lite",
+  "name": "AutoSteer Lite",
+  "version": "1.2.0",
+  "description": "Pure pursuit and Stanley steering with bundled simulation providers.",
+  "requiredApis": {
+    "core": ">=1.0.0",
+    "sim": ">=1.0.0"
+  },
+  "settings": {
+    "defaultMode": "pure-pursuit",
+    "maxLookAhead": 12.5
+  },
+  "simProviders": [
+    {
+      "providerId": "autosteer.vehicle",
+      "type": "Aog.Plugins.Autosteer.VehicleProvider",
+      "topics": ["pose", "steer"],
+      "settings": {
+        "wheelbase": 2.8,
+        "latencyMs": 40
+      }
+    },
+    {
+      "providerId": "gnss.basic",
+      "type": "Aog.Plugins.Sim.GnssProvider",
+      "topics": ["pose"],
+      "settings": {
+        "horizontalNoise": 0.15,
+        "dropoutProbability": 0.01
+      }
+    }
+  ]
+}

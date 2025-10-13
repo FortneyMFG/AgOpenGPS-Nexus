@@ -53,12 +53,14 @@ public static class Program
             })
             .ConfigureServices((context, services) =>
             {
+                // Core health options
                 services
                     .AddOptions<CoreHealthOptions>()
                     .BindConfiguration("CoreHost:Health")
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+                // AGiO connection options
                 services
                     .AddOptions<AgioConnectionOptions>()
                     .BindConfiguration("CoreHost:Agio")
@@ -67,6 +69,7 @@ public static class Program
                         "CoreHost:Agio:Endpoint must be an absolute URI.")
                     .ValidateOnStart();
 
+                // Core capabilities options
                 services
                     .AddOptions<CoreCapabilitiesOptions>()
                     .BindConfiguration("CoreHost:Capabilities")
@@ -77,6 +80,7 @@ public static class Program
                         "CoreHost:Capabilities:SessionPrefix is required.")
                     .ValidateOnStart();
 
+                // Capability descriptor factory (defaults + attributes)
                 services.AddSingleton(provider =>
                 {
                     var options = provider.GetRequiredService<IOptions<CoreCapabilitiesOptions>>().Value;
@@ -93,6 +97,7 @@ public static class Program
                         attributes);
                 });
 
+                // Capabilities client + gRPC wiring
                 services.AddSingleton<CoreCapabilitiesClient>();
 
                 services.AddGrpcClient<CapabilitiesService.CapabilitiesServiceClient>((provider, clientOptions) =>
@@ -114,6 +119,10 @@ public static class Program
 
                 services.AddSingleton<ICapabilitiesHandshakeClient, GrpcCapabilitiesHandshakeClient>();
 
+                // Also register system time provider (from develop)
+                services.AddSingleton(TimeProvider.System);
+
+                // Hosted services
                 services.AddHostedService<CoreHealthService>();
                 services.AddHostedService<CapabilitiesHandshakeService>();
             });

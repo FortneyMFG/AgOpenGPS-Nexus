@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/plugin.schema.json",
+  "title": "Nexus plugin manifest",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "version",
+    "requiredApis",
+    "simProviders"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the plugin manifest schema."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(\\.[a-z0-9_-]+)+$",
+      "description": "Reverse-DNS identifier for the plugin bundle."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display name shown in catalogs and diagnostics."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[-0-9A-Za-z.]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "description": "Semantic version describing the plugin implementation."
+    },
+    "description": {
+      "type": "string",
+      "description": "Long-form summary of the plugin's capabilities."
+    },
+    "requiredApis": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Compatibility map keyed by API name with semantic version constraints."
+    },
+    "settings": {
+      "type": "object",
+      "default": {},
+      "additionalProperties": { "$ref": "#/$defs/value" },
+      "description": "Optional plugin-level settings surfaced to the host."
+    },
+    "simProviders": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/simProvider" },
+      "description": "Simulation providers bundled with the plugin."
+    }
+  },
+  "$defs": {
+    "value": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        {
+          "type": "array",
+          "items": { "type": "number" }
+        }
+      ]
+    },
+    "simProvider": {
+      "type": "object",
+      "required": ["providerId", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "providerId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "description": "Identifier referenced by the simulation graph."
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Fully qualified type name used to materialise the provider."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional human-readable description of the provider."
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "description": "Topics emitted by the provider."
+        },
+        "settings": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": { "$ref": "#/$defs/value" },
+          "description": "Provider-specific tunables."
+        }
+      }
+    }
+  }
+}

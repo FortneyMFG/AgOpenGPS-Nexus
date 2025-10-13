@@ -1,0 +1,2 @@
+sequence,timestamp_utc,frame,source,accel_x_mps2,accel_y_mps2,accel_z_mps2,gyro_x_radps,gyro_y_radps,gyro_z_radps,mag_x_ut,mag_y_ut,mag_z_ut,temperature_c
+1,2024-04-01T12:30:00Z,imu,imu-sensor,0.1,0.0,9.8,0.001,0.002,0.003,12.5,13.5,14.5,22.5

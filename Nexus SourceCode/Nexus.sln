@@ -47,7 +47,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Tools.SafetyLog", "tool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Tools.LegacyConfigTranslator", "tools\Aog.Tools.LegacyConfigTranslator\Aog.Tools.LegacyConfigTranslator.csproj", "{C5E36422-D2BC-4F16-A7FA-9D426F24829A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Tools.LegacyDataMigrator", "tools\Aog.Tools.LegacyDataMigrator\Aog.Tools.LegacyDataMigrator.csproj", "{701AF24B-DE8A-41F4-8DDA-A3747CD0981A}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Tools.LegacyConfigTranslator.Tests", "tests\Aog.Tools.LegacyConfigTranslator.Tests\Aog.Tools.LegacyConfigTranslator.Tests.csproj", "{6675EB58-30AD-4EB3-8EA7-A626A76713F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Tools.LegacyDataMigrator.Tests", "tests\Aog.Tools.LegacyDataMigrator.Tests\Aog.Tools.LegacyDataMigrator.Tests.csproj", "{FEE887B7-6070-42B8-B8D3-0093DA67B553}"
 EndProject
 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Tools.Qa", "tools\Aog.Tools.Qa\Aog.Tools.Qa.csproj", "{C8EA6E00-7DF3-482A-8B53-200128C941FE}"
@@ -175,10 +179,20 @@ Global
     {C5E36422-D2BC-4F16-A7FA-9D426F24829A}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {C5E36422-D2BC-4F16-A7FA-9D426F24829A}.Release|Any CPU.Build.0   = Release|Any CPU
 
+    {701AF24B-DE8A-41F4-8DDA-A3747CD0981A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {701AF24B-DE8A-41F4-8DDA-A3747CD0981A}.Debug|Any CPU.Build.0   = Debug|Any CPU
+    {701AF24B-DE8A-41F4-8DDA-A3747CD0981A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {701AF24B-DE8A-41F4-8DDA-A3747CD0981A}.Release|Any CPU.Build.0   = Release|Any CPU
+
     {6675EB58-30AD-4EB3-8EA7-A626A76713F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
     {6675EB58-30AD-4EB3-8EA7-A626A76713F8}.Debug|Any CPU.Build.0   = Debug|Any CPU
     {6675EB58-30AD-4EB3-8EA7-A626A76713F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {6675EB58-30AD-4EB3-8EA7-A626A76713F8}.Release|Any CPU.Build.0   = Release|Any CPU
+
+    {FEE887B7-6070-42B8-B8D3-0093DA67B553}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {FEE887B7-6070-42B8-B8D3-0093DA67B553}.Debug|Any CPU.Build.0   = Debug|Any CPU
+    {FEE887B7-6070-42B8-B8D3-0093DA67B553}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {FEE887B7-6070-42B8-B8D3-0093DA67B553}.Release|Any CPU.Build.0   = Release|Any CPU
 
   EndGlobalSection
 
@@ -208,7 +222,9 @@ Global
     {7F29D2D7-33B5-49D3-9163-28F015CF3A1D} = {303ABDBD-7499-4F4B-9551-F64B319BC50D}
     {F9660722-8925-4EE8-A209-83C2A92C970A} = {D6D942D1-899F-494D-9891-3658D0D44925}
     {C5E36422-D2BC-4F16-A7FA-9D426F24829A} = {D6D942D1-899F-494D-9891-3658D0D44925}
+    {701AF24B-DE8A-41F4-8DDA-A3747CD0981A} = {D6D942D1-899F-494D-9891-3658D0D44925}
     {6675EB58-30AD-4EB3-8EA7-A626A76713F8} = {303ABDBD-7499-4F4B-9551-F64B319BC50D}
+    {FEE887B7-6070-42B8-B8D3-0093DA67B553} = {303ABDBD-7499-4F4B-9551-F64B319BC50D}
   EndGlobalSection
 
   GlobalSection(ExtensibilityGlobals) = postSolution

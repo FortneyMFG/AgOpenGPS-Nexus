@@ -95,7 +95,7 @@ NX-093,FALSE,FALSE,NX-092,NX-092,Support knowledge base for bridging workflows a
 NX-094,TRUE,FALSE,"NX-078, NX-092",NX-078,Field feedback telemetry aggregator feeding support dashboards
 NX-095,TRUE,FALSE,"NX-087, NX-093",NX-087,Dealer support escalation process and SLA tracking
 NX-096,TRUE,FALSE,"NX-087, NX-094",NX-087,Community preview program with opt-in builds and survey loop
-NX-097,FALSE,FALSE,"NX-095, NX-096",NX-095,1.0 launch readiness review and sign-off checklist
+NX-097,FALSE,TRUE,"NX-095, NX-096",NX-095,1.0 launch readiness review and sign-off checklist
 NX-098,FALSE,FALSE,"NX-030, NX-029",,ISOBUS communications plugin enabling ISO 11783 PGN exchange and diagnostics
 NX-099,FALSE,FALSE,NX-098,NX-098,Update SRS for ISOBUS communications plugin coverage
 NX-100,FALSE,TRUE,"NX-030, NX-012, NX-013",,Combine yield monitoring plugin for crop flow sensors and mapping

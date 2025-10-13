@@ -51,6 +51,7 @@ This directory contains the modern Nexus solution for AgOpenGPS. The initial mil
 ## Projects
 
 - `AgOpenGPS.Nexus.sln` — solution file that groups the UI and accompanying tests.
+- `tools/Aog.Tools.Qa` — Safety and QA console covering checklists, HIL automation, fault injection, dashboards, and reporting.
 - `src/Aog.UI.Avalonia` — Avalonia desktop application providing the shell window and dependency injection bootstrap.
 - `src/Aog.Plugins` — Shared manifest loader and metadata contracts for managed plugins.
 - `tests/Aog.UI.Avalonia.Tests` — unit tests covering the DI registration helpers for the UI shell.
@@ -88,6 +89,24 @@ Replay controls are wired to an `IReplayController` service, enabling real telem
 - Launch the **Edit scenarios...** dialog from the Simulation controls panel to review available simulation presets.
 - Choose provider routes and override seed/time scale options before applying them to the running simulation.
 - Save the active scenario to JSON or load an existing scenario file. Imported scenarios are validated against the simulation schema before being applied.
+
+## Safety & QA tooling
+
+The `Aog.Tools.Qa` console exposes commands for checklists, hardware-in-the-loop automation, fault injection, dashboard aggregation, and post-run reporting. Each command accepts JSON inputs so the tooling can run headless in CI or on bench rigs.
+
+```bash
+# Export the field safety checklist template
+dotnet run --project "tools/Aog.Tools.Qa/Aog.Tools.Qa.csproj" -- checklist template --output tools/qa/checklists/field-safety-template.json
+
+# Execute the sample HIL rig and aggregate metrics
+dotnet run --project "tools/Aog.Tools.Qa/Aog.Tools.Qa.csproj" -- hil run --config tools/qa/hil/rig-config-sample.json
+dotnet run --project "tools/Aog.Tools.Qa/Aog.Tools.Qa.csproj" -- dashboard aggregate --input tools/qa/metrics --output out/qa-dashboard.json
+
+# Generate a post-run Markdown report
+dotnet run --project "tools/Aog.Tools.Qa/Aog.Tools.Qa.csproj" -- report generate --metrics tools/qa/metrics --checklist tools/qa/checklists/completed-sample.json --faults out/fault-schedule.json --output out/post-run.md
+```
+
+See `docs/qa` for task-specific guidance and sample inputs.
 
 ## Testing
 

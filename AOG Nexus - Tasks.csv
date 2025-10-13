@@ -72,12 +72,12 @@ NX-070,FALSE,TRUE,"NX-010, NX-020",,Heartbeats and failsafe watchdog between AGi
 NX-071,FALSE,TRUE,"NX-070, NX-010, NX-020",,Arming and state machine gating outputs
 NX-072,FALSE,TRUE,"NX-012, NX-013",,Deterministic simulation regression test (10s run)
 NX-073,FALSE,TRUE,"NX-070, NX-071",Ready,End-to-end failsafe integration tests in CI and bench rigs
-NX-074,FALSE,FALSE,NX-073,Ready,Field safety validation checklist and sign-off workflow
-NX-075,FALSE,FALSE,NX-073,Ready,Hardware-in-the-loop automation rig for regression testing
-NX-076,FALSE,FALSE,NX-073,Ready,"Fault injection harness for sensors, network, and power events"
+NX-074,FALSE,TRUE,NX-073,Ready,Field safety validation checklist and sign-off workflow
+NX-075,FALSE,TRUE,NX-073,Ready,Hardware-in-the-loop automation rig for regression testing
+NX-076,FALSE,TRUE,NX-073,Ready,"Fault injection harness for sensors, network, and power events"
 NX-077,FALSE,TRUE,"NX-070, NX-075",Ready,Safety log retention and export tooling with retention policy
-NX-078,FALSE,FALSE,"NX-073, NX-077",Ready,"QA dashboard aggregating simulation, hardware, and safety metrics"
-NX-079,FALSE,FALSE,"NX-073, NX-078",Ready,"Post-run report generator summarizing guidance, coverage, and alarms"
+NX-078,FALSE,TRUE,"NX-073, NX-077",Ready,"QA dashboard aggregating simulation, hardware, and safety metrics"
+NX-079,FALSE,TRUE,"NX-073, NX-078",Ready,"Post-run report generator summarizing guidance, coverage, and alarms"
 NX-080,FALSE,TRUE,"NX-027, NX-005",,Legacy UDP discovery and capabilities exchange
 NX-081,FALSE,TRUE,"NX-027, NX-005",Ready,Legacy PGN bridge for steer and sections
 NX-082,FALSE,TRUE,NX-027,,Legacy UART framing with COBS+CRC at 921600 bps

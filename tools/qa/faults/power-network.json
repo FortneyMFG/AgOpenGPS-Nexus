@@ -1,0 +1,32 @@
+{
+  "name": "Power and network",
+  "seed": 123,
+  "events": [
+    {
+      "type": "power_cycle",
+      "target": "controller",
+      "offsetSeconds": 45,
+      "durationSeconds": 6,
+      "severity": 1.0,
+      "jitterSeconds": 2,
+      "notes": "Cycle DC supply to confirm restart handling"
+    },
+    {
+      "type": "network_drop",
+      "target": "ethernet",
+      "offsetSeconds": 90,
+      "durationSeconds": 12,
+      "severity": 0.6,
+      "jitterSeconds": 3,
+      "notes": "Simulate AP roaming event"
+    },
+    {
+      "type": "imu_noise",
+      "target": "imu",
+      "offsetSeconds": 30,
+      "durationSeconds": 20,
+      "severity": 0.4,
+      "notes": "Inject Gaussian noise"
+    }
+  ]
+}

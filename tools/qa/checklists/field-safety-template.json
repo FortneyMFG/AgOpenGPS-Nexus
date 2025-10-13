@@ -1,0 +1,94 @@
+{
+  "siteName": "",
+  "operator": "",
+  "date": "",
+  "approver": "",
+  "sections": [
+    {
+      "name": "Pre-run readiness",
+      "items": [
+        {
+          "id": "pre.ppe",
+          "description": "Operators wearing PPE and aware of emergency stop locations.",
+          "guidance": "Confirm high-visibility clothing, hearing protection, and accessible stop buttons.",
+          "status": "pending"
+        },
+        {
+          "id": "pre.boundary",
+          "description": "Field boundaries and exclusion zones marked and communicated.",
+          "guidance": "Flag hazards and brief spotters before powering hydraulics.",
+          "status": "pending"
+        },
+        {
+          "id": "pre.comms",
+          "description": "Radio/voice comms check completed between cab and ground crew.",
+          "guidance": "Perform a push-to-talk test and confirm hand signals.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Hardware validation",
+      "items": [
+        {
+          "id": "hw.power",
+          "description": "Machine power, hydraulic pressure, and manual override tested.",
+          "guidance": "Cycle actuators manually before enabling autonomy.",
+          "status": "pending"
+        },
+        {
+          "id": "hw.gnss",
+          "description": "GNSS lock with acceptable HDOP and correction source verified.",
+          "guidance": "Target HDOP < 1.5 with RTK/SSR corrections active.",
+          "status": "pending"
+        },
+        {
+          "id": "hw.autosteer",
+          "description": "Autosteer and section controllers respond to engage/disengage.",
+          "guidance": "Use bench sequence before enabling live valves.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Software & failsafes",
+      "items": [
+        {
+          "id": "sw.watchdog",
+          "description": "Failsafe watchdog heartbeat observed in Core and AGiO logs.",
+          "guidance": "Check the safety log exporter if in doubt.",
+          "status": "pending"
+        },
+        {
+          "id": "sw.scenario",
+          "description": "Simulation baseline replayed to confirm deterministic outputs.",
+          "guidance": "Run `nexus sim smoke` or the QA dashboard warm-up.",
+          "status": "pending"
+        },
+        {
+          "id": "sw.logging",
+          "description": "Safety log retention/export configuration reviewed.",
+          "guidance": "Ensure log directory writable and retention matches policy.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Approvals",
+      "items": [
+        {
+          "id": "sign.operator",
+          "description": "Operator acknowledges checklist and assumes control when required.",
+          "guidance": "Signature or badge ID required.",
+          "status": "pending"
+        },
+        {
+          "id": "sign.safety",
+          "description": "Safety officer / QA lead authorises autonomous run.",
+          "guidance": "Requires review of above sections before enabling autonomy.",
+          "status": "pending"
+        }
+      ]
+    }
+  ]
+}

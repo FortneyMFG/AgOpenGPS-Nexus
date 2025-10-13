@@ -1,0 +1,127 @@
+{
+  "siteName": "Demo Field",
+  "operator": "Alex Operator",
+  "date": "2024-03-10",
+  "approver": "Jordan QA",
+  "sections": [
+    {
+      "name": "Pre-run readiness",
+      "items": [
+        {
+          "id": "pre.ppe",
+          "description": "Operators wearing PPE and aware of emergency stop locations.",
+          "guidance": "Confirm high-visibility clothing, hearing protection, and accessible stop buttons.",
+          "status": "completed",
+          "notes": "All crew in PPE",
+          "verifiedBy": "Alex Operator",
+          "verifiedAtUtc": "2024-03-10T13:00:00Z"
+        },
+        {
+          "id": "pre.boundary",
+          "description": "Field boundaries and exclusion zones marked and communicated.",
+          "guidance": "Flag hazards and brief spotters before powering hydraulics.",
+          "status": "completed",
+          "notes": "North tree line flagged",
+          "verifiedBy": "Jordan QA",
+          "verifiedAtUtc": "2024-03-10T13:05:00Z"
+        },
+        {
+          "id": "pre.comms",
+          "description": "Radio/voice comms check completed between cab and ground crew.",
+          "guidance": "Perform a push-to-talk test and confirm hand signals.",
+          "status": "completed",
+          "notes": "PTT clear",
+          "verifiedBy": "Alex Operator",
+          "verifiedAtUtc": "2024-03-10T13:07:00Z"
+        }
+      ]
+    },
+    {
+      "name": "Hardware validation",
+      "items": [
+        {
+          "id": "hw.power",
+          "description": "Machine power, hydraulic pressure, and manual override tested.",
+          "guidance": "Cycle actuators manually before enabling autonomy.",
+          "status": "completed",
+          "notes": "Manual valves responsive",
+          "verifiedBy": "Jordan QA",
+          "verifiedAtUtc": "2024-03-10T13:15:00Z"
+        },
+        {
+          "id": "hw.gnss",
+          "description": "GNSS lock with acceptable HDOP and correction source verified.",
+          "guidance": "Target HDOP < 1.5 with RTK/SSR corrections active.",
+          "status": "completed",
+          "notes": "HDOP 0.9 with RTK",
+          "verifiedBy": "Alex Operator",
+          "verifiedAtUtc": "2024-03-10T13:17:00Z"
+        },
+        {
+          "id": "hw.autosteer",
+          "description": "Autosteer and section controllers respond to engage/disengage.",
+          "guidance": "Use bench sequence before enabling live valves.",
+          "status": "completed",
+          "notes": "Engage latency 110 ms",
+          "verifiedBy": "Jordan QA",
+          "verifiedAtUtc": "2024-03-10T13:19:00Z"
+        }
+      ]
+    },
+    {
+      "name": "Software & failsafes",
+      "items": [
+        {
+          "id": "sw.watchdog",
+          "description": "Failsafe watchdog heartbeat observed in Core and AGiO logs.",
+          "guidance": "Check the safety log exporter if in doubt.",
+          "status": "completed",
+          "notes": "Heartbeat at 10 Hz",
+          "verifiedBy": "Jordan QA",
+          "verifiedAtUtc": "2024-03-10T13:22:00Z"
+        },
+        {
+          "id": "sw.scenario",
+          "description": "Simulation baseline replayed to confirm deterministic outputs.",
+          "guidance": "Run `nexus sim smoke` or the QA dashboard warm-up.",
+          "status": "completed",
+          "notes": "Baseline delta < 0.5 cm",
+          "verifiedBy": "Alex Operator",
+          "verifiedAtUtc": "2024-03-10T13:26:00Z"
+        },
+        {
+          "id": "sw.logging",
+          "description": "Safety log retention/export configuration reviewed.",
+          "guidance": "Ensure log directory writable and retention matches policy.",
+          "status": "completed",
+          "notes": "Retention set to 45 days",
+          "verifiedBy": "Jordan QA",
+          "verifiedAtUtc": "2024-03-10T13:28:00Z"
+        }
+      ]
+    },
+    {
+      "name": "Approvals",
+      "items": [
+        {
+          "id": "sign.operator",
+          "description": "Operator acknowledges checklist and assumes control when required.",
+          "guidance": "Signature or badge ID required.",
+          "status": "completed",
+          "notes": "Badge AO-77",
+          "verifiedBy": "Alex Operator",
+          "verifiedAtUtc": "2024-03-10T13:30:00Z"
+        },
+        {
+          "id": "sign.safety",
+          "description": "Safety officer / QA lead authorises autonomous run.",
+          "guidance": "Requires review of above sections before enabling autonomy.",
+          "status": "completed",
+          "notes": "Sign-off recorded",
+          "verifiedBy": "Jordan QA",
+          "verifiedAtUtc": "2024-03-10T13:32:00Z"
+        }
+      ]
+    }
+  ]
+}

@@ -21,6 +21,7 @@ Determine the presentation technologies and layout systems that power both the l
 - O-UI-4: Electron + WebGL (Three.js/MapLibre).
 - O-UI-5: [Metadata-driven dashboards layered on existing renderers](../options/O-UI-5_MetadataDrivenDashboards.md) — Declarative overlays and inspectors.
 - O-UI-6: Remote client UI connecting to Linux Core via APIs.【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L1-L34】
+- O-UI-7: Avalonia desktop client sharing gRPC contracts across Windows and Linux with optional WinUI/WPF host shells.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L47】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow |
@@ -32,12 +33,14 @@ Determine the presentation technologies and layout systems that power both the l
 | O-UI-4 | Web talent pool | Heavier | Latency; GPU tuning | Reuse AgIO WS |
 | O-UI-5 | UI auto-discovers new layers | Requires metadata completeness + perf work | Overwhelming operators with options | Metadata-driven dashboards |
 | O-UI-6 | Enables web/remote clients + headless rigs | Depends on Core APIs + network reliability | API drift strands clients | Remote clients plan |
+| O-UI-7 | Single codebase, native performance, reuse existing C# skills | Requires Avalonia expertise + theming work | Need to ensure GPU performance on Pi/CM5 | .NET 8 + Avalonia stack |
 
 ## Evaluation criteria
 Touch ergonomics, latency, GPU access, designer productivity, theming support, ability to span monitors.
 
 ## Current sentiment
 - Keep WinForms operational while defining what the WPF shell must ship before asking operators to migrate.
+- The Avalonia + gRPC client is now the leading candidate for a shared Windows/Linux UI because it keeps the C# skillset while unlocking Pi/CM5 deployments and optional Windows-native shells.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L79】
 - Contributors want proof that metadata-driven layouts and remote clients can coexist without fragmenting operator workflows before endorsing a wholesale toolkit switch.【F:docs/SRS/options/O-UI-5_MetadataDrivenDashboards.md†L52-L64】【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L21-L34】
 
 ## Open questions

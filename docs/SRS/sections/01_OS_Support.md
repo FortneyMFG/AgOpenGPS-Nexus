@@ -19,6 +19,7 @@ Define which operating systems we target for development and field runtime, incl
 - O-OS-3: Dual-first: Windows + Linux, shared UI toolkit.
 - O-OS-4: Add Android “display client” for remote UI only.
 - O-OS-5: Linux headless Core on Ubuntu/Debian plus Windows/Linux frontends via APIs.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L1-L44】
+- O-OS-6: .NET 8 dual-first stack with Avalonia UI and AgIO backends for Windows x64 and Linux ARM64.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L47】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -29,12 +30,14 @@ Define which operating systems we target for development and field runtime, incl
 | O-OS-3 | Max portability | Higher CI matrix | Split testing | Keep protocol pure |
 | O-OS-4 | Cheap displays | Fragmentation | Input latency | Use WebSocket telemetry |
 | O-OS-5 | Decouples OS/UI choices, supports headless rigs | Requires Linux packaging expertise + service hardening | API/bridge regressions can strand Windows rigs | Linux Core packaging plan |
+| O-OS-6 | Shared runtime, consistent UI, simplified plugin story | Needs Windows + Linux CI, Avalonia expertise | Backend regressions could impact hardware access on both OSes | .NET 8 + Avalonia stack |
 
 ## Evaluation criteria
 Driver support, latency, deployability, developer velocity, end-user setup complexity.
 
 ## Current sentiment
 - Community leans to dual-first with a strict abstraction for hardware I/O, but nobody wants to drop Windows today.
+- The .NET 8 + Avalonia stack is emerging as the preferred path because it keeps Windows-first quick starts while unlocking Linux ARM64 deployments through shared AgIO backends.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L79】
 - Interest is growing in piloting the Linux Core packaging while validating PGN compatibility before committing to a broader migration.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L21-L44】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
 
 ## Open questions

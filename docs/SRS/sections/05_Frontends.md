@@ -23,6 +23,7 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - O-FE-4: Remote desktop appliance dedicated to cab displays.
 - O-FE-5: [Metadata-driven dashboards and visualization](../options/O-UI-5_MetadataDrivenDashboards.md) — Layer-aware overlays, inspectors, and presets.
 - O-FE-6: [Remote gRPC/WebSocket clients backed by the Linux Core](../options/O-FRONT-6_RemoteClients.md) — Native + browser displays.
+- O-FE-7: Avalonia desktop frontend consuming shared gRPC contracts with optional Windows-native shell hosting.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L47】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -34,6 +35,7 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 | O-FE-4 | Simple to deploy | Extra device to manage | Network latency | Existing remote desktop setups |
 | O-FE-5 | Declarative visuals, richer diagnostics | Large UI refactor and performance tuning | Risk of overwhelming operators with options | Current WPF/OpenGL renderer + metadata plan |
 | O-FE-6 | Enables headless rigs, remote tablets, and browser displays | Requires Core APIs + session/state sync | Network failures impact UX | Remote clients plan |
+| O-FE-7 | Shared codebase, C# productivity, Pi/CM5-ready | Requires Avalonia investment + GPU validation | Need fallbacks for Windows-native integrations | .NET 8 + Avalonia stack |
 
 ## Evaluation criteria
 Operator familiarity, deployment friction, offline resilience, latency, maintainability.
@@ -41,6 +43,7 @@ Operator familiarity, deployment friction, offline resilience, latency, maintain
 ## Current sentiment
 - Keep the Windows suite in place while testing what “remote display” actually needs (mirror vs. control).
 - Operators welcome metadata-driven dashboards if they ship with presets and inspector upgrades rather than requiring manual wiring per layer.【F:docs/SRS/options/O-UI-5_MetadataDrivenDashboards.md†L52-L64】
+- The Avalonia desktop frontend is now viewed as the preferred successor because it keeps one C# codebase and can slide into the Windows quick-start flow before expanding to Pi/CM5 deployments.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L79】
 - Remote-first clients are attractive if they piggyback on the Core without forcing Windows operators to learn a new UI overnight.【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L21-L34】
 
 ## Open questions

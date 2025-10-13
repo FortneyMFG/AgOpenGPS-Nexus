@@ -23,6 +23,7 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - O-COMM-4: Embed a REST API around PGN state for web dashboards.
 - O-COMM-5: [Versioned variable-rate PGN suite](../options/O-COMM-5_VariableRatePGNs.md) — Sequenced layer streams with schema handshakes.
 - O-COMM-6: [PGN compatibility bridge layered over new APIs](../options/O-COMM-6_PGNCompatibilityBridge.md) — Legacy PGNs in, typed events out.
+- O-COMM-7: gRPC/protobuf API surface published via `Aog.Abstractions` NuGet and consumed by Core/UI/Plugins while AgIO backends handle transport specifics.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L36】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -34,6 +35,7 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 | O-COMM-4 | Familiar web tooling | Polling overhead | Divergent auth story | AgDiag HTTP prototypes |
 | O-COMM-5 | Adds sequencing, schema hashes, and layer registries | Firmware/app upgrades required | Bandwidth pressure if many layers stream | AgIO UDP monitor + layer registry plan |
 | O-COMM-6 | Allows Core/API modernization without stranding modules | Bridge adds latency + new failure mode | Incorrect translation can break steering | PGN compatibility bridge |
+| O-COMM-7 | Strong typing, shared contracts, works across Windows/Linux | Requires disciplined versioning + CI | Backend bug impacts every client | .NET 8 + Avalonia stack |
 
 ## Evaluation criteria
 Deterministic latency, message integrity (CRC/sequencing), offline buffering, compatibility with existing AgIO channels, firewall friendliness.
@@ -41,6 +43,7 @@ Deterministic latency, message integrity (CRC/sequencing), offline buffering, co
 ## Current sentiment
 - Keep PGNs flowing through AgIO while we inventory what hardening is required before layering a modern API facade.
 - Community wants the layer PGN suite staged behind feature flags so existing rigs stay stable while richer telemetry rolls out.【F:docs/SRS/options/O-COMM-5_VariableRatePGNs.md†L43-L57】【F:docs/SRS/options/O-TEST-4_LayerReplayCI.md†L7-L27】
+- The shared gRPC/protobuf surface is considered the preferred evolution path when paired with the PGN bridge because it keeps hardware compatibility while aligning Core, UI, and plugins on one contract package.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L79】
 - There is appetite to prototype the compatibility bridge alongside the Core API so UDP/serial devices remain usable during a Linux migration.【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L21-L44】
 
 ## Open questions

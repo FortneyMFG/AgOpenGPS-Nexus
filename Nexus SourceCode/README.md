@@ -80,7 +80,7 @@ The shell displays the current operating system description and exposes a connec
 - Settings are persisted to `%AppData%/AgOpenGPS/Nexus/connection-settings.json` on Windows and `$XDG_CONFIG_HOME/AgOpenGPS/Nexus/connection-settings.json` (or `~/.config/AgOpenGPS/Nexus/connection-settings.json`) on Linux.
 - The **Save settings** button activates when changes are detected and the endpoint field is populated.
 
-An embedded simulation sample is parsed at startup and the window prints the ordered provider graph so contributors can verify the new configuration loader logic without additional tooling.
+An embedded simulation sample is parsed at startup and the window prints the ordered provider graph so contributors can verify the new configuration loader logic without additional tooling. The shell also exposes a simulation control bar (NX-043) that provides play/pause, scrub, and playback rate controls alongside combo boxes for selecting the source and mode for each routed stream.
 
 ## Testing
 

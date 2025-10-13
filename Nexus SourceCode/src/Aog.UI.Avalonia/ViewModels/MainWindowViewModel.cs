@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Aog.UI.Avalonia.Models;
+using Aog.UI.Avalonia.Models;                 // VehiclePose, SimulationBarViewModel
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
 
@@ -12,25 +12,30 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// </summary>
 public class MainWindowViewModel
 {
-    private readonly ConnectionSettingsViewModel _connectionSettings;
-    private static readonly string SimulationSummary = BuildSimulationGraphSummary();
+    private const string SimulationResourceName = "Aog.UI.Avalonia.Resources.SimulationSample.json";
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MainWindowViewModel"/> class.
-    /// </summary>
-    /// <param name="connectionSettings">The connection settings view-model to expose to the view.</param>
+    private readonly ConnectionSettingsViewModel _connectionSettings;
+
     public MainWindowViewModel(ConnectionSettingsViewModel connectionSettings)
     {
         ArgumentNullException.ThrowIfNull(connectionSettings);
         _connectionSettings = connectionSettings;
+
+        Title = "AgOpenGPS Nexus";
+        PlatformDescription =
+            $"Running on {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}) with {RuntimeInformation.FrameworkDescription}";
+
+        // Load simulation configuration + summary and create the bar VM.
+        var configuration = TryLoadSimulationConfiguration(out var summary);
+        SimulationGraphSummary = summary;
+        SimulationBar = new SimulationBarViewModel(configuration);
     }
 
     /// <summary>Gets the title displayed in the main window.</summary>
-    public string Title => "AgOpenGPS Nexus";
+    public string Title { get; }
 
     /// <summary>Gets a description of the runtime platform.</summary>
-    public string PlatformDescription =>
-        $"Running on {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}) with {RuntimeInformation.FrameworkDescription}";
+    public string PlatformDescription { get; }
 
     /// <summary>Gets a sample vehicle pose used to seed the map view.</summary>
     public VehiclePose VehiclePose { get; } = new(10, 15, 45);
@@ -39,16 +44,21 @@ public class MainWindowViewModel
     public ConnectionSettingsViewModel Connection => _connectionSettings;
 
     /// <summary>Gets a summary of the embedded simulation configuration.</summary>
-    public string SimulationGraphSummary => SimulationSummary;
+    public string SimulationGraphSummary { get; }
 
-    private static string BuildSimulationGraphSummary()
+    /// <summary>Gets the simulation bar view-model bound to the UI.</summary>
+    public SimulationBarViewModel SimulationBar { get; }
+
+    private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)
     {
-        const string resourceName = "Aog.UI.Avalonia.Resources.SimulationSample.json";
         var assembly = typeof(MainWindowViewModel).Assembly;
 
-        using var stream = assembly.GetManifestResourceStream(resourceName);
+        using var stream = assembly.GetManifestResourceStream(SimulationResourceName);
         if (stream is null)
-            return "Simulation sample resource not found.";
+        {
+            summary = "Simulation sample resource not found.";
+            return null;
+        }
 
         using var reader = new StreamReader(stream);
         var json = reader.ReadToEnd();
@@ -60,11 +70,13 @@ public class MainWindowViewModel
             foreach (var descriptor in configuration.CreateProviderDescriptors())
                 catalog.Register(descriptor);
 
-            return catalog.BuildGraph().FormatSummary().TrimEnd();
+            summary = catalog.BuildGraph().FormatSummary().TrimEnd();
+            return configuration;
         }
         catch (Exception ex)
         {
-            return $"Failed to load simulation sample: {ex.Message}";
+            summary = $"Failed to load simulation sample: {ex.Message}";
+            return null;
         }
     }
 }

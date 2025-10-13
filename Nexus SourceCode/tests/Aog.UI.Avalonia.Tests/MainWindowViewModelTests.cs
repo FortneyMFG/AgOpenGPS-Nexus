@@ -1,3 +1,4 @@
+using System.Linq;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
 using Xunit;
@@ -13,5 +14,16 @@ public sealed class MainWindowViewModelTests
 
         viewModel.SimulationGraphSummary.Should().Contain("Simulation Provider Graph");
         viewModel.SimulationGraphSummary.Should().Contain("sim.clock.fixed");
+    }
+
+    [Fact]
+    public void SimulationBar_ExposesRoutesFromConfiguration()
+    {
+        var viewModel = new MainWindowViewModel();
+
+        viewModel.SimulationBar.Should().NotBeNull();
+        viewModel.SimulationBar.Routes.Should().NotBeEmpty();
+        viewModel.SimulationBar.Routes.Select(route => route.Stream)
+            .Should().Contain(new[] { "pose", "imu" });
     }
 }

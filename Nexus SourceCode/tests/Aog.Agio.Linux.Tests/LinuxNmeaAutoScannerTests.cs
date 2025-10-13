@@ -4,15 +4,15 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Aog.Agio.Windows.Tests;
+namespace Aog.Agio.Linux.Tests;
 
-public sealed class NmeaAutoScannerTests
+public sealed class LinuxNmeaAutoScannerTests
 {
     [Fact]
-    public async Task ScanAsync_FindsPortWithValidSentences()
+    public async Task ScanAsync_FindsDeviceWithValidSentences()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero));
-        var enumerator = new FakeSerialPortEnumerator("COM1");
+        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero));
+        var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB0");
         var parser = new NmeaSentenceParser();
 
         var sampleLines = new[]
@@ -25,7 +25,7 @@ public sealed class NmeaAutoScannerTests
         var sessionFactory = new FakeSerialPortSessionFactory(
             new Dictionary<(string Port, int Baud), IEnumerable<string>>
             {
-                [("COM1", 9600)] = sampleLines,
+                [("/dev/ttyUSB0", 9600)] = sampleLines,
             },
             () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
 
@@ -48,7 +48,7 @@ public sealed class NmeaAutoScannerTests
         var result = await scanner.ScanAsync(CancellationToken.None);
 
         Assert.NotNull(result);
-        Assert.Equal("COM1", result!.PortName);
+        Assert.Equal("/dev/ttyUSB0", result!.PortName);
         Assert.Equal(9600, result.BaudRate);
         Assert.NotNull(result.Gga);
         Assert.NotNull(result.Rmc);
@@ -57,10 +57,10 @@ public sealed class NmeaAutoScannerTests
     }
 
     [Fact]
-    public async Task ScanAsync_ReturnsNullWhenNoPortsProduceSentences()
+    public async Task ScanAsync_ReturnsNullWhenNoDevicesProduceSentences()
     {
         var timeProvider = new ManualTimeProvider(DateTimeOffset.UnixEpoch);
-        var enumerator = new FakeSerialPortEnumerator("COM9");
+        var enumerator = new FakeSerialPortEnumerator("/dev/ttyACM0");
         var parser = new NmeaSentenceParser();
         var sessionFactory = new FakeSerialPortSessionFactory(new Dictionary<(string Port, int Baud), IEnumerable<string>>(), () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
         var options = Options.Create(new NmeaSerialPortScanOptions

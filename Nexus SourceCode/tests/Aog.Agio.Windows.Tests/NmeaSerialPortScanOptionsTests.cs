@@ -1,4 +1,4 @@
-using Aog.Agio.Windows;
+using Aog.Agio.Serial;
 using Xunit;
 
 namespace Aog.Agio.Windows.Tests;

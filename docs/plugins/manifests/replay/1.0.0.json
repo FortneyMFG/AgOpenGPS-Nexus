@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.plugins.replay",
+  "name": "Replay Toolkit",
+  "version": "1.0.0",
+  "description": "Provides deterministic replay streams for guidance and pose overlays.",
+  "requiredApis": {
+    "core": ">=1.0.0",
+    "sim": ">=1.0.0"
+  },
+  "settings": {
+    "defaultRecording": "~/telemetry/guidance.parquet"
+  },
+  "simProviders": [
+    {
+      "providerId": "replay.guidance",
+      "type": "Aog.Plugins.Replay.GuidanceProvider",
+      "topics": ["guidance.replay.command"],
+      "description": "Plays back logged guidance commands for comparison runs.",
+      "settings": {
+        "loop": true
+      }
+    },
+    {
+      "providerId": "replay.pose",
+      "type": "Aog.Plugins.Replay.PoseProvider",
+      "topics": ["vehicle.replay.pose"],
+      "description": "Streams recorded pose data for overlay and regression analysis.",
+      "settings": {
+        "timeScale": 1.0
+      }
+    }
+  ]
+}

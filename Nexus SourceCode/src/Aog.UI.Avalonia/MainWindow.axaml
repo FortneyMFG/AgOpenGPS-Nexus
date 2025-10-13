@@ -19,15 +19,23 @@
     </Grid.RowDefinitions>
 
     <!-- Header -->
-    <TextBlock Text="{Binding Title}" FontSize="28" FontWeight="Bold"/>
+    <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+      <TextBlock Text="{Binding Title}" FontSize="28" FontWeight="Bold" Margin="0,0,16,0"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+        <TextBlock Text="Theme" VerticalAlignment="Center"/>
+        <ComboBox ItemsSource="{Binding AvailableThemes}"
+                  SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                  Width="140"/>
+      </StackPanel>
+    </Grid>
 
     <!-- Content -->
     <Grid Grid.Row="1" ColumnDefinitions="3*,2*" ColumnSpacing="24" Margin="0,24,0,0">
       <!-- Left: Map -->
       <Border Grid.Column="0"
               CornerRadius="12"
-              Background="#101920"
-              BorderBrush="#1F2D36"
+              Background="{DynamicResource ThemeBackgroundBrush}"
+              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
               BorderThickness="1">
         <controls:MapView VehiclePose="{Binding VehiclePose}"
                           CoverageCells="{Binding CoverageCells}"
@@ -42,7 +50,10 @@
           <TextBlock Text="The highlighted dot shows the current vehicle position and heading." TextWrapping="Wrap"/>
 
           <!-- Simulation controls -->
-          <Border Padding="16" CornerRadius="8" Background="#0F000000">
+          <Border Padding="16" CornerRadius="8"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1">
             <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
               <TextBlock Text="Simulation controls" FontWeight="SemiBold"/>
 
@@ -50,7 +61,8 @@
                 <StackPanel>
                   <TextBlock Text="{Binding SimulationBar.ActiveScenarioTitle}" FontWeight="SemiBold"/>
                   <TextBlock Text="{Binding SimulationBar.ActiveScenarioDescription}" TextWrapping="Wrap"/>
-                  <TextBlock Text="Options: {Binding SimulationBar.ActiveScenarioOptions}" Foreground="#99000000"/>
+                  <TextBlock Text="Options: {Binding SimulationBar.ActiveScenarioOptions}"
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
                 </StackPanel>
 
                 <Button Grid.Column="1"
@@ -60,8 +72,14 @@
                         Click="OnOpenScenarioEditor"/>
               </Grid>
 
+              <Button Grid.Row="2"
+                      Content="Import legacy guidance..."
+                      Padding="12,4"
+                      HorizontalAlignment="Left"
+                      Click="OnOpenLegacyImportWizard"/>
+
               <!-- Transport + playback rates -->
-              <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+              <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                 <Button Content="{Binding SimulationBar.PlayPauseLabel}"
                         Command="{Binding SimulationBar.TogglePlaybackCommand}"
                         MinWidth="96"/>
@@ -91,7 +109,7 @@
               </StackPanel>
 
               <!-- Scrubber -->
-              <Grid Grid.Row="3" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalAlignment="Center">
+              <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalAlignment="Center">
                 <TextBlock Text="{Binding SimulationBar.PositionDisplay}" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1"
                         Minimum="0" Maximum="1"
@@ -103,7 +121,7 @@
               </Grid>
 
               <!-- Stream routing -->
-              <StackPanel Grid.Row="4" Margin="0,4,0,0" Spacing="8">
+              <StackPanel Grid.Row="5" Margin="0,4,0,0" Spacing="8">
                 <TextBlock Text="Stream routing" FontWeight="SemiBold"/>
                 <ItemsControl ItemsSource="{Binding SimulationBar.Routes}">
                   <ItemsControl.ItemTemplate>
@@ -127,7 +145,10 @@
           </Border>
 
           <!-- Plugin panels -->
-          <Border Padding="16" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1">
             <StackPanel Spacing="16">
               <StackPanel Spacing="8" DataContext="{Binding SteerPanel}" x:DataType="vm:SteerPanelViewModel">
                 <TextBlock Text="Steer" FontSize="20" FontWeight="SemiBold"/>
@@ -159,7 +180,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                   <TextBlock Text="Sections" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
                   <ToggleSwitch Content="Auto" IsChecked="{Binding IsAutoEnabled, Mode=TwoWay}"/>
-                  <TextBlock Text="{Binding MaskDisplay}" Foreground="#99000000" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding MaskDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <ItemsControl ItemsSource="{Binding Sections}">
                   <ItemsControl.ItemsPanel>
@@ -182,12 +203,13 @@
               <StackPanel Spacing="8" DataContext="{Binding PlanterPanel}" x:DataType="vm:PlanterPanelViewModel">
                 <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                   <TextBlock Text="Planter" FontSize="20" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding Summary}" Foreground="#99000000" TextWrapping="Wrap" MaxWidth="320"/>
+                  <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap" MaxWidth="320"/>
                 </StackPanel>
                 <ItemsControl ItemsSource="{Binding Rows}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:PlanterRowViewModel">
-                      <Border Padding="8" Margin="0,0,0,6" Background="#05000000" BorderBrush="#19000000" BorderThickness="1" CornerRadius="4">
+                      <Border Padding="8" Margin="0,0,0,6" Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="4">
                         <Grid ColumnDefinitions="Auto,*,*,*,*,*,*" ColumnSpacing="8">
                           <TextBlock Text="{Binding RowLabel}" FontWeight="SemiBold"/>
                           <TextBlock Grid.Column="1" Text="{Binding TargetPopulationDisplay}"/>
@@ -302,8 +324,38 @@
             </StackPanel>
           </Border>
 
+          <!-- Privacy & telemetry -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding TelemetryPrivacy}">
+            <StackPanel Spacing="12">
+              <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <TextBlock Text="Crash telemetry" FontSize="20" FontWeight="SemiBold"/>
+                <ToggleSwitch Content="Share reports" IsChecked="{Binding IsTelemetryOptedIn, Mode=TwoWay}"/>
+              </StackPanel>
+
+              <TextBlock Text="{Binding PendingReportSummary}" TextWrapping="Wrap"/>
+
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Upload pending"
+                        Command="{Binding UploadReportsCommand}"
+                        IsEnabled="{Binding HasPendingReports}"/>
+                <Button Content="Clear pending"
+                        Command="{Binding ClearReportsCommand}"
+                        IsEnabled="{Binding HasPendingReports}"/>
+              </StackPanel>
+
+              <TextBlock Text="{Binding StatusMessage}" IsVisible="{Binding HasStatusMessage}" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+
           <!-- Simulation graph summary -->
-          <Border Padding="16" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1">
             <Grid RowDefinitions="Auto,*" RowSpacing="8">
               <TextBlock Text="Embedded simulation provider graph" FontWeight="SemiBold"/>
               <TextBox Text="{Binding SimulationGraphSummary}"
@@ -316,12 +368,15 @@
           </Border>
 
           <!-- Connection settings -->
-          <Border Padding="20" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
+          <Border Padding="20" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1">
             <StackPanel Spacing="16" DataContext="{Binding Connection}" x:DataType="vm:ConnectionSettingsViewModel">
               <StackPanel Spacing="4">
                 <TextBlock Text="Connection settings" FontSize="20" FontWeight="SemiBold"/>
                 <TextBlock Text="Configure how Nexus connects to AGiO and chooses GPS sources."
-                           Foreground="#99000000"
+                           Foreground="{DynamicResource ThemeForegroundLowBrush}"
                            TextWrapping="Wrap"/>
               </StackPanel>
 
@@ -346,9 +401,9 @@
                 <TextBlock x:Name="StatusText" Text="{Binding StatusMessage}" VerticalAlignment="Center" TextWrapping="Wrap">
                   <TextBlock.Styles>
                     <Style Selector="TextBlock#StatusText">
-                      <Setter Property="Foreground" Value="#FF201F1E"/>
+                      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
                       <DataTrigger Binding="{Binding HasError}" Value="True">
-                        <Setter Property="Foreground" Value="#D13438"/>
+                        <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
                       </DataTrigger>
                     </Style>
                   </TextBlock.Styles>

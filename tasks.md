@@ -47,8 +47,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-035 Replay plugin v1
 - [x] NX-036 Plugin telemetry sink
 - [x] NX-037 Simulation scenario library
-- [ ] NX-038 Simulation performance harness
-- [ ] NX-039 Plugin compatibility CI gate
+- [x] NX-038 Simulation performance harness
+- [x] NX-039 Plugin compatibility CI gate
 
 ### Section E — UI (Avalonia) + Sim Bar
 - [x] NX-040 Avalonia app bootstrap
@@ -61,7 +61,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-047 Plugin dashboards & charts
 - [ ] NX-048 Coverage & guidance overlays
 - [ ] NX-049 Replay analysis timeline
-- [ ] NX-065 UI theming + layout persistence
+- [x] NX-065 UI theming + layout persistence
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory
@@ -85,8 +85,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-062 Linux (Pi) packaging
 - [x] NX-063 How-to: Windows, no hardware
 - [x] NX-064 How-to: Pi/CM5 quick start
-- [ ] NX-067 Release pipeline with signing
-- [ ] NX-068 Crash & telemetry opt-in service
+- [x] NX-067 Release pipeline with signing
+- [x] NX-068 Crash & telemetry opt-in service
 - [ ] NX-069 Installer & update channel documentation
 
 ### Section H — Safety & QA
@@ -105,9 +105,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-080 UDP discovery + capability exchange
 - [x] NX-081 PGN bridge (steer + sections)
 - [x] NX-082 UART framing utility
-- [ ] NX-083 Legacy AB line/boundary import wizard
+- [x] NX-083 Legacy AB line/boundary import wizard
 - [ ] NX-084 Legacy configuration translation CLI
-- [ ] NX-085 Teensy bridge regression test suite
+- [x] NX-085 Teensy bridge regression test suite
 - [ ] NX-086 Legacy migration guide & training set
 - [ ] NX-087 Dealer deployment toolkit
 - [ ] NX-088 Multi-machine sync & licensing workflow
@@ -176,8 +176,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-035 | Replay plugin v1 | Done |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Telemetry Parquet replay controller with play/pause/seek tests |
 | NX-036 | Plugin telemetry sink | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | EventBus sink streams plugin telemetry |
 | NX-037 | Simulation scenario library with curated sample configs and docs | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Bundle field-ready templates and documentation |
-| NX-038 | Simulation performance and stress harness covering plugin combinations | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | CI run ensures deterministic timing under load |
-| NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | Planned |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
+| NX-038 | Simulation performance and stress harness covering plugin combinations | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | CI run ensures deterministic timing under load |
+| NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | Done |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
 
 ### Section E — UI (Avalonia) + Sim Bar
 
@@ -193,7 +193,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-047 | UI plugin dashboards with historical charts and tuning controls | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Graph history + autopilot tuning widgets |
 | NX-048 | Map overlays for coverage heatmaps and guidance paths | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Visualize coverage & AB guidance |
 | NX-049 | Replay analysis timeline with bookmarks and export options | Planned |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Provide bookmark/export tooling |
-| NX-065 | UI theming and layout persistence across sessions | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Save/restore window layout and theme |
+| NX-065 | UI theming and layout persistence across sessions | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Save/restore window layout and theme |
 
 ### Section F — Porting from V6 (Algorithms)
 
@@ -223,8 +223,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-062 | Pi/CM5 packaging (deb + systemd) | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Boots on Pi OS |
 | NX-063 | How-to: Windows, no hardware | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/howto/windows-no-hw.md |
 | NX-064 | How-to: Pi/CM5 quick start | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/howto/pi-sim.md |
-| NX-067 | Release pipeline with signing and artifact promotion stages | Planned |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Promote nightly → beta → release |
-| NX-068 | Crash and telemetry opt-in service with privacy controls | Planned |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Opt-in crash + analytics uploader |
+| NX-067 | Release pipeline with signing and artifact promotion stages | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Promote nightly → beta → release |
+| NX-068 | Crash and telemetry opt-in service with privacy controls | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Opt-in crash + analytics uploader |
 | NX-069 | Installer and update channel documentation for operators | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Covers offline + OTA paths |
 
 ### Section H — Safety & QA

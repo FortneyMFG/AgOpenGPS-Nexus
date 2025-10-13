@@ -81,6 +81,12 @@ The shell displays the current operating system description and exposes a connec
 - Settings are persisted to `%AppData%/AgOpenGPS/Nexus/connection-settings.json` on Windows and `$XDG_CONFIG_HOME/AgOpenGPS/Nexus/connection-settings.json` (or `~/.config/AgOpenGPS/Nexus/connection-settings.json`) on Linux.
 - The **Save settings** button activates when changes are detected and the endpoint field is populated.
 
+### UI theming, layout, and telemetry consent
+
+- Switch between light and dark themes using the theme selector in the main window header. Theme choices persist via `%AppData%/AgOpenGPS/Nexus/ui-preferences.json` so the shell reopens with the same look and feel.
+- Window size, position, and state are captured on shutdown and restored on the next launch so multi-monitor layouts stay intact between sessions.
+- A privacy card in the right-hand column exposes crash telemetry controls. Operators can opt in to sharing crash diagnostics, review pending reports, upload them immediately, or clear the queue entirely.
+
 An embedded simulation sample is parsed at startup and the window prints the ordered provider graph so contributors can verify the new configuration loader logic without additional tooling. The shell also exposes a simulation control bar (NX-043) that provides play/pause, scrub, and playback rate controls alongside combo boxes for selecting the source and mode for each routed stream.
 
 Replay controls are wired to an `IReplayController` service, enabling real telemetry sessions to drive the bar. The default dependency injection registration supplies a no-op controller for design-time usage, while the new `TelemetryReplayController` can be registered to stream Parquet logs with play, pause, seek, and playback rate support.

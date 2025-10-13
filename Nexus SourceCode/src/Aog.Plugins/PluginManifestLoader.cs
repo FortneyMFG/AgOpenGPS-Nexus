@@ -148,14 +148,26 @@ public sealed class PluginManifestLoader
                 throw new InvalidDataException($"Simulation provider '{provider.ProviderId}' must include a type.");
             }
 
+            if (provider.Topics is null || provider.Topics.Count == 0)
+            {
+                throw new InvalidDataException($"Simulation provider '{provider.ProviderId}' must declare at least one topic.");
+            }
+
             if (provider.Topics is not null)
             {
+                var uniqueTopics = new HashSet<string>(StringComparer.Ordinal);
                 for (var i = 0; i < provider.Topics.Count; i++)
                 {
                     if (string.IsNullOrWhiteSpace(provider.Topics[i]))
                     {
                         throw new InvalidDataException(
                             $"Simulation provider '{provider.ProviderId}' contains an empty topic name at index {i}.");
+                    }
+
+                    if (!uniqueTopics.Add(provider.Topics[i]))
+                    {
+                        throw new InvalidDataException(
+                            $"Simulation provider '{provider.ProviderId}' declares duplicate topic '{provider.Topics[i]}'.");
                     }
                 }
             }

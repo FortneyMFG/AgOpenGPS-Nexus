@@ -7,6 +7,7 @@ realistic environment without building a configuration from scratch.
 ## Files
 - `library.json` — full simulation configuration that declares the shared providers,
   default routes, and three scenario presets.
+- `legacy-auto-run/` — legacy UDP scenario pack with soak verification logs.
 
 ## Scenario Presets
 ### `baseline-guidance`

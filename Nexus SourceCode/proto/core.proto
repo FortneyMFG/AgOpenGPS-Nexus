@@ -165,3 +165,43 @@ message TimingCaps {
   // Uncertainty of the system clock in nanoseconds (1-sigma).
   double clock_uncertainty_ns = 6;
 }
+
+// PlanterRowQuality classifies the current quality of a planter row's seed
+// drop behaviour relative to the configured target population.
+enum PlanterRowQuality {
+  // Quality has not been evaluated.
+  PLANTER_ROW_QUALITY_UNKNOWN = 0;
+
+  // Row is operating within configured tolerance bands.
+  PLANTER_ROW_QUALITY_OK = 1;
+
+  // Row is experiencing skips relative to the target population.
+  PLANTER_ROW_QUALITY_SKIP = 2;
+
+  // Row is experiencing doubles relative to the target population.
+  PLANTER_ROW_QUALITY_DOUBLE = 3;
+}
+
+// PlanterRowStatus reports the instantaneous status of a single planter row.
+message PlanterRowStatus {
+  // Telemetry header describing sequence, timestamp, and source metadata.
+  Header header = 1;
+
+  // Zero-based planter row index.
+  uint32 row_index = 2;
+
+  // Target seed population expressed as seeds per meter.
+  double target_population_per_meter = 3;
+
+  // Measured seed population expressed as seeds per meter.
+  double actual_population_per_meter = 4;
+
+  // Fractional skip rate (0-1) relative to the configured skip threshold.
+  double skip_rate = 5;
+
+  // Fractional double rate (0-1) relative to the configured double threshold.
+  double double_rate = 6;
+
+  // Evaluated quality classification for the row.
+  PlanterRowQuality quality = 7;
+}

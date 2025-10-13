@@ -1,0 +1,19 @@
+[Unit]
+Description=AgOpenGPS Nexus AGiO Host
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=nexus
+Group=nexus
+WorkingDirectory=/opt/nexus/agio
+EnvironmentFile=-/etc/nexus/agio.env
+ExecStart=/usr/bin/dotnet /opt/nexus/agio/Aog.Agio.dll
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

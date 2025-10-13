@@ -24,6 +24,9 @@ public sealed class AgioHostBuilderTests
         Assert.Equal("Simulation", registration.BackendName);
         Assert.Equal("Aog.Agio.Sim.SimAgioBackend", registration.BackendType.FullName);
 
+        var failsafe = host.Services.GetRequiredService<IActuatorFailsafeService>();
+        Assert.Equal(TimeSpan.FromMilliseconds(250), failsafe.HeartbeatTimeout);
+
         var backend = host.Services.GetRequiredService<IAgioBackend>();
         Assert.Equal("Simulation", backend.Name);
 
@@ -40,6 +43,9 @@ public sealed class AgioHostBuilderTests
                 {
                     ["AgioHost:Backend:Assembly"] = typeof(TestBackend).Assembly.GetName().Name!,
                     ["AgioHost:Backend:Type"] = typeof(TestBackend).FullName!,
+                    ["AgioHost:Safety:HeartbeatMs"] = "500",
+                    ["AgioHost:Safety:Failsafe:Steer"] = "hold",
+                    ["AgioHost:Safety:Failsafe:Sections"] = "disable",
                 });
             });
 
@@ -50,6 +56,9 @@ public sealed class AgioHostBuilderTests
         var registration = host.Services.GetRequiredService<AgioBackendRegistration>();
         Assert.Equal("Test Backend", registration.BackendName);
         Assert.Equal(typeof(TestBackend), registration.BackendType);
+
+        var failsafe = host.Services.GetRequiredService<IActuatorFailsafeService>();
+        Assert.Equal(TimeSpan.FromMilliseconds(500), failsafe.HeartbeatTimeout);
 
         var marker = host.Services.GetRequiredService<TestMarkerService>();
         Assert.NotNull(marker);

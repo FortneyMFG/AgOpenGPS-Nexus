@@ -1,0 +1,20 @@
+[Unit]
+Description=AgOpenGPS Nexus Core Host
+After=network-online.target nexus-agio.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=nexus
+Group=nexus
+WorkingDirectory=/opt/nexus/core
+EnvironmentFile=-/etc/nexus/core.env
+ExecStart=/usr/bin/dotnet /opt/nexus/core/Aog.Core.Host.dll
+Restart=on-failure
+RestartSec=5
+# Give the service time to attach to AGiO before declaring failure
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

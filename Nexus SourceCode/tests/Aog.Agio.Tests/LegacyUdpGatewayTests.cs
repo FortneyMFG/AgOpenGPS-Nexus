@@ -16,10 +16,24 @@ public sealed class LegacyUdpGatewayTests
     {
         var poseCodec = new LegacyPoseCodec();
         var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
         var transport = new RecordingTransport();
         var observer = new RecordingObserver();
         var discoveryObserver = new RecordingDiscoveryObserver();
-        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, transport, observer, discoveryObserver, new FixedTimeProvider(DateTimeOffset.UtcNow));
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            observer,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            new FixedTimeProvider(DateTimeOffset.UtcNow));
 
         var pose = new Pose { LatitudeDeg = 51.2, LongitudeDeg = -114.1 };
         var metadata = new LegacyPoseMetadata { FixQuality = 4, SatellitesTracked = 17 };
@@ -38,11 +52,25 @@ public sealed class LegacyUdpGatewayTests
     {
         var poseCodec = new LegacyPoseCodec();
         var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
         var transport = new RecordingTransport();
         var observer = new RecordingObserver();
         var discoveryObserver = new RecordingDiscoveryObserver();
         var timestamp = new DateTimeOffset(2024, 05, 01, 12, 30, 00, TimeSpan.Zero);
-        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, transport, observer, discoveryObserver, new FixedTimeProvider(timestamp));
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            observer,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            new FixedTimeProvider(timestamp));
 
         var pose = new Pose { LatitudeDeg = 51.123, LongitudeDeg = -114.456, HeadingRad = 1.5 };
         var frame = poseCodec.EncodePose(pose);
@@ -66,7 +94,17 @@ public sealed class LegacyUdpGatewayTests
     {
         var poseCodec = new LegacyPoseCodec();
         var discoveryCodec = new LegacyDiscoveryCodec();
-        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, new RecordingTransport(), new RecordingObserver(), new RecordingDiscoveryObserver(), new FixedTimeProvider(DateTimeOffset.UtcNow));
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            new LegacySteerCodec(),
+            new RecordingTransport(),
+            new RecordingObserver(),
+            new RecordingDiscoveryObserver(),
+            new RecordingSteerCommandObserver(),
+            new RecordingSteerStateObserver(),
+            new RecordingSectionObserver(),
+            new FixedTimeProvider(DateTimeOffset.UtcNow));
         var invalid = new byte[LegacyPoseCodec.MainAntennaFrameLength];
 
         await gateway.HandleDatagramAsync(invalid);
@@ -79,8 +117,22 @@ public sealed class LegacyUdpGatewayTests
     {
         var poseCodec = new LegacyPoseCodec();
         var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
         var transport = new RecordingTransport();
-        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, transport, new RecordingObserver(), new RecordingDiscoveryObserver(), new FixedTimeProvider(DateTimeOffset.UtcNow));
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            new RecordingObserver(),
+            new RecordingDiscoveryObserver(),
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            new FixedTimeProvider(DateTimeOffset.UtcNow));
 
         var announcement = new LegacyDiscoveryAnnouncement
         {
@@ -114,10 +166,24 @@ public sealed class LegacyUdpGatewayTests
     {
         var poseCodec = new LegacyPoseCodec();
         var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
         var transport = new RecordingTransport();
         var poseObserver = new RecordingObserver();
         var discoveryObserver = new RecordingDiscoveryObserver();
-        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, transport, poseObserver, discoveryObserver, new FixedTimeProvider(DateTimeOffset.UtcNow));
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            poseObserver,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            new FixedTimeProvider(DateTimeOffset.UtcNow));
 
         var announcement = new LegacyDiscoveryAnnouncement
         {
@@ -142,6 +208,155 @@ public sealed class LegacyUdpGatewayTests
         Assert.Equal(announcement.FirmwareVersion, observed.FirmwareVersion);
         Assert.Equal(announcement.Capabilities, observed.Capabilities);
         Assert.Equal(announcement.Health, observed.Health);
+    }
+
+    [Fact]
+    public async Task PublishSteerCommandAsync_SendsEncodedFrame()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
+        var transport = new RecordingTransport();
+        var poseObserver = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            poseObserver,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            new FixedTimeProvider(DateTimeOffset.UtcNow));
+
+        var command = new SteerCmd { TargetWheelAngleDeg = 2.5, Enable = true };
+        var sections = new SectionMask { SectionCount = 8, Mask = 0b1010_0101 };
+        var metadata = new LegacySteerCommandMetadata { SpeedKph = 12.3, GuidanceStatus = 0, TramControl = 0x33 };
+
+        await gateway.PublishSteerCommandAsync(command, sections, metadata);
+
+        var frame = Assert.Single(transport.Frames);
+        Assert.True(steerCodec.TryDecodeSteerCommand(frame.Span, out var decodedCommand, out var decodedMetadata, out var decodedSections));
+        Assert.Equal(command.TargetWheelAngleDeg, decodedCommand.TargetWheelAngleDeg, 2);
+        Assert.True(decodedCommand.Enable);
+        Assert.Equal(1, decodedMetadata.GuidanceStatus);
+        Assert.Equal(metadata.TramControl, decodedMetadata.TramControl);
+        Assert.Equal((uint)(sections.Mask & 0xFFFF), decodedSections.Mask);
+    }
+
+    [Fact]
+    public async Task HandleDatagramAsync_ForwardsSteerCommandAndSections()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
+        var transport = new RecordingTransport();
+        var poseObserver = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var timestamp = new DateTimeOffset(2024, 05, 02, 08, 45, 00, TimeSpan.Zero);
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            poseObserver,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            new FixedTimeProvider(timestamp));
+
+        var command = new SteerCmd { TargetWheelAngleDeg = -4.5, Enable = true };
+        var sections = new SectionMask { SectionCount = 12, Mask = 0b1010_0001_0101 };
+        var metadata = new LegacySteerCommandMetadata { SpeedKph = 15.2, GuidanceStatus = 3, TramControl = 7 };
+        var frame = steerCodec.EncodeSteerCommand(command, sections, metadata);
+
+        await gateway.HandleDatagramAsync(frame);
+
+        var recordedCommand = Assert.Single(steerCommandObserver.Commands);
+        Assert.NotNull(recordedCommand.Header);
+        Assert.Equal("legacy/udp/steer_cmd", recordedCommand.Header.Source);
+        Assert.Equal(1UL, recordedCommand.Header.Sequence);
+        Assert.Equal(Timestamp.FromDateTimeOffset(timestamp), recordedCommand.Header.Timestamp);
+        Assert.Equal(command.TargetWheelAngleDeg, recordedCommand.TargetWheelAngleDeg, 3);
+
+        var recordedMetadata = Assert.Single(steerCommandObserver.Metadata);
+        Assert.Equal(metadata.GuidanceStatus, recordedMetadata.GuidanceStatus);
+        Assert.Equal(metadata.SpeedKph, recordedMetadata.SpeedKph, 6);
+        Assert.Equal(metadata.TramControl, recordedMetadata.TramControl);
+
+        var recordedSection = Assert.Single(sectionObserver.Masks);
+        Assert.NotNull(recordedSection.Header);
+        Assert.Equal("legacy/udp/sections", recordedSection.Header.Source);
+        Assert.Equal(1UL, recordedSection.Header.Sequence);
+        Assert.Equal(Timestamp.FromDateTimeOffset(timestamp), recordedSection.Header.Timestamp);
+        Assert.Equal((uint)(sections.Mask & 0xFFFF), recordedSection.Mask);
+        Assert.Equal(16u, recordedSection.SectionCount);
+
+        Assert.Empty(poseObserver.Poses);
+        Assert.Empty(discoveryObserver.Announcements);
+    }
+
+    [Fact]
+    public async Task HandleDatagramAsync_ForwardsSteerState()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
+        var transport = new RecordingTransport();
+        var poseObserver = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var timestamp = new DateTimeOffset(2024, 05, 03, 09, 15, 00, TimeSpan.Zero);
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            poseObserver,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            new FixedTimeProvider(timestamp));
+
+        var state = new SteerState { MeasuredWheelAngleDeg = 1.25, AppliedEffort = 0.5, Engaged = true };
+        var metadata = new LegacySteerStateMetadata { HeadingDeg = 87.5, RollDeg = -1.2, IsSteerSwitchOn = true, IsWorkSwitchOn = false, IsRemoteSwitchOn = true };
+        var frame = steerCodec.EncodeSteerState(state, metadata);
+
+        await gateway.HandleDatagramAsync(frame);
+
+        var recordedState = Assert.Single(steerStateObserver.States);
+        Assert.NotNull(recordedState.Header);
+        Assert.Equal("legacy/udp/steer_state", recordedState.Header.Source);
+        Assert.Equal(1UL, recordedState.Header.Sequence);
+        Assert.Equal(Timestamp.FromDateTimeOffset(timestamp), recordedState.Header.Timestamp);
+        Assert.Equal(state.MeasuredWheelAngleDeg, recordedState.MeasuredWheelAngleDeg, 2);
+        Assert.Equal(state.AppliedEffort, recordedState.AppliedEffort, 2);
+        Assert.True(recordedState.Engaged);
+
+        var recordedMetadata = Assert.Single(steerStateObserver.Metadata);
+        Assert.Equal(metadata.HeadingDeg, recordedMetadata.HeadingDeg, 2);
+        Assert.Equal(metadata.RollDeg, recordedMetadata.RollDeg, 2);
+        Assert.True(recordedMetadata.IsSteerSwitchOn);
+        Assert.Equal(metadata.IsRemoteSwitchOn, recordedMetadata.IsRemoteSwitchOn);
+        Assert.Equal(metadata.IsWorkSwitchOn, recordedMetadata.IsWorkSwitchOn);
+        Assert.Equal(frame.Span[12], recordedMetadata.RawPwm);
+
+        Assert.Empty(poseObserver.Poses);
+        Assert.Empty(discoveryObserver.Announcements);
+        Assert.Empty(sectionObserver.Masks);
+        Assert.Empty(steerCommandObserver.Commands);
     }
 
     private sealed class RecordingTransport : ILegacyUdpTransport
@@ -175,6 +390,43 @@ public sealed class LegacyUdpGatewayTests
         public ValueTask OnDiscoveryAsync(LegacyDiscoveryAnnouncement announcement, CancellationToken cancellationToken)
         {
             Announcements.Add(announcement);
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingSteerCommandObserver : ILegacySteerCommandObserver
+    {
+        public List<SteerCmd> Commands { get; } = new();
+        public List<LegacySteerCommandMetadata> Metadata { get; } = new();
+
+        public ValueTask OnSteerCommandAsync(SteerCmd command, LegacySteerCommandMetadata metadata, CancellationToken cancellationToken)
+        {
+            Commands.Add(command);
+            Metadata.Add(metadata);
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingSteerStateObserver : ILegacySteerStateObserver
+    {
+        public List<SteerState> States { get; } = new();
+        public List<LegacySteerStateMetadata> Metadata { get; } = new();
+
+        public ValueTask OnSteerStateAsync(SteerState state, LegacySteerStateMetadata metadata, CancellationToken cancellationToken)
+        {
+            States.Add(state);
+            Metadata.Add(metadata);
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingSectionObserver : ILegacySectionObserver
+    {
+        public List<SectionMask> Masks { get; } = new();
+
+        public ValueTask OnSectionMaskAsync(SectionMask mask, CancellationToken cancellationToken)
+        {
+            Masks.Add(mask);
             return ValueTask.CompletedTask;
         }
     }

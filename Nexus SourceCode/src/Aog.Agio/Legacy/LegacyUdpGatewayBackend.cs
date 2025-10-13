@@ -24,9 +24,13 @@ public sealed class LegacyUdpGatewayBackend : IAgioBackend
 
         services.AddSingleton<LegacyPoseCodec>();
         services.AddSingleton<LegacyDiscoveryCodec>();
+        services.AddSingleton<LegacySteerCodec>();
         services.AddSingleton<ILegacyUdpTransport, NullLegacyUdpTransport>();
         services.AddSingleton<ILegacyPoseObserver, NullLegacyPoseObserver>();
         services.AddSingleton<ILegacyDiscoveryObserver, NullLegacyDiscoveryObserver>();
+        services.AddSingleton<ILegacySteerCommandObserver, NullLegacySteerCommandObserver>();
+        services.AddSingleton<ILegacySteerStateObserver, NullLegacySteerStateObserver>();
+        services.AddSingleton<ILegacySectionObserver, NullLegacySectionObserver>();
         services.AddSingleton<LegacyUdpGateway>();
     }
 
@@ -43,5 +47,20 @@ public sealed class LegacyUdpGatewayBackend : IAgioBackend
     private sealed class NullLegacyDiscoveryObserver : ILegacyDiscoveryObserver
     {
         public ValueTask OnDiscoveryAsync(LegacyDiscoveryAnnouncement announcement, CancellationToken cancellationToken) => ValueTask.CompletedTask;
+    }
+
+    private sealed class NullLegacySteerCommandObserver : ILegacySteerCommandObserver
+    {
+        public ValueTask OnSteerCommandAsync(SteerCmd command, LegacySteerCommandMetadata metadata, CancellationToken cancellationToken) => ValueTask.CompletedTask;
+    }
+
+    private sealed class NullLegacySteerStateObserver : ILegacySteerStateObserver
+    {
+        public ValueTask OnSteerStateAsync(SteerState state, LegacySteerStateMetadata metadata, CancellationToken cancellationToken) => ValueTask.CompletedTask;
+    }
+
+    private sealed class NullLegacySectionObserver : ILegacySectionObserver
+    {
+        public ValueTask OnSectionMaskAsync(SectionMask mask, CancellationToken cancellationToken) => ValueTask.CompletedTask;
     }
 }

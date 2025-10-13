@@ -45,6 +45,16 @@ with the gRPC capabilities exchange.
 The codec is symmetric—unit tests assert that encoding and decoding round-trip cleanly and
 that corrupt checksums are rejected.
 
+`LegacySteerCodec` provides the steering bridge used by NX-081:
+
+| PGN | Direction | Payload summary | Notes |
+| --- | --- | --- | --- |
+| `0xFE` | Core → Legacy | `speed_tenths_kph`, `guidance_status`, `target_angle_hundredths_deg`, `tram_control`, `section_bitmap_low`, `section_bitmap_high` | Encoded via `EncodeSteerCommand`; `SectionMask.Mask` is packed little-endian (sections 1–8 in byte 11, 9–16 in byte 12). |
+| `0xFD` | Legacy → Core | `actual_angle_hundredths_deg`, `heading_hundredths_deg`, `roll_hundredths_deg`, `switch_bits`, `pwm` | Decoded via `TryDecodeSteerState`; switch bits expose work/steer/remote inputs and populate `LegacySteerStateMetadata`. |
+
+Steering commands surface through `ILegacySteerCommandObserver`, feedback through
+`ILegacySteerStateObserver`, and section bitmasks through `ILegacySectionObserver`.
+
 ## UART framing helper
 
 `LegacySerialFrameCodec` produces and parses the COBS-framed serial messages used by legacy

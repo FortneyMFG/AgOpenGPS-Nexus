@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Aog.UI.Avalonia.Models;                 // VehiclePose, SimulationBarViewModel
+using Aog.Core.Replay;
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
 
@@ -16,7 +17,7 @@ public class MainWindowViewModel
 
     private readonly ConnectionSettingsViewModel _connectionSettings;
 
-    public MainWindowViewModel(ConnectionSettingsViewModel connectionSettings)
+    public MainWindowViewModel(ConnectionSettingsViewModel connectionSettings, IReplayController? replayController = null)
     {
         ArgumentNullException.ThrowIfNull(connectionSettings);
         _connectionSettings = connectionSettings;
@@ -28,7 +29,7 @@ public class MainWindowViewModel
         // Load simulation configuration + summary and create the bar VM.
         var configuration = TryLoadSimulationConfiguration(out var summary);
         SimulationGraphSummary = summary;
-        SimulationBar = new SimulationBarViewModel(configuration);
+        SimulationBar = new SimulationBarViewModel(configuration, replayController);
     }
 
     /// <summary>Gets the title displayed in the main window.</summary>

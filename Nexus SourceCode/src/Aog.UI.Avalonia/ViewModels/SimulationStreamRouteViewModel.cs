@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Aog.Core.Simulation.Configuration;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -104,6 +105,14 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
 
             SetProperty(ref _selectedMode, value);
         }
+    }
+
+    /// <summary>
+    /// Converts the current selection into a <see cref="SimulationRouteConfiguration"/> instance.
+    /// </summary>
+    public SimulationRouteConfiguration ToConfiguration()
+    {
+        return new SimulationRouteConfiguration(Stream, SelectedSource, SelectedMode);
     }
 
     private static bool ContainsIgnoreCase(IEnumerable<string> source, string value)

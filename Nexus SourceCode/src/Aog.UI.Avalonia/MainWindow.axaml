@@ -41,11 +41,25 @@
 
           <!-- Simulation controls -->
           <Border Padding="16" CornerRadius="8" Background="#0F000000">
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
               <TextBlock Text="Simulation controls" FontWeight="SemiBold"/>
 
+              <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+                <StackPanel>
+                  <TextBlock Text="{Binding SimulationBar.ActiveScenarioTitle}" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding SimulationBar.ActiveScenarioDescription}" TextWrapping="Wrap"/>
+                  <TextBlock Text="Options: {Binding SimulationBar.ActiveScenarioOptions}" Foreground="#99000000"/>
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="Edit scenarios..."
+                        Padding="12,4"
+                        HorizontalAlignment="Right"
+                        Click="OnOpenScenarioEditor"/>
+              </Grid>
+
               <!-- Transport + playback rates -->
-              <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+              <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                 <Button Content="{Binding SimulationBar.PlayPauseLabel}"
                         Command="{Binding SimulationBar.TogglePlaybackCommand}"
                         MinWidth="96"/>
@@ -75,7 +89,7 @@
               </StackPanel>
 
               <!-- Scrubber -->
-              <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalAlignment="Center">
+              <Grid Grid.Row="3" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalAlignment="Center">
                 <TextBlock Text="{Binding SimulationBar.PositionDisplay}" VerticalAlignment="Center"/>
                 <Slider Grid.Column="1"
                         Minimum="0" Maximum="1"
@@ -87,7 +101,7 @@
               </Grid>
 
               <!-- Stream routing -->
-              <StackPanel Grid.Row="3" Margin="0,4,0,0" Spacing="8">
+              <StackPanel Grid.Row="4" Margin="0,4,0,0" Spacing="8">
                 <TextBlock Text="Stream routing" FontWeight="SemiBold"/>
                 <ItemsControl ItemsSource="{Binding SimulationBar.Routes}">
                   <ItemsControl.ItemTemplate>

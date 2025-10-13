@@ -61,4 +61,40 @@ public sealed class CoreHostBuilderTests
         var exception = await Assert.ThrowsAsync<OptionsValidationException>(() => host.StartAsync(cts.Token));
         Assert.Contains(nameof(CoreHealthOptions.IntervalSeconds), exception.Message);
     }
+
+    [Fact]
+    public async Task MissingAgioEndpointFailsValidation()
+    {
+        var builder = Program.CreateHostBuilder(Array.Empty<string>())
+            .ConfigureAppConfiguration((_, configurationBuilder) =>
+            {
+                configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["CoreHost:Agio:Endpoint"] = string.Empty,
+                });
+            });
+
+        using var host = builder.Build();
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var exception = await Assert.ThrowsAsync<OptionsValidationException>(() => host.StartAsync(cts.Token));
+        Assert.Contains("CoreHost:Agio:Endpoint", exception.Message);
+    }
+
+    [Fact]
+    public async Task MissingCapabilitiesNodeIdFailsValidation()
+    {
+        var builder = Program.CreateHostBuilder(Array.Empty<string>())
+            .ConfigureAppConfiguration((_, configurationBuilder) =>
+            {
+                configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["CoreHost:Capabilities:NodeId"] = " ",
+                });
+            });
+
+        using var host = builder.Build();
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var exception = await Assert.ThrowsAsync<OptionsValidationException>(() => host.StartAsync(cts.Token));
+        Assert.Contains("CoreHost:Capabilities:NodeId", exception.Message);
+    }
 }

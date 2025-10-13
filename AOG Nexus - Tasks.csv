@@ -1,98 +1,98 @@
-Task,Going,Done,Wait For
-NX-001,FALSE,TRUE,
-NX-002,FALSE,TRUE,NX-001
-NX-003,FALSE,TRUE,"NX-001, NX-002"
-NX-004,FALSE,TRUE,"NX-001, NX-002"
-NX-005,TRUE,FALSE,"NX-003, NX-004"
-NX-006,FALSE,TRUE,NX-001
-NX-007,FALSE,FALSE,NX-001
-NX-008,FALSE,FALSE,"NX-001, NX-002, NX-006, NX-007"
-NX-009,FALSE,FALSE,NX-008
-NX-010,FALSE,TRUE,"NX-003, NX-004, NX-005"
-NX-011,TRUE,FALSE,NX-010
-NX-012,FALSE,FALSE,"NX-010, NX-011"
-NX-013,FALSE,FALSE,NX-012
-NX-014,FALSE,FALSE,"NX-012, NX-013"
-NX-015,FALSE,FALSE,"NX-010, NX-004"
-NX-016,FALSE,FALSE,NX-010
-NX-017,FALSE,FALSE,"NX-010, NX-011, NX-014, NX-015, NX-016"
-NX-018,FALSE,FALSE,NX-017
-NX-019,FALSE,FALSE,"NX-017, NX-018"
-NX-020,FALSE,FALSE,"NX-003, NX-005"
-NX-021,FALSE,FALSE,"NX-020, NX-012, NX-013, NX-003"
-NX-022,FALSE,FALSE,"NX-020, NX-012, NX-013, NX-003"
-NX-023,FALSE,FALSE,NX-020
-NX-024,FALSE,FALSE,"NX-022, NX-020"
-NX-025,FALSE,FALSE,"NX-022, NX-020"
-NX-026,FALSE,FALSE,NX-020
-NX-027,FALSE,FALSE,"NX-020, NX-003, NX-005"
-NX-028,FALSE,FALSE,"NX-003, NX-010"
-NX-029,FALSE,FALSE,"NX-027, NX-028"
-NX-030,FALSE,FALSE,"NX-010, NX-011"
-NX-031,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003"
-NX-032,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003"
-NX-033,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003"
-NX-034,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003"
-NX-035,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003"
-NX-036,FALSE,FALSE,"NX-015, NX-030, NX-003"
-NX-037,FALSE,FALSE,"NX-031, NX-032, NX-033, NX-034, NX-035"
-NX-038,FALSE,FALSE,NX-037
-NX-039,FALSE,FALSE,"NX-037, NX-038"
-NX-040,FALSE,TRUE,"NX-001, NX-002, NX-003"
-NX-041,FALSE,FALSE,NX-040
-NX-042,FALSE,FALSE,"NX-040, NX-003"
-NX-043,FALSE,FALSE,"NX-012, NX-013, NX-040"
-NX-044,FALSE,FALSE,"NX-031, NX-032, NX-033, NX-040"
-NX-045,FALSE,FALSE,"NX-043, NX-034"
-NX-046,FALSE,FALSE,"NX-012, NX-013, NX-040, NX-004"
-NX-047,FALSE,FALSE,"NX-044, NX-045"
-NX-048,FALSE,FALSE,NX-047
-NX-049,FALSE,FALSE,"NX-047, NX-048"
-NX-050,FALSE,FALSE,"NX-003, NX-004, NX-005"
-NX-051,FALSE,FALSE,NX-050
-NX-052,FALSE,FALSE,NX-050
-NX-053,FALSE,FALSE,NX-050
-NX-054,FALSE,FALSE,"NX-050, NX-031"
-NX-055,FALSE,FALSE,"NX-051, NX-052, NX-053"
-NX-056,FALSE,FALSE,NX-051
-NX-057,FALSE,FALSE,"NX-051, NX-053"
-NX-058,FALSE,FALSE,NX-051
-NX-059,FALSE,FALSE,NX-051
-NX-060,FALSE,TRUE,"NX-010, NX-020, NX-040"
-NX-061,FALSE,FALSE,NX-060
-NX-062,FALSE,FALSE,"NX-006, NX-060, NX-010, NX-020, NX-040"
-NX-063,FALSE,FALSE,"NX-006, NX-060, NX-010, NX-020"
-NX-064,FALSE,FALSE,"NX-041, NX-043, NX-021"
-NX-065,FALSE,FALSE,"NX-041, NX-043, NX-024"
-NX-066,FALSE,FALSE,"NX-061, NX-062, NX-063, NX-064"
-NX-067,FALSE,FALSE,"NX-060, NX-061"
-NX-068,FALSE,FALSE,NX-062
-NX-069,FALSE,FALSE,"NX-063, NX-064"
-NX-070,FALSE,FALSE,"NX-010, NX-020"
-NX-071,FALSE,FALSE,"NX-070, NX-010, NX-020"
-NX-072,FALSE,FALSE,"NX-012, NX-013"
-NX-073,FALSE,FALSE,"NX-012, NX-013, NX-034"
-NX-074,FALSE,FALSE,"NX-070, NX-071, NX-072, NX-073"
-NX-075,FALSE,FALSE,NX-074
-NX-076,FALSE,FALSE,"NX-074, NX-075"
-NX-077,FALSE,FALSE,NX-074
-NX-078,FALSE,FALSE,NX-074
-NX-079,FALSE,FALSE,NX-078
-NX-080,FALSE,FALSE,"NX-027, NX-005"
-NX-081,FALSE,FALSE,"NX-027, NX-005"
-NX-082,FALSE,FALSE,NX-027
-NX-083,FALSE,FALSE,NX-027
-NX-084,FALSE,FALSE,"NX-080, NX-081, NX-082, NX-083"
-NX-085,FALSE,FALSE,NX-084
-NX-086,FALSE,FALSE,NX-084
-NX-087,FALSE,FALSE,"NX-084, NX-085, NX-086"
-NX-088,FALSE,FALSE,NX-084
-NX-089,FALSE,FALSE,NX-087
-NX-090,FALSE,FALSE,"NX-087, NX-088"
-NX-091,FALSE,FALSE,NX-087
-NX-092,FALSE,FALSE,NX-087
-NX-093,FALSE,FALSE,NX-087
-NX-094,FALSE,FALSE,NX-087
-NX-095,FALSE,FALSE,NX-087
-NX-096,FALSE,FALSE,NX-087
-NX-097,FALSE,FALSE,NX-087
+Task,Going,Done,Wait For,Description
+NX-001,FALSE,TRUE,,Repo skeleton and solution scaffolding
+NX-002,FALSE,TRUE,NX-001,"ADRs covering runtime, gRPC, Avalonia, and simulation model choices"
+NX-003,FALSE,TRUE,"NX-001, NX-002","Protobuf v1 contracts for Header, Pose, Imu, SectionMask, Steer, Can, TimingCaps"
+NX-004,FALSE,TRUE,"NX-001, NX-002","JSON schemas for Core, AGiO, UI, and Simulation configuration"
+NX-005,TRUE,FALSE,"NX-003, NX-004",Capabilities handshake proto and service placeholders
+NX-006,FALSE,TRUE,NX-001,CI matrix for Windows x64 and Linux arm64 builds with lint and sim
+NX-007,FALSE,FALSE,NX-001,TBD – add detailed scope in tasks.md
+NX-008,FALSE,FALSE,"NX-001, NX-002, NX-006, NX-007",TBD – add detailed scope in tasks.md
+NX-009,FALSE,FALSE,NX-008,TBD – add detailed scope in tasks.md
+NX-010,FALSE,TRUE,"NX-003, NX-004, NX-005","Core host skeleton using Generic Host, DI, config, and Serilog"
+NX-011,TRUE,FALSE,NX-010,In-process event bus interfaces and tests
+NX-012,FALSE,FALSE,"NX-010, NX-011",Simulation primitives (ISimClock/Bus/Rng) with deterministic fixed-step clock
+NX-013,FALSE,FALSE,NX-012,Simulation catalog graph builder with provider registry and DAG validation
+NX-014,FALSE,FALSE,"NX-012, NX-013",Per-stream source selection config and runtime routing
+NX-015,FALSE,FALSE,"NX-010, NX-004","Parquet logger for pose, imu, can, io, and plugin topics"
+NX-016,FALSE,FALSE,NX-010,TBD – add detailed scope in tasks.md
+NX-017,FALSE,FALSE,"NX-010, NX-011, NX-014, NX-015, NX-016",TBD – add detailed scope in tasks.md
+NX-018,FALSE,FALSE,NX-017,TBD – add detailed scope in tasks.md
+NX-019,FALSE,FALSE,"NX-017, NX-018",TBD – add detailed scope in tasks.md
+NX-020,FALSE,FALSE,"NX-003, NX-005",AGiO host skeleton with backend loader
+NX-021,FALSE,FALSE,"NX-020, NX-012, NX-013, NX-003",Agio.Sim adapter exposing SimBus topics over gRPC services
+NX-022,FALSE,FALSE,"NX-020, NX-012, NX-013, NX-003",Agio.Windows COM NMEA auto-scan and parser
+NX-023,FALSE,FALSE,NX-020,Agio.Windows Location API fallback provider
+NX-024,FALSE,FALSE,"NX-022, NX-020",Agio.Linux serial NMEA auto-scan provider
+NX-025,FALSE,FALSE,"NX-022, NX-020",Agio.Linux gpsd provider
+NX-026,FALSE,FALSE,NX-020,Timing capabilities probe for PPS/PTP detection
+NX-027,FALSE,FALSE,"NX-020, NX-003, NX-005",Legacy UDP gateway skeleton translating PGNs to gRPC
+NX-028,FALSE,FALSE,"NX-003, NX-010",TBD – add detailed scope in tasks.md
+NX-029,FALSE,FALSE,"NX-027, NX-028",TBD – add detailed scope in tasks.md
+NX-030,FALSE,FALSE,"NX-010, NX-011",Plugin loader and manifest handling
+NX-031,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",AutoSteer-Lite plugin v1 (Pure Pursuit and Stanley controllers)
+NX-032,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003","Sections plugin v1 with mask, speed gate, and look-ahead"
+NX-033,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",PlanterMonitor plugin v1 publishing per-row status
+NX-034,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",Simulation provider registrations bundled per plugin
+NX-035,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",Replay plugin v1 with Parquet reader and playback controls
+NX-036,FALSE,FALSE,"NX-015, NX-030, NX-003",TBD – add detailed scope in tasks.md
+NX-037,FALSE,FALSE,"NX-031, NX-032, NX-033, NX-034, NX-035",TBD – add detailed scope in tasks.md
+NX-038,FALSE,FALSE,NX-037,TBD – add detailed scope in tasks.md
+NX-039,FALSE,FALSE,"NX-037, NX-038",TBD – add detailed scope in tasks.md
+NX-040,FALSE,TRUE,"NX-001, NX-002, NX-003",Avalonia app bootstrap shell
+NX-041,FALSE,FALSE,NX-040,Connection and settings panel for AGiO endpoint selection
+NX-042,FALSE,FALSE,"NX-040, NX-003","Map view with pan, zoom, and vehicle visualization"
+NX-043,FALSE,FALSE,"NX-012, NX-013, NX-040",Simulation bar for clock control and routing UI
+NX-044,FALSE,FALSE,"NX-031, NX-032, NX-033, NX-040","Steer, Sections, and Planter panels bound to plugin state"
+NX-045,FALSE,FALSE,"NX-043, NX-034",Scenario editor for selecting providers and options
+NX-046,FALSE,FALSE,"NX-012, NX-013, NX-040, NX-004",TBD – add detailed scope in tasks.md
+NX-047,FALSE,FALSE,"NX-044, NX-045",TBD – add detailed scope in tasks.md
+NX-048,FALSE,FALSE,NX-047,TBD – add detailed scope in tasks.md
+NX-049,FALSE,FALSE,"NX-047, NX-048",TBD – add detailed scope in tasks.md
+NX-050,FALSE,FALSE,"NX-003, NX-004, NX-005",Inventory of V6 math assets
+NX-051,FALSE,FALSE,NX-050,Port coverage math with regression tests
+NX-052,FALSE,FALSE,NX-050,Port AB/curve/headland generation with tests
+NX-053,FALSE,FALSE,NX-050,Port and tune controller gains and startup sequences
+NX-054,FALSE,FALSE,"NX-050, NX-031",TBD – add detailed scope in tasks.md
+NX-055,FALSE,FALSE,"NX-051, NX-052, NX-053",TBD – add detailed scope in tasks.md
+NX-056,FALSE,FALSE,NX-051,TBD – add detailed scope in tasks.md
+NX-057,FALSE,FALSE,"NX-051, NX-053",TBD – add detailed scope in tasks.md
+NX-058,FALSE,FALSE,NX-051,TBD – add detailed scope in tasks.md
+NX-059,FALSE,FALSE,NX-051,TBD – add detailed scope in tasks.md
+NX-060,FALSE,TRUE,"NX-010, NX-020, NX-040","Developer scripts for running core, agio, ui, and sim flows"
+NX-061,FALSE,FALSE,NX-060,Windows packaging pipeline producing installer/zip
+NX-062,FALSE,FALSE,"NX-006, NX-060, NX-010, NX-020, NX-040",Linux Pi packaging with deb and systemd units
+NX-063,FALSE,FALSE,"NX-006, NX-060, NX-010, NX-020",Documentation: Windows no-hardware quickstart
+NX-064,FALSE,FALSE,"NX-041, NX-043, NX-021",Documentation: Pi/CM5 quickstart (sim then GPS)
+NX-065,FALSE,FALSE,"NX-041, NX-043, NX-024",TBD – add detailed scope in tasks.md
+NX-066,FALSE,FALSE,"NX-061, NX-062, NX-063, NX-064",TBD – add detailed scope in tasks.md
+NX-067,FALSE,FALSE,"NX-060, NX-061",TBD – add detailed scope in tasks.md
+NX-068,FALSE,FALSE,NX-062,TBD – add detailed scope in tasks.md
+NX-069,FALSE,FALSE,"NX-063, NX-064",TBD – add detailed scope in tasks.md
+NX-070,FALSE,FALSE,"NX-010, NX-020",Heartbeats and failsafe watchdog between AGiO and plugins
+NX-071,FALSE,FALSE,"NX-070, NX-010, NX-020",Arming and state machine gating outputs
+NX-072,FALSE,FALSE,"NX-012, NX-013",Deterministic simulation regression test (10s run)
+NX-073,FALSE,FALSE,"NX-012, NX-013, NX-034",TBD – add detailed scope in tasks.md
+NX-074,FALSE,FALSE,"NX-070, NX-071, NX-072, NX-073",TBD – add detailed scope in tasks.md
+NX-075,FALSE,FALSE,NX-074,TBD – add detailed scope in tasks.md
+NX-076,FALSE,FALSE,"NX-074, NX-075",TBD – add detailed scope in tasks.md
+NX-077,FALSE,FALSE,NX-074,TBD – add detailed scope in tasks.md
+NX-078,FALSE,FALSE,NX-074,TBD – add detailed scope in tasks.md
+NX-079,FALSE,FALSE,NX-078,TBD – add detailed scope in tasks.md
+NX-080,FALSE,FALSE,"NX-027, NX-005",Legacy UDP discovery and capabilities exchange
+NX-081,FALSE,FALSE,"NX-027, NX-005",Legacy PGN bridge for steer and sections
+NX-082,FALSE,FALSE,NX-027,Legacy UART framing with COBS+CRC at 921600 bps
+NX-083,FALSE,FALSE,NX-027,TBD – add detailed scope in tasks.md
+NX-084,FALSE,FALSE,"NX-080, NX-081, NX-082, NX-083",TBD – add detailed scope in tasks.md
+NX-085,FALSE,FALSE,NX-084,TBD – add detailed scope in tasks.md
+NX-086,FALSE,FALSE,NX-084,TBD – add detailed scope in tasks.md
+NX-087,FALSE,FALSE,"NX-084, NX-085, NX-086",TBD – add detailed scope in tasks.md
+NX-088,FALSE,FALSE,NX-084,TBD – add detailed scope in tasks.md
+NX-089,FALSE,FALSE,NX-087,TBD – add detailed scope in tasks.md
+NX-090,FALSE,FALSE,"NX-087, NX-088",TBD – add detailed scope in tasks.md
+NX-091,FALSE,FALSE,NX-087,TBD – add detailed scope in tasks.md
+NX-092,FALSE,FALSE,NX-087,TBD – add detailed scope in tasks.md
+NX-093,FALSE,FALSE,NX-087,TBD – add detailed scope in tasks.md
+NX-094,FALSE,FALSE,NX-087,TBD – add detailed scope in tasks.md
+NX-095,FALSE,FALSE,NX-087,TBD – add detailed scope in tasks.md
+NX-096,FALSE,FALSE,NX-087,TBD – add detailed scope in tasks.md
+NX-097,FALSE,FALSE,NX-087,TBD – add detailed scope in tasks.md

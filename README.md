@@ -8,7 +8,7 @@ plugin ecosystem, and front-end experiences.
 ## Mission Snapshot
 
 - **Modular architecture:** Core, AGiO backends, plugins, and UI live in dedicated
-  projects that communicate over gRPC contracts generated from `/Nexus Source Code/proto`.
+  projects that communicate over gRPC contracts generated from `/Nexus SourceCode/proto`.
 - **Simulation-first:** A composite simulator drives deterministic development,
   headless testing, and the “Sim Bar” experience described in
   [`docs/SRS/options/O-STACK-1_DotNet8Avalonia.md`](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md).

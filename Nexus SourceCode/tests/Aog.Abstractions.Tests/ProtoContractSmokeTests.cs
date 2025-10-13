@@ -47,4 +47,40 @@ public class ProtoContractSmokeTests
         Assert.Equal(original.SpeedMps, deserialized.SpeedMps);
         Assert.Equal(original.YawRateRadps, deserialized.YawRateRadps);
     }
+
+    [Fact]
+    public void PlanterRowStatusRoundTripsThroughSerialization()
+    {
+        var timestamp = Timestamp.FromDateTime(DateTime.SpecifyKind(new DateTime(2024, 2, 15, 6, 30, 0), DateTimeKind.Utc));
+        var original = new PlanterRowStatus
+        {
+            Header = new Header
+            {
+                Sequence = 7,
+                Timestamp = timestamp,
+                Frame = "vehicle",
+                Source = "sim"
+            },
+            RowIndex = 5,
+            TargetPopulationPerMeter = 9.5,
+            ActualPopulationPerMeter = 8.75,
+            SkipRate = 0.2,
+            DoubleRate = 0.0,
+            Quality = PlanterRowQuality.Skip
+        };
+
+        var serialized = original.ToByteArray();
+        var deserialized = PlanterRowStatus.Parser.ParseFrom(serialized);
+
+        Assert.Equal(original.Header.Sequence, deserialized.Header.Sequence);
+        Assert.Equal(original.Header.Timestamp, deserialized.Header.Timestamp);
+        Assert.Equal(original.Header.Frame, deserialized.Header.Frame);
+        Assert.Equal(original.Header.Source, deserialized.Header.Source);
+        Assert.Equal(original.RowIndex, deserialized.RowIndex);
+        Assert.Equal(original.TargetPopulationPerMeter, deserialized.TargetPopulationPerMeter);
+        Assert.Equal(original.ActualPopulationPerMeter, deserialized.ActualPopulationPerMeter);
+        Assert.Equal(original.SkipRate, deserialized.SkipRate);
+        Assert.Equal(original.DoubleRate, deserialized.DoubleRate);
+        Assert.Equal(original.Quality, deserialized.Quality);
+    }
 }

@@ -30,5 +30,8 @@
     <None Include="Simulation\Data\DeterministicSimRegression.golden.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Coverage\Data\LegacyPatchSamples.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

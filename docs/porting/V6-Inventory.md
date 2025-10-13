@@ -16,6 +16,7 @@ This note captures the legacy (V6) math assets that need assessment during the N
   - Encapsulates Dubins path primitives (outer, inner, curved) used by YouTurn, computing tangents and arc/straight segment lengths lazily from shared turn constraints.【F:Legacy SourceCode -V6/AgOpenGPS.Core/Models/Guidance/DubinsPath.cs†L8-L200】
 - **CGuidance** — `Legacy SourceCode -V6/GPS/Classes/CGuidance.cs`
   - Implements Stanley steering corrections with heading and cross-track damping, integral wind-up protection, and slope compensation, feeding steering angles back to the vehicle model and section control indicators.【F:Legacy SourceCode -V6/GPS/Classes/CGuidance.cs†L40-L194】
+  - Nexus port status: dynamic look-ahead scheduling and startup ramping now live in `AutoSteerLiteTuningProfile`/`AutoSteerLiteController` (see `AutoSteerLite-Tuning.md`).
 
 ## Coverage & Boundaries
 

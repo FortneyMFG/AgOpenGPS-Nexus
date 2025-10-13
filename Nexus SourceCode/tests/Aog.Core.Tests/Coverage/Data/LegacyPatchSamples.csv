@@ -1,0 +1,11 @@
+# PatchId,Stage,LeftEasting,LeftNorthing,RightEasting,RightNorthing,IncludeInUser
+1,start,0,0,4,0,true
+1,continue,0,10,4,10,true
+1,end,0,20,4,20,true
+2,start,4,0,8,0,false
+2,continue,4,12,8,12,false
+2,end,4,24,8,24,true
+3,start,0,0,3,0,true
+3,continue,0,8,3,8,true
+3,continue,0,16,3,16,true
+3,end,0,24,3,24,true

@@ -24,9 +24,11 @@ repo_root="$(cd "${script_dir}/../.." && pwd)"
 
 declare -A defaults=(
   [core]="Nexus SourceCode/src/Aog.Core.Host/Aog.Core.Host.csproj"
-  [agio]="Nexus SourceCode/src/Aog.Agio.Host/Aog.Agio.Host.csproj"
+  [agio]="Nexus SourceCode/src/Aog.Agio/Aog.Agio.csproj"
   [ui]="Nexus SourceCode/src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj"
-  [sim]="Nexus SourceCode/src/Aog.Core.SimHost/Aog.Core.SimHost.csproj"
+  # Simulation work shares the Core host entry point until a dedicated SimHost
+  # project lands. Override via NEXUS_SIM_PROJECT when that host exists.
+  [sim]="Nexus SourceCode/src/Aog.Core.Host/Aog.Core.Host.csproj"
 )
 
 resolve_project() {

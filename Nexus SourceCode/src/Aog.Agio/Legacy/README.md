@@ -24,6 +24,13 @@ The backend registers `LegacyUdpGateway` with no-op transport and observer insta
 Hardware-specific transports can replace `ILegacyUdpTransport`/`ILegacyPoseObserver`
 through dependency injection to forward PGNs over UDP and surface decoded poses to Core.
 
+`LegacyDiscoveryCodec` handles the identity + capability handshake described in the
+SRS (binary PGN `0xD4`). The gateway exposes `PublishDiscoveryAsync` and surfaces
+decoded announcements through `ILegacyDiscoveryObserver`. Downstream callers can
+convert announcements to `CapabilityDescriptor` records via
+`LegacyDiscoveryAnnouncement.ToCapabilityDescriptors()` to bridge the UDP handshake
+with the gRPC capabilities exchange.
+
 ## Encoding
 
 `LegacyPoseCodec` preserves the legacy framing semantics:
@@ -37,3 +44,10 @@ through dependency injection to forward PGNs over UDP and surface decoded poses 
 
 The codec is symmetric—unit tests assert that encoding and decoding round-trip cleanly and
 that corrupt checksums are rejected.
+
+## UART framing helper
+
+`LegacySerialFrameCodec` produces and parses the COBS-framed serial messages used by legacy
+AgIO hardware. Pass it a complete UDP-style frame (sync bytes through checksum) and it
+emits a `0x00`-terminated byte stream suitable for UART links. The helper reuses the legacy
+checksum via `LegacyChecksum`, so callers only need to populate the payload before encoding.

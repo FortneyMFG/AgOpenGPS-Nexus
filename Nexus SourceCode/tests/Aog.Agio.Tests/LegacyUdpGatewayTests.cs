@@ -14,10 +14,12 @@ public sealed class LegacyUdpGatewayTests
     [Fact]
     public async Task PublishPoseAsync_SendsEncodedFrame()
     {
-        var codec = new LegacyPoseCodec();
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
         var transport = new RecordingTransport();
         var observer = new RecordingObserver();
-        var gateway = new LegacyUdpGateway(codec, transport, observer, new FixedTimeProvider(DateTimeOffset.UtcNow));
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, transport, observer, discoveryObserver, new FixedTimeProvider(DateTimeOffset.UtcNow));
 
         var pose = new Pose { LatitudeDeg = 51.2, LongitudeDeg = -114.1 };
         var metadata = new LegacyPoseMetadata { FixQuality = 4, SatellitesTracked = 17 };
@@ -25,7 +27,7 @@ public sealed class LegacyUdpGatewayTests
         await gateway.PublishPoseAsync(pose, metadata);
 
         Assert.Single(transport.Frames);
-        Assert.True(codec.TryDecodePose(transport.Frames[0].Span, out var decodedPose, out var decodedMetadata));
+        Assert.True(poseCodec.TryDecodePose(transport.Frames[0].Span, out var decodedPose, out var decodedMetadata));
         Assert.Equal(pose.LatitudeDeg, decodedPose.LatitudeDeg, 6);
         Assert.Equal(metadata.FixQuality, decodedMetadata.FixQuality);
         Assert.Equal(metadata.SatellitesTracked, decodedMetadata.SatellitesTracked);
@@ -34,14 +36,16 @@ public sealed class LegacyUdpGatewayTests
     [Fact]
     public async Task HandleDatagramAsync_ForwardsPoseToObserver()
     {
-        var codec = new LegacyPoseCodec();
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
         var transport = new RecordingTransport();
         var observer = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
         var timestamp = new DateTimeOffset(2024, 05, 01, 12, 30, 00, TimeSpan.Zero);
-        var gateway = new LegacyUdpGateway(codec, transport, observer, new FixedTimeProvider(timestamp));
+        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, transport, observer, discoveryObserver, new FixedTimeProvider(timestamp));
 
         var pose = new Pose { LatitudeDeg = 51.123, LongitudeDeg = -114.456, HeadingRad = 1.5 };
-        var frame = codec.EncodePose(pose);
+        var frame = poseCodec.EncodePose(pose);
 
         await gateway.HandleDatagramAsync(frame);
 
@@ -60,13 +64,84 @@ public sealed class LegacyUdpGatewayTests
     [Fact]
     public async Task HandleDatagramAsync_IgnoresInvalidFrame()
     {
-        var codec = new LegacyPoseCodec();
-        var gateway = new LegacyUdpGateway(codec, new RecordingTransport(), new RecordingObserver(), new FixedTimeProvider(DateTimeOffset.UtcNow));
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, new RecordingTransport(), new RecordingObserver(), new RecordingDiscoveryObserver(), new FixedTimeProvider(DateTimeOffset.UtcNow));
         var invalid = new byte[LegacyPoseCodec.MainAntennaFrameLength];
 
         await gateway.HandleDatagramAsync(invalid);
 
         // No exception and no observer calls expected.
+    }
+
+    [Fact]
+    public async Task PublishDiscoveryAsync_SendsAnnouncement()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var transport = new RecordingTransport();
+        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, transport, new RecordingObserver(), new RecordingDiscoveryObserver(), new FixedTimeProvider(DateTimeOffset.UtcNow));
+
+        var announcement = new LegacyDiscoveryAnnouncement
+        {
+            VendorId = 0x7C,
+            ProductId = 0x01,
+            VariantId = 0x02,
+            McuId = (byte)LegacyDeviceMcu.Teensy,
+            FirmwareMajor = 1,
+            FirmwareMinor = 2,
+            FirmwarePatch = 3,
+            Capabilities = LegacyDeviceCapabilityFlags.OverTheAirUpdates | LegacyDeviceCapabilityFlags.DualBankFirmware,
+            Health = LegacyDeviceHealthFlags.None,
+        };
+
+        await gateway.PublishDiscoveryAsync(announcement);
+
+        var frame = Assert.Single(transport.Frames);
+        Assert.True(discoveryCodec.TryDecode(frame.Span, out var decoded));
+        Assert.Equal(announcement.VendorId, decoded.VendorId);
+        Assert.Equal(announcement.ProductId, decoded.ProductId);
+        Assert.Equal(announcement.VariantId, decoded.VariantId);
+        Assert.Equal(announcement.McuId, decoded.McuId);
+        Assert.Equal(announcement.FirmwareMajor, decoded.FirmwareMajor);
+        Assert.Equal(announcement.FirmwareMinor, decoded.FirmwareMinor);
+        Assert.Equal(announcement.FirmwarePatch, decoded.FirmwarePatch);
+        Assert.Equal(announcement.Capabilities, decoded.Capabilities);
+    }
+
+    [Fact]
+    public async Task HandleDatagramAsync_ForwardsDiscovery()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var transport = new RecordingTransport();
+        var poseObserver = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var gateway = new LegacyUdpGateway(poseCodec, discoveryCodec, transport, poseObserver, discoveryObserver, new FixedTimeProvider(DateTimeOffset.UtcNow));
+
+        var announcement = new LegacyDiscoveryAnnouncement
+        {
+            VendorId = 0x7C,
+            ProductId = 0x01,
+            VariantId = 0x02,
+            McuId = (byte)LegacyDeviceMcu.Stm32,
+            FirmwareMajor = 2,
+            FirmwareMinor = 5,
+            FirmwarePatch = 9,
+            Capabilities = LegacyDeviceCapabilityFlags.CanBootloader | LegacyDeviceCapabilityFlags.UsbDfu,
+            Health = LegacyDeviceHealthFlags.VoltageLow,
+        };
+
+        var frame = discoveryCodec.Encode(announcement);
+
+        await gateway.HandleDatagramAsync(frame);
+
+        Assert.Empty(poseObserver.Poses);
+        var observed = Assert.Single(discoveryObserver.Announcements);
+        Assert.Equal(announcement.VendorId, observed.VendorId);
+        Assert.Equal(announcement.FirmwareVersion, observed.FirmwareVersion);
+        Assert.Equal(announcement.Capabilities, observed.Capabilities);
+        Assert.Equal(announcement.Health, observed.Health);
     }
 
     private sealed class RecordingTransport : ILegacyUdpTransport
@@ -89,6 +164,17 @@ public sealed class LegacyUdpGatewayTests
         {
             Poses.Add(pose);
             Metadata.Add(metadata);
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingDiscoveryObserver : ILegacyDiscoveryObserver
+    {
+        public List<LegacyDiscoveryAnnouncement> Announcements { get; } = new();
+
+        public ValueTask OnDiscoveryAsync(LegacyDiscoveryAnnouncement announcement, CancellationToken cancellationToken)
+        {
+            Announcements.Add(announcement);
             return ValueTask.CompletedTask;
         }
     }

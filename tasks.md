@@ -22,6 +22,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - **NX-005 Capabilities handshake (Capabilities service)**
   - Output: proto + Core/AGiO placeholders
   - Done: smoke test call works
+- **NX-018 Aog.Abstractions NuGet packaging (gRPC contracts)**
+  - Output: versioned NuGet published from CI
+  - Done: Core, AGiO, and UI consume the shared package
+- **NX-019 Contract compatibility gate (protobuf + manifests)**
+  - Output: compatibility tests wired into CI
+  - Done: pipeline blocks breaking `Aog.Abstractions` changes
 
 ### Section B — Core (Headless, Sim Graph)
 - **NX-010 Core host (Generic Host, DI, config, Serilog)**
@@ -80,6 +86,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - **NX-027 Legacy UDP gateway skeleton (AOG PGNs minimal set)**
   - Output: service that translates to/from gRPC
   - Done: loopback test OK
+- **NX-029 Agio.Linux: SocketCAN backend (CAN → gRPC)**
+  - Output: SocketCANSharp-based backend streaming `CanFrame`
+  - Done: vcan integration test publishes frames to Core
+- **NX-066 GNSS provider policy + TCP/UDP stream support**
+  - Output: `IPositionSource` aggregator with network feed option
+  - Done: policy fails over between COM, gpsd, and TCP/UDP sources
 
 ### Section D — Plugins (Logic + Sim Providers)
 - **NX-030 Plugin loader & manifest (name, version, required APIs, settings, sim providers)**
@@ -214,6 +226,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-003 | A | Protobuf v1 (Header, Pose, Imu, SectionMask, SteerCmd/State, CanFrame, TimingCaps) | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Start Contracts Freeze 1 |
 | NX-004 | A | JSON schemas (Core, AGiO, UI, Simulation) | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Coordinate with Schema Owner |
 | NX-005 | A | Capabilities handshake proto/service | Done |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | Smoke test between Core & AGiO |
+| NX-018 | A | Aog.Abstractions NuGet packaging + CI publish | Planned |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Publish shared gRPC contracts package |
+| NX-019 | A | Contract compatibility gate (protobuf + manifests) | Planned |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | CI blocks breaking `Aog.Abstractions` changes |
 | NX-010 | B | Core host skeleton (Generic Host, DI, config, Serilog) | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) |  |
 | NX-011 | B | Event bus interfaces + tests | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) |  |
 | NX-014 | B | Settings + hot reload / route config | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Per-stream routing |
@@ -254,6 +268,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-025 | C | Linux gpsd provider | Planned |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Emulated feed test |
 | NX-026 | C | TimingCaps probe (Linux PPS/PTP) | Planned |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Report jitter |
 | NX-027 | C | Legacy UDP gateway skeleton | Planned |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Loopback test |
+| NX-029 | C | Agio.Linux SocketCAN backend (CAN→gRPC) | Planned |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Streams CAN frames + section relays |
+| NX-066 | C | GNSS source policy + TCP/UDP provider | Planned |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Aggregates `IPositionSource` feeds |
 
 ## Wave 4 – Core Plugins
 

@@ -16,8 +16,8 @@ NX-014,FALSE,TRUE,"NX-012, NX-013",,Per-stream source selection config and runti
 NX-015,FALSE,TRUE,"NX-010, NX-004",,"Parquet logger for pose, imu, can, io, and plugin topics"
 NX-016,FALSE,TRUE,NX-010,,Core health interval hot reload service
 NX-017,FALSE,TRUE,"NX-010, NX-011, NX-014, NX-015, NX-016",,Source routing service for sim/hardware/replay
-NX-018,FALSE,TRUE,NX-017,,Source routing map applying options snapshots
 NX-019,FALSE,TRUE,"NX-017, NX-018",,Stream route change events and duplicate guard
+NX-018,FALSE,FALSE,"NX-003, NX-004, NX-005",Ready,Aog.Abstractions NuGet packaging and CI publish pipeline
 NX-020,FALSE,TRUE,"NX-003, NX-005",,AGiO host skeleton with backend loader
 NX-021,FALSE,FALSE,"NX-020, NX-012, NX-013, NX-003",Ready,Agio.Sim adapter exposing SimBus topics over gRPC services
 NX-022,FALSE,FALSE,"NX-020, NX-012, NX-013, NX-003",Ready,Agio.Windows COM NMEA auto-scan and parser
@@ -27,7 +27,7 @@ NX-025,FALSE,FALSE,"NX-022, NX-020",NX-022,Agio.Linux gpsd provider
 NX-026,FALSE,FALSE,NX-020,Ready,Timing capabilities probe for PPS/PTP detection
 NX-027,FALSE,FALSE,"NX-020, NX-003, NX-005",Ready,Legacy UDP gateway skeleton translating PGNs to gRPC
 NX-028,FALSE,TRUE,"NX-003, NX-010",,TBD – add detailed scope in tasks.md
-NX-029,FALSE,FALSE,"NX-027, NX-028",NX-027,TBD – add detailed scope in tasks.md
+NX-029,FALSE,FALSE,"NX-003, NX-020",Ready,Agio.Linux SocketCAN backend bridging CAN frames to gRPC services
 NX-030,FALSE,TRUE,"NX-010, NX-011",,Plugin loader and manifest handling
 NX-031,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",Ready,AutoSteer-Lite plugin v1 (Pure Pursuit and Stanley controllers)
 NX-032,FALSE,FALSE,"NX-030, NX-012, NX-013, NX-003",Ready,"Sections plugin v1 with mask, speed gate, and look-ahead"
@@ -64,7 +64,7 @@ NX-062,FALSE,FALSE,"NX-006, NX-060, NX-010, NX-020, NX-040",Ready,Linux Pi packa
 NX-063,FALSE,FALSE,"NX-006, NX-060, NX-010, NX-020",Ready,Documentation: Windows no-hardware quickstart
 NX-064,FALSE,FALSE,"NX-041, NX-043, NX-021",Ready,Documentation: Pi/CM5 quickstart (sim then GPS)
 NX-065,FALSE,FALSE,"NX-041, NX-043, NX-024",Ready,TBD – add detailed scope in tasks.md
-NX-066,FALSE,FALSE,"NX-061, NX-062, NX-063, NX-064",NX-061,TBD – add detailed scope in tasks.md
+NX-066,FALSE,FALSE,"NX-020, NX-021, NX-022, NX-024, NX-025",Ready,GNSS provider policy with TCP/UDP stream support via IPositionSource
 NX-067,FALSE,FALSE,"NX-060, NX-061",Ready,TBD – add detailed scope in tasks.md
 NX-068,FALSE,FALSE,NX-062,NX-062,TBD – add detailed scope in tasks.md
 NX-069,FALSE,FALSE,"NX-063, NX-064",NX-063,TBD – add detailed scope in tasks.md

@@ -1,3 +1,4 @@
+using Aog.Agio.Timing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -53,6 +54,17 @@ public static class Program
                     .ValidateOnStart();
 
                 services.AddSingleton(TimeProvider.System);
+
+                if (OperatingSystem.IsLinux())
+                {
+                    services.AddSingleton<ITimingCapabilitiesProbe, LinuxTimingCapabilitiesProbe>();
+                }
+                else
+                {
+                    services.AddSingleton<ITimingCapabilitiesProbe, NullTimingCapabilitiesProbe>();
+                }
+
+                services.AddHostedService<TimingCapabilitiesLoggerService>();
 
                 var backendOptions = context.Configuration
                     .GetSection("AgioHost:Backend")

@@ -1,0 +1,180 @@
+using Aog.Agio.Linux.Gpsd;
+using Microsoft.Extensions.Logging.Abstractions;
+using Xunit;
+
+namespace Aog.Agio.Linux.Tests;
+
+public sealed class GpsdClientTests
+{
+    [Fact]
+    public async Task WatchAsync_ParsesTpvReports()
+    {
+        var feed = new[]
+        {
+            "{\"class\":\"VERSION\",\"release\":\"3.23\"}",
+            "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
+            "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1173,\"lon\":11.5167,\"alt\":545.4,\"speed\":0.514,\"track\":84.4,\"time\":\"2024-01-01T12:35:19.000Z\"}",
+            "{\"class\":\"TPV\",\"mode\":2,\"lat\":48.1174,\"lon\":11.5168,\"speed\":0.420,\"track\":83.0}",
+        };
+
+        var factory = new FakeGpsdConnectionFactory(feed);
+        var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
+
+        var reports = new List<GpsdTpvReport>();
+        await foreach (var report in client.WatchAsync(CancellationToken.None))
+        {
+            reports.Add(report);
+            if (reports.Count >= 2)
+            {
+                break;
+            }
+        }
+
+        Assert.Equal(2, reports.Count);
+        Assert.Equal(48.1173, reports[0].LatitudeDegrees);
+        Assert.Equal(11.5167, reports[0].LongitudeDegrees);
+        Assert.Equal(545.4, reports[0].AltitudeMeters);
+        Assert.Equal(0.514, reports[0].SpeedMetersPerSecond);
+        Assert.Equal(84.4, reports[0].TrackDegrees);
+        Assert.Equal(3, reports[0].Mode);
+        Assert.Equal(2, reports[1].Mode);
+        Assert.Contains("?WATCH={\"enable\":true,\"json\":true}", factory.WrittenLines);
+    }
+
+    [Fact]
+    public async Task WatchAsync_ThrowsWhenSocketUnavailable()
+    {
+        var factory = new NullGpsdConnectionFactory();
+        var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
+
+        await Assert.ThrowsAsync<GpsdSocketUnavailableException>(async () => await ConsumeAsync(client.WatchAsync(CancellationToken.None)));
+    }
+
+    private static async Task ConsumeAsync(IAsyncEnumerable<GpsdTpvReport> source)
+    {
+        await foreach (var _ in source)
+        {
+        }
+    }
+
+    private sealed class FakeGpsdConnectionFactory : IGpsdConnectionFactory
+    {
+        private readonly string _feed;
+        private bool _connected;
+
+        public FakeGpsdConnectionFactory(IEnumerable<string> lines)
+        {
+            _feed = string.Join("\n", lines) + "\n";
+        }
+
+        public List<string> WrittenLines { get; } = new();
+
+        public Task<Stream?> ConnectAsync(CancellationToken cancellationToken)
+        {
+            if (_connected)
+            {
+                return Task.FromResult<Stream?>(null);
+            }
+
+            _connected = true;
+            return Task.FromResult<Stream?>(new FakeGpsdStream(_feed, WrittenLines));
+        }
+    }
+
+    private sealed class NullGpsdConnectionFactory : IGpsdConnectionFactory
+    {
+        public Task<Stream?> ConnectAsync(CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
+    }
+
+    private sealed class FakeGpsdStream : Stream
+    {
+        private readonly byte[] _readBuffer;
+        private int _readPosition;
+        private readonly List<string> _writtenLines;
+        private readonly List<byte> _writeBuffer = new();
+
+        public FakeGpsdStream(string feed, List<string> writtenLines)
+        {
+            _readBuffer = System.Text.Encoding.UTF8.GetBytes(feed);
+            _writtenLines = writtenLines;
+        }
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => true;
+        public override long Length => _readBuffer.Length;
+        public override long Position
+        {
+            get => _readPosition;
+            set => throw new NotSupportedException();
+        }
+
+        public override void Flush()
+        {
+        }
+
+        public override Task FlushAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return Read(buffer.AsSpan(offset, count));
+        }
+
+        public override int Read(Span<byte> buffer)
+        {
+            var remaining = _readBuffer.Length - _readPosition;
+            if (remaining <= 0)
+            {
+                return 0;
+            }
+
+            var toCopy = Math.Min(buffer.Length, remaining);
+            _readBuffer.AsSpan(_readPosition, toCopy).CopyTo(buffer);
+            _readPosition += toCopy;
+            return toCopy;
+        }
+
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            return new ValueTask<int>(Read(buffer.Span));
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            AppendWritten(new ReadOnlySpan<byte>(buffer, offset, count));
+        }
+
+        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            AppendWritten(buffer.Span);
+            return ValueTask.CompletedTask;
+        }
+
+        private void AppendWritten(ReadOnlySpan<byte> data)
+        {
+            foreach (var b in data)
+            {
+                if (b == (byte)'\n')
+                {
+                    if (_writeBuffer.Count > 0)
+                    {
+                        var line = System.Text.Encoding.UTF8.GetString(_writeBuffer.ToArray()).TrimEnd('\r');
+                        if (line.Length > 0)
+                        {
+                            _writtenLines.Add(line);
+                        }
+                        _writeBuffer.Clear();
+                    }
+                }
+                else
+                {
+                    _writeBuffer.Add(b);
+                }
+            }
+        }
+
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+
+        public override void SetLength(long value) => throw new NotSupportedException();
+    }
+}

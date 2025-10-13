@@ -1,4 +1,4 @@
-using Aog.Agio.Windows.Nmea;
+using Aog.Agio.Nmea;
 using Xunit;
 
 namespace Aog.Agio.Windows.Tests;

@@ -1,4 +1,5 @@
 using System.IO.Ports;
+using Aog.Agio.Serial;
 
 namespace Aog.Agio.Windows;
 

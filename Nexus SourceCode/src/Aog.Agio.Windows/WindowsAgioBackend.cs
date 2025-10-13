@@ -1,3 +1,5 @@
+using Aog.Agio.Nmea;
+using Aog.Agio.Serial;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

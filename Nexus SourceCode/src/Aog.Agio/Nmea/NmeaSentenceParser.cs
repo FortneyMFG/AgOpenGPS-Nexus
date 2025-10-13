@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Aog.Agio.Windows.Nmea;
+namespace Aog.Agio.Nmea;
 
 /// <summary>
 /// Parses the subset of NMEA0183 sentences required by early Nexus builds.

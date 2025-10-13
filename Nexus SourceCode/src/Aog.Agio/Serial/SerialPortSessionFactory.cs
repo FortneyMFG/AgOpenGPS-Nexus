@@ -1,7 +1,7 @@
 using System.IO.Ports;
 using System.Text;
 
-namespace Aog.Agio.Windows;
+namespace Aog.Agio.Serial;
 
 /// <summary>
 /// Creates <see cref="SerialPort"/> backed probe sessions.

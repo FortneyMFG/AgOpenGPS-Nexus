@@ -1,6 +1,6 @@
-using Aog.Agio.Windows.Nmea;
+using Aog.Agio.Nmea;
 
-namespace Aog.Agio.Windows;
+namespace Aog.Agio.Serial;
 
 /// <summary>
 /// Represents the outcome of a successful NMEA COM port scan.
@@ -17,7 +17,7 @@ public sealed class NmeaPortScanResult
     }
 
     /// <summary>
-    /// Gets the COM port identifier.
+    /// Gets the serial device identifier.
     /// </summary>
     public string PortName { get; }
 

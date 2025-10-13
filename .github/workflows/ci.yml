@@ -36,6 +36,10 @@ jobs:
         shell: ${{ matrix.shell }}
         run: ./tools/ci/lint.ps1
 
+      - name: Contract compatibility gate
+        shell: ${{ matrix.shell }}
+        run: ./tools/ci/contracts.ps1
+
       - name: Headless sim smoke (placeholder)
         shell: ${{ matrix.shell }}
         run: ./tools/ci/sim-smoke.ps1

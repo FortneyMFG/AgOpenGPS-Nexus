@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Aog.UI.Avalonia.Models;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -17,4 +18,9 @@ public class MainWindowViewModel
     /// </summary>
     public string PlatformDescription =>
         $"Running on {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}) with {RuntimeInformation.FrameworkDescription}";
+
+    /// <summary>
+    /// Gets a sample vehicle pose used to seed the map view.
+    /// </summary>
+    public VehiclePose VehiclePose { get; } = new(10, 15, 45);
 }

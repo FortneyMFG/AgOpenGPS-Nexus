@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package nexus.capabilities.v1;
+
+option csharp_namespace = "Aog.Protos.Capabilities.V1";
+
+// CapabilitiesService defines the initial handshake between Core and AGiO hosts.
+// The handshake is responsible for exchanging node identity, role, and the set of
+// capabilities that each side can provide or consume.
+service CapabilitiesService {
+  // Handshake exchanges the capabilities supported by the caller and responds with
+  // the capabilities accepted by the host.
+  rpc Handshake(HandshakeRequest) returns (HandshakeResponse);
+}
+
+// CapabilityRole indicates the role of the component participating in the handshake.
+enum CapabilityRole {
+  CAPABILITY_ROLE_UNSPECIFIED = 0;
+  CAPABILITY_ROLE_CORE = 1;
+  CAPABILITY_ROLE_AGIO = 2;
+}
+
+// CapabilityDescriptor identifies a single capability exposed by a node.
+message CapabilityDescriptor {
+  // Canonical identifier of the capability.
+  string name = 1;
+  // Optional semantic version of the capability implementation.
+  string version = 2;
+  // Optional free-form summary shown in diagnostics.
+  string summary = 3;
+  // Additional machine-readable metadata.
+  map<string, string> attributes = 4;
+}
+
+// CapabilityRejection captures the reason a capability was not accepted.
+message CapabilityRejection {
+  CapabilityDescriptor capability = 1;
+  string reason = 2;
+}
+
+// HandshakeRequest advertises the capabilities provided by the caller.
+message HandshakeRequest {
+  string session_id = 1;
+  string node_id = 2;
+  CapabilityRole role = 3;
+  repeated CapabilityDescriptor capabilities = 4;
+}
+
+// HandshakeResponse acknowledges the capabilities accepted by the host.
+message HandshakeResponse {
+  string session_id = 1;
+  string node_id = 2;
+  CapabilityRole role = 3;
+  repeated CapabilityDescriptor accepted_capabilities = 4;
+  repeated CapabilityRejection rejections = 5;
+}

@@ -17,6 +17,29 @@ that higher-level orchestration or smoke tests can watch for successful startup/
 Changes to `CoreHost:Health:IntervalSeconds` are applied without restarting the process, and the
 service logs whenever the heartbeat cadence is updated so operators can confirm the new interval.
 
+When the host starts it performs a capabilities handshake with the configured AGiO endpoint.
+The handshake endpoint and advertised capabilities can be customised under the
+`CoreHost:Agio` and `CoreHost:Capabilities` sections. The following excerpt demonstrates the
+available settings:
+
+```json
+{
+  "CoreHost": {
+    "Agio": {
+      "Endpoint": "https://localhost:5105"
+    },
+    "Capabilities": {
+      "NodeId": "core-host",
+      "SessionPrefix": "core-",
+      "AdvertisedCapabilities": [
+        "nav.pose",
+        "nav.imu"
+      ]
+    }
+  }
+}
+```
+
 ### Configuration
 
 `CoreHost:Health:IntervalSeconds` controls how frequently the heartbeat message is emitted. The

@@ -1,0 +1,9 @@
+{
+  "scenario": "Warm start",
+  "source": "hil",
+  "metrics": [
+    { "name": "pose.rms_error", "category": "steering", "value": 0.05, "unit": "m", "status": "pass" },
+    { "name": "steer.engage_latency_ms", "category": "steering", "value": 132, "unit": "ms", "status": "pass" },
+    { "name": "sections.dropout_count", "category": "sections", "value": 0, "unit": "count", "status": "pass" }
+  ]
+}

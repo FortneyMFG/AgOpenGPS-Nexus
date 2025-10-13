@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Aog.Agio.Windows.Nmea;
+namespace Aog.Agio.Nmea;
 
 /// <summary>
 /// Parses the subset of NMEA0183 sentences required by early Nexus builds.
@@ -198,93 +198,58 @@ public sealed class NmeaSentenceParser
         var minutes = SafeParseInt(value.Substring(2, 2));
         var secondsComponent = value[4..];
 
-        if (hours is null || minutes is null)
+        if (!double.TryParse(secondsComponent, NumberStyles.Float, Invariant, out var seconds))
         {
             return null;
         }
 
-        if (!double.TryParse(secondsComponent, NumberStyles.Float, Invariant, out var secondsDouble))
-        {
-            return null;
-        }
-
-        var totalSeconds = (hours.Value * 60 + minutes.Value) * 60 + secondsDouble;
-        var ticks = (long)Math.Round(totalSeconds * TimeSpan.TicksPerSecond);
-
-        try
-        {
-            return TimeOnly.FromTimeSpan(TimeSpan.FromTicks(ticks));
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private static DateTimeOffset? TryParseDate(string value, TimeOnly? time)
-    {
-        if (string.IsNullOrWhiteSpace(value) || value.Length != 6)
-        {
-            return null;
-        }
-
-        var day = SafeParseInt(value[..2]);
-        var month = SafeParseInt(value.Substring(2, 2));
-        var yearComponent = SafeParseInt(value.Substring(4, 2));
-
-        if (day is null || month is null || yearComponent is null)
-        {
-            return null;
-        }
-
-        var year = yearComponent.Value >= 80 ? 1900 + yearComponent.Value : 2000 + yearComponent.Value;
-
-        try
-        {
-            var date = new DateOnly(year, month.Value, day.Value);
-            var timeComponent = time ?? TimeOnly.MinValue;
-            var dateTime = date.ToDateTime(timeComponent, DateTimeKind.Unspecified);
-            return new DateTimeOffset(dateTime, TimeSpan.Zero);
-        }
-        catch
-        {
-            return null;
-        }
+        return new TimeOnly(hours, minutes, (int)seconds, (int)((seconds - Math.Truncate(seconds)) * 1000));
     }
 
     private static double? TryParseLatitude(string value, string hemisphere)
     {
-        return TryParseCoordinate(value, hemisphere, 2);
+        if (string.IsNullOrWhiteSpace(value) || value.Length < 4)
+        {
+            return null;
+        }
+
+        var degrees = SafeParseInt(value[..2]);
+        var minutes = TryParseDouble(value[2..]);
+        if (minutes is null)
+        {
+            return null;
+        }
+
+        var result = degrees + minutes.Value / 60.0;
+        if (hemisphere.Equals("S", StringComparison.OrdinalIgnoreCase))
+        {
+            result *= -1;
+        }
+
+        return result;
     }
 
     private static double? TryParseLongitude(string value, string hemisphere)
     {
-        return TryParseCoordinate(value, hemisphere, 3);
-    }
-
-    private static double? TryParseCoordinate(string value, string hemisphere, int degreeDigits)
-    {
-        if (string.IsNullOrWhiteSpace(value) || value.Length < degreeDigits + 2)
+        if (string.IsNullOrWhiteSpace(value) || value.Length < 5)
         {
             return null;
         }
 
-        if (!double.TryParse(value, NumberStyles.Float, Invariant, out var raw))
+        var degrees = SafeParseInt(value[..3]);
+        var minutes = TryParseDouble(value[3..]);
+        if (minutes is null)
         {
             return null;
         }
 
-        var degrees = Math.Floor(raw / 100);
-        var minutes = raw - (degrees * 100);
-        var decimalDegrees = degrees + (minutes / 60.0);
-
-        if (!string.IsNullOrWhiteSpace(hemisphere) &&
-            (hemisphere.Equals("S", StringComparison.OrdinalIgnoreCase) || hemisphere.Equals("W", StringComparison.OrdinalIgnoreCase)))
+        var result = degrees + minutes.Value / 60.0;
+        if (hemisphere.Equals("W", StringComparison.OrdinalIgnoreCase))
         {
-            decimalDegrees *= -1.0;
+            result *= -1;
         }
 
-        return decimalDegrees;
+        return result;
     }
 
     private static NmeaFixQuality TryParseFixQuality(string value)
@@ -294,46 +259,61 @@ public sealed class NmeaSentenceParser
 
     private static int? TryParseInt(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (int.TryParse(value, NumberStyles.Integer, Invariant, out var parsed))
         {
-            return null;
+            return parsed;
         }
 
-        return int.TryParse(value, NumberStyles.Integer, Invariant, out var result) ? result : null;
-    }
-
-    private static int? SafeParseInt(string value)
-    {
-        return int.TryParse(value, NumberStyles.Integer, Invariant, out var result) ? result : null;
+        return null;
     }
 
     private static double? TryParseDouble(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (double.TryParse(value, NumberStyles.Float, Invariant, out var parsed))
         {
-            return null;
+            return parsed;
         }
 
-        return double.TryParse(value, NumberStyles.Float, Invariant, out var result) ? result : null;
+        return null;
     }
 
     private static double? TryParseSignedDouble(string value, string? sign)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        var parsed = TryParseDouble(value);
+        if (parsed is null)
         {
             return null;
         }
 
-        if (!double.TryParse(value, NumberStyles.Float, Invariant, out var result))
+        if (sign is not null && sign.Equals("W", StringComparison.OrdinalIgnoreCase))
+        {
+            parsed *= -1;
+        }
+
+        return parsed;
+    }
+
+    private static DateTimeOffset? TryParseDate(string value, TimeOnly? time)
+    {
+        if (string.IsNullOrWhiteSpace(value) || value.Length != 6 || time is null)
         {
             return null;
         }
 
-        if (string.Equals(sign, "W", StringComparison.OrdinalIgnoreCase) || string.Equals(sign, "S", StringComparison.OrdinalIgnoreCase))
+        var day = SafeParseInt(value[..2]);
+        var month = SafeParseInt(value.Substring(2, 2));
+        var year = SafeParseInt(value.Substring(4, 2));
+        if (day <= 0 || month <= 0 || year < 0)
         {
-            result *= -1.0;
+            return null;
         }
 
-        return result;
+        var resolvedYear = year + (year >= 80 ? 1900 : 2000);
+        return new DateTimeOffset(resolvedYear, month, day, time.Value.Hour, time.Value.Minute, time.Value.Second, TimeSpan.Zero);
+    }
+
+    private static int SafeParseInt(string value)
+    {
+        return int.TryParse(value, NumberStyles.Integer, Invariant, out var parsed) ? parsed : 0;
     }
 }

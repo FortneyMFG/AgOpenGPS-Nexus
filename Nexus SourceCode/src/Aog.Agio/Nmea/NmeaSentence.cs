@@ -1,4 +1,4 @@
-namespace Aog.Agio.Windows.Nmea;
+namespace Aog.Agio.Nmea;
 
 /// <summary>
 /// Base type for supported NMEA sentences.

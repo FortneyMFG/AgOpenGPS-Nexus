@@ -1,5 +1,6 @@
+using Aog.Agio.Nmea;
+using Aog.Agio.Serial;
 using Aog.Agio.Windows;
-using Aog.Agio.Windows.Nmea;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Xunit;

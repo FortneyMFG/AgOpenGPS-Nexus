@@ -1,7 +1,7 @@
-namespace Aog.Agio.Windows;
+namespace Aog.Agio.Serial;
 
 /// <summary>
-/// Configuration for probing Windows serial ports for NMEA streams.
+/// Configuration for probing serial ports for NMEA streams.
 /// </summary>
 public sealed class NmeaSerialPortScanOptions
 {
@@ -29,7 +29,7 @@ public sealed class NmeaSerialPortScanOptions
     }
 
     /// <summary>
-    /// Gets or sets the baud rates tested on each COM port.
+    /// Gets or sets the baud rates tested on each serial port.
     /// </summary>
     public int[] BaudRates
     {

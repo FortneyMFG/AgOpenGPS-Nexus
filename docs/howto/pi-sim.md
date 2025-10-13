@@ -126,16 +126,23 @@ A successful build confirms the SDK is installed correctly. Subsequent runs can 
 ## 7. Switch Nexus to GPS Input
 
 Until the AGiO packaging (NX-062) ships, run the AGiO host directly. Export the project
-path override because the host project still lives under `Aog.Agio`:
+path override because the host project still lives under `Aog.Agio` and point the backend
+at the new Linux auto-scan provider:
 
 ```bash
 export NEXUS_AGIO_PROJECT="Nexus SourceCode/src/Aog.Agio/Aog.Agio.csproj"
-./tools/scripts/nexus.sh run agio -- --backend Serial --port /dev/ttyACM0 --baud 115200
+export NEXUS_AgioHost__Backend__Assembly="Aog.Agio.Linux"
+export NEXUS_AgioHost__Backend__Type="Aog.Agio.Linux.LinuxAgioBackend"
+./tools/scripts/nexus.sh run agio
 ```
 
-- Replace `/dev/ttyACM0` with your device.
-- The `Serial` backend publishes GNSS fixes over gRPC for the Core/Sim hosts.
-- Logs appear in the console; look for `FixAcquired` events.
+- `LinuxAgioBackend` automatically cycles common `/dev/tty*` devices and reuses the NMEA
+  parser from the Windows backend. Successful probes log the detected port, baud rate, and
+  last fix.
+- If `/var/run/gpsd.sock` is present, the backend also starts a `gpsd` watcher and logs TPV
+  updates from the daemon. Leave `gpsd` stopped if you want AGiO to take exclusive control
+  of the USB device; enable it to share an existing gpsd feed.
+- Logs appear in the console; look for `NMEA stream detected` and `gpsd TPV` messages.
 
 Leave the AGiO host running and, in a second SSH session, start the simulator again to
 exercise the pipeline with mixed simulated and live data. Once the Core host is available,

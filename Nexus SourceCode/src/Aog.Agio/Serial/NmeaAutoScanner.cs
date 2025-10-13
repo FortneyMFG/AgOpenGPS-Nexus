@@ -1,12 +1,12 @@
 using System.IO;
-using Aog.Agio.Windows.Nmea;
+using Aog.Agio.Nmea;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Aog.Agio.Windows;
+namespace Aog.Agio.Serial;
 
 /// <summary>
-/// Scans Windows COM ports for NMEA streams and returns the first port that emits GGA, RMC, and VTG sentences.
+/// Scans serial ports for NMEA streams and returns the first port that emits GGA, RMC, and VTG sentences.
 /// </summary>
 public sealed class NmeaAutoScanner
 {
@@ -34,7 +34,7 @@ public sealed class NmeaAutoScanner
     }
 
     /// <summary>
-    /// Attempts to find a COM port producing valid NMEA GGA/RMC/VTG sentences.
+    /// Attempts to find a serial port producing valid NMEA GGA/RMC/VTG sentences.
     /// </summary>
     public Task<NmeaPortScanResult?> ScanAsync(CancellationToken cancellationToken)
     {
@@ -132,7 +132,7 @@ public sealed class NmeaAutoScanner
             }
         }
 
-        _logger.LogWarning("No NMEA-capable COM ports were detected during the scan.");
+        _logger.LogWarning("No NMEA-capable serial ports were detected during the scan.");
         return null;
     }
 

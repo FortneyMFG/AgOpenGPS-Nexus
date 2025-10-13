@@ -1,12 +1,12 @@
-namespace Aog.Agio.Windows;
+namespace Aog.Agio.Serial;
 
 /// <summary>
-/// Enumerates available serial (COM) port names.
+/// Enumerates available serial port names.
 /// </summary>
 public interface ISerialPortEnumerator
 {
     /// <summary>
-    /// Returns the available COM port identifiers on the machine.
+    /// Returns the available serial port identifiers on the machine.
     /// </summary>
     IEnumerable<string> GetPortNames();
 }

@@ -1,4 +1,4 @@
-namespace Aog.Agio.Windows;
+namespace Aog.Agio.Serial;
 
 /// <summary>
 /// Represents an open serial port probe session.
@@ -6,7 +6,7 @@ namespace Aog.Agio.Windows;
 public interface ISerialPortSession : IDisposable
 {
     /// <summary>
-    /// Gets the COM port name.
+    /// Gets the serial port name.
     /// </summary>
     string PortName { get; }
 

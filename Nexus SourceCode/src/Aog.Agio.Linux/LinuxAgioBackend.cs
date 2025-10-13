@@ -3,15 +3,15 @@ using Aog.Agio.Serial;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Aog.Agio.Windows;
+namespace Aog.Agio.Linux;
 
 /// <summary>
-/// Windows-specific AGiO backend that scans COM ports for NMEA streams.
+/// Linux-specific AGiO backend that scans serial ports and gpsd for GNSS data.
 /// </summary>
-public sealed class WindowsAgioBackend : IAgioBackend
+public sealed class LinuxAgioBackend : IAgioBackend
 {
     /// <inheritdoc />
-    public string Name => "Windows Serial";
+    public string Name => "Linux Serial";
 
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
@@ -22,11 +22,16 @@ public sealed class WindowsAgioBackend : IAgioBackend
         }
 
         services.AddOptions<NmeaSerialPortScanOptions>();
+        services.AddOptions<GpsdClientOptions>();
 
         services.AddSingleton<NmeaSentenceParser>();
-        services.AddSingleton<ISerialPortEnumerator, WindowsSerialPortEnumerator>();
+        services.AddSingleton<ISerialPortEnumerator, LinuxSerialPortEnumerator>();
         services.AddSingleton<ISerialPortSessionFactory, SerialPortSessionFactory>();
         services.AddSingleton<NmeaAutoScanner>();
-        services.AddSingleton<IHostedService, WindowsNmeaBackgroundService>();
+        services.AddSingleton<IHostedService, LinuxNmeaBackgroundService>();
+
+        services.AddSingleton<IGpsdTransport, UnixDomainSocketGpsdTransport>();
+        services.AddSingleton<GpsdClient>();
+        services.AddSingleton<IHostedService, GpsdBackgroundService>();
     }
 }

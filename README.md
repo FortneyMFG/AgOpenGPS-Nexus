@@ -33,6 +33,13 @@ and the broader Software Requirements Specification (SRS) set under `/docs/SRS`.
 4. **Log discoveries in the SRS notes.** When clarifying requirements or implementation
    constraints, append them to `docs/SRS/NOTES.md` so the next contributor benefits.
 
+## Architecture Decision Records (ADRs)
+
+- [ADR-001: Adopt .NET 8 C# stack for Nexus runtime](docs/ADR/ADR-001-dotnet8-runtime.md)
+- [ADR-002: Expose Nexus services over gRPC/protobuf contracts](docs/ADR/ADR-002-grpc-contracts.md)
+- [ADR-003: Use Avalonia for the cross-platform Nexus UI shell](docs/ADR/ADR-003-avalonia-ui.md)
+- [ADR-004: Establish the composite simulation fabric (SimClock + SimBus)](docs/ADR/ADR-004-composite-simulation.md)
+
 ## Repository Layout
 
 ```text

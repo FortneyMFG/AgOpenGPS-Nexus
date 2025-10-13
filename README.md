@@ -76,7 +76,9 @@ Cross-platform helpers live under `tools/scripts`:
   `dotnet run` on Unix-like systems. Pass additional arguments after `--` to forward them
   to the underlying host.
 - `pwsh ./tools/scripts/nexus.ps1 sim` launches the simulation entry point on Windows
-  PowerShell (Core or Desktop).
+  PowerShell (Core or Desktop). Until the dedicated SimHost lands, both scripts reuse
+  the Core host for `sim`; override the default by setting `NEXUS_SIM_PROJECT` once the
+  simulation host project is available.
 
 Override default project locations by exporting `NEXUS_CORE_PROJECT`,
 `NEXUS_AGIO_PROJECT`, `NEXUS_UI_PROJECT`, or `NEXUS_SIM_PROJECT`. All paths are resolved

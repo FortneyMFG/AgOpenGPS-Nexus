@@ -12,11 +12,16 @@
   <Grid RowDefinitions="Auto,*" Margin="24">
     <TextBlock Text="{Binding Title}" FontSize="28" FontWeight="Bold"/>
     <Border Grid.Row="1" Margin="0,24,0,0" Padding="16" CornerRadius="8" Background="#0F000000">
-      <StackPanel Spacing="8">
+      <Grid RowDefinitions="Auto,Auto,Auto,*">
         <TextBlock Text="Welcome to the AgOpenGPS Nexus shell" FontSize="18"/>
-        <TextBlock Text="{Binding PlatformDescription}"/>
-        <TextBlock Text="This bootstrap window is backed by dependency injection."/>
-      </StackPanel>
+        <TextBlock Grid.Row="1" Margin="0,8,0,0" Text="{Binding PlatformDescription}"/>
+        <TextBlock Grid.Row="2" Margin="0,8,0,0" Text="This bootstrap window is backed by dependency injection."/>
+        <StackPanel Grid.Row="3" Spacing="4">
+          <TextBlock Text="Embedded simulation provider graph" FontWeight="SemiBold"/>
+          <TextBox Text="{Binding SimulationGraphSummary}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                   MinHeight="160" FontFamily="Consolas, Courier New, monospace"/>
+        </StackPanel>
+      </Grid>
     </Border>
   </Grid>
 </Window>

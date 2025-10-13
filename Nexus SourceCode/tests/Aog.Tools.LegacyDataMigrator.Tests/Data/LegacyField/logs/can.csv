@@ -1,0 +1,2 @@
+sequence,timestamp_utc,frame,source,arbitration_id,payload_hex,is_extended_id,is_remote_request
+1,2024-04-01T12:30:00Z,,can,256,0AFF,true,false

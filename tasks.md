@@ -47,8 +47,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-035 Replay plugin v1
 - [x] NX-036 Plugin telemetry sink
 - [x] NX-037 Simulation scenario library
-- [ ] NX-038 Simulation performance harness
-- [ ] NX-039 Plugin compatibility CI gate
+- [x] NX-038 Simulation performance harness
+- [x] NX-039 Plugin compatibility CI gate
 
 ### Section E — UI (Avalonia) + Sim Bar
 - [x] NX-040 Avalonia app bootstrap
@@ -176,8 +176,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-035 | Replay plugin v1 | Done |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Telemetry Parquet replay controller with play/pause/seek tests |
 | NX-036 | Plugin telemetry sink | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | EventBus sink streams plugin telemetry |
 | NX-037 | Simulation scenario library with curated sample configs and docs | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Bundle field-ready templates and documentation |
-| NX-038 | Simulation performance and stress harness covering plugin combinations | Planned |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | CI run ensures deterministic timing under load |
-| NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | Planned |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
+| NX-038 | Simulation performance and stress harness covering plugin combinations | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | CI run ensures deterministic timing under load |
+| NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | Done |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
 
 ### Section E — UI (Avalonia) + Sim Bar
 

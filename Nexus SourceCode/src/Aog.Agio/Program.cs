@@ -53,7 +53,14 @@ public static class Program
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+                services
+                    .AddOptions<AgioSafetyOptions>()
+                    .BindConfiguration("AgioHost:Safety")
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
                 services.AddSingleton(TimeProvider.System);
+                services.AddSingleton<IActuatorFailsafeService, ActuatorFailsafeService>();
 
                 if (OperatingSystem.IsLinux())
                 {

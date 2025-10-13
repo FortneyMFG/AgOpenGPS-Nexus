@@ -1,3 +1,4 @@
+using Aog.Core.Replay;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<App>();
         services.TryAddSingleton<IConnectionSettingsStore, JsonConnectionSettingsStore>();
         services.TryAddSingleton<ConnectionSettingsViewModel>();
+        services.TryAddSingleton<IReplayController, NullReplayController>();
         services.TryAddSingleton<MainWindow>();
         services.TryAddSingleton<MainWindowViewModel>();
         return services;

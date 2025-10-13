@@ -29,7 +29,8 @@ public sealed class AutoSteerLiteControllerTests
             LookAheadDistance = 6,
             StanleyGain = 3,
             StanleySoftening = 1.2,
-            SteeringAngleLimitRadians = Math.PI / 180 * 35
+            SteeringAngleLimitRadians = Math.PI / 180 * 35,
+            EnableDynamicLookAhead = false
         })
         {
             Mode = mode
@@ -66,6 +67,42 @@ public sealed class AutoSteerLiteControllerTests
     }
 
     [Fact]
+    public void DynamicLookAhead_RampsDuringStartup()
+    {
+        var settings = new AutoSteerLiteSettings
+        {
+            EnableDynamicLookAhead = true,
+            LookAheadFilterGain = 0,
+            CrossTrackFilterGain = 0,
+            StartupHoldDistanceMeters = 2,
+            StartupLookAheadMultiplier = 0.5
+        };
+
+        var controller = new AutoSteerLiteController(settings)
+        {
+            Mode = AutoSteerMode.Stanley
+        };
+
+        var path = CreateStraightPath(80, 1);
+        var state = new VehicleState(0, 1.2, headingRadians: AutoSteerMath.NormalizeAngle(4 * Math.PI / 180), speedMetersPerSecond: 4, wheelbaseMeters: 3);
+
+        var lookAheadValues = new List<double>();
+        const double dt = 0.1;
+
+        for (var i = 0; i < 40; i++)
+        {
+            var steering = controller.ComputeSteeringAngle(state, path);
+            lookAheadValues.Add(controller.LastLookAheadDistance);
+            state = state.Advance(steering, dt);
+        }
+
+        lookAheadValues.Should().NotBeEmpty();
+        lookAheadValues[0].Should().BeLessThan(settings.MinimumLookAheadMeters * 1.5);
+        lookAheadValues[^1].Should().BeGreaterThan(lookAheadValues[0]);
+        lookAheadValues[^1].Should().BeGreaterThan(settings.MinimumLookAheadMeters);
+    }
+
+    [Fact]
     public void ComputeSteeringAngle_InvalidPath_Throws()
     {
         var controller = new AutoSteerLiteController();
@@ -85,5 +122,26 @@ public sealed class AutoSteerLiteControllerTests
         next.X.Should().BeGreaterThan(0);
         next.Y.Should().BeGreaterThan(0);
         next.HeadingRadians.Should().NotBe(0);
+    }
+
+    [Fact]
+    public void TuningState_FiltersCrossTrack()
+    {
+        var profile = new AutoSteerLiteTuningProfile
+        {
+            CrossTrackFilterGain = 0.5,
+            LookAheadFilterGain = 0,
+            StartupHoldDistanceMeters = 0,
+            StartupLookAheadMultiplier = 1,
+            MinimumLookAheadMeters = 2
+        };
+
+        var tuningState = new AutoSteerLiteTuningState(profile);
+
+        var first = tuningState.Update(0.5, 3, 0);
+        var second = tuningState.Update(0, 3, 0);
+
+        second.Should().BeLessThan(first);
+        tuningState.IsInStartup.Should().BeFalse();
     }
 }

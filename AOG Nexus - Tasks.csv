@@ -14,10 +14,10 @@ NX-012,FALSE,TRUE,"NX-010, NX-011",,Simulation primitives (ISimClock/Bus/Rng) wi
 NX-013,FALSE,TRUE,NX-012,,Simulation catalog graph builder with provider registry and DAG validation
 NX-014,FALSE,TRUE,"NX-012, NX-013",,Per-stream source selection config and runtime routing
 NX-015,FALSE,TRUE,"NX-010, NX-004",,"Parquet logger for pose, imu, can, io, and plugin topics"
-NX-016,FALSE,TRUE,NX-010,,TBD – add detailed scope in tasks.md
-NX-017,FALSE,TRUE,"NX-010, NX-011, NX-014, NX-015, NX-016",,TBD – add detailed scope in tasks.md
+NX-016,FALSE,TRUE,NX-010,,Core health interval hot reload service
+NX-017,FALSE,TRUE,"NX-010, NX-011, NX-014, NX-015, NX-016",,Source routing service for sim/hardware/replay
+NX-019,FALSE,TRUE,"NX-017, NX-018",,Stream route change events and duplicate guard
 NX-018,FALSE,FALSE,"NX-003, NX-004, NX-005",Ready,Aog.Abstractions NuGet packaging and CI publish pipeline
-NX-019,FALSE,FALSE,NX-018,Ready,Contract compatibility gate for protobuf and manifests
 NX-020,FALSE,TRUE,"NX-003, NX-005",,AGiO host skeleton with backend loader
 NX-021,FALSE,FALSE,"NX-020, NX-012, NX-013, NX-003",Ready,Agio.Sim adapter exposing SimBus topics over gRPC services
 NX-022,FALSE,FALSE,"NX-020, NX-012, NX-013, NX-003",Ready,Agio.Windows COM NMEA auto-scan and parser

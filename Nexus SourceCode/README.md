@@ -51,7 +51,7 @@ dotnet run --project src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj
 
 The bootstrap window displays the current operating system description to confirm cross-platform execution. Dependency injection wires the application, main window, and view-model using `Microsoft.Extensions.Hosting`.
 
-An embedded simulation sample is parsed at startup and the window prints the ordered provider graph so contributors can verify the new configuration loader logic without additional tooling.
+An embedded simulation sample is parsed at startup and the window prints the ordered provider graph so contributors can verify the new configuration loader logic without additional tooling. The shell also exposes a simulation control bar (NX-043) that provides play/pause, scrub, and playback rate controls alongside combo boxes for selecting the source and mode for each routed stream.
 
 ## Testing
 

@@ -11,33 +11,48 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// </summary>
 public class MainWindowViewModel
 {
-    private static readonly string SimulationSummary = BuildSimulationGraphSummary();
+    private const string SimulationResourceName = "Aog.UI.Avalonia.Resources.SimulationSample.json";
+
+    public MainWindowViewModel()
+    {
+        Title = "AgOpenGPS Nexus";
+        PlatformDescription =
+            $"Running on {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}) with {RuntimeInformation.FrameworkDescription}";
+
+        var configuration = TryLoadSimulationConfiguration(out var summary);
+        SimulationGraphSummary = summary;
+        SimulationBar = new SimulationBarViewModel(configuration);
+    }
 
     /// <summary>
     /// Gets the title displayed in the main window.
     /// </summary>
-    public string Title => "AgOpenGPS Nexus";
+    public string Title { get; }
 
     /// <summary>
     /// Gets a description of the platform the application is currently running on.
     /// </summary>
-    public string PlatformDescription =>
-        $"Running on {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}) with {RuntimeInformation.FrameworkDescription}";
+    public string PlatformDescription { get; }
 
     /// <summary>
     /// Gets a summary of the embedded simulation configuration.
     /// </summary>
-    public string SimulationGraphSummary => SimulationSummary;
+    public string SimulationGraphSummary { get; }
 
-    private static string BuildSimulationGraphSummary()
+    /// <summary>
+    /// Gets the simulation bar view-model bound to the UI.
+    /// </summary>
+    public SimulationBarViewModel SimulationBar { get; }
+
+    private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)
     {
-        const string resourceName = "Aog.UI.Avalonia.Resources.SimulationSample.json";
         var assembly = typeof(MainWindowViewModel).Assembly;
 
-        using var stream = assembly.GetManifestResourceStream(resourceName);
+        using var stream = assembly.GetManifestResourceStream(SimulationResourceName);
         if (stream is null)
         {
-            return "Simulation sample resource not found.";
+            summary = "Simulation sample resource not found.";
+            return null;
         }
 
         using var reader = new StreamReader(stream);
@@ -52,11 +67,13 @@ public class MainWindowViewModel
                 catalog.Register(descriptor);
             }
 
-            return catalog.BuildGraph().FormatSummary().TrimEnd();
+            summary = catalog.BuildGraph().FormatSummary().TrimEnd();
+            return configuration;
         }
         catch (Exception ex)
         {
-            return $"Failed to load simulation sample: {ex.Message}";
+            summary = $"Failed to load simulation sample: {ex.Message}";
+            return null;
         }
     }
 }

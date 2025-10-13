@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/core.schema.json",
+  "title": "Nexus Core configuration",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "services",
+    "logging",
+    "agio",
+    "plugins",
+    "simulation"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the configuration contract implemented by the Core host."
+    },
+    "services": {
+      "type": "object",
+      "required": ["host", "grpcPort", "restPort"],
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "type": "string",
+          "format": "hostname",
+          "description": "Interface binding used for inbound Core services."
+        },
+        "grpcPort": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "TCP port for the gRPC control surface exposed by the Core host."
+        },
+        "restPort": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Optional REST status endpoint for diagnostics and orchestration tooling."
+        },
+        "enableTls": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable TLS for external service endpoints."
+        }
+      }
+    },
+    "logging": {
+      "type": "object",
+      "required": ["minimumLevel", "sinks"],
+      "additionalProperties": false,
+      "properties": {
+        "minimumLevel": {
+          "type": "string",
+          "enum": [
+            "Verbose",
+            "Debug",
+            "Information",
+            "Warning",
+            "Error",
+            "Fatal"
+          ],
+          "description": "Global minimum log level applied before sink overrides."
+        },
+        "sinks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["console", "file", "seq"],
+                "description": "Log sink target identifier."
+              },
+              "minimumLevel": {
+                "type": "string",
+                "enum": [
+                  "Verbose",
+                  "Debug",
+                  "Information",
+                  "Warning",
+                  "Error",
+                  "Fatal"
+                ],
+                "description": "Optional override applied to entries routed to this sink."
+              },
+              "path": {
+                "type": "string",
+                "description": "Filesystem path for file sinks."
+              },
+              "rollingInterval": {
+                "type": "string",
+                "enum": ["Hour", "Day", "Week"],
+                "description": "Rolling cadence for file sinks."
+              },
+              "serverUrl": {
+                "type": "string",
+                "format": "uri",
+                "description": "Destination URL for Seq sinks."
+              }
+            },
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "type": {"const": "file"}
+                  }
+                },
+                "then": {
+                  "required": ["path"]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "type": {"const": "seq"}
+                  }
+                },
+                "then": {
+                  "required": ["serverUrl"]
+                }
+              }
+            ]
+          },
+          "description": "Collection of active sinks receiving structured log events."
+        }
+      }
+    },
+    "agio": {
+      "type": "object",
+      "required": ["primary"],
+      "additionalProperties": false,
+      "properties": {
+        "primary": {
+          "$ref": "simulation.schema.json#/$defs/endpointReference"
+        },
+        "fallback": {
+          "$ref": "simulation.schema.json#/$defs/endpointReference"
+        },
+        "capabilityCache": {
+          "type": "string",
+          "description": "Path to the cached AGiO capabilities manifest."
+        }
+      },
+      "description": "Endpoints and state shared with the AGiO hardware host."
+    },
+    "plugins": {
+      "type": "object",
+      "required": ["searchPaths"],
+      "additionalProperties": false,
+      "properties": {
+        "searchPaths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Directories scanned for plugin manifests and bundles."
+        },
+        "autoEnable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable plugins immediately after discovery instead of requiring operator approval."
+        },
+        "allowUnsigned": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow unsigned plugins when signature enforcement is enabled."
+        }
+      }
+    },
+    "simulation": {
+      "$ref": "simulation.schema.json#/$defs/simulationSettings"
+    }
+  }
+}

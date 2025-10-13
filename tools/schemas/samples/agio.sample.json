@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "transports": {
+    "serial": [
+      {"port": "COM3", "baud": 115200, "role": "gnss"},
+      {"port": "/dev/ttyUSB0", "baud": 115200, "role": "steer", "parity": "none", "dataBits": 8, "stopBits": 1}
+    ],
+    "network": {
+      "udp": [
+        {"host": "239.10.0.1", "port": 17790, "topic": "legacy.pgn"}
+      ],
+      "grpc": [
+        {"host": "0.0.0.0", "port": 6050}
+      ]
+    }
+  },
+  "backends": [
+    {
+      "backendId": "agio.sim",
+      "type": "Aog.Agio.SimBackend",
+      "transports": ["grpc"],
+      "settings": {
+        "scenario": "sample-scenario"
+      }
+    }
+  ],
+  "ntrip": {
+    "enabled": true,
+    "caster": "ntrip.example.com",
+    "port": 2101,
+    "mountpoint": "MOUNT1",
+    "username": "farmer",
+    "password": "secret",
+    "sendGga": true
+  },
+  "safety": {
+    "heartbeatMs": 250,
+    "failsafe": {
+      "steer": "disable",
+      "sections": "disable"
+    }
+  }
+}

@@ -36,8 +36,8 @@ NX-034,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",,Simulation provider registra
 NX-035,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",,Replay plugin v1 with Parquet reader and playback controls
 NX-036,FALSE,TRUE,"NX-015, NX-030, NX-003",,Plugin telemetry sink streaming metrics into Core logging
 NX-037,FALSE,FALSE,"NX-031, NX-032, NX-033, NX-034, NX-035",Ready,Simulation scenario library with curated sample configs and operator docs
-NX-038,FALSE,FALSE,NX-037,Ready,Simulation performance and stress harness covering plugin combinations
-NX-039,FALSE,FALSE,"NX-037, NX-038",Ready,Plugin compatibility CI gate with versioned manifest regression tests
+NX-038,FALSE,TRUE,NX-037,Ready,Simulation performance and stress harness covering plugin combinations
+NX-039,FALSE,TRUE,"NX-037, NX-038",Ready,Plugin compatibility CI gate with versioned manifest regression tests
 NX-040,FALSE,TRUE,"NX-001, NX-002, NX-003",,Avalonia app bootstrap shell
 NX-041,FALSE,TRUE,NX-040,,Connection and settings panel for AGiO endpoint selection
 NX-042,FALSE,TRUE,"NX-040, NX-003",,"Map view with pan, zoom, and vehicle visualization"

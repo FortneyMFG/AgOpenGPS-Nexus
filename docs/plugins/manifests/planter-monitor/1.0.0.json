@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.plugins.planter-monitor",
+  "name": "Planter Monitor",
+  "version": "1.0.0",
+  "description": "Publishes per-row population and seed flow diagnostics for virtual stands.",
+  "requiredApis": {
+    "core": ">=1.0.0",
+    "sim": ">=1.0.0"
+  },
+  "settings": {
+    "rowCount": 16,
+    "defaultTargetPopulation": 34000
+  },
+  "simProviders": [
+    {
+      "providerId": "planter.population",
+      "type": "Aog.Plugins.PlanterMonitor.PopulationProvider",
+      "topics": ["planter.population"],
+      "description": "Calculates live population metrics derived from vehicle pose.",
+      "settings": {
+        "variancePct": 3.0
+      }
+    },
+    {
+      "providerId": "planter.seedFlow",
+      "type": "Aog.Plugins.PlanterMonitor.SeedFlowProvider",
+      "topics": ["planter.seedFlow"],
+      "description": "Synthesizes vacuum and seed flow telemetry per row.",
+      "settings": {
+        "samplePeriodMs": 150
+      }
+    }
+  ]
+}

@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Aog.Core.Legacy;
 using Aog.Core.Replay;
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
 using Aog.Core.V1;
 using Aog.UI.Avalonia.Models;
+using Aog.UI.Avalonia.Settings;
+using Aog.UI.Avalonia.Theming;
 using Avalonia;
 using Avalonia.Media;
 
@@ -16,13 +21,17 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// <summary>
 /// Provides presentation data for the bootstrap shell window.
 /// </summary>
-public class MainWindowViewModel
+public class MainWindowViewModel : INotifyPropertyChanged
 {
     private const string SimulationResourceName = "Aog.UI.Avalonia.Resources.SimulationSample.json";
 
     private readonly ConnectionSettingsViewModel _connectionSettings;
     private readonly List<SimulationScenarioConfiguration> _scenarioDefinitions = new();
     private readonly SimulationConfiguration? _simulationConfiguration;
+    private readonly IUiPreferencesService _preferencesService;
+    private readonly IThemeManager _themeManager;
+
+    private UiTheme _selectedTheme;
 
     private readonly IReadOnlyList<CoverageCell> _coverageCells;
     private readonly IReadOnlyList<GuidanceTrack> _guidanceTracks;
@@ -32,10 +41,26 @@ public class MainWindowViewModel
     /// </summary>
     /// <param name="connectionSettings">Connection settings view-model injected from DI.</param>
     /// <param name="replayController">Optional replay controller for transport control.</param>
-    public MainWindowViewModel(ConnectionSettingsViewModel connectionSettings, IReplayController? replayController = null)
+    /// <param name="preferencesService">Service for persisting UI preferences.</param>
+    /// <param name="themeManager">The theme manager used to apply theme changes.</param>
+    /// <param name="telemetryPrivacy">Telemetry opt-in view-model.</param>
+    public MainWindowViewModel(
+        ConnectionSettingsViewModel connectionSettings,
+        IReplayController? replayController,
+        IUiPreferencesService preferencesService,
+        IThemeManager themeManager,
+        TelemetryPrivacyViewModel telemetryPrivacy)
     {
         ArgumentNullException.ThrowIfNull(connectionSettings);
+        ArgumentNullException.ThrowIfNull(preferencesService);
+        ArgumentNullException.ThrowIfNull(themeManager);
+        ArgumentNullException.ThrowIfNull(telemetryPrivacy);
+
         _connectionSettings = connectionSettings;
+        _preferencesService = preferencesService;
+        _themeManager = themeManager;
+
+        TelemetryPrivacy = telemetryPrivacy;
 
         Title = "AgOpenGPS Nexus";
         PlatformDescription =
@@ -63,7 +88,16 @@ public class MainWindowViewModel
         {
             _scenarioDefinitions.AddRange(configuration.Scenarios);
         }
+
+        // Theme bootstrapping
+        AvailableThemes = Enum.GetValues<UiTheme>();
+        var preferences = _preferencesService.GetPreferences();
+        _selectedTheme = preferences.Theme;
+        _themeManager.ApplyTheme(_selectedTheme);
     }
+
+    /// <summary>Raised when a property value changes.</summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>Gets the title displayed in the main window.</summary>
     public string Title { get; }
@@ -95,6 +129,26 @@ public class MainWindowViewModel
     /// <summary>Gets the view-model describing the planter panel.</summary>
     public PlanterPanelViewModel PlanterPanel { get; }
 
+    /// <summary>Gets the telemetry privacy view-model.</summary>
+    public TelemetryPrivacyViewModel TelemetryPrivacy { get; }
+
+    /// <summary>Gets the available UI themes.</summary>
+    public IReadOnlyList<UiTheme> AvailableThemes { get; }
+
+    /// <summary>Gets or sets the currently selected UI theme.</summary>
+    public UiTheme SelectedTheme
+    {
+        get => _selectedTheme;
+        set
+        {
+            if (value == _selectedTheme) return;
+            _selectedTheme = value;
+            OnPropertyChanged();
+            _preferencesService.UpdateTheme(value);
+            _themeManager.ApplyTheme(value);
+        }
+    }
+
     /// <summary>Gets the replay timeline analytics view-model.</summary>
     public ReplayTimelineViewModel ReplayTimeline { get; }
 
@@ -114,6 +168,19 @@ public class MainWindowViewModel
             _scenarioDefinitions,
             scenario => SimulationBar.ApplyScenario(scenario),
             () => SimulationBar.ResetToConfigurationRoutes());
+    }
+
+    /// <summary>
+    /// Creates a legacy import wizard view-model wired to update the simulation routes.
+    /// </summary>
+    public LegacyImportWizardViewModel CreateLegacyImportWizardViewModel()
+    {
+        var service = new LegacyGuidanceImportService();
+        return new LegacyImportWizardViewModel(service, result =>
+        {
+            SimulationBar.ApplyLegacyImport(result);
+            return true;
+        });
     }
 
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)
@@ -282,4 +349,7 @@ public class MainWindowViewModel
             new("Boundary", boundaryPoints, Color.FromArgb(180, 255, 86, 48), 2),
         };
     }
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

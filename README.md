@@ -89,6 +89,11 @@ scripts.
 
 - `pwsh ./tools/ci/package-windows.ps1` builds the Windows single-file publish, `.zip`,
   and installer bundle described in [docs/howto/windows-packaging.md](docs/howto/windows-packaging.md).
+- `pwsh ./tools/ci/release.ps1 -Channel nightly -Version 0.5.0-beta1` orchestrates the signed
+  release pipeline. It reuses the platform-specific packaging scripts, optionally signs
+  Windows executables when a certificate is provided, stages artifacts under
+  `artifacts/release/<channel>/<timestamp>`, and emits a manifest with SHA-256 hashes for
+  downstream promotion.
 
 When Wave 0 tickets (NX-001, NX-002, NX-006) are completed the repository skeleton will be
 ready for the broader contract and simulation work described in the phase plan. Tag

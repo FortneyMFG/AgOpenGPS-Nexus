@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
+using Aog.Core.Legacy;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -223,6 +224,20 @@ public sealed class SimulationBarViewModel : ObservableObject
             ? "No description provided."
             : scenario.Description!;
         ActiveScenarioOptions = FormatScenarioOptions(scenario.Options);
+    }
+
+    /// <summary>
+    /// Applies the routes produced by the legacy guidance import wizard.
+    /// </summary>
+    /// <param name="result">Import result to activate.</param>
+    public void ApplyLegacyImport(LegacyGuidanceImportResult result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+
+        UpdateRoutes(result.Scenario.Routes);
+        ActiveScenarioTitle = $"Legacy import: {result.FieldName}";
+        ActiveScenarioDescription = $"Imported {result.AbLines.Count} AB lines with {result.Boundary.Count} boundary points.";
+        ActiveScenarioOptions = FormatScenarioOptions(result.Scenario.Options);
     }
 
     /// <summary>

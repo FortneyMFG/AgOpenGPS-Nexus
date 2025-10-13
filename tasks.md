@@ -178,7 +178,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | NX-001 | A | Repo skeleton + solutions | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Tag v0.1.0-bootstrap after completion |
 | NX-002 | A | ADRs: language/runtime, gRPC, Avalonia, simulation model | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Link from README |
-| NX-006 | G | CI matrix (Win x64 + Linux arm64) | Planned |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Include lint + headless sim |
+| NX-006 | G | CI matrix (Win x64 + Linux arm64) | In Review | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Include lint + headless sim |
 
 ## Wave 1 – Contracts & Scaffolds
 
@@ -186,7 +186,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | NX-003 | A | Protobuf v1 (Header, Pose, Imu, SectionMask, SteerCmd/State, CanFrame, TimingCaps) | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Start Contracts Freeze 1 |
 | NX-004 | A | JSON schemas (Core, AGiO, UI, Simulation) | Planned |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Coordinate with Schema Owner |
-| NX-005 | A | Capabilities handshake proto/service | Planned |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | Smoke test between Core & AGiO |
+| NX-005 | A | Capabilities handshake proto/service | In Review |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | Smoke test between Core & AGiO |
 | NX-010 | B | Core host skeleton (Generic Host, DI, config, Serilog) | Planned |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) |  |
 | NX-011 | B | Event bus interfaces + tests | Planned |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) |  |
 | NX-014 | B | Settings + hot reload / route config | Planned |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Per-stream routing |

@@ -17,6 +17,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-116 Shared aog-link.proto schemas _(Planned)_
 - [ ] NX-126 Mapping plugin architecture ADR _(In Review)_
 - [ ] NX-131 Field job session lifecycle ADR _(Proposed)_
+- [ ] NX-152 .NET 8 runtime enforcement per ADR-001 _(Planned)_
+- [ ] NX-153 gRPC contract governance rollout _(Planned)_
+- [ ] NX-154 Avalonia companion run-mode delivery _(Planned)_
+- [ ] NX-155 Composite simulation fabric GA _(Planned)_
+- [ ] NX-156 AOG-Link transport rollout _(Planned)_
+- [ ] NX-157 Plugin API lease & manifest enforcement _(Proposed)_
 
 ### Section B — Core (Headless, Sim Graph)
 - [x] NX-010 Core host skeleton
@@ -63,6 +69,19 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-098 ISOBUS communications plugin _(Done)_
 - [x] NX-100 Combine yield monitoring plugin
 - [ ] NX-114 Variable-rate controller plugin _(Planned)_
+- [ ] NX-160 Official AutoSteer plugin GA _(Planned)_
+- [ ] NX-161 Official Mapping plugin GA _(Planned)_
+- [ ] NX-162 Official Sections plugin GA _(Planned)_
+- [ ] NX-163 Official Rate Control plugin GA _(Planned)_
+- [ ] NX-164 Official Variable Mapping plugin GA _(Planned)_
+- [ ] NX-165 Official ISOBUS Bridge plugin GA _(Planned)_
+- [ ] NX-166 Official GNSS/IMU Fusion plugin GA _(Planned)_
+- [ ] NX-167 Official NTRIP Client plugin GA _(Planned)_
+- [ ] NX-168 Official Device Manager plugin GA _(Planned)_
+- [ ] NX-169 Official Planter Monitor plugin GA _(Planned)_
+- [ ] NX-170 Official Job Tasks plugin GA _(Planned)_
+- [ ] NX-171 Official Telemetry Logging plugin GA _(Planned)_
+- [ ] NX-172 Official File IO plugin GA _(Planned)_
 
 ### Section E — UI (Avalonia) + Sim Bar
 - [x] NX-040 Avalonia app bootstrap
@@ -117,6 +136,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-101 Update SRS for combine yield monitoring plugin _(Done)_
 - [x] NX-103 Sync tasks.md with tasks.csv tracker _(Done)_
 - [x] NX-125 Stack responsibility reference ADR _(Done)_
+- [x] NX-151 Backlog update for ADR + official plugin tasks _(Done)_
 - [ ] NX-116 README experiment narrative refresh _(In Progress)_
 - [ ] NX-124 Spatial constraint zones ADR & SRS sync _(In Progress)_
 - [x] NX-134 Official plugin dependency map & manifests _(Done)_
@@ -168,6 +188,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-150 | ADR roadmap: PoseStream, layers, and control revamp | In progress |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Track upcoming ADR-007…ADR-020 deliverables and linked SRS requirements |
 | NX-115 | AOG-Link protocol specification and reference flows | Done |  | — | [SRS §3 Communications & Transports](docs/SRS/sections/03_Comm_Transports.md) | ADR-006 + SRS updates complete |
 | NX-116 | Shared `aog-link.proto` schemas with nanopb options | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Publish contracts aligned with `Aog.Abstractions` |
+| NX-152 | Enforce ADR-001 .NET 8 runtime baselines across solutions and CI | Planned |  | — | [ADR-001 .NET 8 runtime](docs/ADR/ADR-001-dotnet8-runtime.md) | Audit project targets, templates, and docs for `net8.0` compliance |
+| NX-153 | Operationalize ADR-002 gRPC contract governance and compatibility gates | Planned |  | — | [ADR-002 gRPC contracts](docs/ADR/ADR-002-grpc-contracts.md) | Add versioned schema reviews and bridge validation before releases |
+| NX-154 | Deliver ADR-003 Avalonia shell run modes (CompanionRemote/Local) | Planned |  | — | [ADR-003 Avalonia UI](docs/ADR/ADR-003-avalonia-ui.md) | Implement transport adapters, docs, and smoke tests for each mode |
+| NX-155 | Complete ADR-004 composite simulation fabric with regression packs | Planned |  | — | [ADR-004 Composite simulation](docs/ADR/ADR-004-composite-simulation.md) | Finalize SimClock/SimBus topic catalogs and seeded CI scenarios |
+| NX-156 | Roll out ADR-006 AOG-Link transports and bridge translation layers | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Ship Ethernet/RS-485/CAN drivers plus gRPC/PGN translators |
+| NX-157 | Implement ADR-018 plugin API leases, manifests, and AgIO migration | Proposed |  | — | [ADR-018 Plugin API](docs/ADR/ADR-018-plugin-api.md) | Core permission gate, manifest watcher, AgIO pluginization, CI lease tests |
 
 ### Section B — Core (Headless, Sim Graph)
 
@@ -223,6 +249,19 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-098 | ISOBUS communications plugin bridging CAN/UDP transports into Nexus routing | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Implement ISO 11783 PGN ingest + emit, handshake, and diagnostics |
 | NX-100 | Combine yield monitoring plugin with layer overlays and data export | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Capture live yield/moisture feeds and expose UI dashboards |
 | NX-114 | Variable-rate controller plugin consuming layer APIs | Planned |  | — | [SRS §3.7 Sections Control](docs/SRS/NOTES.md#srs-37-sections-control) | Converts imported layers into commanded rates |
+| NX-160 | Official AutoSteer plugin GA (pose fusion + actuator transport) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: mapping, GNSS/IMU fusion, AgIO; Soft: sections, device manager; transports per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-161 | Official Mapping plugin GA (field state store + AB/coverage feeds) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: Core store; Soft: file-io, job tasks, telemetry logging per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-162 | Official Sections plugin GA (coverage gating + IO orchestration) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: mapping + AgIO valves; Soft: rate-control, variable-mapping, telemetry per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-163 | Official Rate Control plugin GA (setpoint + actuator coordination) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: variable-mapping, AgIO; Soft: ISOBUS bridge, mapping telemetry per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-164 | Official Variable Mapping plugin GA (grid ingestion + setpoints) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: mapping layers, file-io; Soft: job-tasks, telemetry logging per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-165 | Official ISOBUS Bridge plugin GA (TC/UT translation) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: Core contracts + AgIO interface; Soft: rate-control diagnostics per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-166 | Official GNSS/IMU Fusion plugin GA (pose publisher) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: ntrip-client, AgIO sensors; Soft: telemetry logging, mapping overlays per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-167 | Official NTRIP Client plugin GA (RTCM streaming) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: AgIO network transport; Soft: telemetry logging, device manager per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-168 | Official Device Manager plugin GA (inventory + health) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: AgIO hardware inventory; Soft: UI shell telemetry badges per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-169 | Official Planter Monitor plugin GA (row sensing + analytics) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: AgIO row sensors + Core session store; Soft: mapping overlays, telemetry logging per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-170 | Official Job Tasks plugin GA (save/resume lifecycle) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: Core job services; Soft: file-io, mapping, telemetry per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-171 | Official Telemetry Logging plugin GA (replay + export) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: Core telemetry bus; Soft: plugin feeds (mapping, autosteer, device manager) per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-172 | Official File IO plugin GA (import/export surfaces) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: Core storage APIs; Soft: mapping, variable-mapping, job-tasks per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
 
 ### Section E — UI (Avalonia) + Sim Bar
 
@@ -285,6 +324,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-101 | Update SRS with combine yield monitoring plugin requirements | Done | AI | — | [SRS §15 Engine & Machine Gauges](docs/SRS/sections/15_Engine_Machine_Gauges.md) | Capture yield/moisture ingestion, calibration, overlays, and exports |
 | NX-103 | Sync tasks.md with tasks.csv progress tracker | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Align statuses and backlog entries |
 | NX-125 | Stack responsibility reference ADR | Done |  | — | [ADR-028](docs/ADR/ADR-028-stack-boundaries.md) | Document layer boundaries for AgIO, Core, and plugins |
+| NX-151 | Backlog update for ADR + official plugin tasks | Done | AI | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Extend tasks.md/.csv with ADR coverage and plugin roadmap |
 | NX-124 | Spatial constraint zones ADR & SRS sync | In Progress | AI | — | [SRS §3 Communications](docs/SRS/sections/03_Comm_Transports.md) | Add ZoneService requirements and constraint policies |
 | NX-141 | Companion/mobile stack rollout documentation | In Progress | AI | — | [SRS §5 Frontends](docs/SRS/sections/05_Frontends.md) | Capture CompanionRemote, LocalInProc, and LocalOutOfProc run modes across docs |
 

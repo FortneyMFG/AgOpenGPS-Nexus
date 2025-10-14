@@ -25,6 +25,11 @@ Adopt the plugin dependency map as the authoritative specification for the first
   - Stricter loader enforcement could block legacy combinations; mitigated by allowing operators to acknowledge Soft dependency gaps and by publishing migration guides alongside manifest updates.【F:docs/plugins/nexus-plugin-dependency-map.md†L109-L205】
   - CI validation introduces overhead; mitigated by shared tooling templates and manifest unit tests distributed with plugin repositories.【F:docs/plugins/nexus-plugin-dependency-map.md†L167-L421】
 
+### Degraded operation & messaging
+- **Soft dependency gaps:** Core records explicit `dependency:soft` warnings and forwards them to Device Manager, which shows dismissible notices that explain which automations are paused. JobsService and PresetsService mirror the same status so operators see consistent messaging regardless of entry point.
+- **Hard dependency failures:** When a hard dependency cannot be satisfied, Core quarantines the requesting plugin but continues startup for the rest of the bundle. The UI surfaces a blocking modal that links to remediation steps (update, enable missing plugin, or accept degraded mode where available) rather than exiting the application abruptly.
+- **Version drift:** If manifests declare ranges outside the currently running Core/AgIO versions, the loader offers an explicit "Launch in compatibility mode" path that tags the session as unsupported. Crash reports include the drift metadata so support can prioritize fixes, and automation features default to safe/manual states.
+
 ## Follow-up Actions
 - Implement manifest schema validation in CI and as part of the `nexus plugin pack` tooling.
 - Extend Core loader to resolve dependency graph orderings and emit actionable diagnostics for missing Hard dependencies.

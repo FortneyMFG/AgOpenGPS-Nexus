@@ -1,4 +1,4 @@
-# ADR-030: Presets and Layout Linking for Equipment Workflows
+# ADR-032: Presets and Layout Linking for Equipment Workflows
 
 ## Status
 Proposed
@@ -8,6 +8,11 @@ Operators need to rapidly switch between tractor + implement combinations while 
 
 ## Decision
 Adopt a Preset model that binds Equipment, Implement, and Layout selections into reusable bundles with support for either live-linked or snapshot Layout references. Layouts will be versioned documents that can inherit from a parent, enabling organization-wide baselines with local overrides. The system will surface dependency graphs, diff tooling, and guardrails to manage changes. Applying a preset will trigger Task executions (e.g., loading implement profiles, warming up GNSS) whose progress is observable in the UI.
+
+## Degraded operation & messaging
+- **Missing dependencies:** When required dependencies (e.g., Sections or Mapping plugins) are absent or unhealthy, the Preset Switcher exposes a disabled state with inline reasons sourced from the dependency matrix (ADR-031). Operators can still review presets/layouts, but task orchestration is paused until dependencies recover. Background retries are surfaced as toast notifications rather than silent failures.
+- **Job service offline:** Presets that rely on job context degrade to snapshot-only mode. The UI labels the active job as "Local-only" and automatically journals preset/layout selections so the JobsService can reconcile once it returns. Drive-In prompts continue to function using cached presets, but any automation that normally journaled to the job metadata emits warnings in the Activity pane.
+- **Layout link breakage:** When a live-linked layout version becomes unavailable (missing file, failed migration), the operator is prompted to either re-link to the last known good version or convert to a snapshot. Changes remain local until the operator explicitly resolves the broken link, preventing silent divergence across machines.
 
 ## Consequences
 - Positive impacts

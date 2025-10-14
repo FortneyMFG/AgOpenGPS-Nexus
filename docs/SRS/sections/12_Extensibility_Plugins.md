@@ -28,9 +28,9 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - R-EXT-133 (SHOULD, remote plugins): Document requirements for remote plugin connections (mTLS, leases, restart policies) so edge clusters and cab computers behave consistently.
 - R-EXT-134 (SHOULD, audit trails): Capture plugin health, command history, and configuration edits in a provenance stream to satisfy Section 09 control audit requirements.
 - R-EXT-140 (MUST, job lifecycle hooks): Expose plugin lifecycle callbacks (`onJobOpen`, `onJobSave`, `onJobClose`, `onJobImport`) gated by `jobs.lifecycle` permissions so importers, analytics, and automation modules participate deterministically in job workflows.【F:docs/ADR/ADR-030-field-job-sessions.md†L47-L86】
-- R-EXT-141 (SHOULD, preset orchestration): Provide SDK helpers and permissions for presets/layout services so plugins can request preset applications, contribute validators, and register dependency graph observers without bypassing Core arbitration.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L11-L62】
+- R-EXT-141 (SHOULD, preset orchestration): Provide SDK helpers and permissions for presets/layout services so plugins can request preset applications, contribute validators, and register dependency graph observers without bypassing Core arbitration.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L7-L34】
 - R-EXT-142 (SHOULD, Drive-In providers): Allow plugins to register Drive-In discovery sources and job importers while Core enforces schema validation and provenance logging for contributed assets.【F:docs/ADR/ADR-030-field-job-sessions.md†L47-L86】
-- R-EXT-143 (SHOULD, task orchestration API): Standardize background task submission, progress streaming, and retry semantics so preset-related preparation work remains observable and restartable across plugins and UI shells.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L19-L62】
+- R-EXT-143 (SHOULD, task orchestration API): Standardize background task submission, progress streaming, and retry semantics so preset-related preparation work remains observable and restartable across plugins and UI shells.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L17-L34】
 
 ## Options
 - O-EXT-0: Status quo — Extend by modifying source projects and rebuilding.

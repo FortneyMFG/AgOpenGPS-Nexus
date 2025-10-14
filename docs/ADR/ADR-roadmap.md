@@ -2,8 +2,6 @@
 
 This tracker consolidates current and planned Architecture Decision Records so the Nexus team can stage the PoseStream, section control, and variable-rate overhaul in one place. It links each ADR to the SRS requirements that must be satisfied before drafting or promoting the decision for review.【F:tasks.md†L131-L137】 Use it to coordinate sequencing, ensure prerequisite requirements are in place, and keep the community focused on the same backlog of decisions.
 
-> **Numbering note:** Two proposals currently occupy the ADR-030 slot (field job sessions and presets/layout linking). They are tracked separately here until one of the authors renumbers the follow-up document.【F:docs/ADR/ADR-030-field-job-sessions.md†L1-L55】【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L1-L41】
-
 ## Adopted decisions (foundation)
 
 | ADR | Title | Status | Key SRS coverage | Requirement anchors |
@@ -18,6 +16,16 @@ This tracker consolidates current and planned Architecture Decision Records so t
 ## Active proposals & in-flight drafts
 
 Draft authors should reference the listed requirements and tasks before opening a proposal so prerequisite SRS coverage is already in place.
+
+### Early unblockers — High fan-in contracts
+- **ADR-010 Layer registry (skeleton)** — Ship a minimal `LayerDefinition` schema draft with hash handshake semantics so mapping, presets, and analytics workstreams can start API reviews before the full catalog governance ADR lands.
+- **ADR-022 CRS policy (preview)** — Publish the CRS normalization matrix and reprojection rules referenced by ADR-027/ADR-029 to unblock cross-pod alignment on spatial math and deterministic replay.
+- **ADR-031 Manifest governance (CI stub)** — Land the manifest validator CLI plus CI gate to let plugin teams iterate against a concrete toolchain while the broader governance ADR proceeds through review.
+
+### Cross-track integration slice — PoseStream → Controller → Guidance preview
+- **Vertical scope:** PoseStream ingest, LayerController stub, Section Arbiter happy-path, and Guidance preview widget stitched together with the NullMapping provider.
+- **Objective:** Exercise ADR-027, ADR-029, and ADR-030 interfaces in concert before full drafts complete, smoke out capability registry assumptions, and validate degraded-mode messaging when optional plugins are absent.
+- **Exit criteria:** End-to-end replay that drives the guidance preview using the shared timebase, emits dependency warnings when mapping/plugins are missing, and records a job session journal entry for the run.
 
 ### ADR-027 — Spatial constraints & zone policies
 - **Owner:** Core Owner — PoseStream & Control pod
@@ -61,15 +69,15 @@ Draft authors should reference the listed requirements and tasks before opening 
   - Legacy archive migration harness must convert ≥ 50 representative jobs with zero schema validation failures and emit warnings for every downgraded field.
   - Drive-In geofence discovery must populate implement entry/exit events with ≤ 50 cm spatial error when evaluated against recorded RTK datasets.
 
-### ADR-030 (Presets & layout linking) — Equipment workflow presets
+### ADR-032 — Presets & layout linking for equipment workflows
 - **Owner:** UI Owner — Device & Layout pod
 - **Stage:** In Review (target sign-off window: 2025-11-07 week)
 - **Dependencies:** ADR-030 (job sessions); ADR-031 (plugin manifest governance); ADR-015 (section control semantics)
-- **Scope:** Deliver presets that bind equipment, implements, and layouts with live-link or snapshot semantics, plus task orchestration that surfaces progress when presets change machine context.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L7-L35】
-- **Key decisions:** Preset/Layout service contracts, versioned layout documents with inheritance, live-link vs. snapshot behavior, diff/rollback tooling, and task orchestration APIs surfaced in the UI.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L11-L39】
+- **Scope:** Deliver presets that bind equipment, implements, and layouts with live-link or snapshot semantics, plus task orchestration that surfaces progress when presets change machine context.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L7-L35】
+- **Key decisions:** Preset/Layout service contracts, versioned layout documents with inheritance, live-link vs. snapshot behavior, diff/rollback tooling, and task orchestration APIs surfaced in the UI.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L11-L39】
 - **SRS alignment:** Frontends (§05 preset switcher & diff tooling), Data Model (§08 preset/layout provenance), Extensibility (§12 task orchestration & permissions).【F:docs/SRS/sections/05_Frontends.md†L22-L25】【F:docs/SRS/sections/08_Data_Model_Storage.md†L24-L27】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L29-L32】
 - **Primary requirements:** R-FE-050…R-FE-053; R-DATA-029…R-DATA-032; R-EXT-140…R-EXT-143.【F:docs/SRS/sections/05_Frontends.md†L22-L25】【F:docs/SRS/sections/08_Data_Model_Storage.md†L24-L27】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L29-L32】
-- **Tasks:** Presets/Layout services, layout diff tooling, preset switcher UI, task orchestration service, fixture catalog, migration utilities.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L41-L74】
+- **Tasks:** Presets/Layout services, layout diff tooling, preset switcher UI, task orchestration service, fixture catalog, migration utilities.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L41-L74】
 - **Acceptance hooks:**
   - Preset application regression pack must execute 12 reference scenarios with ≤ 1 frame of section jitter when switching between live-link implements.
   - Layout inheritance diff tool must emit human-readable change summaries with coverage for adds/removes/overrides and demonstrate < 5% false-positive rate across seeded fixtures.

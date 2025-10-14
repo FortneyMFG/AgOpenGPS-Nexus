@@ -114,6 +114,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-101 Update SRS for combine yield monitoring plugin _(Done)_
 - [x] NX-103 Sync tasks.md with tasks.csv tracker _(Done)_
 - [ ] NX-116 README experiment narrative refresh _(In Progress)_
+- [ ] NX-124 Spatial constraint zones ADR & SRS sync _(In Progress)_
 
 ### Section H — Safety & QA
 - [x] NX-070 Heartbeats & failsafe watchdogs
@@ -278,6 +279,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-099 | Update SRS with ISOBUS communications plugin requirements | Done |  | — | [SRS §12 Extensibility & Plugins](docs/SRS/sections/12_Extensibility_Plugins.md) | Define PGN mappings, diagnostics, and UI references |
 | NX-101 | Update SRS with combine yield monitoring plugin requirements | Done | AI | — | [SRS §15 Engine & Machine Gauges](docs/SRS/sections/15_Engine_Machine_Gauges.md) | Capture yield/moisture ingestion, calibration, overlays, and exports |
 | NX-103 | Sync tasks.md with tasks.csv progress tracker | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Align statuses and backlog entries |
+| NX-124 | Spatial constraint zones ADR & SRS sync | In Progress | AI | — | [SRS §3 Communications](docs/SRS/sections/03_Comm_Transports.md) | Add ZoneService requirements and constraint policies |
 
 ### Section H — Safety & QA
 

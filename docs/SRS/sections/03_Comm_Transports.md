@@ -15,6 +15,27 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - R-COMM-012 (SHOULD, transport-hardening): Establish latency budgets (<100 ms round-trip for control loops, <500 ms for monitoring) and error budgets (≤0.1% packet loss after retries) for any new gRPC/WebSocket channels so contributors know when the slice is ready to graduate from proposal to review.
 - R-COMM-013 (SHOULD, security posture): Document optional encryption/authentication expectations (TLS 1.3, mutual certs or token auth) for modern transports while ensuring PGN bridges can operate offline when credentials are unavailable.
 
+## Adopted architecture (ADR alignment)
+- [ADR-002](../../ADR/ADR-002-grpc-contracts.md) establishes gRPC/protobuf as the authoritative **inter-process** API between Core, UI, plugins, automation tooling, and the Bridge/AgIO hosts. All desktop/server processes share the generated `Aog.Abstractions` clients while transports below the Bridge remain opaque to them.
+- [ADR-006](../../ADR/ADR-006-aog-link-mcu-communications.md) defines **AOG-Link** as the MCU communications layer using nanopb datagrams over Ethernet, RS-485/serial, or CAN. The Bridge service translates between gRPC contracts, AOG-Link frames, and legacy PGN flows so firmware evolution does not alter higher-layer APIs.
+
+### AOG-Link MCU datagram protocol
+AOG-Link standardizes MCU-to-host and MCU-to-MCU exchanges on compact protobuf messages compiled with nanopb. Every packet begins with a fixed header of `{version, class, type, seq, src, dst, len}` followed by the protobuf payload; serial links append a CRC-16 after the payload. The fields mirror the IDs exposed through the gRPC contracts so the Bridge can map between the layers without lossy transforms.
+
+**Transports:**
+
+- **UDP (Ethernet/Wi-Fi):** Telemetry, discovery, and MCU-to-MCU data publish on multicast `239.10.6.1:16666`, while command/ack flows use unicast with retry/timeout handling. Payloads stay ≤600 B to avoid fragmentation, and the same packet framing is shared with the serial variant for firmware simplicity.
+- **RS-485/serial:** Packets reuse the common header/payload, wrapped in COBS with a CRC-16 trailer. Deployments target 115200–1Mbaud multi-drop links with a simple token or host-directed slot every ~5 ms to prevent collisions.
+- **CAN / CAN-FD:** Extended 29-bit identifiers follow `priority (3) | class (2) | type (10) | dest (8) | src (8)`, enabling silicon filtering by message type. CAN-FD single frames encode `[ver][seq][len][flags][protobuf…]`; larger messages either segment through ISO-TP (works on CAN 2.0 and FD) or a lightweight fragment header `[ver][seq][frag_idx][frag_cnt][payload…]` when `flags.fragmented` is set.
+
+**Reliability and arbitration:** Commands mark `flags.needs_ack` and expect an acknowledgement echoing the original `type` and `seq`. Telemetry remains fire-and-forget, but listeners drop stale sources once sequence gaps exceed 300 ms and declare failover at 500 ms. Heartbeat messages advertise `{role, priority, capabilities}` at 1 Hz so multiple MCUs can self-elect producers or consumers per data class.
+
+**MCU-to-MCU data sharing:** Speed, rate, section-state, and override information reuse the same message types used between the host and MCUs. Arbitration favors the highest-priority publisher for each class while still exposing lower-priority data for diagnostics. Suggested cadences: speed 10–20 Hz, section-state 2–5 Hz plus on change, rate 5 Hz, heartbeat 1 Hz.
+
+**Firmware guidance:** Nanopb options should prefer fixed-width numeric fields and compact enums to keep payloads ≤48 B where possible, ensuring single-frame delivery on CAN-FD and minimal ISO-TP fragmentation on classical CAN. Modules log `{device_id, seq, stale_ms}` per data class for diagnostics and fall back to fail-safe outputs if inputs remain stale beyond 500–1000 ms.
+
+Discovery, heartbeat, and time-sync flows originate from the Bridge, which also exposes conversion shims for legacy PGN UDP devices to remain operational during migration. MCU firmware reuses the shared `.proto` schemas from `Aog.Abstractions`, enabling the Bridge to translate losslessly between gRPC topics and AOG-Link datagrams while keeping PGN expansion frozen to maintenance-only fixes.
+
 ## Options
 - O-COMM-0: Status quo — AgIO-managed UDP + serial PGN transports with optional NTRIP.
 - O-COMM-1: Consolidate on a single binary framing library shared across serial/UDP/CAN.
@@ -23,7 +44,7 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - O-COMM-4: Embed a REST API around PGN state for web dashboards.
 - O-COMM-5: [Versioned variable-rate PGN suite](../options/O-COMM-5_VariableRatePGNs.md) — Sequenced layer streams with schema handshakes.
 - O-COMM-6: [PGN compatibility bridge layered over new APIs](../options/O-COMM-6_PGNCompatibilityBridge.md) — Legacy PGNs in, typed events out.
-- O-COMM-7: gRPC/protobuf API surface published via `Aog.Abstractions` NuGet and consumed by Core/UI/Plugins while AgIO backends handle transport specifics.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L36】
+- O-COMM-7: gRPC/protobuf API surface published via `Aog.Abstractions` NuGet and consumed by Core/UI/Plugins while AgIO/Bridge backends handle transport specifics.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L36】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |

@@ -21,6 +21,13 @@ Standardise the Nexus codebase on C# targeting .NET 8 for every first-party comp
   - Scaffold the `Aog.Abstractions` package with generated protobuf contracts (NX-003).
   - Define CI lanes that validate Windows and Linux builds for .NET 8 targets (NX-006).
 
+## Legacy Implementation Notes
+### AgOpenGPS v6
+- Windows remains the only supported runtime, with WinForms and WPF projects compiled as Windows desktop executables, so the stack is tied to the .NET Framework toolchain and lacks cross-platform parity today.【F:docs/SRS/sections/01_OS_Support.md†L6-L13】【F:docs/SRS/sections/02_Framework_UI.md†L6-L17】
+
+### Legacy Dev Branch
+- The community dev branch follows the same Windows-only WinForms/WPF approach, reflecting the status-quo option of incremental modernization without a shared cross-platform runtime or packaging story.【F:docs/SRS/sections/01_OS_Support.md†L6-L13】【F:docs/SRS/sections/02_Framework_UI.md†L16-L29】
+
 ## References
 - [Section 01 — OS Support](../SRS/sections/01_OS_Support.md)
 - [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/O-STACK-1_DotNet8Avalonia.md)

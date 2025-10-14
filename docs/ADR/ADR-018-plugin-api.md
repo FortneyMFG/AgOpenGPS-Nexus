@@ -33,6 +33,13 @@ Establish a gRPC-first plugin architecture composed of:
   - Migrate AgIO into the plugin runtime and expose device enumeration + firmware bridge contracts under the new permission model.
   - Add CI smoke tests that load/unload plugins, verify permission enforcement, and ensure disabling a plugin removes its outputs until reenabling reproduces identical results.
 
+## Legacy Implementation Notes
+### AgOpenGPS v6
+- Extension today means editing the shared solution directly—AgOpenGPS, AgIO, and companion tools link common libraries but ship as monolithic executables without any manifest or permission boundary.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L24】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L30-L41】
+
+### Legacy Dev Branch
+- The dev branch follows the same status-quo model (Option O-EXT-0), so contributors fork source to add features and must rebuild the entire suite, with no lifecycle governance or security gating around extensions.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L30-L56】
+
 ## References
 - [Section 03 — Communications & Transports](../SRS/sections/03_Comm_Transports.md)
 - [Section 05 — Frontends](../SRS/sections/05_Frontends.md)

@@ -15,6 +15,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-104 Metadata-driven variable-rate layer mapping ADR _(Done)_
 - [x] NX-115 AOG-Link protocol specification _(Done)_
 - [ ] NX-116 Shared aog-link.proto schemas _(Planned)_
+- [ ] NX-126 Mapping plugin architecture ADR _(In Review)_
 
 ### Section B — Core (Headless, Sim Graph)
 - [x] NX-010 Core host skeleton

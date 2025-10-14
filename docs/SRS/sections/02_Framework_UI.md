@@ -12,6 +12,8 @@ Determine the presentation technologies and layout systems that power both the l
 - R-UI-005 (SHOULD, proposed-LinuxCore): Provide frontends that can attach to a headless Core over gRPC/WebSocket while keeping Windows UX intact for local rigs.【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L1-L34】
 - R-UI-006 (COULD, proposed-LinuxCore): Evaluate kiosk-friendly cross-platform stacks (Qt, Avalonia, Web) with touch parity and offline theming presets.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L1-L44】【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L1-L34】
 - R-UI-007 (SHOULD, accessibility): Ensure any future UI stack supports high-DPI scaling, configurable color-contrast presets, and localization hooks (fonts, RTL layouts) so metadata-driven dashboards remain operable for diverse operators across cab lighting conditions.
+- R-UI-008 (MUST, shared mobile shell): Keep the Avalonia project free of platform-specific UI forks by driving mobile builds (Android/iOS) through dependency-injected services for transports, storage, and permissions while reusing the same view models and theming.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L44】
+- R-UI-009 (SHOULD, run-mode toggles): Provide a configuration surface (appsettings/UI) that flips between CompanionRemote, LocalInProc, and LocalOutOfProc so QA can validate all modes without rebuilding.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L42】
 
 ## Options
 - O-UI-0: Status quo — WinForms primary UI with incremental WPF modernization.
@@ -42,6 +44,7 @@ Touch ergonomics, latency, GPU access, designer productivity, theming support, a
 - Keep WinForms operational while defining what the WPF shell must ship before asking operators to migrate.
 - The Avalonia + gRPC client is now the leading candidate for a shared Windows/Linux UI because it keeps the C# skillset while unlocking Pi/CM5 deployments and optional Windows-native shells.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L79】
 - Contributors want proof that metadata-driven layouts and remote clients can coexist without fragmenting operator workflows before endorsing a wholesale toolkit switch.【F:docs/SRS/options/O-UI-5_MetadataDrivenDashboards.md†L52-L64】【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L21-L34】
+- Mobile pilots should reuse the same Avalonia shell so Android/iOS companions launch quickly and later embed Core with minimal UI churn, demonstrating the value of a single .NET 8 stack.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L44】【F:docs/SRS/sections/05_Frontends.md†L26-L72】
 
 ## Open questions
 - Can we abstract OpenGL usage so both WinForms and WPF (or future UI) reuse the renderer?

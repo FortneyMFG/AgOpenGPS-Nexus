@@ -23,6 +23,10 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - R-FE-051 (SHOULD, job drawer details): Display job metadata (boundaries, coverage status, guidance sets, presets/layout links) with Drive-In prompts and autosave warnings so operators see lifecycle context at a glance.【F:docs/ADR/ADR-030-field-job-sessions.md†L41-L86】
 - R-FE-052 (SHOULD, preset switcher & diff): Provide preset selectors, layout diff viewers, and snapshot/live-link indicators so operators understand the impact of applying presets or editing shared layouts.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L11-L53】
 - R-FE-053 (SHOULD, task orchestration UI): Surface task progress, retries, and failures triggered by preset or layout changes so background preparation steps remain transparent and actionable.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L25-L62】
+- R-FE-060 (MUST, companion rollout): Ship a connection center that handles discovery (mDNS/manual), authentication, reconnect, and health states so Android/iOS tablets can attach to Core/AgIO over gRPC or gRPC-Web without bespoke builds.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L31】
+- R-FE-061 (SHOULD, offline resilience): Provide an offline cache for boundaries, guidance sets, and coverage so companion clients continue rendering field context while disconnected and resync when links return.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L31】
+- R-FE-062 (MUST, run mode switching): Expose a `RunMode` setting with `CompanionRemote`, `LocalInProc`, and `LocalOutOfProc` values that swap the `ICoreTransport` implementation via DI, keeping view models identical across desktop and mobile builds.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L42】
+- R-FE-063 (SHOULD, feature gating): Introduce feature flags (e.g., `EnableAutosteer`, `EnableAgioHardware`) so mobile deployments can hide unavailable controls while still compiling from the same Avalonia project.【F:docs/ADR/ADR-003-avalonia-ui.md†L33-L42】
 
 ### R-FE — Plugin UI contributions
 - R-FE-030 (MUST, plugin manifest UI): Load plugin-declared panels, config pages, and map overlays at runtime using declarative manifests so Core/UI updates do not require recompiling plugin visuals.
@@ -60,6 +64,12 @@ Operator familiarity, deployment friction, offline resilience, latency, maintain
 - The Avalonia desktop frontend is now viewed as the preferred successor because it keeps one C# codebase and can slide into the Windows quick-start flow before expanding to Pi/CM5 deployments.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L79】
 - Remote-first clients are attractive if they piggyback on the Core without forcing Windows operators to learn a new UI overnight.【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L21-L34】
 - Simulation tooling should reuse the same controls regardless of data source so operators can blend hardware inputs with plugin-provided scenarios without context switching.
+
+## Mobile companion and embedded roadmap
+- **CompanionRemote (today):** Android builds speak gRPC directly while iOS falls back to gRPC-Web through an Envoy/grpcwebproxy sidecar. The connection center covers discovery, TLS/auth, and reconnect states so the same UI ships as a remote monitor for Core + AgIO rigs.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L31】
+- **LocalInProc (next):** Package Core as a library referenced by the Avalonia app. DI swaps the transport to an in-process adapter, enabling “lite” offline workflows with feature gates and local telemetry persistence on mobile devices.【F:docs/ADR/ADR-003-avalonia-ui.md†L32-L36】
+- **LocalOutOfProc (later):** Embed Core as a self-contained binary launched via platform services (Android foreground service, Windows/Linux process). The UI continues using gRPC against `127.0.0.1`, preserving crash isolation, logging, and security patterns shared with desktop shells.【F:docs/ADR/ADR-003-avalonia-ui.md†L36-L42】
+- **AgIO convergence:** Android platforms extend the same transport abstraction to USB-OTG serial, Bluetooth SPP, and BLE so AgIO features can move in-process once the mobile host proves stable, while iOS companions remain remote-first and rely on BLE/Wi-Fi to reach bridge hardware.【F:docs/ADR/ADR-003-avalonia-ui.md†L43-L44】
 
 ## Open questions
 - Which screens must be mirrored vs. reimagined for mobile?

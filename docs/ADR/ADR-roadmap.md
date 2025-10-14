@@ -25,11 +25,14 @@ Draft authors should reference the listed requirements and tasks before opening 
 ### Cross-track integration slice — PoseStream → Controller → Guidance preview
 - **Vertical scope:** PoseStream ingest, LayerController stub, Section Arbiter happy-path, and Guidance preview widget stitched together with the NullMapping provider.
 - **Objective:** Exercise ADR-027, ADR-029, and ADR-030 interfaces in concert before full drafts complete, smoke out capability registry assumptions, and validate degraded-mode messaging when optional plugins are absent.
+- **Approach adjustment:** Lead with the ADR-031 manifest validator running inside the replay CI harness so NullMapping, ZoneService, and JobsService mocks must declare capabilities before the slice boots. Follow with Section Arbiter + Guidance preview wiring once manifest gating passes, keeping optional providers behind capability fallbacks rather than hard-coded wiring.
+- **Validation harness:** Extend `nexus sim replay --slice cross-track` to drive the slice in headless CI, capturing PoseStream, controller outputs, dependency warnings, and job journal events for regression comparison.
 - **Exit criteria:** End-to-end replay that drives the guidance preview using the shared timebase, emits dependency warnings when mapping/plugins are missing, and records a job session journal entry for the run.
+- **NX task alignment:** NX-124, NX-126, NX-131, NX-157.
 
 ### ADR-027 — Spatial constraints & zone policies
 - **Owner:** Core Owner — PoseStream & Control pod
-- **Stage:** Drafting (target review window: 2025-10-27 week)
+- **Stage:** Proposed (target review window: 2025-10-27 week)
 - **Dependencies:** ADR-028 (stack boundaries, accepted); ADR-010 (layer registry draft); ADR-031 (plugin manifest governance)
 - **Scope:** Stand up a ZoneService with first-class boundary, headland, keep-out, and work-disabled polygons so guidance, section control, and visualization share deterministic constraint context across live runs and replays.【F:docs/ADR/ADR-027-spatial-constraints.md†L7-L55】
 - **Key decisions:** Canonical zone types and buffered footprints, storage/indexing strategy, PoseStream zone bitmask semantics, control arbiter gates, and shared UX contracts for overrides and provenance.【F:docs/ADR/ADR-027-spatial-constraints.md†L11-L64】
@@ -40,10 +43,11 @@ Draft authors should reference the listed requirements and tasks before opening 
   - 95th percentile zone-mask propagation latency ≤ 120 ms from ingest to section arbiter under 20 Hz PoseStream load (measured on reference sim fixture).
   - Constraint gate fault-injection: forced keep-out toggles must block section enable within two PoseStream frames and emit override telemetry with actor, reason, and expiry fields populated.
   - Override audit log retention verified across crash-recovery scenario with ≤ 1 lost entry for a 30-minute replay.
+- **NX task alignment:** NX-124, NX-157.
 
 ### ADR-029 — Mapping plugin architecture & geospatial kernel split
 - **Owner:** Core Owner — Mapping & Replay pod
-- **Stage:** In Review (target sign-off window: 2025-11-03 week)
+- **Stage:** Proposed (target sign-off window: 2025-11-03 week)
 - **Dependencies:** ADR-028 (stack boundaries); ADR-031 (plugin bundle governance); ADR-022 (CRS policy, pending draft)
 - **Scope:** Move mapping engines into plugins while Core keeps a minimal geospatial kernel (CRS transforms, tiling helpers, monotonic timebase, deterministic replay scaffolding, null providers). Ensure headless rigs and alternate pose sources can run without mapping while variable-rate and sections consume a stable Mapping API.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L7-L84】
 - **Key decisions:** Mapping contracts in `Aog.Abstractions`, capability registry entries (`mapping:raster@v1`, `mapping:vector@v2`), event bus fan-out, replay taps, and plugin lifecycle/health semantics.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L19-L84】
@@ -54,10 +58,11 @@ Draft authors should reference the listed requirements and tasks before opening 
   - NullMapping provider start-up must complete < 350 ms (p95) on reference hardware and publish healthy status before section plugins request pose transforms.
   - Capability registry integration tests must fail-fast (< 2 s) when a plugin declares incompatible `mapping:*` capabilities, with actionable error messaging surfaced in Device Manager.
   - Replay tap verification: 60-minute PoseStream replay must render identical raster tiles (checksum parity) when run against headless Core with and without mapping plugins loaded, proving deterministic tap semantics.
+- **NX task alignment:** NX-126, NX-161.
 
 ### ADR-030 — Field job sessions & lifecycle services
 - **Owner:** Core Owner — Lifecycle & UI pod
-- **Stage:** Drafting (target review window: 2025-10-31 week)
+- **Stage:** Proposed (target review window: 2025-10-31 week)
 - **Dependencies:** ADR-028 (stack boundaries); ADR-029 (mapping kernel availability); ADR-031 (plugin manifest governance)
 - **Scope:** Establish a job metadata schema, filesystem job store, and Core-hosted lifecycle service so New/Resume/Open/Drive-In flows share deterministic state across Core, UI, plugins, and import pipelines while remaining compatible with legacy archives.【F:docs/ADR/ADR-030-field-job-sessions.md†L7-L58】
 - **Key decisions:** Versioned `aog.job.v1` schema, job folder layout, JobsService verbs, UI drawer/menu parity, plugin lifecycle hooks, and autosave/journaling expectations.【F:docs/ADR/ADR-030-field-job-sessions.md†L13-L86】
@@ -68,10 +73,11 @@ Draft authors should reference the listed requirements and tasks before opening 
   - Resume-from-crash scenario must restore the active job within 8 seconds and without duplicating more than one PoseStream segment in audit logs.
   - Legacy archive migration harness must convert ≥ 50 representative jobs with zero schema validation failures and emit warnings for every downgraded field.
   - Drive-In geofence discovery must populate implement entry/exit events with ≤ 50 cm spatial error when evaluated against recorded RTK datasets.
+- **NX task alignment:** NX-131, NX-170.
 
 ### ADR-032 — Presets & layout linking for equipment workflows
 - **Owner:** UI Owner — Device & Layout pod
-- **Stage:** In Review (target sign-off window: 2025-11-07 week)
+- **Stage:** Proposed (target sign-off window: 2025-11-07 week)
 - **Dependencies:** ADR-030 (job sessions); ADR-031 (plugin manifest governance); ADR-015 (section control semantics)
 - **Scope:** Deliver presets that bind equipment, implements, and layouts with live-link or snapshot semantics, plus task orchestration that surfaces progress when presets change machine context.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L7-L35】
 - **Key decisions:** Preset/Layout service contracts, versioned layout documents with inheritance, live-link vs. snapshot behavior, diff/rollback tooling, and task orchestration APIs surfaced in the UI.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L11-L39】
@@ -82,10 +88,11 @@ Draft authors should reference the listed requirements and tasks before opening 
   - Preset application regression pack must execute 12 reference scenarios with ≤ 1 frame of section jitter when switching between live-link implements.
   - Layout inheritance diff tool must emit human-readable change summaries with coverage for adds/removes/overrides and demonstrate < 5% false-positive rate across seeded fixtures.
   - Task orchestration telemetry must surface preset apply progress within 500 ms of state change and include correlated job/session IDs for audit.
+- **NX task alignment:** NX-130, NX-170.
 
 ### ADR-031 — Official plugin bundle & dependency governance
 - **Owner:** Plugins Owner — Bundle governance pod
-- **Stage:** Drafting (target review window: 2025-11-10 week)
+- **Stage:** Proposed (target review window: 2025-11-10 week)
 - **Dependencies:** ADR-028 (stack boundaries); ADR-010 (layer registry for manifest hashes); ADR-026 (performance budgets, pending)
 - **Scope:** Ratify the authoritative manifest schema, dependency matrices, and compatibility policy for the first-party plugin bundle (guidance, mapping, rate/section control, IO bridges, UI shell) so deployments can validate stack integrity before activation.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】
 - **Key decisions:** Manifest compliance tooling, dependency classification (hard/soft/suggest), release cadence for manifest updates, and how Core enforces mismatched ranges during plugin load.【F:docs/plugins/nexus-plugin-dependency-map.md†L13-L421】
@@ -96,6 +103,7 @@ Draft authors should reference the listed requirements and tasks before opening 
   - CI schema validation job must complete in < 90 s and block merges when dependency ranges conflict or when transitive manifests omit required hashes.
   - Core loader integration must quarantine incompatible plugins and emit structured diagnostics (`manifestError`) consumable by UI/telemetry pipelines within 250 ms of load attempt.
   - UI compatibility dashboard must present bundle health with pass/warn/fail states and include remediation links for at least the top 10 first-party plugins.
+- **NX task alignment:** NX-134, NX-157, NX-168.
 
 ### ADR-032 — Layer controllers & aggregation runtime
 - **Owner:** Core Owner — Layer Controllers pod

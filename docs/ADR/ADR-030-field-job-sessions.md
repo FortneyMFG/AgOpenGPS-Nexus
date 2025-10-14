@@ -27,6 +27,11 @@ Establish Jobs as a first-class concept spanning Core, UI, and plugins with the 
 - **Shared layout & preset context.** Jobs may reference presets or layouts by link or snapshot, letting seasonal layout updates propagate automatically while preserving overrides when required.
 - **Follow-up work.** Implement the `aog.job.v1` schema and helpers, build the JobsService host, refresh the UI menu and drawer, port ISOXML/KML importers, add Drive-In discovery with geofence indexing, wire autosave + coverage journaling, and provide migration tools for V6 archives.
 
+## Validation
+- **Crash recovery:** Resume-from-crash workflows must restore the previously active job within 8 seconds and avoid duplicating more than one PoseStream segment in journal entries.
+- **Migration coverage:** The legacy archive migration harness must successfully convert at least 50 representative V6 jobs without schema validation failures, emitting warnings whenever fields are downgraded or skipped.
+- **Drive-In accuracy:** Drive-In geofence discovery must populate implement entry/exit events with ≤ 50 cm spatial error when replayed against recorded RTK datasets.
+
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
 - Stores field sessions as folder trees with `Resume.txt` markers, coverage bins, and assorted JSON files; job metadata is implicit and tightly coupled to UI flows.

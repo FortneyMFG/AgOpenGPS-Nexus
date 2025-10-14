@@ -17,6 +17,13 @@ Define the data contracts between AgOpenGPS, AgIO, companion tools, and external
 - R-GEO-001 (SHOULD, section grouping): Describe overlapping SectionGroup semantics, master group overrides, and per-toolbar lookahead/overlap policies so control logic, simulators, and analytics derive identical gating behavior.
 - R-GEO-002 (SHOULD, profile discovery): Expose manifest metadata (e.g., hitch profiles, attachment points, kinematic parameters) through the shared registries so plugin capability discovery can populate control and visualization surfaces without bespoke wiring.
 
+### R-API — Plugin contracts & lifecycle
+- R-API-020 (MUST, capabilities service): Provide a Capabilities gRPC service for plugin registration, manifest exchange, lease renewal, and version negotiation so Core can enforce compatibility at runtime.
+- R-API-021 (MUST, service catalog): Publish typed gRPC contracts for Pose, Equipment, SectionControl, LayerRegistry, TileQuery, Config, EventBus, Guidance, and Health services with explicit streaming semantics and error codes.
+- R-API-022 (SHOULD, schema negotiation): Include feature flags and semantic version ranges in plugin manifests so Core can downgrade or reject plugins when contracts diverge.
+- R-API-023 (SHOULD, UI manifest contract): Define a declarative schema for plugin UI contributions (panels, config pages, overlays) consumed by the frontend APIs without embedding arbitrary UI code.
+- R-API-024 (SHOULD, audit logging): Require control-affecting RPCs (section commands, rate commands, pose writes) to include operator/plugin identity and timestamps so audit trails align with Section 09 control requirements.
+
 ## Options
 - O-API-0: Status quo — Binary PGNs over UDP/serial with tooling to inspect.
 - O-API-1: Wrap PGNs in protobuf definitions for typed consumption.
@@ -46,8 +53,8 @@ Compatibility with firmware, tooling support, latency, schema governance, ease o
 - Bridging PGNs to typed APIs is viewed as the safest path toward Linux/Core pilots without stranding current firmware.【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】
 
 ## Upcoming ADR coverage
-- **ADR-008 Equipment hierarchy** will settle the canonical geometry/tree metadata, satisfying new requirements R-GEO-000 through R-GEO-002 and feeding the control semantics defined in Section 09.【F:docs/ADR/ADR-roadmap.md†L64-L91】【F:docs/SRS/sections/09_MultiMonitor_Headless.md†L11-L36】
-- **ADR-017 Profiles & kinematics** will extend the manifest expectations with hitch linkages, pivot tongues, and sensor fusion priorities so pose outputs align with the PoseStream architecture (ADR-007).【F:docs/ADR/ADR-roadmap.md†L142-L167】
+- **ADR-008 Equipment hierarchy** will settle the canonical geometry/tree metadata, satisfying new requirements R-GEO-000 through R-GEO-002 and feeding the control semantics defined in Section 09.【F:docs/ADR/ADR-roadmap.md†L27-L33】【F:docs/SRS/sections/09_Control_Automation.md†L1-L80】
+- **ADR-017 Profiles & kinematics** will extend the manifest expectations with hitch linkages, pivot tongues, and sensor fusion priorities so pose outputs align with the PoseStream architecture (ADR-007).【F:docs/ADR/ADR-roadmap.md†L99-L105】
 
 ## Open questions
 - How do we synchronize schema changes with firmware releases?

@@ -19,6 +19,12 @@ Capture how AgOpenGPS and AgIO interface with GNSS, steer, rate, machine, and se
 - R-HW-013 (MUST, safety): Require watchdogs, fail-safe defaults, and manual override paths when introducing modular firmware so richer telemetry cannot block steer/section cutoffs during controller faults.
 - R-HW-014 (SHOULD, compliance): Reserve placeholders for required certifications or field validation (e.g., ISO 25119 functional safety notes) whenever hardware abstractions or PGN bridges change safety envelopes.
 
+### R-HW — AgIO as a privileged plugin
+- R-HW-020 (MUST, AgIO plugin lifecycle): Treat AgIO as an out-of-process plugin with explicit discovery, authentication, and lease renewal so hardware transport updates do not require Core restarts.
+- R-HW-021 (MUST, device permissions): Gate raw device access (serial, SocketCAN, USB) behind permission scopes (`io.device`, `io.can`, `io.serial`) so only trusted plugins can open hardware channels.
+- R-HW-022 (SHOULD, device enumeration): Expose a standardized enumeration API for detected devices (buses, firmware versions, capabilities) that feeds Core registries and UI panels without bespoke adapters.
+- R-HW-023 (SHOULD, health telemetry): Require hardware plugins to publish health metrics (bus load, firmware heartbeat status, last command timestamp) through the shared health RPC so operators spot wiring faults quickly.
+
 ## Options
 - O-HW-0: Status quo — Serial + UDP PGNs managed by AgIO with manual module discovery.
 - O-HW-1: Introduce a hardware abstraction layer with per-device drivers.

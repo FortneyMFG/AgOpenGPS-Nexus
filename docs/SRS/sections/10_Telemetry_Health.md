@@ -43,8 +43,8 @@ Latency, usability in the cab, offline capability, scalability, data retention p
 - Linux service health must integrate with metrics/logging expectations before we can deploy headless rigs broadly.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L21-L33】【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L21-L34】
 
 ## Upcoming ADR coverage
-- **ADR-011 Mapping & visualization pipeline** will answer R-TH-020 and R-TH-021 by specifying render ordering, GPU textures, interpolation rules, and overview pyramids shared between UI and replay tooling.【F:docs/ADR/ADR-roadmap.md†L141-L167】
-- **ADR-019 Provenance, audit, and QA** will connect telemetry overlays to quality scores and provenance tags defined in Section 11 so dashboards expose lineage along with visualization state.【F:docs/ADR/ADR-roadmap.md†L254-L278】
+- **ADR-011 Mapping & visualization pipeline** will answer R-TH-020 and R-TH-021 by specifying render ordering, GPU textures, interpolation rules, and overview pyramids shared between UI and replay tooling.【F:docs/ADR/ADR-roadmap.md†L51-L57】
+- **ADR-019 Provenance, audit, and QA** will connect telemetry overlays to quality scores and provenance tags defined in Section 11 so dashboards expose lineage along with visualization state.【F:docs/ADR/ADR-roadmap.md†L115-L121】
 
 ## Open questions
 - What metrics matter most for field reliability (packet loss, GNSS age, CPU load)?

@@ -20,6 +20,13 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - R-EXT-103 (SHOULD, NX-099): Offer declarative mapping metadata that links configured implements to their ISOBUS Device Descriptor Identifiers (DDIs) and section counts, enabling UI manifests to auto-populate section control panels and gauge groups with accurate labels and units.【F:docs/SRS/appendices/GaugeId_Registry.md†L12-L20】【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】
 - R-EXT-120 (MUST, capability discovery): Require plugin manifests to declare produced/consumed PoseStream topics, layer definitions, control endpoints, and hardware bindings so Core can authorize and route capabilities deterministically.
 
+### R-EXT — Plugin lifecycle & security
+- R-EXT-130 (MUST, lifecycle states): Standardize plugin lifecycle states (discovered, verified, started, healthy, degraded, stopped) with observable transitions so Core can supervise hot-plug workflows and automated recovery.
+- R-EXT-131 (MUST, permission gate): Enforce a policy-driven permission gate (pose.read, section.command, storage.write, io.device, config.manage) during plugin registration so untrusted modules cannot bypass safety-critical services.
+- R-EXT-132 (SHOULD, manifest signing): Support optional signing/verification of plugin bundles with operator overrides documented for air-gapped rigs.
+- R-EXT-133 (SHOULD, remote plugins): Document requirements for remote plugin connections (mTLS, leases, restart policies) so edge clusters and cab computers behave consistently.
+- R-EXT-134 (SHOULD, audit trails): Capture plugin health, command history, and configuration edits in a provenance stream to satisfy Section 09 control audit requirements.
+
 ## Options
 - O-EXT-0: Status quo — Extend by modifying source projects and rebuilding.
 - O-EXT-1: Introduce a managed plugin API (MEF/AssemblyLoadContext) for UI and logic extensions.
@@ -77,8 +84,9 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 - How do we version plugin APIs alongside firmware expectations?
 
 ## Upcoming ADR coverage
-- **ADR-007 PoseStream & SectionState architecture** couples plugin topic manifests to the unified pose timeline and SectionState diffs, informing capability declarations required by R-EXT-120.【F:docs/ADR/ADR-roadmap.md†L38-L62】
-- **ADR-018 Plugin API & capability discovery** will finalize manifest schema, permissions, and lifecycle expectations that deliver on R-EXT-000 through R-EXT-120 while enabling hot-plug workflows.【F:docs/ADR/ADR-roadmap.md†L279-L299】
+- **ADR-007 PoseStream & SectionState architecture** couples plugin topic manifests to the unified pose timeline and SectionState diffs, informing capability declarations required by R-EXT-120.【F:docs/ADR/ADR-roadmap.md†L19-L25】
+- **ADR-018 Plugin API & capability discovery** will finalize manifest schema, permissions, and lifecycle expectations that deliver on R-EXT-000 through R-EXT-120 while enabling hot-plug workflows.【F:docs/ADR/ADR-roadmap.md†L107-L113】
+- **ADR-024 Discovery & identity** will define plugin/node identity, capability handshakes, and lease semantics required by R-COMM-030…R-COMM-032 and R-EXT-130…R-EXT-134.【F:docs/ADR/ADR-roadmap.md†L155-L161】
 
 ## Related specifications
 - Packaging, distribution, and catalog requirements: see Section 16 `Plugin Packaging, Updates, and Catalog`.

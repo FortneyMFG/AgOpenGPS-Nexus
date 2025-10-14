@@ -154,15 +154,15 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-DATA-013 | O-DATA-5 | [Retention policy](../sections/08_Data_Model_Storage.md) | ADR-DATA-007 (TBD) |
 | R-DATA-014 | O-DATA-5 | [Schema hashes](../sections/08_Data_Model_Storage.md) | ADR-DATA-007 (TBD) |
 
-### Section 09 – Multi-monitor & Headless
+### Section 09 – Control & Automation
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
 |-------------|----------------------|----------------------|-----------------|
 | R-MM-000 | O-MM-0 | [Screen helper](../../SourceCode/GPS/Helpers/ScreenHelper.cs) | ADR-MM-001 (TBD) |
 | R-MM-001 | O-MM-0 | [UDP monitor](../../SourceCode/AgIO/Source/Forms/FormUDPMonitor.cs) | ADR-MM-001 (TBD) |
-| R-MM-002 | O-MM-2 | [Headless plans](../sections/09_MultiMonitor_Headless.md) | ADR-MM-002 (TBD) |
+| R-MM-002 | O-MM-2 | [Headless plans](../sections/09_Control_Automation.md) | ADR-MM-002 (TBD) |
 | R-MM-003 | O-MM-2, O-OS-5 | [Linux Core option](../options/O-BACKEND-6_LinuxCoreService.md) | ADR-MM-003 (TBD) |
-| R-MM-004 | O-MM-2 | [Layout locking](../sections/09_MultiMonitor_Headless.md) | ADR-MM-004 (TBD) |
-| R-MM-005 | O-MM-2 | [Auto-recovery expectations](../sections/09_MultiMonitor_Headless.md) | ADR-MM-005 (TBD) |
+| R-MM-004 | O-MM-2 | [Layout locking](../sections/09_Control_Automation.md) | ADR-MM-004 (TBD) |
+| R-MM-005 | O-MM-2 | [Auto-recovery expectations](../sections/09_Control_Automation.md) | ADR-MM-005 (TBD) |
 
 ### Section 10 – Telemetry & Health
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |

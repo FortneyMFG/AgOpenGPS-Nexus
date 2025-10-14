@@ -17,13 +17,24 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - R-COMM-020 (MUST, PoseStream cadence): Publish a canonical PoseStream cadence/decimation policy with deterministic sequencing so Core, plugins, and firmware consume a single authoritative pose timeline during live runs and replays.
 - R-COMM-021 (SHOULD, layer transport handshake): Extend the layer PGN/registry handshake with registry hashes, payload chunking rules, and retry/back-pressure signals so variable-rate controllers can negotiate capabilities before exchanging SectionState deltas.
 
+### R-COMM — Plugin transport & leases
+- R-COMM-030 (MUST, plugin transport): Define how Core exposes gRPC endpoints, discovery directories, and lease heartbeats so plugins can register/renew capabilities without restarting Core or the UI.
+- R-COMM-031 (MUST, capability permissions): Require every plugin connection to negotiate an authenticated session (local policy or certificates) and enforce per-capability permissions (pose.read, section.command, storage.write) before streaming data.
+- R-COMM-032 (SHOULD, health semantics): Publish health/metrics RPC expectations (Ping, GetStatus, GetMetrics) and degraded-state signaling so operators can see when transports or plugins fall behind without guesswork.
+
+### R-TIME — Timebase & clock sync
+- R-COMM-040 (MUST, canonical timebase): Establish a canonical time authority (GPS, PTP, or system clock fallback) with documented drift tolerances for PoseStream sequencing and cross-node coordination.
+- R-COMM-041 (SHOULD, timestamp reconciliation): Require firmware-ingested samples to include capture timestamps and sequence numbers so Core can reconcile device clocks against the canonical timebase and surface drift metrics.
+- R-COMM-042 (SHOULD, latency budgets): Document maximum end-to-end latency budgets per topic (pose ingest, section commands, tile flush) to guide scheduling and CI alerts across transports and plugins.
+
 ## Adopted architecture (ADR alignment)
 - [ADR-002](../../ADR/ADR-002-grpc-contracts.md) establishes gRPC/protobuf as the authoritative **inter-process** API between Core, UI, plugins, automation tooling, and the Bridge/AgIO hosts. All desktop/server processes share the generated `Aog.Abstractions` clients while transports below the Bridge remain opaque to them.
 - [ADR-006](../../ADR/ADR-006-aog-link-mcu-communications.md) defines **AOG-Link** as the MCU communications layer using nanopb datagrams over Ethernet, RS-485/serial, or CAN. The Bridge service translates between gRPC contracts, AOG-Link frames, and legacy PGN flows so firmware evolution does not alter higher-layer APIs.
 
 ## Upcoming ADR coverage
-- **ADR-007 PoseStream & SectionState architecture** will standardize the pose timeline, SectionState diff rules, and replay guarantees that satisfy transport requirements R-COMM-010, R-COMM-011, and R-COMM-020 while aligning plugin/service expectations captured in Section 12.【F:docs/ADR/ADR-roadmap.md†L38-L62】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L11-L34】
-- **ADR-016 Firmware/Transport: Variable-Rate & Layer PGNs** will finalize payload packing, sequencing, and registry-handshake semantics for layer definitions, fulfilling R-COMM-010, R-COMM-011, and R-COMM-021 prior to firmware rollout.【F:docs/ADR/ADR-roadmap.md†L118-L140】
+- **ADR-007 PoseStream & SectionState architecture** will standardize the pose timeline, SectionState diff rules, and replay guarantees that satisfy transport requirements R-COMM-010, R-COMM-011, and R-COMM-020 while aligning plugin/service expectations captured in Section 12.【F:docs/ADR/ADR-roadmap.md†L19-L25】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L34】
+- **ADR-016 Firmware/Transport: Variable-Rate & Layer PGNs** will finalize payload packing, sequencing, and registry-handshake semantics for layer definitions, fulfilling R-COMM-010, R-COMM-011, and R-COMM-021 prior to firmware rollout.【F:docs/ADR/ADR-roadmap.md†L91-L97】
+- **ADR-021 Timebase & clock sync** will establish the canonical clock, drift handling, and latency budgets that anchor R-COMM-020 and R-COMM-040…R-COMM-042 across Core, plugins, and firmware.【F:docs/ADR/ADR-roadmap.md†L131-L137】
 
 ### AOG-Link MCU datagram protocol
 AOG-Link standardizes MCU-to-host and MCU-to-MCU exchanges on compact protobuf messages compiled with nanopb. Every packet begins with a fixed header of `{version, class, type, seq, src, dst, len}` followed by the protobuf payload; serial links append a CRC-16 after the payload. The fields mirror the IDs exposed through the gRPC contracts so the Bridge can map between the layers without lossy transforms.

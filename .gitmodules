@@ -1,0 +1,7 @@
+[submodule "Legacy SourceCode -V6"]
+	path = Legacy SourceCode -V6
+	url = https://github.com/AgOpenGPS-Official/AgOpenGPS.git
+	branch = master
+[submodule "Legacy SourceCode -Dev"]
+	path = Legacy SourceCode -Dev
+	url = https://github.com/double07killor/AOG_Dev.git

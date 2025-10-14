@@ -121,3 +121,4 @@ NX-119,FALSE,FALSE,NX-117,,AOG-Link ⇄ PGN compatibility bridge for legacy devi
 NX-120,FALSE,FALSE,NX-116,,AOG-Link Ethernet/UDP driver with multicast and command retries
 NX-121,FALSE,FALSE,NX-116,,AOG-Link RS-485/serial driver using COBS + CRC and slot scheduling
 NX-122,FALSE,FALSE,NX-116,,AOG-Link CAN/CAN-FD driver implementing AOG-CAN ID layout and segmentation
+NX-131,FALSE,FALSE,"NX-001, NX-002",,"Field job session lifecycle ADR covering JobsService, job.json metadata, and UI flows"

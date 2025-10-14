@@ -16,6 +16,11 @@ Establish Jobs as a first-class concept spanning Core, UI, and plugins with the 
 5. **Plugin extensibility.** Allow plugins to register Job Sources under the Import menu, contribute decorators that attach data on open/save/close, and receive lifecycle hooks (`onJobOpen`, `onJobSave`, `onJobClose`) gated by `jobs.lifecycle` permissions. Job metadata can link to shared Layouts or Presets; live updates flow through these links while allowing snapshot overrides for historical integrity.
 6. **Safety & autosave.** Track dirty state for coverage and guidance edits, autosave at intervals and before risky operations, and run crash-safe journaling for coverage tiles so replay can restore state after interruptions.
 
+### Degraded operation & messaging
+- **No mapping provider:** When mapping capabilities are absent (`mapping:offline`), the JobsService annotates active jobs as "Map-light" and skips coverage journaling expectations. The UI still renders job metadata and Drive-In prompts but adds a banner clarifying that coverage playback will be limited. Once mapping returns, Core backfills coverage pointers without forcing operators to restart the job.
+- **Plugin hooks unavailable:** If lifecycle-capable plugins decline hooks (e.g., automation plugin disabled), Core logs the skipped hooks with reason codes and surfaces a toast in the Activity pane so operators understand why certain automations did not run. Jobs remain openable/resumable, but the job drawer highlights affected integrations.
+- **Filesystem pressure / read-only media:** When the job store detects read-only media or low disk, JobsService automatically shifts to rolling snapshot mode and warns operators before autosave would fail. Crash recovery prompts include guidance on exporting the job or freeing space prior to resuming full journaling.
+
 ## Consequences
 - **Consistent lifecycle orchestration.** Core, UI, and plugins share a single authority for job identity and storage, enabling autosave policies, Drive-In geofence matching, and deterministic crash recovery while keeping V6 Resume flows functional.
 - **Extensible import pipeline.** ISOXML, KML, and plugin-defined importers normalize assets into the job store, making future sources (cloud prescriptions, RTK base lists) pluggable without diverging UI experiences.

@@ -67,6 +67,11 @@ Services:
 - **Deterministic replay:** Core mirrors Pose/Layer traffic into replay logs; plugins must honor frame IDs/mono time and supply deterministic outputs under replay.
 - **Debugging:** Core exposes replay/tap endpoints so developers can feed recorded Pose logs into mapping plugins for regression tests.
 
+### Degraded operation & operator messaging
+- **NullMapping UX:** When NullMapping is active, Core publishes a `mapping:offline` state with explicit operator-facing messaging in the Device Manager and Preset Switcher. Sections and rate controllers continue to run using headland-only constraints, and UI overlays display a "No map data" banner rather than empty tiles.
+- **Health flaps:** Repeated health failures transition mapping plugins into a quarantined state. Core pauses consumer subscriptions, renders historical coverage as read-only, and provides retry controls in the UI so operators can deliberately re-enable the plugin after addressing root causes.
+- **Partial capability gaps:** If a plugin lacks optional capabilities (e.g., raster but not vector), presets and JobsService entries annotate the missing features and downgrade dependent automations. For example, a VRC preset shows "Variable rate paused — mapping:raster missing" while maintaining baseline/manual rates until the capability becomes available again.
+
 ## Consequences
 - **Pros:** Optional mapping footprint for headless rigs, swappable engines for specialized workflows, isolated failures, and faster iteration on GIS features without Core releases.【F:docs/aog-v6-mapping-brief.md†L55-L97】
 - **Cons & mitigations:** IPC latency managed through shared monotonic timebase/frame IDs; protobuf version drift mitigated by contracts freeze/versioning; debugging supported by standardized replay taps; state fan-out handled via Core’s event bus and capability registry.【F:docs/SRS/sections/03_Comm_Transports.md†L6-L28】【F:docs/ADR/ADR-018-plugin-api.md†L12-L34】

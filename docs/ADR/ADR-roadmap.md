@@ -16,6 +16,14 @@ This tracker consolidates current and planned Architecture Decision Records so t
 
 Each entry inherits the numbering shown here (ADR-007 through ADR-020) now that ADR-005 has been retired. Draft authors should reference the listed requirements and tasks before opening a proposal.
 
+### ADR-029 — Mapping plugin architecture & geospatial kernel split
+- **Scope:** Move mapping engines into plugins while Core keeps a minimal geospatial kernel (CRS transforms, tiling helpers, monotonic timebase, deterministic replay scaffolding, null providers). Ensure headless rigs and alternate pose sources can run without mapping while variable-rate and sections consume a stable Mapping API.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L7-L84】
+- **Key decisions:** Mapping contracts in `Aog.Abstractions`, capability registry entries (`mapping:raster@v1`, `mapping:vector@v2`), event bus fan-out, replay taps, and plugin lifecycle/health semantics.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L19-L84】
+- **SRS alignment:** Communications (§03 timebase/event bus), Backend Services (§04 replay/registry), Data Model (§08 layers), Extensibility (§12 plugin lifecycle).【F:docs/SRS/sections/03_Comm_Transports.md†L6-L28】【F:docs/SRS/sections/04_Backend_Services.md†L6-L20】【F:docs/SRS/sections/08_Data_Model_Storage.md†L6-L31】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L80】
+- **Primary requirements:** R-COMM-020…R-COMM-042; R-BE-000…R-BE-014; R-DATA-010…R-DATA-025; R-EXT-010…R-EXT-134.【F:docs/SRS/sections/03_Comm_Transports.md†L11-L28】【F:docs/SRS/sections/04_Backend_Services.md†L6-L20】【F:docs/SRS/sections/08_Data_Model_Storage.md†L11-L31】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L11-L80】
+- **Tasks:** Draft Mapping proto/service updates, implement NullMapping/NullPose, prototype grid mapping plugin with replay fixtures, extend plugin loader for capability-gated presets.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L86-L93】
+- **Acceptance hooks:** Deterministic replay fixtures covering Pose→RateHint/SectionMask flows, capability registry integration tests, restart/isolation fault-injection scenarios.
+
 ### ADR-007 — PoseStream & SectionState architecture
 - **Scope:** A single, time-ordered PoseStream spanning tractor, implement, toolbar, and section poses with diffed SectionState updates, unified vector logs, and event/opportunity metrics.
 - **Key decisions:** Cadence/decimation policy, one pose timeline for all layers, SectionState diff rules, optional per-layer micro-streams when plugin cadence diverges, replay determinism budgets, and how to compute opportunity vs. event tallies.

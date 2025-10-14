@@ -13,6 +13,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-004 JSON schema suite
 - [x] NX-005 Capabilities handshake service
 - [x] NX-104 Metadata-driven variable-rate layer mapping ADR _(Done)_
+- [x] NX-115 AOG-Link protocol specification _(Done)_
+- [ ] NX-116 Shared aog-link.proto schemas _(Planned)_
 
 ### Section B — Core (Headless, Sim Graph)
 - [x] NX-010 Core host skeleton
@@ -38,6 +40,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-027 Legacy UDP gateway skeleton
 - [x] NX-029 Agio.Linux SocketCAN backend
 - [x] NX-066 GNSS provider policy + TCP/UDP support
+- [ ] NX-117 Bridge service host (gRPC ⇄ AOG-Link) _(Planned)_
+- [ ] NX-118 gRPC ⇄ AOG-Link translator _(Planned)_
+- [ ] NX-119 AOG-Link ⇄ PGN compatibility bridge _(Planned)_
+- [ ] NX-120 AOG-Link Ethernet/UDP driver _(Planned)_
+- [ ] NX-121 AOG-Link RS-485/serial driver _(Planned)_
+- [ ] NX-122 AOG-Link CAN/CAN-FD driver _(Planned)_
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -119,8 +127,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-079 Post-run report generator _(Done)_
 
 ### Section I — Legacy/Teensy Compatibility
-- [x] NX-080 UDP discovery + capability exchange
-- [x] NX-081 PGN bridge (steer + sections)
+- [x] NX-080 UDP discovery + capability exchange _(Legacy-maintained)_
+- [x] NX-081 PGN bridge (steer + sections) _(Legacy-maintained)_
 - [x] NX-082 UART framing utility
 - [x] NX-083 Legacy AB line/boundary import wizard
 - [x] NX-084 Legacy configuration translation CLI
@@ -128,7 +136,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-086 Legacy migration guide & training set
 - [x] NX-087 Dealer deployment toolkit
 - [x] NX-088 Multi-machine sync workflow
-- [x] NX-089 High-rate serial/UDP stress testing
+- [x] NX-089 High-rate serial/UDP stress testing _(Legacy-maintained)_
 - [x] NX-090 Legacy auto-run scenario pack
 - [x] NX-091 Legacy coverage export verification _(Done)_
 - [x] NX-092 Legacy data migration utility _(Done)_
@@ -150,6 +158,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-004 | JSON schemas (Core, AGiO, UI, Simulation) | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Coordinate with Schema Owner |
 | NX-005 | Capabilities handshake proto/service | Done |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | Smoke test between Core & AGiO |
 | NX-104 | ADR: Metadata-driven variable-rate layer mapping & imports | Done |  | — | [SRS §8 Data Model & Storage](docs/SRS/sections/08_Data_Model_Storage.md) | Aligns coverage, importer, and plugin contracts per ADR-005 |
+| NX-115 | AOG-Link protocol specification and reference flows | Done |  | — | [SRS §3 Communications & Transports](docs/SRS/sections/03_Comm_Transports.md) | ADR-006 + SRS updates complete |
+| NX-116 | Shared `aog-link.proto` schemas with nanopb options | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Publish contracts aligned with `Aog.Abstractions` |
 
 ### Section B — Core (Headless, Sim Graph)
 
@@ -181,6 +191,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-027 | Legacy UDP gateway skeleton | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Loopback test |
 | NX-029 | Agio.Linux SocketCAN backend (CAN→gRPC) | Done |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Streams CAN frames + section relays |
 | NX-066 | GNSS source policy + TCP/UDP provider | Done |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Aggregates `IPositionSource` feeds |
+| NX-117 | Bridge service host for gRPC ⇄ AOG-Link | Planned |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Standalone daemon mediating inter-process, AOG-Link, and PGN flows |
+| NX-118 | gRPC ⇄ AOG-Link translator layer | Planned |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Map service calls/streams onto nanopb datagrams with ack/retry semantics |
+| NX-119 | AOG-Link ⇄ PGN compatibility bridge | Planned |  | — | [SRS Option O-COMM-6](docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md) | Maintain legacy devices during migration |
+| NX-120 | AOG-Link Ethernet/UDP driver | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Implement multicast/unicast transport with command retries |
+| NX-121 | AOG-Link RS-485/serial driver | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | COBS framing + CRC-16 with token/slot scheduling |
+| NX-122 | AOG-Link CAN/CAN-FD driver | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Implement AOG-CAN ID layout + ISO-TP / fragment support |
 
 ### Section D — Plugins (Logic + Sim Providers)
 
@@ -280,16 +296,16 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 | ID | Description | Status | Owner | Human QA | SRS Ref | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| NX-080 | UDP discovery + caps/version exchange | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | AIO responds; caps logged |
-| NX-081 | PGN bridge (steer + sections minimal) | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Drives a real AIO on bench |
-| NX-082 | UART framing (COBS+CRC), 921600 bps option | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Loopback verified |
+| NX-080 | UDP discovery + caps/version exchange | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Legacy-maintained; compatibility only |
+| NX-081 | PGN bridge (steer + sections minimal) | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Legacy-maintained; no new PGNs |
+| NX-082 | UART framing (COBS+CRC), 921600 bps option | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Legacy-maintained utility |
 | NX-083 | Legacy AB line and boundary import wizard feeding Core routes | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Support shape + CSV inputs |
 | NX-084 | Legacy configuration translation CLI for profiles and machine settings | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Convert V6 config bundles |
 | NX-085 | Teensy bridge regression test suite with recorded PGN sessions | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Automate nightly bench playback |
 | NX-086 | Legacy migration guide and training materials for operators | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Docs/howto + training kit |
 | NX-087 | Dealer deployment toolkit with scripts and checklists | Done |  | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Bundled script set |
 | NX-088 | Multi-machine synchronization and licensing workflow definition | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Document license + sync process |
-| NX-089 | High-rate serial and UDP stress testing with soak reports | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | 24 h soak logs |
+| NX-089 | High-rate serial and UDP stress testing with soak reports | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Legacy-maintained soak logs |
 | NX-090 | Legacy auto-run scenario pack with verification logs | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Provide sample fields |
 | NX-091 | Legacy coverage export verification against Nexus outputs | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Compare shapefile + CSV exports |
 | NX-092 | Legacy data migration utility for logs and field histories | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | CLI for migrating archives |

@@ -1,9 +1,33 @@
 # Nexus (AgOpenGPS Next Generation)
 
-Nexus is the from-scratch successor to AgOpenGPS. This repository collects the plans,
-requirements, and source roots for building a modular, cross-platform guidance and
-application platform that cleanly separates the core orchestrator, hardware I/O host,
-plugin ecosystem, and front-end experiences.
+Nexus is an experiment to see whether AI can synthesize the best ideas from across the
+AgOpenGPS community and fuse them into the most badass version of AOG imaginable. There
+is no attempt to optimize for team size, budgets, or schedules—every change chases the
+highest ceiling the community has ever dreamed of, with AI doing the heavy lifting end to
+end. It might flop, it might soar; the only guarantee is that we are iterating in public
+to find out.
+
+## Why "Nexus"?
+
+The name "Nexus" reflects the hub where community inspiration, legacy experience, and
+next-generation experimentation intersect. It is the connective tissue that brings
+together field-proven guidance math, fresh simulation ideas, plugin experimentation, and
+AI-assisted development into one place.
+
+## Mission Snapshot
+
+- **Community fusion:** Surface the strongest ideas from forums, GitHub projects, field
+  notes, and Discord chats, then combine them into cohesive features that feel curated
+  rather than compromised.
+- **Modular architecture:** Core, AGiO backends, plugins, and UI live in dedicated
+  projects that communicate over gRPC contracts generated from `/Nexus SourceCode/proto`.
+- **Simulation-first:** A composite simulator drives deterministic development,
+  headless testing, and the “Sim Bar” experience described in
+  [`docs/SRS/options/O-STACK-1_DotNet8Avalonia.md`](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md).
+- **Legacy friendly:** Teensy/ESP32 AIO users stay productive through UART/Ethernet
+  compatibility layers and UDP gateways.
+- **Target platforms:** Windows desktops and Raspberry Pi/CM5 hosts, with or without
+  external hardware beyond optional GPS.
 
 ## Mission Snapshot
 
@@ -17,7 +41,7 @@ plugin ecosystem, and front-end experiences.
 - **Target platforms:** Windows desktops and Raspberry Pi/CM5 hosts, with or without
   external hardware beyond optional GPS.
 
-AgOpenGPS Nexus starts development here, following the engineering blueprint captured in
+AgOpenGPS Nexus development starts here, guided by the engineering blueprint captured in
 [`docs/SRS/options/O-STACK-1_DotNet8Avalonia.md`](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md)
 and the broader Software Requirements Specification (SRS) set under `/docs/SRS`.
 

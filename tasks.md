@@ -113,6 +113,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-099 Update SRS for ISOBUS communications plugin _(Done)_
 - [x] NX-101 Update SRS for combine yield monitoring plugin _(Done)_
 - [x] NX-103 Sync tasks.md with tasks.csv tracker _(Done)_
+- [ ] NX-116 README experiment narrative refresh _(In Progress)_
 
 ### Section H — Safety & QA
 - [x] NX-070 Heartbeats & failsafe watchdogs

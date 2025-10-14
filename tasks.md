@@ -77,6 +77,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-049 Replay analysis timeline
 - [x] NX-065 UI theming + layout persistence
 - [ ] NX-112 Layer-aware section map visualization _(Planned)_
+- [ ] NX-130 Presets & layout linking ADR _(Proposed)_
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory

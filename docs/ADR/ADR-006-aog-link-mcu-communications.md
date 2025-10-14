@@ -49,6 +49,13 @@ Adopt AOG-Link v1, a compact protobuf/nanopb-based datagram protocol, as the sta
   - Direct MCU↔MCU sharing (speed, rate, sections with stale-source handling)
 - Deprecate PGN expansion in favor of static legacy maintenance.
 
+## Legacy Implementation Notes
+### AgOpenGPS v6
+- MCU and host communications ride on the classic PGN frame (0x80/0x81 header, CRC trailer) across UDP and serial links, so firmware today exchanges fixed-width byte payloads without protobuf schemas.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L24】
+
+### Legacy Dev Branch
+- Dev experiments focus on normalizing those same PGNs—including SocketCAN bridges—but still depend on the legacy framing rather than nanopb-based datagrams.【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L7-L36】
+
 ## References
 - [Section 03 — Communications & Transports](../SRS/sections/03_Comm_Transports.md)
 - [Option O-COMM-6 — PGN compatibility bridge](../SRS/options/O-COMM-6_PGNCompatibilityBridge.md)

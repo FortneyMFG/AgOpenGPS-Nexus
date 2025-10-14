@@ -21,6 +21,13 @@ Adopt Avalonia as the primary UI framework for the Nexus desktop shell. The Aval
   - Scaffold the Avalonia solution and shell project structure (future NX tasks).
   - Define UI theming, metadata-driven widget strategy, and remote-client story around the Avalonia host.
 
+## Legacy Implementation Notes
+### AgOpenGPS v6
+- Operators rely on the WinForms UI with selective WPF panels, so the legacy stack is confined to Windows desktops and lacks a cross-platform shell today.【F:docs/SRS/sections/02_Framework_UI.md†L6-L10】【F:docs/SRS/sections/05_Frontends.md†L7-L12】
+
+### Legacy Dev Branch
+- The dev branch follows the same pattern—WinForms remains primary with incremental WPF modernization—leaving remote or Linux clients unserved without remote desktop workarounds.【F:docs/SRS/sections/02_Framework_UI.md†L16-L29】【F:docs/SRS/sections/05_Frontends.md†L7-L17】
+
 ## References
 - [Section 02 — UI Framework](../SRS/sections/02_Framework_UI.md)
 - [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/O-STACK-1_DotNet8Avalonia.md)

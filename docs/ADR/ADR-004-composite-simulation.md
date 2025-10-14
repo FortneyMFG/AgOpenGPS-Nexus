@@ -25,6 +25,13 @@ Plugins register simulation providers against this fabric and must respect seede
   - Define the topic catalog and schema ownership within the forthcoming protobuf contracts (NX-003/NX-004).
   - Implement regression vectors and seeded scenarios as part of the CI smoke suite (future NX testing tasks).
 
+## Legacy Implementation Notes
+### AgOpenGPS v6
+- Simulation lives inside the monolithic `CSim` helper, which synthesizes GNSS/IMU data in-process without a shared bus or external plugin hooks, limiting reuse and determinism across tools.【F:docs/porting/V6-Inventory.md†L45-L49】
+
+### Legacy Dev Branch
+- Current dev tooling still depends on standalone utilities such as ModSim and direct wiring in the WinForms app, so there is no authoritative clock/bus that multiple modules can share without duplicating logic.【F:docs/SRS/sections/05_Frontends.md†L7-L17】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L51-L56】
+
 ## References
 - [Section 04 — Backend Services](../SRS/sections/04_Backend_Services.md)
 - [Section 12 — Extensibility & Plugins](../SRS/sections/12_Extensibility_Plugins.md)

@@ -21,6 +21,13 @@ Adopt gRPC with protobuf IDLs as the authoritative inter-process API for Nexus s
   - Define protobuf packages and namespaces for the first wave of contracts (NX-003).
   - Implement the Bridge translation path between gRPC services, AOG-Link datagrams, and legacy PGNs (see NX-120 series tasks).
 
+## Legacy Implementation Notes
+### AgOpenGPS v6
+- Inter-process coordination is limited to serial and UDP PGN streams managed by AgIO and the WinForms host, leaving no typed API surface between components today.【F:docs/SRS/sections/03_Comm_Transports.md†L7-L15】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L24】
+
+### Legacy Dev Branch
+- The dev branch continues to lean on the same PGN transports while experimenting with SocketCAN and normalization inside bridge prototypes, rather than shipping a shared gRPC contract layer.【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L36】
+
 ## References
 - [Section 03 — Communications & Transports](../SRS/sections/03_Comm_Transports.md)
 - [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/O-STACK-1_DotNet8Avalonia.md)

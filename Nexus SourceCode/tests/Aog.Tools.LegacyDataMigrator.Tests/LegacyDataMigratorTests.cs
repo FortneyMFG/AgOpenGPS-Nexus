@@ -1,0 +1,140 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Aog.Tools.LegacyDataMigrator;
+using FluentAssertions;
+using Parquet;
+using Parquet.Data;
+using Xunit;
+
+namespace Aog.Tools.LegacyDataMigrator.Tests;
+
+public sealed class LegacyDataMigratorTests
+{
+    private static readonly string SampleLegacyPath = Path.Combine("Data", "LegacyField");
+
+    [Fact]
+    public async Task MigrateAsync_WritesTelemetryAndHistory()
+    {
+        var legacyPath = Path.Combine(AppContext.BaseDirectory, SampleLegacyPath);
+        using var temp = new TempDirectory();
+
+        var migrator = new LegacyDataMigrator();
+        var report = await migrator.MigrateAsync(new LegacyMigrationOptions
+        {
+            InputDirectory = legacyPath,
+            OutputDirectory = temp.Path,
+        }).ConfigureAwait(false);
+
+        report.PoseCount.Should().Be(2);
+        report.ImuCount.Should().Be(1);
+        report.CanCount.Should().Be(1);
+        report.SectionCount.Should().Be(1);
+        report.PluginCount.Should().Be(1);
+        report.FieldHistoryFields.Should().Be(2);
+        report.FieldHistoryEntries.Should().Be(3);
+        report.SkippedFiles.Should().BeEmpty();
+
+        var posePath = Path.Combine(temp.Path, "pose.parquet");
+        File.Exists(posePath).Should().BeTrue();
+        using (var reader = ParquetReader.Create(File.OpenRead(posePath)))
+        {
+            reader.RowGroupCount.Should().Be(1);
+            var schema = reader.Schema;
+            using var rowGroup = reader.OpenRowGroupReader(0);
+            var latitudeField = (DataField<double>)schema.DataFields.Single(f => f.Name == "latitude_deg");
+            var speedField = (DataField<double>)schema.DataFields.Single(f => f.Name == "speed_mps");
+            var latitudes = (double[])rowGroup.ReadColumn(latitudeField).Data;
+            var speeds = (double[])rowGroup.ReadColumn(speedField).Data;
+
+            latitudes.Should().ContainInOrder(45.123, 45.124);
+            speeds.Should().Contain(new[] { 5.5, 5.6 });
+        }
+
+        var canPath = Path.Combine(temp.Path, "can.parquet");
+        using (var reader = ParquetReader.Create(File.OpenRead(canPath)))
+        {
+            reader.RowGroupCount.Should().Be(1);
+            var schema = reader.Schema;
+            using var rowGroup = reader.OpenRowGroupReader(0);
+            var payloadField = (DataField<byte[]?>)schema.DataFields.Single(f => f.Name == "payload");
+            var payloads = (byte[]?[])rowGroup.ReadColumn(payloadField).Data;
+            payloads.Should().HaveCount(1);
+            payloads[0].Should().BeEquivalentTo(new byte[] { 0x0A, 0xFF });
+        }
+
+        var historyPath = Path.Combine(temp.Path, "field-history.json");
+        File.Exists(historyPath).Should().BeTrue();
+        using var document = JsonDocument.Parse(File.ReadAllText(historyPath));
+        var fields = document.RootElement.GetProperty("Fields").EnumerateArray().ToList();
+        fields.Should().HaveCount(2);
+
+        var north = fields.Single(f => f.GetProperty("FieldName").GetString() == "North 40");
+        var northEntries = north.GetProperty("Entries").EnumerateArray().ToList();
+        northEntries.Should().HaveCount(2);
+        northEntries[0].GetProperty("AreaHectares").GetDouble().Should().Be(15.2);
+        northEntries[1].GetProperty("Operator").GetString().Should().Be("Bob");
+    }
+
+    [Fact]
+    public async Task MigrateAsync_ReportsMissingFiles()
+    {
+        using var tempInput = new TempDirectory();
+        using var tempOutput = new TempDirectory();
+
+        var migrator = new LegacyDataMigrator();
+        var report = await migrator.MigrateAsync(new LegacyMigrationOptions
+        {
+            InputDirectory = tempInput.Path,
+            OutputDirectory = tempOutput.Path,
+        }).ConfigureAwait(false);
+
+        report.PoseCount.Should().Be(0);
+        report.ImuCount.Should().Be(0);
+        report.CanCount.Should().Be(0);
+        report.SectionCount.Should().Be(0);
+        report.PluginCount.Should().Be(0);
+        report.FieldHistoryEntries.Should().Be(0);
+        report.SkippedFiles.Should().Contain(file => file.Contains("pose.csv", StringComparison.OrdinalIgnoreCase));
+        report.SkippedFiles.Should().Contain(file => file.Contains("field-history.csv", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task ProgramMain_ReturnsZeroOnSuccess()
+    {
+        var legacyPath = Path.Combine(AppContext.BaseDirectory, SampleLegacyPath);
+        using var tempOutput = new TempDirectory();
+
+        var exitCode = await Program.Main(new[] { "migrate", "--input", legacyPath, "--output", tempOutput.Path });
+        exitCode.Should().Be(0);
+
+        Directory.EnumerateFiles(tempOutput.Path).Should().Contain(file => file.EndsWith("pose.parquet", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private sealed class TempDirectory : IDisposable
+    {
+        public TempDirectory()
+        {
+            Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "legacy-migration-test-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(Path);
+        }
+
+        public string Path { get; }
+
+        public void Dispose()
+        {
+            try
+            {
+                if (Directory.Exists(Path))
+                {
+                    Directory.Delete(Path, recursive: true);
+                }
+            }
+            catch
+            {
+            }
+        }
+    }
+}

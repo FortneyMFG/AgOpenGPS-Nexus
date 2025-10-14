@@ -36,8 +36,8 @@ NX-034,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",,Simulation provider registra
 NX-035,FALSE,TRUE,"NX-030, NX-012, NX-013, NX-003",,Replay plugin v1 with Parquet reader and playback controls
 NX-036,FALSE,TRUE,"NX-015, NX-030, NX-003",,Plugin telemetry sink streaming metrics into Core logging
 NX-037,FALSE,TRUE,"NX-031, NX-032, NX-033, NX-034, NX-035",,Simulation scenario library with curated sample configs and operator docs
-NX-038,TRUE,FALSE,NX-037,Ready,Simulation performance and stress harness covering plugin combinations
-NX-039,TRUE,FALSE,"NX-037, NX-038",Ready,Plugin compatibility CI gate with versioned manifest regression tests
+NX-038,FALSE,TRUE,NX-037,,Simulation performance and stress harness covering plugin combinations
+NX-039,FALSE,TRUE,"NX-037, NX-038",,Plugin compatibility CI gate with versioned manifest regression tests
 NX-040,FALSE,TRUE,"NX-001, NX-002, NX-003",,Avalonia app bootstrap shell
 NX-041,FALSE,TRUE,NX-040,,Connection and settings panel for AGiO endpoint selection
 NX-042,FALSE,TRUE,"NX-040, NX-003",,"Map view with pan, zoom, and vehicle visualization"
@@ -67,38 +67,57 @@ NX-065,FALSE,TRUE,"NX-041, NX-043",,UI theming and layout persistence across ses
 NX-066,FALSE,TRUE,"NX-020, NX-021, NX-022, NX-024, NX-025",,GNSS provider policy with TCP/UDP stream support via IPositionSource
 NX-067,FALSE,TRUE,"NX-060, NX-061, NX-062",,Release pipeline with signing and artifact promotion stages
 NX-068,FALSE,TRUE,NX-060,,Crash and telemetry opt-in service with privacy controls
-NX-069,TRUE,FALSE,NX-067,Ready,Installer and update channel documentation for operators
+NX-069,FALSE,TRUE,NX-067,,Installer and update channel documentation for operators
 NX-070,FALSE,TRUE,"NX-010, NX-020",,Heartbeats and failsafe watchdog between AGiO and plugins
 NX-071,FALSE,TRUE,"NX-070, NX-010, NX-020",,Arming and state machine gating outputs
 NX-072,FALSE,TRUE,"NX-012, NX-013",,Deterministic simulation regression test (10s run)
-NX-073,FALSE,TRUE,"NX-070, NX-071",Ready,End-to-end failsafe integration tests in CI and bench rigs
-NX-074,FALSE,TRUE,NX-073,Ready,Field safety validation checklist and sign-off workflow
-NX-075,FALSE,TRUE,NX-073,Ready,Hardware-in-the-loop automation rig for regression testing
-NX-076,FALSE,TRUE,NX-073,Ready,"Fault injection harness for sensors, network, and power events"
-NX-077,FALSE,TRUE,"NX-070, NX-075",Ready,Safety log retention and export tooling with retention policy
-NX-078,FALSE,TRUE,"NX-073, NX-077",Ready,"QA dashboard aggregating simulation, hardware, and safety metrics"
-NX-079,FALSE,TRUE,"NX-073, NX-078",Ready,"Post-run report generator summarizing guidance, coverage, and alarms"
+NX-073,FALSE,TRUE,"NX-070, NX-071",,End-to-end failsafe integration tests in CI and bench rigs
+NX-074,FALSE,TRUE,NX-073,,Field safety validation checklist and sign-off workflow
+NX-075,FALSE,TRUE,NX-073,,Hardware-in-the-loop automation rig for regression testing
+NX-076,FALSE,TRUE,NX-073,,"Fault injection harness for sensors, network, and power events"
+NX-077,FALSE,TRUE,"NX-070, NX-075",,Safety log retention and export tooling with retention policy
+NX-078,FALSE,TRUE,"NX-073, NX-077",,"QA dashboard aggregating simulation, hardware, and safety metrics"
+NX-079,FALSE,TRUE,"NX-073, NX-078",,"Post-run report generator summarizing guidance, coverage, and alarms"
 NX-080,FALSE,TRUE,"NX-027, NX-005",,Legacy UDP discovery and capabilities exchange
 NX-081,FALSE,TRUE,"NX-027, NX-005",,Legacy PGN bridge for steer and sections
 NX-082,FALSE,TRUE,NX-027,,Legacy UART framing with COBS+CRC at 921600 bps
 NX-083,FALSE,TRUE,NX-027,,Legacy AB line and boundary import wizard feeding Core routes
-NX-084,TRUE,FALSE,NX-083,Ready,Legacy configuration translation CLI for profiles and machine settings
+NX-084,FALSE,TRUE,NX-083,,Legacy configuration translation CLI for profiles and machine settings
 NX-085,FALSE,TRUE,NX-081,,Teensy bridge regression test suite with recorded PGN sessions
-NX-086,FALSE,FALSE,"NX-084, NX-085",NX-084,Legacy migration guide and training materials for operators
-NX-087,TRUE,FALSE,"NX-067, NX-084",Ready,Dealer deployment toolkit with scripts and checklists
-NX-088,FALSE,TRUE,NX-087,NX-087,Multi-machine synchronization workflow definition
-NX-089,TRUE,FALSE,NX-085,Ready,High-rate serial and UDP stress testing with soak reports
-NX-090,TRUE,FALSE,"NX-085, NX-083",Ready,Legacy auto-run scenario pack with verification logs
-NX-091,TRUE,FALSE,"NX-055, NX-085",Ready,Legacy coverage export verification against Nexus outputs
-NX-092,FALSE,FALSE,NX-084,NX-084,Legacy data migration utility for logs and field histories
-NX-093,FALSE,FALSE,NX-092,NX-092,Support knowledge base for bridging workflows and troubleshooting
-NX-094,FALSE,FALSE,"NX-078, NX-092",NX-078,Field feedback telemetry aggregator feeding support dashboards
-NX-095,FALSE,FALSE,"NX-087, NX-093",NX-087,Dealer support escalation process and SLA tracking
-NX-096,FALSE,FALSE,"NX-087, NX-094",NX-087,Community preview program with opt-in builds and survey loop
-NX-097,FALSE,FALSE,"NX-095, NX-096",NX-095,1.0 launch readiness review and sign-off checklist
-NX-098,FALSE,FALSE,"NX-030, NX-029",,ISOBUS communications plugin enabling ISO 11783 PGN exchange and diagnostics
-NX-099,FALSE,FALSE,NX-098,NX-098,Update SRS for ISOBUS communications plugin coverage
-NX-100,FALSE,FALSE,"NX-030, NX-012, NX-013",,Combine yield monitoring plugin for crop flow sensors and mapping
-NX-101,FALSE,FALSE,NX-100,NX-100,Update SRS for combine yield monitoring plugin details
-NX-102,FALSE,FALSE,,,V6 functionality inventory and gap analysis across Nexus
+NX-086,FALSE,TRUE,"NX-084, NX-085",,Legacy migration guide and training materials for operators
+NX-087,FALSE,TRUE,"NX-067, NX-084",,Dealer deployment toolkit with scripts and checklists
+NX-088,FALSE,TRUE,NX-087,,Multi-machine synchronization workflow definition
+NX-089,FALSE,TRUE,NX-085,,High-rate serial and UDP stress testing with soak reports
+NX-090,FALSE,TRUE,"NX-085, NX-083",,Legacy auto-run scenario pack with verification logs
+NX-091,FALSE,TRUE,"NX-055, NX-085",,Legacy coverage export verification against Nexus outputs
+NX-092,FALSE,TRUE,NX-084,,Legacy data migration utility for logs and field histories
+NX-093,FALSE,TRUE,NX-092,,Support knowledge base for bridging workflows and troubleshooting
+NX-094,FALSE,TRUE,"NX-078, NX-092",,Field feedback telemetry aggregator feeding support dashboards
+NX-095,FALSE,TRUE,"NX-087, NX-093",,Dealer support escalation process and SLA tracking
+NX-096,FALSE,TRUE,"NX-087, NX-094",,Community preview program with opt-in builds and survey loop
+NX-097,FALSE,TRUE,"NX-095, NX-096",,1.0 launch readiness review and sign-off checklist
+NX-098,FALSE,TRUE,"NX-030, NX-029",,ISOBUS communications plugin enabling ISO 11783 PGN exchange and diagnostics
+NX-099,FALSE,TRUE,NX-098,,Update SRS for ISOBUS communications plugin coverage
+NX-100,FALSE,TRUE,"NX-030, NX-012, NX-013",,Combine yield monitoring plugin for crop flow sensors and mapping
+NX-101,FALSE,TRUE,NX-100,,Update SRS for combine yield monitoring plugin details
+NX-102,FALSE,TRUE,,,V6 functionality inventory and gap analysis across Nexus
 NX-103,FALSE,TRUE,,,Sync tasks.md with tasks.csv tracker
+NX-104,FALSE,TRUE,NX-002,,ADR for metadata-driven variable-rate layer mapping and agronomic imports
+NX-105,FALSE,FALSE,NX-054,,Extend legacy importer to load BackPic imagery bundles
+NX-106,FALSE,FALSE,NX-054,,Import Field.txt overview metadata into Nexus field records
+NX-107,FALSE,FALSE,"NX-054, NX-104",,Parse Flags.txt markers and expose them in the UI map
+NX-108,FALSE,FALSE,NX-054,,Resume Contour.txt passes within Nexus contour guidance
+NX-109,FALSE,FALSE,"NX-054, NX-035",,Translate RecPath.txt logs into replay-compatible datasets
+NX-110,FALSE,FALSE,NX-054,,Import Tram.txt templates and hook them into tramline planning
+NX-111,FALSE,FALSE,"NX-054, NX-032",,Load Sections.txt history into the layer registry for coverage continuity
+NX-112,FALSE,FALSE,"NX-104, NX-032",,Replace binary section overlay with layer-aware visualization in the UI
+NX-113,FALSE,FALSE,NX-104,,Build GeoTIFF/ISOXML/shapefile importers that normalize agronomic maps into layers
+NX-114,FALSE,FALSE,"NX-104, NX-032",,Variable-rate controller plugin converting layer tiles into commanded section rates
+NX-115,FALSE,TRUE,NX-002,,AOG-Link protocol specification and reference flows
+NX-116,FALSE,FALSE,NX-115,,Shared aog-link.proto schemas with nanopb options
+NX-117,FALSE,FALSE,"NX-115, NX-003",,Bridge service host mediating gRPC, AOG-Link, and PGN flows
+NX-118,FALSE,FALSE,NX-117,,gRPC ⇄ AOG-Link translator with ack/retry handling
+NX-119,FALSE,FALSE,NX-117,,AOG-Link ⇄ PGN compatibility bridge for legacy devices
+NX-120,FALSE,FALSE,NX-116,,AOG-Link Ethernet/UDP driver with multicast and command retries
+NX-121,FALSE,FALSE,NX-116,,AOG-Link RS-485/serial driver using COBS + CRC and slot scheduling
+NX-122,FALSE,FALSE,NX-116,,AOG-Link CAN/CAN-FD driver implementing AOG-CAN ID layout and segmentation

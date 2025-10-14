@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.plugins.isobus-bridge",
+  "name": "ISOBUS Communications Bridge",
+  "version": "1.0.0",
+  "description": "Bridges ISO 11783 CAN PGNs with the Nexus UDP envelope and records diagnostics.",
+  "requiredApis": {
+    "aog.core.telemetry": "1.0"
+  },
+  "settings": {
+    "sourceAddress": {
+      "type": "byte",
+      "default": 144,
+      "description": "Default ISOBUS source address claimed by the bridge."
+    }
+  },
+  "simProviders": []
+}

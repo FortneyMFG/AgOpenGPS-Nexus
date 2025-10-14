@@ -19,6 +19,17 @@ Clarify how fields, boundaries, tram lines, tiles, and telemetry are stored, syn
 - R-DATA-017 (SHOULD, multi-session fusion): Document spatial/temporal alignment rules, CRS policies, and provenance chaining when merging PoseStreams or layers across sessions or implements so analytics stay auditable.
 - R-DATA-018 (SHOULD, provenance registry): Capture registry hashes, quality scores, and audit metadata alongside stored tiles and logs so derived products can expose traceable lineage through plugins and exports.
 
+### R-CRS — Coordinate reference & precision
+- R-DATA-019 (MUST, canonical CRS policy): Define the default CRS (WGS84) and rules for switching to projected systems (e.g., UTM per field) so PoseStreams, tile stores, and exports remain aligned without manual overrides.
+- R-DATA-020 (MUST, numeric precision): Specify numeric storage types (f16/f32/u16) and rounding policies per layer type to balance fidelity with storage budgets across vector logs and tiles.
+- R-DATA-021 (SHOULD, unit normalization): Publish a canonical units catalog (e.g., pop/ac, gal/ac, kg/ha) and conversion rules so ingest/export flows normalize values deterministically.
+- R-DATA-022 (SHOULD, reprojection governance): Require import/export tooling to log CRS transforms, precision loss, and bounding boxes whenever data is reprojected or resampled.
+
+### R-DATA — Lifecycle & performance guardrails
+- R-DATA-023 (MUST, retention policy): Document minimum on-device retention windows, compaction triggers, and archival workflows so storage usage stays predictable across rigs.
+- R-DATA-024 (SHOULD, background maintenance): Define background jobs (tile compaction, log roll-up, codec upgrades) with CPU/IO budgets to avoid starving live ingest.
+- R-DATA-025 (SHOULD, deterministic transforms): Mandate deterministic transforms between PoseStream vector logs and TileStore outputs so replays reproduce identical hashes given fixture inputs.
+
 ## Options
 - O-DATA-0: Status quo — Local file storage with SQLite + custom binary/JSON field artifacts.
 - O-DATA-1: Formalize a documented schema (e.g., protobuf) for all field assets.
@@ -45,10 +56,14 @@ Offline use, storage footprint, interoperability, migration effort, tooling avai
 - Layer catalog work should land with export tooling and schema hashes before any centralized storage move is reconsidered.【F:docs/SRS/options/O-DATA-5_MetadataDrivenLayers.md†L59-L78】【F:docs/SRS/options/O-TEST-4_LayerReplayCI.md†L7-L27】
 
 ## Upcoming ADR coverage
-- **ADR-007 PoseStream & SectionState architecture** will codify the unified pose timeline, diffed SectionState records, and replay determinism needed to satisfy R-DATA-015 and align with transport and plugin requirements.【F:docs/ADR/ADR-roadmap.md†L38-L62】
-- **ADR-009 Persistence & storage** will finalize the vector log + tile store architecture governed by R-DATA-016 and R-DATA-018, including codecs, compaction, and crash-safety policies.【F:docs/ADR/ADR-roadmap.md†L92-L115】
-- **ADR-012 Multi-session & fusion** will settle the merge semantics and provenance chain expected by R-DATA-017 when combining historical PoseStreams or agronomic layers.【F:docs/ADR/ADR-roadmap.md†L168-L190】
-- **ADR-014 Interop formats** will map the internal tile/log model to export/import standards while preserving schema hashes and units per R-DATA-003 and R-DATA-014.【F:docs/ADR/ADR-roadmap.md†L202-L227】
+- **ADR-007 PoseStream & SectionState architecture** will codify the unified pose timeline, diffed SectionState records, and replay determinism needed to satisfy R-DATA-015 and align with transport and plugin requirements.【F:docs/ADR/ADR-roadmap.md†L19-L25】
+- **ADR-009 Persistence & storage** will finalize the vector log + tile store architecture governed by R-DATA-016 and R-DATA-018, including codecs, compaction, and crash-safety policies.【F:docs/ADR/ADR-roadmap.md†L35-L41】
+- **ADR-012 Multi-session & fusion** will settle the merge semantics and provenance chain expected by R-DATA-017 when combining historical PoseStreams or agronomic layers.【F:docs/ADR/ADR-roadmap.md†L59-L65】
+- **ADR-014 Interop formats** will map the internal tile/log model to export/import standards while preserving schema hashes and units per R-DATA-003 and R-DATA-014.【F:docs/ADR/ADR-roadmap.md†L75-L81】
+- **ADR-022 CRS/units & precision policy** will define canonical CRS defaults, numeric precision tiers, and unit normalization so PoseStreams, tiles, and exports stay aligned under R-DATA-019…R-DATA-022.【F:docs/ADR/ADR-roadmap.md†L139-L145】
+- **ADR-023 Session/job model & provenance graph** will wire sessions and provenance metadata together, satisfying R-DATA-017…R-DATA-025 and linking analytics outputs to storage.【F:docs/ADR/ADR-roadmap.md†L147-L153】
+- **ADR-025 Data lifecycle & retention** codifies retention windows, compaction triggers, and archival workflows required by R-DATA-013 and R-DATA-023…R-DATA-025.【F:docs/ADR/ADR-roadmap.md†L163-L169】
+- **ADR-026 Performance budgets** sets the CPU/IO and storage targets that govern background maintenance jobs and replay determinism under R-DATA-024…R-DATA-025.【F:docs/ADR/ADR-roadmap.md†L171-L177】
 
 ## Open questions
 - Which artifacts must be backward compatible for existing rigs?

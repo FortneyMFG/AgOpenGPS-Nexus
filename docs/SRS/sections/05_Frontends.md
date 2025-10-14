@@ -15,6 +15,12 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - R-FE-013 (SHOULD, safety posture): Distinguish monitor-only remote clients from control-capable clients with explicit capability flags so safety-critical actions are disabled on unreliable links by default.
 - R-FE-014 (SHOULD, operator readiness): Capture training, preset migration, and configuration handoff requirements when metadata-heavy dashboards roll out so operators can transition without losing saved layouts.
 - R-FE-020 (SHOULD, proposed-composite-sim): Surface a unified simulation bar that drives play/pause/seek/speed for the authoritative SimClock so operators, replay, and plugin simulators stay synchronized.
+- R-FE-021 (SHOULD, accessibility): Provide theming and localization hooks so plugin-supplied panels inherit readable typography, contrast, and translated labels without manual wiring.
+
+### R-FE — Plugin UI contributions
+- R-FE-030 (MUST, plugin manifest UI): Load plugin-declared panels, config pages, and map overlays at runtime using declarative manifests so Core/UI updates do not require recompiling plugin visuals.
+- R-FE-031 (MUST, safety gating): Enforce capability-aware states (monitor vs. control) across plugin UI surfaces so panels that issue commands remain hidden or read-only when permissions are denied or connections degrade.
+- R-FE-032 (SHOULD, shared widgets): Provide a shared library of charts, tables, and map overlay primitives that plugin UI contributions can reference declaratively, preventing plugins from shipping bespoke rendering stacks.
 
 ## Options
 - O-FE-0: Status quo — Windows desktop suite (AgOpenGPS + AgIO + utilities).

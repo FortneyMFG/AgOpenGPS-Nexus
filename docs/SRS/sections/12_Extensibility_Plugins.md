@@ -18,6 +18,7 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - R-EXT-101 (MUST, NX-099): Normalize ISO 11783 condensed work state, gauge, and diagnostics PGNs (289–291, 65279, 65242, 65263, 65265, 65266, 64964) into the Layer/Telemetry registries so section control, machine status, and gauge widgets consume consistent topic IDs regardless of physical bus source.【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】【F:docs/SRS/sections/15_Engine_Machine_Gauges.md†L4-L134】
 - R-EXT-102 (SHOULD, NX-099): Surface plugin-provided diagnostics (bus load, address-claim status, last-PGN timestamps, fault codes) through the standard plugin health contract so the desktop UI and headless monitors can present actionable alerts without bespoke code paths.【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L7-L58】
 - R-EXT-103 (SHOULD, NX-099): Offer declarative mapping metadata that links configured implements to their ISOBUS Device Descriptor Identifiers (DDIs) and section counts, enabling UI manifests to auto-populate section control panels and gauge groups with accurate labels and units.【F:docs/SRS/appendices/GaugeId_Registry.md†L12-L20】【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】
+- R-EXT-120 (MUST, capability discovery): Require plugin manifests to declare produced/consumed PoseStream topics, layer definitions, control endpoints, and hardware bindings so Core can authorize and route capabilities deterministically.
 
 ## Options
 - O-EXT-0: Status quo — Extend by modifying source projects and rebuilding.
@@ -74,6 +75,10 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 ## Open questions
 - Which features are safe to expose via scripting vs. compiled plugins?
 - How do we version plugin APIs alongside firmware expectations?
+
+## Upcoming ADR coverage
+- **ADR-007 PoseStream & SectionState architecture** couples plugin topic manifests to the unified pose timeline and SectionState diffs, informing capability declarations required by R-EXT-120.【F:docs/ADR/ADR-roadmap.md†L38-L62】
+- **ADR-018 Plugin API & capability discovery** will finalize manifest schema, permissions, and lifecycle expectations that deliver on R-EXT-000 through R-EXT-120 while enabling hot-plug workflows.【F:docs/ADR/ADR-roadmap.md†L279-L299】
 
 ## Related specifications
 - Packaging, distribution, and catalog requirements: see Section 16 `Plugin Packaging, Updates, and Catalog`.

@@ -21,3 +21,7 @@ This index lists every active section in the SRS with quick links. Each section 
 | 15 | [Engine & Machine Gauges](sections/15_Engine_Machine_Gauges.md) | Read-only engine telemetry, gauge PGNs, JSON definitions, and shared UI behaviors. | Builds on 03 transport contracts and 05 frontend layouts; feeds 04 service controllers and 10 telemetry dashboards.
 | 16 | [Plugin Packaging, Updates, and Catalog](sections/16_Plugin_Packaging_Updates.md) | Plugin archive layout, manifest schema, permissions, catalog governance, and side-loading policies. | Relies on 12 extensibility scaffolding and 14 update distribution; sets trust inputs for 17 firmware updates.
 | 17 | [Device Firmware Updates](sections/17_Device_Firmware_Updates.md) | Device identity discovery, cataloged firmware releases, orchestrated flashing flows, and offline bundles. | Depends on 03 transports, 14 offline strategies, and 16 packaging policies; informs hardware readiness in 06.
+
+## Upcoming ADR program
+
+PoseStream, layer, and control workstreams captured in the [ADR roadmap](../ADR/ADR-roadmap.md) span Sections 03, 07–12. Track requirements R-COMM-020/R-COMM-021, R-GEO-000–R-GEO-002, R-DATA-015–R-DATA-018, R-CTRL-000–R-CTRL-002, R-TH-020/R-TH-021, R-CI-020–R-CI-030, and R-EXT-120 as prerequisites for those ADRs before promoting related options to review.

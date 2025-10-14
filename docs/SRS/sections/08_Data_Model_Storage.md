@@ -14,6 +14,10 @@ Clarify how fields, boundaries, tram lines, tiles, and telemetry are stored, syn
 - R-DATA-004 (COULD): Add compression and delta sync for large telemetry sets without breaking existing file readers.
 - R-DATA-013 (SHOULD, retention): Define minimum retention/archival windows for agronomic history (e.g., three seasons accessible offline, long-term archives exportable to cold storage) so future requirements inherit a shared performance envelope.
 - R-DATA-014 (SHOULD, schema integrity): Clarify how schema hashes flow through export/import tooling (including mismatch detection and operator prompts) to prevent silent drift between machines running different Core or firmware versions.
+- R-DATA-015 (MUST, PoseStream persistence): Record PoseStream and SectionState vector logs with monotonic ordering, compression hints, and replay indexes so deterministic replays can rebuild field state without floating drift.
+- R-DATA-016 (MUST, tile store governance): Define chunked tile layouts, cell sizes, codecs, and compaction/append strategies for quantitative layers so storage remains bounded while preserving engineering fidelity.
+- R-DATA-017 (SHOULD, multi-session fusion): Document spatial/temporal alignment rules, CRS policies, and provenance chaining when merging PoseStreams or layers across sessions or implements so analytics stay auditable.
+- R-DATA-018 (SHOULD, provenance registry): Capture registry hashes, quality scores, and audit metadata alongside stored tiles and logs so derived products can expose traceable lineage through plugins and exports.
 
 ## Options
 - O-DATA-0: Status quo — Local file storage with SQLite + custom binary/JSON field artifacts.
@@ -39,6 +43,12 @@ Offline use, storage footprint, interoperability, migration effort, tooling avai
 ## Current sentiment
 - Keep local files operational while documenting how they evolve and what metadata is missing for machine-to-machine exchange.
 - Layer catalog work should land with export tooling and schema hashes before any centralized storage move is reconsidered.【F:docs/SRS/options/O-DATA-5_MetadataDrivenLayers.md†L59-L78】【F:docs/SRS/options/O-TEST-4_LayerReplayCI.md†L7-L27】
+
+## Upcoming ADR coverage
+- **ADR-007 PoseStream & SectionState architecture** will codify the unified pose timeline, diffed SectionState records, and replay determinism needed to satisfy R-DATA-015 and align with transport and plugin requirements.【F:docs/ADR/ADR-roadmap.md†L38-L62】
+- **ADR-009 Persistence & storage** will finalize the vector log + tile store architecture governed by R-DATA-016 and R-DATA-018, including codecs, compaction, and crash-safety policies.【F:docs/ADR/ADR-roadmap.md†L92-L115】
+- **ADR-012 Multi-session & fusion** will settle the merge semantics and provenance chain expected by R-DATA-017 when combining historical PoseStreams or agronomic layers.【F:docs/ADR/ADR-roadmap.md†L168-L190】
+- **ADR-014 Interop formats** will map the internal tile/log model to export/import standards while preserving schema hashes and units per R-DATA-003 and R-DATA-014.【F:docs/ADR/ADR-roadmap.md†L202-L227】
 
 ## Open questions
 - Which artifacts must be backward compatible for existing rigs?

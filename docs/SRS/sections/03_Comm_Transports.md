@@ -14,10 +14,16 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - R-COMM-005 (MUST, proposed-PGNBridge): Preserve byte-for-byte compatibility with the current AgIO PGN framing or provide a deterministic bridge when introducing new transports.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
 - R-COMM-012 (SHOULD, transport-hardening): Establish latency budgets (<100 ms round-trip for control loops, <500 ms for monitoring) and error budgets (≤0.1% packet loss after retries) for any new gRPC/WebSocket channels so contributors know when the slice is ready to graduate from proposal to review.
 - R-COMM-013 (SHOULD, security posture): Document optional encryption/authentication expectations (TLS 1.3, mutual certs or token auth) for modern transports while ensuring PGN bridges can operate offline when credentials are unavailable.
+- R-COMM-020 (MUST, PoseStream cadence): Publish a canonical PoseStream cadence/decimation policy with deterministic sequencing so Core, plugins, and firmware consume a single authoritative pose timeline during live runs and replays.
+- R-COMM-021 (SHOULD, layer transport handshake): Extend the layer PGN/registry handshake with registry hashes, payload chunking rules, and retry/back-pressure signals so variable-rate controllers can negotiate capabilities before exchanging SectionState deltas.
 
 ## Adopted architecture (ADR alignment)
 - [ADR-002](../../ADR/ADR-002-grpc-contracts.md) establishes gRPC/protobuf as the authoritative **inter-process** API between Core, UI, plugins, automation tooling, and the Bridge/AgIO hosts. All desktop/server processes share the generated `Aog.Abstractions` clients while transports below the Bridge remain opaque to them.
 - [ADR-006](../../ADR/ADR-006-aog-link-mcu-communications.md) defines **AOG-Link** as the MCU communications layer using nanopb datagrams over Ethernet, RS-485/serial, or CAN. The Bridge service translates between gRPC contracts, AOG-Link frames, and legacy PGN flows so firmware evolution does not alter higher-layer APIs.
+
+## Upcoming ADR coverage
+- **ADR-007 PoseStream & SectionState architecture** will standardize the pose timeline, SectionState diff rules, and replay guarantees that satisfy transport requirements R-COMM-010, R-COMM-011, and R-COMM-020 while aligning plugin/service expectations captured in Section 12.【F:docs/ADR/ADR-roadmap.md†L38-L62】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L11-L34】
+- **ADR-016 Firmware/Transport: Variable-Rate & Layer PGNs** will finalize payload packing, sequencing, and registry-handshake semantics for layer definitions, fulfilling R-COMM-010, R-COMM-011, and R-COMM-021 prior to firmware rollout.【F:docs/ADR/ADR-roadmap.md†L118-L140】
 
 ### AOG-Link MCU datagram protocol
 AOG-Link standardizes MCU-to-host and MCU-to-MCU exchanges on compact protobuf messages compiled with nanopb. Every packet begins with a fixed header of `{version, class, type, seq, src, dst, len}` followed by the protobuf payload; serial links append a CRC-16 after the payload. The fields mirror the IDs exposed through the gRPC contracts so the Bridge can map between the layers without lossy transforms.

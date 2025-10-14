@@ -51,6 +51,14 @@ Draft authors should reference the listed requirements and tasks before opening 
 - **Tasks:** Presets/Layout services, layout diff tooling, preset switcher UI, task orchestration service, fixture catalog, migration utilities.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L41-L74】
 - **Acceptance hooks:** Preset apply regression pack, layout inheritance diff tests, task orchestration telemetry, UX guardrail validation.
 
+### ADR-031 — Official plugin bundle & dependency governance
+- **Scope:** Ratify the authoritative manifest schema, dependency matrices, and compatibility policy for the first-party plugin bundle (guidance, mapping, rate/section control, IO bridges, UI shell) so deployments can validate stack integrity before activation.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】
+- **Key decisions:** Manifest compliance tooling, dependency classification (hard/soft/suggest), release cadence for manifest updates, and how Core enforces mismatched ranges during plugin load.【F:docs/plugins/nexus-plugin-dependency-map.md†L13-L421】
+- **SRS alignment:** Extensibility & Plugins (§12 R-EXT-120, R-EXT-150), Hardware I/O (§06 AgIO bridge contracts), Frontends (§05 UI contributions).【F:docs/SRS/sections/12_Extensibility_Plugins.md†L1-L161】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L54】【F:docs/SRS/sections/05_Frontends.md†L1-L120】
+- **Primary requirements:** R-EXT-120, R-EXT-150, R-HW-020…R-HW-027, R-FE-030…R-FE-032.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L113-L161】【F:docs/SRS/sections/06_Hardware_IO.md†L16-L54】【F:docs/SRS/sections/05_Frontends.md†L20-L76】
+- **Tasks:** Promote manifest schema tooling, automate dependency graph validation in CI, publish per-plugin manifests, and surface compatibility status in Device Manager/UI Shell.【F:docs/plugins/nexus-plugin-dependency-map.md†L167-L421】
+- **Acceptance hooks:** CI job validating manifests against schema, Core refusing incompatible bundles with actionable errors, UI status badges reflecting dependency health.
+
 ### ADR-007 — PoseStream & SectionState architecture
 - **Scope:** A single, time-ordered PoseStream spanning tractor, implement, toolbar, and section poses with diffed SectionState updates, unified vector logs, and event/opportunity metrics.
 - **Key decisions:** Cadence/decimation policy, one pose timeline for all layers, SectionState diff rules, optional per-layer micro-streams when plugin cadence diverges, replay determinism budgets, and how to compute opportunity vs. event tallies.

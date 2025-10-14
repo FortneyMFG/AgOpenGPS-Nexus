@@ -19,6 +19,7 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - R-EXT-102 (SHOULD, NX-099): Surface plugin-provided diagnostics (bus load, address-claim status, last-PGN timestamps, fault codes) through the standard plugin health contract so the desktop UI and headless monitors can present actionable alerts without bespoke code paths.【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L7-L58】
 - R-EXT-103 (SHOULD, NX-099): Offer declarative mapping metadata that links configured implements to their ISOBUS Device Descriptor Identifiers (DDIs) and section counts, enabling UI manifests to auto-populate section control panels and gauge groups with accurate labels and units.【F:docs/SRS/appendices/GaugeId_Registry.md†L12-L20】【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】
 - R-EXT-120 (MUST, capability discovery): Require plugin manifests to declare produced/consumed PoseStream topics, layer definitions, control endpoints, and hardware bindings so Core can authorize and route capabilities deterministically.
+- R-EXT-150 (MUST, NX-134): Maintain an authoritative dependency register, manifest catalog, and compatibility matrix for all first-party plugins so operators and Core can validate stack composition before activation.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】
 
 ### R-EXT — Plugin lifecycle & security
 - R-EXT-130 (MUST, lifecycle states): Standardize plugin lifecycle states (discovered, verified, started, healthy, degraded, stopped) with observable transitions so Core can supervise hot-plug workflows and automated recovery.
@@ -58,6 +59,7 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 - The unified .NET 8 plugin runtime (shared gRPC contracts + manifest loader) is the leading proposal because it supports cross-platform simulation, replay, and device plugins without per-OS rewrites.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L79】
 - Treating the UI and advanced agronomy modules as “official plugins” keeps the default install familiar while letting operators toggle them off to run core services headless.【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L7-L58】
 - Contributors want the simulation surface to live inside the plugin contract so device, agronomy, and automation modules can share deterministic scenarios without recompiling Core or duplicating ModSim logic.
+- The official plugin dependency map now enumerates cross-domain hard/soft requirements, manifest metadata, and compatibility ranges to guide bundle validation and satisfy R-EXT-150.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】
 
 ## Composite simulation blueprint
 

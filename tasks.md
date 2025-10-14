@@ -119,6 +119,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-125 Stack responsibility reference ADR _(Done)_
 - [ ] NX-116 README experiment narrative refresh _(In Progress)_
 - [ ] NX-124 Spatial constraint zones ADR & SRS sync _(In Progress)_
+- [x] NX-134 Official plugin dependency map & manifests _(Done)_
 
 ### Section H — Safety & QA
 - [x] NX-070 Heartbeats & failsafe watchdogs

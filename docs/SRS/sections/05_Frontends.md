@@ -19,6 +19,10 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - R-FE-040 (MUST, spatial constraint overlays): Render boundary, headland, keep-out, and work-disabled zones with canonical symbology (outline, hatch, fill colors) and legend entries so operators and plugins see consistent constraint states across all frontends.
 - R-FE-041 (SHOULD, zone management UI): Provide zone list, enable/disable toggles, buffer controls, and provenance/tooltips within the map UI so operators can adjust constraint policies without leaving the field workflow.
 - R-FE-042 (SHOULD, override awareness): Surface alerts and undo affordances when Core gates automation due to zones (e.g., autosteer inhibited, product off) so operators understand and acknowledge constraint-driven behavior.
+- R-FE-050 (MUST, job lifecycle UI): Mirror the legacy Job menu verbs (New, Resume, Open, Drive-In, Import, Clone, Close) and surface the active job with status chips/drawers so operators can manage sessions without losing compatibility with V6 workflows.【F:docs/ADR/ADR-030-field-job-sessions.md†L40-L67】
+- R-FE-051 (SHOULD, job drawer details): Display job metadata (boundaries, coverage status, guidance sets, presets/layout links) with Drive-In prompts and autosave warnings so operators see lifecycle context at a glance.【F:docs/ADR/ADR-030-field-job-sessions.md†L41-L86】
+- R-FE-052 (SHOULD, preset switcher & diff): Provide preset selectors, layout diff viewers, and snapshot/live-link indicators so operators understand the impact of applying presets or editing shared layouts.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L11-L53】
+- R-FE-053 (SHOULD, task orchestration UI): Surface task progress, retries, and failures triggered by preset or layout changes so background preparation steps remain transparent and actionable.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L25-L62】
 
 ### R-FE — Plugin UI contributions
 - R-FE-030 (MUST, plugin manifest UI): Load plugin-declared panels, config pages, and map overlays at runtime using declarative manifests so Core/UI updates do not require recompiling plugin visuals.

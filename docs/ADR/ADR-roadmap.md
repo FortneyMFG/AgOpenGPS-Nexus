@@ -1,6 +1,8 @@
 # ADR Roadmap: PoseStream, Layer, and Control Program
 
-This tracker consolidates current and planned Architecture Decision Records so the Nexus team can stage the PoseStream, section control, and variable-rate overhaul in one place. It anchors task **NX-150** and links each ADR to the SRS requirements that must be satisfied before drafting or promoting the decision for review.【F:tasks.md†L131-L137】 Use it to coordinate sequencing, ensure prerequisite requirements are in place, and keep the community focused on the same backlog of decisions.
+This tracker consolidates current and planned Architecture Decision Records so the Nexus team can stage the PoseStream, section control, and variable-rate overhaul in one place. It links each ADR to the SRS requirements that must be satisfied before drafting or promoting the decision for review.【F:tasks.md†L131-L137】 Use it to coordinate sequencing, ensure prerequisite requirements are in place, and keep the community focused on the same backlog of decisions.
+
+> **Numbering note:** Two proposals currently occupy the ADR-030 slot (field job sessions and presets/layout linking). They are tracked separately here until one of the authors renumbers the follow-up document.【F:docs/ADR/ADR-030-field-job-sessions.md†L1-L55】【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L1-L41】
 
 ## Adopted decisions (foundation)
 
@@ -10,11 +12,20 @@ This tracker consolidates current and planned Architecture Decision Records so t
 | [ADR-002](ADR-002-grpc-contracts.md) | Expose Nexus services over gRPC/protobuf contracts | Accepted | SRS §03 Communications & Transports, §07 Interprocess API | R-COMM-000…R-COMM-013, R-API-000…R-API-012【F:docs/ADR/ADR-002-grpc-contracts.md†L1-L28】【F:docs/SRS/sections/03_Comm_Transports.md†L1-L27】【F:docs/SRS/sections/07_Interprocess_API.md†L1-L18】 |
 | [ADR-003](ADR-003-avalonia-ui.md) | Use Avalonia for the cross-platform Nexus UI shell | Accepted | SRS §02 UI Framework, §05 Frontends | R-UI-000…R-UI-007, R-FE-000…R-FE-014【F:docs/ADR/ADR-003-avalonia-ui.md†L1-L22】【F:docs/SRS/sections/02_Framework_UI.md†L1-L48】【F:docs/SRS/sections/05_Frontends.md†L1-L120】 |
 | [ADR-004](ADR-004-composite-simulation.md) | Establish the composite simulation fabric (SimClock + SimBus) | Accepted | SRS §04 Backend Services, §12 Extensibility & Plugins | R-BE-000…R-BE-014, R-EXT-030…R-EXT-103【F:docs/ADR/ADR-004-composite-simulation.md†L1-L20】【F:docs/SRS/sections/04_Backend_Services.md†L1-L120】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L51-L74】 |
-| [ADR-006](ADR-006-aog-link-mcu-communications.md) | MCU communications over AOG-Link (nanopb) | Accepted | SRS §03 Communications & Transports, §06 Hardware I/O | R-COMM-000…R-COMM-013, R-HW-000…R-HW-014【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L1-L55】【F:docs/SRS/sections/03_Comm_Transports.md†L1-L27】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L38】 |
+| [ADR-006](ADR-006-aog-link-mcu-communications.md) | MCU communications over AOG-Link (nanopb) | Accepted | SRS §03 Communications & Transports, §06 Hardware I/O | R-COMM-000…R-COMM-013, R-HW-000…R-HW-014【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L1-L55】【F:docs/SRS/sections/03_Comm_Transports.md†L1-L45】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L38】 |
+| [ADR-028](ADR-028-stack-boundaries.md) | Nexus stack responsibilities & handoff boundaries | Accepted | SRS §03 Communications & Transports, §06 Hardware I/O, §12 Extensibility & Plugins | R-COMM-000…R-COMM-032, R-HW-000…R-HW-027, R-EXT-000…R-EXT-134【F:docs/ADR/ADR-028-stack-boundaries.md†L1-L118】【F:docs/SRS/sections/03_Comm_Transports.md†L1-L45】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L54】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L1-L80】 |
 
-## Planned ADRs (staged under NX-150)
+## Active proposals & in-flight drafts
 
-Each entry inherits the numbering shown here (ADR-007 through ADR-020) now that ADR-005 has been retired. Draft authors should reference the listed requirements and tasks before opening a proposal.
+Draft authors should reference the listed requirements and tasks before opening a proposal so prerequisite SRS coverage is already in place.
+
+### ADR-027 — Spatial constraints & zone policies
+- **Scope:** Stand up a ZoneService with first-class boundary, headland, keep-out, and work-disabled polygons so guidance, section control, and visualization share deterministic constraint context across live runs and replays.【F:docs/ADR/ADR-027-spatial-constraints.md†L7-L55】
+- **Key decisions:** Canonical zone types and buffered footprints, storage/indexing strategy, PoseStream zone bitmask semantics, control arbiter gates, and shared UX contracts for overrides and provenance.【F:docs/ADR/ADR-027-spatial-constraints.md†L11-L64】
+- **SRS alignment:** Communications (§03 zone streaming), Data Model (§08 zone persistence), Control (§09 constraint gating), Telemetry (§10 override logging).【F:docs/SRS/sections/03_Comm_Transports.md†L16-L45】【F:docs/SRS/sections/08_Data_Model_Storage.md†L21-L27】【F:docs/SRS/sections/09_Control_Automation.md†L16-L60】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】
+- **Primary requirements:** R-COMM-020…R-COMM-023; R-DATA-015…R-DATA-028; R-CTRL-000…R-CTRL-007.【F:docs/SRS/sections/03_Comm_Transports.md†L20-L45】【F:docs/SRS/sections/08_Data_Model_Storage.md†L17-L27】【F:docs/SRS/sections/09_Control_Automation.md†L12-L60】
+- **Tasks:** ZoneService/storage implementation, guidance/section plugin integration, UI editor/importers, replay fixtures.【F:docs/ADR/ADR-027-spatial-constraints.md†L64-L108】
+- **Acceptance hooks:** Deterministic zone-mask fixtures, constraint gate fault-injection tests, override audit log verification.
 
 ### ADR-029 — Mapping plugin architecture & geospatial kernel split
 - **Scope:** Move mapping engines into plugins while Core keeps a minimal geospatial kernel (CRS transforms, tiling helpers, monotonic timebase, deterministic replay scaffolding, null providers). Ensure headless rigs and alternate pose sources can run without mapping while variable-rate and sections consume a stable Mapping API.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L7-L84】
@@ -23,6 +34,22 @@ Each entry inherits the numbering shown here (ADR-007 through ADR-020) now that 
 - **Primary requirements:** R-COMM-020…R-COMM-042; R-BE-000…R-BE-014; R-DATA-010…R-DATA-025; R-EXT-010…R-EXT-134.【F:docs/SRS/sections/03_Comm_Transports.md†L11-L28】【F:docs/SRS/sections/04_Backend_Services.md†L6-L20】【F:docs/SRS/sections/08_Data_Model_Storage.md†L11-L31】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L11-L80】
 - **Tasks:** Draft Mapping proto/service updates, implement NullMapping/NullPose, prototype grid mapping plugin with replay fixtures, extend plugin loader for capability-gated presets.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L86-L93】
 - **Acceptance hooks:** Deterministic replay fixtures covering Pose→RateHint/SectionMask flows, capability registry integration tests, restart/isolation fault-injection scenarios.
+
+### ADR-030 — Field job sessions & lifecycle services
+- **Scope:** Establish a job metadata schema, filesystem job store, and Core-hosted lifecycle service so New/Resume/Open/Drive-In flows share deterministic state across Core, UI, plugins, and import pipelines while remaining compatible with legacy archives.【F:docs/ADR/ADR-030-field-job-sessions.md†L7-L58】
+- **Key decisions:** Versioned `aog.job.v1` schema, job folder layout, JobsService verbs, UI drawer/menu parity, plugin lifecycle hooks, and autosave/journaling expectations.【F:docs/ADR/ADR-030-field-job-sessions.md†L13-L86】
+- **SRS alignment:** Data Model (§08 job metadata & journaling), Frontends (§05 job menus & drawer), Extensibility (§12 plugin lifecycle hooks).【F:docs/SRS/sections/08_Data_Model_Storage.md†L24-L27】【F:docs/SRS/sections/05_Frontends.md†L22-L25】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L29-L32】
+- **Primary requirements:** R-DATA-029…R-DATA-031; R-FE-050…R-FE-052; R-EXT-140…R-EXT-142.【F:docs/SRS/sections/08_Data_Model_Storage.md†L24-L27】【F:docs/SRS/sections/05_Frontends.md†L22-L25】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L29-L32】
+- **Tasks:** Implement job schema/helpers, JobsService host, Avalonia job drawer/menu, importer hooks, Drive-In geofence indexing, autosave/journaling pipeline.【F:docs/ADR/ADR-030-field-job-sessions.md†L58-L97】
+- **Acceptance hooks:** Crash-recovery replay fixture, legacy archive migration tests, Drive-In geofence discovery scenarios, plugin lifecycle integration tests.
+
+### ADR-030 (Presets & layout linking) — Equipment workflow presets
+- **Scope:** Deliver presets that bind equipment, implements, and layouts with live-link or snapshot semantics, plus task orchestration that surfaces progress when presets change machine context.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L7-L35】
+- **Key decisions:** Preset/Layout service contracts, versioned layout documents with inheritance, live-link vs. snapshot behavior, diff/rollback tooling, and task orchestration APIs surfaced in the UI.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L11-L39】
+- **SRS alignment:** Frontends (§05 preset switcher & diff tooling), Data Model (§08 preset/layout provenance), Extensibility (§12 task orchestration & permissions).【F:docs/SRS/sections/05_Frontends.md†L22-L25】【F:docs/SRS/sections/08_Data_Model_Storage.md†L24-L27】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L29-L32】
+- **Primary requirements:** R-FE-050…R-FE-053; R-DATA-029…R-DATA-032; R-EXT-140…R-EXT-143.【F:docs/SRS/sections/05_Frontends.md†L22-L25】【F:docs/SRS/sections/08_Data_Model_Storage.md†L24-L27】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L29-L32】
+- **Tasks:** Presets/Layout services, layout diff tooling, preset switcher UI, task orchestration service, fixture catalog, migration utilities.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L41-L74】
+- **Acceptance hooks:** Preset apply regression pack, layout inheritance diff tests, task orchestration telemetry, UX guardrail validation.
 
 ### ADR-007 — PoseStream & SectionState architecture
 - **Scope:** A single, time-ordered PoseStream spanning tractor, implement, toolbar, and section poses with diffed SectionState updates, unified vector logs, and event/opportunity metrics.
@@ -49,7 +76,7 @@ Each entry inherits the numbering shown here (ADR-007 through ADR-020) now that 
 - **Acceptance hooks:** Determinism fixture (TileStore hash matches), pose-ingest CPU budget (<Z% on reference hardware), ISOXML round-trip tolerance.
 
 ### ADR-010 — Layer registry & variable-rate framework
-- **Scope:** LayerDefinition schema, units, normalization, color ramps, aggregation modes, discovery/versioning; replaces legacy ADR-005.
+- **Scope:** LayerDefinition schema, units, normalization, color ramps, aggregation modes, discovery/versioning; supersedes earlier variable-rate catalog drafts.
 - **Key decisions:** IDs, schema hashes, numeric precision, display metadata, registry publishing cadence, and compatibility with plugin manifests.
 - **SRS alignment:** Data Model (§08) and Extensibility (§12).【F:docs/SRS/sections/08_Data_Model_Storage.md†L6-L31】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L28】
 - **Primary requirements:** R-DATA-010…R-DATA-014; R-EXT-010; R-EXT-120.【F:docs/SRS/sections/08_Data_Model_Storage.md†L11-L21】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L11-L28】
@@ -185,5 +212,5 @@ Each entry inherits the numbering shown here (ADR-007 through ADR-020) now that 
 - **Acceptance hooks:** Determinism fixture (TileStore hash matches), pose-ingest CPU budget (<Z% on reference hardware), ISOXML round-trip tolerance.
 ## How to use this tracker
 - **Before drafting an ADR**, confirm the associated requirements are satisfied or add missing ones to the SRS within the relevant section (Sections 03, 07–12 already include new requirement IDs for this program).【F:docs/SRS/sections/03_Comm_Transports.md†L6-L28】【F:docs/SRS/sections/07_Interprocess_API.md†L6-L28】【F:docs/SRS/sections/08_Data_Model_Storage.md†L6-L31】【F:docs/SRS/sections/09_Control_Automation.md†L8-L22】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L17】【F:docs/SRS/sections/11_Testing_CI_CDPipelines.md†L6-L19】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L28】
-- **During implementation**, link work items to NX-150 and update this file with progress notes or additional prerequisites discovered by prototypes or field feedback.
+- **During implementation**, link work items to the corresponding NX task in `tasks.md` and update this file with progress notes or additional prerequisites discovered by prototypes or field feedback.【F:tasks.md†L131-L149】
 - **When an ADR is approved**, move it to the adopted table above and ensure the SRS section references are updated to point to the final record.

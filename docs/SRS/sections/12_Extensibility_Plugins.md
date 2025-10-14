@@ -26,6 +26,10 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - R-EXT-132 (SHOULD, manifest signing): Support optional signing/verification of plugin bundles with operator overrides documented for air-gapped rigs.
 - R-EXT-133 (SHOULD, remote plugins): Document requirements for remote plugin connections (mTLS, leases, restart policies) so edge clusters and cab computers behave consistently.
 - R-EXT-134 (SHOULD, audit trails): Capture plugin health, command history, and configuration edits in a provenance stream to satisfy Section 09 control audit requirements.
+- R-EXT-140 (MUST, job lifecycle hooks): Expose plugin lifecycle callbacks (`onJobOpen`, `onJobSave`, `onJobClose`, `onJobImport`) gated by `jobs.lifecycle` permissions so importers, analytics, and automation modules participate deterministically in job workflows.【F:docs/ADR/ADR-030-field-job-sessions.md†L47-L86】
+- R-EXT-141 (SHOULD, preset orchestration): Provide SDK helpers and permissions for presets/layout services so plugins can request preset applications, contribute validators, and register dependency graph observers without bypassing Core arbitration.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L11-L62】
+- R-EXT-142 (SHOULD, Drive-In providers): Allow plugins to register Drive-In discovery sources and job importers while Core enforces schema validation and provenance logging for contributed assets.【F:docs/ADR/ADR-030-field-job-sessions.md†L47-L86】
+- R-EXT-143 (SHOULD, task orchestration API): Standardize background task submission, progress streaming, and retry semantics so preset-related preparation work remains observable and restartable across plugins and UI shells.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L19-L62】
 
 ## Options
 - O-EXT-0: Status quo — Extend by modifying source projects and rebuilding.
@@ -84,9 +88,9 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 - How do we version plugin APIs alongside firmware expectations?
 
 ## Upcoming ADR coverage
-- **ADR-007 PoseStream & SectionState architecture** couples plugin topic manifests to the unified pose timeline and SectionState diffs, informing capability declarations required by R-EXT-120.【F:docs/ADR/ADR-roadmap.md†L19-L25】
-- **ADR-018 Plugin API & capability discovery** will finalize manifest schema, permissions, and lifecycle expectations that deliver on R-EXT-000 through R-EXT-120 while enabling hot-plug workflows.【F:docs/ADR/ADR-roadmap.md†L107-L113】
-- **ADR-024 Discovery & identity** will define plugin/node identity, capability handshakes, and lease semantics required by R-COMM-030…R-COMM-032 and R-EXT-130…R-EXT-134.【F:docs/ADR/ADR-roadmap.md†L155-L161】
+- **ADR-007 PoseStream & SectionState architecture** couples plugin topic manifests to the unified pose timeline and SectionState diffs, informing capability declarations required by R-EXT-120.【F:docs/ADR/ADR-roadmap.md†L67-L73】
+- **ADR-018 Plugin API & capability discovery** will finalize manifest schema, permissions, and lifecycle expectations that deliver on R-EXT-000 through R-EXT-120 while enabling hot-plug workflows.【F:docs/ADR/ADR-roadmap.md†L142-L148】
+- **ADR-024 Discovery & identity** will define plugin/node identity, capability handshakes, and lease semantics required by R-COMM-030…R-COMM-032 and R-EXT-130…R-EXT-134.【F:docs/ADR/ADR-roadmap.md†L190-L196】
 
 ## Related specifications
 - Packaging, distribution, and catalog requirements: see Section 16 `Plugin Packaging, Updates, and Catalog`.

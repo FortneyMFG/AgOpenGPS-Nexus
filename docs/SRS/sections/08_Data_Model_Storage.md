@@ -18,6 +18,9 @@ Clarify how fields, boundaries, tram lines, tiles, and telemetry are stored, syn
 - R-DATA-016 (MUST, tile store governance): Define chunked tile layouts, cell sizes, codecs, and compaction/append strategies for quantitative layers so storage remains bounded while preserving engineering fidelity.
 - R-DATA-017 (SHOULD, multi-session fusion): Document spatial/temporal alignment rules, CRS policies, and provenance chaining when merging PoseStreams or layers across sessions or implements so analytics stay auditable.
 - R-DATA-018 (SHOULD, provenance registry): Capture registry hashes, quality scores, and audit metadata alongside stored tiles and logs so derived products can expose traceable lineage through plugins and exports.
+- R-DATA-026 (MUST, spatial constraint schema): Persist boundary, headland, keep-out, and work-disabled zones as vector polygons (with holes) plus per-zone metadata (label, priority, enabled flag, provenance) in the geometry layer store so Core and plugins share authoritative constraints.
+- R-DATA-027 (MUST, buffered footprints): Support independent drive/work buffers per zone and store the effective buffered polygon so guidance, section control, and visualization can evaluate constraints without recomputing offsets at runtime.
+- R-DATA-028 (SHOULD, indexed queries): Maintain an R-tree or equivalent spatial index over zones to keep PoseStream zone-mask lookups and map rendering within real-time CPU budgets even with dozens of polygons.
 
 ### R-CRS — Coordinate reference & precision
 - R-DATA-019 (MUST, canonical CRS policy): Define the default CRS (WGS84) and rules for switching to projected systems (e.g., UTM per field) so PoseStreams, tile stores, and exports remain aligned without manual overrides.
@@ -54,6 +57,7 @@ Offline use, storage footprint, interoperability, migration effort, tooling avai
 ## Current sentiment
 - Keep local files operational while documenting how they evolve and what metadata is missing for machine-to-machine exchange.
 - Layer catalog work should land with export tooling and schema hashes before any centralized storage move is reconsidered.【F:docs/SRS/options/O-DATA-5_MetadataDrivenLayers.md†L59-L78】【F:docs/SRS/options/O-TEST-4_LayerReplayCI.md†L7-L27】
+- Spatial constraint zones should reuse the same geometry store and provenance logging so interop, replay, and automation consumers receive identical data regardless of import source or deployment topology.
 
 ## Upcoming ADR coverage
 - **ADR-007 PoseStream & SectionState architecture** will codify the unified pose timeline, diffed SectionState records, and replay determinism needed to satisfy R-DATA-015 and align with transport and plugin requirements.【F:docs/ADR/ADR-roadmap.md†L19-L25】

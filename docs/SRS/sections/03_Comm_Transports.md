@@ -16,6 +16,8 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - R-COMM-013 (SHOULD, security posture): Document optional encryption/authentication expectations (TLS 1.3, mutual certs or token auth) for modern transports while ensuring PGN bridges can operate offline when credentials are unavailable.
 - R-COMM-020 (MUST, PoseStream cadence): Publish a canonical PoseStream cadence/decimation policy with deterministic sequencing so Core, plugins, and firmware consume a single authoritative pose timeline during live runs and replays.
 - R-COMM-021 (SHOULD, layer transport handshake): Extend the layer PGN/registry handshake with registry hashes, payload chunking rules, and retry/back-pressure signals so variable-rate controllers can negotiate capabilities before exchanging SectionState deltas.
+- R-COMM-022 (MUST, spatial constraints service): Expose a ZoneService gRPC API (`ListZones`, `WatchZones`, `GetZonesInBounds`) that streams boundary, headland, keep-out, and work-disabled polygons with provenance metadata so guidance and section plugins share authoritative constraint geometry.
+- R-COMM-023 (MUST, pose zone mask): Attach a zone bitmask (`insideBoundary`, `insideHeadland`, `insideKeepOut`, `insideWorkDisabled`) to PoseStream samples so replays, plugins, and logs can reproduce constraint context deterministically when transports relay pose data.
 
 ### R-COMM — Plugin transport & leases
 - R-COMM-030 (MUST, plugin transport): Define how Core exposes gRPC endpoints, discovery directories, and lease heartbeats so plugins can register/renew capabilities without restarting Core or the UI.

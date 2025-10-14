@@ -16,6 +16,9 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - R-FE-014 (SHOULD, operator readiness): Capture training, preset migration, and configuration handoff requirements when metadata-heavy dashboards roll out so operators can transition without losing saved layouts.
 - R-FE-020 (SHOULD, proposed-composite-sim): Surface a unified simulation bar that drives play/pause/seek/speed for the authoritative SimClock so operators, replay, and plugin simulators stay synchronized.
 - R-FE-021 (SHOULD, accessibility): Provide theming and localization hooks so plugin-supplied panels inherit readable typography, contrast, and translated labels without manual wiring.
+- R-FE-040 (MUST, spatial constraint overlays): Render boundary, headland, keep-out, and work-disabled zones with canonical symbology (outline, hatch, fill colors) and legend entries so operators and plugins see consistent constraint states across all frontends.
+- R-FE-041 (SHOULD, zone management UI): Provide zone list, enable/disable toggles, buffer controls, and provenance/tooltips within the map UI so operators can adjust constraint policies without leaving the field workflow.
+- R-FE-042 (SHOULD, override awareness): Surface alerts and undo affordances when Core gates automation due to zones (e.g., autosteer inhibited, product off) so operators understand and acknowledge constraint-driven behavior.
 
 ### R-FE — Plugin UI contributions
 - R-FE-030 (MUST, plugin manifest UI): Load plugin-declared panels, config pages, and map overlays at runtime using declarative manifests so Core/UI updates do not require recompiling plugin visuals.

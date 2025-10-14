@@ -20,6 +20,8 @@ Define how Nexus coordinates operator stations, automation plugins, and firmware
 - R-CTRL-003 (SHOULD, automation lifecycle): Capture enable/disable policies for automation plugins (autosteer, section control, rate) so Core mediates state transitions and logs operator intent.
 - R-CTRL-004 (SHOULD, safety interlocks): Document interlock expectations (hydraulic lockouts, seat switches, user acknowledgements) that automation plugins must honor before commanding sections or steering.
 - R-CTRL-005 (COULD, remote supervision): Allow privileged remote clients to request control leases with explicit operator acknowledgement workflows to support tele-assist scenarios.
+- R-CTRL-006 (MUST, constraint gating): Insert a constraint gate in the control arbiter that prevents autosteer engagement and forces section/rate outputs off when keep-out zones intersect the implement footprint, while trimming guidance terminals at boundaries/headlands.
+- R-CTRL-007 (SHOULD, override policy): Provide configurable operator override policies for work-disabled zones (e.g., hold-to-confirm) with audit logging so product shutoff behavior remains transparent and traceable.
 
 ## Options
 - O-MM-0: Status quo — Desktop windows with manual layout tools and helper checks.
@@ -46,6 +48,7 @@ Operator workflow, recovery from display loss, remote access needs, control dete
 - Operators rely on multi-monitor helpers today, but headless support is ad hoc and needs a clearer plan.
 - The community wants kiosk scripts and watchdogs bundled with any Linux Core pilot so remote dashboards recover automatically after power loss.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L23】【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L10-L34】
 - Control arbitration must consolidate in Core so plugins remain optional and headless deployments retain deterministic behavior.
+- Constraint gates for spatial zones need to live in the same arbiter to keep automation deterministic and ensure plugins cannot bypass safety policies.
 
 ## Upcoming ADR coverage
 - **ADR-007 PoseStream & SectionState architecture** introduces SectionState diffing tied to the control graph, binding R-CTRL-000 through R-CTRL-002 to the unified pose timeline for replay accuracy.【F:docs/ADR/ADR-roadmap.md†L19-L25】

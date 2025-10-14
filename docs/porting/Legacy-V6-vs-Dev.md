@@ -51,6 +51,11 @@ This note captures the most meaningful differences between the legacy AgOpenGPS 
 - **Legacy Dev:** Follows the same pattern, leaving Linux or remote clients to rely on workarounds such as remote desktop mirroring.【F:docs/ADR/ADR-003-avalonia-ui.md†L28-L29】
 - **Nexus direction:** Elevates Avalonia as the primary desktop shell consuming the shared gRPC contracts, delivering a single UI codebase that runs natively on Windows and Linux (x64/ARM64) with touch-friendly layouts and optional host shells.【F:docs/ADR/ADR-003-avalonia-ui.md†L6-L22】
 
+### Mobile companions and embedded expansion
+- **V6:** Ships no native mobile clients; any tablet workflow depends on remote desktop mirrors or web widgets with limited control fidelity.
+- **Legacy Dev:** Mirrors the same Windows-only expectation, so remote monitoring still requires external remote-desktop tooling and offers no pathway to run Core on-device.
+- **Nexus direction:** Reuses the Avalonia codebase across Windows, Linux, Android, and iOS by introducing CompanionRemote, LocalInProc, and LocalOutOfProc run modes backed by DI-swappable transports, allowing the same app to start as a remote companion and later embed Core and AgIO on Android hardware while iOS stays remote-first over gRPC-Web.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L44】【F:docs/SRS/sections/05_Frontends.md†L26-L72】
+
 ### Remote Displays, Metadata-Driven Panels, and Simulation Controls
 - **V6:** Keeps operators on the Windows desktop suite (AgOpenGPS + AgIO + utilities) with manual wiring for dashboards and simulation tools, limiting remote or declarative UI experiences.【F:docs/SRS/sections/05_Frontends.md†L3-L24】【F:docs/ADR/ADR-004-composite-simulation.md†L29-L33】
 - **Legacy Dev:** Continues focusing on the same Windows suite, so remote display/control remains ad hoc and dashboards are still hand-crafted rather than metadata-driven.【F:docs/SRS/sections/05_Frontends.md†L3-L33】

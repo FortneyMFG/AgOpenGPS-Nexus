@@ -9,6 +9,15 @@ Nexus must deliver a desktop experience that runs identically on Windows and Lin
 ## Decision
 Adopt Avalonia as the primary UI framework for the Nexus desktop shell. The Avalonia client consumes the shared gRPC contracts, supports Windows x64 and Linux (x64/ARM64), and becomes the foundation for metadata-driven dashboards, simulation controls, and remote-client wrappers. Optional host shells (WinUI/WPF) can embed the Avalonia client when Windows-native polish is required, but the Avalonia implementation remains the authoritative cross-platform UI.
 
+## Mobile and companion roadmap
+The Avalonia footprint also unlocks native Android and iOS builds so the same codebase can ship as a remote companion now and later host Core + AgIO locally. We will structure the client around three dependency-injected run modes that swap the `ICoreTransport` implementation without rewriting views or view models:
+
+1. **CompanionRemote:** Ship the UI as-is on mobile and connect to Core/AgIO running on a Windows/Linux host over gRPC (Android) or gRPC-Web (iOS or restricted networks). A connection center handles discovery (mDNS/manual), reconnect, health, and authentication workflows so tablets and phones mirror desktop capabilities safely.【F:docs/SRS/sections/05_Frontends.md†L26-L29】【F:docs/SRS/sections/05_Frontends.md†L68-L69】
+2. **LocalInProc:** Package the Core runtime as a library and host it inside the Avalonia process. The UI swaps the transport to an in-process adapter, reuses the same view models, and exposes feature toggles so operators can run “lite” workflows on mobile hardware before adding hardware I/O.【F:docs/SRS/sections/05_Frontends.md†L28-L71】
+3. **LocalOutOfProc:** Bundle Core as a platform-specific binary and start it locally (e.g., Android foreground service) while the UI speaks loopback gRPC. This keeps crash isolation and matches how desktop shells talk to Core today, making it easier to reuse diagnostics, logging, and permission flows.【F:docs/SRS/sections/05_Frontends.md†L28-L72】
+
+Connection policy, offline caches, and feature gating flow from shared configuration so the same Avalonia client can pivot between remote monitoring and fully embedded rigs without branching the UI stack. Platform hosts contribute only the glue for permissions (USB/BLE/notifications) and storage policies, keeping the app surface identical across Windows, Linux, Android, and iOS.【F:docs/SRS/sections/01_OS_Support.md†L14-L44】【F:docs/SRS/sections/02_Framework_UI.md†L15-L47】
+
 ## Consequences
 - Positive impacts
   - Single UI codebase that runs on Windows and Linux, simplifying feature parity and theming.

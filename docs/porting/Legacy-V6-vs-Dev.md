@@ -1,0 +1,76 @@
+# Legacy V6 vs. Legacy Dev Comparison
+
+This note captures the most meaningful differences between the legacy AgOpenGPS V6 release line and the community Dev branch. It summarizes where each branch diverges in core foundations and operator experience, then outlines how Nexus is addressing the gaps while keeping migration pathways open.
+
+## Foundational Differences
+
+### Runtime and OS Footprint
+- **V6:** Ships only as Windows desktop executables built on WinForms and WPF, so all core services, AgIO, and tooling stay tied to the .NET Framework stack without cross-platform parity.【F:docs/ADR/ADR-001-dotnet8-runtime.md†L25-L27】
+- **Legacy Dev:** Continues the same Windows-only WinForms/WPF approach, reflecting incremental modernization without a shared cross-platform runtime or packaging model.【F:docs/ADR/ADR-001-dotnet8-runtime.md†L28-L29】
+- **Nexus direction:** Standardizes every first-party component on .NET 8 with platform-specific hardware isolated behind AgIO backends, giving Windows and Linux builds equal footing while keeping contracts shared through `Aog.Abstractions`.【F:docs/ADR/ADR-001-dotnet8-runtime.md†L7-L22】
+
+### Service Contracts and Inter-Process APIs
+- **V6:** Coordinates components solely through serial and UDP PGN streams managed inside AgIO and the WinForms host, leaving no typed API surface between modules.【F:docs/ADR/ADR-002-grpc-contracts.md†L25-L26】
+- **Legacy Dev:** Experiments with SocketCAN and PGN normalization, but still relies on the same PGN transports instead of an extensible contract layer.【F:docs/ADR/ADR-002-grpc-contracts.md†L28-L29】
+- **Nexus direction:** Establishes gRPC with protobuf IDLs as the authoritative service boundary so Core, UI, plugins, and automation tools share strongly typed, versioned contracts while the Bridge translates to legacy PGNs during migration.【F:docs/ADR/ADR-002-grpc-contracts.md†L6-L22】
+
+### MCU Communications and Field Buses
+- **V6:** Uses the classic PGN frame (0x80/0x81 header plus CRC) across UDP and serial links, so firmware exchanges fixed-width byte payloads without schemas.【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L53-L54】
+- **Legacy Dev:** Normalizes those same PGNs (including SocketCAN bridges) yet stays on the legacy framing instead of adopting a typed datagram protocol.【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L56-L57】
+- **Nexus direction:** Introduces AOG-Link, a nanopb-based datagram with shared protobuf payloads, consistent framing across Ethernet, serial, and CAN, and Bridge translation layers for coexistence with legacy PGNs.【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L7-L21】
+
+### Working Directory Layout and Artifact Compatibility
+- **V6:** Creates a single `%USERPROFILE%\Documents\AgOpenGPS` tree and keeps all vehicle, tool, and UI state in one `Properties.Settings` aggregate, so field archives and machine profiles are tightly coupled and difficult to share across rigs.【F:docs/porting/Legacy-Dev-Excerpts.md†L7-L19】
+- **Legacy Dev:** Moves the suite under `%USERPROFILE%\Documents\AOG`, splits `Vehicles`, `Tools`, and `Fields` into dedicated folders, and persists separate XML payloads for the user display profile, vehicles, and tools, breaking backward compatibility with V6 exports.【F:docs/porting/Legacy-Dev-Excerpts.md†L23-L44】
+- **Nexus direction:** Uses importers that translate V6/Dev directories into typed `MachineProfile` aggregates and workspace assets so legacy folders can be staged, validated, and versioned without copying raw settings files.【F:docs/porting/LegacyDataIngest.md†L24-L41】
+
+### Configuration Segmentation and Profile Management
+- **V6:** Relies on the monolithic `Properties.Settings.Default` blob where UI, hydraulics, tool geometry, and GNSS preferences live side by side, making profile swaps brittle and hard to audit.【F:docs/porting/Legacy-Dev-Excerpts.md†L33-L39】
+- **Legacy Dev:** Promotes explicit `User`, `Vehicle`, and `Tool` settings classes and loads each from its own XML file so operators can mix and match tractors, implements, and display preferences without touching the others.【F:docs/porting/Legacy-Dev-Excerpts.md†L40-L44】
+- **Nexus direction:** Consolidates legacy inputs into the `MachineProfile` translator and validation harness, then exposes declarative profiles through gRPC/CLI tooling so vehicles, implements, and UI shells can be versioned independently while still supporting PGN bridges.【F:docs/porting/LegacyDataIngest.md†L24-L48】
+
+### Simulation and Determinism
+- **V6:** Embeds simulation inside the monolithic `CSim` helper, synthesizing GNSS/IMU data in-process without a shared bus or plugin hooks, which limits reuse and determinism.【F:docs/ADR/ADR-004-composite-simulation.md†L29-L30】
+- **Legacy Dev:** Relies on standalone tools (e.g., ModSim) and direct WinForms wiring, so no authoritative clock or bus exists for multiple modules to share without duplicated logic.【F:docs/ADR/ADR-004-composite-simulation.md†L32-L33】
+- **Nexus direction:** Builds a composite simulation fabric with a Core-governed SimClock, typed SimBus topics, and deterministic source routing so hardware, replay, and plugins remain in sync across CI and operator workflows.【F:docs/ADR/ADR-004-composite-simulation.md†L6-L26】
+
+### Extensibility and Plugin Model
+- **V6:** Treats extensions as edits inside the monolithic solution—executables ship without manifests, permission boundaries, or lifecycle governance.【F:docs/ADR/ADR-018-plugin-api.md†L36-L38】
+- **Legacy Dev:** Maintains that status-quo (Option O-EXT-0), so contributors must fork and rebuild the suite with no security or lifecycle isolation for add-ons.【F:docs/ADR/ADR-018-plugin-api.md†L40-L41】
+- **Nexus direction:** Defines an out-of-process, manifest-driven plugin architecture over gRPC with explicit capabilities, permissions, health leases, and declarative UI contributions, keeping Core minimal while enabling safe extensibility.【F:docs/ADR/ADR-018-plugin-api.md†L6-L33】
+
+## Operator Experience (UX) Differences
+
+### Desktop Shell and Platform Reach
+- **V6:** Operators interact through WinForms with selective WPF panels, so the experience is Windows-only and lacks a cross-platform shell.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L26】
+- **Legacy Dev:** Follows the same pattern, leaving Linux or remote clients to rely on workarounds such as remote desktop mirroring.【F:docs/ADR/ADR-003-avalonia-ui.md†L28-L29】
+- **Nexus direction:** Elevates Avalonia as the primary desktop shell consuming the shared gRPC contracts, delivering a single UI codebase that runs natively on Windows and Linux (x64/ARM64) with touch-friendly layouts and optional host shells.【F:docs/ADR/ADR-003-avalonia-ui.md†L6-L22】
+
+### Remote Displays, Metadata-Driven Panels, and Simulation Controls
+- **V6:** Keeps operators on the Windows desktop suite (AgOpenGPS + AgIO + utilities) with manual wiring for dashboards and simulation tools, limiting remote or declarative UI experiences.【F:docs/SRS/sections/05_Frontends.md†L3-L24】【F:docs/ADR/ADR-004-composite-simulation.md†L29-L33】
+- **Legacy Dev:** Continues focusing on the same Windows suite, so remote display/control remains ad hoc and dashboards are still hand-crafted rather than metadata-driven.【F:docs/SRS/sections/05_Frontends.md†L3-L33】
+- **Nexus direction:** Plans metadata-driven dashboards, remote clients that attach over the Core APIs, and a unified simulation bar tied to the authoritative SimClock so operators blend hardware, replay, and plugin scenarios without context switching.【F:docs/SRS/sections/05_Frontends.md†L10-L34】【F:docs/SRS/sections/05_Frontends.md†L38-L67】
+
+### Plugin-Contributed UI and Safety Awareness
+- **V6:** Has no manifest or capability system, so any UI extension requires shipping new binaries and offers no built-in safety gating for control panels.【F:docs/ADR/ADR-018-plugin-api.md†L36-L38】
+- **Legacy Dev:** Shares the same limitation; contributors rebuild the host UI to add panels, keeping safety-critical controls intertwined with core windows.【F:docs/ADR/ADR-018-plugin-api.md†L40-L41】
+- **Nexus direction:** Requires plugins to declare panels, overlays, and config pages via schema-driven manifests while Core enforces permission-aware visibility so monitor-only clients stay safe and automation panels appear only when authorized.【F:docs/ADR/ADR-018-plugin-api.md†L9-L24】
+
+### Field and Job Workflow
+- **V6:** Carries a single active job inside the field folder and relies on manual exports or “Field From Existing” workflows when operators want to resume different passes of the same boundary.【F:docs/aog-v6-mapping-brief.md†L31-L36】
+- **Legacy Dev:** Stores each job in its own subdirectory beneath a field (`Fields/<Field>/Jobs/<Job>`), letting operators resume previous passes with painted coverage and sections intact without cloning the base field.【F:docs/porting/Legacy-Dev-Excerpts.md†L46-L61】
+- **Nexus direction:** Plans declarative workspace manifests that import legacy boundaries, coverage, and per-job artifacts into versioned datasets so replay, analysis, and Avalonia UIs can target any saved job run while the bridge feeds PGN hardware.【F:docs/porting/LegacyDataIngest.md†L8-L41】
+
+### Integrated Rate and Tool Steering Control
+- **V6:** Depends on external utilities (e.g., rate-control or tool-steer sketches) with minimal desktop integration, so nozzle rates and implement steering require manual PGN wiring and ad hoc profiles.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L94-L115】
+- **Legacy Dev:** Adds on-screen nozzle rate management and a dedicated tool-steer panel that publish PGNs directly from the host, providing built-in calibration sliders and safety toggles for implements.【F:docs/porting/Legacy-Dev-Excerpts.md†L65-L78】
+- **Nexus direction:** Treats rate control and tool steering as first-class plugin capabilities exposed through the Bridge/API surface, with regression harnesses that verify Nexus outputs against captured V6 scenarios before shipping drivers.【F:docs/porting/LegacyDataIngest.md†L37-L43】
+
+## Nexus Bridging Strategy
+
+Across each area, Nexus couples the modernized runtime and UX with bridges that keep legacy deployments productive:
+- The Bridge service translates gRPC contracts to legacy PGNs and back, letting V6/Dev hardware coexist while Nexus services adopt typed APIs.【F:docs/ADR/ADR-002-grpc-contracts.md†L9-L22】
+- AOG-Link is designed to run alongside PGN devices during migration, supporting Ethernet, serial, and CAN transports without forcing immediate firmware rewrites.【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L7-L21】【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L29-L34】
+- Metadata-driven UI contributions and plugin manifests allow gradual adoption—operators can continue using the Windows suite while Avalonia shells, remote clients, and declarative dashboards reach parity before becoming defaults.【F:docs/ADR/ADR-003-avalonia-ui.md†L6-L22】【F:docs/SRS/sections/05_Frontends.md†L10-L67】
+
+These guardrails ensure Nexus addresses the structural and UX gaps between legacy V6 and Dev without stranding existing rigs.

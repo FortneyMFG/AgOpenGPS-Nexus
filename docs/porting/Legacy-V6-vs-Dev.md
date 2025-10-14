@@ -27,7 +27,12 @@ This note captures the most meaningful differences between the legacy AgOpenGPS 
 ### Configuration Segmentation and Profile Management
 - **V6:** Relies on the monolithic `Properties.Settings.Default` blob where UI, hydraulics, tool geometry, and GNSS preferences live side by side, making profile swaps brittle and hard to audit.【F:docs/porting/Legacy-Dev-Excerpts.md†L33-L39】
 - **Legacy Dev:** Promotes explicit `User`, `Vehicle`, and `Tool` settings classes and loads each from its own XML file so operators can mix and match tractors, implements, and display preferences without touching the others.【F:docs/porting/Legacy-Dev-Excerpts.md†L40-L44】
-- **Nexus direction:** Consolidates legacy inputs into the `MachineProfile` translator and validation harness, then exposes declarative profiles through gRPC/CLI tooling so vehicles, implements, and UI shells can be versioned independently while still supporting PGN bridges.【F:docs/porting/LegacyDataIngest.md†L24-L48】
+- **Nexus direction:** Consolidates legacy inputs into the `MachineProfile` translator and validation harness, then exposes declarative profiles through gRPC/CLI tooling so vehicles, implements, and UI shells can be versioned independently while still supporting PGN bridges.【F:docs/porting/LegacyDataIngest.md†L24-L48】 It layers Presets/Layout services so operators apply live-linked or snapshot layouts alongside equipment presets without re-editing every profile.【F:docs/ADR/ADR-030-presets-and-layout-linking.md†L7-L39】
+
+### Spatial Constraint Governance
+- **V6:** Treats boundaries/headlands as simple text exports with manual overrides, providing no keep-out or work-disabled semantics for automation to enforce.【F:docs/porting/V6-Functionality-Gap-Analysis.md†L16-L25】【F:docs/aog-v6-mapping-brief.md†L23-L34】
+- **Legacy Dev:** Mirrors the same boundary/headland-only model, leaving constraint enforcement to operator discretion rather than deterministic gating.【F:docs/porting/Legacy-Dev-Excerpts.md†L46-L61】
+- **Nexus direction:** Establishes a ZoneService with buffered boundary, headland, keep-out, and work-disabled polygons so guidance and sections honor constraint gates, log overrides, and display canonical symbology across UIs.【F:docs/ADR/ADR-027-spatial-constraints.md†L7-L64】
 
 ### Simulation and Determinism
 - **V6:** Embeds simulation inside the monolithic `CSim` helper, synthesizing GNSS/IMU data in-process without a shared bus or plugin hooks, which limits reuse and determinism.【F:docs/ADR/ADR-004-composite-simulation.md†L29-L30】
@@ -37,7 +42,7 @@ This note captures the most meaningful differences between the legacy AgOpenGPS 
 ### Extensibility and Plugin Model
 - **V6:** Treats extensions as edits inside the monolithic solution—executables ship without manifests, permission boundaries, or lifecycle governance.【F:docs/ADR/ADR-018-plugin-api.md†L36-L38】
 - **Legacy Dev:** Maintains that status-quo (Option O-EXT-0), so contributors must fork and rebuild the suite with no security or lifecycle isolation for add-ons.【F:docs/ADR/ADR-018-plugin-api.md†L40-L41】
-- **Nexus direction:** Defines an out-of-process, manifest-driven plugin architecture over gRPC with explicit capabilities, permissions, health leases, and declarative UI contributions, keeping Core minimal while enabling safe extensibility.【F:docs/ADR/ADR-018-plugin-api.md†L6-L33】
+- **Nexus direction:** Defines an out-of-process, manifest-driven plugin architecture over gRPC with explicit capabilities, permissions, health leases, and declarative UI contributions, keeping Core minimal while enabling safe extensibility.【F:docs/ADR/ADR-018-plugin-api.md†L6-L33】 The accepted stack responsibilities ADR documents how firmware, Bridge, Core, plugins, and UI shells divide ownership so extensions cannot bypass safety-critical boundaries.【F:docs/ADR/ADR-028-stack-boundaries.md†L1-L118】
 
 ## Operator Experience (UX) Differences
 
@@ -59,7 +64,7 @@ This note captures the most meaningful differences between the legacy AgOpenGPS 
 ### Field and Job Workflow
 - **V6:** Carries a single active job inside the field folder and relies on manual exports or “Field From Existing” workflows when operators want to resume different passes of the same boundary.【F:docs/aog-v6-mapping-brief.md†L31-L36】
 - **Legacy Dev:** Stores each job in its own subdirectory beneath a field (`Fields/<Field>/Jobs/<Job>`), letting operators resume previous passes with painted coverage and sections intact without cloning the base field.【F:docs/porting/Legacy-Dev-Excerpts.md†L46-L61】
-- **Nexus direction:** Plans declarative workspace manifests that import legacy boundaries, coverage, and per-job artifacts into versioned datasets so replay, analysis, and Avalonia UIs can target any saved job run while the bridge feeds PGN hardware.【F:docs/porting/LegacyDataIngest.md†L8-L41】
+- **Nexus direction:** Plans declarative workspace manifests that import legacy boundaries, coverage, and per-job artifacts into versioned datasets so replay, analysis, and Avalonia UIs can target any saved job run while the bridge feeds PGN hardware.【F:docs/porting/LegacyDataIngest.md†L8-L41】 The JobsService formalizes those manifests through versioned metadata, Drive-In discovery, and lifecycle hooks so sessions resume cleanly across Core, UI, and plugins.【F:docs/ADR/ADR-030-field-job-sessions.md†L7-L86】
 
 ### Integrated Rate and Tool Steering Control
 - **V6:** Depends on external utilities (e.g., rate-control or tool-steer sketches) with minimal desktop integration, so nozzle rates and implement steering require manual PGN wiring and ad hoc profiles.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L94-L115】

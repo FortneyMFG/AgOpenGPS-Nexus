@@ -34,7 +34,8 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - [ADR-006](../../ADR/ADR-006-aog-link-mcu-communications.md) defines **AOG-Link** as the MCU communications layer using nanopb datagrams over Ethernet, RS-485/serial, or CAN. The Bridge service translates between gRPC contracts, AOG-Link frames, and legacy PGN flows so firmware evolution does not alter higher-layer APIs.
 
 ## Upcoming ADR coverage
-- **ADR-007 PoseStream & SectionState architecture** will standardize the pose timeline, SectionState diff rules, and replay guarantees that satisfy transport requirements R-COMM-010, R-COMM-011, and R-COMM-020 while aligning plugin/service expectations captured in Section 12.【F:docs/ADR/ADR-roadmap.md†L19-L25】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L34】
+- **ADR-007 PoseStream & SectionState architecture** will standardize the pose timeline, SectionState diff rules, and replay guarantees that satisfy transport requirements R-COMM-010, R-COMM-011, and R-COMM-020 while aligning plugin/service expectations captured in Section 12.【F:docs/ADR/ADR-roadmap.md†L67-L73】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L34】
+- **ADR-027 Spatial constraints & zone policies** introduces the ZoneService, buffered zone masks, and constraint gating transports required by R-COMM-020…R-COMM-023 so guidance, section control, and telemetry share deterministic context.【F:docs/ADR/ADR-roadmap.md†L27-L41】
 - **ADR-016 Firmware/Transport: Variable-Rate & Layer PGNs** will finalize payload packing, sequencing, and registry-handshake semantics for layer definitions, fulfilling R-COMM-010, R-COMM-011, and R-COMM-021 prior to firmware rollout.【F:docs/ADR/ADR-roadmap.md†L91-L97】
 - **ADR-021 Timebase & clock sync** will establish the canonical clock, drift handling, and latency budgets that anchor R-COMM-020 and R-COMM-040…R-COMM-042 across Core, plugins, and firmware.【F:docs/ADR/ADR-roadmap.md†L131-L137】
 

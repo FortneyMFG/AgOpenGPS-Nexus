@@ -81,3 +81,8 @@ Services:
 - Implement NullMapping and NullPose providers in Core to unblock headless deployments.
 - Prototype a reference mapping plugin (grid-based) and add regression replay fixtures.
 - Update presets to reference mapping capabilities and extend the plugin loader to enforce capability dependencies.
+
+## Validation
+- **NullMapping readiness:** NullMapping provider start-up on reference hardware must complete in under 350 ms at the 95th percentile and publish a healthy capability state before sections/plugins request pose transforms.
+- **Capability enforcement:** Integration tests must fail within 2 seconds when a plugin advertises incompatible `mapping:*` capabilities, with actionable diagnostics surfaced through the Device Manager contract.
+- **Deterministic taps:** A 60-minute PoseStream replay must generate identical raster tile checksums when executed with and without mapping plugins loaded, demonstrating deterministic tap semantics for regression harnesses.

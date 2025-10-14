@@ -44,6 +44,11 @@ Example JSON representation:
   - Update guidance and section plugins to subscribe to zones, integrate keep-out costs, and honor constraint gates.
   - Ship UI editors/importers aligned with the shared schema and provenance logging.
 
+## Validation
+- **Zone propagation latency:** 95th percentile zone-mask propagation latency must remain ≤ 120 ms from ingest to section arbiter under a 20 Hz PoseStream load on the reference simulation fixture.
+- **Constraint fault injection:** Forced keep-out toggles must block section enable within two PoseStream frames and emit override telemetry with actor, reason, and expiry populated for audit.
+- **Audit retention:** Crash-recovery replay covering 30 minutes of operation must retain all but at most one override log entry when exercising autosave/journaling paths.
+
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
 - Field assets track boundaries and headlands through text exports (`Boundary.txt`, `Headland.txt`), and the WinForms runtime draws those polygons for lift cues, but there is no formal notion of keep-out or work-disabled zones beyond manual operator overrides.【F:docs/porting/V6-Functionality-Gap-Analysis.md†L16-L25】【F:docs/aog-v6-mapping-brief.md†L23-L34】

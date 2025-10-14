@@ -13,6 +13,9 @@ Define the data contracts between AgOpenGPS, AgIO, companion tools, and external
 - R-API-004 (SHOULD, proposed-PGNBridge): Publish the canonical PGN reference and formalize how the bridge exposes versioning, validation, and translation hooks for new APIs.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
 - R-API-005 (COULD): Document handshake messages for capability discovery across processes.
 - R-API-012 (SHOULD, release management): Adopt semantic versioning, deprecation periods, and schema compatibility tests for every published API/registry so contributors know when breaking changes are permitted and how long legacy clients are supported.
+- R-GEO-000 (MUST, implement geometry): Publish a canonical equipment → implement → toolbar → section hierarchy with stable IDs, offsets, and working widths so Core, UI, plugins, and firmware target consistent geometry metadata.
+- R-GEO-001 (SHOULD, section grouping): Describe overlapping SectionGroup semantics, master group overrides, and per-toolbar lookahead/overlap policies so control logic, simulators, and analytics derive identical gating behavior.
+- R-GEO-002 (SHOULD, profile discovery): Expose manifest metadata (e.g., hitch profiles, attachment points, kinematic parameters) through the shared registries so plugin capability discovery can populate control and visualization surfaces without bespoke wiring.
 
 ## Options
 - O-API-0: Status quo — Binary PGNs over UDP/serial with tooling to inspect.
@@ -41,6 +44,10 @@ Compatibility with firmware, tooling support, latency, schema governance, ease o
 - Keep PGNs as the source of truth while defining how typed APIs can layer on top without fragmenting the ecosystem.
 - Schema hashing + registry publishing is seen as a prerequisite before exposing new APIs or plugins to the layer data.【F:docs/SRS/options/O-API-5_VersionedLayerSchemas.md†L50-L64】
 - Bridging PGNs to typed APIs is viewed as the safest path toward Linux/Core pilots without stranding current firmware.【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】
+
+## Upcoming ADR coverage
+- **ADR-008 Equipment hierarchy** will settle the canonical geometry/tree metadata, satisfying new requirements R-GEO-000 through R-GEO-002 and feeding the control semantics defined in Section 09.【F:docs/ADR/ADR-roadmap.md†L64-L91】【F:docs/SRS/sections/09_MultiMonitor_Headless.md†L11-L36】
+- **ADR-017 Profiles & kinematics** will extend the manifest expectations with hitch linkages, pivot tongues, and sensor fusion priorities so pose outputs align with the PoseStream architecture (ADR-007).【F:docs/ADR/ADR-roadmap.md†L142-L167】
 
 ## Open questions
 - How do we synchronize schema changes with firmware releases?

@@ -14,6 +14,9 @@ Explain how the project is validated (unit, integration, field), packaged, and s
 - R-CI-005 (COULD): Integrate hardware-in-the-loop smoke tests for steering/rate modules.
 - R-CI-012 (SHOULD, release assurance): Define acceptance criteria for cross-platform build artifacts (checksums, signatures, SBOM availability) before they ship to operators.
 - R-CI-013 (SHOULD, fixture governance): Document how hardware-in-the-loop rigs and replay fixtures are versioned and synchronized with firmware/controller changes so tests remain trustworthy over time.
+- R-CI-020 (MUST, provenance & audit): Capture job/session identifiers, dataset hashes, and quality flags in CI artifacts so analytics outputs and exports remain traceable back to source PoseStreams and controller builds.
+- R-CI-021 (SHOULD, derived product QA): Provide repeatable evaluation metrics (banding/clamping checks, target function validation, ROI masking) for prescription/analytics pipelines so agronomic decisions can be reviewed before release.
+- R-CI-030 (MUST, golden replay determinism): Maintain golden PoseStream-to-tile replay suites with pass/fail thresholds on spatial/temporal deltas and performance budgets so regression gates catch non-deterministic changes.
 
 ## Options
 - O-CI-0: Status quo — Manual release pipeline with ad-hoc CI builds.
@@ -40,6 +43,11 @@ Coverage, release reliability, effort to maintain, reproducibility, compatibilit
 - Keep basic tests running but invest in CI pipelines that can still emit the simple zip packages operators expect.
 - Replay-driven validation is viewed as mandatory before enabling layer telemetry by default, ensuring field confidence.【F:docs/SRS/options/O-TEST-4_LayerReplayCI.md†L47-L64】
 - Linux packaging and PGN bridge builds must be proven in CI before encouraging field pilots.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L1-L44】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
+
+## Upcoming ADR coverage
+- **ADR-013 Derived products** will define the analytics-to-prescription recipes and QA metrics expected by R-CI-021, ensuring prescriptions remain auditable and repeatable.【F:docs/ADR/ADR-roadmap.md†L191-L201】
+- **ADR-019 Provenance, audit, and QA** will formalize the provenance schema, quality scores, and audit trail requirements captured in R-CI-020, aligning storage and visualization expectations.【F:docs/ADR/ADR-roadmap.md†L254-L278】
+- **ADR-020 Determinism, replay & CI** will enhance the golden dataset workflows required by R-CI-030, including hashing schemes, fixture formats, and performance gates.【F:docs/ADR/ADR-roadmap.md†L279-L299】
 
 ## Open questions
 - How do we validate PGN compatibility in automation without physical hardware?

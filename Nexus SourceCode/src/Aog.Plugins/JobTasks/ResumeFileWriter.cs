@@ -64,6 +64,29 @@ internal static class ResumeFileWriter
             builder.AppendLine($"Tags={string.Join(',', snapshot.Metadata.Tags)}");
         }
 
+        if (snapshot.Equipment is { } equipment)
+        {
+            if (!string.IsNullOrWhiteSpace(equipment.VehicleId))
+            {
+                builder.AppendLine($"VehicleId={equipment.VehicleId}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(equipment.ImplementId))
+            {
+                builder.AppendLine($"ImplementId={equipment.ImplementId}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(equipment.PresetId))
+            {
+                builder.AppendLine($"PresetId={equipment.PresetId}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(equipment.LayoutId))
+            {
+                builder.AppendLine($"LayoutId={equipment.LayoutId}");
+            }
+        }
+
         var sessions = snapshot.Sessions ?? Array.Empty<JobSessionSnapshot>();
         builder.AppendLine($"SessionCount={sessions.Count}");
 

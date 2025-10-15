@@ -58,7 +58,8 @@ internal static class JobDocumentFactory
             Assets = CreateAssets(snapshot.Assets),
             Stats = CreateStatistics(snapshot.Stats),
             Sessions = sessions.Count > 0 ? sessions.Select(CreateSession).ToList() : new List<JobSessionDocument>(),
-            Extensions = snapshot.Extensions is null ? null : new Dictionary<string, JsonElement>(snapshot.Extensions)
+            Extensions = snapshot.Extensions is null ? null : new Dictionary<string, JsonElement>(snapshot.Extensions),
+            Equipment = CreateEquipment(snapshot.Equipment)
         };
 
         if (metadata.State is JobLifecycleState.Active or JobLifecycleState.Paused or JobLifecycleState.Mounted)
@@ -125,8 +126,9 @@ internal static class JobDocumentFactory
         var assets = document.Assets is null ? null : ToAssets(document.Assets);
         var stats = document.Stats is null ? null : ToStatistics(document.Stats);
         var extensions = document.Extensions is null ? null : new Dictionary<string, JsonElement>(document.Extensions);
+        var equipment = document.Equipment is null ? null : ToEquipment(document.Equipment);
 
-        return new JobSnapshot(metadata, layout, sessions, spatial, assets, stats, extensions);
+        return new JobSnapshot(metadata, layout, sessions, spatial, assets, stats, extensions, equipment);
     }
 
     private static JobContextDocument CreateContext(JobContext context)
@@ -264,6 +266,30 @@ internal static class JobDocumentFactory
         };
     }
 
+    private static JobEquipmentDocument? CreateEquipment(JobEquipmentSnapshot? snapshot)
+    {
+        if (snapshot is null)
+        {
+            return null;
+        }
+
+        if (IsNullOrWhiteSpace(snapshot.VehicleId)
+            && IsNullOrWhiteSpace(snapshot.ImplementId)
+            && IsNullOrWhiteSpace(snapshot.PresetId)
+            && IsNullOrWhiteSpace(snapshot.LayoutId))
+        {
+            return null;
+        }
+
+        return new JobEquipmentDocument
+        {
+            VehicleId = SanitizeEquipmentIdentifier(snapshot.VehicleId),
+            ImplementId = SanitizeEquipmentIdentifier(snapshot.ImplementId),
+            PresetId = SanitizeEquipmentIdentifier(snapshot.PresetId),
+            LayoutId = SanitizeEquipmentIdentifier(snapshot.LayoutId)
+        };
+    }
+
     private static JobSessionSnapshot ToSessionSnapshot(JobSessionDocument document)
     {
         if (string.IsNullOrWhiteSpace(document.Id))
@@ -373,4 +399,45 @@ internal static class JobDocumentFactory
             document.ActiveDurationSeconds,
             document.CompletedSessionCount);
     }
+
+    private static JobEquipmentSnapshot? ToEquipment(JobEquipmentDocument document)
+    {
+        if (IsNullOrWhiteSpace(document.VehicleId)
+            && IsNullOrWhiteSpace(document.ImplementId)
+            && IsNullOrWhiteSpace(document.PresetId)
+            && IsNullOrWhiteSpace(document.LayoutId))
+        {
+            return null;
+        }
+
+        return new JobEquipmentSnapshot(
+            NormalizeEquipmentIdentifier(document.VehicleId),
+            NormalizeEquipmentIdentifier(document.ImplementId),
+            NormalizeEquipmentIdentifier(document.PresetId),
+            NormalizeEquipmentIdentifier(document.LayoutId));
+    }
+
+    private static string? SanitizeEquipmentIdentifier(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var trimmed = value.Trim();
+        return trimmed.Length == 0 ? null : trimmed;
+    }
+
+    private static string? NormalizeEquipmentIdentifier(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var trimmed = value.Trim();
+        return trimmed.Length == 0 ? null : trimmed;
+    }
+
+    private static bool IsNullOrWhiteSpace(string? value) => string.IsNullOrWhiteSpace(value);
 }

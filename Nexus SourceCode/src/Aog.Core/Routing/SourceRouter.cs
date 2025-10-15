@@ -15,6 +15,7 @@ public sealed class SourceRouter
     private readonly Dictionary<string, TopicState> _topics = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _preferredSources;
     private readonly object _gate = new();
+    private readonly SemaphoreSlim _publishGate = new(1, 1);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SourceRouter"/> class.
@@ -183,8 +184,17 @@ public sealed class SourceRouter
         TopicRoute? current,
         CancellationToken cancellationToken)
     {
-        await _eventBus.PublishAsync(new TopicRouteChanged(topic, previous, current), cancellationToken)
-            .ConfigureAwait(false);
+        await _publishGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await _eventBus.PublishAsync(new TopicRouteChanged(topic, previous, current), cancellationToken)
+                .ConfigureAwait(false);
+        }
+        finally
+        {
+            _publishGate.Release();
+        }
+
         return current;
     }
 

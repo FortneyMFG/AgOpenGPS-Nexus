@@ -7,7 +7,7 @@ AGiO transports/backends, Avalonia UI layout, and simulation providers/routes/op
 
 ## Layout
 
-- `*.schema.json` — Authoritative schemas for each configuration surface (core, AGiO, UI, simulation, plugin manifests, job metadata, session documents).
+- `*.schema.json` — Authoritative schemas for each configuration surface (core, AGiO, UI, simulation, plugin manifests, job metadata, season organizers, session documents).
 - `samples/*.sample.json` — Example configuration files used for smoke validation.
 - `validate.py` — Helper that validates configuration files against the schemas.
 

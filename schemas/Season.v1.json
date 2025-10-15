@@ -51,6 +51,7 @@
         "type": "string",
         "pattern": "^job:[A-Za-z0-9._:-]+$"
       },
+      "uniqueItems": true,
       "description": "Jobs associated with the season.",
       "x-nexus-scope": "core"
     },
@@ -60,12 +61,13 @@
       "x-nexus-scope": "core"
     },
     "optimizerState": {
-      "type": "object",
+      "type": ["object", "array", "string", "number", "boolean", "null"],
       "description": "Optional opaque planner or optimizer metadata persisted with the season.",
       "x-nexus-scope": "core"
     },
     "createdBy": {
       "type": "string",
+      "pattern": "^[a-z]+:[A-Za-z0-9._:-]+$",
       "description": "Actor that created the season (user:*, system:*).",
       "x-nexus-scope": "core"
     },

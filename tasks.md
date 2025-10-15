@@ -175,7 +175,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-276 Autosteer plugin constraint gating updates _(Planned)_ — ADR-027 gating + ADR-033 guidance planner
 - [ ] NX-277 Sections plugin constraint gating updates _(Planned)_ — ADR-027 gating
 - [x] NX-278 Guidance lane publishing contracts _(Done)_ — ADR-033 guidance planner
-- [ ] NX-279 Turn planner integration in guidance plugin _(Planned)_ — ADR-033 guidance planner
+- [x] NX-279 Turn planner integration in guidance plugin _(Done)_ — ADR-033 guidance planner
 - [ ] NX-280 Guidance plugin regression suite _(Planned)_ — ADR-033 QA coverage
 - [ ] NX-281 Mapping plugin zone overlay updates _(Planned)_ — ADR-027 zones + ADR-029 mapping kernel
 - [ ] NX-282 Variable rate plugin zone gating _(Planned)_ — ADR-027 gating semantics
@@ -249,7 +249,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 
 - [x] NX-313 Stanley controller parity harness _(Done)_ — ADR-033 guidance planner porting
-- [ ] NX-314 Pure pursuit control port with fixtures _(Planned)_ — ADR-033 guidance planner porting
+- [x] NX-314 Pure pursuit control port with fixtures _(Done)_ — ADR-033 guidance planner porting
 - [ ] NX-315 Turn planner library port _(Planned)_ — ADR-033 guidance planner porting
 - [x] NX-316 Constraint-aware lookahead tuning _(Done)_ — ADR-033 lookahead + ADR-027 gating
 - [x] NX-317 Firmware-in-loop stability validation _(Done)_ — ADR-033 closed-loop validation
@@ -303,7 +303,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-329 Mesh security and penetration tests _(Done)_ — ADR-047/048 security validation
 - [ ] NX-330 Session crash-recovery regression _(Planned)_ — ADR-041 session durability
 - [ ] NX-331 Report export audit & diff tests _(Planned)_ — ADR-051 report builder QA
-- [ ] NX-332 Autosteer closed-loop bench tests _(Planned)_ — ADR-033 guidance QA
+- [x] NX-332 Autosteer closed-loop bench tests _(Done)_ — ADR-033 guidance QA
 
 ### Section I — Legacy/Teensy Compatibility
 - [x] NX-080 UDP discovery + capability exchange _(Legacy-maintained)_
@@ -509,7 +509,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-276 | Autosteer plugin constraint gating updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-027 gating + ADR-033 guidance planner |
 | NX-277 | Sections plugin constraint gating updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating |
 | NX-278 | Guidance lane publishing contracts | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner |
-| NX-279 | Turn planner integration in guidance plugin | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner |
+| NX-279 | Turn planner integration in guidance plugin | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner |
 | NX-280 | Guidance plugin regression suite | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 QA coverage |
 | NX-281 | Mapping plugin zone overlay updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-029](docs/ADR/ADR-029-mapping-plugin-architecture.md) | ADR-027 zones + ADR-029 mapping kernel |
 | NX-282 | Variable rate plugin zone gating | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating semantics |
@@ -585,7 +585,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-111 | Legacy worked area history import for coverage bootstraps | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Sections.txt history converted to layer cells |
 | NX-113 | External agronomic map ingest pipeline | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | CSV importer emits Layer.v1 documents |
 | NX-313 | Stanley controller parity harness | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
-| NX-314 | Pure pursuit control port with fixtures | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
+| NX-314 | Pure pursuit control port with fixtures | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
 | NX-315 | Turn planner library port | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
 | NX-316 | Constraint-aware lookahead tuning | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md), [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-033 lookahead + ADR-027 gating |
 | NX-317 | Firmware-in-loop stability validation | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 closed-loop validation |
@@ -642,7 +642,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-329 | Mesh security and penetration tests | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047/048 security validation |
 | NX-330 | Session crash-recovery regression | Planned |  | — | [ADR-041](docs/ADR/ADR-041_JobSessions.md) | ADR-041 session durability |
 | NX-331 | Report export audit & diff tests | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder QA |
-| NX-332 | Autosteer closed-loop bench tests | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance QA |
+| NX-332 | Autosteer closed-loop bench tests | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance QA |
 
 ### Section I — Legacy/Teensy Compatibility
 

@@ -37,6 +37,9 @@
     <None Include="FieldHealth\Data\FieldHealthRegressionFixture.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="CostProfit\Data\ProfitRegressionFixture.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Weather\Data\WeatherRegressionFixture.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

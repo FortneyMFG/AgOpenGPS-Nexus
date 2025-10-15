@@ -153,6 +153,21 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-DATA-004 | O-DATA-5 | [Compression ideas](../sections/08_Data_Model_Storage.md) | ADR-DATA-006 (TBD) |
 | R-DATA-013 | O-DATA-5 | [Retention policy](../sections/08_Data_Model_Storage.md) | ADR-DATA-007 (TBD) |
 | R-DATA-014 | O-DATA-5 | [Schema hashes](../sections/08_Data_Model_Storage.md) | ADR-DATA-007 (TBD) |
+| R-DATA-026 | O-DATA-5 | [Spatial constraints](../sections/08_Data_Model_Storage.md) | [ADR-027](../ADR/ADR-027-spatial-constraints.md) |
+| R-DATA-027 | O-DATA-5 | [Buffered footprints](../sections/08_Data_Model_Storage.md) | [ADR-027](../ADR/ADR-027-spatial-constraints.md) |
+| R-DATA-028 | O-DATA-5 | [Indexed queries](../sections/08_Data_Model_Storage.md) | [ADR-027](../ADR/ADR-027-spatial-constraints.md) |
+| R-DATA-040 | O-DATA-5 | [Zone edit provenance](../sections/08_Data_Model_Storage.md) | [ADR-044](../ADR/ADR-044_ZoneDrawingFramework.md) |
+| R-DATA-041 | O-DATA-5 | [Crop history schema](../sections/08_Data_Model_Storage.md) | [ADR-045](../ADR/ADR-045_CropTypePlugin.md) |
+| R-DATA-042 | O-DATA-5 | [Session weather snapshot](../sections/08_Data_Model_Storage.md) | [ADR-053](../ADR/ADR-053_WeatherPlugin.md) |
+| R-DATA-043 | O-DATA-5 | [Plugin attribute schemas](../sections/08_Data_Model_Storage.md) | [ADR-044](../ADR/ADR-044_ZoneDrawingFramework.md) |
+| R-DATA-044 | O-DATA-5 | [Genetics records](../sections/08_Data_Model_Storage.md) | [ADR-046](../ADR/ADR-046_GeneticsPlugin.md) |
+| R-DATA-045 | O-DATA-5 | [Yield layers](../sections/08_Data_Model_Storage.md) | [ADR-049](../ADR/ADR-049_YieldPlugin.md) |
+| R-DATA-046 | O-DATA-5 | [Cost & profit schemas](../sections/08_Data_Model_Storage.md) | [ADR-050](../ADR/ADR-050_CostProfitPlugin.md) |
+| R-DATA-047 | O-DATA-5 | [Risk overlays](../sections/08_Data_Model_Storage.md) | [ADR-052](../ADR/ADR-052_FieldHealthPlugin.md) |
+| R-DATA-048 | O-DATA-5 | [Weather overlays](../sections/08_Data_Model_Storage.md) | [ADR-053](../ADR/ADR-053_WeatherPlugin.md) |
+| R-DATA-049 | O-DATA-5 | [Report templates](../sections/08_Data_Model_Storage.md) | [ADR-051](../ADR/ADR-051_ReportBuilder.md) |
+| R-DATA-050 | O-DATA-5 | [Inventory ledger](../sections/08_Data_Model_Storage.md) | [ADR-050](../ADR/ADR-050_CostProfitPlugin.md) |
+| R-DATA-051 | O-DATA-5 | [Inventory provenance](../sections/08_Data_Model_Storage.md) | [ADR-050](../ADR/ADR-050_CostProfitPlugin.md) |
 
 ### Section 09 – Control & Automation
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |

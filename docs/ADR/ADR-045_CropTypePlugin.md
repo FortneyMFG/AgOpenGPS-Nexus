@@ -66,6 +66,6 @@ integrity, context publication, and storage; the plugin focuses on attribute sem
 
 ## SRS Impact
 
-- Updates §02 Data Model (Field crop history, job/session crop context).
-- Extends §03 Job Lifecycle with crop auto-fill flows tied to session start.
-- Adds crop layer catalog entries in §04 Mapping Layers and analytics requirements in §08 Data & Storage.
+- Satisfies crop history requirement R-DATA-041 and associated catalog expectations in §04 Mapping Layers and §08 Data Model & Storage.【F:docs/SRS/sections/08_Data_Model_Storage.md†L28-L31】【F:docs/SRS/sections/04_MappingLayers.md†L62-L67】
+- Hooks crop context auto-fill into job lifecycle and work order flows described in §03 Job Lifecycle (R-JOB-040…R-JOB-042).【F:docs/SRS/sections/03_JobLifecycle.md†L27-L75】
+- Powers crop overlay toggles and analytics in §05 Frontends (R-FE-074).【F:docs/SRS/sections/05_Frontends.md†L29-L30】

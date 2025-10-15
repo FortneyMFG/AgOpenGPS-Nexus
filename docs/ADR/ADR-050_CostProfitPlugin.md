@@ -58,6 +58,6 @@ deducts quantities, updates weighted cost bases, and feeds replenishment forecas
 
 ## SRS Impact
 
-- Adds economic requirements to §08 Data Model & Storage and §12 Extensibility.
-- Updates §05 Frontends with profit visualization expectations.
-- Documents export/reporting needs in §17 Device/Firmware? (No) — Instead update §05 and §12 plus §08.
+- Covers ledger, cost, and provenance requirements R-DATA-046, R-DATA-050, and R-DATA-051 in §08 Data Model & Storage.【F:docs/SRS/sections/08_Data_Model_Storage.md†L34-L39】
+- Supports profit overlays and work order reconciliation described in §05 Frontends (R-FE-074) and §03 Job Lifecycle (R-JOB-042…R-JOB-043).【F:docs/SRS/sections/05_Frontends.md†L29-L30】【F:docs/SRS/sections/03_JobLifecycle.md†L73-L76】
+- Establishes plugin responsibilities for economic analytics within §12 Extensibility policies.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L18-L36】

@@ -65,7 +65,11 @@ public sealed class AutoSteerLiteController
         var closest = FindClosestPoint(state, path);
 
         var crossTrack = ComputeCrossTrack(state, closest);
-        var lookAheadDistance = _tuningState?.Update(crossTrack, state.SpeedMetersPerSecond, distanceTravelled)
+        var lookAheadDistance = _tuningState?.Update(
+            crossTrack,
+            state.SpeedMetersPerSecond,
+            distanceTravelled,
+            state.ConstraintContext)
             ?? Settings.LookAheadDistance;
 
         LastLookAheadDistance = lookAheadDistance;
@@ -304,6 +308,9 @@ public sealed class AutoSteerLiteSettings
     public double StartupLookAheadMultiplier { get; set; } = 0.65;
     public double CrossTrackFilterGain { get; set; } = 0.5;
     public double LookAheadFilterGain { get; set; } = 0.25;
+    public double HeadlandSlowdownMultiplier { get; set; } = 0.75;
+    public double ConstraintSlowdownMultiplier { get; set; } = 0.5;
+    public double ConstraintDistanceMarginMeters { get; set; } = 1.0;
 
     internal AutoSteerLiteSettings Clone() => new()
     {
@@ -321,7 +328,10 @@ public sealed class AutoSteerLiteSettings
         StartupHoldDistanceMeters = StartupHoldDistanceMeters,
         StartupLookAheadMultiplier = StartupLookAheadMultiplier,
         CrossTrackFilterGain = CrossTrackFilterGain,
-        LookAheadFilterGain = LookAheadFilterGain
+        LookAheadFilterGain = LookAheadFilterGain,
+        HeadlandSlowdownMultiplier = HeadlandSlowdownMultiplier,
+        ConstraintSlowdownMultiplier = ConstraintSlowdownMultiplier,
+        ConstraintDistanceMarginMeters = ConstraintDistanceMarginMeters
     };
 
     internal void Validate()
@@ -395,6 +405,21 @@ public sealed class AutoSteerLiteSettings
         {
             throw new ArgumentOutOfRangeException(nameof(LookAheadFilterGain), LookAheadFilterGain, "Look-ahead filter gain must be in [0, 1].");
         }
+
+        if (HeadlandSlowdownMultiplier <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(HeadlandSlowdownMultiplier), HeadlandSlowdownMultiplier, "Headland slowdown multiplier must be positive.");
+        }
+
+        if (ConstraintSlowdownMultiplier <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(ConstraintSlowdownMultiplier), ConstraintSlowdownMultiplier, "Constraint slowdown multiplier must be positive.");
+        }
+
+        if (ConstraintDistanceMarginMeters < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(ConstraintDistanceMarginMeters), ConstraintDistanceMarginMeters, "Constraint distance margin must be non-negative.");
+        }
     }
 
     internal AutoSteerLiteTuningProfile CreateTuningProfile() => new()
@@ -408,13 +433,22 @@ public sealed class AutoSteerLiteSettings
         StartupHoldDistanceMeters = StartupHoldDistanceMeters,
         StartupLookAheadMultiplier = StartupLookAheadMultiplier,
         CrossTrackFilterGain = CrossTrackFilterGain,
-        LookAheadFilterGain = LookAheadFilterGain
+        LookAheadFilterGain = LookAheadFilterGain,
+        HeadlandSlowdownMultiplier = HeadlandSlowdownMultiplier,
+        ConstraintSlowdownMultiplier = ConstraintSlowdownMultiplier,
+        ConstraintDistanceMarginMeters = ConstraintDistanceMarginMeters
     };
 }
 
 public readonly struct VehicleState
 {
-    public VehicleState(double x, double y, double headingRadians, double speedMetersPerSecond, double wheelbaseMeters)
+    public VehicleState(
+        double x,
+        double y,
+        double headingRadians,
+        double speedMetersPerSecond,
+        double wheelbaseMeters,
+        ConstraintLookAheadContext? constraintContext = null)
     {
         if (wheelbaseMeters <= 0)
         {
@@ -426,6 +460,7 @@ public readonly struct VehicleState
         HeadingRadians = headingRadians;
         SpeedMetersPerSecond = speedMetersPerSecond;
         WheelbaseMeters = wheelbaseMeters;
+        ConstraintContext = constraintContext;
     }
 
     public double X { get; }
@@ -433,6 +468,7 @@ public readonly struct VehicleState
     public double HeadingRadians { get; }
     public double SpeedMetersPerSecond { get; }
     public double WheelbaseMeters { get; }
+    public ConstraintLookAheadContext? ConstraintContext { get; }
 
     public VehicleState Advance(double steeringAngleRadians, double timeStepSeconds)
     {
@@ -447,8 +483,11 @@ public readonly struct VehicleState
         var newX = X + SpeedMetersPerSecond * Math.Cos(headingMid) * timeStepSeconds;
         var newY = Y + SpeedMetersPerSecond * Math.Sin(headingMid) * timeStepSeconds;
         var newHeading = AutoSteerMath.NormalizeAngle(HeadingRadians + headingDelta);
-        return new VehicleState(newX, newY, newHeading, SpeedMetersPerSecond, WheelbaseMeters);
+        return new VehicleState(newX, newY, newHeading, SpeedMetersPerSecond, WheelbaseMeters, ConstraintContext);
     }
+
+    public VehicleState WithConstraintContext(ConstraintLookAheadContext? constraintContext) =>
+        new(X, Y, HeadingRadians, SpeedMetersPerSecond, WheelbaseMeters, constraintContext);
 }
 
 public static class AutoSteerMath

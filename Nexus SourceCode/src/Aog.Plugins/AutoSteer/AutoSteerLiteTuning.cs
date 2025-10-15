@@ -69,6 +69,24 @@ public sealed class AutoSteerLiteTuningProfile
     public double StartupLookAheadMultiplier { get; set; } = 0.65;
 
     /// <summary>
+    /// Gets or sets the multiplier applied when the vehicle is operating inside a headland
+    /// constraint zone (default 0.75).
+    /// </summary>
+    public double HeadlandSlowdownMultiplier { get; set; } = 0.75;
+
+    /// <summary>
+    /// Gets or sets the multiplier applied when a blocking constraint (e.g. keep-out) is active
+    /// but look-ahead computation still proceeds (default 0.5).
+    /// </summary>
+    public double ConstraintSlowdownMultiplier { get; set; } = 0.5;
+
+    /// <summary>
+    /// Gets or sets the clearance margin maintained when clamping look-ahead against a nearby
+    /// constraint distance (default 1.0 m).
+    /// </summary>
+    public double ConstraintDistanceMarginMeters { get; set; } = 1.0;
+
+    /// <summary>
     /// Returns a copy of the default profile derived from the V6 controller settings.
     /// </summary>
     public static AutoSteerLiteTuningProfile Default => new();
@@ -124,6 +142,21 @@ public sealed class AutoSteerLiteTuningProfile
         {
             throw new ArgumentOutOfRangeException(nameof(StartupLookAheadMultiplier), StartupLookAheadMultiplier, "Startup multiplier must be positive.");
         }
+
+        if (HeadlandSlowdownMultiplier <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(HeadlandSlowdownMultiplier), HeadlandSlowdownMultiplier, "Headland slowdown multiplier must be positive.");
+        }
+
+        if (ConstraintSlowdownMultiplier <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(ConstraintSlowdownMultiplier), ConstraintSlowdownMultiplier, "Constraint slowdown multiplier must be positive.");
+        }
+
+        if (ConstraintDistanceMarginMeters < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(ConstraintDistanceMarginMeters), ConstraintDistanceMarginMeters, "Constraint distance margin must be non-negative.");
+        }
     }
 }
 
@@ -165,7 +198,11 @@ public sealed class AutoSteerLiteTuningState
     /// <param name="crossTrackErrorMeters">Signed cross-track error (metres) at the controller pivot axle.</param>
     /// <param name="speedMetersPerSecond">Current vehicle speed (m/s).</param>
     /// <param name="distanceTravelledMeters">Distance travelled since the previous update (metres).</param>
-    public double Update(double crossTrackErrorMeters, double speedMetersPerSecond, double distanceTravelledMeters)
+    public double Update(
+        double crossTrackErrorMeters,
+        double speedMetersPerSecond,
+        double distanceTravelledMeters,
+        ConstraintLookAheadContext? constraintContext = null)
     {
         if (distanceTravelledMeters < 0)
         {
@@ -209,7 +246,7 @@ public sealed class AutoSteerLiteTuningState
             rawLookAhead *= _profile.StartupLookAheadMultiplier;
         }
 
-        rawLookAhead = Math.Max(rawLookAhead, _profile.MinimumLookAheadMeters);
+        rawLookAhead = ApplyConstraintModifiers(rawLookAhead, constraintContext);
 
         var lookAheadFilter = Math.Clamp(_profile.LookAheadFilterGain, 0, 1);
         if (double.IsNaN(_filteredLookAhead))
@@ -223,5 +260,42 @@ public sealed class AutoSteerLiteTuningState
 
         return _filteredLookAhead;
     }
+
+    private double ApplyConstraintModifiers(double rawLookAhead, ConstraintLookAheadContext? constraintContext)
+    {
+        var lookAhead = Math.Max(rawLookAhead, _profile.MinimumLookAheadMeters);
+        if (constraintContext is null)
+        {
+            return lookAhead;
+        }
+
+        var context = constraintContext.Value;
+
+        if (context.DistanceToConstraintMeters is { } distance)
+        {
+            var clearance = Math.Max(0, distance - _profile.ConstraintDistanceMarginMeters);
+            lookAhead = Math.Min(lookAhead, Math.Max(_profile.MinimumLookAheadMeters, clearance));
+        }
+
+        if (context.InsideHeadland)
+        {
+            lookAhead = Math.Max(_profile.MinimumLookAheadMeters, lookAhead * _profile.HeadlandSlowdownMultiplier);
+        }
+
+        if (context.HasBlockingConstraint)
+        {
+            lookAhead = Math.Max(_profile.MinimumLookAheadMeters, lookAhead * _profile.ConstraintSlowdownMultiplier);
+        }
+
+        return lookAhead;
+    }
 }
+
+/// <summary>
+/// Describes the constraint context used to bias dynamic look-ahead calculations.
+/// </summary>
+public readonly record struct ConstraintLookAheadContext(
+    bool HasBlockingConstraint,
+    bool InsideHeadland,
+    double? DistanceToConstraintMeters);
 

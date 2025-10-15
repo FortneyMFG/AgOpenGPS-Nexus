@@ -38,6 +38,9 @@ public sealed class AutoSteerLiteTuningCalculatorTests
         tuning.SpeedMultiplier.Should().BeApproximately(1.5, 0.1);
         tuning.AcquireFactor.Should().BeApproximately(0.9, 0.05);
         tuning.MinimumLookAheadMeters.Should().BeGreaterThanOrEqualTo(2.0);
+        tuning.HeadlandSlowdownMultiplier.Should().BeGreaterThan(0.6);
+        tuning.ConstraintSlowdownMultiplier.Should().BeApproximately(0.4, 1e-6);
+        tuning.ConstraintDistanceMarginMeters.Should().BeGreaterThan(0.5);
     }
 
     [Fact]
@@ -53,5 +56,7 @@ public sealed class AutoSteerLiteTuningCalculatorTests
 
         tuning.LookAheadHoldMultiplier.Should().BeGreaterThan(3.5);
         tuning.MinimumLookAheadMeters.Should().BeGreaterThan(2.0);
+        tuning.HeadlandSlowdownMultiplier.Should().BeGreaterThan(0.7);
+        tuning.ConstraintDistanceMarginMeters.Should().BeGreaterThan(1.0);
     }
 }

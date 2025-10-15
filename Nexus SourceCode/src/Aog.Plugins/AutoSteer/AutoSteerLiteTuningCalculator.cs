@@ -29,6 +29,9 @@ public static class AutoSteerLiteTuningCalculator
         var acquireThreshold = Math.Clamp(holdThreshold + Math.Clamp(implement.WidthMeters * 0.075, 0.25, 0.5), holdThreshold + 0.1, 0.6);
         var startupDistance = Math.Clamp(vehicle.WheelbaseMeters * 1.2, 3.0, 6.0);
         var startupMultiplier = Math.Clamp(0.5 + implement.WidthMeters / 20.0, 0.6, 0.8);
+        var headlandSlowdown = Math.Clamp(0.6 + implement.WidthMeters / 40.0, 0.6, 0.85);
+        var constraintSlowdown = 0.4;
+        var constraintMargin = Math.Clamp(implement.WidthMeters * 0.12, 0.5, 2.5);
 
         var profile = new AutoSteerLiteTuningProfile
         {
@@ -42,6 +45,9 @@ public static class AutoSteerLiteTuningCalculator
             LookAheadFilterGain = 0.25,
             StartupHoldDistanceMeters = startupDistance,
             StartupLookAheadMultiplier = startupMultiplier,
+            HeadlandSlowdownMultiplier = headlandSlowdown,
+            ConstraintSlowdownMultiplier = constraintSlowdown,
+            ConstraintDistanceMarginMeters = constraintMargin,
         };
 
         profile.Validate();

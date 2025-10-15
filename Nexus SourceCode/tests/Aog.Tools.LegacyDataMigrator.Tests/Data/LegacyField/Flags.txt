@@ -1,0 +1,4 @@
+$Flags
+1,North Rock,5.0,12.5,90,Red,Check rock pile
+id=2,label=Drainage issue,x=15.5,y=18.25,heading=45,color=Blue,notes=Tile outlet inspection
+3,,20.0,25.0,270,Orange

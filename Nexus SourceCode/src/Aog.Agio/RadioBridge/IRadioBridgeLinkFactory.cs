@@ -6,7 +6,7 @@ namespace Aog.Agio.RadioBridge;
 public interface IRadioBridgeLinkFactory
 {
     /// <summary>
-    /// Creates a link for the ELRS adapter using the supplied options.
+    /// Creates a link for the specified adapter using the supplied options.
     /// </summary>
-    IRadioBridgeLink Create(RadioBridgeElrsAdapterOptions options);
+    IRadioBridgeLink Create(RadioBridgeAdapterOptions options);
 }

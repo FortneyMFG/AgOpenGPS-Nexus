@@ -34,4 +34,9 @@ public sealed record RadioBridgeOptions
     /// delivery failure.
     /// </summary>
     public int MaxRetransmissions { get; init; } = 5;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether forward error correction blocks should be attached to frames.
+    /// </summary>
+    public bool EnableForwardErrorCorrection { get; init; }
 }

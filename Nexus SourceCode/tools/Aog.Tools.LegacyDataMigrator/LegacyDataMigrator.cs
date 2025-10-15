@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Parquet;
@@ -17,6 +20,26 @@ namespace Aog.Tools.LegacyDataMigrator;
 /// </summary>
 public sealed class LegacyDataMigrator
 {
+    private static readonly JsonSerializerOptions LayerSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+
+    private static readonly DateTimeOffset FieldHealthBaseTimestamp = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset YieldBaseTimestamp = new(2020, 6, 1, 0, 0, 0, TimeSpan.Zero);
+
+    private static readonly IReadOnlyDictionary<string, string> FieldHealthSeverityByColor = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["red"] = "critical",
+        ["orange"] = "high",
+        ["yellow"] = "moderate",
+        ["blue"] = "moderate",
+        ["purple"] = "high",
+        ["green"] = "low"
+    };
+
     /// <summary>
     /// Migrates telemetry logs and field histories into the output directory.
     /// </summary>
@@ -85,6 +108,16 @@ public sealed class LegacyDataMigrator
             {
                 report = AppendSkipped(report, pluginPath + " (missing)");
             }
+
+            var weatherPath = Path.Combine(logsRoot, "weather.csv");
+            if (File.Exists(weatherPath))
+            {
+                report = report with { WeatherCount = report.WeatherCount + WriteWeather(weatherPath, options.OutputDirectory) };
+            }
+            else
+            {
+                report = AppendSkipped(report, weatherPath + " (missing)");
+            }
         }
         else
         {
@@ -113,6 +146,30 @@ public sealed class LegacyDataMigrator
             report = AppendSkipped(report, fieldHistoryPath + " (missing)");
         }
 
+        var flagsPath = Path.Combine(options.InputDirectory, options.FlagsFileName);
+        if (File.Exists(flagsPath))
+        {
+            var outputPath = Path.Combine(options.OutputDirectory, "risk.other.layer.json");
+            var observationCount = WriteFieldHealthLayer(flagsPath, outputPath);
+            report = report with { FieldHealthObservationCount = report.FieldHealthObservationCount + observationCount };
+        }
+        else
+        {
+            report = AppendSkipped(report, flagsPath + " (missing)");
+        }
+
+        var yieldPath = Path.Combine(logsRoot, options.YieldTelemetryFileName);
+        if (File.Exists(yieldPath))
+        {
+            var outputPath = Path.Combine(options.OutputDirectory, "yield.actual.layer.json");
+            var sampleCount = WriteYieldLayer(yieldPath, outputPath);
+            report = report with { YieldSampleCount = report.YieldSampleCount + sampleCount };
+        }
+        else
+        {
+            report = AppendSkipped(report, yieldPath + " (missing)");
+        }
+
         return Task.FromResult(report);
     }
 
@@ -120,6 +177,435 @@ public sealed class LegacyDataMigrator
     {
         var entries = report.SkippedFiles.Append(path).ToList();
         return report with { SkippedFiles = entries };
+    }
+
+    private static int WriteFieldHealthLayer(string flagsPath, string outputPath)
+    {
+        var flags = ParseLegacyFlags(flagsPath);
+        if (flags.Count == 0)
+        {
+            return 0;
+        }
+
+        var observations = CreateFieldHealthObservations(flags);
+        var sortedByAscending = observations.OrderBy(o => o.ObservedAt).ToList();
+        var createdAt = sortedByAscending.First().ObservedAt;
+        var lastModified = sortedByAscending.Last().ObservedAt;
+
+        var statistics = CreateFieldHealthStatistics(observations);
+        var history = CreateFieldHealthHistory(sortedByAscending);
+        var metadata = new FieldHealthMetadataDocument(
+            SchemaRef: "https://agopengps.org/schemas/FieldHealthRiskLayer.v1.json",
+            Notes: null,
+            Tags: Array.Empty<string>(),
+            Observations: observations,
+            Statistics: statistics,
+            History: history);
+
+        var provenance = new LayerProvenanceDocument(
+            Source: "legacy:flags",
+            Transform: "migrate:legacy-flags",
+            Hash: ComputeHash(observations.Select(o => o.FeatureId + o.Severity + o.ObservedAt.ToUnixTimeSeconds())),
+            CreatedAt: lastModified,
+            Actor: "system:legacy-migrator");
+
+        var document = new FieldHealthLayerDocument(
+            SchemaVersion: "1.0.0",
+            Id: "layer:risk.other.legacy",
+            Kind: "risk.other",
+            JobId: "job:legacy",
+            SessionId: "session:legacy",
+            Units: "severity-index",
+            CreatedAt: createdAt,
+            CreatedBy: "system:legacy-migrator",
+            LastModifiedAt: lastModified,
+            Provenance: provenance,
+            Metadata: metadata);
+
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+        var json = JsonSerializer.Serialize(document, LayerSerializerOptions);
+        File.WriteAllText(outputPath, json);
+        return observations.Count;
+    }
+
+    private static int WriteYieldLayer(string csvPath, string outputPath)
+    {
+        var samples = ParseYieldSamples(csvPath);
+        if (samples.Count == 0)
+        {
+            return 0;
+        }
+
+        var ordered = samples.OrderBy(s => s.Timestamp).ToList();
+        var createdAt = ordered.First().Timestamp;
+        var lastTimestamp = ordered.Last().Timestamp;
+        var yields = ordered.Select(s => s.YieldKgPerHa).ToList();
+
+        var mean = yields.Average();
+        var median = ComputeMedian(yields);
+        var stdDev = ComputeStandardDeviation(yields, mean);
+        var min = yields.Min();
+        var max = yields.Max();
+        var totalMassKg = ordered.Sum(s => s.YieldKgPerHa * s.AreaHa);
+
+        var averageAreaHa = ordered.Average(s => s.AreaHa > 0 ? s.AreaHa : 0.01);
+        var cellSizeMeters = Math.Sqrt(Math.Max(averageAreaHa, 1e-6) * 10_000d);
+
+        var metadata = new YieldLayerMetadataDocument(
+            Grid: new YieldGridMetadata(cellSizeMeters, "EPSG:32615"),
+            Smoothing: new YieldSmoothingMetadata("none", null, null, null),
+            Calibration: new YieldCalibrationMetadata(
+                ProfileId: "calibration:legacy-default",
+                AppliedAt: createdAt,
+                Source: "legacy",
+                SensorModel: null,
+                Notes: null,
+                Factors: null),
+            Aggregation: new YieldAggregationMetadata(
+                Basis: "area",
+                Scopes: new[] { "job", "field" },
+                UpdatedAt: lastTimestamp,
+                Bins: new YieldAggregationBinsMetadata("quantile", 5, null, null)),
+            Statistics: new YieldStatisticsMetadata(
+                Count: ordered.Count,
+                Mean: mean,
+                Median: median,
+                StdDev: stdDev,
+                Min: min,
+                Max: max,
+                TotalMassKg: totalMassKg));
+
+        var provenance = new LayerProvenanceDocument(
+            Source: "legacy:yield",
+            Transform: "migrate:legacy-yield",
+            Hash: ComputeHash(ordered.Select(s => s.Timestamp.ToUnixTimeSeconds() + s.YieldKgPerHa.ToString(CultureInfo.InvariantCulture))),
+            CreatedAt: lastTimestamp,
+            Actor: "system:legacy-migrator");
+
+        var document = new YieldLayerDocument(
+            SchemaVersion: "1.0.0",
+            Id: "layer:yield.actual.legacy",
+            Kind: "yield.actual",
+            JobId: "job:legacy",
+            SessionId: "session:legacy",
+            FieldId: null,
+            Units: "kg/ha",
+            CreatedAt: createdAt,
+            CreatedBy: "system:legacy-migrator",
+            LastModifiedAt: lastTimestamp,
+            Provenance: provenance,
+            Metadata: metadata);
+
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+        var json = JsonSerializer.Serialize(document, LayerSerializerOptions);
+        File.WriteAllText(outputPath, json);
+        return ordered.Count;
+    }
+
+    private static List<LegacyFlagRow> ParseLegacyFlags(string path)
+    {
+        var flags = new List<LegacyFlagRow>();
+        using var reader = new StreamReader(path);
+        string? line;
+        while ((line = reader.ReadLine()) is not null)
+        {
+            line = line.Trim();
+            if (string.IsNullOrEmpty(line) || line.StartsWith("$", StringComparison.Ordinal) || line.StartsWith("#", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            int id = 0;
+            string? label = null;
+            double? easting = null;
+            double? northing = null;
+            double heading = 0;
+            string color = "yellow";
+            string? notes = null;
+
+            if (line.Contains('=', StringComparison.Ordinal))
+            {
+                var kvPairs = line.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                    .Select(part => part.Split('=', 2, StringSplitOptions.TrimEntries))
+                    .Where(pair => pair.Length == 2)
+                    .ToDictionary(pair => pair[0].ToLowerInvariant(), pair => pair[1]);
+
+                if (kvPairs.TryGetValue("id", out var idValue))
+                {
+                    _ = int.TryParse(idValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out id);
+                }
+
+                if (kvPairs.TryGetValue("label", out var labelValue))
+                {
+                    label = labelValue;
+                }
+
+                if (kvPairs.TryGetValue("x", out var xValue) || kvPairs.TryGetValue("easting", out xValue))
+                {
+                    easting = double.Parse(xValue, CultureInfo.InvariantCulture);
+                }
+
+                if (kvPairs.TryGetValue("y", out var yValue) || kvPairs.TryGetValue("northing", out yValue))
+                {
+                    northing = double.Parse(yValue, CultureInfo.InvariantCulture);
+                }
+
+                if (kvPairs.TryGetValue("heading", out var headingValue) && double.TryParse(headingValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedHeading))
+                {
+                    heading = parsedHeading;
+                }
+
+                if (kvPairs.TryGetValue("color", out var colorValue))
+                {
+                    color = colorValue;
+                }
+
+                if (kvPairs.TryGetValue("notes", out var notesValue))
+                {
+                    notes = notesValue;
+                }
+            }
+            else
+            {
+                var parts = line.Split(',', StringSplitOptions.TrimEntries);
+                if (parts.Length > 0)
+                {
+                    _ = int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out id);
+                }
+
+                if (parts.Length > 1 && !string.IsNullOrEmpty(parts[1]))
+                {
+                    label = parts[1];
+                }
+
+                if (parts.Length > 2)
+                {
+                    easting = double.Parse(parts[2], CultureInfo.InvariantCulture);
+                }
+
+                if (parts.Length > 3)
+                {
+                    northing = double.Parse(parts[3], CultureInfo.InvariantCulture);
+                }
+
+                if (parts.Length > 4 && double.TryParse(parts[4], NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedHeading))
+                {
+                    heading = parsedHeading;
+                }
+
+                if (parts.Length > 5)
+                {
+                    color = parts[5];
+                }
+
+                if (parts.Length > 6)
+                {
+                    notes = parts[6];
+                }
+            }
+
+            if (easting.HasValue && northing.HasValue)
+            {
+                flags.Add(new LegacyFlagRow(id, label, easting.Value, northing.Value, heading, color, notes));
+            }
+        }
+
+        return flags;
+    }
+
+    private static List<FieldHealthObservationDocument> CreateFieldHealthObservations(IReadOnlyList<LegacyFlagRow> flags)
+    {
+        var observations = new List<FieldHealthObservationDocument>(flags.Count);
+        for (var i = 0; i < flags.Count; i++)
+        {
+            var flag = flags[i];
+            var observedAt = FieldHealthBaseTimestamp.AddMinutes((i + 1) * 5);
+            var featureId = $"feature:legacy-flag-{flag.Id.ToString("D4", CultureInfo.InvariantCulture)}";
+            var label = string.IsNullOrWhiteSpace(flag.Label) ? $"Legacy Flag {flag.Id}" : flag.Label.Trim();
+            var severity = ResolveSeverity(flag.Color);
+            var geometryHash = ComputeShortHash(string.Format(CultureInfo.InvariantCulture, "{0:F3},{1:F3}", flag.EastingMeters, flag.NorthingMeters));
+
+            observations.Add(new FieldHealthObservationDocument(
+                FeatureId: featureId,
+                ZoneId: null,
+                Label: label,
+                Severity: severity,
+                ObservedAt: observedAt,
+                Observer: "system:legacy-migrator",
+                Notes: string.IsNullOrWhiteSpace(flag.Notes) ? null : flag.Notes,
+                Attachments: Array.Empty<string>(),
+                SessionId: "session:legacy",
+                AreaHa: null,
+                GeometryHash: geometryHash,
+                LastUpdatedAt: null,
+                Status: "active"));
+        }
+
+        return observations
+            .OrderByDescending(o => o.ObservedAt)
+            .ThenBy(o => o.FeatureId, StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private static FieldHealthStatisticsDocument CreateFieldHealthStatistics(IReadOnlyList<FieldHealthObservationDocument> observations)
+    {
+        var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["none"] = 0,
+            ["low"] = 0,
+            ["moderate"] = 0,
+            ["high"] = 0,
+            ["critical"] = 0
+        };
+
+        foreach (var observation in observations)
+        {
+            if (counts.ContainsKey(observation.Severity))
+            {
+                counts[observation.Severity]++;
+            }
+        }
+
+        var lastSurveyedAt = observations.Max(o => o.ObservedAt);
+        var severityCounts = new FieldHealthSeverityCountsDocument(
+            None: counts["none"],
+            Low: counts["low"],
+            Moderate: counts["moderate"],
+            High: counts["high"],
+            Critical: counts["critical"]);
+
+        return new FieldHealthStatisticsDocument(0, severityCounts, lastSurveyedAt);
+    }
+
+    private static FieldHealthHistoryDocument CreateFieldHealthHistory(IReadOnlyList<FieldHealthObservationDocument> observationsAscending)
+    {
+        var entries = observationsAscending
+            .Select(o => new FieldHealthHistoryEntryDocument(o.FeatureId, o.Status, o.Severity, o.ObservedAt))
+            .ToList();
+
+        var toggles = new FieldHealthHistoryTogglesDocument(true, true, false);
+        return new FieldHealthHistoryDocument(entries, toggles);
+    }
+
+    private static string ResolveSeverity(string color)
+    {
+        if (string.IsNullOrWhiteSpace(color))
+        {
+            return "low";
+        }
+
+        if (FieldHealthSeverityByColor.TryGetValue(color, out var mapped))
+        {
+            return mapped;
+        }
+
+        if (int.TryParse(color, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numeric))
+        {
+            return numeric switch
+            {
+                0 => "critical",
+                1 => "low",
+                2 => "moderate",
+                _ => "low"
+            };
+        }
+
+        return "low";
+    }
+
+    private static List<LegacyYieldSample> ParseYieldSamples(string path)
+    {
+        var samples = new List<LegacyYieldSample>();
+        using var reader = new StreamReader(path);
+        _ = reader.ReadLine(); // header
+
+        int index = 0;
+        string? line;
+        while ((line = reader.ReadLine()) is not null)
+        {
+            line = line.Trim();
+            if (string.IsNullOrEmpty(line) || line.StartsWith("#", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var parts = line.Split(',', StringSplitOptions.TrimEntries);
+            if (parts.Length < 6)
+            {
+                continue;
+            }
+
+            DateTimeOffset timestamp;
+            if (!DateTimeOffset.TryParse(parts[0], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out timestamp))
+            {
+                timestamp = YieldBaseTimestamp.AddSeconds(index * 2);
+            }
+
+            var easting = double.Parse(parts[1], CultureInfo.InvariantCulture);
+            var northing = double.Parse(parts[2], CultureInfo.InvariantCulture);
+            var yieldValue = double.Parse(parts[3], CultureInfo.InvariantCulture);
+            double? moisture = string.IsNullOrWhiteSpace(parts[4]) ? null : double.Parse(parts[4], CultureInfo.InvariantCulture);
+            var area = double.TryParse(parts[5], NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedArea) ? parsedArea : 0.01;
+
+            samples.Add(new LegacyYieldSample(timestamp, easting, northing, yieldValue, moisture, area <= 0 ? 0.01 : area));
+            index++;
+        }
+
+        return samples;
+    }
+
+    private static double ComputeMedian(IReadOnlyList<double> values)
+    {
+        if (values.Count == 0)
+        {
+            return 0;
+        }
+
+        var ordered = values.OrderBy(v => v).ToList();
+        var midpoint = ordered.Count / 2;
+        if (ordered.Count % 2 == 0)
+        {
+            return (ordered[midpoint - 1] + ordered[midpoint]) / 2.0;
+        }
+
+        return ordered[midpoint];
+    }
+
+    private static double ComputeStandardDeviation(IReadOnlyList<double> values, double mean)
+    {
+        if (values.Count <= 1)
+        {
+            return 0;
+        }
+
+        var sumSquares = values.Sum(v => Math.Pow(v - mean, 2));
+        var variance = sumSquares / values.Count;
+        return Math.Sqrt(variance);
+    }
+
+    private static string ComputeHash(IEnumerable<string> components)
+    {
+        var builder = new StringBuilder();
+        foreach (var component in components)
+        {
+            if (builder.Length > 0)
+            {
+                builder.Append('|');
+            }
+
+            builder.Append(component);
+        }
+
+        var bytes = Encoding.UTF8.GetBytes(builder.ToString());
+        var hash = SHA256.HashData(bytes);
+        return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
+    private static string ComputeShortHash(string value)
+    {
+        var bytes = Encoding.UTF8.GetBytes(value);
+        var hash = SHA256.HashData(bytes);
+        return Convert.ToHexString(hash)[..8].ToLowerInvariant();
     }
 
     private static int WritePose(string filePath, string outputDirectory)
@@ -264,6 +750,43 @@ public sealed class LegacyDataMigrator
         return rows.Count;
     }
 
+    private static int WriteWeather(string filePath, string outputDirectory)
+    {
+        var rows = LegacyWeatherCsvParser.Parse(filePath);
+        if (rows.Count == 0)
+        {
+            return 0;
+        }
+
+        using var stream = CreateParquetStream(outputDirectory, "weather.parquet");
+        using var writer = new ParquetWriter(TelemetrySchemas.Weather.Schema, stream);
+        using var rowGroup = writer.CreateRowGroup(rows.Count);
+
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.Sequence, rows.Select(r => r.Sequence).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.Source, rows.Select(r => r.Source).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.TemperatureC, rows.Select(r => r.TemperatureC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.HumidityPct, rows.Select(r => r.HumidityPct).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WindKph, rows.Select(r => r.WindKph).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WindDirectionDeg, rows.Select(r => r.WindDirectionDeg).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WindGustKph, rows.Select(r => r.WindGustKph).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.RainfallMm, rows.Select(r => r.RainfallMm).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.PressureKpa, rows.Select(r => r.PressureKpa).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.DewPointC, rows.Select(r => r.DewPointC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WetBulbC, rows.Select(r => r.WetBulbC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.DeltaTC, rows.Select(r => r.DeltaTC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.EvapotranspirationMm, rows.Select(r => r.EvapotranspirationMm).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.SolarIrradianceWm2, rows.Select(r => r.SolarIrradianceWm2).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.UvIndex, rows.Select(r => r.UvIndex).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.CloudCoverPct, rows.Select(r => r.CloudCoverPct).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.VisibilityKm, rows.Select(r => r.VisibilityKm).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.SoilTempC, rows.Select(r => r.SoilTempC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.SoilMoisturePct, rows.Select(r => r.SoilMoisturePct).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.LeafWetnessPct, rows.Select(r => r.LeafWetnessPct).ToArray()));
+
+        return rows.Count;
+    }
+
     private static FieldHistoryDocument ParseFieldHistory(string path)
     {
         var lines = File.ReadAllLines(path);
@@ -359,12 +882,24 @@ public sealed class LegacyMigrationOptions
     /// </summary>
     public string FieldHistoryFileName { get; set; } = "field-history.csv";
 
+    /// <summary>
+    /// Gets or sets the relative path to the legacy flags file used for field health remapping.
+    /// </summary>
+    public string FlagsFileName { get; set; } = "Flags.txt";
+
+    /// <summary>
+    /// Gets or sets the legacy yield telemetry CSV located under the logs directory.
+    /// </summary>
+    public string YieldTelemetryFileName { get; set; } = "yield.csv";
+
     internal void Validate()
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(InputDirectory);
         ArgumentException.ThrowIfNullOrWhiteSpace(OutputDirectory);
         ArgumentException.ThrowIfNullOrWhiteSpace(LogsDirectoryName);
         ArgumentException.ThrowIfNullOrWhiteSpace(FieldHistoryFileName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(FlagsFileName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(YieldTelemetryFileName);
 
         if (!Directory.Exists(InputDirectory))
         {
@@ -389,12 +924,15 @@ public sealed record LegacyMigrationReport(
     int CanCount = 0,
     int SectionCount = 0,
     int PluginCount = 0,
+    int WeatherCount = 0,
     int FieldHistoryFields = 0,
     int FieldHistoryEntries = 0,
+    int FieldHealthObservationCount = 0,
+    int YieldSampleCount = 0,
     IReadOnlyList<string> SkippedFiles = null!)
 {
     public LegacyMigrationReport(string outputDirectory)
-        : this(outputDirectory, 0, 0, 0, 0, 0, 0, 0, Array.Empty<string>())
+        : this(outputDirectory, 0, 0, 0, 0, 0, 0, 0, 0, 0, Array.Empty<string>())
     {
     }
 };
@@ -763,11 +1301,195 @@ internal static class LegacyPluginCsvParser
         byte[]? Payload);
 }
 
+internal static class LegacyWeatherCsvParser
+{
+    public static IReadOnlyList<WeatherRow> Parse(string path)
+    {
+        var rows = new List<WeatherRow>();
+        using var reader = new StreamReader(path);
+        reader.ReadLine();
+        while (!reader.EndOfStream)
+        {
+            var line = reader.ReadLine();
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            var parts = line.Split(',', StringSplitOptions.TrimEntries);
+            if (parts.Length < 3)
+            {
+                continue;
+            }
+
+            rows.Add(new WeatherRow(
+                ulong.Parse(parts[0], CultureInfo.InvariantCulture),
+                ParseTimestamp(GetPart(parts, 1)),
+                Normalize(GetPart(parts, 2)),
+                ParseNullableDouble(GetPart(parts, 3)),
+                ParseNullableDouble(GetPart(parts, 4)),
+                ParseNullableDouble(GetPart(parts, 5)),
+                ParseNullableDouble(GetPart(parts, 6)),
+                ParseNullableDouble(GetPart(parts, 7)),
+                ParseNullableDouble(GetPart(parts, 8)),
+                ParseNullableDouble(GetPart(parts, 9)),
+                ParseNullableDouble(GetPart(parts, 10)),
+                ParseNullableDouble(GetPart(parts, 11)),
+                ParseNullableDouble(GetPart(parts, 12)),
+                ParseNullableDouble(GetPart(parts, 13)),
+                ParseNullableDouble(GetPart(parts, 14)),
+                ParseNullableDouble(GetPart(parts, 15)),
+                ParseNullableDouble(GetPart(parts, 16)),
+                ParseNullableDouble(GetPart(parts, 17)),
+                ParseNullableDouble(GetPart(parts, 18)),
+                ParseNullableDouble(GetPart(parts, 19)),
+                ParseNullableDouble(GetPart(parts, 20))));
+        }
+
+        return rows;
+    }
+
+    private static DateTime? ParseTimestamp(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var timestamp = DateTime.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal);
+        return DateTime.SpecifyKind(timestamp, DateTimeKind.Utc);
+    }
+
+    private static double? ParseNullableDouble(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return double.Parse(value, CultureInfo.InvariantCulture);
+    }
+
+    private static string? Normalize(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value;
+
+    private static string? GetPart(string[] parts, int index)
+        => index < parts.Length ? parts[index] : null;
+
+    internal sealed record WeatherRow(
+        ulong Sequence,
+        DateTime? TimestampUtc,
+        string? Source,
+        double? TemperatureC,
+        double? HumidityPct,
+        double? WindKph,
+        double? WindDirectionDeg,
+        double? WindGustKph,
+        double? RainfallMm,
+        double? PressureKpa,
+        double? DewPointC,
+        double? WetBulbC,
+        double? DeltaTC,
+        double? EvapotranspirationMm,
+        double? SolarIrradianceWm2,
+        double? UvIndex,
+        double? CloudCoverPct,
+        double? VisibilityKm,
+        double? SoilTempC,
+        double? SoilMoisturePct,
+        double? LeafWetnessPct);
+}
+
 internal sealed record FieldHistoryDocument(IReadOnlyList<FieldHistoryField> Fields);
 
 internal sealed record FieldHistoryField(string FieldName, IReadOnlyList<FieldHistoryEntry> Entries);
 
 internal sealed record FieldHistoryEntry(DateTime TimestampUtc, double AreaHectares, string? Operator);
+
+internal sealed record LegacyFlagRow(int Id, string? Label, double EastingMeters, double NorthingMeters, double HeadingDegrees, string Color, string? Notes);
+
+internal sealed record FieldHealthLayerDocument(
+    string SchemaVersion,
+    string Id,
+    string Kind,
+    string? JobId,
+    string? SessionId,
+    string Units,
+    DateTimeOffset CreatedAt,
+    string CreatedBy,
+    DateTimeOffset LastModifiedAt,
+    LayerProvenanceDocument Provenance,
+    FieldHealthMetadataDocument Metadata);
+
+internal sealed record FieldHealthMetadataDocument(
+    string SchemaRef,
+    string? Notes,
+    IReadOnlyList<string> Tags,
+    IReadOnlyList<FieldHealthObservationDocument> Observations,
+    FieldHealthStatisticsDocument Statistics,
+    FieldHealthHistoryDocument History);
+
+internal sealed record FieldHealthObservationDocument(
+    string FeatureId,
+    Guid? ZoneId,
+    string Label,
+    string Severity,
+    DateTimeOffset ObservedAt,
+    string Observer,
+    string? Notes,
+    IReadOnlyList<string> Attachments,
+    string? SessionId,
+    double? AreaHa,
+    string GeometryHash,
+    DateTimeOffset? LastUpdatedAt,
+    string Status);
+
+internal sealed record FieldHealthStatisticsDocument(double TotalAreaHa, FieldHealthSeverityCountsDocument SeverityCounts, DateTimeOffset LastSurveyedAt);
+
+internal sealed record FieldHealthSeverityCountsDocument(int None, int Low, int Moderate, int High, int Critical);
+
+internal sealed record FieldHealthHistoryDocument(IReadOnlyList<FieldHealthHistoryEntryDocument> Entries, FieldHealthHistoryTogglesDocument Toggles);
+
+internal sealed record FieldHealthHistoryEntryDocument(string FeatureId, string Status, string Severity, DateTimeOffset ChangedAt);
+
+internal sealed record FieldHealthHistoryTogglesDocument(bool ShowActive, bool ShowMonitor, bool ShowResolved);
+
+internal sealed record YieldLayerDocument(
+    string SchemaVersion,
+    string Id,
+    string Kind,
+    string? JobId,
+    string? SessionId,
+    string? FieldId,
+    string Units,
+    DateTimeOffset CreatedAt,
+    string CreatedBy,
+    DateTimeOffset LastModifiedAt,
+    LayerProvenanceDocument Provenance,
+    YieldLayerMetadataDocument Metadata);
+
+internal sealed record YieldLayerMetadataDocument(
+    YieldGridMetadata Grid,
+    YieldSmoothingMetadata Smoothing,
+    YieldCalibrationMetadata Calibration,
+    YieldAggregationMetadata Aggregation,
+    YieldStatisticsMetadata Statistics);
+
+internal sealed record YieldGridMetadata(double CellSizeMeters, string Projection);
+
+internal sealed record YieldSmoothingMetadata(string Method, double? WindowSeconds, double? LagCompensationSeconds, int? Passes);
+
+internal sealed record YieldCalibrationMetadata(string ProfileId, DateTimeOffset? AppliedAt, string? Source, string? SensorModel, string? Notes, IReadOnlyDictionary<string, double>? Factors);
+
+internal sealed record YieldAggregationMetadata(string Basis, IReadOnlyList<string> Scopes, DateTimeOffset UpdatedAt, YieldAggregationBinsMetadata Bins);
+
+internal sealed record YieldAggregationBinsMetadata(string Scheme, int? Count, IReadOnlyList<double>? Breaks, IReadOnlyList<string>? Labels);
+
+internal sealed record YieldStatisticsMetadata(int Count, double Mean, double Median, double StdDev, double Min, double Max, double TotalMassKg);
+
+internal sealed record LegacyYieldSample(DateTimeOffset Timestamp, double EastingMeters, double NorthingMeters, double YieldKgPerHa, double? MoisturePercent, double AreaHa);
+
+internal sealed record LayerProvenanceDocument(string Source, string Transform, string Hash, DateTimeOffset CreatedAt, string Actor);
 
 internal static class TelemetrySchemas
 {
@@ -886,5 +1608,52 @@ internal static class TelemetrySchemas
             PluginId,
             Topic,
             Payload);
+    }
+
+    internal static class Weather
+    {
+        public static readonly DataField<ulong> Sequence = new("sequence");
+        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+        public static readonly DataField<string?> Source = new("source");
+        public static readonly DataField<double?> TemperatureC = new("temperature_c");
+        public static readonly DataField<double?> HumidityPct = new("humidity_pct");
+        public static readonly DataField<double?> WindKph = new("wind_kph");
+        public static readonly DataField<double?> WindDirectionDeg = new("wind_dir_deg");
+        public static readonly DataField<double?> WindGustKph = new("wind_gust_kph");
+        public static readonly DataField<double?> RainfallMm = new("rainfall_mm");
+        public static readonly DataField<double?> PressureKpa = new("pressure_kpa");
+        public static readonly DataField<double?> DewPointC = new("dew_point_c");
+        public static readonly DataField<double?> WetBulbC = new("wet_bulb_c");
+        public static readonly DataField<double?> DeltaTC = new("delta_t_c");
+        public static readonly DataField<double?> EvapotranspirationMm = new("evapotranspiration_mm");
+        public static readonly DataField<double?> SolarIrradianceWm2 = new("solar_irradiance_wm2");
+        public static readonly DataField<double?> UvIndex = new("uv_index");
+        public static readonly DataField<double?> CloudCoverPct = new("cloud_cover_pct");
+        public static readonly DataField<double?> VisibilityKm = new("visibility_km");
+        public static readonly DataField<double?> SoilTempC = new("soil_temp_c");
+        public static readonly DataField<double?> SoilMoisturePct = new("soil_moisture_pct");
+        public static readonly DataField<double?> LeafWetnessPct = new("leaf_wetness_pct");
+        public static readonly Schema Schema = new(
+            Sequence,
+            Timestamp,
+            Source,
+            TemperatureC,
+            HumidityPct,
+            WindKph,
+            WindDirectionDeg,
+            WindGustKph,
+            RainfallMm,
+            PressureKpa,
+            DewPointC,
+            WetBulbC,
+            DeltaTC,
+            EvapotranspirationMm,
+            SolarIrradianceWm2,
+            UvIndex,
+            CloudCoverPct,
+            VisibilityKm,
+            SoilTempC,
+            SoilMoisturePct,
+            LeafWetnessPct);
     }
 }

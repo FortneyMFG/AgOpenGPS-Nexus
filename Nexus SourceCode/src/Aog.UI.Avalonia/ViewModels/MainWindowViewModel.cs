@@ -70,6 +70,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         SeasonNavigator = SeasonNavigatorViewModel.CreateSample();
         CropQuickSelect = CropQuickSelectViewModel.CreateSample();
+        PresetSwitcher = PresetSwitcherViewModel.CreateSample();
 
         // Load simulation configuration + summary and create the bar VM.
         var configuration = TryLoadSimulationConfiguration(out var summary);
@@ -96,6 +97,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         ApplySamplePluginState();
         SeedDashboards();
+
+        DeviceManagerCompatibility = DeviceManagerCompatibilityViewModel.CreateSample();
 
         if (configuration?.Scenarios is not null)
         {
@@ -151,6 +154,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets the crop quick-select view-model surfaced in the field navigator.</summary>
     public CropQuickSelectViewModel CropQuickSelect { get; }
 
+    /// <summary>Gets the preset switcher view-model that surfaces orchestration status.</summary>
+    public PresetSwitcherViewModel PresetSwitcher { get; }
+
     /// <summary>Gets the available UI themes.</summary>
     public IReadOnlyList<UiTheme> AvailableThemes { get; }
 
@@ -191,6 +197,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets the inspector exposing the pinned layer observation.</summary>
     public LayerInspectorViewModel LayerInspector { get; }
 
+    /// <summary>Gets the compatibility dashboard view-model consumed by the Device Manager card.</summary>
+    public DeviceManagerCompatibilityViewModel DeviceManagerCompatibility { get; }
     /// <summary>Gets the mesh share/subscribe panel view-model.</summary>
     public MeshSharePanelViewModel MeshSharePanel { get; }
 
@@ -217,6 +225,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
             SimulationBar.ApplyLegacyImport(result);
             return true;
         });
+    }
+
+    /// <summary>
+    /// Creates a metadata snapshot that companion clients can consume to mirror the desktop layout.
+    /// </summary>
+    public CompanionMetadataSnapshot CreateCompanionMetadataSnapshot()
+    {
+        return CompanionMetadataSnapshot.From(LayerLegend, LayerInspector, SteerDashboard, ReplayTimeline);
     }
 
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)

@@ -208,13 +208,44 @@ public sealed class FileSystemJobStore : IJobStore, IDisposable
         await _mutex.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            var job = await LoadJobDocumentByIdAsync(jobId.Trim(), cancellationToken).ConfigureAwait(false);
+            var jobIdTrimmed = jobId.Trim();
+            var job = await LoadJobDocumentByIdAsync(jobIdTrimmed, cancellationToken).ConfigureAwait(false);
             if (job is null)
             {
                 throw new InvalidOperationException($"Job '{jobId}' was not found in the store.");
             }
 
             var now = _timeProvider.GetUtcNow();
+            var active = await ReadActiveStateAsync(cancellationToken).ConfigureAwait(false);
+            if (active is not null && !string.Equals(active.JobId, job.Document.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                var previouslyActive = await LoadJobDocumentByIdAsync(active.JobId, cancellationToken).ConfigureAwait(false);
+                if (previouslyActive is not null)
+                {
+                    previouslyActive.Document.State = JobLifecycleState.Inactive;
+                    previouslyActive.Document.UpdatedAt = now;
+
+                    foreach (var session in previouslyActive.Document.Sessions)
+                    {
+                        if (session.State == JobSessionState.Active)
+                        {
+                            session.State = JobSessionState.Paused;
+                        }
+
+                        if (session.State == JobSessionState.Paused && session.EndedAt is null)
+                        {
+                            session.EndedAt = now;
+                        }
+                    }
+
+                    await PersistJobDocumentAsync(previouslyActive.DirectoryPath, previouslyActive.Document, cancellationToken).ConfigureAwait(false);
+                    await WriteResumeMarkerAsync(previouslyActive.DirectoryPath, previouslyActive.Document, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    await ClearActiveStateAsync().ConfigureAwait(false);
+                }
+            }
             job.Document.State = JobLifecycleState.Active;
             job.Document.UpdatedAt = now;
 

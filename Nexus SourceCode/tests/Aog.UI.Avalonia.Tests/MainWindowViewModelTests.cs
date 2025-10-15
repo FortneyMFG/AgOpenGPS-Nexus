@@ -68,7 +68,9 @@ public sealed class MainWindowViewModelTests
     {
         var viewModel = CreateViewModel();
 
-        viewModel.SteerDashboard.CrossTrackErrorHistory.Should().NotBeEmpty();
+        viewModel.SteerDashboard.Series.Should().NotBeEmpty();
+        viewModel.SteerDashboard.Series.SelectMany(series => series.Values).Should().NotBeEmpty();
+        viewModel.SteerDashboard.TuningParameters.Should().NotBeEmpty();
         viewModel.ReplayTimeline.Bookmarks.Should().NotBeEmpty();
         viewModel.ReplayTimeline.SpeedSamples.Should().HaveCountGreaterThan(10);
     }

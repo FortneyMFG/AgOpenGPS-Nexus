@@ -21,11 +21,21 @@ public sealed class DashboardsViewModelTests
         viewModel.IntegralGain = -1;    // Should clamp
         viewModel.DerivativeGain = 2;   // Should clamp
 
-        viewModel.CrossTrackErrorHistory.Should().HaveCount(10);
+        var crossTrackSeries = viewModel.Series.Single(series => series.Id == "autosteer.crossTrack");
+        crossTrackSeries.Values.Should().HaveCount(10);
+
         viewModel.Status.Should().Contain("Cross-track");
         viewModel.GainSummary.Should().Contain("P 2.00");
         viewModel.GainSummary.Should().Contain("I 0.00");
         viewModel.GainSummary.Should().Contain("D 1.00");
+
+        viewModel.TuningParameters.Should().HaveCount(3);
+        viewModel.TuningParameters.Select(parameter => parameter.Label)
+            .Should().Contain(new[] { "P", "I", "D" });
+
+        var proportionalParameter = viewModel.TuningParameters.Single(parameter => parameter.Id == "controller.p");
+        proportionalParameter.Value = 1.23;
+        viewModel.ProportionalGain.Should().BeApproximately(1.23, 1e-6);
     }
 
     [Fact]

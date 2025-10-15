@@ -375,39 +375,53 @@
                   <TextBlock Text="{Binding Status}" Foreground="#99000000"/>
                 </StackPanel>
 
-                <Grid RowDefinitions="Auto,Auto" RowSpacing="12">
-                  <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
-                    <StackPanel>
-                      <TextBlock Text="Cross-track error" FontWeight="SemiBold"/>
-                      <controls:Sparkline Values="{Binding CrossTrackErrorHistory}" Height="60" StrokeThickness="2.5"/>
-                    </StackPanel>
+                <StackPanel Spacing="12">
+                  <ItemsControl ItemsSource="{Binding Series}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <WrapPanel Spacing="12"/>
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:DashboardSeriesViewModel">
+                        <StackPanel MinWidth="180" Width="220" Spacing="4">
+                          <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+                          <controls:Sparkline Values="{Binding Values}"
+                                              Height="60"
+                                              Stroke="{Binding Stroke}"
+                                              Fill="{Binding Fill}"
+                                              StrokeThickness="{Binding StrokeThickness}"/>
+                          <TextBlock Text="{Binding Units}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
 
-                    <StackPanel Grid.Column="1">
-                      <TextBlock Text="Wheel angle" FontWeight="SemiBold"/>
-                      <controls:Sparkline Values="{Binding WheelAngleHistory}" Height="60" Stroke="#FF35A1FF" Fill="#2035A1FF"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2">
-                      <TextBlock Text="Controller output" FontWeight="SemiBold"/>
-                      <controls:Sparkline Values="{Binding ControllerOutputHistory}" Height="60" Stroke="#FFFFD700" Fill="#20FFD700"/>
-                    </StackPanel>
-                  </Grid>
-
-                  <StackPanel Grid.Row="1" Spacing="8">
+                  <StackPanel Spacing="8">
                     <TextBlock Text="Tuning" FontWeight="SemiBold"/>
-                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="6" ColumnSpacing="8">
-                      <TextBlock Grid.Row="0" Grid.Column="0" Text="P" VerticalAlignment="Center"/>
-                      <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="2" Value="{Binding ProportionalGain, Mode=TwoWay}"/>
-                      <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding ProportionalGain, StringFormat='{}{0:0.00}'}" VerticalAlignment="Center"/>
-
-                      <TextBlock Grid.Row="1" Grid.Column="0" Text="I" VerticalAlignment="Center"/>
-                      <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="0.5" Value="{Binding IntegralGain, Mode=TwoWay}"/>
-                      <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding IntegralGain, StringFormat='{}{0:0.00}'}" VerticalAlignment="Center"/>
-
-                      <TextBlock Grid.Row="2" Grid.Column="0" Text="D" VerticalAlignment="Center"/>
-                      <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding DerivativeGain, Mode=TwoWay}"/>
-                      <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding DerivativeGain, StringFormat='{}{0:0.00}'}" VerticalAlignment="Center"/>
-                    </Grid>
+                    <ItemsControl ItemsSource="{Binding TuningParameters}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <StackPanel Spacing="6"/>
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DashboardTuningParameterViewModel">
+                          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                            <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                            <Slider Grid.Column="1"
+                                    Minimum="{Binding Minimum}"
+                                    Maximum="{Binding Maximum}"
+                                    Value="{Binding Value, Mode=TwoWay}"
+                                    SmallChange="{Binding Step}"
+                                    LargeChange="{Binding Step}"/>
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding DisplayValue}"
+                                       VerticalAlignment="Center"/>
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <TextBlock Text="{Binding GainSummary}" Foreground="#99000000"/>
 
                     <StackPanel>
@@ -424,7 +438,7 @@
                       </ItemsControl>
                     </StackPanel>
                   </StackPanel>
-                </Grid>
+                </StackPanel>
               </StackPanel>
             </StackPanel>
           </Border>

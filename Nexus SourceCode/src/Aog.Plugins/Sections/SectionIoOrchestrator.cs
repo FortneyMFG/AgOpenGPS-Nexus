@@ -76,9 +76,17 @@ public sealed class SectionIoOrchestrator
         lock (_gate)
         {
             var lastMatches = _lastMask.HasValue && _lastMask.Value == mask;
-            var inFlightMatches = _inFlightMask.HasValue && _inFlightMask.Value == mask;
+            var publishPending = _inFlightMask.HasValue;
+            var inFlightMatches = publishPending && _inFlightMask.Value == mask;
 
-            if (inFlightMatches || (lastMatches && !_inFlightMask.HasValue))
+            if (lastMatches)
+            {
+                if (!publishPending || inFlightMatches)
+                {
+                    return;
+                }
+            }
+            else if (inFlightMatches)
             {
                 return;
             }

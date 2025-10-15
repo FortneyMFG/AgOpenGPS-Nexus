@@ -192,6 +192,7 @@ public sealed class PluginCompatibilityEvaluator
         CompatibilityEnvironment environment,
         IReadOnlyDictionary<string, PluginManifest> manifestById,
         IReadOnlyDictionary<string, IReadOnlyList<ReplacementProvider>> replacementIndex,
+        IReadOnlyDictionary<string, IReadOnlyList<PluginManifest>> replacementIndex,
         ICollection<PluginCompatibilityDependencyStatus> issues)
     {
         foreach (var requirement in manifest.RequiredApis)
@@ -230,6 +231,10 @@ public sealed class PluginCompatibilityEvaluator
                         CultureInfo.InvariantCulture,
                         "Required plugin '{0}' is not installed.",
                         pluginId);
+                        continue;
+                    }
+
+                    var message = string.Format(CultureInfo.InvariantCulture, "Required plugin '{0}' is not installed.", pluginId);
                     issues.Add(new PluginCompatibilityDependencyStatus(
                         PluginDependencyKind.Plugin,
                         pluginId,
@@ -743,6 +748,9 @@ public sealed class PluginCompatibilityEvaluator
     private static IReadOnlyDictionary<string, IReadOnlyList<ReplacementProvider>> BuildReplacementIndex(IEnumerable<PluginManifest> manifests)
     {
         var index = new Dictionary<string, List<ReplacementProvider>>(StringComparer.OrdinalIgnoreCase);
+    private static IReadOnlyDictionary<string, IReadOnlyList<PluginManifest>> BuildReplacementIndex(IEnumerable<PluginManifest> manifests)
+    {
+        var index = new Dictionary<string, List<PluginManifest>>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var manifest in manifests)
         {
@@ -759,6 +767,15 @@ public sealed class PluginCompatibilityEvaluator
         }
 
         return index.ToDictionary(pair => pair.Key, pair => (IReadOnlyList<ReplacementProvider>)pair.Value, StringComparer.OrdinalIgnoreCase);
+                    list = new List<PluginManifest>();
+                    index[replacement.Id] = list;
+                }
+
+                list.Add(manifest);
+            }
+        }
+
+        return index.ToDictionary(pair => pair.Key, pair => (IReadOnlyList<PluginManifest>)pair.Value, StringComparer.OrdinalIgnoreCase);
     }
 
     private static PluginCompatibilityState DetermineState(IReadOnlyCollection<PluginCompatibilityDependencyStatus> issues)

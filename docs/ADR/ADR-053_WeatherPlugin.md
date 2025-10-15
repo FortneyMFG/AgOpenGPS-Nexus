@@ -26,7 +26,7 @@ builder and analytics.
 
 ### Data Model
 
-- Session documents include `weatherSnapshot` (temperature, humidity, wind, rainfall, pressure) captured at start and optionally
+- Session documents include `weatherSnapshot` (temperature, humidity, wind, wind gusts, rainfall, pressure, dew point, wet bulb, delta T, solar irradiance, UV index, visibility, evapotranspiration, soil temperature/moisture, leaf wetness) captured at start and optionally
   updated via `onSessionWeatherUpdate` events.
 - `weather.overlay` layer stores gridded environmental values with provenance referencing the source and timestamp.
 - Weather data available to other plugins via context bus for analytics (e.g., spraying compliance, yield correlation).

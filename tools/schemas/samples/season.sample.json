@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0.0",
+  "seasonId": "season:2025",
+  "displayName": "2025 Crop Year",
+  "slug": "2025-crop-year",
+  "dateRange": {
+    "start": "2025-01-01",
+    "end": "2025-12-31"
+  },
+  "jobIds": [
+    "job:2025-plant-soy",
+    "job:2025-spray-1",
+    "job:2025-harvest-corn"
+  ],
+  "notes": "Aggregates planting, spraying, and harvest work for 2025 row crops.",
+  "optimizerState": {
+    "planner": "profit/v1",
+    "payloadVersion": 2,
+    "state": {
+      "targetMarginPct": 0.18,
+      "seedCostPerHa": 124.5
+    }
+  },
+  "createdBy": "user:planner.annika",
+  "createdAt": "2025-01-02T14:00:00Z",
+  "lastModifiedAt": "2025-03-15T22:45:10Z",
+  "extensions": {
+    "analytics.crop": {
+      "rotation": "corn-soy-corn",
+      "anticipatedAreaHa": 128.4
+    },
+    "reporting.checklist": {
+      "preseasonBriefed": true
+    }
+  }
+}

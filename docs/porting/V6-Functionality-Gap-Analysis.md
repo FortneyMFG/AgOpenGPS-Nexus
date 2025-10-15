@@ -43,13 +43,13 @@ The Nexus importer currently focuses on a subset of the V6 assets:
 | --- | --- | --- |
 | AB/curve tracks | ✅ Imported via `LegacyFieldImporter` and surfaced on `LegacyFieldData.Tracks`.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L33-L90】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L21-L29】 |
 | Boundaries & headlands | ✅ Imported via `LegacyFieldImporter`/`LegacyFieldData.Boundaries` and already referenced by UI importers.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L92-L200】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L21-L29】 |
-| Background imagery | ❌ Not represented in `LegacyFieldData`; no Nexus service persists `BackPic` artefacts yet.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
-| Field overview metadata | ✅ `Field.txt` importer populates `LegacyFieldOverview`, preserving origin, operator, and convergence data.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L30-L141】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L74-L118】 |
-| Flags & annotations | ✅ `Flags.txt` rows map into `LegacyFlag` records, ready for UI surfacing.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L143-L210】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L120-L160】 |
-| Contour coverage strips | ✅ `Contour.txt` resume buffers populate `LegacyContourResume` so operators can pick up contour runs.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L212-L259】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L162-L197】 |
-| Recorded path logs | ✅ `RecPath.txt` imports yield `LegacyRecordedPath` collections consumable by replay services.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L261-L307】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L199-L229】 |
-| Tram line templates | ✅ `Tram.txt` templates translate into `LegacyTramTemplate` payloads for tramline planners.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L309-L363】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L231-L269】 |
-| Worked area patches | ✅ `Sections.txt` history converts into `LegacyWorkedAreaHistory` cells ready for layer replay.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L365-L416】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L271-L307】 |
+| **Background imagery** | ✅ | Imported from `BackPic.txt` / `BackPic.png` and exposed as `LegacyFieldData.BackgroundImagery` (via `LegacyGeoBoundingBox` + PNG payload). Implemented in `LegacyFieldImporter.LoadBackgroundImagery`. |
+| **Field overview metadata** | ✅ | `Field.txt` → `LegacyFieldOverview` (origin, operator, created, convergence, elevation, notes) and exposed via `LegacyFieldData.Overview`. Implemented in `LegacyFieldImporter.LoadOverview`. |
+| **Flags & annotations** | ✅ | `Flags.txt` → `LegacyFlag` collection on `LegacyFieldData.Flags` (id / label / point / heading / color / notes). Implemented in `LegacyFieldImporter.LoadFlags`. |
+| **Contour coverage strips** | ✅ | `Contour.txt` → `LegacyContourResume` (saved strips + pending buffer) on `LegacyFieldData.Contour`. Implemented in `LegacyFieldImporter.LoadContour`. |
+| **Recorded path logs** | ✅ | `RecPath.txt` → `LegacyRecordedPath` collection on `LegacyFieldData.RecordedPaths`. Implemented in `LegacyFieldImporter.LoadRecordedPaths`. |
+| **Tram line templates** | ✅ | `Tram.txt` → `LegacyTramTemplate` collection on `LegacyFieldData.TramTemplates`. Implemented in `LegacyFieldImporter.LoadTramTemplates`. |
+| **Worked area patches** | ✅ | `Sections.txt` → `LegacyWorkedAreaHistory` (cell size, saved / pending cells, layer id) on `LegacyFieldData.WorkedArea`. Implemented in `LegacyFieldImporter.LoadWorkedArea`. |
 
 ## Recommended Follow-Ups
 

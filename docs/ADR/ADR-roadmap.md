@@ -24,7 +24,9 @@ Draft authors should reference the listed requirements and tasks before opening 
 
 ### Early unblockers — High fan-in contracts
 - **ADR-010 Layer registry (skeleton)** — Ship a minimal `LayerDefinition` schema draft with hash handshake semantics so mapping, presets, and analytics workstreams can start API reviews before the full catalog governance ADR lands.
-- **ADR-022 CRS policy (preview)** — Publish the CRS normalization matrix and reprojection rules referenced by ADR-027/ADR-029 to unblock cross-pod alignment on spatial math and deterministic replay.
+- **ADR-022 CRS policy (preview)** — [CRS normalization matrix](../reference/crs-normalization-matrix.md)
+  plus reprojection rules referenced by ADR-027/ADR-029 to unblock cross-pod alignment on
+  spatial math and deterministic replay.
 - **ADR-031 Manifest governance (CI stub)** — Land the manifest validator CLI plus CI gate to let plugin teams iterate against a concrete toolchain while the broader governance ADR proceeds through review.
 
 ### Cross-track integration slice — PoseStream → Controller → Guidance preview

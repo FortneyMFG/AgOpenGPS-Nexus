@@ -1,0 +1,346 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/job-session.schema.json",
+  "title": "AgOpenGPS Nexus job session document (Session.v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "jobId",
+    "sessionId",
+    "state",
+    "startedAt",
+    "createdAt",
+    "createdBy",
+    "lastModifiedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the session document contract."
+    },
+    "jobId": {
+      "$ref": "job.schema.json#/$defs/jobId"
+    },
+    "sessionId": {
+      "$ref": "job.schema.json#/$defs/sessionId"
+    },
+    "state": {
+      "$ref": "job.schema.json#/$defs/sessionState"
+    },
+    "name": {
+      "type": "string",
+      "description": "Operator friendly name used in UI timelines."
+    },
+    "startedAt": {
+      "$ref": "job.schema.json#/$defs/timestamp"
+    },
+    "endedAt": {
+      "$ref": "job.schema.json#/$defs/timestamp"
+    },
+    "createdAt": {
+      "$ref": "job.schema.json#/$defs/timestamp"
+    },
+    "createdBy": {
+      "$ref": "job.schema.json#/$defs/entityId"
+    },
+    "lastModifiedAt": {
+      "$ref": "job.schema.json#/$defs/timestamp"
+    },
+    "lastModifiedBy": {
+      "$ref": "job.schema.json#/$defs/entityId"
+    },
+    "operators": {
+      "type": "array",
+      "items": {
+        "$ref": "job.schema.json#/$defs/entityId"
+      },
+      "description": "Roster of operators participating in the session."
+    },
+    "workOrderId": {
+      "$ref": "job.schema.json#/$defs/entityId",
+      "description": "Linked work order if the session originated from TaskService orchestration."
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "seasonId": {
+          "$ref": "job.schema.json#/$defs/entityId"
+        },
+        "farmId": {
+          "$ref": "job.schema.json#/$defs/entityId"
+        },
+        "fieldIds": {
+          "type": "array",
+          "items": {
+            "$ref": "job.schema.json#/$defs/entityId"
+          }
+        },
+        "presetId": {
+          "$ref": "job.schema.json#/$defs/entityId"
+        },
+        "layoutId": {
+          "$ref": "job.schema.json#/$defs/entityId"
+        }
+      },
+      "description": "Resolved context for the session when it was created."
+    },
+    "environment": {
+      "$ref": "#/$defs/environmentSnapshot"
+    },
+    "environmentSamples": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/environmentSnapshot"
+      },
+      "description": "Historical environment samples captured during the session."
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/inputRecord"
+      },
+      "description": "Material and product inputs applied during the session keyed by plugin-defined identifiers."
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      },
+      "description": "Freeform or structured operator notes recorded during the session."
+    },
+    "layerRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "job.schema.json#/$defs/entityId"
+      },
+      "description": "Layer identifiers associated with the session's work."
+    },
+    "telemetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "logId": {
+          "$ref": "job.schema.json#/$defs/entityId"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "$ref": "job.schema.json#/$defs/entityId"
+          }
+        }
+      },
+      "description": "Telemetry logs recorded for the session."
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path"],
+        "properties": {
+          "id": {
+            "$ref": "job.schema.json#/$defs/entityId"
+          },
+          "path": {
+            "type": "string"
+          },
+          "mediaType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "description": "Attachments captured specifically for this session."
+    },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "areaHa": {
+          "type": "number",
+          "minimum": 0
+        },
+        "distanceKm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "durationSec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "workRateHaPerHr": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "description": "Session level statistics derived from telemetry and coverage layers."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin owned structured data scoped to the session."
+    }
+  },
+  "$defs": {
+    "environmentSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at"],
+      "properties": {
+        "at": {
+          "$ref": "job.schema.json#/$defs/timestamp"
+        },
+        "source": {
+          "type": "string",
+          "description": "Data source for the sample (sensor id, weather station, manual entry)."
+        },
+        "tempC": {
+          "type": "number"
+        },
+        "humidityPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "windKph": {
+          "type": "number",
+          "minimum": 0
+        },
+        "windDeg": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 360
+        },
+        "windGustKph": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Peak wind gust recorded during the sampling interval in kilometers per hour."
+        },
+        "pressureKpa": {
+          "type": "number",
+          "minimum": 0
+        },
+        "rainMm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "evapotranspirationMm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Evapotranspiration observed during the sampling interval in millimeters."
+        },
+        "soilTempC": {
+          "type": "number"
+        },
+        "soilMoisturePct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Volumetric soil moisture percentage at the sampling depth."
+        },
+        "leafWetnessPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Leaf wetness sensor reading expressed as a percentage."
+        },
+        "dewPointC": {
+          "type": "number",
+          "description": "Calculated dew point temperature in Celsius."
+        },
+        "wetBulbC": {
+          "type": "number",
+          "description": "Wet bulb temperature in Celsius."
+        },
+        "deltaTC": {
+          "type": "number",
+          "description": "Spray Delta T (dry bulb - wet bulb) in Celsius."
+        },
+        "solarIrradianceWm2": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Solar irradiance measured in watts per square meter."
+        },
+        "uvIndex": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Ultraviolet index reported for the sampling interval."
+        },
+        "cloudCoverPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Cloud cover estimate as a percentage."
+        },
+        "visibilityKm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Horizontal visibility in kilometers."
+        }
+      },
+      "description": "Snapshot of environmental conditions."
+    },
+    "inputRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "productId": {
+          "$ref": "job.schema.json#/$defs/entityId"
+        },
+        "lot": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
+        },
+        "rateUnits": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "number"
+        },
+        "quantityUnits": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "description": "Material usage entry captured during the session."
+    },
+    "note": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "author", "type"],
+      "properties": {
+        "at": {
+          "$ref": "job.schema.json#/$defs/timestamp"
+        },
+        "author": {
+          "$ref": "job.schema.json#/$defs/entityId"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["freeform", "checklist", "automation", "system"]
+        },
+        "text": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Optional structured payload for checklist or automation notes."
+        }
+      },
+      "description": "Structured note entry recorded during the session."
+    }
+  }
+}

@@ -26,14 +26,25 @@ public sealed class LegacyFieldImporter
         var fullPath = Path.GetFullPath(fieldDirectory);
         var tracks = LoadTracks(fullPath);
         var boundaries = LoadBoundaries(fullPath);
+
         var overview = LoadOverview(fullPath);
         var flags = LoadFlags(fullPath);
         var contour = LoadContour(fullPath);
         var recordedPaths = LoadRecordedPaths(fullPath);
         var tramTemplates = LoadTramTemplates(fullPath);
         var workedArea = LoadWorkedArea(fullPath);
+        var backgroundImagery = LoadBackgroundImagery(fullPath);
 
-        return new LegacyFieldData(tracks, boundaries, overview, flags, contour, recordedPaths, tramTemplates, workedArea);
+        return new LegacyFieldData(
+            tracks,
+            boundaries,
+            overview,
+            flags,
+            contour,
+            recordedPaths,
+            tramTemplates,
+            workedArea,
+            backgroundImagery);
     }
 
     private static LegacyFieldOverview? LoadOverview(string directory)
@@ -443,134 +454,63 @@ public sealed class LegacyFieldImporter
         return new LegacyWorkedAreaHistory(cellSize, saved, pending, layerId);
     }
 
-    private static IReadOnlyList<GuidanceTrackDefinition> LoadTracks(string directory)
+    private static LegacyBackgroundImagery? LoadBackgroundImagery(string directory)
     {
-        var path = Path.Combine(directory, "TrackLines.txt");
-        if (!File.Exists(path))
+        var metadataPath = Path.Combine(directory, "BackPic.txt");
+        if (!File.Exists(metadataPath))
         {
-            return Array.Empty<GuidanceTrackDefinition>();
+            return null;
         }
 
-        var tracks = new List<GuidanceTrackDefinition>();
-        using var reader = new StreamReader(path);
+        using var reader = new StreamReader(metadataPath);
+        _ = reader.ReadLine(); // Skip optional header.
 
-        var header = reader.ReadLine();
-        if (header is null || !header.TrimStart().StartsWith("$", StringComparison.Ordinal))
+        var flagLine = reader.ReadLine();
+        if (flagLine is null)
         {
-            throw new InvalidDataException("TrackLines.txt missing $ header.");
+            return null;
         }
 
-        while (!reader.EndOfStream)
+        if (!bool.TryParse(flagLine.Trim(), out var hasImagery))
         {
-            var name = ReadTrimmedLine(reader);
-            if (name is null)
+            throw new InvalidDataException("BackPic.txt missing imagery flag.");
+        }
+
+        if (!hasImagery)
+        {
+            return null;
+        }
+
+        double ReadBoundedValue(string description)
+        {
+            var line = reader.ReadLine();
+            if (line is null)
             {
-                break;
+                throw new InvalidDataException($"Unexpected EOF reading {description}.");
             }
 
-            var headingLine = ReadTrimmedLine(reader) ?? throw new InvalidDataException("Unexpected EOF reading heading.");
-            var pointALine = ReadTrimmedLine(reader) ?? throw new InvalidDataException("Unexpected EOF reading point A.");
-            var pointBLine = ReadTrimmedLine(reader) ?? throw new InvalidDataException("Unexpected EOF reading point B.");
-            var nudgeLine = ReadTrimmedLine(reader) ?? throw new InvalidDataException("Unexpected EOF reading nudge distance.");
-            var modeLine = ReadTrimmedLine(reader) ?? throw new InvalidDataException("Unexpected EOF reading track mode.");
-            var visibleLine = ReadTrimmedLine(reader) ?? throw new InvalidDataException("Unexpected EOF reading visibility flag.");
-            var countLine = ReadTrimmedLine(reader) ?? throw new InvalidDataException("Unexpected EOF reading curve count.");
-
-            var heading = double.Parse(headingLine, CultureInfo.InvariantCulture);
-            var pointA = ParsePoint(pointALine);
-            var pointB = ParsePoint(pointBLine);
-            var nudge = double.Parse(nudgeLine, CultureInfo.InvariantCulture);
-            var mode = (LegacyTrackMode)int.Parse(modeLine, NumberStyles.Integer, CultureInfo.InvariantCulture);
-            var isVisible = bool.Parse(visibleLine);
-            var curveCount = int.Parse(countLine, NumberStyles.Integer, CultureInfo.InvariantCulture);
-
-            var curvePoints = new List<GuidanceCurvePoint>(curveCount);
-            for (var i = 0; i < curveCount; i++)
-            {
-                var curveLine = reader.ReadLine();
-                if (curveLine is null)
-                {
-                    throw new InvalidDataException("Unexpected EOF reading curve points.");
-                }
-
-                curvePoints.Add(ParseCurvePoint(curveLine));
-            }
-
-            tracks.Add(new GuidanceTrackDefinition(name, heading, pointA, pointB, nudge, mode, isVisible, curvePoints));
+            return double.Parse(line.Trim(), CultureInfo.InvariantCulture);
         }
 
-        return tracks;
-    }
+        var maxEasting = ReadBoundedValue("maximum easting");
+        var minEasting = ReadBoundedValue("minimum easting");
+        var maxNorthing = ReadBoundedValue("maximum northing");
+        var minNorthing = ReadBoundedValue("minimum northing");
 
-    private static IReadOnlyList<FieldBoundary> LoadBoundaries(string directory)
-    {
-        var boundaryPath = Path.Combine(directory, "Boundary.txt");
-        if (!File.Exists(boundaryPath))
+        var imagePath = Path.Combine(directory, "BackPic.png");
+        if (!File.Exists(imagePath))
         {
-            return Array.Empty<FieldBoundary>();
+            return null;
         }
 
-        var boundaries = new List<FieldBoundary>();
-        using (var reader = new StreamReader(boundaryPath))
+        var imageBytes = File.ReadAllBytes(imagePath);
+        if (imageBytes.Length == 0)
         {
-            string? line = reader.ReadLine();
-            if (line is not null && !line.TrimStart().StartsWith("$", StringComparison.Ordinal))
-            {
-                reader.BaseStream.Seek(0, SeekOrigin.Begin);
-                reader.DiscardBufferedData();
-            }
-
-            while ((line = ReadNextDataLine(reader)) is not null)
-            {
-                var driveThrough = false;
-                var trimmed = line.Trim();
-
-                if (bool.TryParse(trimmed, out var flag))
-                {
-                    driveThrough = flag;
-                    line = ReadNextDataLine(reader);
-                    if (line is null)
-                    {
-                        break;
-                    }
-
-                    trimmed = line.Trim();
-                    if (bool.TryParse(trimmed, out flag))
-                    {
-                        driveThrough = flag;
-                        line = ReadNextDataLine(reader);
-                        if (line is null)
-                        {
-                            break;
-                        }
-
-                        trimmed = line.Trim();
-                    }
-                }
-
-                if (!int.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var vertexCount))
-                {
-                    break;
-                }
-
-                var vertices = new List<BoundaryVertex>(vertexCount);
-                for (var i = 0; i < vertexCount; i++)
-                {
-                    var vertexLine = reader.ReadLine();
-                    if (vertexLine is null)
-                    {
-                        throw new InvalidDataException("Unexpected EOF reading boundary vertices.");
-                    }
-
-                    vertices.Add(ParseBoundaryVertex(vertexLine));
-                }
-
-                boundaries.Add(new FieldBoundary(driveThrough, vertices, Array.Empty<HeadlandRing>()));
-            }
+            return null;
         }
 
-        AttachHeadlands(directory, boundaries);
-        return boundaries;
+        var boundingBox = new LegacyGeoBoundingBox(minNorthing, maxNorthing, minEasting, maxEasting);
+        return new LegacyBackgroundImagery(boundingBox, imageBytes);
     }
 
     private static void AttachHeadlands(string directory, List<FieldBoundary> boundaries)

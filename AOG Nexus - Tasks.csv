@@ -114,8 +114,8 @@ NX-112,FALSE,TRUE,"NX-104, NX-032",,Replace binary section overlay with layer-aw
 NX-113,FALSE,TRUE,NX-104,,Build GeoTIFF/ISOXML/shapefile importers that normalize agronomic maps into layers
 NX-114,FALSE,TRUE,"NX-104, NX-032",,Variable-rate controller plugin converting layer tiles into commanded section rates
 NX-115,FALSE,TRUE,NX-002,,AOG-Link protocol specification and reference flows
-NX-116,FALSE,FALSE,NX-115,,Shared aog-link.proto schemas with nanopb options
-NX-117,FALSE,FALSE,"NX-115, NX-003",,"Bridge service host mediating gRPC, AOG-Link, and PGN flows"
+NX-116,FALSE,TRUE,NX-115,,Shared aog-link.proto schemas with nanopb options
+NX-117,FALSE,TRUE,"NX-115, NX-003",,"Bridge service host mediating gRPC, AOG-Link, and PGN flows"
 NX-118,FALSE,FALSE,NX-117,,gRPC ⇄ AOG-Link translator with ack/retry handling
 NX-119,FALSE,FALSE,NX-117,,AOG-Link ⇄ PGN compatibility bridge for legacy devices
 NX-120,FALSE,FALSE,NX-116,,AOG-Link Ethernet/UDP driver with multicast and command retries
@@ -156,11 +156,11 @@ NX-201,FALSE,FALSE,NX-200,,Genetics layer definitions and registries — ADR-046
 NX-202,FALSE,FALSE,NX-199,,Yield layer schema refresh — ADR-049 yield analytics plugin
 NX-203,FALSE,FALSE,NX-202,,Cost/profit layer schema — ADR-050 cost & profit plugin
 NX-204,FALSE,FALSE,NX-199,,Field health risk schema — ADR-052 field health plugin
-NX-205,FALSE,FALSE,NX-196,,Weather snapshot schema extensions — ADR-053 weather & environment plugin
+NX-205,FALSE,TRUE,NX-196,,Weather snapshot schema extensions — ADR-053 weather & environment plugin
 NX-206,FALSE,FALSE,"NX-202, NX-203",,Report template schema + manifest handshake — ADR-051 report builder & exports
 NX-207,FALSE,FALSE,NX-206,,SRS + ADR cross-reference sweep for new layers — ADR-027…ADR-053 portfolio alignment
 NX-208,FALSE,FALSE,NX-195,,Official bundle capability matrix update — ADR-031 manifest governance
-NX-209,FALSE,FALSE,NX-116,,CRS normalization matrix publication — ADR-022 CRS policy
+NX-209,FALSE,TRUE,NX-116,,CRS normalization matrix publication — ADR-022 CRS policy
 NX-210,FALSE,FALSE,NX-208,,Contracts freeze automation for new capabilities — ADR-031 governance rollout
 NX-211,FALSE,FALSE,"NX-191, NX-209",,ZoneStore persistence service — ADR-027 ZoneService storage and indexing
 NX-212,FALSE,FALSE,NX-211,,ZoneService gRPC host & watcher plumbing — ADR-027 ZoneService implementation

@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <UseLocalAogAbstractions Condition="'$(UseLocalAogAbstractions)' == '' and Exists('..\Aog.Abstractions\Aog.Abstractions.csproj')">true</UseLocalAogAbstractions>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.59.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.9" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseLocalAogAbstractions)' == 'true'">
+    <ProjectReference Include="..\Aog.Abstractions\Aog.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseLocalAogAbstractions)' != 'true'">
+    <PackageReference Include="AgOpenGPS.Aog.Abstractions" Version="$(AogAbstractionsPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

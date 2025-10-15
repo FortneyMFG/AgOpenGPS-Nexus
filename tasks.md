@@ -14,7 +14,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-005 Capabilities handshake service
 - [x] NX-104 Metadata-driven variable-rate layer mapping ADR _(Done)_
 - [x] NX-115 AOG-Link protocol specification _(Done)_
-- [ ] NX-116 Shared aog-link.proto schemas _(Planned)_
+- [x] NX-116 Shared aog-link.proto schemas _(Done)_
 - [ ] NX-126 Mapping plugin architecture ADR _(In Review)_
 - [ ] NX-131 Field job session lifecycle ADR _(Proposed)_
 - [x] NX-152 .NET 8 runtime enforcement per ADR-001 _(Done)_
@@ -39,11 +39,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-202 Yield layer schema refresh _(Planned)_ — ADR-049 yield analytics plugin
 - [ ] NX-203 Cost/profit layer schema _(Planned)_ — ADR-050 cost & profit plugin
 - [ ] NX-204 Field health risk schema _(Planned)_ — ADR-052 field health plugin
-- [ ] NX-205 Weather snapshot schema extensions _(Planned)_ — ADR-053 weather & environment plugin
+- [x] NX-205 Weather snapshot schema extensions _(Done)_ — ADR-053 weather & environment plugin
 - [ ] NX-206 Report template schema + manifest handshake _(Planned)_ — ADR-051 report builder & exports
 - [ ] NX-207 SRS + ADR cross-reference sweep for new layers _(Planned)_ — ADR-027…ADR-053 portfolio alignment
 - [ ] NX-208 Official bundle capability matrix update _(Planned)_ — ADR-031 manifest governance
-- [ ] NX-209 CRS normalization matrix publication _(Planned)_ — ADR-022 CRS policy
+- [x] NX-209 CRS normalization matrix publication _(Done)_ — ADR-022 CRS policy
 - [ ] NX-210 Contracts freeze automation for new capabilities _(Planned)_ — ADR-031 governance rollout
 
 ### Section B — Core (Headless, Sim Graph)
@@ -96,7 +96,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-027 Legacy UDP gateway skeleton
 - [x] NX-029 Agio.Linux SocketCAN backend
 - [x] NX-066 GNSS provider policy + TCP/UDP support
-- [ ] NX-117 Bridge service host (gRPC ⇄ AOG-Link) _(Planned)_
+- [x] NX-117 Bridge service host (gRPC ⇄ AOG-Link) _(Done)_
 - [ ] NX-118 gRPC ⇄ AOG-Link translator _(Planned)_
 - [ ] NX-119 AOG-Link ⇄ PGN compatibility bridge _(Planned)_
 - [ ] NX-120 AOG-Link Ethernet/UDP driver _(Planned)_
@@ -238,7 +238,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-058 Guidance tuning auto-calculations
 - [x] NX-059 Ported math verification report
 - [x] NX-102 V6 functionality inventory & gap analysis _(Done)_
-- [ ] NX-105 Legacy background imagery import _(Planned)_
+- [x] NX-105 Legacy background imagery import _(Planned)_
 - [x] NX-106 Legacy field overview metadata import _(Done)_
 - [x] NX-107 Legacy flag importer & UI surfacing _(Done)_
 - [x] NX-108 Legacy contour resume support _(Done)_
@@ -246,6 +246,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-110 Legacy tram line template import _(Done)_
 - [x] NX-111 Legacy worked area history import _(Done)_
 - [x] NX-113 External agronomic map ingest pipeline _(Done)_
+
 
 - [ ] NX-313 Stanley controller parity harness _(Planned)_ — ADR-033 guidance planner porting
 - [ ] NX-314 Pure pursuit control port with fixtures _(Planned)_ — ADR-033 guidance planner porting
@@ -344,7 +345,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-104 | ADR: Metadata-driven variable-rate layer mapping & imports | Done |  | — | [SRS §8 Data Model & Storage](docs/SRS/sections/08_Data_Model_Storage.md) | Superseded by ADR-010 roadmap planning; see ADR tracker for replacement scope |
 | NX-150 | ADR roadmap: PoseStream, layers, and control revamp | In progress |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Track upcoming ADR-007…ADR-020 deliverables and linked SRS requirements |
 | NX-115 | AOG-Link protocol specification and reference flows | Done |  | — | [SRS §3 Communications & Transports](docs/SRS/sections/03_Comm_Transports.md) | ADR-006 + SRS updates complete |
-| NX-116 | Shared `aog-link.proto` schemas with nanopb options | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Publish contracts aligned with `Aog.Abstractions` |
+| NX-116 | Shared `aog-link.proto` schemas with nanopb options | Done |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Publish contracts aligned with `Aog.Abstractions` |
 | NX-152 | Enforce ADR-001 .NET 8 runtime baselines across solutions and CI | Done | AI | — | [ADR-001 .NET 8 runtime](docs/ADR/ADR-001-dotnet8-runtime.md) | Runtime baseline playbook + SDK pinning in `global.json` |
 | NX-190 | Comprehensive ADR portfolio review | In Review |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Apply 2025 governance updates across accepted and draft ADRs |
 | NX-153 | Operationalize ADR-002 gRPC contract governance and compatibility gates | Done | AI | — | [ADR-002 gRPC contracts](docs/ADR/ADR-002-grpc-contracts.md) | Checklist for clinics, golden fixtures, and release gating |
@@ -366,11 +367,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-202 | Yield layer schema refresh | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 yield analytics plugin |
 | NX-203 | Cost/profit layer schema | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 cost & profit plugin |
 | NX-204 | Field health risk schema | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 field health plugin |
-| NX-205 | Weather snapshot schema extensions | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather & environment plugin |
+| NX-205 | Weather snapshot schema extensions | Done |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather & environment plugin |
 | NX-206 | Report template schema + manifest handshake | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder & exports |
 | NX-207 | SRS + ADR cross-reference sweep for new layers | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-027…ADR-053 portfolio alignment |
 | NX-208 | Official bundle capability matrix update | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
-| NX-209 | CRS normalization matrix publication | Planned |  | — | [ADR-022](docs/ADR/ADR-022-crs-units-precision-policy.md) | ADR-022 CRS policy |
+| NX-209 | CRS normalization matrix publication | Done |  | — | [ADR-022](docs/ADR/ADR-022-crs-units-precision-policy.md) | Published [reference matrix](docs/reference/crs-normalization-matrix.md) |
 | NX-210 | Contracts freeze automation for new capabilities | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 governance rollout |
 
 ### Section B — Core (Headless, Sim Graph)
@@ -428,7 +429,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-027 | Legacy UDP gateway skeleton | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Loopback test |
 | NX-029 | Agio.Linux SocketCAN backend (CAN→gRPC) | Done |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Streams CAN frames + section relays |
 | NX-066 | GNSS source policy + TCP/UDP provider | Done |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Aggregates `IPositionSource` feeds |
-| NX-117 | Bridge service host for gRPC ⇄ AOG-Link | Planned |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Standalone daemon mediating inter-process, AOG-Link, and PGN flows |
+| NX-117 | Bridge service host for gRPC ⇄ AOG-Link | Done |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Standalone daemon mediating inter-process, AOG-Link, and PGN flows |
 | NX-118 | gRPC ⇄ AOG-Link translator layer | Planned |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Map service calls/streams onto nanopb datagrams with ack/retry semantics |
 | NX-119 | AOG-Link ⇄ PGN compatibility bridge | Planned |  | — | [SRS Option O-COMM-6](docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md) | Maintain legacy devices during migration |
 | NX-120 | AOG-Link Ethernet/UDP driver | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Implement multicast/unicast transport with command retries |

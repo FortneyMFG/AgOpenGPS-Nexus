@@ -11,6 +11,27 @@ File I/O plugins handle import and export workflows for ISOXML, Shapefile, GeoJS
 - Support export bundles for jobs (layers, ledger, notes, presets) with deterministic folder layouts per ADR-030. Provide integrity manifests (hashes, metadata) for auditing.【F:docs/ADR/ADR-030-field-job-sessions.md†L33-L86】
 - Coordinate with Telemetry Logging and Replay plugins to include log references in job bundles when requested.
 
+## Implementation Status
+
+- `Aog.Plugins.FileIO.FileIoSurfaceService` ingests delimited agronomic grids via `ExternalAgronomicMapIngestor` and exports normalized surfaces to GeoJSON feature collections with provenance metadata and bounding boxes. The wrapper providers referenced by the manifest delegate to this service so simulation flows can request import/export operations directly from plugin metadata.【F:Nexus SourceCode/src/Aog.Plugins/FileIO/FileIoSurfaceService.cs†L1-L198】【F:Nexus SourceCode/src/Aog.Plugins/FileIO/SurfaceExportProvider.cs†L1-L32】
+
+### Example
+
+```csharp
+var service = new FileIoSurfaceService();
+var layer = service.ImportSurfaceFromDelimitedFile(
+    path: "~/imports/prescription.csv",
+    layerId: "layer:vr.sample",
+    kind: "rate",
+    units: "kg/ha",
+    cellSizeMeters: 12,
+    source: "import:legacy",
+    transform: "normalize:nearest",
+    createdBy: "user:demo");
+
+await service.ExportSurfaceToGeoJsonAsync(layer, "~/exports/prescription.geojson");
+```
+
 ## UX Requirements
 
 - Offer import wizards that preview metadata (layer type, units, coverage area) and highlight validation issues before commit.

@@ -36,6 +36,12 @@ Clients relying on historical ad-hoc `extensions` fields should migrate to these
 - Present yield maps with planned/actual toggles, tooltips showing crop/genetics context, and legend presets for accessibility.
 - Offer time-series charts and distribution plots to highlight within-field variability and performance relative to planned prescriptions.
 
+### Overlay UX baseline (NX-304)
+
+- The map overlay must derive its legend bins directly from `YieldLayerMetadata.Aggregation.Bins` so UI palettes stay in lockstep with analytics exports. Equal-interval and quantile strategies should be rendered with explicit break labels, while custom bins surface author-supplied captions without re-ordering.【F:Nexus SourceCode/tests/Aog.Plugins.Tests/CombineYield/YieldRegressionFixtureTests.cs†L130-L194】
+- Overlay tooltips display smoothed yield/moisture pairs using the same precision as the regression fixtures to guarantee parity between QA captures and operator experiences.【F:Nexus SourceCode/tests/Aog.Plugins.Tests/CombineYield/YieldRegressionFixtureTests.cs†L64-L119】
+- Regression fixtures stored at `tests/Aog.Plugins.Tests/CombineYield/Data/YieldRegressionFixture.json` gate overlay updates in CI; any UX change that modifies binning, smoothing metadata, or provenance hashes must update the fixture and accompanying screenshot diffs before merge.【F:Nexus SourceCode/tests/Aog.Plugins.Tests/CombineYield/Data/YieldRegressionFixture.json†L1-L124】
+
 ## Compatibility Notes
 
 - Offline operation is mandatory; imports and telemetry logging must persist locally and sync opportunistically when cloud storage is available.【F:docs/ADR/ADR-030-field-job-sessions.md†L33-L86】

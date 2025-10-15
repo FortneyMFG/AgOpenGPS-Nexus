@@ -144,4 +144,62 @@ public sealed class AutoSteerLiteControllerTests
         second.Should().BeLessThan(first);
         tuningState.IsInStartup.Should().BeFalse();
     }
+
+    [Fact]
+    public void TuningState_HeadlandConstraintReducesLookAhead()
+    {
+        var profile = new AutoSteerLiteTuningProfile
+        {
+            CrossTrackFilterGain = 0,
+            LookAheadFilterGain = 0,
+            StartupHoldDistanceMeters = 0,
+            StartupLookAheadMultiplier = 1,
+            MinimumLookAheadMeters = 2,
+            HeadlandSlowdownMultiplier = 0.7,
+            ConstraintSlowdownMultiplier = 0.4,
+            ConstraintDistanceMarginMeters = 0.5,
+        };
+
+        var tuningState = new AutoSteerLiteTuningState(profile);
+
+        var baseline = tuningState.Update(0, 4, 0);
+        tuningState.Reset();
+
+        var headlandContext = new ConstraintLookAheadContext(
+            HasBlockingConstraint: false,
+            InsideHeadland: true,
+            DistanceToConstraintMeters: null);
+        var headland = tuningState.Update(0, 4, 0, headlandContext);
+
+        headland.Should().BeLessThan(baseline);
+        headland.Should().BeGreaterThanOrEqualTo(profile.MinimumLookAheadMeters);
+    }
+
+    [Fact]
+    public void TuningState_DistanceClampHonoursMargin()
+    {
+        var profile = new AutoSteerLiteTuningProfile
+        {
+            CrossTrackFilterGain = 0,
+            LookAheadFilterGain = 0,
+            StartupHoldDistanceMeters = 0,
+            StartupLookAheadMultiplier = 1,
+            MinimumLookAheadMeters = 2,
+            ConstraintDistanceMarginMeters = 1.0,
+        };
+
+        var tuningState = new AutoSteerLiteTuningState(profile);
+        var context = new ConstraintLookAheadContext(false, false, 3.0);
+        var lookAhead = tuningState.Update(0, 6, 0, context);
+
+        lookAhead.Should().BeLessThanOrEqualTo(2.0); // 3 - margin => clamp to min
+        lookAhead.Should().Be(profile.MinimumLookAheadMeters);
+
+        tuningState.Reset();
+        var farContext = new ConstraintLookAheadContext(false, false, 6.0);
+        var distantLookAhead = tuningState.Update(0, 6, 0, farContext);
+
+        distantLookAhead.Should().BeGreaterThan(lookAhead);
+        distantLookAhead.Should().BeLessThan(6.0);
+    }
 }

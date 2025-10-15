@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -32,26 +33,17 @@ public sealed class AogLinkTransportManager : BackgroundService
 
         _logger.LogInformation("Started {Count} AOG-Link transport(s).", enabledDrivers.Length);
 
+        var receiveTasks = enabledDrivers
+            .Select(driver => ReceiveFramesAsync(driver, stoppingToken))
+            .ToArray();
+
         try
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                foreach (var driver in enabledDrivers)
-                {
-                    await foreach (var frame in driver.ReceiveAsync(stoppingToken).ConfigureAwait(false))
-                    {
-                        _logger.LogDebug(
-                            "Received frame from {Driver}: class={Class} type=0x{Type:X4} seq={Sequence} length={Length}.",
-                            driver.Name,
-                            frame.Header.MessageClass,
-                            frame.Header.MessageType,
-                            frame.Header.Sequence,
-                            frame.Header.PayloadLength);
-                    }
-                }
-
-                await Task.Delay(10, stoppingToken).ConfigureAwait(false);
-            }
+            await Task.WhenAll(receiveTasks).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            // Normal shutdown path.
         }
         finally
         {
@@ -59,6 +51,31 @@ public sealed class AogLinkTransportManager : BackgroundService
             {
                 await driver.StopAsync(CancellationToken.None).ConfigureAwait(false);
             }
+        }
+    }
+
+    private async Task ReceiveFramesAsync(IAogLinkTransportDriver driver, CancellationToken stoppingToken)
+    {
+        try
+        {
+            await foreach (var frame in driver.ReceiveAsync(stoppingToken).ConfigureAwait(false))
+            {
+                _logger.LogDebug(
+                    "Received frame from {Driver}: class={Class} type=0x{Type:X4} seq={Sequence} length={Length}.",
+                    driver.Name,
+                    frame.Header.MessageClass,
+                    frame.Header.MessageType,
+                    frame.Header.Sequence,
+                    frame.Header.PayloadLength);
+            }
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            // Cancellation is expected during shutdown.
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Unhandled exception while receiving frames from {Driver}.", driver.Name);
         }
     }
 }

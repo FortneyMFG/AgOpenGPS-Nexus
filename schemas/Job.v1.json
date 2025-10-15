@@ -263,30 +263,22 @@
       "properties": {
         "minLon": {
           "type": "number",
-          "minimum": -180,
-          "maximum": 180,
-          "description": "Minimum longitude bound for the envelope.",
+          "description": "Minimum horizontal coordinate bound for the envelope in the CRS defined by `crsEpsg`.",
           "x-nexus-scope": "core"
         },
         "minLat": {
           "type": "number",
-          "minimum": -90,
-          "maximum": 90,
-          "description": "Minimum latitude bound for the envelope.",
+          "description": "Minimum vertical coordinate bound for the envelope in the CRS defined by `crsEpsg`.",
           "x-nexus-scope": "core"
         },
         "maxLon": {
           "type": "number",
-          "minimum": -180,
-          "maximum": 180,
-          "description": "Maximum longitude bound for the envelope.",
+          "description": "Maximum horizontal coordinate bound for the envelope in the CRS defined by `crsEpsg`.",
           "x-nexus-scope": "core"
         },
         "maxLat": {
           "type": "number",
-          "minimum": -90,
-          "maximum": 90,
-          "description": "Maximum latitude bound for the envelope.",
+          "description": "Maximum vertical coordinate bound for the envelope in the CRS defined by `crsEpsg`.",
           "x-nexus-scope": "core"
         }
       }

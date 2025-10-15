@@ -1,0 +1,8 @@
+$RecPath
+Path=Training Pass
+0,0,0,0,true
+10,0,0,1.5,true
+20,5,12,1.6,false
+Path=Boundary Tour
+0,0,0,0,false
+0,20,90,1.2,false

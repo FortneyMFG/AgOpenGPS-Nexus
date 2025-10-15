@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0.0",
+  "zoneId": "9f4b9b2a-7f84-4d06-958a-0d6453af46a1",
+  "type": "keepout",
+  "label": "Rock pile",
+  "priority": 90,
+  "enabled": true,
+  "geometry": {
+    "exterior": [
+      [ -94.12345, 45.12345 ],
+      [ -94.12310, 45.12380 ],
+      [ -94.12270, 45.12355 ],
+      [ -94.12305, 45.12320 ],
+      [ -94.12345, 45.12345 ]
+    ]
+  },
+  "buffers": {
+    "drive_m": 2.0,
+    "work_m": 5.0
+  },
+  "validWhen": {
+    "crop": "corn",
+    "season": "2026",
+    "conditions": []
+  },
+  "provenance": {
+    "source": "shp",
+    "timestamp": "2025-02-14T18:22:03Z",
+    "note": "Imported from county survey"
+  }
+}

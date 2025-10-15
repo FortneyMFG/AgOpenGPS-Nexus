@@ -13,6 +13,9 @@ validation harnesses, and auto-tuning helpers.
   imported geometry before persisting it.
 - The implementation mirrors the tolerant readers used by V6 and accepts duplicate
   drive-through flags or optional headers to keep recovery workflows reliable.
+- NX-105 adds support for `BackPic.txt`/`BackPic.png` bundles, populating
+  `LegacyFieldData.BackgroundImagery` with the Bing map bounding box and PNG payload so
+  migration preserves legacy satellite backdrops.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L24-L153】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L128】
 
 ## Coverage Analytics Parity Harness (NX-055)
 
@@ -49,4 +52,18 @@ validation harnesses, and auto-tuning helpers.
 - Wider implements bias the hold multiplier upward, while shorter wheelbases tighten the
   minimum look-ahead distance. The calculator validates its output before returning it so
   callers can rely on sane defaults.
+
+## Legacy Metadata + History Import (NX-106–NX-111)
+
+- `LegacyFieldImporter` now reads `Field.txt`, `Flags.txt`, `Contour.txt`, `RecPath.txt`,
+  `Tram.txt`, and `Sections.txt` alongside geometry files so the importer surfaces operator
+  metadata, scouting flags, contour resume buffers, recorded path logs, tram templates, and
+  worked-area cells in a single `LegacyFieldData` bundle.
+- New domain models (`LegacyFieldOverview`, `LegacyFlag`, `LegacyContourResume`,
+  `LegacyRecordedPath`, `LegacyTramTemplate`, `LegacyWorkedAreaHistory`) encapsulate the
+  imported assets, making it trivial for UI and service layers to reason about provenance and
+  keep audit trails intact.
+- The regression fixtures under `tests/Aog.Core.Tests/Legacy/Data/SampleField` now include
+  representative `Field.txt`, `Flags.txt`, `Contour.txt`, `RecPath.txt`, `Tram.txt`, and
+  `Sections.txt` exports so future importer changes have a parity harness to lean on.
 

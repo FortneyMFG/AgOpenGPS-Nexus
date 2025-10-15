@@ -45,7 +45,20 @@
         "humidityPct": { "type": "number", "minimum": 0, "maximum": 100, "x-nexus-scope": "core" },
         "windKph": { "type": "number", "minimum": 0, "x-nexus-scope": "core" },
         "windDeg": { "type": "number", "minimum": 0, "maximum": 360, "x-nexus-scope": "core" },
-        "pressureKpa": { "type": "number", "minimum": 0, "x-nexus-scope": "core" }
+        "windGustKph": { "type": "number", "minimum": 0, "description": "Peak gust observed near session start.", "x-nexus-scope": "core" },
+        "pressureKpa": { "type": "number", "minimum": 0, "x-nexus-scope": "core" },
+        "rainMm": { "type": "number", "minimum": 0, "x-nexus-scope": "core" },
+        "evapotranspirationMm": { "type": "number", "minimum": 0, "x-nexus-scope": "core" },
+        "soilTempC": { "type": "number", "x-nexus-scope": "core" },
+        "soilMoisturePct": { "type": "number", "minimum": 0, "maximum": 100, "x-nexus-scope": "core" },
+        "leafWetnessPct": { "type": "number", "minimum": 0, "maximum": 100, "x-nexus-scope": "core" },
+        "dewPointC": { "type": "number", "x-nexus-scope": "core" },
+        "wetBulbC": { "type": "number", "x-nexus-scope": "core" },
+        "deltaTC": { "type": "number", "x-nexus-scope": "core" },
+        "solarIrradianceWm2": { "type": "number", "minimum": 0, "x-nexus-scope": "core" },
+        "uvIndex": { "type": "number", "minimum": 0, "x-nexus-scope": "core" },
+        "cloudCoverPct": { "type": "number", "minimum": 0, "maximum": 100, "x-nexus-scope": "core" },
+        "visibilityKm": { "type": "number", "minimum": 0, "x-nexus-scope": "core" }
       },
       "additionalProperties": {
         "type": ["number", "string"],
@@ -104,6 +117,77 @@
           "type": "number",
           "minimum": 0,
           "description": "Atmospheric pressure in kilopascals.",
+          "x-nexus-scope": "core"
+        },
+        "soilTempC": {
+          "type": "number",
+          "description": "Soil temperature in Celsius at the configured probe depth.",
+          "x-nexus-scope": "core"
+        },
+        "soilMoisturePct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Volumetric soil moisture percentage.",
+          "x-nexus-scope": "core"
+        },
+        "leafWetnessPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Leaf wetness reading expressed as a percentage.",
+          "x-nexus-scope": "core"
+        },
+        "dewPointC": {
+          "type": "number",
+          "description": "Dew point temperature in Celsius.",
+          "x-nexus-scope": "core"
+        },
+        "wetBulbC": {
+          "type": "number",
+          "description": "Wet bulb temperature in Celsius.",
+          "x-nexus-scope": "core"
+        },
+        "deltaTC": {
+          "type": "number",
+          "description": "Spray Delta T (dry bulb - wet bulb) in Celsius.",
+          "x-nexus-scope": "core"
+        },
+        "windGustKph": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Peak wind gust recorded during the sampling interval in kilometers per hour.",
+          "x-nexus-scope": "core"
+        },
+        "evapotranspirationMm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Evapotranspiration observed during the sampling interval in millimeters.",
+          "x-nexus-scope": "core"
+        },
+        "solarIrradianceWm2": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Solar irradiance measured in watts per square meter.",
+          "x-nexus-scope": "core"
+        },
+        "uvIndex": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Ultraviolet index reported for the sampling interval.",
+          "x-nexus-scope": "core"
+        },
+        "cloudCoverPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Cloud cover estimate as a percentage.",
+          "x-nexus-scope": "core"
+        },
+        "visibilityKm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Horizontal visibility in kilometers.",
           "x-nexus-scope": "core"
         }
       }

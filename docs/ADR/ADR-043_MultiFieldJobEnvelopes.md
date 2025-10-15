@@ -30,6 +30,20 @@ overlays deterministically.
   "farmId": "farm:NorthHome",
   "fieldIds": ["field:North40", "field:DrivewayWest"],
   "sessions": ["session:1", "session:2"],
+  "envelope": {
+    "polygons": [
+      {"exterior": [[-94.6123, 41.5621], [-94.6109, 41.5621], [-94.6109, 41.5648], [-94.6123, 41.5648], [-94.6123, 41.5621]]},
+      {"exterior": [[-94.6094, 41.5616], [-94.6079, 41.5616], [-94.6079, 41.5634], [-94.6094, 41.5634], [-94.6094, 41.5616]]}
+    ],
+    "members": [
+      {"fieldId": "field:North40", "areaHa": 16.2},
+      {"fieldId": "field:DrivewayWest", "areaHa": 4.8}
+    ],
+    "boundingBox": {"minLon": -94.6123, "minLat": 41.5616, "maxLon": -94.6079, "maxLat": 41.5648},
+    "centroid": [-94.6101, 41.563],
+    "areaHa": 21.0,
+    "crsEpsg": 4326
+  },
   "stats": {
     "fields": [
       {"fieldId": "field:North40", "areaHa": 16.2},
@@ -60,6 +74,10 @@ overlays deterministically.
   plugins listen for the subsequent `mountFields(fieldIds[])` call (Core-provided helper that resolves geometry) and may read
   job `extensions` to drive crop/genetics or profitability overlays. Core also emits `onJobContextChanged` when the active
   envelope changes so spatial caches and analytics recompute safely.
+
+`job.envelope` captures the deterministic geometry Core publishes: union polygons, optional per-field members with analytics
+metadata, bounding box/centroid hints, and the CRS used for the envelope. Plugins rely on the shared structure defined in
+`Job.v1` to avoid bespoke geometry parsing when replaying sessions or rendering overlays.
 
 ## Alternatives considered
 

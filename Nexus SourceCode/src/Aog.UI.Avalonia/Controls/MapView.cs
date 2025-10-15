@@ -33,21 +33,21 @@ public sealed class MapView : SKElement
             notifying: static (sender, _) => sender.InvalidateVisual());
 
     /// <summary>
-    /// Identifies the <see cref="CoverageCells"/> styled property.
-    /// </summary>
-    public static readonly StyledProperty<IReadOnlyList<CoverageCell>> CoverageCellsProperty =
-        AvaloniaProperty.Register<MapView, IReadOnlyList<CoverageCell>>(
-            nameof(CoverageCells),
-            Array.Empty<CoverageCell>(),
-            notifying: static (sender, _) => sender.InvalidateVisual());
-
-    /// <summary>
     /// Identifies the <see cref="GuidanceTracks"/> styled property.
     /// </summary>
     public static readonly StyledProperty<IReadOnlyList<GuidanceTrack>> GuidanceTracksProperty =
         AvaloniaProperty.Register<MapView, IReadOnlyList<GuidanceTrack>>(
             nameof(GuidanceTracks),
             Array.Empty<GuidanceTrack>(),
+            notifying: static (sender, _) => sender.InvalidateVisual());
+
+    /// <summary>
+    /// Identifies the <see cref="Layers"/> styled property.
+    /// </summary>
+    public static readonly StyledProperty<IReadOnlyList<MapLayer>> LayersProperty =
+        AvaloniaProperty.Register<MapView, IReadOnlyList<MapLayer>>(
+            nameof(Layers),
+            Array.Empty<MapLayer>(),
             notifying: static (sender, _) => sender.InvalidateVisual());
 
     /// <summary>
@@ -59,11 +59,11 @@ public sealed class MapView : SKElement
         set => SetValue(VehiclePoseProperty, value);
     }
 
-    /// <summary>Gets or sets the coverage cells visualised on the map.</summary>
-    public IReadOnlyList<CoverageCell> CoverageCells
+    /// <summary>Gets or sets the map layers visualised on the map.</summary>
+    public IReadOnlyList<MapLayer> Layers
     {
-        get => GetValue(CoverageCellsProperty);
-        set => SetValue(CoverageCellsProperty, value);
+        get => GetValue(LayersProperty);
+        set => SetValue(LayersProperty, value);
     }
 
     /// <summary>Gets or sets the guidance tracks rendered on top of the map.</summary>
@@ -113,57 +113,68 @@ public sealed class MapView : SKElement
         canvas.Clear(new SKColor(24, 31, 36));
 
         canvas.Save();
-        DrawCoverage(canvas);
+        DrawLayers(canvas);
         DrawGuidance(canvas);
         DrawAxes(canvas);
         DrawVehicle(canvas);
         canvas.Restore();
     }
 
-    private void DrawCoverage(SKCanvas canvas)
+    private void DrawLayers(SKCanvas canvas)
     {
-        var cells = CoverageCells;
-        if (cells is null || cells.Count == 0)
+        var layers = Layers;
+        if (layers is null || layers.Count == 0)
         {
             return;
         }
 
-        foreach (var cell in cells)
+        foreach (var layer in layers)
         {
-            var half = cell.SizeMeters / 2.0;
-            var topLeft = _viewport.WorldToScreen(new Point(cell.Center.X - half, cell.Center.Y + half));
-            var bottomRight = _viewport.WorldToScreen(new Point(cell.Center.X + half, cell.Center.Y - half));
-
-            var left = Math.Min(topLeft.X, bottomRight.X);
-            var right = Math.Max(topLeft.X, bottomRight.X);
-            var top = Math.Min(topLeft.Y, bottomRight.Y);
-            var bottom = Math.Max(topLeft.Y, bottomRight.Y);
-
-            var rect = new SKRect((float)left, (float)top, (float)right, (float)bottom);
-            var coverage = (float)cell.ClampedCoverage;
-            var fillColor = new SKColor(
-                (byte)(40 + coverage * 60),
-                (byte)(110 + coverage * 100),
-                (byte)(60 + coverage * 80),
-                (byte)(160 + coverage * 80));
-
-            using var fillPaint = new SKPaint
+            if (!layer.IsVisible || layer.Cells.Count == 0)
             {
-                Color = fillColor,
-                IsStroke = false,
-                IsAntialias = true,
-            };
+                continue;
+            }
 
-            using var outlinePaint = new SKPaint
+            foreach (var cell in layer.Cells)
             {
-                Color = new SKColor(33, 46, 51, 180),
-                StrokeWidth = 1,
-                IsStroke = true,
-                IsAntialias = true,
-            };
+                var half = cell.SizeMeters / 2.0;
+                var topLeft = _viewport.WorldToScreen(new Point(cell.Center.X - half, cell.Center.Y + half));
+                var bottomRight = _viewport.WorldToScreen(new Point(cell.Center.X + half, cell.Center.Y - half));
 
-            canvas.DrawRect(rect, fillPaint);
-            canvas.DrawRect(rect, outlinePaint);
+                var left = Math.Min(topLeft.X, bottomRight.X);
+                var right = Math.Max(topLeft.X, bottomRight.X);
+                var top = Math.Min(topLeft.Y, bottomRight.Y);
+                var bottom = Math.Max(topLeft.Y, bottomRight.Y);
+
+                var rect = new SKRect((float)left, (float)top, (float)right, (float)bottom);
+                var fillColor = layer.Style.Evaluate(cell.Value);
+                if (layer.Style.IsPlanned)
+                {
+                    fillColor = fillColor.WithAlpha((byte)(fillColor.A * 0.55));
+                }
+
+                using var fillPaint = new SKPaint
+                {
+                    Color = ToSkColor(fillColor),
+                    IsStroke = false,
+                    IsAntialias = true,
+                };
+
+                canvas.DrawRect(rect, fillPaint);
+
+                if (layer.Style.OutlineColor.A > 0)
+                {
+                    using var outlinePaint = new SKPaint
+                    {
+                        Color = ToSkColor(layer.Style.OutlineColor),
+                        StrokeWidth = 1,
+                        IsStroke = true,
+                        IsAntialias = true,
+                    };
+
+                    canvas.DrawRect(rect, outlinePaint);
+                }
+            }
         }
     }
 

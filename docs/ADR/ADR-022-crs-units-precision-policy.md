@@ -23,6 +23,9 @@ Consistent coordinate reference systems (CRS), units, and numeric precision are 
 
 ## Governance Updates
 - **CRS decision tooling.** A guided decision tree with distortion heatmaps now ships alongside CLI tools that flag when distortion exceeds thresholds, recommending alternative CRS selections.
+- **Normalization matrix.** [docs/reference/crs-normalization-matrix.md](../reference/crs-normalization-matrix.md)
+  codifies storage, processing, and audit expectations for every spatial pipeline so
+  pods implement ADR-022 consistently.
 - **Operator education.** Training modules and visual overlays teach operators how CRS selection impacts analytics, driving better adoption of recommended projections.
 - **Alerting.** Pipelines emit warnings when incoming data deviates from site-approved CRS, ensuring redaction workflows catch misconfigured sources.
 

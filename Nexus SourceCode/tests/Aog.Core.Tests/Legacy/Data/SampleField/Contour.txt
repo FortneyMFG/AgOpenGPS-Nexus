@@ -1,0 +1,12 @@
+$Contour
+IsRecording=true
+Strip=3
+0,0
+10,0
+10,10
+Strip=2
+12,5
+12,15
+Pending=2
+5,5
+6,7

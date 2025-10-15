@@ -5,6 +5,7 @@ using Aog.Abstractions.Contracts;
 using Aog.Abstractions.Runtime;
 using Aog.Core.Capabilities;
 using Aog.Core.Host.Capabilities;
+using Aog.Core.Jobs;
 using Aog.Protos.Capabilities.V1;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -126,6 +127,9 @@ public static class Program
                 });
 
                 services.AddSingleton<ICapabilitiesHandshakeClient, GrpcCapabilitiesHandshakeClient>();
+
+                // Job lifecycle orchestrator
+                services.AddSingleton<IJobLifecycleOrchestrator, JobLifecycleOrchestrator>();
 
                 // Also register system time provider (from develop)
                 services.AddSingleton(TimeProvider.System);

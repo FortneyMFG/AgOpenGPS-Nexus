@@ -1,0 +1,6 @@
+# Sample agronomic rate map exported from legacy system
+Easting,Northing,Value
+0,0,120
+12,0,110
+0,12,132
+12,12,125

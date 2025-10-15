@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "0.9.0",
+  "jobId": "job:legacy-planting",
+  "displayName": "Legacy Planting",
+  "slug": "legacy-planting",
+  "state": "completed",
+  "createdAt": "2024-04-10T05:00:00Z",
+  "updatedAt": "2024-04-11T02:15:00Z",
+  "context": {
+    "farmId": "farm:home",
+    "fieldIds": ["field:north-40"],
+    "notes": "Migrated from V6"
+  },
+  "paths": {
+    "jobRoot": "Jobs/Legacy Planting",
+    "dataDir": "Jobs/Legacy Planting/data",
+    "resumeFile": "Jobs/Legacy Planting/Resume.txt"
+  },
+  "spatial": {
+    "home": {"lat": 47.5001, "lon": -99.2001},
+    "envelope": {"minLat": 47.4990, "minLon": -99.2010, "maxLat": 47.5010, "maxLon": -99.1990}
+  },
+  "assets": {
+    "boundaryLayers": ["layer:boundary:north-40"],
+    "coverageLayers": ["layer:coverage:legacy"],
+    "guidanceSets": [],
+    "prescriptions": [],
+    "attachments": []
+  },
+  "equipment": {
+    "vehicleId": "equipment:tractor-alpha",
+    "implementId": "equipment:planter-legacy"
+  },
+  "stats": {
+    "totalAreaHa": 12.5,
+    "totalDistanceKm": 18.2,
+    "activeDurationSec": 7200,
+    "coveragePct": 95.4
+  }
+}

@@ -58,8 +58,20 @@ downtime.
    in source control or the deployment tracker to keep the rollout reproducible.
 3. **Stage session migration.** Use the session migration utility (delivered in
    NX-334) or equivalent scripts to convert `job.json` to the ADR-041 schema in
-   staging. Confirm `sessions[]` references the seeded season IDs and that
-   coverage/log artefacts link to the right session documents.
+   staging. A typical invocation looks like:
+
+   ```bash
+   dotnet run --project tools/Aog.Tools.LegacyJobMigrator migrate \
+       --input /Jobs/Spring\ Planting/job.json \
+       --season season:2025 \
+       --operator user:operator.maya
+   ```
+
+   The tool injects a placeholder session summary, seeds `context.seasonId`
+   when provided, and normalises timestamps so validation against
+   `job.schema.json` succeeds. Confirm `sessions[]` references the seeded
+   season IDs and that coverage/log artefacts link to the right session
+   documents.
 
 ### Phase 3 — Validation gates
 

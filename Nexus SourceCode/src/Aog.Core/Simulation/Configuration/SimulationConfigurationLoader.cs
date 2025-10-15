@@ -67,9 +67,12 @@ public static class SimulationConfigurationLoader
             .Select(ConvertProvider)
             .ToArray();
 
-        var routes = model.Routes is null
-            ? Array.Empty<SimulationRouteConfiguration>()
-            : model.Routes.Select(ConvertRoute).ToArray();
+        if (model.Routes is null || model.Routes.Count == 0)
+        {
+            throw new InvalidOperationException("At least one route must be declared in the simulation configuration.");
+        }
+
+        var routes = model.Routes.Select(ConvertRoute).ToArray();
 
         var scenarios = model.Scenarios is null
             ? Array.Empty<SimulationScenarioConfiguration>()

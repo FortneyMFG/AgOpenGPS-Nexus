@@ -74,5 +74,11 @@ public class LayerControllerRegistryBuilderTests
 
         var poseStream = provider.GetRequiredService<ILayerControllerPoseStream>();
         poseStream.Should().NotBeNull();
+
+        var tileWriter = provider.GetRequiredService<LayerControllerTileWriter>();
+        tileWriter.Should().NotBeNull();
+
+        var diagnosticsPublisher = provider.GetRequiredService<LayerControllerDiagnosticsPublisher>();
+        diagnosticsPublisher.Should().NotBeNull();
     }
 }

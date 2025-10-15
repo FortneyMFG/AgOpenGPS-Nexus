@@ -94,6 +94,18 @@ public sealed class MainWindowViewModelTests
         viewModel.LayerInspector.RateAvailabilityDisplay.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Fact]
+    public void PresetSwitcher_SurfaceSamplePresets()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.PresetSwitcher.Should().NotBeNull();
+        viewModel.PresetSwitcher.Presets.Should().HaveCountGreaterThan(1);
+        viewModel.PresetSwitcher.ActivePresetDisplay.Should().NotBeNullOrWhiteSpace();
+        viewModel.PresetSwitcher.Presets.Any(preset => preset.OrchestrationState == PresetOrchestrationState.Blocked)
+            .Should().BeTrue();
+    }
+
     private static MainWindowViewModel CreateViewModel()
     {
         var connectionStore = new InMemoryConnectionSettingsStore();

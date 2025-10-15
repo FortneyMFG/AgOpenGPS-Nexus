@@ -187,6 +187,130 @@
           <TextBlock Text="Use the mouse wheel to zoom and drag with the left mouse button to pan the map." TextWrapping="Wrap"/>
           <TextBlock Text="The highlighted dot shows the current vehicle position and heading." TextWrapping="Wrap"/>
 
+          <Border Padding="16"
+                  CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding PresetSwitcher}"
+                  x:DataType="vm:PresetSwitcherViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Preset switcher" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <Border Padding="12"
+                      CornerRadius="8"
+                      Background="{DynamicResource ThemeBackgroundBrush}"
+                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                      BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="{Binding ActivePresetDisplay}" FontSize="16" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding ActivePresetDescription}" TextWrapping="Wrap"/>
+                  <TextBlock Text="{Binding ActivePresetLayout}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding ActivePresetCapabilities}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding OrchestrationStatus}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                  <TextBlock Text="{Binding ActivePresetTaskSummary}"
+                             TextWrapping="Wrap"
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}">
+                    <TextBlock.IsVisible>
+                      <Binding Path="HasActivePresetTaskSummary"/>
+                    </TextBlock.IsVisible>
+                  </TextBlock>
+                  <ItemsControl ItemsSource="{Binding ActivePresetAlerts}">
+                    <ItemsControl.IsVisible>
+                      <Binding Path="HasActivePresetAlerts"/>
+                    </ItemsControl.IsVisible>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <TextBlock Text="⚠" Foreground="#FFD97706"/>
+                          <TextBlock Text="{Binding .}"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                     TextWrapping="Wrap"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Text="Background orchestration in progress…"
+                             FontStyle="Italic"
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}">
+                    <TextBlock.IsVisible>
+                      <Binding Path="IsBusy"/>
+                    </TextBlock.IsVisible>
+                  </TextBlock>
+                </StackPanel>
+              </Border>
+
+              <ItemsControl ItemsSource="{Binding Presets}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:PresetOptionViewModel">
+                    <Border Padding="12"
+                            Margin="0,6,0,0"
+                            CornerRadius="8"
+                            Background="{DynamicResource ThemeBackgroundBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                            BorderThickness="1">
+                      <Border.Styles>
+                        <Style Selector="Border">
+                          <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+                          <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
+                          <DataTrigger Binding="{Binding IsActive}" Value="True">
+                            <Setter Property="BorderBrush" Value="#FF2D5D9F"/>
+                            <Setter Property="Background" Value="#142D5D9F"/>
+                          </DataTrigger>
+                        </Style>
+                      </Border.Styles>
+                      <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                          <TextBlock Text="{Binding StatusDisplay}"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                     FontStyle="Italic"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding LayoutSummary}"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        <TextBlock Text="{Binding CapabilitySummary}"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        <TextBlock Text="{Binding TaskSummary}"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource ThemeForegroundLowBrush}">
+                          <TextBlock.IsVisible>
+                            <Binding Path="HasTaskSummary"/>
+                          </TextBlock.IsVisible>
+                        </TextBlock>
+                        <ItemsControl ItemsSource="{Binding Alerts}">
+                          <ItemsControl.IsVisible>
+                            <Binding Path="HasAlerts"/>
+                          </ItemsControl.IsVisible>
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="⚠" Foreground="#FFD97706"/>
+                                <TextBlock Text="{Binding .}"
+                                           Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                           TextWrapping="Wrap"/>
+                              </StackPanel>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button Content="{Binding ButtonLabel}"
+                                Command="{Binding ApplyCommand}"
+                                HorizontalAlignment="Left"
+                                MinWidth="100"
+                                IsEnabled="{Binding IsEnabled}"/>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
           <!-- Layer legend -->
           <Border Padding="16" CornerRadius="12"
                   Background="{DynamicResource ThemeBackgroundBrush}"

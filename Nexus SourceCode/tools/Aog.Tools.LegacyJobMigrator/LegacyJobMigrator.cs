@@ -142,16 +142,18 @@ public sealed class LegacyJobMigrator
             WriteIndented = options.WriteIndented,
         });
 
-        var tempPath = Path.GetTempFileName();
+        var outputDirectory = Path.GetDirectoryName(outputPath);
+        if (string.IsNullOrEmpty(outputDirectory))
+        {
+            outputDirectory = Directory.GetCurrentDirectory();
+        }
+
+        Directory.CreateDirectory(outputDirectory);
+
+        var tempPath = CreateTempFilePath(outputDirectory);
         try
         {
             await File.WriteAllTextAsync(tempPath, json, cancellationToken).ConfigureAwait(false);
-            var outputDirectory = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrEmpty(outputDirectory))
-            {
-                Directory.CreateDirectory(outputDirectory);
-            }
-
             File.Move(tempPath, outputPath, overwrite: true);
         }
         finally
@@ -169,6 +171,18 @@ public sealed class LegacyJobMigrator
             skipped: false,
             sessionId,
             assignedSeason);
+    }
+
+    private static string CreateTempFilePath(string directory)
+    {
+        while (true)
+        {
+            var candidate = Path.Combine(directory, Path.GetRandomFileName());
+            if (!File.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
     }
 
     private static JsonObject BuildSessionStats(JsonObject jobStats)

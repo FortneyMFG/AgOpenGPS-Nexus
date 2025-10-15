@@ -180,18 +180,21 @@ public sealed class SourceRouter
         TopicRouteChanged change,
         CancellationToken cancellationToken)
     {
-        return _publicationQueue.EnqueueAsync(
+        cancellationToken.ThrowIfCancellationRequested();
+
+        _publicationQueue.Enqueue(
             change,
             PublishRouteChangeCoreAsync,
             cancellationToken);
+
+        return ValueTask.FromResult<TopicRoute?>(change.Current);
     }
 
-    private async ValueTask<TopicRoute?> PublishRouteChangeCoreAsync(
+    private ValueTask PublishRouteChangeCoreAsync(
         TopicRouteChanged change,
         CancellationToken cancellationToken)
     {
-        await _eventBus.PublishAsync(change, cancellationToken).ConfigureAwait(false);
-        return change.Current;
+        return _eventBus.PublishAsync(change, cancellationToken);
     }
 
     private TopicState GetOrCreateState(string topic)
@@ -316,43 +319,28 @@ public sealed class SourceRouter
     private sealed class PublicationQueue
     {
         private readonly object _gate = new();
-        private readonly AsyncLocal<int> _scopeDepth = new();
         private Task _tail = Task.CompletedTask;
 
-        public ValueTask<TResult> EnqueueAsync<TState, TResult>(
+        public void Enqueue<TState>(
             TState state,
-            Func<TState, CancellationToken, ValueTask<TResult>> action,
+            Func<TState, CancellationToken, ValueTask> action,
             CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(action);
 
-            if (_scopeDepth.Value > 0)
-            {
-                return action(state, cancellationToken);
-            }
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return ValueTask.FromCanceled<TResult>(cancellationToken);
-            }
-
-            var completion = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
             Task previous;
 
             lock (_gate)
             {
                 previous = _tail;
-                _tail = ProcessAsync(previous, state, action, completion, cancellationToken);
+                _tail = ProcessAsync(previous, state, action, cancellationToken);
             }
-
-            return new ValueTask<TResult>(completion.Task);
         }
 
-        private async Task ProcessAsync<TState, TResult>(
+        private static async Task ProcessAsync<TState>(
             Task previous,
             TState state,
-            Func<TState, CancellationToken, ValueTask<TResult>> action,
-            TaskCompletionSource<TResult> completion,
+            Func<TState, CancellationToken, ValueTask> action,
             CancellationToken cancellationToken)
         {
             try
@@ -361,29 +349,20 @@ public sealed class SourceRouter
             }
             catch
             {
-                // Ignore failures from prior publications. Their awaiters have already observed them.
+                // Ignore failures from prior publications. Subsequent publications continue processing.
             }
 
             try
             {
-                _scopeDepth.Value++;
-                try
-                {
-                    var result = await action(state, cancellationToken).ConfigureAwait(false);
-                    completion.TrySetResult(result);
-                }
-                finally
-                {
-                    _scopeDepth.Value--;
-                }
+                await action(state, cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException oce) when (oce.CancellationToken == cancellationToken)
             {
-                completion.TrySetCanceled(cancellationToken);
+                // Respect caller-requested cancellation without faulting the queue.
             }
-            catch (Exception ex)
+            catch
             {
-                completion.TrySetException(ex);
+                // Swallow publication failures to keep the queue draining.
             }
         }
     }

@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/report-template.schema.json",
+  "title": "AgOpenGPS Nexus report template contract (aog.report.template.v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "version",
+    "scope",
+    "sections",
+    "outputs"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the report template contract."
+    },
+    "id": {
+      "$ref": "#/$defs/templateId"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display name shown in the Report Builder catalog."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[-0-9A-Za-z.]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "description": "Semantic version of the template definition."
+    },
+    "description": {
+      "type": "string",
+      "description": "Long-form description rendered in selection dialogs and documentation."
+    },
+    "scope": {
+      "$ref": "#/$defs/reportScope"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]{1,48}$"
+      },
+      "uniqueItems": true,
+      "description": "Optional classification tags used for filtering in the catalog."
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/sectionPlacement"
+      },
+      "description": "Ordered list of report sections rendered by the template."
+    },
+    "outputs": {
+      "type": "object",
+      "required": ["pdf"],
+      "additionalProperties": false,
+      "properties": {
+        "pdf": {
+          "$ref": "#/$defs/pdfOutput"
+        },
+        "csv": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/csvExport"
+          },
+          "uniqueItems": true,
+          "description": "Optional CSV exports keyed by contributing section."
+        },
+        "geoJson": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/geoJsonExport"
+          },
+          "uniqueItems": true,
+          "description": "Optional GeoJSON exports referencing section-provided features."
+        }
+      },
+      "description": "Export bundle configuration for the template."
+    }
+  },
+  "$defs": {
+    "templateId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)+$",
+      "description": "Stable identifier for the report template (reverse-DNS style)."
+    },
+    "reportScope": {
+      "type": "string",
+      "enum": ["farm", "season", "job", "session"],
+      "description": "Context scope that the template operates on."
+    },
+    "sectionId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)+$",
+      "description": "Identifier for a report section contributed by a plugin."
+    },
+    "reportCapability": {
+      "type": "string",
+      "enum": [
+        "crop",
+        "genetics",
+        "yield",
+        "profit",
+        "risk",
+        "weather",
+        "telemetry",
+        "guidance",
+        "zones",
+        "jobs",
+        "notes"
+      ],
+      "description": "Named capability or dataset required for rendering a section."
+    },
+    "sectionPlacement": {
+      "type": "object",
+      "required": ["sectionId"],
+      "additionalProperties": false,
+      "properties": {
+        "sectionId": { "$ref": "#/$defs/sectionId" },
+        "title": {
+          "type": "string",
+          "description": "Optional override title rendered above the section."
+        },
+        "variant": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$",
+          "description": "Renderer-specific variant identifier (e.g., compact, detailed)."
+        },
+        "required": {
+          "type": "boolean",
+          "default": true,
+          "description": "When false, the section is skipped if prerequisites are not met."
+        },
+        "options": {
+          "type": "object",
+          "default": {},
+          "description": "Plugin-defined options forwarded to the section renderer.",
+          "additionalProperties": true
+        },
+        "when": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requiresCapabilities": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/reportCapability" },
+              "description": "Capabilities that must be available for the section to render."
+            },
+            "requiresSections": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/sectionId" },
+              "description": "Other sections that must successfully render before this section."
+            }
+          },
+          "description": "Conditional requirements controlling whether the section is included."
+        },
+        "layout": {
+          "$ref": "#/$defs/sectionLayout"
+        }
+      },
+      "description": "Placement and behavior overrides for a report section."
+    },
+    "sectionLayout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "region": {
+          "type": "string",
+          "enum": ["cover", "header", "body", "footer", "appendix"],
+          "default": "body",
+          "description": "Report region where the section should render."
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Relative ordering hint within the region."
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Zero-based column index in multi-column layouts."
+        },
+        "columnSpan": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3,
+          "description": "Number of columns occupied by the section."
+        },
+        "rowSpan": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6,
+          "description": "Number of row units consumed by the section."
+        }
+      },
+      "description": "Layout hint used by the PDF renderer when assembling the template."
+    },
+    "pdfOutput": {
+      "type": "object",
+      "required": ["pageSize"],
+      "additionalProperties": false,
+      "properties": {
+        "pageSize": {
+          "type": "string",
+          "enum": ["Letter", "Legal", "A4", "A3"],
+          "description": "Output page size for the generated PDF."
+        },
+        "orientation": {
+          "type": "string",
+          "enum": ["portrait", "landscape"],
+          "default": "portrait",
+          "description": "Page orientation for the exported PDF."
+        },
+        "includeTableOfContents": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, adds an automatically generated table of contents."
+        },
+        "theme": {
+          "type": "string",
+          "description": "Theme identifier controlling typography and color palette."
+        },
+        "margins": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "top": { "$ref": "#/$defs/margin" },
+            "right": { "$ref": "#/$defs/margin" },
+            "bottom": { "$ref": "#/$defs/margin" },
+            "left": { "$ref": "#/$defs/margin" }
+          },
+          "description": "Page margins expressed in inches."
+        }
+      },
+      "description": "PDF export configuration for the template."
+    },
+    "margin": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2,
+      "description": "Margin size in inches."
+    },
+    "csvExport": {
+      "type": "object",
+      "required": ["sectionId", "filename"],
+      "additionalProperties": false,
+      "properties": {
+        "sectionId": { "$ref": "#/$defs/sectionId" },
+        "filename": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.csv$",
+          "description": "Filename to assign to the CSV artifact in the export bundle."
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "Optional list of column identifiers to request from the section."
+        }
+      },
+      "description": "Configuration for generating a CSV export from a section."
+    },
+    "geoJsonExport": {
+      "type": "object",
+      "required": ["sectionId", "filename"],
+      "additionalProperties": false,
+      "properties": {
+        "sectionId": { "$ref": "#/$defs/sectionId" },
+        "filename": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.geojson$",
+          "description": "Filename assigned to the GeoJSON artifact."
+        },
+        "featureRole": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$",
+          "description": "Semantic role of the exported features (e.g., crop.layers, risk.hotspots)."
+        }
+      },
+      "description": "Configuration for exporting GeoJSON features contributed by a section."
+    }
+  }
+}

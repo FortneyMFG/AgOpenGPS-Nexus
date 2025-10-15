@@ -59,5 +59,38 @@
       "timeoutSeconds": 10,
       "recovery": "GracefulDegradation"
     }
+  ],
+  "reportSections": [
+    {
+      "id": "org.agopengps.reports.sections.guidance-summary",
+      "displayName": "Guidance Summary",
+      "description": "Charts steering engagement, coverage, and overlap metrics.",
+      "version": "1.0.0",
+      "scopes": ["season", "job", "session"],
+      "capabilities": ["telemetry", "guidance"],
+      "provides": {
+        "pdf": true,
+        "csv": true
+      },
+      "defaultLayout": {
+        "region": "body",
+        "order": 40,
+        "column": 0,
+        "columnSpan": 2
+      },
+      "optionsSchema": "https://agopengps.org/schemas/report-sections/guidance-summary-options.schema.json",
+      "defaultOptions": {
+        "includeCharts": true,
+        "maxSessions": 5
+      },
+      "defaultExports": {
+        "csv": [
+          {
+            "filename": "guidance-summary.csv",
+            "columns": ["fieldName", "hoursEngaged", "overlapPercent", "coverageHectares"]
+          }
+        ]
+      }
+    }
   ]
 }

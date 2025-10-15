@@ -1,3 +1,8 @@
+using Aog.Agio.Legacy;
+using Aog.Bridge.Host.AogLink;
+using Aog.Bridge.Host.AogLink.Legacy;
+using Aog.Bridge.Host.AogLink.Transports;
+using Aog.Link.V1;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -55,7 +60,23 @@ public static class Program
 
                 services.AddSingleton(TimeProvider.System);
 
-                services.AddSingleton<IAogLinkGateway, NullAogLinkGateway>();
+                services.AddSingleton(provider =>
+                {
+                    var options = provider.GetRequiredService<IOptions<BridgeHostOptions>>().Value;
+                    return new AogLinkNodeIdentity(
+                        options.NodeId,
+                        options.FirmwareVersion,
+                        NodeRole.NodeRoleHost,
+                        NodePriority.NodePriorityHigh);
+                });
+
+                services.AddSingleton<AogLinkTranslator>();
+                services.AddSingleton<LegacyPoseCodec>();
+                services.AddSingleton<LegacySteerCodec>();
+                services.AddSingleton<LegacyDiscoveryCodec>();
+                services.AddSingleton<LegacyCompatibilityBridge>();
+                services.AddSingleton<IAogLinkTransport, UdpAogLinkTransport>();
+                services.AddSingleton<IAogLinkGateway, AogLinkGateway>();
                 services.AddHostedService<BridgeHostedService>();
 
                 services.AddLogging(builder => builder.AddSerilog());

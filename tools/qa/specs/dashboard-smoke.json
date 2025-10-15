@@ -1,0 +1,27 @@
+{
+  "scenario": "Dashboard smoke",
+  "widgets": [
+    {
+      "id": "steering",
+      "displayName": "Steering health",
+      "series": [
+        { "name": "steering.pose.rms_error", "required": true, "minSampleCount": 50 },
+        { "name": "steering.engage_latency_ms", "required": true }
+      ]
+    },
+    {
+      "id": "sections",
+      "displayName": "Section monitor",
+      "series": [
+        { "name": "sections.dropout_count", "required": true, "minSampleCount": 1 }
+      ]
+    },
+    {
+      "id": "optional-widget",
+      "displayName": "Optional summary",
+      "series": [
+        { "name": "telemetry.optional_metric", "required": false }
+      ]
+    }
+  ]
+}

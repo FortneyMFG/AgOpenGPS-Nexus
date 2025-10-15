@@ -205,6 +205,43 @@ public static class Program
 
                 return dashboard.AllPassed ? 0 : 2;
 
+            case "harness":
+                var specPath = RequireOption(options, positionals, "--spec", allowPositional: true, required: true);
+                var observationPath = RequireOption(options, positionals, "--observations", allowPositional: false, required: true);
+                var harnessOutput = RequireOption(options, positionals, "--output", allowPositional: false, required: false);
+                var fileName = RequireOption(options, positionals, "--file", allowPositional: false, required: false);
+                var scenarioOverride = RequireOption(options, positionals, "--scenario", allowPositional: false, required: false);
+
+                var harness = new DashboardAutomationHarness();
+                var harnessResult = harness.Run(new DashboardHarnessRequest
+                {
+                    SpecPath = specPath,
+                    ObservationPath = observationPath,
+                    OutputDirectory = harnessOutput,
+                    OutputFileName = fileName,
+                    ScenarioOverride = scenarioOverride
+                });
+
+                foreach (var finding in harnessResult.Findings)
+                {
+                    var prefix = finding.Severity switch
+                    {
+                        DashboardHarnessFindingSeverity.Error => "[ERROR]",
+                        DashboardHarnessFindingSeverity.Warning => "[WARN]",
+                        _ => "[INFO]"
+                    };
+
+                    Console.WriteLine($"{prefix} {finding.Message}");
+                }
+
+                Console.WriteLine($"Harness scenario '{harnessResult.MetricSet.Scenario}' produced {harnessResult.MetricSet.Metrics.Count} metrics.");
+                if (!string.IsNullOrWhiteSpace(harnessOutput))
+                {
+                    Console.WriteLine($"Metrics emitted to {Path.GetFullPath(harnessOutput)}.");
+                }
+
+                return harnessResult.Passed ? 0 : 2;
+
             default:
                 throw new InvalidOperationException($"Unknown dashboard command '{subcommand}'.");
         }
@@ -373,7 +410,12 @@ public static class Program
 
     private static void PrintDashboardUsage()
     {
-        Console.WriteLine("Usage: qa dashboard aggregate --input <directory> [--output <file>]");
+        Console.WriteLine("Usage: qa dashboard <aggregate|harness> [options]");
+        Console.WriteLine();
+        Console.WriteLine("Commands:");
+        Console.WriteLine("  aggregate --input <directory> [--output <file>]   Combine metric JSON files into a dashboard summary.");
+        Console.WriteLine("  harness <spec> --observations <file> [--output <dir>] [--file <name>] [--scenario <name>]   ");
+        Console.WriteLine("           Evaluate dashboard automation logs and emit QA metrics.");
     }
 
     private static void PrintReportUsage()

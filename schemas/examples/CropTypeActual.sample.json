@@ -4,6 +4,8 @@
   "sessionId": "session:1",
   "fieldId": "field:north80",
   "crop": "Soybean",
+  "year": 2025,
+  "status": "actual",
   "variety": "ZX-2045",
   "source": "barcode",
   "notes": "Switched lot mid-session",

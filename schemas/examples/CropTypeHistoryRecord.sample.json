@@ -3,6 +3,8 @@
   "crop": "corn",
   "status": "historical",
   "source": "session:2024-harvest",
+  "jobId": "job:2024-harvest",
+  "sessionId": "session:2024-harvest-1",
   "layerId": "layer:cropType.history.2024",
   "recordedAt": "2024-11-15T18:20:00Z",
   "notes": "High residue following wet fall"

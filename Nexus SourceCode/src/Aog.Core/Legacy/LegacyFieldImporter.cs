@@ -170,12 +170,20 @@ public sealed class LegacyFieldImporter
         }
 
         using var reader = new StreamReader(metadataPath);
-        _ = reader.ReadLine(); // Skip optional header.
 
         var flagLine = reader.ReadLine();
         if (flagLine is null)
         {
             return null;
+        }
+
+        if (flagLine.TrimStart().StartsWith("$", StringComparison.Ordinal))
+        {
+            flagLine = reader.ReadLine();
+            if (flagLine is null)
+            {
+                return null;
+            }
         }
 
         if (!bool.TryParse(flagLine.Trim(), out var hasImagery))

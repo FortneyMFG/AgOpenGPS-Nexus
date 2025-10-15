@@ -1,0 +1,9 @@
+$Field
+Field=North Farm West
+Operator=Casey Jensen
+CreatedUtc=2024-03-18T12:34:56Z
+OriginLat=51.123456
+OriginLon=-114.123789
+ConvergenceDeg=0.45
+Elevation=845.2
+Notes=Imported from legacy Field.txt snapshot.

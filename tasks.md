@@ -128,7 +128,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-039 Plugin compatibility CI gate _(Done)_
 - [x] NX-098 ISOBUS communications plugin _(Done)_
 - [x] NX-100 Combine yield monitoring plugin
-- [ ] NX-114 Variable-rate controller plugin _(Planned)_
+- [x] NX-114 Variable-rate controller plugin _(Done)_
 - [ ] NX-160 Official AutoSteer plugin GA _(Planned)_
 - [ ] NX-161 Official Mapping plugin GA _(Planned)_
 - [ ] NX-162 Official Sections plugin GA _(Planned)_
@@ -200,7 +200,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-048 Coverage & guidance overlays
 - [x] NX-049 Replay analysis timeline
 - [x] NX-065 UI theming + layout persistence
-- [ ] NX-112 Layer-aware section map visualization _(Planned)_
+- [x] NX-112 Layer-aware section map visualization _(Done)_
 - [ ] NX-130 Presets & layout linking ADR _(Proposed)_
 
 - [ ] NX-291 Zone editor toolbar integration _(Planned)_ — ADR-044 zone drawing framework
@@ -239,13 +239,13 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-059 Ported math verification report
 - [x] NX-102 V6 functionality inventory & gap analysis _(Done)_
 - [ ] NX-105 Legacy background imagery import _(Planned)_
-- [ ] NX-106 Legacy field overview metadata import _(Planned)_
-- [ ] NX-107 Legacy flag importer & UI surfacing _(Planned)_
-- [ ] NX-108 Legacy contour resume support _(Planned)_
-- [ ] NX-109 Legacy recorded path import & replay _(Planned)_
-- [ ] NX-110 Legacy tram line template import _(Planned)_
-- [ ] NX-111 Legacy worked area history import _(Planned)_
-- [ ] NX-113 External agronomic map ingest pipeline _(Planned)_
+- [x] NX-106 Legacy field overview metadata import _(Done)_
+- [x] NX-107 Legacy flag importer & UI surfacing _(Done)_
+- [x] NX-108 Legacy contour resume support _(Done)_
+- [x] NX-109 Legacy recorded path import & replay _(Done)_
+- [x] NX-110 Legacy tram line template import _(Done)_
+- [x] NX-111 Legacy worked area history import _(Done)_
+- [x] NX-113 External agronomic map ingest pipeline _(Done)_
 
 - [ ] NX-313 Stanley controller parity harness _(Planned)_ — ADR-033 guidance planner porting
 - [ ] NX-314 Pure pursuit control port with fixtures _(Planned)_ — ADR-033 guidance planner porting
@@ -462,7 +462,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-039 | Plugin compatibility CI gate with versioned manifest regression tests | Done |  | — | [SRS §2.6 Extensibility](docs/SRS/NOTES.md#srs-26-extensibility) | Block incompatible plugin updates before release |
 | NX-098 | ISOBUS communications plugin bridging CAN/UDP transports into Nexus routing | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Implement ISO 11783 PGN ingest + emit, handshake, and diagnostics |
 | NX-100 | Combine yield monitoring plugin with layer overlays and data export | Done |  | — | [SRS §3.5 Simulation Providers](docs/SRS/NOTES.md#srs-35-simulation-providers) | Capture live yield/moisture feeds and expose UI dashboards |
-| NX-114 | Variable-rate controller plugin consuming layer APIs | Planned |  | — | [SRS §3.7 Sections Control](docs/SRS/NOTES.md#srs-37-sections-control) | Converts imported layers into commanded rates |
+| NX-114 | Variable-rate controller plugin consuming layer APIs | Done |  | — | [SRS §3.7 Sections Control](docs/SRS/NOTES.md#srs-37-sections-control) | Layer-driven SectionPlacement rate controller |
 | NX-160 | Official AutoSteer plugin GA (pose fusion + actuator transport) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: mapping, GNSS/IMU fusion, AgIO; Soft: sections, device manager; transports per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
 | NX-161 | Official Mapping plugin GA (field state store + AB/coverage feeds) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: Core store; Soft: file-io, job tasks, telemetry logging per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
 | NX-162 | Official Sections plugin GA (coverage gating + IO orchestration) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: mapping + AgIO valves; Soft: rate-control, variable-mapping, telemetry per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
@@ -536,7 +536,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-048 | Map overlays for coverage heatmaps and guidance paths | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Visualize coverage & AB guidance |
 | NX-049 | Replay analysis timeline with bookmarks and export options | Done |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Provide bookmark/export tooling |
 | NX-065 | UI theming and layout persistence across sessions | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Save/restore window layout and theme |
-| NX-112 | Layer-aware section map visualization aligned with layer registry | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Replace binary overlay with metadata-driven layers |
+| NX-112 | Layer-aware section map visualization aligned with layer registry | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Map view renders registry-backed layers |
 | NX-291 | Zone editor toolbar integration | Planned |  | — | [ADR-044](docs/ADR/ADR-044_ZoneDrawingFramework.md) | ADR-044 zone drawing framework |
 | NX-292 | Zone override toggles & policy UX | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint UX |
 | NX-293 | Zone import/export workflows | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 interop contracts |
@@ -576,13 +576,13 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-059 | Ported math verification report and documentation updates | Done |  | — | [SRS §5.8 Verification](docs/SRS/NOTES.md#srs-58-verification) | Summarize parity metrics |
 | NX-102 | V6 functionality inventory & gap analysis across Nexus features | Done |  | — | [SRS §5.1 V6 Porting Inventory](docs/SRS/NOTES.md#srs-51-v6-porting-inventory) | Document Bing imagery, field outlines, layers, and other legacy flows |
 | NX-105 | Legacy background imagery import and persistence | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Extend importer with BackPic.txt/.png handling |
-| NX-106 | Legacy field overview metadata import | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Capture Field.txt origins and operators |
-| NX-107 | Legacy flags and annotations importer + UI exposure | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Surface scouting markers in Nexus |
-| NX-108 | Legacy contour coverage resume support | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Import Contour.txt buffers |
-| NX-109 | Legacy recorded path import feeding replay services | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Map RecPath.txt into Nexus replay |
-| NX-110 | Legacy tram line template import and planner integration | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Translate Tram.txt polygons |
-| NX-111 | Legacy worked area history import for coverage bootstraps | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Bring Sections.txt history into layer registry |
-| NX-113 | External agronomic map ingest pipeline | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Normalize GeoTIFF/ISOXML maps into layers |
+| NX-106 | Legacy field overview metadata import | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Field.txt importer populates LegacyFieldOverview |
+| NX-107 | Legacy flags and annotations importer + UI exposure | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Flags.txt importer surfaces scouting markers |
+| NX-108 | Legacy contour coverage resume support | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Contour.txt resume buffers mapped into Core |
+| NX-109 | Legacy recorded path import feeding replay services | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | RecPath.txt translated for replay |
+| NX-110 | Legacy tram line template import and planner integration | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Tram.txt templates ingested |
+| NX-111 | Legacy worked area history import for coverage bootstraps | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Sections.txt history converted to layer cells |
+| NX-113 | External agronomic map ingest pipeline | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | CSV importer emits Layer.v1 documents |
 | NX-313 | Stanley controller parity harness | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
 | NX-314 | Pure pursuit control port with fixtures | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
 | NX-315 | Turn planner library port | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |

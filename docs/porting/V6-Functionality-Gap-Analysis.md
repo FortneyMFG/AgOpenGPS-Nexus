@@ -31,10 +31,11 @@ The Nexus importer currently focuses on a subset of the V6 assets:
 - `LegacyFieldImporter` loads `TrackLines.txt`, `Boundary.txt`, and `Headland.txt`,
   returning a `LegacyFieldData` bundle that only includes AB/curve tracks plus boundary
   geometry.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L13-L161】
-- The resulting `LegacyFieldData` exposes only `Tracks` and `Boundaries`, leaving no slots
-  for imagery, contour strips, flags, or section history.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L128】
-- Existing documentation for the import tooling reiterates the same limited scope and does
-  not mention additional field-aspect readers yet.【F:docs/porting/LegacyDataIngest.md†L7-L15】
+- `LegacyFieldData` now surfaces overview metadata, scouting flags, contour resume buffers,
+  recorded paths, tram templates, and worked-area history alongside geometry so UI and
+  replay layers can consume the legacy artefacts directly.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L199】
+- Documentation and fixtures outline the extended importer coverage, keeping parity
+  expectations visible for future contributors.【F:docs/porting/LegacyDataIngest.md†L7-L36】【F:Nexus SourceCode/tests/Aog.Core.Tests/Legacy/Data/SampleField/Field.txt†L1-L9】
 
 ### Gap Analysis
 
@@ -43,24 +44,22 @@ The Nexus importer currently focuses on a subset of the V6 assets:
 | AB/curve tracks | ✅ Imported via `LegacyFieldImporter` and surfaced on `LegacyFieldData.Tracks`.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L33-L90】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L21-L29】 |
 | Boundaries & headlands | ✅ Imported via `LegacyFieldImporter`/`LegacyFieldData.Boundaries` and already referenced by UI importers.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L92-L200】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L21-L29】 |
 | Background imagery | ❌ Not represented in `LegacyFieldData`; no Nexus service persists `BackPic` artefacts yet.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
-| Field overview metadata | ❌ No importer output for `Field.txt`, so creator/origin data is unavailable for Nexus workflows.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
-| Flags & annotations | ❌ Flag collections are not parsed today; UI lacks legacy scouting markers until readers are added.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
-| Contour coverage strips | ❌ Contour files are not consumed, preventing resuming legacy contour control runs.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
-| Recorded path logs | ❌ `RecPath.txt` is ignored, so replay/teach-in data is absent in Nexus imports.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
-| Tram line templates | ❌ Tram automation artefacts are not yet mapped into Nexus structures.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
-| Worked area patches | ❌ Section history (`Sections.txt`) is not surfaced, limiting continuity metrics after migration.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
+| Field overview metadata | ✅ `Field.txt` importer populates `LegacyFieldOverview`, preserving origin, operator, and convergence data.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L30-L141】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L74-L118】 |
+| Flags & annotations | ✅ `Flags.txt` rows map into `LegacyFlag` records, ready for UI surfacing.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L143-L210】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L120-L160】 |
+| Contour coverage strips | ✅ `Contour.txt` resume buffers populate `LegacyContourResume` so operators can pick up contour runs.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L212-L259】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L162-L197】 |
+| Recorded path logs | ✅ `RecPath.txt` imports yield `LegacyRecordedPath` collections consumable by replay services.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L261-L307】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L199-L229】 |
+| Tram line templates | ✅ `Tram.txt` templates translate into `LegacyTramTemplate` payloads for tramline planners.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L309-L363】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L231-L269】 |
+| Worked area patches | ✅ `Sections.txt` history converts into `LegacyWorkedAreaHistory` cells ready for layer replay.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L365-L416】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L271-L307】 |
 
 ## Recommended Follow-Ups
 
-1. **Extend `LegacyFieldImporter`** with optional readers for imagery, flags, tram lines,
-   contours, and worked area so the importer mirrors the V6 `FieldStreamer` responsibilities.
-2. **Design new domain models** (or reuse existing Nexus primitives) for imagery metadata,
-   flag annotations, and section history to avoid bolting raw text files directly into the
-   runtime.
-3. **Update the UI migration wizard** to surface these additional assets, ensuring operators
-   can preview and selectively import overlays, markers, and tram patterns.
-4. **Add regression fixtures** using representative field directories that exercise each
-   asset, continuing the parity approach used for NX-055/NX-057 coverage validation.
+1. **Add BackPic imagery support** so legacy satellite tiles and bounding boxes migrate
+   alongside geometry and metadata.
+2. **Route imported assets into UX flows** (e.g. surface flags in the import wizard, expose
+   worked-area history in analytics) to close the loop with operators.
+3. **Expand replay and automation fixtures** using the enriched `SampleField` directory so
+   tram templates, recorded paths, and contour resumes receive parity coverage similar to
+   NX-055/NX-057.
 
 Capturing these follow-ups will close the biggest gaps between V6 field workflows and the
 current Nexus experience.

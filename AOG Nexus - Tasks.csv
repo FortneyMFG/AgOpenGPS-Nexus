@@ -104,15 +104,15 @@ NX-102,FALSE,TRUE,,,V6 functionality inventory and gap analysis across Nexus
 NX-103,FALSE,TRUE,,,Sync tasks.md with tasks.csv tracker
 NX-104,FALSE,TRUE,NX-002,,ADR for metadata-driven variable-rate layer mapping and agronomic imports
 NX-105,FALSE,FALSE,NX-054,,Extend legacy importer to load BackPic imagery bundles
-NX-106,FALSE,FALSE,NX-054,,Import Field.txt overview metadata into Nexus field records
-NX-107,FALSE,FALSE,"NX-054, NX-104",,Parse Flags.txt markers and expose them in the UI map
-NX-108,FALSE,FALSE,NX-054,,Resume Contour.txt passes within Nexus contour guidance
-NX-109,FALSE,FALSE,"NX-054, NX-035",,Translate RecPath.txt logs into replay-compatible datasets
-NX-110,FALSE,FALSE,NX-054,,Import Tram.txt templates and hook them into tramline planning
-NX-111,FALSE,FALSE,"NX-054, NX-032",,Load Sections.txt history into the layer registry for coverage continuity
-NX-112,FALSE,FALSE,"NX-104, NX-032",,Replace binary section overlay with layer-aware visualization in the UI
-NX-113,FALSE,FALSE,NX-104,,Build GeoTIFF/ISOXML/shapefile importers that normalize agronomic maps into layers
-NX-114,FALSE,FALSE,"NX-104, NX-032",,Variable-rate controller plugin converting layer tiles into commanded section rates
+NX-106,FALSE,TRUE,NX-054,,Import Field.txt overview metadata into Nexus field records
+NX-107,FALSE,TRUE,"NX-054, NX-104",,Parse Flags.txt markers and expose them in the UI map
+NX-108,FALSE,TRUE,NX-054,,Resume Contour.txt passes within Nexus contour guidance
+NX-109,FALSE,TRUE,"NX-054, NX-035",,Translate RecPath.txt logs into replay-compatible datasets
+NX-110,FALSE,TRUE,NX-054,,Import Tram.txt templates and hook them into tramline planning
+NX-111,FALSE,TRUE,"NX-054, NX-032",,Load Sections.txt history into the layer registry for coverage continuity
+NX-112,FALSE,TRUE,"NX-104, NX-032",,Replace binary section overlay with layer-aware visualization in the UI
+NX-113,FALSE,TRUE,NX-104,,Build GeoTIFF/ISOXML/shapefile importers that normalize agronomic maps into layers
+NX-114,FALSE,TRUE,"NX-104, NX-032",,Variable-rate controller plugin converting layer tiles into commanded section rates
 NX-115,FALSE,TRUE,NX-002,,AOG-Link protocol specification and reference flows
 NX-116,FALSE,FALSE,NX-115,,Shared aog-link.proto schemas with nanopb options
 NX-117,FALSE,FALSE,"NX-115, NX-003",,"Bridge service host mediating gRPC, AOG-Link, and PGN flows"

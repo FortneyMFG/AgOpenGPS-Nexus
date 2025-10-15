@@ -36,6 +36,35 @@ public sealed class LegacyFieldImporterTests
 
         data.Boundaries[1].IsDriveThrough.Should().BeFalse();
         data.Boundaries[1].Perimeter.Should().HaveCount(3);
+
+        data.Overview.Should().NotBeNull();
+        data.Overview!.FieldName.Should().Be("North Farm West");
+        data.Overview.OperatorName.Should().Be("Casey Jensen");
+        data.Overview.Origin.Should().Be(new GeographicCoordinate(51.123456, -114.123789));
+        data.Overview.ConvergenceAngleDegrees.Should().BeApproximately(0.45, 1e-6);
+
+        data.Flags.Should().HaveCount(3);
+        data.Flags[0].Label.Should().Be("North Rock");
+        data.Flags[0].Location.Should().Be(new PlanarPoint(5, 12.5));
+        data.Flags[1].Color.Should().Be("Blue");
+
+        data.Contour.IsRecording.Should().BeTrue();
+        data.Contour.SavedStrips.Should().HaveCount(2);
+        data.Contour.PendingStrip.Should().NotBeNull();
+        data.Contour.PendingStrip!.Vertices.Should().Contain(new PlanarPoint(6, 7));
+
+        data.RecordedPaths.Should().HaveCount(2);
+        data.RecordedPaths[0].Name.Should().Be("Training Pass");
+        data.RecordedPaths[0].Samples.Should().HaveCount(3);
+
+        data.TramTemplates.Should().HaveCount(2);
+        data.TramTemplates[0].Name.Should().Be("North Tram");
+        data.TramTemplates[0].Passes.Should().HaveCount(2);
+
+        data.WorkedArea.LayerId.Should().Be("layer:coverage.actual");
+        data.WorkedArea.CellSizeMeters.Should().BeApproximately(5.5, 1e-9);
+        data.WorkedArea.SavedCells.Should().HaveCount(2);
+        data.WorkedArea.PendingCells.Should().HaveCount(2);
     }
 
     [Fact]
@@ -48,6 +77,13 @@ public sealed class LegacyFieldImporterTests
 
         data.Tracks.Should().BeEmpty();
         data.Boundaries.Should().BeEmpty();
+        data.Flags.Should().BeEmpty();
+        data.RecordedPaths.Should().BeEmpty();
+        data.TramTemplates.Should().BeEmpty();
+        data.Contour.IsRecording.Should().BeFalse();
+        data.WorkedArea.SavedCells.Should().BeEmpty();
+        data.WorkedArea.PendingCells.Should().BeEmpty();
+        data.Overview.Should().BeNull();
     }
 
     private sealed class TempDirectory : IDisposable

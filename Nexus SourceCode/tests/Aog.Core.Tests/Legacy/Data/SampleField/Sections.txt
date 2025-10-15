@@ -1,0 +1,9 @@
+$Sections
+Layer=layer:coverage.actual
+CellSize=5.5
+Saved=true
+10,10,1.0
+15,10,0.75
+Pending=true
+10,15,0.5
+12,15,0.25

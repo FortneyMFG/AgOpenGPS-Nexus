@@ -1,0 +1,20 @@
+$Tram
+Template=North Tram
+Spacing=27
+Outer=4
+0,0
+30,0
+30,120
+0,120
+Pass=3
+5,0
+5,120
+5,140
+Pass=2
+25,0
+25,120
+Template=South Tram
+Spacing=24
+Pass=2
+0,-10
+120,-10

@@ -53,7 +53,8 @@ public sealed class MainWindowViewModelTests
     {
         var viewModel = CreateViewModel();
 
-        viewModel.CoverageCells.Should().NotBeEmpty();
+        viewModel.MapLayers.Should().NotBeEmpty();
+        viewModel.MapLayers.SelectMany(layer => layer.Cells).Should().NotBeEmpty();
         viewModel.GuidanceTracks.Should().NotBeEmpty();
         viewModel.GuidanceTracks.Select(track => track.Points.Count).Max().Should().BeGreaterThan(1);
     }

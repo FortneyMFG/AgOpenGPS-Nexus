@@ -74,20 +74,18 @@ public sealed class PurePursuitController
             return 0;
         }
 
-        var headingToTarget = Math.Atan2(toTargetY, toTargetX);
-        var headingError = AutoSteerMath.NormalizeAngle(headingToTarget - state.HeadingRadians);
-        var curvature = 2 * Math.Sin(headingError) / Math.Max(distanceToTarget, 1e-6);
-        var steering = AutoSteerPathGeometry.ComputePurePursuitSteering(state, toTargetX, toTargetY, distanceToTarget);
+        var targetGeometry = AutoSteerPathGeometry.ComputePurePursuitTargetGeometry(state, toTargetX, toTargetY, distanceToTarget);
+        var steering = targetGeometry.SteeringAngleRadians;
 
         LastPreview = new PurePursuitPreview(
             crossTrack,
-            headingError,
+            targetGeometry.HeadingErrorRadians,
             LookAheadDistance,
             target.X,
             target.Y,
-            headingToTarget,
+            targetGeometry.HeadingToTargetRadians,
             controllerOutput: steering,
-            targetCurvaturePerMeter: curvature);
+            targetCurvaturePerMeter: targetGeometry.CurvaturePerMeter);
 
         return Math.Clamp(steering, -SteeringAngleLimitRadians, SteeringAngleLimitRadians);
     }

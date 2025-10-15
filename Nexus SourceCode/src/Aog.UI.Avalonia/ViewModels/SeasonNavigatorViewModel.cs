@@ -12,6 +12,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
 {
     private readonly List<SeasonSummaryViewModel> _allSeasons;
     private readonly ObservableCollection<SeasonSummaryViewModel> _filteredSeasons = new();
+    private readonly ReadOnlyObservableCollection<SeasonSummaryViewModel> _readOnlyFilteredSeasons;
     private SeasonSummaryViewModel? _selectedSeason;
     private string _searchText = string.Empty;
     private bool _showOnlyActiveSeasons = true;
@@ -27,6 +28,8 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
         _allSeasons = seasons
             .OrderByDescending(season => season.StartDate)
             .ToList();
+
+        _readOnlyFilteredSeasons = new ReadOnlyObservableCollection<SeasonSummaryViewModel>(_filteredSeasons);
 
         RefreshFilteredSeasons();
         OnPropertyChanged(nameof(ShowOnlyActiveSeasons));
@@ -158,7 +161,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
     }
 
     /// <summary>Gets the seasons available in the navigator after filtering.</summary>
-    public IReadOnlyList<SeasonSummaryViewModel> Seasons => _filteredSeasons;
+    public ReadOnlyObservableCollection<SeasonSummaryViewModel> Seasons => _readOnlyFilteredSeasons;
 
     /// <summary>Gets or sets the selected season in the navigator.</summary>
     public SeasonSummaryViewModel? SelectedSeason

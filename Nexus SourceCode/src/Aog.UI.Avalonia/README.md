@@ -17,6 +17,13 @@ The toolbar is meant to demonstrate integration points for later plugin-owned at
 code-behind should not interact with it directly; bind to the view-model and rely on its commands and
 properties.
 
+## Crop quick-select UI (NX-302)
+
+`CropQuickSelectViewModel` models the crop quick-select card described in [ADR-045](../../../docs/ADR/ADR-045_CropTypePlugin.md).
+Groups expose curated rotations, favorites, and recent assignments via `CropQuickSelectGroupViewModel`
+and `CropQuickSelectOptionViewModel`. The MainWindow binds to the sample instance returned by
+`CropQuickSelectViewModel.CreateSample()`, illustrating how plugins can publish crop context for field
+envelopes without code-behind wiring.
 ## Zone constraint policies (NX-292)
 
 `ZoneConstraintPolicyViewModel` exposes the ADR-027 gating contract and manual override workflow. The

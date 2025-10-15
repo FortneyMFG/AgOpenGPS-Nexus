@@ -1,0 +1,10 @@
+{
+  "scenario": "Genetics regression",
+  "source": "plugins/genetics",
+  "metrics": [
+    { "name": "genetics.plan.feature_count", "category": "genetics", "value": 24, "unit": "features", "status": "pass" },
+    { "name": "genetics.variety.feature_count", "category": "genetics", "value": 21, "unit": "features", "status": "pass" },
+    { "name": "genetics.variety.coverage_gap_pct", "category": "genetics", "value": 4.5, "unit": "percent", "status": "warn" },
+    { "name": "genetics.barcode.scan_latency_ms", "category": "genetics", "value": 380, "unit": "ms", "status": "pass" }
+  ]
+}

@@ -21,6 +21,7 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
     private readonly Dictionary<string, MeshDeviceRecord> _devices = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, MeshPresenceEntry> _presence = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Guid, MeshSubscriptionRecord> _subscriptions = new();
+    private readonly MeshDiagnosticsCounters _diagnostics = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LiveTelemetryMeshService"/> class.
@@ -91,14 +92,17 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
         {
             if (!_devices.TryGetValue(deviceId, out device!))
             {
+                _diagnostics.IncrementPublishDeniedUnknownDevice();
                 throw new KeyNotFoundException($"Device '{deviceId}' is not registered with the mesh.");
             }
 
             if (!device.ShareProfile.Allows(topicParts.SeasonId, topicParts.JobId, topicParts.LayerNamespace, request.Tier))
             {
+                _diagnostics.IncrementPublishDenied();
                 throw new InvalidOperationException($"Device '{deviceId}' is not permitted to publish to topic '{topicParts.Topic}'.");
             }
 
+            _diagnostics.IncrementPublishAccepted();
             var publishedAt = request.PublishedAt ?? _timeProvider.GetUtcNow();
             var payload = request.Payload;
             var metadata = SanitizeMetadata(request.Metadata);
@@ -145,12 +149,14 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
         {
             if (!_devices.TryGetValue(deviceId, out var device))
             {
+                _diagnostics.IncrementSubscribeDeniedUnknownDevice();
                 throw new KeyNotFoundException($"Device '{deviceId}' is not registered with the mesh.");
             }
 
             var filters = device.SubscribeProfile.CreateFilters(normalizedSeason, normalizedJob, normalizedLayers, tierMask);
             if (filters.Length == 0)
             {
+                _diagnostics.IncrementSubscribeDenied();
                 throw new InvalidOperationException($"Device '{deviceId}' does not have subscription grants for the requested filters.");
             }
 
@@ -164,6 +170,7 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
             subscriptionId = Guid.NewGuid();
             subscription = new MeshSubscriptionRecord(subscriptionId, device.DeviceId, channel, filters);
             _subscriptions[subscriptionId] = subscription;
+            _diagnostics.IncrementSubscribeAccepted();
         }
 
         return ReadAsync(channel, subscriptionId, cancellationToken);
@@ -200,14 +207,17 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
         {
             if (!_devices.TryGetValue(deviceId, out var device))
             {
+                _diagnostics.IncrementPresenceDeniedUnknownDevice();
                 throw new KeyNotFoundException($"Device '{deviceId}' is not registered with the mesh.");
             }
 
             if (!device.ShareProfile.Allows(topicParts.SeasonId, topicParts.JobId, "presence", MeshDataTier.Presence))
             {
+                _diagnostics.IncrementPresenceDenied();
                 throw new InvalidOperationException($"Device '{deviceId}' is not permitted to broadcast presence for job '{topicParts.JobId}'.");
             }
 
+            _diagnostics.IncrementPresenceAccepted();
             snapshot = new MeshPresenceSnapshot(device.DeviceId, update.State, session, pose, timestamp, metadata);
             var expiresAt = update.State == MeshPresenceState.Online ? timestamp + PresenceTtl : timestamp;
             _presence[device.DeviceId] = new MeshPresenceEntry(snapshot, expiresAt);
@@ -240,7 +250,11 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
 
         lock (_gate)
         {
-            PrunePresence(now);
+            var pruned = PrunePresence(now);
+            if (pruned > 0)
+            {
+                _diagnostics.AddPresenceExpired(pruned);
+            }
 
             var results = new List<MeshPresenceSnapshot>();
             foreach (var entry in _presence.Values)
@@ -260,6 +274,22 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
             }
 
             return results;
+        }
+    }
+
+    /// <inheritdoc />
+    public MeshDiagnosticsSnapshot GetDiagnostics()
+    {
+        lock (_gate)
+        {
+            var now = _timeProvider.GetUtcNow();
+            var pruned = PrunePresence(now);
+            if (pruned > 0)
+            {
+                _diagnostics.AddPresenceExpired(pruned);
+            }
+
+            return _diagnostics.CreateSnapshot(now, _devices.Count, _subscriptions.Count, _presence.Count);
         }
     }
 
@@ -531,6 +561,8 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
             return;
         }
 
+        long delivered = 0;
+        long dropped = 0;
         foreach (var subscription in subscriptions)
         {
             if (!subscription.Filters.Any(filter => filter.Matches(publication)))
@@ -541,15 +573,30 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
             var writer = subscription.Channel.Writer;
             if (!writer.TryWrite(publication))
             {
+                dropped++;
                 lock (_gate)
                 {
                     _subscriptions.Remove(subscription.Id);
                 }
             }
+            else
+            {
+                delivered++;
+            }
+        }
+
+        if (delivered > 0)
+        {
+            _diagnostics.AddFanoutDelivered(delivered);
+        }
+
+        if (dropped > 0)
+        {
+            _diagnostics.AddFanoutDropped(dropped);
         }
     }
 
-    private void PrunePresence(DateTimeOffset now)
+    private int PrunePresence(DateTimeOffset now)
     {
         var expired = _presence
             .Where(pair => pair.Value.ExpiresAt <= now)
@@ -560,6 +607,8 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
         {
             _presence.Remove(key);
         }
+
+        return expired.Length;
     }
 
     private async IAsyncEnumerable<MeshPublication> ReadAsync(Channel<MeshPublication> channel, Guid subscriptionId, [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -885,5 +934,86 @@ public sealed class LiveTelemetryMeshService : ILiveTelemetryMeshService, IDispo
         public Channel<MeshPublication> Channel { get; }
 
         public MeshSubscriptionFilter[] Filters { get; }
+    }
+
+    private sealed class MeshDiagnosticsCounters
+    {
+        private long _publishAccepted;
+        private long _publishDenied;
+        private long _publishDeniedUnknownDevice;
+        private long _subscribeAccepted;
+        private long _subscribeDenied;
+        private long _subscribeDeniedUnknownDevice;
+        private long _presenceAccepted;
+        private long _presenceDenied;
+        private long _presenceDeniedUnknownDevice;
+        private long _presenceExpired;
+        private long _fanoutDelivered;
+        private long _fanoutDropped;
+
+        public void IncrementPublishAccepted() => Interlocked.Increment(ref _publishAccepted);
+
+        public void IncrementPublishDenied() => Interlocked.Increment(ref _publishDenied);
+
+        public void IncrementPublishDeniedUnknownDevice() => Interlocked.Increment(ref _publishDeniedUnknownDevice);
+
+        public void IncrementSubscribeAccepted() => Interlocked.Increment(ref _subscribeAccepted);
+
+        public void IncrementSubscribeDenied() => Interlocked.Increment(ref _subscribeDenied);
+
+        public void IncrementSubscribeDeniedUnknownDevice() => Interlocked.Increment(ref _subscribeDeniedUnknownDevice);
+
+        public void IncrementPresenceAccepted() => Interlocked.Increment(ref _presenceAccepted);
+
+        public void IncrementPresenceDenied() => Interlocked.Increment(ref _presenceDenied);
+
+        public void IncrementPresenceDeniedUnknownDevice() => Interlocked.Increment(ref _presenceDeniedUnknownDevice);
+
+        public void AddPresenceExpired(int count)
+        {
+            if (count > 0)
+            {
+                Interlocked.Add(ref _presenceExpired, count);
+            }
+        }
+
+        public void AddFanoutDelivered(long count)
+        {
+            if (count > 0)
+            {
+                Interlocked.Add(ref _fanoutDelivered, count);
+            }
+        }
+
+        public void AddFanoutDropped(long count)
+        {
+            if (count > 0)
+            {
+                Interlocked.Add(ref _fanoutDropped, count);
+            }
+        }
+
+        public MeshDiagnosticsSnapshot CreateSnapshot(DateTimeOffset capturedAt, int registeredDeviceCount, int activeSubscriptionCount, int activePresenceCount)
+        {
+            return new MeshDiagnosticsSnapshot(
+                capturedAt,
+                registeredDeviceCount,
+                activeSubscriptionCount,
+                activePresenceCount,
+                new MeshDiagnosticsAclSnapshot(
+                    PublishDenied: Interlocked.Read(ref _publishDenied),
+                    PublishDeniedUnknownDevice: Interlocked.Read(ref _publishDeniedUnknownDevice),
+                    SubscribeDenied: Interlocked.Read(ref _subscribeDenied),
+                    SubscribeDeniedUnknownDevice: Interlocked.Read(ref _subscribeDeniedUnknownDevice),
+                    PresenceDenied: Interlocked.Read(ref _presenceDenied),
+                    PresenceDeniedUnknownDevice: Interlocked.Read(ref _presenceDeniedUnknownDevice)),
+                new MeshDiagnosticsTrafficSnapshot(
+                    PublicationsAccepted: Interlocked.Read(ref _publishAccepted),
+                    PresenceBroadcasts: Interlocked.Read(ref _presenceAccepted),
+                    PresenceExpirations: Interlocked.Read(ref _presenceExpired),
+                    SubscriptionsOpened: Interlocked.Read(ref _subscribeAccepted),
+                    FanoutDelivered: Interlocked.Read(ref _fanoutDelivered),
+                    FanoutDropped: Interlocked.Read(ref _fanoutDropped)));
+        }
     }
 }

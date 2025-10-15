@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Aog.Core.Eventing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aog.Core.Layers.Controllers;
@@ -35,6 +36,12 @@ public static class LayerControllerServiceCollectionExtensions
 
         services.AddSingleton<LayerControllerBufferPool>();
         services.AddSingleton<IReadOnlyList<LayerControllerDescriptor>>(descriptors);
+        services.AddSingleton<ILayerControllerPoseStream>(provider =>
+        {
+            var eventBus = provider.GetRequiredService<IEventBus>();
+            var timeProvider = provider.GetService<TimeProvider>();
+            return new PoseStreamIngestionService(eventBus, timeProvider);
+        });
         services.AddSingleton(provider =>
         {
             var timeProvider = provider.GetService<TimeProvider>();

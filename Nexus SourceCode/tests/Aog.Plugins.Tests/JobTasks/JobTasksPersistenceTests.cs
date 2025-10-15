@@ -53,7 +53,13 @@ public sealed class JobTasksPersistenceTests
             new JobSessionStatisticsSnapshot(12.4, 8.1, 5400, 58.2),
             null);
 
-        var snapshot = new JobSnapshot(metadata, layout, new[] { session });
+        var equipment = new JobEquipmentSnapshot(
+            VehicleId: " equipment:tractor.alpha ",
+            ImplementId: "equipment:Planter-16R",
+            PresetId: " preset:planter-16r ",
+            LayoutId: " layout:planter-dashboard ");
+
+        var snapshot = new JobSnapshot(metadata, layout, new[] { session }, Equipment: equipment);
         var timeProvider = new FakeTimeProvider(createdAt.AddHours(3));
         var persistence = new JobTasksPersistence(timeProvider);
 
@@ -79,18 +85,33 @@ public sealed class JobTasksPersistenceTests
             var sessionsElement = root.GetProperty("sessions");
             sessionsElement.GetArrayLength().Should().Be(1);
             sessionsElement[0].GetProperty("id").GetString().Should().Be(session.SessionId);
+
+            var equipmentElement = root.GetProperty("equipment");
+            equipmentElement.GetProperty("vehicleId").GetString().Should().Be("equipment:tractor.alpha");
+            equipmentElement.GetProperty("implementId").GetString().Should().Be("equipment:Planter-16R");
+            equipmentElement.GetProperty("presetId").GetString().Should().Be("preset:planter-16r");
+            equipmentElement.GetProperty("layoutId").GetString().Should().Be("layout:planter-dashboard");
         }
 
         var resumeContent = await File.ReadAllTextAsync(layout.ResumeFile);
         resumeContent.Should().Contain($"JobId={metadata.JobId}");
         resumeContent.Should().Contain($"SavedAt={timeProvider.GetUtcNow():O}");
         resumeContent.Should().Contain("[Session session:1]");
+        resumeContent.Should().Contain("VehicleId=equipment:tractor.alpha");
+        resumeContent.Should().Contain("ImplementId=equipment:Planter-16R");
+        resumeContent.Should().Contain("PresetId=preset:planter-16r");
+        resumeContent.Should().Contain("LayoutId=layout:planter-dashboard");
 
         var loaded = await persistence.LoadAsync(jobRoot);
         loaded.Metadata.Should().Be(metadata);
         loaded.Layout.JobRoot.Should().Be(layout.JobRoot);
         loaded.Layout.ResumeFile.Should().Be(layout.ResumeFile);
         loaded.Sessions.Should().ContainSingle().Which.Should().Be(session);
+        loaded.Equipment.Should().Be(new JobEquipmentSnapshot(
+            VehicleId: "equipment:tractor.alpha",
+            ImplementId: "equipment:Planter-16R",
+            PresetId: "preset:planter-16r",
+            LayoutId: "layout:planter-dashboard"));
     }
 
     private sealed class TemporaryDirectory : IDisposable

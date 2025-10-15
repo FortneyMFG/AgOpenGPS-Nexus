@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Aog.Abstractions\Aog.Abstractions.csproj" />
+    <ProjectReference Include="..\Aog.Agio.Sim\Aog.Agio.Sim.csproj" />
   </ItemGroup>
 
   <ItemGroup>

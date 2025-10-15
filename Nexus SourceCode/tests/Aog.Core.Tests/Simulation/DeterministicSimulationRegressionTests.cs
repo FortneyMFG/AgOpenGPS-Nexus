@@ -51,7 +51,7 @@ public sealed class DeterministicSimulationRegressionTests
             var clock = new FixedStepSimClock(Step);
             var state = new VehicleState(0d, 0d, Math.PI / 18d, BaseSpeedMetersPerSecond);
             var builder = new StringBuilder();
-            builder.AppendLine("tick,elapsed_ms,x_m,y_m,heading_deg,velocity_mps,yaw_rate_dps,ax_mps2");
+            builder.Append("tick,elapsed_ms,x_m,y_m,heading_deg,velocity_mps,yaw_rate_dps,ax_mps2\n");
 
             AppendRow(builder, clock.Current, state, BaseYawRateRadiansPerSecond, 0d);
 

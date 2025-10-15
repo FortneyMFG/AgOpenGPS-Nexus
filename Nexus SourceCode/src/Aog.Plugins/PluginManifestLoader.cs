@@ -129,7 +129,7 @@ public sealed class PluginManifestLoader
             }
         }
 
-        var supportedCapabilities = manifest.SupportedCapabilities ?? Array.Empty<string>();
+        var supportedCapabilities = manifest.SupportedCapabilities ?? new List<string>();
         foreach (var capability in supportedCapabilities)
         {
             if (string.IsNullOrWhiteSpace(capability))
@@ -138,7 +138,7 @@ public sealed class PluginManifestLoader
             }
         }
 
-        var requiredTransports = manifest.RequiredTransports ?? Array.Empty<string>();
+        var requiredTransports = manifest.RequiredTransports ?? new List<string>();
         foreach (var transport in requiredTransports)
         {
             if (string.IsNullOrWhiteSpace(transport))
@@ -200,7 +200,7 @@ public sealed class PluginManifestLoader
             }
         }
 
-        var capabilityLeases = manifest.CapabilityLeases ?? Array.Empty<PluginCapabilityLease>();
+        var capabilityLeases = manifest.CapabilityLeases ?? new List<PluginCapabilityLease>();
 
         if (capabilityLeases.Count > 0)
         {

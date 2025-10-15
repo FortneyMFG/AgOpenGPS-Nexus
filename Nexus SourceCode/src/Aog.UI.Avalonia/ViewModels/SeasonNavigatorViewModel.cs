@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Aog.UI.Avalonia.ViewModels;
@@ -10,7 +11,7 @@ namespace Aog.UI.Avalonia.ViewModels;
 public sealed class SeasonNavigatorViewModel : ObservableObject
 {
     private readonly List<SeasonSummaryViewModel> _allSeasons;
-    private readonly List<SeasonSummaryViewModel> _filteredSeasons = new();
+    private readonly ObservableCollection<SeasonSummaryViewModel> _filteredSeasons = new();
     private SeasonSummaryViewModel? _selectedSeason;
     private string _searchText = string.Empty;
     private bool _showOnlyActiveSeasons = true;

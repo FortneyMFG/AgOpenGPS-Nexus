@@ -64,7 +64,7 @@ if (-not $binary) {
 }
 
 $artifactBase = "AgOpenGPS.Nexus-$Runtime"
-$singleFilePath = Join-Path $OutputRoot $binary.Name
+$singleFilePath = Join-Path $OutputRoot 'AgOpenGPS.Nexus'
 Copy-Item -Path $binary.FullName -Destination $singleFilePath -Force
 
 $stagingDir = Join-Path $OutputRoot 'staging'

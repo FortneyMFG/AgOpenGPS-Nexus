@@ -83,6 +83,35 @@ public sealed class PluginManifestLoaderTests
         await act.Should().ThrowAsync<InvalidDataException>();
     }
 
+    [Theory]
+    [InlineData("2.0.0")]
+    [InlineData("0.9.0")]
+    [InlineData("1.0.0-beta.1")]
+    public async Task LoadAsync_UnsupportedSchemaVersion_Throws(string schemaVersion)
+    {
+        var json = $"""
+        {{
+          "schemaVersion": "{schemaVersion}",
+          "id": "org.agopengps.plugins.unsupported",
+          "name": "Unsupported Plugin",
+          "version": "1.0.0",
+          "requiredApis": {{ "core": ">=1.0.0" }},
+          "simProviders": [
+            {{
+              "providerId": "unsupported.sim",
+              "type": "Aog.Plugins.Unsupported.Provider"
+            }}
+          ]
+        }}
+        """;
+
+        await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        var act = async () => await _loader.LoadAsync(stream);
+
+        await act.Should().ThrowAsync<InvalidDataException>()
+            .WithMessage("*schemaVersion must be a supported version in the 1.x range*");
+    }
+
     [Fact]
     public async Task LoadAsync_Path_ReadsManifestFromDisk()
     {

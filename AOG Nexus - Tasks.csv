@@ -115,7 +115,7 @@ NX-113,FALSE,FALSE,NX-104,,Build GeoTIFF/ISOXML/shapefile importers that normali
 NX-114,FALSE,FALSE,"NX-104, NX-032",,Variable-rate controller plugin converting layer tiles into commanded section rates
 NX-115,FALSE,TRUE,NX-002,,AOG-Link protocol specification and reference flows
 NX-116,FALSE,FALSE,NX-115,,Shared aog-link.proto schemas with nanopb options
-NX-117,FALSE,FALSE,"NX-115, NX-003",,Bridge service host mediating gRPC, AOG-Link, and PGN flows
+NX-117,FALSE,FALSE,"NX-115, NX-003",,"Bridge service host mediating gRPC, AOG-Link, and PGN flows"
 NX-118,FALSE,FALSE,NX-117,,gRPC ⇄ AOG-Link translator with ack/retry handling
 NX-119,FALSE,FALSE,NX-117,,AOG-Link ⇄ PGN compatibility bridge for legacy devices
 NX-120,FALSE,FALSE,NX-116,,AOG-Link Ethernet/UDP driver with multicast and command retries

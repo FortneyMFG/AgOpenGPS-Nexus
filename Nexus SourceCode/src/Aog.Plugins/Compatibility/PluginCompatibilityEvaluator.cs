@@ -64,6 +64,9 @@ public sealed class PluginCompatibilityEvaluator
         var bundleSet = new HashSet<string>(officialBundleIds ?? OfficialPluginIds, StringComparer.OrdinalIgnoreCase);
 
         var exclusiveConflicts = EvaluateExclusiveCapabilityConflicts(manifestList);
+        var capabilityProviders = BuildCapabilityIndex(manifestList);
+        var profileProviders = BuildProfileIndex(manifestList);
+        var replacements = BuildReplacementIndex(manifestList);
 
         var results = new List<PluginCompatibilityResult>();
 
@@ -72,9 +75,15 @@ public sealed class PluginCompatibilityEvaluator
             var issues = new List<PluginCompatibilityDependencyStatus>();
 
             EvaluateRuntimeVersion(manifest, environment, issues);
-            EvaluateRequiredApis(manifest, environment, manifestById, issues);
+            EvaluateRequiredApis(manifest, environment, manifestById, replacements, issues);
             EvaluateRequiredTransports(manifest, environment, issues);
             EvaluateExclusiveConflicts(manifest, exclusiveConflicts, issues);
+            EvaluateCapabilityRequirements(manifest, capabilityProviders, issues);
+            EvaluateProfileRequirements(manifest, profileProviders, issues);
+            EvaluatePeerRelationships(manifest, manifestById, issues);
+            EvaluateConflictRelationships(manifest, manifestById, issues);
+            EvaluateReplacementRelationships(manifest, manifestById, issues);
+            EvaluateExtendsRelationships(manifest, manifestById, issues);
             EvaluateOptionalDependencies(manifest, manifestById, issues);
 
             var state = DetermineState(issues);
@@ -182,6 +191,7 @@ public sealed class PluginCompatibilityEvaluator
         PluginManifest manifest,
         CompatibilityEnvironment environment,
         IReadOnlyDictionary<string, PluginManifest> manifestById,
+        IReadOnlyDictionary<string, IReadOnlyList<PluginManifest>> replacementIndex,
         ICollection<PluginCompatibilityDependencyStatus> issues)
     {
         foreach (var requirement in manifest.RequiredApis)
@@ -193,6 +203,11 @@ public sealed class PluginCompatibilityEvaluator
             {
                 if (!manifestById.TryGetValue(pluginId, out var dependency))
                 {
+                    if (replacementIndex.TryGetValue(pluginId, out var replacements) && replacements.Count > 0)
+                    {
+                        continue;
+                    }
+
                     var message = string.Format(CultureInfo.InvariantCulture, "Required plugin '{0}' is not installed.", pluginId);
                     issues.Add(new PluginCompatibilityDependencyStatus(
                         PluginDependencyKind.Plugin,
@@ -348,6 +363,383 @@ public sealed class PluginCompatibilityEvaluator
         }
     }
 
+    private static void EvaluateCapabilityRequirements(
+        PluginManifest manifest,
+        IReadOnlyDictionary<string, IReadOnlyList<CapabilityProvider>> capabilityProviders,
+        ICollection<PluginCompatibilityDependencyStatus> issues)
+    {
+        foreach (var requirement in manifest.Requires.Capabilities)
+        {
+            if (!capabilityProviders.TryGetValue(requirement.Id, out var providers) || providers.Count == 0)
+            {
+                var message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Capability '{0}' range '{1}' is unavailable.",
+                    requirement.Id,
+                    requirement.Range);
+
+                issues.Add(new PluginCompatibilityDependencyStatus(
+                    PluginDependencyKind.Capability,
+                    requirement.Id,
+                    requirement.Classification,
+                    MapClassificationToState(requirement.Classification),
+                    message));
+                continue;
+            }
+
+            CapabilityProvider? compatible = null;
+            string? failure = null;
+
+            foreach (var provider in providers)
+            {
+                if (!IsVersionSatisfied(provider.Descriptor.Version, requirement.Range, out var versionFailure))
+                {
+                    failure = versionFailure ?? string.Format(CultureInfo.InvariantCulture, "expected range '{0}'", requirement.Range);
+                    continue;
+                }
+
+                var featuresSatisfied = true;
+
+                foreach (var feature in requirement.Features)
+                {
+                    if (!provider.Descriptor.Features.TryGetValue(feature.Key, out var featureVersion))
+                    {
+                        failure = string.Format(
+                            CultureInfo.InvariantCulture,
+                            "feature '{0}' missing from provider '{1}'.",
+                            feature.Key,
+                            provider.Manifest.Id);
+                        featuresSatisfied = false;
+                        break;
+                    }
+
+                    if (!IsVersionSatisfied(featureVersion, feature.Value, out var featureFailure))
+                    {
+                        failure = string.Format(
+                            CultureInfo.InvariantCulture,
+                            "feature '{0}' version {1} does not satisfy '{2}' ({3}).",
+                            feature.Key,
+                            featureVersion,
+                            feature.Value,
+                            featureFailure ?? "version check failed");
+                        featuresSatisfied = false;
+                        break;
+                    }
+                }
+
+                if (featuresSatisfied)
+                {
+                    compatible = provider;
+                    break;
+                }
+            }
+
+            if (compatible is not null)
+            {
+                continue;
+            }
+
+            var detail = failure ?? "no compatible provider found";
+            var message = string.Format(
+                CultureInfo.InvariantCulture,
+                "Capability '{0}' range '{1}' is not satisfied ({2}).",
+                requirement.Id,
+                requirement.Range,
+                detail);
+
+            issues.Add(new PluginCompatibilityDependencyStatus(
+                PluginDependencyKind.Capability,
+                requirement.Id,
+                requirement.Classification,
+                MapClassificationToState(requirement.Classification),
+                message));
+        }
+    }
+
+    private static void EvaluateProfileRequirements(
+        PluginManifest manifest,
+        IReadOnlyDictionary<string, IReadOnlyList<ProfileProvider>> profileProviders,
+        ICollection<PluginCompatibilityDependencyStatus> issues)
+    {
+        foreach (var requirement in manifest.Requires.Profiles)
+        {
+            if (!profileProviders.TryGetValue(requirement.Id, out var providers) || providers.Count == 0)
+            {
+                var message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Profile '{0}' range '{1}' is unavailable.",
+                    requirement.Id,
+                    requirement.Range);
+
+                issues.Add(new PluginCompatibilityDependencyStatus(
+                    PluginDependencyKind.Profile,
+                    requirement.Id,
+                    requirement.Classification,
+                    MapClassificationToState(requirement.Classification),
+                    message));
+                continue;
+            }
+
+            ProfileProvider? compatible = null;
+            string? failure = null;
+
+            foreach (var provider in providers)
+            {
+                if (IsVersionSatisfied(provider.Descriptor.Version, requirement.Range, out var versionFailure))
+                {
+                    compatible = provider;
+                    break;
+                }
+
+                failure = versionFailure ?? string.Format(CultureInfo.InvariantCulture, "expected range '{0}'", requirement.Range);
+            }
+
+            if (compatible is not null)
+            {
+                continue;
+            }
+
+            var detail = failure ?? "no compatible provider found";
+            var message = string.Format(
+                CultureInfo.InvariantCulture,
+                "Profile '{0}' range '{1}' is not satisfied ({2}).",
+                requirement.Id,
+                requirement.Range,
+                detail);
+
+            issues.Add(new PluginCompatibilityDependencyStatus(
+                PluginDependencyKind.Profile,
+                requirement.Id,
+                requirement.Classification,
+                MapClassificationToState(requirement.Classification),
+                message));
+        }
+    }
+
+    private static void EvaluatePeerRelationships(
+        PluginManifest manifest,
+        IReadOnlyDictionary<string, PluginManifest> manifestById,
+        ICollection<PluginCompatibilityDependencyStatus> issues)
+    {
+        foreach (var peer in manifest.Requires.PeerOf)
+        {
+            if (!manifestById.TryGetValue(peer.Id, out var dependency))
+            {
+                var message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Peer plugin '{0}' is not installed{1}.",
+                    peer.Id,
+                    string.IsNullOrWhiteSpace(peer.Reason) ? string.Empty : string.Concat(" (", peer.Reason, ")"));
+
+                issues.Add(new PluginCompatibilityDependencyStatus(
+                    PluginDependencyKind.Relationship,
+                    peer.Id,
+                    peer.Classification,
+                    MapClassificationToState(peer.Classification),
+                    message));
+                continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(peer.Range) && !IsVersionSatisfied(dependency.Version, peer.Range, out var failure))
+            {
+                var message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Peer plugin '{0}' version {1} does not satisfy '{2}' ({3}).",
+                    peer.Id,
+                    dependency.Version,
+                    peer.Range,
+                    failure ?? "version check failed");
+
+                issues.Add(new PluginCompatibilityDependencyStatus(
+                    PluginDependencyKind.Relationship,
+                    peer.Id,
+                    peer.Classification,
+                    MapClassificationToState(peer.Classification),
+                    message));
+            }
+        }
+    }
+
+    private static void EvaluateConflictRelationships(
+        PluginManifest manifest,
+        IReadOnlyDictionary<string, PluginManifest> manifestById,
+        ICollection<PluginCompatibilityDependencyStatus> issues)
+    {
+        foreach (var conflict in manifest.Requires.ConflictsWith)
+        {
+            if (!manifestById.TryGetValue(conflict.Id, out var other))
+            {
+                continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(conflict.Range) && !IsVersionSatisfied(other.Version, conflict.Range, out _))
+            {
+                continue;
+            }
+
+            var message = string.Format(
+                CultureInfo.InvariantCulture,
+                "Plugin '{0}' conflicts with '{1}'{2}.",
+                manifest.Id,
+                conflict.Id,
+                string.IsNullOrWhiteSpace(conflict.Reason) ? string.Empty : string.Concat(" (", conflict.Reason, ")"));
+
+            issues.Add(new PluginCompatibilityDependencyStatus(
+                PluginDependencyKind.Relationship,
+                conflict.Id,
+                conflict.Classification,
+                MapClassificationToState(conflict.Classification),
+                message));
+        }
+    }
+
+    private static void EvaluateReplacementRelationships(
+        PluginManifest manifest,
+        IReadOnlyDictionary<string, PluginManifest> manifestById,
+        ICollection<PluginCompatibilityDependencyStatus> issues)
+    {
+        foreach (var replacement in manifest.Requires.Replaces)
+        {
+            if (!manifestById.TryGetValue(replacement.Id, out var other))
+            {
+                continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(replacement.Range) && !IsVersionSatisfied(other.Version, replacement.Range, out _))
+            {
+                continue;
+            }
+
+            var message = string.Format(
+                CultureInfo.InvariantCulture,
+                "Plugin '{0}' replaces '{1}' but both are installed{2}.",
+                manifest.Id,
+                replacement.Id,
+                string.IsNullOrWhiteSpace(replacement.Reason) ? string.Empty : string.Concat(" (", replacement.Reason, ")"));
+
+            issues.Add(new PluginCompatibilityDependencyStatus(
+                PluginDependencyKind.Relationship,
+                replacement.Id,
+                replacement.Classification,
+                MapClassificationToState(replacement.Classification),
+                message));
+        }
+    }
+
+    private static void EvaluateExtendsRelationships(
+        PluginManifest manifest,
+        IReadOnlyDictionary<string, PluginManifest> manifestById,
+        ICollection<PluginCompatibilityDependencyStatus> issues)
+    {
+        foreach (var extension in manifest.Requires.Extends)
+        {
+            if (!manifestById.TryGetValue(extension.Id, out var dependency))
+            {
+                var message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Extension target '{0}' is not installed{1}.",
+                    extension.Id,
+                    string.IsNullOrWhiteSpace(extension.Reason) ? string.Empty : string.Concat(" (", extension.Reason, ")"));
+
+                issues.Add(new PluginCompatibilityDependencyStatus(
+                    PluginDependencyKind.Relationship,
+                    extension.Id,
+                    extension.Classification,
+                    MapClassificationToState(extension.Classification),
+                    message));
+                continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(extension.Range) && !IsVersionSatisfied(dependency.Version, extension.Range, out var failure))
+            {
+                var message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Extension target '{0}' version {1} does not satisfy '{2}' ({3}).",
+                    extension.Id,
+                    dependency.Version,
+                    extension.Range,
+                    failure ?? "version check failed");
+
+                issues.Add(new PluginCompatibilityDependencyStatus(
+                    PluginDependencyKind.Relationship,
+                    extension.Id,
+                    extension.Classification,
+                    MapClassificationToState(extension.Classification),
+                    message));
+            }
+        }
+    }
+
+    private static PluginCompatibilityState MapClassificationToState(PluginDependencyClassification classification)
+    {
+        return classification == PluginDependencyClassification.Hard
+            ? PluginCompatibilityState.Blocked
+            : PluginCompatibilityState.Warning;
+    }
+
+    private static IReadOnlyDictionary<string, IReadOnlyList<CapabilityProvider>> BuildCapabilityIndex(IEnumerable<PluginManifest> manifests)
+    {
+        var index = new Dictionary<string, List<CapabilityProvider>>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var manifest in manifests)
+        {
+            foreach (var capability in manifest.Provides.Capabilities)
+            {
+                if (!index.TryGetValue(capability.Id, out var list))
+                {
+                    list = new List<CapabilityProvider>();
+                    index[capability.Id] = list;
+                }
+
+                list.Add(new CapabilityProvider(manifest, capability));
+            }
+        }
+
+        return index.ToDictionary(pair => pair.Key, pair => (IReadOnlyList<CapabilityProvider>)pair.Value, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static IReadOnlyDictionary<string, IReadOnlyList<ProfileProvider>> BuildProfileIndex(IEnumerable<PluginManifest> manifests)
+    {
+        var index = new Dictionary<string, List<ProfileProvider>>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var manifest in manifests)
+        {
+            foreach (var profile in manifest.Provides.Profiles)
+            {
+                if (!index.TryGetValue(profile.Id, out var list))
+                {
+                    list = new List<ProfileProvider>();
+                    index[profile.Id] = list;
+                }
+
+                list.Add(new ProfileProvider(manifest, profile));
+            }
+        }
+
+        return index.ToDictionary(pair => pair.Key, pair => (IReadOnlyList<ProfileProvider>)pair.Value, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static IReadOnlyDictionary<string, IReadOnlyList<PluginManifest>> BuildReplacementIndex(IEnumerable<PluginManifest> manifests)
+    {
+        var index = new Dictionary<string, List<PluginManifest>>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var manifest in manifests)
+        {
+            foreach (var replacement in manifest.Requires.Replaces)
+            {
+                if (!index.TryGetValue(replacement.Id, out var list))
+                {
+                    list = new List<PluginManifest>();
+                    index[replacement.Id] = list;
+                }
+
+                list.Add(manifest);
+            }
+        }
+
+        return index.ToDictionary(pair => pair.Key, pair => (IReadOnlyList<PluginManifest>)pair.Value, StringComparer.OrdinalIgnoreCase);
+    }
+
     private static PluginCompatibilityState DetermineState(IReadOnlyCollection<PluginCompatibilityDependencyStatus> issues)
     {
         if (issues.Any(issue => issue.Classification == PluginDependencyClassification.Hard && issue.State == PluginCompatibilityState.Blocked))
@@ -434,6 +826,10 @@ public sealed class PluginCompatibilityEvaluator
         var words = slug.Replace('-', ' ');
         return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(words);
     }
+
+    private sealed record CapabilityProvider(PluginManifest Manifest, PluginCapabilityDescriptor Descriptor);
+
+    private sealed record ProfileProvider(PluginManifest Manifest, PluginProfileDescriptor Descriptor);
 
     private static bool IsVersionSatisfied(string actualVersion, string requirement, out string? failureReason)
     {

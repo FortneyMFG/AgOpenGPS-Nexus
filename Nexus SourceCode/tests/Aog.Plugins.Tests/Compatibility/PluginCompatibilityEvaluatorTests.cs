@@ -187,17 +187,95 @@ public sealed class PluginCompatibilityEvaluatorTests
             .Should().Contain(issue => issue.Kind == PluginDependencyKind.Capability && issue.Identifier == "guidance.control");
     }
 
+    [Fact]
+    public void Evaluate_TreatsCapabilityProfilesAsEquivalency()
+    {
+        var provider = CreateManifest(
+            "vendor.mapping",
+            "Vendor Mapping",
+            "mapping:vector",
+            requiredApis: new Dictionary<string, string>
+            {
+                ["core.runtime"] = ">=1.0.0",
+                ["mapping.layers"] = ">=1.0.0",
+            },
+            requiredTransports: Array.Empty<string>(),
+            configure: manifest =>
+            {
+                manifest.Provides.Capabilities.Add(new PluginCapabilityDescriptor
+                {
+                    Id = "mapping:vector",
+                    Version = "1.3.2",
+                    Features = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["offlinePyramid"] = "2.1.3",
+                    }
+                });
+
+                manifest.Provides.Profiles.Add(new PluginProfileDescriptor
+                {
+                    Id = "aog.mapping.v1/core",
+                    Version = "1.3.2",
+                });
+
+                manifest.Requires.Replaces.Add(new PluginRelationshipRequirement
+                {
+                    Id = "org.agopengps.plugins.mapping",
+                    Range = "^1.2.0",
+                    Classification = PluginDependencyClassification.Hard,
+                });
+            });
+
+        var consumer = CreateManifest(
+            "org.agopengps.plugins.variable-mapping",
+            "Variable Mapping",
+            "variable.mapping",
+            requiredApis: new Dictionary<string, string>
+            {
+                ["core.runtime"] = ">=1.0.0",
+                ["plugins.mapping"] = "^1.2.0",
+            },
+            requiredTransports: Array.Empty<string>(),
+            configure: manifest =>
+            {
+                manifest.Requires.Capabilities.Add(new PluginCapabilityRequirement
+                {
+                    Id = "mapping:vector",
+                    Range = "^1.2.0",
+                    Features = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["offlinePyramid"] = "^2.1.0",
+                    },
+                });
+
+                manifest.Requires.Profiles.Add(new PluginProfileRequirement
+                {
+                    Id = "aog.mapping.v1/core",
+                    Range = "^1.2.0",
+                });
+            });
+
+        var report = _evaluator.Evaluate(new[] { provider, consumer }, _environment);
+
+        report.OverallState.Should().Be(PluginCompatibilityState.Healthy);
+
+        var consumerResult = report.Plugins.Single(result => result.PluginId == consumer.Id);
+        consumerResult.State.Should().Be(PluginCompatibilityState.Healthy);
+        consumerResult.Issues.Should().BeEmpty();
+    }
+
     private static PluginManifest CreateManifest(
         string id,
         string name,
         string capability,
         IDictionary<string, string> requiredApis,
         IEnumerable<string> requiredTransports,
-        PluginLeaseMode leaseMode = PluginLeaseMode.Exclusive)
+        PluginLeaseMode leaseMode = PluginLeaseMode.Exclusive,
+        Action<PluginManifest>? configure = null)
     {
         var capabilityList = new List<string> { capability };
 
-        return new PluginManifest
+        var manifest = new PluginManifest
         {
             SchemaVersion = "1.0.0",
             Id = id,
@@ -229,5 +307,8 @@ public sealed class PluginCompatibilityEvaluatorTests
             },
             Settings = new Dictionary<string, JsonElement>()
         };
+
+        configure?.Invoke(manifest);
+        return manifest;
     }
 }

@@ -29,4 +29,14 @@ public enum PluginDependencyKind
     /// Capability lease health (e.g. exclusive conflicts).
     /// </summary>
     Capability,
+
+    /// <summary>
+    /// Conformance profile requirements.
+    /// </summary>
+    Profile,
+
+    /// <summary>
+    /// Higher-order plugin relationships (peer, conflict, extends, replaces).
+    /// </summary>
+    Relationship,
 }

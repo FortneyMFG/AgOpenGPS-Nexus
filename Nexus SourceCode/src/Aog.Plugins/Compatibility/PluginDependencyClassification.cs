@@ -1,4 +1,4 @@
-namespace Aog.Plugins.Compatibility;
+namespace Aog.Plugins;
 
 /// <summary>
 /// Classification describing how strongly a dependency impacts compatibility.

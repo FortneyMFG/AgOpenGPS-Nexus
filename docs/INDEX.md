@@ -52,6 +52,8 @@
 
 - [CRS normalization matrix](reference/crs-normalization-matrix.md) — canonical storage,
   processing, and audit expectations per ADR-022.
+- [Official plugin bundle capability matrix](reference/official-bundle-capability-matrix.md) —
+  lease posture and capability coverage for ADR-031 governance.
 
 ## Contribution Guides
 

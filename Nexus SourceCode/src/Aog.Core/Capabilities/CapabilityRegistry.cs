@@ -23,6 +23,16 @@ public static class CapabilityRegistry
                 ["mode"] = "exclusive"
             }),
         new(
+            name: "guidance.telemetry",
+            category: CapabilityCategory.Guidance,
+            summary: "Publishes guidance status, engage state, and controller diagnostics for operator dashboards.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "guidance",
+                ["mode"] = "shared"
+            }),
+        new(
             name: "mapping:raster",
             category: CapabilityCategory.Mapping,
             summary: "Publishes raster coverage tiles, rate surfaces, and diagnostics.",
@@ -91,6 +101,206 @@ public static class CapabilityRegistry
             {
                 ["bundle"] = "zones",
                 ["role"] = "editor"
+            }),
+        new(
+            name: "sections.control",
+            category: CapabilityCategory.Sections,
+            summary: "Commands boom and row actuators using Core arbitration policies.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "sections",
+                ["mode"] = "exclusive"
+            }),
+        new(
+            name: "sections.telemetry",
+            category: CapabilityCategory.Sections,
+            summary: "Streams duty cycle, switch feedback, and diagnostics from section controllers.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "sections",
+                ["mode"] = "shared"
+            }),
+        new(
+            name: "fileio.import",
+            category: CapabilityCategory.DataOperations,
+            summary: "Handles import workflows for agronomic layers, jobs, and provenance manifests.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "file-io",
+                ["mode"] = "shared"
+            }),
+        new(
+            name: "fileio.export",
+            category: CapabilityCategory.DataOperations,
+            summary: "Exports agronomic layers, jobs, and provenance manifests in supported formats.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "file-io",
+                ["mode"] = "shared"
+            }),
+        new(
+            name: "replay.guidance",
+            category: CapabilityCategory.Replay,
+            summary: "Provides deterministic guidance command replay streams for analysis.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "replay",
+                ["mode"] = "shared"
+            }),
+        new(
+            name: "replay.pose",
+            category: CapabilityCategory.Replay,
+            summary: "Provides deterministic pose replay streams for overlay and validation.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "replay",
+                ["mode"] = "shared"
+            }),
+        new(
+            name: "devices.inventory",
+            category: CapabilityCategory.Devices,
+            summary: "Publishes discovered devices, hardware identifiers, and transport bindings.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "devices",
+                ["mode"] = "exclusive"
+            }),
+        new(
+            name: "devices.health",
+            category: CapabilityCategory.Devices,
+            summary: "Streams device health, fault states, and telemetry for operator dashboards.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "devices",
+                ["mode"] = "shared"
+            }),
+        new(
+            name: "devices.firmware",
+            category: CapabilityCategory.Devices,
+            summary: "Coordinates firmware update orchestration and eligibility checks for managed devices.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "devices",
+                ["mode"] = "exclusive"
+            }),
+        new(
+            name: "navigation.pose",
+            category: CapabilityCategory.Navigation,
+            summary: "Publishes fused pose estimates aligned with Core timing requirements.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "navigation",
+                ["stream"] = "pose"
+            }),
+        new(
+            name: "navigation.imu",
+            category: CapabilityCategory.Navigation,
+            summary: "Streams raw IMU telemetry for pose fusion and diagnostics.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "navigation",
+                ["stream"] = "imu"
+            }),
+        new(
+            name: "navigation.pose.quality",
+            category: CapabilityCategory.Navigation,
+            summary: "Publishes pose quality metrics and covariance estimates for downstream gating.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "navigation",
+                ["stream"] = "pose-quality"
+            }),
+        new(
+            name: "isobus.task-controller",
+            category: CapabilityCategory.Transports,
+            summary: "Bridges ISOBUS Task Controller (TC) workflows to Core capability consumers.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "isobus",
+                ["mode"] = "exclusive"
+            }),
+        new(
+            name: "isobus.universal-terminal",
+            category: CapabilityCategory.Transports,
+            summary: "Exposes ISOBUS Universal Terminal (UT) UI channels for compatible implements.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "isobus",
+                ["mode"] = "exclusive"
+            }),
+        new(
+            name: "bridge.udp-mirror",
+            category: CapabilityCategory.Transports,
+            summary: "Mirrors ISOBUS frames onto UDP for diagnostics and remote tooling integration.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "isobus",
+                ["mode"] = "shared"
+            }),
+        new(
+            name: "gnss.corrections",
+            category: CapabilityCategory.Navigation,
+            summary: "Streams RTCM or equivalent GNSS correction data to pose fusion providers.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "navigation",
+                ["channel"] = "rtcm"
+            }),
+        new(
+            name: "telemetry.corrections",
+            category: CapabilityCategory.Telemetry,
+            summary: "Publishes correction stream health metrics for operator visibility.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "telemetry",
+                ["mode"] = "shared"
+            }),
+        new(
+            name: "telemetry.logging",
+            category: CapabilityCategory.Telemetry,
+            summary: "Provides structured telemetry journaling for replay and diagnostics.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "telemetry",
+                ["mode"] = "shared"
+            }),
+        new(
+            name: "planter.monitor.telemetry",
+            category: CapabilityCategory.Agronomy,
+            summary: "Streams planter sensor telemetry for row-level monitoring.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "planter-monitor",
+                ["mode"] = "exclusive"
+            }),
+        new(
+            name: "planter.monitor.analytics",
+            category: CapabilityCategory.Agronomy,
+            summary: "Publishes planter analytics and derived agronomic metrics.",
+            defaultVersion: "1.0.0",
+            attributes: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["bundle"] = "planter-monitor",
+                ["mode"] = "shared"
             })
     };
 
@@ -141,6 +351,14 @@ public enum CapabilityCategory
     Guidance,
     Mapping,
     Zones,
+    Sections,
+    DataOperations,
+    Replay,
+    Devices,
+    Navigation,
+    Transports,
+    Telemetry,
+    Agronomy,
 }
 
 /// <summary>

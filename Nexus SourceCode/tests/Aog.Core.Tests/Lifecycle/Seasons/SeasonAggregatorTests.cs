@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Aog.Core.Lifecycle.Seasons;
 using FluentAssertions;
@@ -140,27 +141,219 @@ public sealed class SeasonSyncOrchestratorTests
         target.Removed.Should().ContainSingle().Which.Should().Be("season:2025");
     }
 
-    private sealed class FakeSeasonSyncTarget : ISeasonSyncTarget
+}
+
+public sealed class SeasonDiscoveryWatcherTests
+{
+    [Fact]
+    public async Task StartAsync_PublishesSnapshotsFromSources()
     {
-        public List<SeasonAggregate> Published { get; } = new();
-        public List<string> Removed { get; } = new();
+        var aggregator = new SeasonAggregator();
+        var target = new FakeSeasonSyncTarget();
+        var orchestrator = new SeasonSyncOrchestrator(aggregator, target, NullLogger<SeasonSyncOrchestrator>.Instance);
+        var source = new TestSeasonDiscoverySource("local");
+        await using var watcher = new SeasonDiscoveryWatcher(orchestrator, new[] { source }, NullLogger<SeasonDiscoveryWatcher>.Instance);
+
+        await watcher.StartAsync();
+        try
+        {
+            source.Publish(new[]
+            {
+                new SeasonDocument(
+                    "season:2026",
+                    "2026",
+                    new DateOnly(2026, 1, 1),
+                    new DateOnly(2026, 12, 31),
+                    new[] { "job:delta" },
+                    null,
+                    "user:test",
+                    DateTimeOffset.UtcNow,
+                    DateTimeOffset.UtcNow)
+            });
+
+            (await WaitForAsync(() => target.Published.Count == 1, TimeSpan.FromSeconds(1))).Should().BeTrue();
+        }
+        finally
+        {
+            await watcher.StopAsync();
+        }
+
+        target.Published.Should().ContainSingle(aggregate => aggregate.Document.SeasonId == "season:2026");
+    }
+
+    [Fact]
+    public async Task StartAsync_IgnoresNullSnapshots()
+    {
+        var aggregator = new SeasonAggregator();
+        var target = new FakeSeasonSyncTarget();
+        var orchestrator = new SeasonSyncOrchestrator(aggregator, target, NullLogger<SeasonSyncOrchestrator>.Instance);
+        var source = new TestSeasonDiscoverySource("local");
+        await using var watcher = new SeasonDiscoveryWatcher(orchestrator, new[] { source }, NullLogger<SeasonDiscoveryWatcher>.Instance);
+
+        await watcher.StartAsync();
+        try
+        {
+            source.Publish(null);
+            await Task.Delay(100);
+        }
+        finally
+        {
+            await watcher.StopAsync();
+        }
+
+        target.Published.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task StartAsync_ContinuesAfterPublishFailures()
+    {
+        var aggregator = new SeasonAggregator();
+        var target = new FlakySeasonSyncTarget(failuresBeforeSuccess: 1);
+        var orchestrator = new SeasonSyncOrchestrator(aggregator, target, NullLogger<SeasonSyncOrchestrator>.Instance);
+        var source = new TestSeasonDiscoverySource("local");
+        await using var watcher = new SeasonDiscoveryWatcher(orchestrator, new[] { source }, NullLogger<SeasonDiscoveryWatcher>.Instance);
+
+        await watcher.StartAsync();
+        try
+        {
+            var snapshot = new[]
+            {
+                new SeasonDocument(
+                    "season:2027",
+                    "2027",
+                    new DateOnly(2027, 1, 1),
+                    new DateOnly(2027, 12, 31),
+                    new[] { "job:epsilon" },
+                    null,
+                    "user:test",
+                    DateTimeOffset.UtcNow,
+                    DateTimeOffset.UtcNow)
+            };
+
+            source.Publish(snapshot);
+            source.Publish(snapshot);
+
+            (await WaitForAsync(() => target.SuccessfulPublishes == 1, TimeSpan.FromSeconds(1))).Should().BeTrue();
+        }
+        finally
+        {
+            await watcher.StopAsync();
+        }
+
+        target.Attempts.Should().BeGreaterThan(1);
+    }
+
+    [Fact]
+    public void Constructor_ThrowsForDuplicateProviders()
+    {
+        var aggregator = new SeasonAggregator();
+        var target = new FakeSeasonSyncTarget();
+        var orchestrator = new SeasonSyncOrchestrator(aggregator, target, NullLogger<SeasonSyncOrchestrator>.Instance);
+
+        var source = new TestSeasonDiscoverySource("dup");
+
+        Action act = () => new SeasonDiscoveryWatcher(orchestrator, new[] { source, source }, NullLogger<SeasonDiscoveryWatcher>.Instance);
+
+        act.Should().Throw<ArgumentException>();
+    }
+
+    private static async Task<bool> WaitForAsync(Func<bool> condition, TimeSpan timeout)
+    {
+        var deadline = DateTime.UtcNow + timeout;
+
+        while (DateTime.UtcNow <= deadline)
+        {
+            if (condition())
+            {
+                return true;
+            }
+
+            await Task.Delay(25);
+        }
+
+        return condition();
+    }
+
+    private sealed class TestSeasonDiscoverySource : ISeasonDiscoverySource
+    {
+        private readonly Channel<IReadOnlyList<SeasonDocument>?> _channel = Channel.CreateUnbounded<IReadOnlyList<SeasonDocument>?>(new UnboundedChannelOptions
+        {
+            SingleReader = true,
+            SingleWriter = false,
+            AllowSynchronousContinuations = false,
+        });
+
+        public TestSeasonDiscoverySource(string providerId)
+        {
+            ProviderId = providerId;
+        }
+
+        public string ProviderId { get; }
+
+        public IAsyncEnumerable<IReadOnlyList<SeasonDocument>?> WatchAsync(CancellationToken cancellationToken)
+        {
+            return _channel.Reader.ReadAllAsync(cancellationToken);
+        }
+
+        public void Publish(IReadOnlyList<SeasonDocument>? snapshot)
+        {
+            _channel.Writer.TryWrite(snapshot);
+        }
+    }
+
+    private sealed class FlakySeasonSyncTarget : ISeasonSyncTarget
+    {
+        private readonly int _failuresBeforeSuccess;
+
+        public FlakySeasonSyncTarget(int failuresBeforeSuccess)
+        {
+            _failuresBeforeSuccess = failuresBeforeSuccess;
+        }
+
+        public int Attempts { get; private set; }
+
+        public int SuccessfulPublishes { get; private set; }
 
         public Task PublishAsync(SeasonAggregate aggregate, CancellationToken cancellationToken)
         {
-            Published.Add(aggregate);
+            Attempts++;
+
+            if (Attempts <= _failuresBeforeSuccess)
+            {
+                throw new InvalidOperationException("Simulated publish failure.");
+            }
+
+            SuccessfulPublishes++;
             return Task.CompletedTask;
         }
 
         public Task RemoveAsync(string seasonId, CancellationToken cancellationToken)
         {
-            Removed.Add(seasonId);
             return Task.CompletedTask;
         }
+    }
+}
 
-        public void Clear()
-        {
-            Published.Clear();
-            Removed.Clear();
-        }
+internal sealed class FakeSeasonSyncTarget : ISeasonSyncTarget
+{
+    public List<SeasonAggregate> Published { get; } = new();
+    public List<string> Removed { get; } = new();
+
+    public Task PublishAsync(SeasonAggregate aggregate, CancellationToken cancellationToken)
+    {
+        Published.Add(aggregate);
+        return Task.CompletedTask;
+    }
+
+    public Task RemoveAsync(string seasonId, CancellationToken cancellationToken)
+    {
+        Removed.Add(seasonId);
+        return Task.CompletedTask;
+    }
+
+    public void Clear()
+    {
+        Published.Clear();
+        Removed.Clear();
     }
 }

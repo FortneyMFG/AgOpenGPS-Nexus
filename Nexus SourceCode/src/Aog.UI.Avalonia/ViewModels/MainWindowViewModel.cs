@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Aog.Core.Layers;
 using Aog.Core.Legacy;
 using Aog.Core.Replay;
 using Aog.Core.Simulation;
@@ -80,6 +81,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
         SectionsPanel = new SectionsPanelViewModel();
         PlanterPanel = new PlanterPanelViewModel();
         ReplayTimeline = new ReplayTimelineViewModel();
+
+        var layerEditJournal = new LayerEditEventJournalService(TimeProvider.System);
+        ZoneEditorToolbar = new ZoneEditorToolbarViewModel(layerEditJournal);
 
         _mapLayers = BuildSampleLayers();
         _guidanceTracks = BuildSampleGuidance();
@@ -166,6 +170,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets the guidance tracks rendered on the map.</summary>
     public IReadOnlyList<GuidanceTrack> GuidanceTracks => _guidanceTracks;
 
+    /// <summary>Gets the zone editor toolbar view-model powering map editing affordances.</summary>
+    public ZoneEditorToolbarViewModel ZoneEditorToolbar { get; }
     /// <summary>Gets the legend describing the active map layers.</summary>
     public LayerLegendViewModel LayerLegend { get; }
 

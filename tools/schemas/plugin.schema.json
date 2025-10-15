@@ -4,13 +4,13 @@
   "title": "Nexus plugin manifest",
   "type": "object",
   "required": [
-    "schemaVersion",
     "id",
-    "name",
-    "version",
     "minimumRuntimeVersion",
+    "name",
     "requiredApis",
-    "simProviders"
+    "schemaVersion",
+    "simProviders",
+    "version"
   ],
   "additionalProperties": false,
   "properties": {

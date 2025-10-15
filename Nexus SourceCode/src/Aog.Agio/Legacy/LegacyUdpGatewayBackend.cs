@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Aog.Core.Mesh;
 using Aog.Core.V1;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,12 +26,15 @@ public sealed class LegacyUdpGatewayBackend : IAgioBackend
         services.AddSingleton<LegacyPoseCodec>();
         services.AddSingleton<LegacyDiscoveryCodec>();
         services.AddSingleton<LegacySteerCodec>();
+        services.AddSingleton<ILiveTelemetryMeshService, LiveTelemetryMeshService>();
         services.AddSingleton<ILegacyUdpTransport, NullLegacyUdpTransport>();
         services.AddSingleton<ILegacyPoseObserver, NullLegacyPoseObserver>();
         services.AddSingleton<ILegacyDiscoveryObserver, NullLegacyDiscoveryObserver>();
         services.AddSingleton<ILegacySteerCommandObserver, NullLegacySteerCommandObserver>();
         services.AddSingleton<ILegacySteerStateObserver, NullLegacySteerStateObserver>();
         services.AddSingleton<ILegacySectionObserver, NullLegacySectionObserver>();
+        services.AddSingleton<LegacyMeshPresencePublisher>();
+        services.AddSingleton<ILegacyMeshPresencePublisher>(provider => provider.GetRequiredService<LegacyMeshPresencePublisher>());
         services.AddSingleton<LegacyUdpGateway>();
     }
 

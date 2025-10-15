@@ -39,6 +39,7 @@ public sealed class TeensyBridgeRegressionTests
             steerCommandObserver,
             steerStateObserver,
             sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
             timeProvider);
 
         foreach (var frame in frames)

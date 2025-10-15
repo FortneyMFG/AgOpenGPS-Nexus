@@ -1,5 +1,6 @@
 using Aog.Abstractions.Runtime;
 using Aog.Agio.AogLink;
+using Aog.Agio.Legacy;
 using Aog.Agio.Safety;
 using Aog.Agio.Timing;
 using Microsoft.Extensions.Configuration;
@@ -73,6 +74,12 @@ public static class Program
                 services
                     .AddOptions<AogLinkTransportOptions>()
                     .BindConfiguration("AgioHost:AogLink")
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
+                services
+                    .AddOptions<LegacyMeshOptions>()
+                    .BindConfiguration("AgioHost:LegacyMesh")
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 

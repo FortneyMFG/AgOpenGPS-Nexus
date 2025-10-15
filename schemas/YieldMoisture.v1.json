@@ -5,6 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "x-nexus-layerId": "yield.moisture",
+  "x-nexus-actual": true,
   "required": ["layerId", "jobId", "sessionId", "units", "createdBy", "createdAt"],
   "properties": {
     "layerId": {"type": "string", "pattern": "^layer:[A-Za-z0-9._:-]+$", "description": "Layer identifier", "x-nexus-scope": "core"},

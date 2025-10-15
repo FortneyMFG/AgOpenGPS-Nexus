@@ -9,6 +9,7 @@
     "name",
     "version",
     "requiredApis",
+    "minimumRuntimeVersion",
     "simProviders"
   ],
   "additionalProperties": false,

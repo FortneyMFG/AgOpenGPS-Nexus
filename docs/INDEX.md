@@ -54,6 +54,8 @@
   processing, and audit expectations per ADR-022.
 - [Official plugin bundle capability matrix](reference/official-bundle-capability-matrix.md) —
   lease posture and capability coverage for ADR-031 governance.
+- [Metadata-driven UI style guide](reference/metadata-driven-ui-style-guide.md) — layout and
+  theming guidance for ADR-034 dashboards, inspectors, and legends.
 
 ## Contribution Guides
 
@@ -65,6 +67,7 @@
 
 - [Runtime baseline enforcement](support/dotnet-runtime-baseline.md) — .NET 8 guardrails and review checklist.
 - [Avalonia run modes](howto/avalonia-run-modes.md) — CompanionRemote, LocalInProc, and LocalOutOfProc configuration.
+- [Companion metadata parity](howto/companion-metadata-parity.md) — snapshot contract powering ADR-034 remote clients.
 - [AOG-Link transport rollout](howto/aog-link-transport-rollout.md) — Ethernet, RS-485, and CAN staging guidance.
 - [Performance budget telemetry dashboards](howto/performance-budget-telemetry-dashboards.md) — ADR-026 dashboard provisioning and guardrails.
 - [Season/session migration playbook](howto/season-session-migration-playbook.md) — ADR-040/041 rollout playbook.

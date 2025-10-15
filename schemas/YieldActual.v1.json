@@ -48,7 +48,7 @@
           "type": "object",
           "description": "Yield layer metadata describing smoothing, calibration, and aggregation context.",
           "additionalProperties": false,
-          "required": ["grid", "smoothing", "calibration", "aggregation"],
+          "required": ["grid", "smoothing", "calibration", "aggregation", "statistics"],
           "x-nexus-scope": "plugin",
           "properties": {
             "grid": {

@@ -1,6 +1,7 @@
 using Aog.Abstractions.Runtime;
 using Aog.Agio.AogLink;
 using Aog.Agio.Legacy;
+using Aog.Agio.RadioBridge;
 using Aog.Agio.Safety;
 using Aog.Agio.Telemetry;
 using Aog.Agio.Timing;
@@ -80,6 +81,12 @@ public static class Program
                     .ValidateOnStart();
 
                 services
+                    .AddOptions<RadioBridgeElrsAdapterOptions>()
+                    .BindConfiguration("AgioHost:RadioBridge:Elrs")
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
+                services
                     .AddOptions<MeshTelemetryAggregatorOptions>()
                     .BindConfiguration("AgioHost:Mesh")
                     .AddOptions<LegacyMeshOptions>()
@@ -94,6 +101,8 @@ public static class Program
                 services.AddSingleton<LiveTelemetryMeshService>();
                 services.AddSingleton<ILiveTelemetryMeshService>(provider => provider.GetRequiredService<LiveTelemetryMeshService>());
                 services.AddSingleton<MeshTelemetryAggregator>();
+                services.AddSingleton<IRadioBridgeLinkFactory, RadioBridgeLinkFactory>();
+                services.AddSingleton<RadioBridgeElrsAdapter>();
 
                 if (OperatingSystem.IsLinux())
                 {
@@ -121,6 +130,7 @@ public static class Program
                 backend.ConfigureServices(services);
 
                 services.AddSingleton<ILegacyPoseObserver>(provider => provider.GetRequiredService<MeshTelemetryAggregator>());
+                services.AddHostedService(provider => provider.GetRequiredService<RadioBridgeElrsAdapter>());
 
                 services.AddSingleton(backend);
                 services.AddSingleton(new AgioBackendRegistration(

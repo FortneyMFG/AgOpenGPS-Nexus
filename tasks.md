@@ -179,8 +179,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-280 Guidance plugin regression suite _(Planned)_ — ADR-033 QA coverage
 - [ ] NX-281 Mapping plugin zone overlay updates _(Planned)_ — ADR-027 zones + ADR-029 mapping kernel
 - [ ] NX-282 Variable rate plugin zone gating _(Planned)_ — ADR-027 gating semantics
-- [ ] NX-283 Device Manager plugin capability surfacing _(Planned)_ — ADR-031 compatibility dashboard
-- [ ] NX-284 Plugin manifest compliance CI gate _(Planned)_ — ADR-031 manifest governance
+- [x] NX-283 Device Manager plugin capability surfacing _(Done)_ — ADR-031 compatibility dashboard
+- [x] NX-284 Plugin manifest compliance CI gate _(Done)_ — ADR-031 manifest governance
 - [ ] NX-285 Telemetry logging plugin season/session updates _(Planned)_ — ADR-040/041 lifecycle data
 - [ ] NX-286 Telemetry logging mesh event capture _(Planned)_ — ADR-047 live telemetry mesh
 - [ ] NX-287 Telemetry export updates for new layers _(Planned)_ — ADR-051 report builder + new layers
@@ -513,8 +513,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-280 | Guidance plugin regression suite | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 QA coverage |
 | NX-281 | Mapping plugin zone overlay updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-029](docs/ADR/ADR-029-mapping-plugin-architecture.md) | ADR-027 zones + ADR-029 mapping kernel |
 | NX-282 | Variable rate plugin zone gating | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating semantics |
-| NX-283 | Device Manager plugin capability surfacing | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 compatibility dashboard |
-| NX-284 | Plugin manifest compliance CI gate | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
+| NX-283 | Device Manager plugin capability surfacing | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 compatibility dashboard |
+| NX-284 | Plugin manifest compliance CI gate | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
 | NX-285 | Telemetry logging plugin season/session updates | Planned |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040/041 lifecycle data |
 | NX-286 | Telemetry logging mesh event capture | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 live telemetry mesh |
 | NX-287 | Telemetry export updates for new layers | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder + new layers |

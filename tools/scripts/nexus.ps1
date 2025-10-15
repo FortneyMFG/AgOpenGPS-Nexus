@@ -15,12 +15,15 @@ Usage: ./nexus.ps1 <command> [options]
 Commands:
   run <target> [-- <args>...]   Run a Nexus host (core, agio, ui) via dotnet run.
   sim [-- <args>...]            Launch the composite simulation host.
+  plugin <cmd> [options]        Plugin manifest tooling (lint, capabilities).
 
 Environment overrides:
   NEXUS_CORE_PROJECT  Relative path to the Core host .csproj.
   NEXUS_AGIO_PROJECT  Relative path to the AgIO host .csproj.
   NEXUS_UI_PROJECT    Relative path to the UI .csproj.
   NEXUS_SIM_PROJECT   Relative path to the simulation entry .csproj.
+  NEXUS_PLUGIN_TOOL_PROJECT
+                       Relative path to the plugin compliance tool .csproj.
   DOTNET              dotnet executable to invoke (default: dotnet).
 '@
 }
@@ -41,6 +44,7 @@ $defaults = @{
     # Override via NEXUS_SIM_PROJECT when that host exists.
     sim  = 'Nexus SourceCode/src/Aog.Core.Host/Aog.Core.Host.csproj'
 }
+$pluginToolDefault = 'Nexus SourceCode/tools/Aog.Tools.PluginCompliance/Aog.Tools.PluginCompliance.csproj'
 
 function Resolve-Project {
     param([string]$Target)
@@ -90,6 +94,24 @@ function Run-Target {
     exit $LASTEXITCODE
 }
 
+function Run-PluginTool {
+    param([string[]]$Args)
+    $dotnetCmd = Ensure-Dotnet
+    $projectRel = if ($env:NEXUS_PLUGIN_TOOL_PROJECT) { $env:NEXUS_PLUGIN_TOOL_PROJECT } else { $pluginToolDefault }
+    $projectPath = Join-Path $repoRoot $projectRel
+    if (-not (Test-Path -Path $projectPath -PathType Leaf)) {
+        throw "Expected plugin tool at $projectPath. Override via NEXUS_PLUGIN_TOOL_PROJECT."
+    }
+
+    if ($Args -and $Args.Count -gt 0) {
+        & $dotnetCmd run --project $projectPath -- @Args
+    } else {
+        & $dotnetCmd run --project $projectPath -- help
+    }
+
+    exit $LASTEXITCODE
+}
+
 switch ($Command.ToLowerInvariant()) {
     'run' {
         if (-not $Target) {
@@ -109,6 +131,9 @@ switch ($Command.ToLowerInvariant()) {
     }
     'sim' {
         Run-Target -Target 'sim' -Args $RemainingArgs
+    }
+    'plugin' {
+        Run-PluginTool -Args $RemainingArgs
     }
     'help' { Show-Usage }
     default {

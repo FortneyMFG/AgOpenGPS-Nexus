@@ -123,7 +123,8 @@ public static class ReportExportAuditor
             }
 
             var format = pair.Key["requestedOutput.".Length..];
-            if (!string.IsNullOrWhiteSpace(format))
+            if (!string.IsNullOrWhiteSpace(format) &&
+                string.Equals(pair.Value, "true", StringComparison.OrdinalIgnoreCase))
             {
                 set.Add(format);
             }

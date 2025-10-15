@@ -20,6 +20,7 @@ public sealed class SectionIoOrchestrator
     private readonly string _frame;
     private readonly object _gate = new();
     private uint? _lastMask;
+    private uint? _inFlightMask;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SectionIoOrchestrator"/> class.
@@ -74,28 +75,50 @@ public sealed class SectionIoOrchestrator
 
         lock (_gate)
         {
-            if (_lastMask.HasValue && _lastMask.Value == mask)
+            if ((_lastMask.HasValue && _lastMask.Value == mask) ||
+                (_inFlightMask.HasValue && _inFlightMask.Value == mask))
             {
                 return;
             }
 
-            _lastMask = mask;
+            _inFlightMask = mask;
         }
 
-        var timestamp = _timeProvider.GetUtcNow().UtcDateTime;
-        var message = new SectionMask
+        try
         {
-            Header = new Header
+            var timestamp = _timeProvider.GetUtcNow().UtcDateTime;
+            var message = new SectionMask
             {
-                Timestamp = Timestamp.FromDateTime(timestamp),
-                Source = _source,
-                Frame = _frame,
-            },
-            SectionCount = (uint)sections.Count,
-            Mask = mask,
-        };
+                Header = new Header
+                {
+                    Timestamp = Timestamp.FromDateTime(timestamp),
+                    Source = _source,
+                    Frame = _frame,
+                },
+                SectionCount = (uint)sections.Count,
+                Mask = mask,
+            };
 
-        await _eventBus.PublishAsync(message, cancellationToken).ConfigureAwait(false);
+            await _eventBus.PublishAsync(message, cancellationToken).ConfigureAwait(false);
+
+            lock (_gate)
+            {
+                _lastMask = mask;
+                _inFlightMask = null;
+            }
+        }
+        catch
+        {
+            lock (_gate)
+            {
+                if (_inFlightMask.HasValue && _inFlightMask.Value == mask)
+                {
+                    _inFlightMask = null;
+                }
+            }
+
+            throw;
+        }
     }
 
     /// <summary>
@@ -106,6 +129,7 @@ public sealed class SectionIoOrchestrator
         lock (_gate)
         {
             _lastMask = null;
+            _inFlightMask = null;
         }
     }
 }

@@ -23,6 +23,16 @@ profitability estimates. Lifecycle contracts are explicit: plugins subscribe to 
 `onSessionResume`, and `onSessionEnd` in addition to `onJobLoaded` and `onContextChanged` so they can checkpoint state without
 polling job storage.
 
+### Work order alignment
+
+TaskService derives executable work orders from job templates. When a work order launches, Core records the originating
+`workOrderId`, the assigned operator(s), and the preset/layout bundle resolved during orchestration inside the session metadata.
+Checklist events coming from companion clients append to `Session.notes[]` with `type: "checklist"` so proof-of-work logs and
+contractor billing exports can replay progress. Session lifecycle hooks surface the associated `workOrderId` and checklist
+completion state so plugins (e.g., Profit, Telemetry Logging) can stamp provenance and calculate labor utilization without
+scraping task queues. Cancelling or reassigning a work order emits `onSessionMetadataChange` updates with the new assignee and
+task state, keeping provenance synchronized across mobile and desktop surfaces.
+
 ### Session payload
 
 ```json

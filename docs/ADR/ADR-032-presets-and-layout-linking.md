@@ -21,6 +21,7 @@ Adopt a Preset model that binds Equipment, Implement, and Layout selections into
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - TaskService orchestration will be reused by future Work Order flows (NX-170). This ADR documents the dependency but leaves work order scope out-of-bounds for this pass.
+- Work Order intents authored through the TaskService inherit preset/layout bindings. When managers create a work order that references a job template, the PresetsService resolves the matching preset bundle, records its layout version hash, and exposes the dependency list to TaskService so crew assignments can validate implements before dispatch. Checklist progress coming back from mobile companions updates the same preset application record, keeping provenance aligned between preparation tasks and field execution.
 
 ## Degraded operation & messaging
 - **Missing dependencies:** When required dependencies (e.g., Sections or Mapping plugins) are absent or unhealthy, the Preset Switcher exposes a disabled state with inline reasons sourced from the dependency matrix (ADR-031). Operators can still review presets/layouts, but task orchestration is paused until dependencies recover. Background retries are surfaced as toast notifications rather than silent failures.

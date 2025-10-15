@@ -68,6 +68,15 @@ updates to plugins so spatial renderers, rate controllers, and analytics stay al
 - **Start New Session:** Accessible during an active job; prompts for optional name and notes before closing the current session.
 - **Session metadata panel:** Inline edits for env snapshot, inputs, notes, and layer references with autosave indicators.
 
+## Work orders & task orchestration
+
+- R-JOB-040 (MUST): Provide a TaskService-backed Work Order list that lets managers assign jobs with presets, implements, and planned inputs. Launching a work order must automatically open a session with the originating `workOrderId`, preset hash, and assignee captured in session metadata and provenance.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L17-L40】【F:docs/ADR/ADR-041_JobSessions.md†L33-L55】
+- R-JOB-041 (SHOULD): Mobile/companion clients shall surface per-work-order checklists, notes, and completion toggles that sync into `Session.notes[]` entries with actor/timestamp data for proof-of-work exports.【F:docs/ADR/ADR-041_JobSessions.md†L46-L55】
+- R-JOB-042 (MUST): Task state transitions (Assigned → In Progress → Completed/Cancelled) must emit lifecycle events so Profit, Telemetry Logging, and regulatory plugins can stamp provenance without polling queue state. Events include `workOrderId`, `jobId`, `sessionId`, `assignee`, and checklist completion percentage.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L32-L40】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L17-L34】
+- R-JOB-043 (SHOULD): TaskService must reconcile work order material reservations with the Inventory Ledger, reducing on-hand quantity when sessions report consumption and flagging discrepancies for manual review.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L15-L34】
+
+These requirements extend the session lifecycle so orchestration, crew scheduling, and audit logs align with field execution while preserving deterministic provenance across plugins.
+
 ## Open Questions
 
 - How should automatic session segmentation behave when equipment idles in-field for extended periods?

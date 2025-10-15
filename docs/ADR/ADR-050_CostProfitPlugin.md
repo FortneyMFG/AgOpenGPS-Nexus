@@ -16,19 +16,25 @@ reports.
 
 Deliver a Cost & Profit plugin that records cost transactions, links them to jobs/sessions/layers, and generates a
 `profit.net` layer stored as `ProfitLayer.v1`. Costs are stored via `CostRecord.v1` documents with categories, amounts, and
-provenance. The plugin consumes yield data and crop/genetics context to produce rollups.
+provenance. The plugin consumes yield data and crop/genetics context to produce rollups. An Inventory & Material Ledger sub-
+module maintains stock positions (seed, chemistry, fertilizer) per lot/batch. As sessions log application rates, the ledger
+deducts quantities, updates weighted cost bases, and feeds replenishment forecasts back into Profit analytics.
 
 ### Features
 
 - Cost entry table with categories (seed, chem, fuel, labor, misc) and support for bulk imports from CSV or API connectors.
 - Automatic ingestion of costs from genetics (seed usage), spraying jobs, and machine telemetry (fuel burn) when available.
+- Material ledger UI with barcode/QR scan support for lot intake, transfer, and reconciliation when field logs diverge from
+  expected usage.
 - Profit heatmap overlay using normalized yield vs. cost per area with color-coded bins and tooltips summarizing contributions.
 - Exports for CSV and PDF field/season summaries, including audit-ready breakdowns.
 
 ### Data Model
 
 - `CostRecord.v1` includes immutable ID, scope (`farmId`, `fieldId?`, `jobId?`, `sessionId?`), category, amount, currency,
-  quantity units, actor, timestamps, and optional links to layer IDs.
+  quantity units, actor, timestamps, optional links to layer IDs, and an optional `inventoryLotId` reference.
+- `InventoryLot.v1` tracks SKU, supplier, lot/batch identifiers, quantity on hand, committed quantity (scheduled work orders),
+  storage location, acquisition cost, and compliance attributes (e.g., restricted use, expiration).
 - `ProfitLayer.v1` extends `Layer.v1` metadata with per-cell profit, revenue, cost, and supporting references.
 - Aggregated results stored in `job.extensions["profit.summary"]` and `season.extensions["profit.rollups"]` for analytics and
   report builder.

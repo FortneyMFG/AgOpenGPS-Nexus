@@ -70,6 +70,10 @@ Multi-field job envelopes must provide continuous navigation across adjacent fie
 - **Profit:** `profit.net` overlays combine yield-derived revenue and cost inputs, referencing `CostRecord` transactions and source layers.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L21-L52】
 - **Risk:** `risk.flood`, `risk.compaction`, `risk.weeds`, `risk.other` annotate severity and observations, leveraging LayerEditService for edits.【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L21-L44】
 - **Weather:** `weather.overlay` visualizes rainfall, temperature, and wind vectors sourced from sensors/APIs and linked to session weather snapshots.【F:docs/ADR/ADR-053_WeatherPlugin.md†L21-L49】
+- **Soil:** `soil.ph`, `soil.om`, `soil.p`, `soil.k`, `soil.n`, `soil.zn`, `soil.ec`, `soil.cec` grids capture lab-imported attributes with sample depth, lot, and lab provenance for agronomic analytics and prescription derivations.【F:docs/plugins/SoilLab.md†L1-L120】
+- **Terrain:** `terrain.elevation`, `terrain.slope`, `terrain.aspect`, and `terrain.flowAccumulation` surfaces derive from LiDAR/RTK/DEM ingest to support drainage planning, erosion mitigation, and contour guidance workflows.【F:docs/plugins/Terrain3D.md†L1-L140】
+- **Drainage design:** `drain.tilePlan` and `drain.outlet` vector layers store planned tile paths, outlet locations, pipe sizes, and installation notes for export to contractors and integration with guidance paths.【F:docs/plugins/Terrain3D.md†L85-L140】
+- **Advisor recommendations:** `advisor.vrRecommendation.*` layers (e.g., population, nitrogen) store AI-derived prescription candidates with model metadata, confidence scores, and source history to keep decisions auditable and reproducible in replay fixtures.【F:docs/plugins/AgronomicAdvisor.md†L1-L170】
 
 Each layer definition includes unit metadata, provenance expectations, and accessibility requirements (color ramps, legends) maintained in plugin manifests and schema files under `/schemas`.
 

@@ -21,6 +21,9 @@ Detail how we observe system health, log events, and surface telemetry (packet r
 - R-TH-031 (SHOULD, radio diagnostics): Expose RadioBridge counters (RSSI, retry rate, FEC usage, encryption status) in UI dashboards and logs to diagnose ELRS/LoRa links.【F:docs/ADR/ADR-048_RadioBridge.md†L21-L56】
 - R-TH-032 (SHOULD, edit history telemetry): Forward `LayerEditEvent` summaries to telemetry feeds so collaborative edits appear in health dashboards and reports.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
 - R-TH-033 (SHOULD, weather logging health): Track weather auto-logging cadence, API import status, and sensor availability to alert operators when environmental data falls behind schedule.【F:docs/ADR/ADR-053_WeatherPlugin.md†L33-L49】
+- R-TH-034 (MUST, equipment maintenance): Aggregate engine hours, hydraulic cycles, fault codes, and alert history from telemetry logs into `EquipmentHealthRecord` documents that drive maintenance schedules and predictive alerts surfaced in Device Manager dashboards.【F:docs/plugins/EquipmentHealth.md†L1-L160】
+- R-TH-035 (SHOULD, maintenance workflow): Emit maintenance due/overdue events with recommended tasks, required parts, and linked work orders so TaskService can schedule service alongside field jobs.【F:docs/plugins/EquipmentHealth.md†L45-L160】【F:docs/SRS/sections/03_JobLifecycle.md†L86-L109】
+- R-TH-036 (SHOULD, automation safety): Provide rule evaluation telemetry (ruleId, trigger state, action result) for the Automation Engine so operators can audit why actions fired or were suppressed during sessions.【F:docs/plugins/AutomationEngine.md†L1-L150】
 
 ## Options
 - O-TH-0: Status quo — Manual monitors/logs with operator-driven analysis.

@@ -5,6 +5,10 @@
 Guidance plugins compute steering targets, lookahead paths, and visual overlays. They must honor multi-field envelopes, session
 context, and provenance expectations introduced by ADR-041 and ADR-043.
 
+## Manifest
+
+- [`autosteer` 1.0.0](manifests/autosteer/1.0.0.json) publishes the production AutoSteer bundle, declaring the fused-pose guidance capability, GNSS/IMU fusion requirements, and CAN/serial actuator transports described in the dependency map. The manifest is governed by ADR-031 and is mirrored under the automated compatibility baselines for regression tracking.
+
 ## Runtime Contracts
 
 - Subscribe to `onFarmLoaded`, `onJobLoaded`, and `onSessionStart` to prime lookahead models with farm assets, mounted field geometry, and session metadata. Core broadcasts the active context (`farmId`, `fieldIds[]`, `seasonId?`, `jobId`, `sessionId`) plus plugin `extensions` for overlays.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L40】

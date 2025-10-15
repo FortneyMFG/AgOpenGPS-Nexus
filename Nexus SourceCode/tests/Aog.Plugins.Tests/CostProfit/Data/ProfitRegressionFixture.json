@@ -1,0 +1,189 @@
+{
+  "scenarios": [
+    {
+      "name": "farm-field-session-usd-cad",
+      "options": {
+        "layerId": "profit-fixture-field-18",
+        "layerKind": "ProfitLayer.v1",
+        "units": "USD/ha",
+        "source": "plugin:cost-profit",
+        "transform": "profit/export/v1",
+        "actor": "plugin:cost-profit",
+        "createdBy": "plugin:cost-profit"
+      },
+      "filter": {
+        "farmId": "farm-fixture",
+        "fieldId": "field-18",
+        "jobId": "job-2025-spring",
+        "sessionId": "session-07"
+      },
+      "costRecords": [
+        {
+          "id": "cost-seed",
+          "category": "Seed",
+          "amount": 245.3,
+          "currency": "USD",
+          "timestamp": "2025-03-20T14:05:00Z",
+          "actor": "ops",
+          "scope": {
+            "farmId": "farm-fixture",
+            "fieldId": "field-18",
+            "jobId": "job-2025-spring",
+            "sessionId": "session-07"
+          }
+        },
+        {
+          "id": "cost-fuel",
+          "category": "Fuel",
+          "amount": 80.1,
+          "currency": "USD",
+          "timestamp": "2025-03-20T14:06:00Z",
+          "actor": "ops",
+          "scope": {
+            "farmId": "farm-fixture",
+            "fieldId": "field-18",
+            "jobId": "job-2025-spring",
+            "sessionId": "session-07"
+          }
+        },
+        {
+          "id": "cost-chemistry",
+          "category": "Chemistry",
+          "amount": 120.0,
+          "currency": "CAD",
+          "timestamp": "2025-03-20T14:07:00Z",
+          "actor": "ops",
+          "scope": {
+            "farmId": "farm-fixture",
+            "fieldId": "field-18",
+            "jobId": "job-2025-spring",
+            "sessionId": "session-07"
+          }
+        },
+        {
+          "id": "cost-other-field",
+          "category": "Seed",
+          "amount": 200.0,
+          "currency": "USD",
+          "timestamp": "2025-03-19T09:00:00Z",
+          "actor": "ops",
+          "scope": {
+            "farmId": "farm-fixture",
+            "fieldId": "field-99",
+            "jobId": "job-2025-spring",
+            "sessionId": "session-02"
+          }
+        }
+      ],
+      "revenue": [
+        {
+          "id": "rev-yield-primary",
+          "amount": 520.05,
+          "currency": "USD",
+          "timestamp": "2025-03-22T18:05:00Z",
+          "source": "yield-sync",
+          "actor": "yield",
+          "scope": {
+            "farmId": "farm-fixture",
+            "fieldId": "field-18",
+            "jobId": "job-2025-spring",
+            "sessionId": "session-07"
+          }
+        },
+        {
+          "id": "rev-yield-supplemental",
+          "amount": 400.1,
+          "currency": "USD",
+          "timestamp": "2025-03-22T18:15:00Z",
+          "source": "yield-sync",
+          "actor": "yield",
+          "scope": {
+            "farmId": "farm-fixture",
+            "fieldId": "field-18",
+            "jobId": "job-2025-spring",
+            "sessionId": "session-07"
+          }
+        },
+        {
+          "id": "rev-other-field",
+          "amount": 275.5,
+          "currency": "USD",
+          "timestamp": "2025-03-22T18:30:00Z",
+          "source": "yield-sync",
+          "actor": "yield",
+          "scope": {
+            "farmId": "farm-fixture",
+            "fieldId": "field-77",
+            "jobId": "job-2025-spring",
+            "sessionId": "session-99"
+          }
+        }
+      ],
+      "cells": [
+        {
+          "easting": 105.5,
+          "northing": 210.25,
+          "size": 5.0,
+          "revenue": 350.4,
+          "cost": 150.1
+        },
+        {
+          "easting": 100.0,
+          "northing": 205.0,
+          "size": 5.0,
+          "revenue": 300.25,
+          "cost": 120.15
+        },
+        {
+          "easting": 110.0,
+          "northing": 205.0,
+          "size": 5.0,
+          "revenue": 269.5,
+          "cost": 55.15
+        }
+      ],
+      "expected": {
+        "layer": {
+          "createdAt": "2025-03-23T09:45:00Z",
+          "hash": "1309C11CFFE87C0180785B51989076BEF5C430F907CF0CA5144067E9AC1D9F2A",
+          "cells": [
+            {
+              "easting": 100.0,
+              "northing": 205.0,
+              "profit": 180.1,
+              "size": 5.0
+            },
+            {
+              "easting": 110.0,
+              "northing": 205.0,
+              "profit": 214.35,
+              "size": 5.0
+            },
+            {
+              "easting": 105.5,
+              "northing": 210.25,
+              "profit": 200.3,
+              "size": 5.0
+            }
+          ]
+        },
+        "summaryRows": [
+          {
+            "currency": "CAD",
+            "revenue": 0.0,
+            "cost": 120.0,
+            "profit": -120.0,
+            "margin": 0.0
+          },
+          {
+            "currency": "USD",
+            "revenue": 920.15,
+            "cost": 325.4,
+            "profit": 594.75,
+            "margin": 0.6464
+          }
+        ]
+      }
+    }
+  ]
+}

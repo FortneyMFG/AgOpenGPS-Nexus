@@ -66,6 +66,10 @@ if (-not $binary) {
 $artifactBase = "AgOpenGPS.Nexus-$Runtime"
 $singleFilePath = Join-Path $OutputRoot 'AgOpenGPS.Nexus'
 Copy-Item -Path $binary.FullName -Destination $singleFilePath -Force
+if (-not (Test-Path -Path $singleFilePath -PathType Leaf)) {
+    throw "Expected single-file binary at $singleFilePath after packaging."
+}
+Write-Output "Packaged single-file binary: $singleFilePath"
 
 $stagingDir = Join-Path $OutputRoot 'staging'
 if (Test-Path $stagingDir) {

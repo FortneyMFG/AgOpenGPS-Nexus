@@ -77,6 +77,7 @@ jobs:
           path: |
             artifacts/linux/AgOpenGPS.Nexus
             artifacts/linux/AgOpenGPS.Nexus-linux-x64.zip
+          if-no-files-found: error
 
   publish:
     name: Publish GitHub release
@@ -96,11 +97,17 @@ jobs:
         run: |
           mkdir -p dist
           shopt -s nullglob globstar
+          found=0
           for file in release/artifacts/**/AgOpenGPS.Nexus*; do
             if [ -f "$file" ]; then
               cp "$file" dist/
+              found=1
             fi
           done
+          if [ "$found" -eq 0 ]; then
+            echo "No release assets found in downloaded artifacts" >&2
+            exit 1
+          fi
 
       - name: Publish release assets
         uses: softprops/action-gh-release@v1

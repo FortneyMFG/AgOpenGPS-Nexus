@@ -1,0 +1,26 @@
+[
+  {
+    "state": { "x": 0.0, "y": 1.2, "headingDeg": 0.0 },
+    "lookAhead": 6.0,
+    "wheelbase": 3.0,
+    "expectedSteeringRadians": -0.18998828791871572,
+    "expectedCurvature": -0.0641025641025641,
+    "expectedHeadingError": -0.19739555984988075
+  },
+  {
+    "state": { "x": 0.0, "y": -1.5, "headingDeg": 0.0 },
+    "lookAhead": 6.0,
+    "wheelbase": 3.0,
+    "expectedSteeringRadians": 0.23109066719589708,
+    "expectedCurvature": 0.0784313725490196,
+    "expectedHeadingError": 0.24497866312686414
+  },
+  {
+    "state": { "x": 1.5, "y": 0.5, "headingDeg": 8.0 },
+    "lookAhead": 6.0,
+    "wheelbase": 3.0,
+    "expectedSteeringRadians": -0.317140104563101,
+    "expectedCurvature": -0.10940614523815409,
+    "expectedHeadingError": -0.250283561333442
+  }
+]

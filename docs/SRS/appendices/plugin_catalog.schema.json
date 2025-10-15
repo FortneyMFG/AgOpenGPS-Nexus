@@ -71,7 +71,7 @@
             "minProperties": 1,
             "additionalProperties": {
               "type": "object",
-              "required": ["version", "download"],
+              "required": ["version", "download", "sha256"],
               "additionalProperties": false,
               "properties": {
                 "version": { "type": "string" },

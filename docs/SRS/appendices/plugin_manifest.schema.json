@@ -124,7 +124,18 @@
         "assetPattern": { "type": "string", "description": "Glob or regex matching release asset names." },
         "channel": { "type": "string", "enum": ["stable", "beta", "alpha", "pinned"] }
       },
-      "required": ["provider"]
+      "required": ["provider"],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "provider": { "const": "github" } },
+            "required": ["provider"]
+          },
+          "then": {
+            "required": ["repo", "assetPattern"]
+          }
+        }
+      ]
     },
     "dependencies": {
       "type": "array",

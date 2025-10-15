@@ -67,6 +67,48 @@
             }
           }
         },
+        "history": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Historical transitions and persisted toggle selections for this layer.",
+          "x-nexus-scope": "plugin",
+          "properties": {
+            "entries": {
+              "type": "array",
+              "items": {
+                "$ref": "https://agopengps.org/schemas/FieldHealthRiskLayer.v1.json#/$defs/historyEntry"
+              },
+              "description": "Chronological record of observation status and severity updates.",
+              "x-nexus-scope": "plugin"
+            },
+            "toggles": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Persisted UI toggle preferences controlling visibility of observation statuses.",
+              "x-nexus-scope": "plugin",
+              "properties": {
+                "showActive": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Display active risk observations.",
+                  "x-nexus-scope": "plugin"
+                },
+                "showMonitor": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Display observations in monitor state.",
+                  "x-nexus-scope": "plugin"
+                },
+                "showResolved": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Display resolved (historical) observations.",
+                  "x-nexus-scope": "plugin"
+                }
+              }
+            }
+          }
+        },
         "notes": {
           "type": "string",
           "description": "Layer-level notes summarising scouting context or follow-up actions.",
@@ -173,6 +215,34 @@
       "enum": ["none", "low", "moderate", "high", "critical"],
       "description": "Risk severity classification used for color ramps and analytics.",
       "x-nexus-scope": "plugin"
+    },
+    "historyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["featureId", "status", "severity", "changedAt"],
+      "properties": {
+        "featureId": {
+          "type": "string",
+          "pattern": "^feature:[A-Za-z0-9._:-]+$",
+          "description": "Identifier for the editable zone feature.",
+          "x-nexus-scope": "plugin"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "resolved", "monitor"],
+          "description": "Observation lifecycle status at the recorded timestamp.",
+          "x-nexus-scope": "plugin"
+        },
+        "severity": {
+          "$ref": "https://agopengps.org/schemas/FieldHealthRiskLayer.v1.json#/$defs/severity"
+        },
+        "changedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the status or severity change was recorded.",
+          "x-nexus-scope": "plugin"
+        }
+      }
     }
   }
 }

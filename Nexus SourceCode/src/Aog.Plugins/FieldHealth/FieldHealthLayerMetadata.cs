@@ -15,7 +15,8 @@ public sealed class FieldHealthLayerMetadata
         string? notes,
         IReadOnlyList<string> tags,
         IReadOnlyList<FieldHealthObservation> observations,
-        FieldHealthLayerStatistics statistics)
+        FieldHealthLayerStatistics statistics,
+        FieldHealthLayerHistory history)
     {
         Kind = kind ?? throw new ArgumentNullException(nameof(kind));
         SchemaRef = schemaRef;
@@ -23,6 +24,7 @@ public sealed class FieldHealthLayerMetadata
         Tags = tags?.ToArray() ?? throw new ArgumentNullException(nameof(tags));
         Observations = observations?.ToArray() ?? throw new ArgumentNullException(nameof(observations));
         Statistics = statistics ?? throw new ArgumentNullException(nameof(statistics));
+        History = history ?? throw new ArgumentNullException(nameof(history));
     }
 
     /// <summary>
@@ -54,4 +56,9 @@ public sealed class FieldHealthLayerMetadata
     /// Aggregated statistics derived from the observations.
     /// </summary>
     public FieldHealthLayerStatistics Statistics { get; }
+
+    /// <summary>
+    /// Historical transitions and persisted toggle state for this layer.
+    /// </summary>
+    public FieldHealthLayerHistory History { get; }
 }

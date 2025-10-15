@@ -17,6 +17,7 @@ public sealed class SourceRouter
     private readonly Queue<PendingPublication> _pendingPublications = new();
     private readonly object _gate = new();
     private bool _isPublishing;
+    private readonly AsyncLocal<bool> _isPublishingOnCurrentContext = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SourceRouter"/> class.
@@ -201,16 +202,30 @@ public sealed class SourceRouter
         }
 
         var completion = new TaskCompletionSource<TopicRoute?>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _pendingPublications.Enqueue(new PendingPublication(
+        var pending = new PendingPublication(
             new TopicRouteChanged(topic, previous, current),
             cancellationToken,
             completion,
-            current));
+            current);
+
+        _pendingPublications.Enqueue(pending);
 
         startPublisher = !_isPublishing;
         if (startPublisher)
         {
             _isPublishing = true;
+        }
+
+        if (_isPublishingOnCurrentContext.Value)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                completion.TrySetCanceled(cancellationToken);
+            }
+            else
+            {
+                completion.TrySetResult(current);
+            }
         }
 
         return new ValueTask<TopicRoute?>(completion.Task);
@@ -235,6 +250,8 @@ public sealed class SourceRouter
 
             try
             {
+                _isPublishingOnCurrentContext.Value = true;
+
                 await _eventBus.PublishAsync(pending.Change, pending.CancellationToken)
                     .ConfigureAwait(false);
                 pending.Completion.TrySetResult(pending.Result);
@@ -257,6 +274,10 @@ public sealed class SourceRouter
             catch (Exception ex)
             {
                 pending.Completion.TrySetException(ex);
+            }
+            finally
+            {
+                _isPublishingOnCurrentContext.Value = false;
             }
         }
     }

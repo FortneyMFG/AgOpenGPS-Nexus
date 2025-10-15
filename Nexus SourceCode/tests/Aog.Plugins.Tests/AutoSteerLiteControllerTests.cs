@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Aog.Core.Safety;
+using Aog.Core.V1;
 using Aog.Plugins.AutoSteer;
 using FluentAssertions;
 using Xunit;
@@ -146,6 +148,17 @@ public sealed class AutoSteerLiteControllerTests
     }
 
     [Fact]
+    public void ComputeSteeringAngle_ConstraintGateBlocksSteering()
+    {
+        var controller = new AutoSteerLiteController();
+        var path = CreateStraightPath(20, 2);
+        var state = new VehicleState(0, 1.0, headingRadians: 0.05, speedMetersPerSecond: 3, wheelbaseMeters: 2.8);
+        var gate = ConstraintGateSnapshot.FromZoneMask(new PoseZoneMask { InsideKeepOut = true }, DateTimeOffset.UtcNow);
+
+        var steering = controller.ComputeSteeringAngle(state, path, gate);
+
+        steering.Should().Be(0);
+        controller.LastLookAheadDistance.Should().Be(0);
     public void TuningState_HeadlandConstraintReducesLookAhead()
     {
         var profile = new AutoSteerLiteTuningProfile

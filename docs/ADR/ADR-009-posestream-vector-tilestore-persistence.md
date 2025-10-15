@@ -3,6 +3,10 @@
 ## Status
 In Review (target sign-off window: 2025-10-28 week)
 
+**Relevant Plugin(s):** Mapping, Variable Mapping, Telemetry Logging, Replay
+
+
+
 ## Context
 To support deterministic replay, analytics, and long-term storage, Nexus needs an authoritative persistence layer covering both PoseStream/SectionState vectors and aggregated tile data. Current prototypes store pose and coverage separately with inconsistent codecs, making crash recovery and transformation between formats unreliable. ADR-009 establishes shared persistence semantics so downstream ADRs (010, 012, 020) can rely on stable storage contracts.
 

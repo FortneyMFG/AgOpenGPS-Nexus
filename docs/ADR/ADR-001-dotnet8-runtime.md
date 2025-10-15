@@ -3,6 +3,9 @@
 ## Status
 Accepted
 
+**Relevant Plugin(s):** Full Stack
+
+
 ## Context
 Nexus needs a unified language and runtime that spans the Core guidance engine, AgIO backends, plugins, simulation, and the desktop UI. The System Slices outline pushes for dual-first Windows and Linux support with minimal divergence, while the stack option under review emphasises keeping hardware-specific code isolated behind AgIO backends.【F:docs/SRS/sections/01_OS_Support.md†L4-L55】【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L47】 Community sentiment already leans toward sharing contracts and tooling across Windows x64 and Linux ARM64 without abandoning existing operators.【F:docs/SRS/sections/01_OS_Support.md†L57-L63】
 

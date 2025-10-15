@@ -3,6 +3,9 @@
 ## Status
 Proposed
 
+**Relevant Plugin(s):** Mapping, Autosteer, Section Control, Rate Control, Variable Mapping, UI Shell
+
+
 ## Context
 Guidance, section control, and mapping teams need a shared way to represent field boundaries, headlands, keep-out areas, and work-disabled regions so automation respects legal and agronomic constraints. Today, plugins each interpret shapefiles or ad hoc polygons independently, which prevents Core from enforcing safety policies, leads to non-deterministic replays, and offers no way to coordinate guidance line trimming, section gating, or operator alerts. Upcoming guidance work ("Smarter AB") depends on headland-aware cost maps, auto-extend behavior at boundaries, and deterministic recovery when re-entering a field, while section control must hard-stop product in no-spray zones and log overrides for audits.
 

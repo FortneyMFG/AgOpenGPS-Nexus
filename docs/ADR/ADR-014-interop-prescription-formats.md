@@ -3,6 +3,9 @@
 ## Status
 Drafting (target review window: 2025-11-26 week)
 
+**Relevant Plugin(s):** Variable Mapping, Rate Control, Mapping, Planter Monitor, File IO, Job Tasks
+
+
 ## Context
 Nexus must import and export industry-standard agronomic formats—ISOXML TaskData, GeoTIFF/COG rasters, Shapefile/GeoPackage vectors, MBTiles tilesets—while honoring units, CRS, and attribute mapping. Current pipelines rely on bespoke scripts that lose metadata and introduce spatial error. ADR-014 defines canonical interop behavior aligned with ADR-010 layer registry metadata, ADR-022 CRS policy, and ADR-013 derivation outputs.
 

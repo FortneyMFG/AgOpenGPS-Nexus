@@ -3,6 +3,10 @@
 ## Status
 Proposed
 
+**Relevant Plugin(s):** Job Tasks, Mapping, Variable Mapping, UI Shell, Device Manager, Telemetry Logging
+
+
+
 ## Context
 AgOpenGPS v6 exposes field sessions as loosely-structured folders with ad-hoc menu flows for New, Resume, Open, Drive-In, and import verbs. Coverage tiles, boundaries, and guidance data live side-by-side, and Resume.txt is the only structured metadata. The Nexus Core host now orchestrates plugins, presets, and layouts, but has no first-class job lifecycle model, making it difficult to coordinate autosave, geofence discovery, or plugin participation. A unified Job abstraction is required so Core, UI, and plugins can exchange consistent metadata, load/save workflows, and resume behavior while remaining compatible with V6 job archives.
 

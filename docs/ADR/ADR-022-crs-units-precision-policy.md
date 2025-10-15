@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-12-20 week)
 
+**Relevant Plugin(s):** Mapping, Variable Mapping, Rate Control, Telemetry Logging, File IO
+
+
+
 ## Context
 Consistent coordinate reference systems (CRS), units, and numeric precision are foundational for fusion, interop, and analytics workflows. Without a project-wide policy, layers and PoseStreams risk accumulating distortion and rounding errors. ADR-022 codifies CRS defaults, precision tiers, and reprojection rules supporting ADR-010 layer registry, ADR-014 interop, and ADR-029 mapping kernel decisions.
 

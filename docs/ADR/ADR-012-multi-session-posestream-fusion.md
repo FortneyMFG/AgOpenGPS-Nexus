@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-11-19 week)
 
+**Relevant Plugin(s):** Mapping, Variable Mapping, Telemetry Logging, Job Tasks
+
+
+
 ## Context
 Operations often blend PoseStreams from multiple machines and seasons (e.g., planter plus sprayer passes) to produce prescriptions or QA analytics. Without a defined fusion policy, CRS reprojection, deduplication, and provenance handling remain ad-hoc and error-prone. ADR-012 formalizes merge rules that rely on ADR-009 persistence, ADR-010 layer registry metadata, and the forthcoming ADR-022 CRS policy so composite datasets remain deterministic.
 

@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-11-12 week)
 
+**Relevant Plugin(s):** Mapping, UI Shell (Avalonia/Web), Telemetry Logging
+
+
+
 ## Context
 Nexus must render PoseStream-derived ribbons, heatmaps, and telemetry overlays with deterministic performance across desktop and companion clients. Current UI code mixes basemap handling, interpolation rules, and attribution requirements across components, making caching and offline workflows fragile. ADR-011 consolidates mapping and imagery decisions so the UI owner can deliver consistent visualization while coordinating with ADR-029 mapping plugins, ADR-010 layer registry metadata, and ADR-034 dashboard refactors.
 

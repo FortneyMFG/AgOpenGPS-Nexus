@@ -3,6 +3,9 @@
 ## Status
 Drafting (target review window: 2025-11-21 week)
 
+**Relevant Plugin(s):** Autosteer, Guidance Planner, Mapping, Section Control, Device Manager, Variable Mapping
+
+
 ## Context
 The Nexus guidance stack must reconcile legacy planners (AB, curve, turn) and controllers (Stanley, pure pursuit) with PoseStream, zone gating, and plugin extensibility. Existing implementations rely on legacy assumptions that do not honor ADR-027 zone policies or ADR-032 layer metadata. ADR-033 defines the canonical lane model, lookahead scheduling, and constraint handling to align autosteer firmware, UI, and plugins.
 

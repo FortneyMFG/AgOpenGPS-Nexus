@@ -3,6 +3,9 @@
 ## Status
 Proposed
 
+**Relevant Plugin(s):** Full Stack
+
+
 ## Context
 The Nexus roadmap requires a plugin model that keeps Core minimal while letting automation, visualization, and hardware bridges evolve independently. Contributors need out-of-process plugins that register over gRPC, declare capabilities, expose UI contributions, and operate under explicit permissions so headless rigs remain deterministic.【F:docs/SRS/sections/03_Comm_Transports.md†L20-L28】【F:docs/SRS/sections/05_Frontends.md†L20-L23】【F:docs/SRS/sections/06_Hardware_IO.md†L23-L34】【F:docs/SRS/sections/09_Control_Automation.md†L16-L22】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L28】 Core today hosts transport, storage, and control logic tightly coupled with built-in UIs and AgIO; introducing hot-pluggable services without governance risks safety regressions, drift in contracts, and incompatible UI extensions.
 

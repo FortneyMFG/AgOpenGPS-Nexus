@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-12-09 week)
 
+**Relevant Plugin(s):** Job Tasks, Mapping, Variable Mapping, Telemetry Logging, UI Shell
+
+
+
 ## Context
 Nexus must relate jobs, sessions, PoseStreams, and derived artifacts so provenance (ADR-019) and lifecycle services (ADR-030) operate consistently. Legacy flows treat sessions as ad-hoc folders without stable identifiers, hindering provenance and automation. ADR-023 defines session lifecycle semantics, identifiers, and graph relationships tying together jobs, equipment snapshots, PoseStreams, and derived outputs.
 

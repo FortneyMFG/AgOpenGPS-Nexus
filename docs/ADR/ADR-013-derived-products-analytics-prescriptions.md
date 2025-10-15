@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-12-02 week)
 
+**Relevant Plugin(s):** Variable Mapping, Mapping, Rate Control, Telemetry Logging, Job Tasks
+
+
+
 ## Context
 Turning PoseStream-derived datasets (yield, soil, NDVI) into actionable prescriptions requires reproducible recipes, QA metrics, and deterministic exports. Current tooling mixes manual steps and custom scripts, making repeatability and auditability difficult. ADR-013 defines a governed derivation pipeline that builds on ADR-012 fusion outputs, ADR-010 layer metadata, and ADR-014 interop expectations.
 

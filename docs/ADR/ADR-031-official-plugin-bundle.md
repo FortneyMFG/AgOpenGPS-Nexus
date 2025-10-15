@@ -3,6 +3,9 @@
 ## Status
 Proposed
 
+**Relevant Plugin(s):** Mapping, Autosteer, Section Control, Rate Control, Variable Mapping, Device Manager, Telemetry Logging, UI Shell, Job Tasks
+
+
 ## Context
 The Nexus stack now distributes guidance, mapping, rate/section control, IO bridges, telemetry, and UI surfaces as discrete plugins. While ADR-018 defined the plugin API, teams lacked a canonical register of hard/soft dependencies, manifest expectations, and compatibility ranges. Operators could unknowingly load incompatible versions or omit supporting services, leading to runtime faults or degraded functionality across Core, AgIO, and the Avalonia/Web frontends. The newly published plugin dependency map documents cross-domain relationships, but the decision to make that register authoritative and enforceable has not yet been ratified.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L99-L161】
 

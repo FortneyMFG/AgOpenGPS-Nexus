@@ -3,6 +3,9 @@
 ## Status
 Drafting (target review window: 2025-12-16 week)
 
+**Relevant Plugin(s):** Simulation & Replay providers, Mapping, Autosteer, Section Control, Rate Control, Telemetry Logging
+
+
 ## Context
 Nexus relies on deterministic replays to validate PoseStream, TileStore, and control behaviors across platforms. Without explicit hashing schemes, fixtures, and CI gates, regressions can slip into production unnoticed. ADR-020 defines determinism guardrails building on ADR-007 PoseStream, ADR-009 persistence, and ADR-026 performance budgets.
 

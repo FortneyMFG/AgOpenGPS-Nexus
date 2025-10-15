@@ -3,6 +3,9 @@
 ## Status
 Accepted
 
+**Relevant Plugin(s):** AgIO Host Services, Device Manager, Autosteer, Section Control, Rate Control, Planter Monitor, ISOBUS Bridge
+
+
 ## Context
 Nexus needs a unified, typed, and lightweight transport for MCU communications that can operate over Ethernet, RS-485/serial, or CAN while coexisting with legacy PGN-based modules. The goal is to simplify firmware and host interfaces by standardizing on a single schema and message framing that’s portable across all MCU classes (ESP32, Teensy, STM32, etc.) and consistent with the protobuf contracts used in higher layers.【F:docs/SRS/sections/03_Comm_Transports.md†L60-L112】 Legacy UDP/PGN modules must remain functional, but new Nexus firmware will use a modern datagram approach leveraging the same protobuf definitions used in gRPC contracts, compiled via nanopb for embedded targets.
 

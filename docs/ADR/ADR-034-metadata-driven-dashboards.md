@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-11-28 week)
 
+**Relevant Plugin(s):** UI Shell (Dashboards), Mapping, Variable Mapping, Telemetry Logging, Device Manager
+
+
+
 ## Context
 UI overlays, dashboards, and inspectors need to consume layer metadata without hard-coded IDs so Nexus can adapt to new layers and plugins. Current implementations tightly couple widgets to specific datasets, impeding reuse across desktop and companion clients. ADR-034 describes the metadata-driven UI model that leverages ADR-010 layer registry and ADR-032 layer controllers to deliver declarative visualization.
 

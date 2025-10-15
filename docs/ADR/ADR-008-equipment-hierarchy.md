@@ -3,6 +3,9 @@
 ## Status
 Drafting (target review window: 2025-10-31 week)
 
+**Relevant Plugin(s):** Mapping, Autosteer, Section Control, Rate Control, Variable Mapping, Planter Monitor
+
+
 ## Context
 Legacy AOG configurations model implements as flat lists of sections with limited grouping semantics. Nexus must handle multiple toolbars per implement, overlapping SectionGroups, and richer metadata to coordinate lookahead, overlap policies, and future kinematic links. A shared hierarchy ensures PoseStream, control arbitration, and UI editors reason about the same structure while providing placeholders for ADR-017 profile integration.
 

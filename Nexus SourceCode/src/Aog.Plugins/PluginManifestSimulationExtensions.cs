@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Aog.Core.Simulation;
 
 namespace Aog.Plugins;
@@ -35,6 +36,8 @@ public static class PluginManifestSimulationExtensions
         }
 
         var registrations = new List<PluginSimProviderRegistration>(manifest.SimulationProviders.Count);
+        var manifestIds = new HashSet<string>(StringComparer.Ordinal);
+        var catalogIds = new HashSet<string>(catalog.Providers.Select(provider => provider.ProviderId), StringComparer.Ordinal);
 
         foreach (var provider in manifest.SimulationProviders)
         {
@@ -44,8 +47,24 @@ public static class PluginManifestSimulationExtensions
             }
 
             var registration = new PluginSimProviderRegistration(manifest.Id, provider);
-            catalog.Register(registration.Descriptor);
+            if (!manifestIds.Add(registration.ProviderId))
+            {
+                throw new InvalidOperationException(
+                    $"Plugin '{manifest.Id}' declares duplicate simulation provider '{registration.ProviderId}'.");
+            }
+
+            if (!catalogIds.Add(registration.ProviderId))
+            {
+                throw new InvalidOperationException(
+                    $"Simulation provider '{registration.ProviderId}' from plugin '{manifest.Id}' conflicts with an existing provider.");
+            }
+
             registrations.Add(registration);
+        }
+
+        foreach (var registration in registrations)
+        {
+            catalog.Register(registration.Descriptor);
         }
 
         return registrations;

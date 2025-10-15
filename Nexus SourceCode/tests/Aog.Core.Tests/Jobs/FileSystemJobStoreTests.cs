@@ -78,6 +78,32 @@ public sealed class FileSystemJobStoreTests : IDisposable
     }
 
     [Fact]
+    public async Task ResumeJob_DeactivatesPreviouslyActiveJob()
+    {
+        using var store = CreateStore();
+        await store.EnsureInitializedAsync(CancellationToken.None);
+
+        var first = await store.CreateAsync(new JobCreationRequest("Alpha Field"), CancellationToken.None);
+        await store.CloseActiveAsync(CancellationToken.None);
+
+        _timeProvider.Advance(TimeSpan.FromMinutes(5));
+        var second = await store.CreateAsync(new JobCreationRequest("Bravo Field"), CancellationToken.None);
+
+        _timeProvider.Advance(TimeSpan.FromMinutes(10));
+        var resumed = await store.ResumeAsync(first.Id, CancellationToken.None);
+
+        Assert.Equal(first.Id, resumed.Id);
+        Assert.Equal(JobLifecycleState.Active, resumed.State);
+
+        var jobs = await store.ListAsync(CancellationToken.None);
+        var previous = Assert.Single(jobs.Where(job => job.Id == second.Id));
+        Assert.Equal(JobLifecycleState.Inactive, previous.State);
+        var previousSession = Assert.Single(previous.Sessions);
+        Assert.Equal(JobSessionState.Paused, previousSession.State);
+        Assert.Equal(_timeProvider.GetUtcNow(), previousSession.EndedAt);
+    }
+
+    [Fact]
     public async Task ListAsync_ReturnsJobsOrderedByUpdatedAt()
     {
         using var store = CreateStore();

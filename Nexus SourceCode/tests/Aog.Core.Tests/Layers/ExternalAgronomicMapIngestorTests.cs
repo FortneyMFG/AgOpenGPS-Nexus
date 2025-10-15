@@ -155,9 +155,18 @@ public sealed class ExternalAgronomicMapIngestorTests
         var builder = new StringBuilder();
         builder.Append(layerId);
         builder.Append('|');
-        foreach (var cell in cells.OrderBy(c => c.Position.Easting).ThenBy(c => c.Position.Northing))
+        foreach (var cell in cells
+            .OrderBy(c => c.Position.Easting)
+            .ThenBy(c => c.Position.Northing)
+            .ThenBy(c => c.CellSizeMeters))
         {
-            builder.AppendFormat(CultureInfo.InvariantCulture, "{0:F3},{1:F3},{2:G17};", cell.Position.Easting, cell.Position.Northing, cell.Value);
+            builder.AppendFormat(
+                CultureInfo.InvariantCulture,
+                "{0:F3},{1:F3},{2:G17},{3:G17};",
+                cell.Position.Easting,
+                cell.Position.Northing,
+                cell.CellSizeMeters,
+                cell.Value);
         }
 
         var bytes = Encoding.UTF8.GetBytes(builder.ToString());

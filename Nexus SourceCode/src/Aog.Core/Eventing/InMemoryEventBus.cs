@@ -35,7 +35,15 @@ public sealed class InMemoryEventBus : IEventBus
                 _subscriptions[subscription.EventType] = subscribers;
             }
 
+            // Keep the dictionary entry protected while adding the subscription so that
+            // concurrent disposals cannot remove the `Subscribers` instance before the
+            // handler has been linked to it.
             subscribers.Add(subscription);
+
+            if (!_subscriptions.TryGetValue(subscription.EventType, out var current) || !ReferenceEquals(current, subscribers))
+            {
+                _subscriptions[subscription.EventType] = subscribers;
+            }
         }
 
         return new SubscriptionHandle(this, subscription);

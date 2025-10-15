@@ -26,8 +26,9 @@ public sealed class LegacyFieldImporter
         var fullPath = Path.GetFullPath(fieldDirectory);
         var tracks = LoadTracks(fullPath);
         var boundaries = LoadBoundaries(fullPath);
+        var backgroundImagery = LoadBackgroundImagery(fullPath);
 
-        return new LegacyFieldData(tracks, boundaries);
+        return new LegacyFieldData(tracks, boundaries, backgroundImagery);
     }
 
     private static IReadOnlyList<GuidanceTrackDefinition> LoadTracks(string directory)
@@ -158,6 +159,65 @@ public sealed class LegacyFieldImporter
 
         AttachHeadlands(directory, boundaries);
         return boundaries;
+    }
+
+    private static LegacyBackgroundImagery? LoadBackgroundImagery(string directory)
+    {
+        var metadataPath = Path.Combine(directory, "BackPic.txt");
+        if (!File.Exists(metadataPath))
+        {
+            return null;
+        }
+
+        using var reader = new StreamReader(metadataPath);
+        _ = reader.ReadLine(); // Skip optional header.
+
+        var flagLine = reader.ReadLine();
+        if (flagLine is null)
+        {
+            return null;
+        }
+
+        if (!bool.TryParse(flagLine.Trim(), out var hasImagery))
+        {
+            throw new InvalidDataException("BackPic.txt missing imagery flag.");
+        }
+
+        if (!hasImagery)
+        {
+            return null;
+        }
+
+        double ReadBoundedValue(string description)
+        {
+            var line = reader.ReadLine();
+            if (line is null)
+            {
+                throw new InvalidDataException($"Unexpected EOF reading {description}.");
+            }
+
+            return double.Parse(line.Trim(), CultureInfo.InvariantCulture);
+        }
+
+        var maxEasting = ReadBoundedValue("maximum easting");
+        var minEasting = ReadBoundedValue("minimum easting");
+        var maxNorthing = ReadBoundedValue("maximum northing");
+        var minNorthing = ReadBoundedValue("minimum northing");
+
+        var imagePath = Path.Combine(directory, "BackPic.png");
+        if (!File.Exists(imagePath))
+        {
+            return null;
+        }
+
+        var imageBytes = File.ReadAllBytes(imagePath);
+        if (imageBytes.Length == 0)
+        {
+            return null;
+        }
+
+        var boundingBox = new LegacyGeoBoundingBox(minNorthing, maxNorthing, minEasting, maxEasting);
+        return new LegacyBackgroundImagery(boundingBox, imageBytes);
     }
 
     private static void AttachHeadlands(string directory, List<FieldBoundary> boundaries)

@@ -42,7 +42,7 @@ The Nexus importer currently focuses on a subset of the V6 assets:
 | --- | --- | --- |
 | AB/curve tracks | ✅ Imported via `LegacyFieldImporter` and surfaced on `LegacyFieldData.Tracks`.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L33-L90】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L21-L29】 |
 | Boundaries & headlands | ✅ Imported via `LegacyFieldImporter`/`LegacyFieldData.Boundaries` and already referenced by UI importers.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L92-L200】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L21-L29】 |
-| Background imagery | ❌ Not represented in `LegacyFieldData`; no Nexus service persists `BackPic` artefacts yet.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
+| Background imagery | ✅ Imported via `LegacyFieldImporter` and surfaced on `LegacyFieldData.BackgroundImagery`, including bounding boxes and PNG payloads from `BackPic` artefacts.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L24-L153】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L128】 |
 | Field overview metadata | ❌ No importer output for `Field.txt`, so creator/origin data is unavailable for Nexus workflows.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
 | Flags & annotations | ❌ Flag collections are not parsed today; UI lacks legacy scouting markers until readers are added.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |
 | Contour coverage strips | ❌ Contour files are not consumed, preventing resuming legacy contour control runs.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L29】 |

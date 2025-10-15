@@ -54,18 +54,18 @@ public sealed class WindowsLocationPosePublisher : IAsyncDisposable
             throw new InvalidOperationException("Publisher has already been started.");
         }
 
-        _geolocator.PositionChanged += HandlePositionChanged;
         try
         {
             var initial = await _geolocator.GetGeopositionAsync(cancellationToken).ConfigureAwait(false);
             await PublishAsync(initial, cancellationToken).ConfigureAwait(false);
-            _started = true;
         }
         catch
         {
-            _geolocator.PositionChanged -= HandlePositionChanged;
             throw;
         }
+
+        _started = true;
+        _geolocator.PositionChanged += HandlePositionChanged;
     }
 
     /// <inheritdoc />
@@ -83,6 +83,11 @@ public sealed class WindowsLocationPosePublisher : IAsyncDisposable
 
     private void HandlePositionChanged(object? sender, WinRtPositionChangedEventArgs args)
     {
+        if (!_started)
+        {
+            return;
+        }
+
         // Fire-and-forget while ensuring exceptions propagate to the thread pool.
         var publish = PublishAsync(args.Position, CancellationToken.None);
         if (!publish.IsCompletedSuccessfully)

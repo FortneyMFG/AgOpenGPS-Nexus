@@ -130,14 +130,14 @@ public sealed class ArmingStateMachine
     {
         lock (_gate)
         {
-            if (_state != ArmingState.Armed)
-            {
-                return OutputGateResult.Blocked("System is disarmed.");
-            }
-
             if (!_profileValid)
             {
                 return OutputGateResult.Blocked("Guidance profile is not valid.");
+            }
+
+            if (_state != ArmingState.Armed)
+            {
+                return OutputGateResult.Blocked("System is disarmed.");
             }
 
             return OutputGateResult.Allowed();

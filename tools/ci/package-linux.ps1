@@ -4,7 +4,8 @@ param(
     [string]$Configuration = 'Release',
     [string]$Runtime = 'linux-x64',
     [string]$Project = 'Nexus SourceCode/src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj',
-    [string]$OutputRoot
+    [string]$OutputRoot,
+    [string]$ArtifactName = 'AgOpenGPS.Nexus'
 )
 
 Set-StrictMode -Version Latest
@@ -63,8 +64,12 @@ if (-not $binary) {
     throw "No binary produced in $publishDir."
 }
 
-$artifactBase = "AgOpenGPS.Nexus-$Runtime"
-$singleFileName = "AgOpenGPS.Nexus$($binary.Extension)"
+$artifactBase = "$ArtifactName-$Runtime"
+$singleFileName = if ([string]::IsNullOrEmpty($binary.Extension)) {
+    $ArtifactName
+} else {
+    "$ArtifactName$($binary.Extension)"
+}
 $singleFilePath = Join-Path $OutputRoot $singleFileName
 Copy-Item -Path $binary.FullName -Destination $singleFilePath -Force
 
@@ -74,25 +79,25 @@ if (Test-Path $stagingDir) {
 }
 New-Item -ItemType Directory -Path $stagingDir | Out-Null
 
-Copy-Item -Path $singleFilePath -Destination (Join-Path $stagingDir 'AgOpenGPS.Nexus') -Force
+Copy-Item -Path $singleFilePath -Destination (Join-Path $stagingDir $ArtifactName) -Force
 Copy-Item -Path (Join-Path $repoRoot 'LICENSE') -Destination (Join-Path $stagingDir 'LICENSE.txt') -Force
 
-$readmeText = @'
-AgOpenGPS Nexus Linux package
-=============================
+$readmeText = @"
+$ArtifactName Linux package
+===========================
 
 Contents:
-- AgOpenGPS.Nexus (self-contained single-file publish)
+- $ArtifactName (self-contained single-file publish)
 - LICENSE.txt
 - README.txt (this file)
 
 Usage:
 1. Extract the archive.
-2. Run `chmod +x AgOpenGPS.Nexus` if the executable bit is not preserved.
-3. Launch the app with `./AgOpenGPS.Nexus`.
+2. Run `chmod +x $ArtifactName` if the executable bit is not preserved.
+3. Launch the app with `./$ArtifactName`.
 
 The package targets the specified runtime identifier (RID). Use `dotnet publish` with a different `-Runtime` value if you need another platform.
-'@
+"@
 Set-Content -Path (Join-Path $stagingDir 'README.txt') -Value $readmeText -Encoding UTF8
 
 $zipPath = Join-Path $OutputRoot "$artifactBase.zip"

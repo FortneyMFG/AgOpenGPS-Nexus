@@ -44,7 +44,7 @@ public sealed class CapabilitiesHandshakeTests
     }
 
     [Fact]
-    public async Task AgioServiceUsesHostDescriptorsWhenMetadataDiffers()
+    public async Task AgioServiceRejectsCapabilityWhenMetadataDiffers()
     {
         var request = new HandshakeRequest
         {
@@ -73,11 +73,11 @@ public sealed class CapabilitiesHandshakeTests
         var service = new AgioCapabilitiesService("agio-host", agioCapabilities);
         var response = await service.Handshake(request, CreateContext());
 
-        var accepted = Assert.Single(response.AcceptedCapabilities);
-        Assert.Equal("nav.pose", accepted.Name);
-        Assert.Equal("1.2.3", accepted.Version);
-        Assert.Equal("Latest pose stream", accepted.Summary);
-        Assert.Empty(response.Rejections);
+        Assert.Empty(response.AcceptedCapabilities);
+
+        var rejection = Assert.Single(response.Rejections);
+        Assert.Equal("nav.pose", rejection.Capability.Name);
+        Assert.Equal("Capability metadata mismatch between request and AGiO host.", rejection.Reason);
     }
 
     [Fact]

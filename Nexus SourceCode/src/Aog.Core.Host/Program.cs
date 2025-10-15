@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Aog.Core.Capabilities;
 using Aog.Core.Host.Capabilities;
+using Aog.Core.Jobs;
 using Aog.Protos.Capabilities.V1;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,6 +81,19 @@ public static class Program
                         "CoreHost:Capabilities:SessionPrefix is required.")
                     .ValidateOnStart();
 
+                // Jobs service options
+                services
+                    .AddOptions<JobsServiceOptions>()
+                    .BindConfiguration("CoreHost:Jobs")
+                    .ValidateDataAnnotations()
+                    .Validate(static options => !string.IsNullOrWhiteSpace(options.RootDirectory),
+                        "CoreHost:Jobs:RootDirectory is required.")
+                    .Validate(static options => !string.IsNullOrWhiteSpace(options.ActiveStateFileName),
+                        "CoreHost:Jobs:ActiveStateFileName is required.")
+                    .Validate(static options => !string.IsNullOrWhiteSpace(options.DefaultSessionName),
+                        "CoreHost:Jobs:DefaultSessionName is required.")
+                    .ValidateOnStart();
+
                 // Capability descriptor factory (defaults + attributes)
                 services.AddSingleton(provider =>
                 {
@@ -125,5 +139,8 @@ public static class Program
                 // Hosted services
                 services.AddHostedService<CoreHealthService>();
                 services.AddHostedService<CapabilitiesHandshakeService>();
+                services.AddSingleton<IJobStore, FileSystemJobStore>();
+                services.AddSingleton<IJobLifecycleOrchestrator, JobLifecycleOrchestrator>();
+                services.AddHostedService<JobsHostedService>();
             });
 }

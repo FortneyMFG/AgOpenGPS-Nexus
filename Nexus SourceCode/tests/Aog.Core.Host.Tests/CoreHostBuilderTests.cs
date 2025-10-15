@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Aog.Core.Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -96,5 +97,20 @@ public sealed class CoreHostBuilderTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var exception = await Assert.ThrowsAsync<OptionsValidationException>(() => host.StartAsync(cts.Token));
         Assert.Contains("CoreHost:Capabilities:NodeId", exception.Message);
+    }
+
+    [Fact]
+    public void JobsService_Is_Registered()
+    {
+        using var host = Program.CreateHostBuilder(Array.Empty<string>()).Build();
+
+        var jobStore = host.Services.GetRequiredService<IJobStore>();
+        Assert.IsType<FileSystemJobStore>(jobStore);
+
+        var orchestrator = host.Services.GetRequiredService<IJobLifecycleOrchestrator>();
+        Assert.IsType<JobLifecycleOrchestrator>(orchestrator);
+
+        var hostedServices = host.Services.GetRequiredService<IEnumerable<IHostedService>>();
+        Assert.Contains(hostedServices, service => service is JobsHostedService);
     }
 }

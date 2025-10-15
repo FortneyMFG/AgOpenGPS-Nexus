@@ -69,7 +69,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-218 Controller quality & diagnostic feeds _(Planned)_ — ADR-032 diagnostics surfacing
 - [ ] NX-219 TileStore writer updates for controller outputs _(Planned)_ — ADR-032 TileStore integration
 - [ ] NX-220 Deterministic replay fixtures for controllers _(Planned)_ — ADR-032 replay harness
-- [ ] NX-221 JobsService host & lifecycle orchestration _(Planned)_ — ADR-030 job sessions service
+- [x] NX-221 JobsService host & lifecycle orchestration _(In Review)_ — ADR-030 job sessions service
 - [ ] NX-222 Session autosave & journaling pipeline _(Planned)_ — ADR-041 job sessions
 - [ ] NX-223 Season aggregator & sync orchestration _(Planned)_ — ADR-040 season organizers
 - [ ] NX-224 Multi-field envelope aggregation pipeline _(Planned)_ — ADR-043 multi-field jobs
@@ -398,7 +398,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-218 | Controller quality & diagnostic feeds | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 diagnostics surfacing |
 | NX-219 | TileStore writer updates for controller outputs | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 TileStore integration |
 | NX-220 | Deterministic replay fixtures for controllers | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 replay harness |
-| NX-221 | JobsService host & lifecycle orchestration | Planned |  | — | [ADR-030](docs/ADR/ADR-030-field-job-sessions.md) | ADR-030 job sessions service |
+| NX-221 | JobsService host & lifecycle orchestration | In Review |  | — | [ADR-030](docs/ADR/ADR-030-field-job-sessions.md) | ADR-030 job sessions service |
 | NX-222 | Session autosave & journaling pipeline | Planned |  | — | [ADR-041](docs/ADR/ADR-041_JobSessions.md) | ADR-041 job sessions |
 | NX-223 | Season aggregator & sync orchestration | Planned |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040 season organizers |
 | NX-224 | Multi-field envelope aggregation pipeline | Planned |  | — | [ADR-043](docs/ADR/ADR-043_MultiFieldJobEnvelopes.md) | ADR-043 multi-field jobs |

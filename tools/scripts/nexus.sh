@@ -70,7 +70,7 @@ run_target() {
   project_path="$(require_project "${target}")"
   local dotnet_cmd="${DOTNET:-dotnet}"
   if [[ $# -gt 0 ]]; then
-    "${dotnet_cmd}" run --project "${project_path}" -- "$@"
+    "${dotnet_cmd}" run --project "${project_path}" "$@"
   else
     "${dotnet_cmd}" run --project "${project_path}"
   fi

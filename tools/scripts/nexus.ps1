@@ -81,7 +81,7 @@ function Run-Target {
     $dotnetCmd = Ensure-Dotnet
     $projectPath = Require-Project -Target $Target
     if ($Args -and $Args.Count -gt 0) {
-        & $dotnetCmd run --project $projectPath -- @Args
+        & $dotnetCmd run --project $projectPath @Args
     } else {
         & $dotnetCmd run --project $projectPath
     }

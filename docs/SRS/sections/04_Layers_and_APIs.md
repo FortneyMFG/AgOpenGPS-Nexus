@@ -73,6 +73,18 @@ Coverage tiles, section state, and derived metrics are part of the TileStore per
 | `genetics.plan` | Planned hybrid/variety strips. | product ID | Drafting (ADR-046) |
 | `genetics.variety` | Actual hybrid/variety planted. | product ID | Drafting (ADR-046) |
 
+`cropType.planned` payloads store the crop name, target season (`year`), and fixed
+`status="planned"` flag alongside optional variety notes and the authoring source so
+Field history can trace provenance.【F:schemas/CropTypePlanned.v1.json†L8-L58】
+`cropType.actual` requires the planted crop, `year`, `status="actual"`, and an explicit
+`source` (manual, sensor, import, barcode) plus optional variety metadata for rotation and
+analytics workflows.【F:schemas/CropTypeActual.v1.json†L8-L74】
+`cropType.history` aggregates append-only records with links back to the originating job
+and session plus the evidencing layer ID, keeping seasonal history immutable for audits
+and replay.【F:schemas/CropTypeHistory.v1.json†L8-L58】 Field documents mirror these entries
+through `CropTypeHistoryRecord.v1`, which now includes optional `jobId`/`sessionId`
+references so reports and analytics can navigate directly to the source job bundle.【F:schemas/CropTypeHistoryRecord.v1.json†L1-L53】
+
 Crop and genetics layers are owned by dedicated plugins in ADR-045 and ADR-046, sharing context via sessions and job extensions.【F:docs/ADR/ADR-045_CropTypePlugin.md†L1-L52】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L1-L52】
 
 ### Yield & Harvest

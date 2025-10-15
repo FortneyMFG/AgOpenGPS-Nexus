@@ -19,7 +19,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["year", "status", "crop"],
+        "required": ["year", "status", "crop", "source"],
         "properties": {
           "year": {
             "type": "integer",
@@ -35,13 +35,24 @@
             "type": "string",
             "description": "Crop name"
           },
+          "jobId": {
+            "type": ["string", "null"],
+            "pattern": "^job:[A-Za-z0-9._:-]+$",
+            "description": "Originating job identifier"
+          },
+          "sessionId": {
+            "type": ["string", "null"],
+            "pattern": "^session:[A-Za-z0-9._:-]+$",
+            "description": "Originating session identifier"
+          },
           "layerId": {
             "type": ["string", "null"],
             "pattern": "^layer:[A-Za-z0-9._:-]+$",
             "description": "Linked layer providing evidence"
           },
           "source": {
-            "type": ["string", "null"],
+            "type": "string",
+            "minLength": 1,
             "description": "Origin of the record"
           },
           "recordedAt": {

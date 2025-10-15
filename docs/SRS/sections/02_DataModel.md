@@ -96,9 +96,8 @@ domain-specific facts through `extensions` bags that Core stores verbatim.
 
 ### CropTypeHistoryRecord.v1 (new)
 - **Identity:** Embedded within `Field.cropTypeHistory[]`.
-- **Core attributes:** `year`, `crop`, `status` (`planned`, `actual`, `historical`), `source`, `layerId`, `recordedAt`,
-  authoring metadata.
-- **Relationships:** References layers produced by the Crop Type plugin; informs job/session crop context broadcasts.
+- **Core attributes:** `year`, `crop`, `status` (`planned`, `actual`, `historical`), `source`, `layerId`, `recordedAt`, optional `jobId`/`sessionId`, authoring metadata.【F:schemas/CropTypeHistoryRecord.v1.json†L1-L53】
+- **Relationships:** References layers produced by the Crop Type plugin; optional job/session references let analytics and reporting link directly to the originating work context while informing crop context broadcasts.【F:schemas/CropTypeHistory.v1.json†L20-L55】
 - **Schema:** `schemas/CropTypeHistoryRecord.v1.json` defines validation and plugin ownership flags.
 
 ### GeneticsPlan.v1 & GeneticsVariety.v1 (new)

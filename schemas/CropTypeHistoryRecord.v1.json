@@ -36,6 +36,18 @@
       "description": "Reference layer representing the crop geometry.",
       "x-nexus-scope": "plugin"
     },
+    "jobId": {
+      "type": ["string", "null"],
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Job associated with the crop record.",
+      "x-nexus-scope": "plugin"
+    },
+    "sessionId": {
+      "type": ["string", "null"],
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Session associated with the crop record.",
+      "x-nexus-scope": "plugin"
+    },
     "recordedAt": {
       "type": "string",
       "format": "date-time",

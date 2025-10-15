@@ -6,7 +6,18 @@
   "additionalProperties": false,
   "x-nexus-layerId": "cropType.actual",
   "x-nexus-planned": false,
-  "required": ["layerId", "jobId", "sessionId", "crop", "recordedAt", "createdBy", "createdAt"],
+  "required": [
+    "layerId",
+    "jobId",
+    "sessionId",
+    "crop",
+    "year",
+    "status",
+    "source",
+    "recordedAt",
+    "createdBy",
+    "createdAt"
+  ],
   "properties": {
     "layerId": {
       "type": "string",
@@ -37,14 +48,28 @@
       "description": "Crop name or identifier",
       "x-nexus-scope": "plugin"
     },
+    "year": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 2100,
+      "description": "Calendar year when the crop was planted",
+      "x-nexus-scope": "plugin"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["actual"],
+      "description": "Lifecycle classification for the crop record",
+      "x-nexus-scope": "plugin"
+    },
     "variety": {
       "type": ["string", "null"],
       "description": "Actual variety or hybrid",
       "x-nexus-scope": "plugin"
     },
     "source": {
-      "type": ["string", "null"],
-      "description": "Source of the record (manual, import, barcode)",
+      "type": "string",
+      "minLength": 1,
+      "description": "Source of the record (manual, sensor, import, barcode)",
       "x-nexus-scope": "plugin"
     },
     "notes": {

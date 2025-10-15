@@ -6,7 +6,16 @@
   "additionalProperties": false,
   "x-nexus-layerId": "cropType.planned",
   "x-nexus-planned": true,
-  "required": ["layerId", "jobId", "crop", "plannedAt", "createdBy", "createdAt"],
+  "required": [
+    "layerId",
+    "jobId",
+    "crop",
+    "year",
+    "status",
+    "plannedAt",
+    "createdBy",
+    "createdAt"
+  ],
   "properties": {
     "layerId": {
       "type": "string",
@@ -31,9 +40,27 @@
       "description": "Crop name or identifier",
       "x-nexus-scope": "plugin"
     },
+    "year": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 2100,
+      "description": "Calendar year the crop plan applies to",
+      "x-nexus-scope": "plugin"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned"],
+      "description": "Lifecycle classification for the crop record",
+      "x-nexus-scope": "plugin"
+    },
     "variety": {
       "type": ["string", "null"],
       "description": "Optional variety or hybrid",
+      "x-nexus-scope": "plugin"
+    },
+    "source": {
+      "type": ["string", "null"],
+      "description": "Origin of the crop plan (manual, import, integration)",
       "x-nexus-scope": "plugin"
     },
     "plannedAreaHa": {

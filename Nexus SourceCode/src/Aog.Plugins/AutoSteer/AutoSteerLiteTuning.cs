@@ -249,25 +249,17 @@ public sealed class AutoSteerLiteTuningState
         var constrainedLookAhead = ApplyConstraintModifiers(rawLookAhead, constraintContext);
 
         var lookAheadFilter = Math.Clamp(_profile.LookAheadFilterGain, 0, 1);
-        if (double.IsNaN(_filteredLookAhead))
+        var constraintActive = constraintContext is { } ctx &&
+            (ctx.HasBlockingConstraint || ctx.InsideHeadland || ctx.DistanceToConstraintMeters is not null);
+
+        if (double.IsNaN(_filteredLookAhead) || constraintActive)
         {
             _filteredLookAhead = constrainedLookAhead;
         }
         else
         {
             _filteredLookAhead = lookAheadFilter * _filteredLookAhead + (1 - lookAheadFilter) * constrainedLookAhead;
-
-            if (constraintContext is not null)
-            {
-                _filteredLookAhead = Math.Clamp(
-                    _filteredLookAhead,
-                    _profile.MinimumLookAheadMeters,
-                    constrainedLookAhead);
-            }
-            else
-            {
-                _filteredLookAhead = Math.Max(_filteredLookAhead, _profile.MinimumLookAheadMeters);
-            }
+            _filteredLookAhead = Math.Max(_filteredLookAhead, _profile.MinimumLookAheadMeters);
         }
 
         return _filteredLookAhead;

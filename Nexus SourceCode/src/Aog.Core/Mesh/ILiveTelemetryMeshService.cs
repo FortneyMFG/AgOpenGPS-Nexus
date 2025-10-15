@@ -43,4 +43,9 @@ public interface ILiveTelemetryMeshService
     /// <param name="seasonId">Optional season filter.</param>
     /// <param name="jobId">Optional job filter.</param>
     IReadOnlyList<MeshPresenceSnapshot> ListPresence(string? seasonId = null, string? jobId = null);
+
+    /// <summary>
+    /// Creates an immutable snapshot of mesh diagnostics and counters.
+    /// </summary>
+    MeshDiagnosticsSnapshot GetDiagnostics();
 }

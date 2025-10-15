@@ -104,8 +104,9 @@ public sealed class SimulationCatalogTests
 
         var action = () => catalog.BuildGraph();
 
-        action.Should().Throw<InvalidOperationException>()
-            .WithMessage("*sim.vehicle*")
-            .And.Which.Message.Should().Contain("time");
+        var exception = action.Should().Throw<InvalidOperationException>().Which;
+
+        exception.Message.Should().Contain("sim.vehicle");
+        exception.Message.Should().Contain("time");
     }
 }

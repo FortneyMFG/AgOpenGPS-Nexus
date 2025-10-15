@@ -71,6 +71,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         SeasonNavigator = SeasonNavigatorViewModel.CreateSample();
         CropQuickSelect = CropQuickSelectViewModel.CreateSample();
         PresetSwitcher = PresetSwitcherViewModel.CreateSample();
+        LayoutDiff = LayoutDiffViewModel.CreateSample();
 
         // Load simulation configuration + summary and create the bar VM.
         var configuration = TryLoadSimulationConfiguration(out var summary);
@@ -95,6 +96,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
         LayerInspector = BuildSampleInspector(_mapLayers);
         MeshSharePanel = MeshSharePanelViewModel.CreateSample();
         FieldHealthSeverity = FieldHealthSeverityPanelViewModel.CreateSample();
+        ProfitAnalytics = ProfitAnalyticsViewModel.CreateSample();
+        RadioProvisioningPanel = RadioProvisioningPanelViewModel.CreateSample();
+        RadioProvisioning = RadioProvisioningFlowViewModel.CreateSample();
 
         ApplySamplePluginState();
         SeedDashboards();
@@ -158,6 +162,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets the preset switcher view-model that surfaces orchestration status.</summary>
     public PresetSwitcherViewModel PresetSwitcher { get; }
 
+    /// <summary>Gets the layout diff view-model surfaced for linked layouts.</summary>
+    public LayoutDiffViewModel LayoutDiff { get; }
+
     /// <summary>Gets the available UI themes.</summary>
     public IReadOnlyList<UiTheme> AvailableThemes { get; }
 
@@ -200,10 +207,17 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets the panel surfacing field health severity guidance.</summary>
     public FieldHealthSeverityPanelViewModel FieldHealthSeverity { get; }
 
+    /// <summary>Gets the profitability analytics view-model powering the profit card.</summary>
+    public ProfitAnalyticsViewModel ProfitAnalytics { get; }
+
     /// <summary>Gets the compatibility dashboard view-model consumed by the Device Manager card.</summary>
     public DeviceManagerCompatibilityViewModel DeviceManagerCompatibility { get; }
     /// <summary>Gets the mesh share/subscribe panel view-model.</summary>
     public MeshSharePanelViewModel MeshSharePanel { get; }
+    /// <summary>Gets the radio provisioning panel view-model.</summary>
+    public RadioProvisioningPanelViewModel RadioProvisioningPanel { get; }
+    /// <summary>Gets the RadioBridge provisioning workflow view-model.</summary>
+    public RadioProvisioningFlowViewModel RadioProvisioning { get; }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.
@@ -373,6 +387,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         var actualCells = new List<MapLayerCell>();
         var plannedCells = new List<MapLayerCell>();
+        var profitCells = new List<MapLayerCell>();
 
         for (var x = -3; x <= 3; x++)
         {
@@ -381,9 +396,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 var center = new Point(10 + x * spacing, 10 + y * spacing);
                 var actualCoverage = Math.Clamp(0.15 + (y + 2) * 0.18 + Math.Sin(x * 0.7) * 0.05, 0, 1);
                 var plannedCoverage = Math.Clamp(0.3 + (y + 1) * 0.14 + Math.Cos(x * 0.5) * 0.07, 0, 1);
+                var profitValue = ((Math.Sin(x * 0.8) * 120) + (Math.Cos((y + 1) * 0.55) * 95)) + ((y - 1) * 42) - 65;
 
                 actualCells.Add(new MapLayerCell(center, size, actualCoverage));
                 plannedCells.Add(new MapLayerCell(center, size, plannedCoverage));
+                profitCells.Add(new MapLayerCell(center, size, profitValue));
             }
         }
 
@@ -404,10 +421,19 @@ public class MainWindowViewModel : INotifyPropertyChanged
             isPlanned: true,
             outlineColor: Color.FromArgb(120, 24, 34, 84));
 
+        var profitStyle = new LayerVisualizationStyle(
+            Color.FromArgb(230, 178, 62, 94),
+            Color.FromArgb(230, 16, 110, 85),
+            -180,
+            420,
+            units: "USD/ha",
+            outlineColor: Color.FromArgb(140, 33, 46, 51));
+
         return new List<MapLayer>
         {
             new("layer:coverage.actual", "Actual coverage", actualStyle, actualCells),
             new("layer:coverage.planned", "Planned rate", plannedStyle, plannedCells),
+            new("layer:profit.net", "Profit per hectare", profitStyle, profitCells),
         };
     }
 

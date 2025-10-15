@@ -187,19 +187,28 @@ public sealed class CropLayerIngestionPipeline
 
     private void ApplyComposite(LayerEditEventEntry entry, LayerEditEventOperation operation)
     {
+        var compositeFeature = BuildFeature(entry, operation);
+
         foreach (var sourceId in operation.SourceFeatureIds)
         {
             _features.Remove(sourceId);
         }
 
-        ApplyCreate(entry, operation);
+        _features[operation.FeatureId] = compositeFeature;
     }
 
     private void ApplyCreate(LayerEditEventEntry entry, LayerEditEventOperation operation)
     {
+        var feature = BuildFeature(entry, operation);
+
+        _features[operation.FeatureId] = feature;
+    }
+
+    private CropZoneFeature BuildFeature(LayerEditEventEntry entry, LayerEditEventOperation operation)
+    {
         if (string.IsNullOrWhiteSpace(operation.FeatureId))
         {
-            throw new InvalidOperationException("Create operations must include a feature identifier.");
+            throw new InvalidOperationException("Operations must include a feature identifier.");
         }
 
         if (_features.ContainsKey(operation.FeatureId))
@@ -211,7 +220,7 @@ public sealed class CropLayerIngestionPipeline
         var attributes = ExtractAttributes(operation.AttributesAfterNode, null, requireAll: true);
         var area = ComputeArea(operation.Summary, null);
 
-        var feature = new CropZoneFeature(
+        return new CropZoneFeature(
             operation.FeatureId,
             attributes.Crop,
             attributes.Year,
@@ -223,8 +232,6 @@ public sealed class CropLayerIngestionPipeline
             attributes.Notes,
             entry.CreatedAt,
             entry.Actor);
-
-        _features[operation.FeatureId] = feature;
     }
 
     private void ApplyUpdate(LayerEditEventEntry entry, LayerEditEventOperation operation)

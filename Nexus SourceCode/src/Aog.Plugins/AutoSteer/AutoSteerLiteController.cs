@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Aog.Core.Safety;
 
 namespace Aog.Plugins.AutoSteer;
 
@@ -43,12 +44,21 @@ public sealed class AutoSteerLiteController
         }
     }
 
-    public double ComputeSteeringAngle(VehicleState state, IReadOnlyList<PathPoint> path)
+    public double ComputeSteeringAngle(
+        VehicleState state,
+        IReadOnlyList<PathPoint> path,
+        ConstraintGateSnapshot? constraintGate = null)
     {
         ArgumentNullException.ThrowIfNull(path);
         if (path.Count < 2)
         {
             throw new InvalidOperationException("AutoSteer requires at least two path points.");
+        }
+
+        if (constraintGate is not null && !constraintGate.AutosteerAllowed)
+        {
+            LastLookAheadDistance = 0;
+            return 0;
         }
 
         var distanceTravelled = UpdateTravelledDistance(state);

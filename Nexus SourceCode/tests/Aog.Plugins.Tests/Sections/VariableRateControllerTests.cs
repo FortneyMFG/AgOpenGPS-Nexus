@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Aog.Core.Layers;
 using Aog.Core.Paths;
+using Aog.Core.Safety;
+using Aog.Core.V1;
 using Aog.Plugins.Sections;
 using FluentAssertions;
 using Xunit;
@@ -125,5 +127,37 @@ public sealed class VariableRateControllerTests
 
         var rates = controller.ComputeRates(placements, layer);
         rates.Should().ContainSingle().Which.Should().Be(110);
+    }
+
+    [Fact]
+    public void ComputeRates_ConstraintGateZerosOutputs()
+    {
+        var placements = new List<SectionPlacement>
+        {
+            new(new PlanarPoint(0, 0)),
+            new(new PlanarPoint(10, 0)),
+        };
+
+        var cells = new List<AgronomicLayerCell>
+        {
+            new(new PlanarPoint(0, 0), 12, 100),
+            new(new PlanarPoint(10, 0), 12, 110),
+        };
+
+        var layer = new AgronomicLayerDocument(
+            "layer:rate",
+            "rate",
+            "L/ha",
+            DateTimeOffset.UtcNow,
+            "user",
+            cells,
+            new LayerProvenance("import", "none", "hash", DateTimeOffset.UtcNow, "user"));
+
+        var controller = new VariableRateController(2, 50, 150, 90);
+        var gate = ConstraintGateSnapshot.FromZoneMask(new PoseZoneMask { InsideKeepOut = true }, DateTimeOffset.UtcNow);
+
+        var rates = controller.ComputeRates(placements, layer, gate);
+
+        rates.Should().OnlyContain(rate => Math.Abs(rate) < 1e-6);
     }
 }

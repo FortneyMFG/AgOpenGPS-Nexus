@@ -57,6 +57,17 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
+    public void LayoutDiff_SurfacesSampleChanges()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.LayoutDiff.Should().NotBeNull();
+        viewModel.LayoutDiff.HasChanges.Should().BeTrue();
+        viewModel.LayoutDiff.Changes.Should().HaveCountGreaterThan(0);
+        viewModel.LayoutDiff.HasLinkedPreset.Should().BeTrue();
+    }
+
+    [Fact]
     public void MapOverlays_ExposeCoverageAndGuidance()
     {
         var viewModel = CreateViewModel();
@@ -165,6 +176,21 @@ public sealed class MainWindowViewModelTests
         {
             device.DisplayName.Should().NotBeNullOrWhiteSpace();
             device.DeviceId.Should().NotBeNullOrWhiteSpace();
+        });
+    }
+
+    [Fact]
+    public void RadioProvisioningPanel_SurfacesProvisioningState()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.RadioProvisioningPanel.Should().NotBeNull();
+        viewModel.RadioProvisioningPanel.Devices.Should().NotBeEmpty();
+        viewModel.RadioProvisioningPanel.Profiles.Should().NotBeEmpty();
+        viewModel.RadioProvisioningPanel.AuditTrail.Should().NotBeEmpty();
+        viewModel.RadioProvisioningPanel.Devices.Should().AllSatisfy(device =>
+        {
+            device.Steps.Should().NotBeEmpty();
         });
     }
 

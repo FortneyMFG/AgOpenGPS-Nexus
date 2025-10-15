@@ -132,6 +132,7 @@ public abstract class RadioBridgeAdapterBase<TOptions> : IHostedService, IDispos
 
         _link = _linkFactory.Create(_options);
         _link.LinkMetricsChanged += OnLinkMetricsChanged;
+        OnLinkMetricsChanged(_link.CurrentMetrics);
 
         _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 

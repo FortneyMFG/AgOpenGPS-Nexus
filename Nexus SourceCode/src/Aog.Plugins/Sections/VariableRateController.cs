@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Aog.Core.Layers;
 using Aog.Core.Paths;
+using Aog.Core.Safety;
 
 namespace Aog.Plugins.Sections;
 
@@ -57,7 +58,10 @@ public sealed class VariableRateController
     /// </summary>
     /// <param name="sections">Section placements in planar coordinates.</param>
     /// <param name="layer">Agronomic layer containing target rates.</param>
-    public IReadOnlyList<double> ComputeRates(IReadOnlyList<SectionPlacement> sections, AgronomicLayerDocument layer)
+    public IReadOnlyList<double> ComputeRates(
+        IReadOnlyList<SectionPlacement> sections,
+        AgronomicLayerDocument layer,
+        ConstraintGateSnapshot? constraintGate = null)
     {
         if (sections is null)
         {
@@ -67,6 +71,11 @@ public sealed class VariableRateController
         if (layer is null)
         {
             throw new ArgumentNullException(nameof(layer));
+        }
+
+        if (constraintGate is not null && !constraintGate.SectionsAllowed)
+        {
+            return new ReadOnlyCollection<double>(new double[_sectionCount]);
         }
 
         if (sections.Count != _sectionCount)

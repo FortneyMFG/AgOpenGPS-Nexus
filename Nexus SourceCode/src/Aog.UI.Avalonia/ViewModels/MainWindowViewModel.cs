@@ -71,6 +71,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         SeasonNavigator = SeasonNavigatorViewModel.CreateSample();
         CropQuickSelect = CropQuickSelectViewModel.CreateSample();
         PresetSwitcher = PresetSwitcherViewModel.CreateSample();
+        LayoutDiff = LayoutDiffViewModel.CreateSample();
 
         // Load simulation configuration + summary and create the bar VM.
         var configuration = TryLoadSimulationConfiguration(out var summary);
@@ -95,6 +96,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
         LayerInspector = BuildSampleInspector(_mapLayers);
         MeshSharePanel = MeshSharePanelViewModel.CreateSample();
         ProfitAnalytics = ProfitAnalyticsViewModel.CreateSample();
+        RadioProvisioningPanel = RadioProvisioningPanelViewModel.CreateSample();
+        RadioProvisioning = RadioProvisioningFlowViewModel.CreateSample();
 
         ApplySamplePluginState();
         SeedDashboards();
@@ -158,6 +161,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets the preset switcher view-model that surfaces orchestration status.</summary>
     public PresetSwitcherViewModel PresetSwitcher { get; }
 
+    /// <summary>Gets the layout diff view-model surfaced for linked layouts.</summary>
+    public LayoutDiffViewModel LayoutDiff { get; }
+
     /// <summary>Gets the available UI themes.</summary>
     public IReadOnlyList<UiTheme> AvailableThemes { get; }
 
@@ -205,6 +211,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public DeviceManagerCompatibilityViewModel DeviceManagerCompatibility { get; }
     /// <summary>Gets the mesh share/subscribe panel view-model.</summary>
     public MeshSharePanelViewModel MeshSharePanel { get; }
+    /// <summary>Gets the radio provisioning panel view-model.</summary>
+    public RadioProvisioningPanelViewModel RadioProvisioningPanel { get; }
+    /// <summary>Gets the RadioBridge provisioning workflow view-model.</summary>
+    public RadioProvisioningFlowViewModel RadioProvisioning { get; }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.

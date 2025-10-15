@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
+using Aog.Core.Safety;
 using Aog.Core.V1;
 using Aog.Plugins.Sections;
 using FluentAssertions;
@@ -124,6 +125,35 @@ public sealed class SectionIoOrchestratorTests
         await orchestrator.ApplyAsync(1.0, sections);
 
         publishCount.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task ApplyAsync_ConstraintGateForcesZeroMask()
+    {
+        var eventBus = new InMemoryEventBus();
+        var calculator = new SectionMaskCalculator(sectionCount: 2, minimumSpeedMps: 0.0, lookAheadSeconds: 0.0);
+        var orchestrator = new SectionIoOrchestrator(eventBus, calculator);
+
+        var gate = ConstraintGateSnapshot.FromZoneMask(new PoseZoneMask { InsideWorkDisabled = true }, DateTimeOffset.UtcNow);
+        orchestrator.UpdateConstraintGate(gate);
+
+        var published = new List<SectionMask>();
+        using var subscription = eventBus.Subscribe<SectionMask>((mask, _) =>
+        {
+            published.Add(mask.Clone());
+            return ValueTask.CompletedTask;
+        });
+
+        var sections = new[]
+        {
+            new SectionObservation(true, null),
+            new SectionObservation(true, null),
+        };
+
+        await orchestrator.ApplyAsync(4.0, sections);
+
+        published.Should().ContainSingle();
+        published[0].Mask.Should().Be(0u);
     }
 
     private sealed class TestTimeProvider : TimeProvider

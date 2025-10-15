@@ -1,0 +1,168 @@
+{
+  "scenarios": [
+    {
+      "name": "Four cell equal interval baseline",
+      "timestamp": "2024-01-01T12:00:00Z",
+      "options": {
+        "cellSizeMeters": 10.0,
+        "publishIntervalSeconds": 30,
+        "source": "telemetry:combine-yield",
+        "transform": "aggregate:combine-yield",
+        "actor": "plugin:combine-yield",
+        "frame": "field",
+        "crop": "Corn",
+        "projection": "EPSG:32615",
+        "calibrationProfileId": "calibration:2024-corn",
+        "calibrationAppliedAt": "2024-01-01T10:00:00Z",
+        "calibrationSource": "manual",
+        "calibrationSensorModel": "AgLeader-YM2000",
+        "calibrationNotes": "Pre-season calibration",
+        "calibrationFactors": {
+          "massFlow": 1.02,
+          "moisture": 0.98
+        },
+        "smoothingMethod": "movingAverage",
+        "smoothingKernelSize": 3,
+        "smoothingWindowSeconds": 12.0,
+        "smoothingLagCompensationSeconds": 1.5,
+        "smoothingPasses": 2,
+        "outlierClampFraction": 0.05,
+        "aggregationBasis": "area",
+        "aggregationScopes": [
+          "season",
+          "field",
+          "job"
+        ],
+        "binningScheme": "equalInterval",
+        "binningBinCount": 4
+      },
+      "measurements": [
+        {
+          "eastingMeters": 5.0,
+          "northingMeters": 5.0,
+          "yieldKgPerHectare": 8000.0,
+          "moisturePercent": 18.0
+        },
+        {
+          "eastingMeters": 5.0,
+          "northingMeters": 15.0,
+          "yieldKgPerHectare": 9000.0,
+          "moisturePercent": 19.0
+        },
+        {
+          "eastingMeters": 15.0,
+          "northingMeters": 5.0,
+          "yieldKgPerHectare": 7500.0,
+          "moisturePercent": 17.0
+        },
+        {
+          "eastingMeters": 15.0,
+          "northingMeters": 15.0,
+          "yieldKgPerHectare": 8500.0,
+          "moisturePercent": 18.0
+        }
+      ],
+      "expected": {
+        "layer": {
+          "header": {
+            "sequence": 1,
+            "source": "telemetry:combine-yield",
+            "frame": "field",
+            "timestamp": "2024-01-01T12:00:00Z"
+          },
+          "crop": "Corn",
+          "cellSizeMeters": 10.0,
+          "cells": [
+            {
+              "column": 0,
+              "row": 0,
+              "averageYieldKgPerHectare": 8250.0,
+              "averageMoisturePercent": 18.0,
+              "sampleCount": 1
+            },
+            {
+              "column": 1,
+              "row": 0,
+              "averageYieldKgPerHectare": 8250.0,
+              "averageMoisturePercent": 18.0,
+              "sampleCount": 1
+            },
+            {
+              "column": 0,
+              "row": 1,
+              "averageYieldKgPerHectare": 8250.0,
+              "averageMoisturePercent": 18.0,
+              "sampleCount": 1
+            },
+            {
+              "column": 1,
+              "row": 1,
+              "averageYieldKgPerHectare": 8250.0,
+              "averageMoisturePercent": 18.0,
+              "sampleCount": 1
+            }
+          ]
+        },
+        "provenance": {
+          "source": "telemetry:combine-yield",
+          "transform": "aggregate:combine-yield",
+          "actor": "plugin:combine-yield",
+          "hash": "166F856418694ECE01BCA85F884C5EE421C1B1BD154B1BA1024DCEC6EBBAA580",
+          "createdAt": "2024-01-01T12:00:00Z"
+        },
+        "metadata": {
+          "grid": {
+            "cellSizeMeters": 10.0,
+            "projection": "EPSG:32615"
+          },
+          "smoothing": {
+            "method": "movingAverage",
+            "windowSeconds": 12.0,
+            "lagCompensationSeconds": 1.5,
+            "passes": 2
+          },
+          "calibration": {
+            "profileId": "calibration:2024-corn",
+            "appliedAt": "2024-01-01T10:00:00Z",
+            "source": "manual",
+            "sensorModel": "AgLeader-YM2000",
+            "notes": "Pre-season calibration",
+            "factors": {
+              "massFlow": 1.02,
+              "moisture": 0.98
+            }
+          },
+          "aggregation": {
+            "basis": "area",
+            "scopes": [
+              "season",
+              "field",
+              "job"
+            ],
+            "timestamp": "2024-01-01T12:00:00Z",
+            "bins": {
+              "scheme": "equalInterval",
+              "count": 4,
+              "breaks": [
+                8250.0,
+                8250.0,
+                8250.0,
+                8250.0,
+                8250.0
+              ]
+            }
+          },
+          "statistics": {
+            "sampleCount": 4,
+            "mean": 8250.0,
+            "median": 8250.0,
+            "stdDev": 0.0,
+            "min": 8250.0,
+            "max": 8250.0,
+            "totalMassKg": 330.0
+          }
+        }
+      }
+    }
+  ]
+}

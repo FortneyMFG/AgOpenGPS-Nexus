@@ -9,6 +9,7 @@ using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Telemetry;
 using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels;
+using Avalonia.Media;
 using FluentAssertions;
 using Xunit;
 
@@ -92,6 +93,42 @@ public sealed class MainWindowViewModelTests
         viewModel.LayerInspector.TransportMetadata.Should().NotBeEmpty();
         viewModel.LayerInspector.PayloadMetadata.Should().NotBeEmpty();
         viewModel.LayerInspector.RateAvailabilityDisplay.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public void CompanionSnapshot_MirrorsMetadataDrivenState()
+    {
+        var viewModel = CreateViewModel();
+
+        var snapshot = viewModel.CreateCompanionMetadataSnapshot();
+
+        snapshot.Legend.Entries.Should().HaveCount(viewModel.LayerLegend.Entries.Count);
+        snapshot.Legend.Entries.Select(entry => entry.LayerId)
+            .Should().BeEquivalentTo(viewModel.LayerLegend.Entries.Select(entry => entry.LayerId));
+
+        var sourceLegend = viewModel.LayerLegend.Entries.First();
+        var snapshotLegend = snapshot.Legend.Entries.First();
+        snapshotLegend.RangeDisplay.Should().Be(sourceLegend.RangeDisplay);
+        snapshotLegend.ModeDisplay.Should().Be(sourceLegend.ModeDisplay);
+
+        snapshot.Inspector.LayerId.Should().Be(viewModel.LayerInspector.LayerId);
+        snapshot.Inspector.TransportMetadata.Should().HaveCount(viewModel.LayerInspector.TransportMetadata.Count);
+        snapshot.Inspector.PayloadMetadata.Should().HaveCount(viewModel.LayerInspector.PayloadMetadata.Count);
+        snapshot.Inspector.RateAvailability.Should().Be(viewModel.LayerInspector.RateAvailabilityDisplay);
+
+        snapshot.Dashboard.Series.Should().HaveCount(viewModel.SteerDashboard.Series.Count);
+        var sourceSeries = viewModel.SteerDashboard.Series.Single(series => series.Id == "autosteer.crossTrack");
+        var snapshotSeries = snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack");
+        snapshotSeries.Values.Should().Equal(sourceSeries.Values);
+        snapshotSeries.StrokeColor.Should().Be(((ISolidColorBrush)sourceSeries.Stroke).Color.ToString());
+
+        snapshot.Dashboard.TuningParameters.Select(parameter => parameter.Id)
+            .Should().BeEquivalentTo(viewModel.SteerDashboard.TuningParameters.Select(parameter => parameter.Id));
+        snapshot.Dashboard.GainSummary.Should().Be(viewModel.SteerDashboard.GainSummary);
+
+        snapshot.ReplayTimeline.SpeedSamples.Should().HaveCount(viewModel.ReplayTimeline.SpeedSamples.Count);
+        snapshot.ReplayTimeline.HeadingSamples.Should().HaveCount(viewModel.ReplayTimeline.HeadingSamples.Count);
+        snapshot.ReplayTimeline.Bookmarks.Should().HaveCount(viewModel.ReplayTimeline.Bookmarks.Count);
     }
 
     private static MainWindowViewModel CreateViewModel()

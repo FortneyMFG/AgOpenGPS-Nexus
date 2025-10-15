@@ -203,6 +203,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
         });
     }
 
+    /// <summary>
+    /// Creates a metadata snapshot that companion clients can consume to mirror the desktop layout.
+    /// </summary>
+    public CompanionMetadataSnapshot CreateCompanionMetadataSnapshot()
+    {
+        return CompanionMetadataSnapshot.From(LayerLegend, LayerInspector, SteerDashboard, ReplayTimeline);
+    }
+
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)
     {
         var assembly = typeof(MainWindowViewModel).Assembly;

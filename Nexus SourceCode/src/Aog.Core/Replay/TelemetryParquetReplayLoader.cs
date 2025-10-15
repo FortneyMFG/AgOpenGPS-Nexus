@@ -57,22 +57,25 @@ internal static class TelemetryParquetReplayLoader
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
         {
             using var rowGroup = reader.OpenRowGroupReader(rowGroupIndex);
-            var sequences = ReadColumn<ulong>(schema, rowGroup, 0);
-            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, 1);
-            var frames = ReadColumn<string?>(schema, rowGroup, 2);
-            var sources = ReadColumn<string?>(schema, rowGroup, 3);
-            var latitude = ReadColumn<double>(schema, rowGroup, 4);
-            var longitude = ReadColumn<double>(schema, rowGroup, 5);
-            var altitude = ReadColumn<double>(schema, rowGroup, 6);
-            var heading = ReadColumn<double>(schema, rowGroup, 7);
-            var roll = ReadColumn<double>(schema, rowGroup, 8);
-            var pitch = ReadColumn<double>(schema, rowGroup, 9);
-            var speed = ReadColumn<double>(schema, rowGroup, 10);
-            var yawRate = ReadColumn<double>(schema, rowGroup, 11);
+            var sequences = ReadColumn<ulong>(schema, rowGroup, "sequence");
+            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, "timestamp_utc");
+            var frames = ReadColumn<string?>(schema, rowGroup, "frame");
+            var sources = ReadColumn<string?>(schema, rowGroup, "source");
+            var jobIds = ReadOptionalStringColumn(schema, rowGroup, "job_id", sequences.Length);
+            var seasonIds = ReadOptionalStringColumn(schema, rowGroup, "season_id", sequences.Length);
+            var sessionIds = ReadOptionalStringColumn(schema, rowGroup, "session_id", sequences.Length);
+            var latitude = ReadColumn<double>(schema, rowGroup, "latitude_deg");
+            var longitude = ReadColumn<double>(schema, rowGroup, "longitude_deg");
+            var altitude = ReadColumn<double>(schema, rowGroup, "altitude_m");
+            var heading = ReadColumn<double>(schema, rowGroup, "heading_rad");
+            var roll = ReadColumn<double>(schema, rowGroup, "roll_rad");
+            var pitch = ReadColumn<double>(schema, rowGroup, "pitch_rad");
+            var speed = ReadColumn<double>(schema, rowGroup, "speed_mps");
+            var yawRate = ReadColumn<double>(schema, rowGroup, "yaw_rate_radps");
 
             for (var i = 0; i < sequences.Length; i++)
             {
-                var header = CreateHeader(sequences[i], timestamps[i], frames[i], sources[i]);
+                var header = CreateHeader(sequences[i], timestamps[i], frames[i], sources[i], jobIds[i], seasonIds[i], sessionIds[i]);
                 var message = new Pose
                 {
                     Header = header,
@@ -105,24 +108,27 @@ internal static class TelemetryParquetReplayLoader
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
         {
             using var rowGroup = reader.OpenRowGroupReader(rowGroupIndex);
-            var sequences = ReadColumn<ulong>(schema, rowGroup, 0);
-            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, 1);
-            var frames = ReadColumn<string?>(schema, rowGroup, 2);
-            var sources = ReadColumn<string?>(schema, rowGroup, 3);
-            var accelX = ReadColumn<double>(schema, rowGroup, 4);
-            var accelY = ReadColumn<double>(schema, rowGroup, 5);
-            var accelZ = ReadColumn<double>(schema, rowGroup, 6);
-            var gyroX = ReadColumn<double>(schema, rowGroup, 7);
-            var gyroY = ReadColumn<double>(schema, rowGroup, 8);
-            var gyroZ = ReadColumn<double>(schema, rowGroup, 9);
-            var magX = ReadColumn<double>(schema, rowGroup, 10);
-            var magY = ReadColumn<double>(schema, rowGroup, 11);
-            var magZ = ReadColumn<double>(schema, rowGroup, 12);
-            var temperature = ReadColumn<double>(schema, rowGroup, 13);
+            var sequences = ReadColumn<ulong>(schema, rowGroup, "sequence");
+            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, "timestamp_utc");
+            var frames = ReadColumn<string?>(schema, rowGroup, "frame");
+            var sources = ReadColumn<string?>(schema, rowGroup, "source");
+            var jobIds = ReadOptionalStringColumn(schema, rowGroup, "job_id", sequences.Length);
+            var seasonIds = ReadOptionalStringColumn(schema, rowGroup, "season_id", sequences.Length);
+            var sessionIds = ReadOptionalStringColumn(schema, rowGroup, "session_id", sequences.Length);
+            var accelX = ReadColumn<double>(schema, rowGroup, "accel_x_mps2");
+            var accelY = ReadColumn<double>(schema, rowGroup, "accel_y_mps2");
+            var accelZ = ReadColumn<double>(schema, rowGroup, "accel_z_mps2");
+            var gyroX = ReadColumn<double>(schema, rowGroup, "gyro_x_radps");
+            var gyroY = ReadColumn<double>(schema, rowGroup, "gyro_y_radps");
+            var gyroZ = ReadColumn<double>(schema, rowGroup, "gyro_z_radps");
+            var magX = ReadColumn<double>(schema, rowGroup, "mag_x_ut");
+            var magY = ReadColumn<double>(schema, rowGroup, "mag_y_ut");
+            var magZ = ReadColumn<double>(schema, rowGroup, "mag_z_ut");
+            var temperature = ReadColumn<double>(schema, rowGroup, "temperature_c");
 
             for (var i = 0; i < sequences.Length; i++)
             {
-                var header = CreateHeader(sequences[i], timestamps[i], frames[i], sources[i]);
+                var header = CreateHeader(sequences[i], timestamps[i], frames[i], sources[i], jobIds[i], seasonIds[i], sessionIds[i]);
                 var message = new Imu
                 {
                     Header = header,
@@ -157,18 +163,21 @@ internal static class TelemetryParquetReplayLoader
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
         {
             using var rowGroup = reader.OpenRowGroupReader(rowGroupIndex);
-            var sequences = ReadColumn<ulong>(schema, rowGroup, 0);
-            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, 1);
-            var frames = ReadColumn<string?>(schema, rowGroup, 2);
-            var sources = ReadColumn<string?>(schema, rowGroup, 3);
-            var arbitrationId = ReadColumn<uint>(schema, rowGroup, 4);
-            var payloads = ReadColumn<byte[]?>(schema, rowGroup, 5);
-            var isExtended = ReadColumn<bool>(schema, rowGroup, 6);
-            var isRemote = ReadColumn<bool>(schema, rowGroup, 7);
+            var sequences = ReadColumn<ulong>(schema, rowGroup, "sequence");
+            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, "timestamp_utc");
+            var frames = ReadColumn<string?>(schema, rowGroup, "frame");
+            var sources = ReadColumn<string?>(schema, rowGroup, "source");
+            var jobIds = ReadOptionalStringColumn(schema, rowGroup, "job_id", sequences.Length);
+            var seasonIds = ReadOptionalStringColumn(schema, rowGroup, "season_id", sequences.Length);
+            var sessionIds = ReadOptionalStringColumn(schema, rowGroup, "session_id", sequences.Length);
+            var arbitrationId = ReadColumn<uint>(schema, rowGroup, "arbitration_id");
+            var payloads = ReadColumn<byte[]?>(schema, rowGroup, "payload");
+            var isExtended = ReadColumn<bool>(schema, rowGroup, "is_extended_id");
+            var isRemote = ReadColumn<bool>(schema, rowGroup, "is_remote_request");
 
             for (var i = 0; i < sequences.Length; i++)
             {
-                var header = CreateHeader(sequences[i], timestamps[i], frames[i], sources[i]);
+                var header = CreateHeader(sequences[i], timestamps[i], frames[i], sources[i], jobIds[i], seasonIds[i], sessionIds[i]);
                 var payload = payloads[i];
                 var message = new CanFrame
                 {
@@ -198,16 +207,19 @@ internal static class TelemetryParquetReplayLoader
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
         {
             using var rowGroup = reader.OpenRowGroupReader(rowGroupIndex);
-            var sequences = ReadColumn<ulong>(schema, rowGroup, 0);
-            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, 1);
-            var frames = ReadColumn<string?>(schema, rowGroup, 2);
-            var sources = ReadColumn<string?>(schema, rowGroup, 3);
-            var sectionCount = ReadColumn<uint>(schema, rowGroup, 4);
-            var mask = ReadColumn<uint>(schema, rowGroup, 5);
+            var sequences = ReadColumn<ulong>(schema, rowGroup, "sequence");
+            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, "timestamp_utc");
+            var frames = ReadColumn<string?>(schema, rowGroup, "frame");
+            var sources = ReadColumn<string?>(schema, rowGroup, "source");
+            var jobIds = ReadOptionalStringColumn(schema, rowGroup, "job_id", sequences.Length);
+            var seasonIds = ReadOptionalStringColumn(schema, rowGroup, "season_id", sequences.Length);
+            var sessionIds = ReadOptionalStringColumn(schema, rowGroup, "session_id", sequences.Length);
+            var sectionCount = ReadColumn<uint>(schema, rowGroup, "section_count");
+            var mask = ReadColumn<uint>(schema, rowGroup, "mask");
 
             for (var i = 0; i < sequences.Length; i++)
             {
-                var header = CreateHeader(sequences[i], timestamps[i], frames[i], sources[i]);
+                var header = CreateHeader(sequences[i], timestamps[i], frames[i], sources[i], jobIds[i], seasonIds[i], sessionIds[i]);
                 var message = new SectionMask
                 {
                     Header = header,
@@ -234,17 +246,19 @@ internal static class TelemetryParquetReplayLoader
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
         {
             using var rowGroup = reader.OpenRowGroupReader(rowGroupIndex);
-            var sequences = ReadColumn<ulong>(schema, rowGroup, 0);
-            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, 1);
-            var sources = ReadColumn<string?>(schema, rowGroup, 2);
-            var pluginId = ReadColumn<string>(schema, rowGroup, 3);
-            var topic = ReadColumn<string>(schema, rowGroup, 4);
-            var payloads = ReadColumn<byte[]?>(schema, rowGroup, 5);
+            var sequences = ReadColumn<ulong>(schema, rowGroup, "sequence");
+            var timestamps = ReadColumn<DateTime?>(schema, rowGroup, "timestamp_utc");
+            var sources = ReadColumn<string?>(schema, rowGroup, "source");
+            var jobIds = ReadOptionalStringColumn(schema, rowGroup, "job_id", sequences.Length);
+            var seasonIds = ReadOptionalStringColumn(schema, rowGroup, "season_id", sequences.Length);
+            var sessionIds = ReadOptionalStringColumn(schema, rowGroup, "session_id", sequences.Length);
+            var pluginId = ReadColumn<string>(schema, rowGroup, "plugin_id");
+            var topic = ReadColumn<string>(schema, rowGroup, "topic");
+            var payloads = ReadColumn<byte[]?>(schema, rowGroup, "payload");
 
             for (var i = 0; i < sequences.Length; i++)
             {
-                var header = CreateHeader(sequences[i], timestamps[i], frame: null, sources[i]);
-                header.Frame = string.Empty;
+                var header = CreateHeader(sequences[i], timestamps[i], frame: null, sources[i], jobIds[i], seasonIds[i], sessionIds[i]);
 
                 var payload = payloads[i];
                 var message = new PluginTelemetryEvent
@@ -312,13 +326,23 @@ internal static class TelemetryParquetReplayLoader
         return frames;
     }
 
-    private static Header CreateHeader(ulong sequence, DateTime? timestampUtc, string? frame, string? source)
+    private static Header CreateHeader(
+        ulong sequence,
+        DateTime? timestampUtc,
+        string? frame,
+        string? source,
+        string? jobId,
+        string? seasonId,
+        string? sessionId)
     {
         var header = new Header
         {
             Sequence = sequence,
             Frame = string.IsNullOrWhiteSpace(frame) ? string.Empty : frame,
-            Source = string.IsNullOrWhiteSpace(source) ? string.Empty : source
+            Source = string.IsNullOrWhiteSpace(source) ? string.Empty : source,
+            JobId = string.IsNullOrWhiteSpace(jobId) ? string.Empty : jobId,
+            SeasonId = string.IsNullOrWhiteSpace(seasonId) ? string.Empty : seasonId,
+            SessionId = string.IsNullOrWhiteSpace(sessionId) ? string.Empty : sessionId
         };
 
         if (timestampUtc.HasValue)
@@ -339,10 +363,50 @@ internal static class TelemetryParquetReplayLoader
             (bus, token) => bus.PublishAsync(message, token));
     }
 
-    private static T[] ReadColumn<T>(Schema schema, ParquetRowGroupReader reader, int index)
+    private static T[] ReadColumn<T>(Schema schema, ParquetRowGroupReader reader, string columnName)
     {
-        var field = (DataField)schema.Fields[index];
+        var field = GetRequiredDataField(schema, columnName);
         return (T[])reader.ReadColumn(field).Data;
+    }
+
+    private static string?[] ReadOptionalStringColumn(
+        Schema schema,
+        ParquetRowGroupReader reader,
+        string columnName,
+        int rowCount)
+    {
+        if (!TryGetDataField(schema, columnName, out var field))
+        {
+            return new string?[rowCount];
+        }
+
+        return (string?[])reader.ReadColumn(field).Data;
+    }
+
+    private static DataField GetRequiredDataField(Schema schema, string columnName)
+    {
+        if (TryGetDataField(schema, columnName, out var field) && field is not null)
+        {
+            return field;
+        }
+
+        throw new InvalidOperationException($"Telemetry parquet file is missing required column '{columnName}'.");
+    }
+
+    private static bool TryGetDataField(Schema schema, string columnName, out DataField? field)
+    {
+        foreach (var candidate in schema.Fields)
+        {
+            if (candidate is DataField dataField &&
+                string.Equals(dataField.Name, columnName, StringComparison.OrdinalIgnoreCase))
+            {
+                field = dataField;
+                return true;
+            }
+        }
+
+        field = null;
+        return false;
     }
 
     private static DateTime EnsureUtc(DateTime value)

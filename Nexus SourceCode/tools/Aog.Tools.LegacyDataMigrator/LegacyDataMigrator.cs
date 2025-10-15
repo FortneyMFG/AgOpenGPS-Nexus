@@ -139,6 +139,9 @@ public sealed class LegacyDataMigrator
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.Frame, rows.Select(r => r.Frame).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.Source, rows.Select(r => r.Source).ToArray()));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Pose.JobId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Pose.SeasonId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Pose.SessionId, rows.Count));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.LatitudeDeg, rows.Select(r => r.LatitudeDeg).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.LongitudeDeg, rows.Select(r => r.LongitudeDeg).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.AltitudeM, rows.Select(r => r.AltitudeM).ToArray()));
@@ -167,6 +170,9 @@ public sealed class LegacyDataMigrator
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.Frame, rows.Select(r => r.Frame).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.Source, rows.Select(r => r.Source).ToArray()));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Imu.JobId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Imu.SeasonId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Imu.SessionId, rows.Count));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.AccelXMps2, rows.Select(r => r.AccelXMps2).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.AccelYMps2, rows.Select(r => r.AccelYMps2).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.AccelZMps2, rows.Select(r => r.AccelZMps2).ToArray()));
@@ -197,6 +203,9 @@ public sealed class LegacyDataMigrator
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.Frame, rows.Select(r => r.Frame).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.Source, rows.Select(r => r.Source).ToArray()));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Can.JobId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Can.SeasonId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Can.SessionId, rows.Count));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.ArbitrationId, rows.Select(r => r.ArbitrationId).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.Payload, rows.Select(r => r.Payload).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.IsExtendedId, rows.Select(r => r.IsExtendedId).ToArray()));
@@ -221,6 +230,9 @@ public sealed class LegacyDataMigrator
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.Frame, rows.Select(r => r.Frame).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.Source, rows.Select(r => r.Source).ToArray()));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Io.JobId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Io.SeasonId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Io.SessionId, rows.Count));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.SectionCount, rows.Select(r => r.SectionCount).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.Mask, rows.Select(r => r.Mask).ToArray()));
 
@@ -242,6 +254,9 @@ public sealed class LegacyDataMigrator
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Sequence, rows.Select(r => r.Sequence).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Source, rows.Select(r => r.Source).ToArray()));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Plugin.JobId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Plugin.SeasonId, rows.Count));
+        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Plugin.SessionId, rows.Count));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.PluginId, rows.Select(r => r.PluginId).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Topic, rows.Select(r => r.Topic).ToArray()));
         rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Payload, rows.Select(r => r.Payload).ToArray()));
@@ -301,6 +316,9 @@ public sealed class LegacyDataMigrator
 
         return new FieldHistoryDocument(orderedFields);
     }
+
+    private static DataColumn CreateEmptyStringColumn(DataField<string?> field, int count)
+        => new(field, new string?[count]);
 
     private static FileStream CreateParquetStream(string outputDirectory, string fileName)
     {

@@ -57,6 +57,17 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
+    public void LayoutDiff_SurfacesSampleChanges()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.LayoutDiff.Should().NotBeNull();
+        viewModel.LayoutDiff.HasChanges.Should().BeTrue();
+        viewModel.LayoutDiff.Changes.Should().HaveCountGreaterThan(0);
+        viewModel.LayoutDiff.HasLinkedPreset.Should().BeTrue();
+    }
+
+    [Fact]
     public void MapOverlays_ExposeCoverageAndGuidance()
     {
         var viewModel = CreateViewModel();

@@ -67,15 +67,17 @@ public sealed class RadioProvisioningFlowViewModel
                     new(
                         "Run the provisioning command for the device you are onboarding.",
                         "Override --output to write directly to a secure share or omit it to stream the JSON to stdout.",
-                        "dotnet run -- provision \\
-    --device-id bridge.lora.alpha \\
-    --label \"LoRa Bridge Alpha\" \\
-    --radio-kind lora \\
-    --capability radio \\
-    --capability bridge \\
-    --capability lora \\
-    --key-bytes 16 \\
-    --output /secure-share/radio/bridge.lora.alpha.json"),
+                        """
+                        dotnet run -- provision \
+                            --device-id bridge.lora.alpha \
+                            --label "LoRa Bridge Alpha" \
+                            --radio-kind lora \
+                            --capability radio \
+                            --capability bridge \
+                            --capability lora \
+                            --key-bytes 16 \
+                            --output /secure-share/radio/bridge.lora.alpha.json
+                        """),
                     new(
                         "Deterministic keys are supported for lab fixtures via --key 0123456789ABCDEF when needed."),
                     new(

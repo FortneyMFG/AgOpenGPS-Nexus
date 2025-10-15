@@ -35,6 +35,14 @@ public sealed class SimulationPerformanceHarnessTests
         result.TotalMessages.Should().Be(result.Iterations * result.TotalOutputs);
         result.Elapsed.Should().BeLessThan(TimeSpan.FromMilliseconds(400));
         result.Checksum.Should().NotBe(0d);
+        result.BudgetSnapshot.TotalElapsed.Should().Be(result.Elapsed);
+        result.BudgetSnapshot.ExpectedMessageCount.Should().Be(result.TotalMessages);
+        result.BudgetSnapshot.RecordedMessageCount.Should().Be(result.TotalMessages);
+        result.BudgetSnapshot.MessagesPerSecond.Should().BeGreaterThan(6000);
+        result.BudgetSnapshot.Topics.Should().HaveCount(result.TotalOutputs);
+        result.BudgetSnapshot.Topics.Select(topic => topic.Topic).Should().OnlyHaveUniqueItems();
+        result.BudgetSnapshot.Topics.Should().OnlyContain(topic => topic.PublishCount == result.Iterations);
+        result.BudgetSnapshot.Topics.Should().OnlyContain(topic => topic.AverageDuration >= TimeSpan.Zero);
     }
 
     [Fact]

@@ -586,6 +586,18 @@ Draft authors should reference the listed requirements and tasks before opening 
   - Security model must enforce mTLS authentication for remote nodes and reject unauthenticated clients with actionable telemetry.
   - Operator identity UI must allow rename/retire flows audited via automated UI tests with telemetry events emitted for every change.
 
+## Linked backlog items
+
+- **NX-113 — External layer ingest GA:** Tracks the GeoTIFF/COG and GeoJSON normalization flow referenced by ADR-010, ADR-014, and the Mapping SRS. The backlog entry now depends on ADR-044 for deterministic edits and ADR-051 for report exports.
+- **NX-165 — ISOXML bridge general availability:** Connects ADR-014, the Rate Control plugin, and the ISOBUS Bridge documentation to deliver full task exchange workflows.
+- **NX-170 — Job tasks GA:** Anchors TaskService orchestration (ADR-032) so Jobs can emit structured work orders once lifecycle and session contracts settle.
+
+## Icebox & planned explorations
+
+- **Soil & Lab Manager (Planned):** Placeholder for sampling workflows, lab import schemas, and agronomic recommendations surfaced through Profit and Crop Reports.
+- **Map Composer & Print Studio (Planned):** Staging area for offline map layout tools that export PDF/GeoJSON packets from ADR-051 templates.
+- **3D Terrain & Drainage (Planned):** Captures LiDAR/RTK elevation ingest, drainage modeling, and 3D rendering requirements feeding future guidance features.
+
 ### ADR-025 — Data lifecycle & retention
 - **Owner:** Core Owner — Storage Operations pod
 - **Stage:** Drafting (target review window: 2025-12-22 week)

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/YieldMoisture.v1.json",
+  "title": "YieldMoisture.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "x-nexus-layerId": "yield.moisture",
+  "required": ["layerId", "jobId", "sessionId", "units", "createdBy", "createdAt"],
+  "properties": {
+    "layerId": {"type": "string", "pattern": "^layer:[A-Za-z0-9._:-]+$", "description": "Layer identifier", "x-nexus-scope": "core"},
+    "jobId": {"type": "string", "pattern": "^job:[A-Za-z0-9._:-]+$", "description": "Job identifier", "x-nexus-scope": "core"},
+    "sessionId": {"type": "string", "pattern": "^session:[A-Za-z0-9._:-]+$", "description": "Session identifier", "x-nexus-scope": "core"},
+    "fieldId": {"type": ["string", "null"], "pattern": "^field:[A-Za-z0-9._:-]+$", "description": "Optional field", "x-nexus-scope": "core"},
+    "units": {"type": "string", "description": "Units (e.g., % moisture)", "x-nexus-scope": "core"},
+    "sensorModel": {"type": ["string", "null"], "description": "Sensor model or calibration id", "x-nexus-scope": "plugin"},
+    "createdBy": {"type": "string", "description": "Actor generating the layer", "x-nexus-scope": "core"},
+    "createdAt": {"type": "string", "format": "date-time", "description": "Creation timestamp", "x-nexus-scope": "core"},
+    "extensions": {"type": "object", "description": "Plugin metadata", "additionalProperties": true, "x-nexus-scope": "plugin"}
+  }
+}

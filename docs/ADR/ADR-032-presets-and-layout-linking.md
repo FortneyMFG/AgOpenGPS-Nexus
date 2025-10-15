@@ -18,6 +18,10 @@ Adopt a Preset model that binds Equipment, Implement, and Layout selections into
 - **Execution logging.** Preset applications write success/failure outcomes into provenance records so automation drift can be audited per job.
 - **Dependency gating.** Applying presets now checks capability and constraint readiness, blocking activation when prerequisite services are degraded and surfacing actionable remediation guidance.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- TaskService orchestration will be reused by future Work Order flows (NX-170). This ADR documents the dependency but leaves work order scope out-of-bounds for this pass.
+
 ## Degraded operation & messaging
 - **Missing dependencies:** When required dependencies (e.g., Sections or Mapping plugins) are absent or unhealthy, the Preset Switcher exposes a disabled state with inline reasons sourced from the dependency matrix (ADR-031). Operators can still review presets/layouts, but task orchestration is paused until dependencies recover. Background retries are surfaced as toast notifications rather than silent failures.
 - **Job service offline:** Presets that rely on job context degrade to snapshot-only mode. The UI labels the active job as "Local-only" and automatically journals preset/layout selections so the JobsService can reconcile once it returns. Drive-In prompts continue to function using cached presets, but any automation that normally journaled to the job metadata emits warnings in the Activity pane.

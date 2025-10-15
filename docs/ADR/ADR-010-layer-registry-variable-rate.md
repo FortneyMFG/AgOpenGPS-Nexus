@@ -26,6 +26,13 @@ Variable-rate workflows, analytics, and dashboards require a canonical catalog o
 - **Governance charter.** Published workflow defines proposal intake, review quorum, deprecation policy, and appeals. Automation syncs accepted definitions into CI so downstream ADRs consume the same catalog.
 - **Deprecation handling.** Deprecated layers require dual publishing windows with compatibility adapters, and removal dates are broadcast 90 days in advance via release notes and operator mailers.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Catalog expanded to include crop (`cropType.planned`, `cropType.actual`, `cropType.history`), genetics (`genetics.plan`, `genetics.variety`), harvest (`yield.actual`, `yield.moisture`, `yield.testWeight`), and profitability (`profit.net`) layers aligned with ADR-045 through ADR-050. Schemas reside under `/schemas` with provenance flags marking Core vs. plugin ownership.
+- Registry metadata now encodes planned vs. actual semantics using `x-nexus-planned` and `x-nexus-actual` annotations. UI and export tooling consume these flags to group layers without inferring from IDs.
+- Session awareness is mandatory for mutable layers. Definitions declare `requiresSession: true` when edits must occur under an active session per ADR-041, ensuring provenance includes `sessionId`.
+- External ingest workflows (NX-113) must validate incoming rasters/vectors against the registry before persistence; incompatible layers are rejected with actionable diagnostics referencing the expected definition hash.
+
 ## Validation
 - LayerDefinition validator must reject inconsistent units/precision combinations with explicit error codes and ≥ 95% branch coverage in unit tests.
 - Registry publish automation must emit signed manifests and propagate updates to plugin registries within three minutes, demonstrated in CI.

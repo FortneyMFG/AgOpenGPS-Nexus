@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/CropTypeActual.v1.json",
+  "title": "CropTypeActual.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "x-nexus-layerId": "cropType.actual",
+  "x-nexus-planned": false,
+  "required": ["layerId", "jobId", "sessionId", "crop", "recordedAt", "createdBy", "createdAt"],
+  "properties": {
+    "layerId": {
+      "type": "string",
+      "pattern": "^layer:[A-Za-z0-9._:-]+$",
+      "description": "Layer identifier",
+      "x-nexus-scope": "core"
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Job where crop was applied",
+      "x-nexus-scope": "core"
+    },
+    "sessionId": {
+      "type": "string",
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Session capturing the actual crop",
+      "x-nexus-scope": "core"
+    },
+    "fieldId": {
+      "type": ["string", "null"],
+      "pattern": "^field:[A-Za-z0-9._:-]+$",
+      "description": "Optional field identifier",
+      "x-nexus-scope": "core"
+    },
+    "crop": {
+      "type": "string",
+      "description": "Crop name or identifier",
+      "x-nexus-scope": "plugin"
+    },
+    "variety": {
+      "type": ["string", "null"],
+      "description": "Actual variety or hybrid",
+      "x-nexus-scope": "plugin"
+    },
+    "source": {
+      "type": ["string", "null"],
+      "description": "Source of the record (manual, import, barcode)",
+      "x-nexus-scope": "plugin"
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Operator notes",
+      "x-nexus-scope": "plugin"
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the crop assignment was recorded",
+      "x-nexus-scope": "core"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor recording the crop",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin owned metadata",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

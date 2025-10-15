@@ -1,0 +1,12 @@
+{
+  "layerId": "layer:crop-plan-2025",
+  "jobId": "job:2025-plant-soy",
+  "sessionId": null,
+  "crop": "Soybean",
+  "variety": "ZX-2045",
+  "plannedAreaHa": 54.3,
+  "notes": "Primary rotation",
+  "plannedAt": "2025-01-05T18:22:00Z",
+  "createdBy": "user:planner.annika",
+  "createdAt": "2025-01-05T18:22:00Z"
+}

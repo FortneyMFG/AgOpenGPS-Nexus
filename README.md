@@ -1,146 +1,47 @@
 # Nexus (AgOpenGPS Next Generation)
 
-Nexus is an experiment to see whether AI can synthesize the best ideas from across the
-AgOpenGPS community and fuse them into the most badass version of AOG imaginable. There
-is no attempt to optimize for team size, budgets, or schedules—every change chases the
-highest ceiling the community has ever dreamed of, with AI doing the heavy lifting end to
-end. It might flop, it might soar; the only guarantee is that we are iterating in public
-to find out.
+Nexus is the next-generation AgOpenGPS stack that blends community experience with ambitious 2025 planning. It keeps rigs productive offline, codifies farm → field and season → job → session hierarchies, and opens the door for a governed plugin ecosystem.
 
-## Why "Nexus"?
+## Why Nexus?
 
-The name "Nexus" reflects the hub where community inspiration, legacy experience, and
-next-generation experimentation intersect. It is the connective tissue that brings
-together field-proven guidance math, fresh simulation ideas, plugin experimentation, and
-AI-assisted development into one place.
+- **Offline-first, cloud-optional.** Jobs, sessions, telemetry, and plugins run locally with deterministic folder layouts. Cloud sync is additive and reconciles when devices land back on a network—never a requirement for field work.【F:docs/ADR/ADR-030-field-job-sessions.md†L33-L86】
+- **Canonical hierarchies.** Farm → Field geometry and Season → Job → Session operational flows align Core, plugins, and analytics around shared identifiers.【F:docs/SRS/sections/02_DataModel.md†L1-L132】
+- **Plugin ecosystem.** Core lifecycle events, the Layer Registry, and manifest governance let crop type, genetics, yield, profit, and telemetry plugins ship independently while sharing provenance and QA policies.【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】
+- **Safety posture.** Remote dashboards default to monitor-only. Telemetry sharing runs through explicit share/subscribe profiles and never grants control without an in-cab lease.【F:docs/SRS/sections/09_Control_Automation.md†L33-L60】【F:docs/plugins/MultiMachine.md†L1-L80】
+- **Interop built-in.** ISOXML bridges, external layer ingest, and report builders share the same registry hashes so TaskData, GeoTIFF, and GeoJSON round-trip without drift.【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】【F:docs/SRS/sections/04_MappingLayers.md†L84-L106】
 
-## Mission Snapshot
-
-- **Community fusion:** Surface the strongest ideas from forums, GitHub projects, field
-  notes, and Discord chats, then combine them into cohesive features that feel curated
-  rather than compromised.
-- **Modular architecture:** Core, AGiO backends, plugins, and UI live in dedicated
-  projects that communicate over gRPC contracts generated from `/Nexus SourceCode/proto`.
-- **Simulation-first:** A composite simulator drives deterministic development,
-  headless testing, and the “Sim Bar” experience described in
-  [`docs/SRS/options/O-STACK-1_DotNet8Avalonia.md`](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md).
-- **Legacy friendly:** Teensy/ESP32 AIO users stay productive through UART/Ethernet
-  compatibility layers and UDP gateways.
-- **Target platforms:** Windows desktops and Raspberry Pi/CM5 hosts, with or without
-  external hardware beyond optional GPS.
-
-## Mission Snapshot
-
-- **Modular architecture:** Core, AGiO backends, plugins, and UI live in dedicated
-  projects that communicate over gRPC contracts generated from `/Nexus SourceCode/proto`.
-- **Simulation-first:** A composite simulator drives deterministic development,
-  headless testing, and the “Sim Bar” experience described in
-  [`docs/SRS/options/O-STACK-1_DotNet8Avalonia.md`](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md).
-- **Legacy friendly:** Teensy/ESP32 AIO users stay productive through UART/Ethernet
-  compatibility layers and UDP gateways.
-- **Target platforms:** Windows desktops and Raspberry Pi/CM5 hosts, with or without
-  external hardware beyond optional GPS.
-
-AgOpenGPS Nexus development starts here, guided by the engineering blueprint captured in
-[`docs/SRS/options/O-STACK-1_DotNet8Avalonia.md`](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md)
-and the broader Software Requirements Specification (SRS) set under `/docs/SRS`.
-
-## Read Me First
-
-1. **SRS is authoritative.** Requirements, process flows, and acceptance criteria all
-   originate in `/docs/SRS`. Begin each task by reviewing the relevant SRS section.
-2. **Track work in `tasks.md`.** Tickets are organised by lane and wave so AIs and humans
-   can stay out of each other’s way. Update statuses and human-verification fields as you
-   close out work.
-3. **Follow the contribution playbook.** The root `AGENTS.md` spells out ownership bands,
-   branch naming, PR expectations, and how contract freezes are handled.
-4. **Log discoveries in the SRS notes.** When clarifying requirements or implementation
-   constraints, append them to `docs/SRS/NOTES.md` so the next contributor benefits.
-
-## Architecture Decision Records (ADRs)
-
-- [ADR-001: Adopt .NET 8 C# stack for Nexus runtime](docs/ADR/ADR-001-dotnet8-runtime.md)
-- [ADR-002: Expose Nexus services over gRPC/protobuf contracts](docs/ADR/ADR-002-grpc-contracts.md)
-- [ADR-003: Use Avalonia for the cross-platform Nexus UI shell](docs/ADR/ADR-003-avalonia-ui.md)
-- [ADR-004: Establish the composite simulation fabric (SimClock + SimBus)](docs/ADR/ADR-004-composite-simulation.md)
-- [ADR-044: Zone drawing framework](docs/ADR/ADR-044_ZoneDrawingFramework.md)
-- [ADR-045: Crop type plugin & layers](docs/ADR/ADR-045_CropTypePlugin.md)
-- [ADR-046: Genetics plugin & layers](docs/ADR/ADR-046_GeneticsPlugin.md)
-- [ADR-047: Live telemetry mesh](docs/ADR/ADR-047_LiveTelemetryMesh.md)
-- [ADR-048: RadioBridge for ELRS/LoRa telemetry](docs/ADR/ADR-048_RadioBridge.md)
-- [ADR-049: Yield & analytics plugin](docs/ADR/ADR-049_YieldPlugin.md)
-- [ADR-050: Cost & profit plugin](docs/ADR/ADR-050_CostProfitPlugin.md)
-- [ADR-051: Report builder & export system](docs/ADR/ADR-051_ReportBuilder.md)
-- [ADR-052: Field health & risk plugin](docs/ADR/ADR-052_FieldHealthPlugin.md)
-- [ADR-053: Weather & environment plugin](docs/ADR/ADR-053_WeatherPlugin.md)
-
-## Repository Layout
+## Repository Tour
 
 ```text
 /
-├── docs/                  # SRS, ADRs, how-tos, templates
-│   ├── SRS/               # System Requirements (single source of truth)
-│   └── NOTES.md           # Living notes about the SRS canon and clarifications
-├── Nexus SourceCode/      # Nexus .NET 8 solution (Avalonia UI bootstrap, tests)
-│   ├── AgOpenGPS.Nexus.sln
-│   ├── Directory.Build.props
-│   ├── README.md
-│   ├── src/               # Production projects (Avalonia shell lives here)
-│   └── tests/             # Test projects
-├── Legacy SourceCode -V6/ # Historical AgOpenGPS materials for reference
-├── tasks.md               # Active backlog with per-lane ticket tracking
-├── AGENTS.md              # Contribution conventions and automation guardrails
+├── docs/                  # SRS, ADRs, plugin guides, training, support
+│   ├── ADR/               # Architecture Decision Records
+│   ├── SRS/               # System Requirements Specification
+│   ├── plugins/           # Plugin requirements and planned surfaces
+│   ├── INDEX.md           # Quick links into docs
+│   └── CONTRIBUTING-PLUGINS.md # Packaging and governance guidance
+├── Nexus SourceCode/      # .NET 8 solution (Core, UI, plugins, tests)
+├── schemas/               # JSON schemas for jobs, sessions, layers, mesh
+├── tasks.md               # Backlog (NX-###) with automation guardrails
 └── README.md              # This document
 ```
 
 ## Getting Started
 
-1. Fork or clone the repo.
-2. Read `AGENTS.md` for contribution rules, CODEOWNER areas, and PR workflow.
-3. Pick a ticket from `tasks.md`, review the linked SRS content, and create a
-   short-lived feature branch (`feat/NX-###-short-label`).
-4. Ship code, docs, and tests together. Every change should leave the repo runnable and
-   well-documented.
+1. Review `docs/INDEX.md` for entry points into the SRS, ADR roadmap, and plugin docs.
+2. Pick an NX ticket from `tasks.md`, confirm the owning ADR/SRS sections, and align on scope.
+3. Follow `AGENTS.md` for branch naming, ownership bands, and PR expectations. Every change ties to one NX ticket.
+4. Run documentation, schema, and test updates together; deterministic storage and replay are core principles.
 
-### Dev scripts
+## Safety & Remote Access
 
-Cross-platform helpers live under `tools/scripts`:
-
-- `./tools/scripts/nexus.sh run core` (or `agio`/`ui`) runs the relevant host via
-  `dotnet run` on Unix-like systems. Pass additional arguments after `--` to forward them
-  to the underlying host.
-- `pwsh ./tools/scripts/nexus.ps1 sim` launches the simulation entry point on Windows
-  PowerShell (Core or Desktop). Until the dedicated SimHost lands, both scripts reuse
-  the Core host for `sim`; override the default by setting `NEXUS_SIM_PROJECT` once the
-  simulation host project is available.
-
-Override default project locations by exporting `NEXUS_CORE_PROJECT`,
-`NEXUS_AGIO_PROJECT`, `NEXUS_UI_PROJECT`, or `NEXUS_SIM_PROJECT`. All paths are resolved
-relative to the repository root so future solution files can slot in without editing the
-scripts.
-
-### Packaging
-
-- `pwsh ./tools/ci/package-windows.ps1` builds the Windows single-file publish, `.zip`,
-  and installer bundle described in [docs/howto/windows-packaging.md](docs/howto/windows-packaging.md).
-- `pwsh ./tools/ci/release.ps1 -Channel nightly -Version 0.5.0-beta1` orchestrates the signed
-  release pipeline. It reuses the platform-specific packaging scripts, optionally signs
-  Windows executables when a certificate is provided, stages artifacts under
-  `artifacts/release/<channel>/<timestamp>`, and emits a manifest with SHA-256 hashes for
-  downstream promotion.
-
-When Wave 0 tickets (NX-001, NX-002, NX-006) are completed the repository skeleton will be
-ready for the broader contract and simulation work described in the phase plan. Tag
-milestones as outlined in the engineering brief to keep parallel teams aligned.
+- Remote dashboards subscribe to telemetry but cannot issue commands unless an operator grants an explicit control lease. Mesh profiles limit what leaves the cab, with profitability and layer edits denied by default.【F:docs/plugins/MultiMachine.md†L1-L80】【F:docs/SRS/sections/09_Control_Automation.md†L33-L60】
+- Section control treats advisory `noWorkMask` overlays as guidance only; constraint gates remain in Core and never depend on remote inputs.【F:docs/SRS/sections/09_Control_Automation.md†L61-L71】
 
 ## Additional Resources
 
-- [AgOpenGPS community forum](https://discourse.agopengps.com/) — stay in touch with power
-  users and hardware builders.
-- [Legacy boards & firmware](https://github.com/agopengps-official/Boards) — reference
-  designs for Teensy/ESP32 controllers.
-- [Avalonia UI](https://www.avaloniaui.net/) — cross-platform UI framework targeted in the
-  O-STACK plan.
+- [docs/INDEX.md](docs/INDEX.md) — curated links into ADRs, SRS sections, and plugin guides.
+- [docs/CONTRIBUTING-PLUGINS.md](docs/CONTRIBUTING-PLUGINS.md) — packaging, manifest, and signing requirements for plugin authors.
+- [docs/plugins](docs/plugins) — feature-specific requirements (Mapping, Rate Control, Genetics, Yield, Profit, Multi-Machine, ISOBUS Bridge, Telemetry Logging, Replay, File I/O, and planned Soil/Lab, Map Composer, 3D Terrain).
 
-Nexus development has officially begun. Let’s build the next generation of open precision
-agriculture tooling together.
+Nexus continues to evolve in public. Contributions that respect the offline-first, session-aware architecture keep rigs productive today while enabling the ambitious 2025 roadmap.

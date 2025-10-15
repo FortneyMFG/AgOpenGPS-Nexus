@@ -2,33 +2,32 @@
 
 ## Overview
 
-Rate and section control plugins manage product application across implements. Multi-field jobs and session metadata require
-additional context for deterministic control and audit trails.
+Rate and section control plugins manage product application across implements. Multi-field jobs and session metadata require additional context for deterministic control and audit trails.
 
 ## Runtime Contracts
 
-- Subscribe to `onFarmLoaded`, `onJobLoaded`, and `onSessionStart` so controller state machines preload farm assets, job field geometry, and session metadata before enabling sections. Core context includes `seasonId?`, authoring metadata, and plugin `extensions` for agronomic overlays.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L40】
-- Receive `jobId`, `sessionId`, and `fieldIds[]` on initialization and when sessions change. Use this context to align coverage
-  logging, implement leases, and automated shutoff policies.
-- Respect multi-field envelopes provided by the mapping plugin to avoid unintended application when crossing field boundaries.
-- Emit coverage/rate layers tagged with `jobId` and `sessionId`; append provenance records describing rate tables, variable maps,
-  and section events, including `createdBy` metadata for audit trails.【F:docs/SRS/sections/04_MappingLayers.md†L10-L83】【F:schemas/Layer.v1.json†L1-L117】
-- Read/write `session.extensions` for plugin-specific telemetry (e.g., product lot tracking, profitability) while preserving core session fields.【F:schemas/Session.v1.json†L1-L99】
+- Subscribe to `onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, and `onSessionStart` so controller state machines preload farm assets, job field geometry, and session metadata before enabling sections. Core context includes `seasonId?`, authoring metadata, and plugin `extensions` for agronomic overlays.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L40】
+- Receive `jobId`, `sessionId`, and `fieldIds[]` on initialization and when sessions change. Use this context to align coverage logging, implement leases, and automated shutoff policies.
+- Respect multi-field envelopes provided by the mapping plugin to avoid unintended application when crossing field boundaries.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L21-L63】
+- Consume planned layers (`vr.planned.*`) and as-applied outputs registered in the Layer Registry. Planned vs. actual comparisons must reference catalog metadata to ensure analytics and ISOXML exports remain consistent.【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】【F:docs/SRS/sections/04_MappingLayers.md†L10-L106】
+- Emit coverage/rate layers tagged with `jobId` and `sessionId`; append provenance records describing rate tables, variable maps, section events, and operator overrides.【F:schemas/Layer.v1.json†L1-L117】
+- Integrate with ISOXML import/export flows so TaskData generation references session hashes, recipe IDs, and layer IDs per ADR-014. Exported jobs must remain round-trip safe for NX-165.【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】
+- Read/write `session.extensions` for plugin-specific telemetry (e.g., product lot tracking, profitability) while preserving core session fields.【F:schemas/Session.v1.json†L1-L115】
 
 ## Session-Aware Outputs
 
 - When journaling section states, include session metadata (start/end timestamps, operator notes) to support compliance reports.
-- Autosave changes whenever rate presets, material inputs, or environment data shift beyond configured thresholds; align with
-  session autosave cadence for consistent recovery.【F:docs/SRS/sections/03_JobLifecycle.md†L37-L74】
+- Autosave changes whenever rate presets, material inputs, or environment data shift beyond configured thresholds; align with session autosave cadence for consistent recovery.【F:docs/SRS/sections/03_JobLifecycle.md†L37-L74】
+- Expose hooks for `onSessionEnd` to flush ISOXML tasks, coverage summaries, and rate diagnostics so report builders can assemble crop and profit summaries.
 
 ## UX Integration
 
-- Display active session name, environment snapshot, and per-field coverage percentages in control panels to help operators
-  validate product usage across fields.
-- Provide controls to start a new session directly from the rate panel; Core handles lifecycle events but plugins should surface
-  state transitions.
+- Display active session name, environment snapshot, and per-field coverage percentages in control panels to help operators validate product usage across fields.
+- Provide controls to start a new session directly from the rate panel; Core handles lifecycle events but plugins should surface state transitions.
+- Surface advisory `noWorkMask` warnings without blocking automation, following the control arbiter guidance in SRS §09.【F:docs/SRS/sections/09_Control_Automation.md†L33-L60】
 
 ## Compatibility Notes
 
 - Plugins relying on a single field must update; Core will pass all mounted fields and expect per-field rate totals.
 - Replace any “Run” terminology with “Session” in logs, tooltips, and exported files for operator clarity.
+- ISOXML bridges must reference the same recipe hashes and layer IDs recorded in the Layer Registry; mismatches block export until corrected.

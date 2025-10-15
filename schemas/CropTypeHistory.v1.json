@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/CropTypeHistory.v1.json",
+  "title": "CropTypeHistory.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "x-nexus-layerId": "cropType.history",
+  "required": ["fieldId", "entries", "createdBy", "createdAt"],
+  "properties": {
+    "fieldId": {
+      "type": "string",
+      "pattern": "^field:[A-Za-z0-9._:-]+$",
+      "description": "Field whose history is recorded",
+      "x-nexus-scope": "core"
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["year", "status", "crop"],
+        "properties": {
+          "year": {
+            "type": "integer",
+            "minimum": 1900,
+            "description": "Calendar year"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["planned", "actual", "historical"],
+            "description": "Classification of the record"
+          },
+          "crop": {
+            "type": "string",
+            "description": "Crop name"
+          },
+          "layerId": {
+            "type": ["string", "null"],
+            "pattern": "^layer:[A-Za-z0-9._:-]+$",
+            "description": "Linked layer providing evidence"
+          },
+          "source": {
+            "type": ["string", "null"],
+            "description": "Origin of the record"
+          },
+          "recordedAt": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "When this entry was recorded"
+          },
+          "notes": {
+            "type": ["string", "null"],
+            "description": "Additional context"
+          }
+        }
+      },
+      "description": "Chronological crop history entries",
+      "x-nexus-scope": "plugin"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor composing the history",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp history was assembled",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin metadata",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

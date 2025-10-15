@@ -1,0 +1,10 @@
+{
+  "layerId": "layer:yield-testweight-2025",
+  "jobId": "job:2025-harvest-corn",
+  "sessionId": "session:2",
+  "fieldId": "field:east-40",
+  "units": "lb/bu",
+  "calibration": "scale-check-2025-09-30",
+  "createdBy": "system:yield-logger",
+  "createdAt": "2025-10-20T09:10:00Z"
+}

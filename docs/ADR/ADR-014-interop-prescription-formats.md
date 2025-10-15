@@ -25,6 +25,13 @@ Nexus must import and export industry-standard agronomic formats—ISOXML TaskDa
 - **Schema diff automation.** Import/export tooling now emits structured diffs when incoming data deviates from expected schemas, surfacing actionable warnings for operators.
 - **Regression rehearsals.** Firmware releases trigger replay of the compatibility suite before publication, with failures blocking distribution until addressed.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- ISOXML import/export pipelines now align with the Job lifecycle defined in [ADR-030](ADR-030-field-job-sessions.md). TaskData exports bundle job metadata, session hashes, and layer IDs so remote controllers preserve provenance when re-imported.
+- Planned rate layers referenced in ISOXML use `vr.planned.*` catalog IDs from ADR-010. The Rate Control plugin consumes the same IDs at runtime, ensuring Core and hardware stay in lockstep.
+- External ingest (NX-113) validates GeoTIFF/COG rasters and GeoJSON/GeoPackage vectors against the Layer Registry before writing to storage. Failed validations surface actionable diagnostics referencing expected schema hashes.
+- Report Builder templates (ADR-051) depend on interop metadata to assemble crop and profit summaries. Exports now include recipe hashes from ADR-013 to satisfy compliance audits.
+
 ## Validation
 - ISOXML TaskData importer/exporter must retain 100% of task attributes with ≤ 2 cm spatial error against canonical fixtures.
 - GeoTIFF/COG pipelines must preserve raster statistics (mean, stdev) within 0.2% after compression/decompression across sample datasets.

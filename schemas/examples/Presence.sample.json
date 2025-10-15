@@ -1,0 +1,8 @@
+{
+  "deviceId": "device:cab-alpha",
+  "sessionId": "session:1",
+  "topics": ["presence", "trails"],
+  "profileHash": "sha256:abcdef",
+  "staleAfter": "2025-05-01T12:00:05Z",
+  "publishedAt": "2025-05-01T12:00:00Z"
+}

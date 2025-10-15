@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/CropTypePlanned.v1.json",
+  "title": "CropTypePlanned.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "x-nexus-layerId": "cropType.planned",
+  "x-nexus-planned": true,
+  "required": ["layerId", "jobId", "crop", "plannedAt", "createdBy", "createdAt"],
+  "properties": {
+    "layerId": {
+      "type": "string",
+      "pattern": "^layer:[A-Za-z0-9._:-]+$",
+      "description": "Layer identifier",
+      "x-nexus-scope": "core"
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Job planning this crop",
+      "x-nexus-scope": "core"
+    },
+    "sessionId": {
+      "type": ["string", "null"],
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Session when plan was recorded (optional)",
+      "x-nexus-scope": "core"
+    },
+    "crop": {
+      "type": "string",
+      "description": "Crop name or identifier",
+      "x-nexus-scope": "plugin"
+    },
+    "variety": {
+      "type": ["string", "null"],
+      "description": "Optional variety or hybrid",
+      "x-nexus-scope": "plugin"
+    },
+    "plannedAreaHa": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Planned area in hectares",
+      "x-nexus-scope": "plugin"
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Planner notes",
+      "x-nexus-scope": "plugin"
+    },
+    "plannedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when planning occurred",
+      "x-nexus-scope": "core"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor creating the plan",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin owned metadata",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

@@ -36,6 +36,12 @@ Establish Jobs as a first-class concept spanning Core, UI, and plugins with the 
 - **Transactional hooks.** Plugin hook contracts declare commit/rollback semantics. Core enforces these hooks so partial failures revert gracefully and log reasons.
 - **Release gates.** Before promoting schema changes, maintainers run full job lifecycle rehearsals (create, execute, archive) covering automation hooks and UI integrations.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Canonical on-disk layout reaffirmed as `/Jobs/<JobName>/job.json`, `Resume.txt`, and typed subfolders (`layers/`, `sessions/`, `attachments/`). Cloud sync remains optional; devices reconcile job folders upon landing instead of requiring continuous connectivity.
+- Session awareness (ADR-041) replaces legacy Run terminology. JobsService emits `onSessionStart`/`End`/`MetadataChange` hooks to plugins, and UI copy now references Sessions across drawers, reports, and telemetry.
+- Remote dashboards operate in monitor-only mode. They consume lifecycle events via gRPC/WebSocket but cannot mutate jobs unless operators grant explicit permissions, keeping offline rigs safe.
+
 ## Validation
 - **Crash recovery:** Resume-from-crash workflows must restore the previously active job within 8 seconds and avoid duplicating more than one PoseStream segment in journal entries.
 - **Migration coverage:** The legacy archive migration harness must successfully convert at least 50 representative V6 jobs without schema validation failures, emitting warnings whenever fields are downgraded or skipped.

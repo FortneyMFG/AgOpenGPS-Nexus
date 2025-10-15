@@ -1,0 +1,10 @@
+{
+  "id": "subscribe:monitor",
+  "deviceId": "device:tablet-01",
+  "requestedTopics": ["presence", "trails", "coverage"],
+  "allowList": ["device:cab-alpha"],
+  "denyList": ["device:unknown"],
+  "visibilityPreset": "coverage",
+  "updatedBy": "user:viewer.liam",
+  "updatedAt": "2025-05-01T12:05:00Z"
+}

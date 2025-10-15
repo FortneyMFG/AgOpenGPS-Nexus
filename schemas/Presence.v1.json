@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/Presence.v1.json",
+  "title": "Presence.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["deviceId", "publishedAt", "topics"],
+  "properties": {
+    "deviceId": {
+      "type": "string",
+      "pattern": "^device:[A-Za-z0-9._:-]+$",
+      "description": "Device broadcasting presence",
+      "x-nexus-scope": "core"
+    },
+    "sessionId": {
+      "type": ["string", "null"],
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Active session for this device",
+      "x-nexus-scope": "core"
+    },
+    "topics": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Topics currently shared",
+      "x-nexus-scope": "core"
+    },
+    "profileHash": {
+      "type": ["string", "null"],
+      "description": "Profile snapshot hash",
+      "x-nexus-scope": "core"
+    },
+    "staleAfter": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when presence is considered stale",
+      "x-nexus-scope": "core"
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Publish timestamp",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin metadata (e.g., location, heading)",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

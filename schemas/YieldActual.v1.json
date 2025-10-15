@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/YieldActual.v1.json",
+  "title": "YieldActual.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "x-nexus-layerId": "yield.actual",
+  "required": ["layerId", "jobId", "sessionId", "units", "createdBy", "createdAt"],
+  "properties": {
+    "layerId": {
+      "type": "string",
+      "pattern": "^layer:[A-Za-z0-9._:-]+$",
+      "description": "Layer identifier",
+      "x-nexus-scope": "core"
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Job producing the yield",
+      "x-nexus-scope": "core"
+    },
+    "sessionId": {
+      "type": "string",
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Session producing the yield",
+      "x-nexus-scope": "core"
+    },
+    "fieldId": {
+      "type": ["string", "null"],
+      "pattern": "^field:[A-Za-z0-9._:-]+$",
+      "description": "Optional field identifier",
+      "x-nexus-scope": "core"
+    },
+    "units": {
+      "type": "string",
+      "description": "Units of measure (e.g., bu/ac)",
+      "x-nexus-scope": "core"
+    },
+    "aggregation": {
+      "type": "string",
+      "enum": ["grid", "point"],
+      "description": "Aggregation type",
+      "x-nexus-scope": "plugin"
+    },
+    "source": {
+      "type": ["string", "null"],
+      "description": "Telemetry source identifier",
+      "x-nexus-scope": "plugin"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor generating the layer",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin-owned analytics (e.g., smoothing metadata)",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

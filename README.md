@@ -33,6 +33,11 @@ Nexus is the next-generation AgOpenGPS stack that blends community experience wi
 3. Follow `AGENTS.md` for branch naming, ownership bands, and PR expectations. Every change ties to one NX ticket.
 4. Run documentation, schema, and test updates together; deterministic storage and replay are core principles.
 
+## Continuous Integration & Release Automation
+
+- The **Nexus CI** workflow (`.github/workflows/ci.yml`) runs on every push and pull request. It restores, builds, and tests the .NET 8 solution on Windows and Linux runners before executing repository linting, contract governance checks, the simulation smoke harness, and packaging smoke tests for each platform.
+- The **Nexus Release Packaging** workflow (`.github/workflows/release.yml`) triggers for tags that match `v*` (or manually via workflow dispatch). It rebuilds and tests the solution on dedicated Windows and Linux jobs, packages self-contained single-file binaries using `tools/ci/package-windows.ps1` and `tools/ci/package-linux.ps1`, and publishes zip bundles directly to the GitHub release so operators can download ready-to-run archives for each platform.
+
 ## Safety & Remote Access
 
 - Remote dashboards subscribe to telemetry but cannot issue commands unless an operator grants an explicit control lease. Mesh profiles limit what leaves the cab, with profitability and layer edits denied by default.【F:docs/plugins/MultiMachine.md†L1-L80】【F:docs/SRS/sections/09_Control_Automation.md†L33-L60】

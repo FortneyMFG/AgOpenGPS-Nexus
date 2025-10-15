@@ -287,6 +287,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-325 Weather compliance export documentation _(Planned)_ — ADR-053 compliance outputs
 - [x] NX-326 Metadata-driven UI style guide _(Done)_ — ADR-034 UI refactor
 - [x] NX-327 Plugin QA handshake update _(Done)_ — ADR-031 manifest governance QA
+- [ ] NX-341 GitHub Actions release packaging (Win/Linux zips) _(In Progress)_ — SRS §2.7 Packaging & DevEx
 
 ### Section H — Safety & QA
 - [x] NX-070 Heartbeats & failsafe watchdogs
@@ -624,6 +625,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-325 | Weather compliance export documentation | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 compliance outputs |
 | NX-326 | Metadata-driven UI style guide | Done |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | Style tokens cover dashboards, inspectors, and legends across desktop + companion shells. |
 | NX-327 | Plugin QA handshake update | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance QA |
+| NX-341 | GitHub Actions release packaging (Win/Linux zips) | In Progress | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
 
 ### Section H — Safety & QA
 

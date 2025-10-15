@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+package aog.guidance.v1;
+
+option csharp_namespace = "Aog.Guidance.V1";
+
+import "core.proto";
+
+// LaneTemplate enumerates the canonical lane templates supported by the guidance
+// planner. Templates map to ADR-033 lane families so downstream components can
+// attach specialized semantics (e.g. adaptive lookahead, turn entry conditions).
+enum LaneTemplate {
+  LANE_TEMPLATE_UNSPECIFIED = 0;
+  LANE_TEMPLATE_STRAIGHT = 1;
+  LANE_TEMPLATE_CURVE = 2;
+  LANE_TEMPLATE_ADAPTIVE = 3;
+}
+
+// LaneMetadata describes the static identity and provenance fields shared by all
+// passes belonging to a guidance lane.
+message LaneMetadata {
+  // Stable identifier for the published lane. Matches planner/job registry ids.
+  string lane_id = 1;
+
+  // Canonical lane template type (straight, curve, adaptive headland, ...).
+  LaneTemplate template = 2;
+
+  // Human readable label exposed to operator UIs.
+  string label = 3;
+
+  // Optional field identifier associated with this lane.
+  string field_id = 4;
+
+  // Optional job identifier associated with this lane.
+  string job_id = 5;
+
+  // Optional session identifier associated with this lane.
+  string session_id = 6;
+}
+
+// LanePoint represents a single sample along a lane pass, expressed in planar
+// east/north meters relative to the planner origin.
+message LanePoint {
+  double easting_m = 1;
+  double northing_m = 2;
+
+  // Optional heading at the point in radians (0 = north, increasing clockwise).
+  double heading_rad = 3;
+
+  // Optional curvature at the point in 1/meters (positive turns right).
+  optional double curvature_per_meter = 4;
+}
+
+// LanePass captures the geometry for a single lane pass relative to the
+// template reference.
+message LanePass {
+  // Pass index relative to the template reference line (0 = reference pass).
+  int32 index = 1;
+
+  // Heading of the pass in radians (0 = north, increasing clockwise).
+  double heading_rad = 2;
+
+  // Signed distance from the reference line to this pass (meters).
+  double signed_distance_m = 3;
+
+  // Sampled geometry of the pass expressed as planar points.
+  repeated LanePoint points = 4;
+}
+
+// LaneConstraintState summarises the constraint mask active when the preview was
+// generated so firmware can respect gating decisions.
+message LaneConstraintState {
+  // Zone mask summarising active constraint zones at the preview sample.
+  aog.core.v1.PoseZoneMask zone_mask = 1;
+
+  // True when a blocking constraint (e.g. keep-out) is engaged ahead of the vehicle.
+  bool has_blocking_constraint = 2;
+
+  // True when the vehicle is currently operating inside a headland zone.
+  bool inside_headland = 3;
+
+  // Optional clearance distance (meters) to the nearest blocking constraint.
+  optional double distance_to_constraint_m = 4;
+}
+
+// PreviewTarget captures the current goal point produced by the planner for the
+// control loop.
+message PreviewTarget {
+  LanePoint point = 1;
+
+  // Curvature of the goal segment in 1/meters (positive turns right).
+  optional double curvature_per_meter = 2;
+}
+
+// LanePreview contains the dynamic preview context exposed to firmware to close
+// the steering loop.
+message LanePreview {
+  double cross_track_error_m = 1;
+  double heading_error_rad = 2;
+  double lookahead_distance_m = 3;
+  PreviewTarget target = 4;
+  double controller_output = 5;
+  bool controller_enabled = 6;
+  LaneConstraintState constraint = 7;
+}
+
+// GuidanceLane publishes the geometry and current preview state for a single
+// planner lane.
+message GuidanceLane {
+  // Standard telemetry header containing sequence and timestamp metadata.
+  aog.core.v1.Header header = 1;
+
+  // Static metadata and provenance for the lane.
+  LaneMetadata metadata = 2;
+
+  // Spacing between adjacent passes in meters (tool width minus overlap).
+  double lane_spacing_m = 3;
+
+  // Implement/tool width in meters used when generating the lane.
+  double implement_width_m = 4;
+
+  // Overlap between adjacent passes in meters.
+  double overlap_m = 5;
+
+  // Lateral nudge applied to the lane in meters (positive shifts right).
+  double nudge_m = 6;
+
+  // Extension length applied when generating pass geometry (meters).
+  double extension_length_m = 7;
+
+  // Heading of the reference pass in radians.
+  double base_heading_rad = 8;
+
+  // Generated passes including their sampled geometry.
+  repeated LanePass passes = 9;
+
+  // Optional planner preview for the active vehicle state.
+  LanePreview preview = 10;
+}
+
+// GuidanceLaneFrame bundles multiple lanes into a single publish frame. Frames
+// are useful when planners refresh several passes atomically (e.g. straight and
+// turn lanes).
+message GuidanceLaneFrame {
+  aog.core.v1.Header header = 1;
+  repeated GuidanceLane lanes = 2;
+}

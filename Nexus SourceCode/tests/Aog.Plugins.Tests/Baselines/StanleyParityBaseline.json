@@ -1,0 +1,62 @@
+{
+  "path": [
+    { "x": 0.0, "y": 0.0 },
+    { "x": 10.0, "y": 0.0 },
+    { "x": 20.0, "y": 0.0 },
+    { "x": 30.0, "y": 0.0 },
+    { "x": 40.0, "y": 0.0 },
+    { "x": 50.0, "y": 0.0 }
+  ],
+  "samples": [
+    {
+      "state": {
+        "x": 0.0,
+        "y": 1.2,
+        "headingRadians": 0.08726646259971647,
+        "speedMetersPerSecond": 4.0,
+        "wheelbaseMeters": 3.0
+      },
+      "expectedSteeringRadians": 0.39852942284059756
+    },
+    {
+      "state": {
+        "x": 10.0,
+        "y": -0.8,
+        "headingRadians": -0.05235987755982989,
+        "speedMetersPerSecond": 6.0,
+        "wheelbaseMeters": 3.0
+      },
+      "expectedSteeringRadians": -0.1939628707791466
+    },
+    {
+      "state": {
+        "x": 20.0,
+        "y": 0.3,
+        "headingRadians": 0.017453292519943295,
+        "speedMetersPerSecond": 5.0,
+        "wheelbaseMeters": 3.0
+      },
+      "expectedSteeringRadians": 0.09210623425400105
+    },
+    {
+      "state": {
+        "x": 30.0,
+        "y": -1.5,
+        "headingRadians": 0.13962634015954636,
+        "speedMetersPerSecond": 7.0,
+        "wheelbaseMeters": 3.0
+      },
+      "expectedSteeringRadians": -0.5308619192867206
+    },
+    {
+      "state": {
+        "x": 40.0,
+        "y": 0.05,
+        "headingRadians": -0.008726646259971648,
+        "speedMetersPerSecond": 2.5,
+        "wheelbaseMeters": 3.0
+      },
+      "expectedSteeringRadians": 0.040144875906347605
+    }
+  ]
+}

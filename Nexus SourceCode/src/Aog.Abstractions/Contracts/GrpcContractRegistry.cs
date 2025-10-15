@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Aog.Core.V1;
+using Aog.Guidance.V1;
 using Aog.Protos.Agio.V1;
 using Aog.Protos.Capabilities.V1;
 using Google.Protobuf;
@@ -61,6 +62,7 @@ public static class GrpcContractRegistry
             CoreReflection.Descriptor,
             CapabilitiesReflection.Descriptor,
             AgioSimReflection.Descriptor,
+            GuidanceReflection.Descriptor,
         };
 
         var queue = new Stack<FileDescriptor>(roots);

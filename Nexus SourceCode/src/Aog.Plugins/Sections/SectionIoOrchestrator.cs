@@ -74,24 +74,26 @@ public sealed class SectionIoOrchestrator
         var mask = _calculator.ComputeMask(speedMps, sections);
 
         lock (_gate)
+{
+    var lastMatches = _lastMask.HasValue && _lastMask.Value == mask;
+    var publishPending = _inFlightMask.HasValue;
+    var inFlightMatches = publishPending && _inFlightMask.Value == mask;
+
+    if (lastMatches)
+    {
+        if (!publishPending || inFlightMatches)
         {
-            var lastMatches = _lastMask.HasValue && _lastMask.Value == mask;
-            var inFlightMatches = _inFlightMask.HasValue && _inFlightMask.Value == mask;
-
-            if (lastMatches)
-            {
-                if (!_inFlightMask.HasValue || inFlightMatches)
-                {
-                    return;
-                }
-            }
-            else if (inFlightMatches)
-            {
-                return;
-            }
-
-            _inFlightMask = mask;
+            return;
         }
+    }
+    else if (inFlightMatches)
+    {
+        return;
+    }
+
+    _inFlightMask = mask;
+}
+
 
         try
         {

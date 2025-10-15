@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/Zone.v1.json",
+  "title": "Zone.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "zoneId",
+    "type",
+    "label",
+    "priority",
+    "enabled",
+    "geometry",
+    "buffers",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$",
+      "default": "1.0.0",
+      "description": "Schema semantic version for zones.",
+      "x-nexus-scope": "core"
+    },
+    "zoneId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Stable identifier for the zone.",
+      "x-nexus-scope": "core"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "boundary",
+        "headland",
+        "keepout",
+        "work_disabled"
+      ],
+      "description": "Classification of the zone constraint.",
+      "x-nexus-scope": "core"
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable name shown in UIs.",
+      "x-nexus-scope": "core"
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "description": "Ordering priority when multiple zones overlap (higher wins).",
+      "x-nexus-scope": "core"
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Whether the constraint is currently active.",
+      "x-nexus-scope": "core"
+    },
+    "geometry": {
+      "$ref": "#/$defs/polygon",
+      "description": "Buffered polygon geometry expressed in the project CRS.",
+      "x-nexus-scope": "core"
+    },
+    "buffers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "drive_m",
+        "work_m"
+      ],
+      "properties": {
+        "drive_m": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Drive clearance in meters from the polygon edge.",
+          "x-nexus-scope": "core"
+        },
+        "work_m": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Work clearance in meters from the polygon edge.",
+          "x-nexus-scope": "core"
+        }
+      },
+      "description": "Drive/work buffer distances applied to the zone.",
+      "x-nexus-scope": "core"
+    },
+    "validWhen": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "crop": {
+          "type": "string",
+          "description": "Crop name for which the zone applies.",
+          "x-nexus-scope": "core"
+        },
+        "season": {
+          "type": "string",
+          "description": "Season identifier for applicability.",
+          "x-nexus-scope": "core"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional policy conditions governing the zone.",
+          "x-nexus-scope": "core"
+        }
+      },
+      "description": "Optional applicability qualifiers.",
+      "x-nexus-scope": "core"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "timestamp"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Origin of the zone (import tool, editor, automation).",
+          "x-nexus-scope": "core"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the zone was authored or updated.",
+          "x-nexus-scope": "core"
+        },
+        "note": {
+          "type": "string",
+          "description": "Optional note describing the change rationale.",
+          "x-nexus-scope": "core"
+        }
+      },
+      "description": "Provenance metadata for audit and replay.",
+      "x-nexus-scope": "core"
+    }
+  },
+  "$defs": {
+    "coordinate": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 3,
+      "items": {
+        "type": "number"
+      },
+      "description": "Coordinate expressed as [lon, lat] or [lon, lat, elevation].",
+      "x-nexus-scope": "core"
+    },
+    "ring": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "$ref": "#/$defs/coordinate"
+      },
+      "description": "Linear ring with closed coordinates (first == last).",
+      "x-nexus-scope": "core"
+    },
+    "polygon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exterior"
+      ],
+      "properties": {
+        "exterior": {
+          "$ref": "#/$defs/ring",
+          "description": "Exterior ring of the polygon.",
+          "x-nexus-scope": "core"
+        },
+        "holes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ring"
+          },
+          "description": "Interior holes carved out of the polygon.",
+          "x-nexus-scope": "core"
+        }
+      },
+      "description": "Polygon geometry supporting holes.",
+      "x-nexus-scope": "core"
+    }
+  }
+}

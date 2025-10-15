@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.plugins.ntrip-client",
+  "name": "NTRIP Client",
+  "version": "1.0.0",
+  "description": "Authenticates with NTRIP casters and streams RTCM corrections to GNSS receivers via AGiO transports.",
+  "requiredApis": {
+    "core.runtime": ">=1.0.0",
+    "agio.transport": ">=1.0.0"
+  },
+  "supportedCapabilities": [
+    "gnss.corrections",
+    "telemetry.corrections"
+  ],
+  "requiredTransports": [
+    "udp://localhost:2101",
+    "core://ntrip"
+  ],
+  "settings": {
+    "mountPoints": {
+      "type": "array",
+      "description": "Configured caster mountpoints with credentials and fallback order."
+    },
+    "reconnectBackoffSeconds": {
+      "type": "number",
+      "default": 5,
+      "description": "Delay before reconnecting after transport interruptions."
+    }
+  },
+  "leases": [
+    {
+      "capability": "gnss.corrections",
+      "mode": "exclusive"
+    }
+  ],
+  "simProviders": []
+}

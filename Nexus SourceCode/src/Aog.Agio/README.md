@@ -4,6 +4,37 @@ The AGiO host now records watchdog transitions and failsafe actions to structure
 By default logs are written under `logs/safety` alongside the host binary. Each entry captures a
 UTC timestamp, event type, and metadata describing the actuator or watchdog reason.
 
+## NTRIP Client backend
+
+The official NTRIP client backend streams RTCM corrections from internet casters and forwards
+them to enabled AOG-Link transports. Enable the backend by selecting
+`Aog.Agio.Ntrip.NtripClientBackend` and configuring the `AgioHost:NtripClient` section:
+
+```json
+{
+  "AgioHost": {
+    "Backend": {
+      "Assembly": "Aog.Agio",
+      "Type": "Aog.Agio.Ntrip.NtripClientBackend"
+    },
+    "NtripClient": {
+      "Host": "caster.example.com",
+      "Port": 2101,
+      "MountPoint": "MY-MOUNT",
+      "Username": "rtk-user",
+      "Password": "secret",
+      "UseTls": true,
+      "ReconnectBackoff": "00:00:05"
+    }
+  }
+}
+```
+
+- **Host / Port / MountPoint** — Target caster endpoint and mountpoint name.
+- **Username / Password** — Optional basic-auth credentials; omit both for anonymous access.
+- **UseTls** — Enables TLS negotiation for casters served over HTTPS.
+- **ReconnectBackoff** — Delay applied before reconnecting when the connection is interrupted.
+
 ## Configuration
 
 The `AgioHost:SafetyLogs` section controls retention and output paths:

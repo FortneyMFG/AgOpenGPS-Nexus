@@ -136,7 +136,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-164 Official Variable Mapping plugin GA _(Planned)_
 - [ ] NX-165 Official ISOBUS Bridge plugin GA _(Planned)_
 - [ ] NX-166 Official GNSS/IMU Fusion plugin GA _(Planned)_
-- [ ] NX-167 Official NTRIP Client plugin GA _(Planned)_
+- [x] NX-167 Official NTRIP Client plugin GA _(Done)_
 - [ ] NX-168 Official Device Manager plugin GA _(Planned)_
 - [ ] NX-169 Official Planter Monitor plugin GA _(Planned)_
 - [ ] NX-170 Official Job Tasks plugin GA _(Planned)_

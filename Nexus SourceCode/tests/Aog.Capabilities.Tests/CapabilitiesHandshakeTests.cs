@@ -93,6 +93,20 @@ public sealed class CapabilitiesHandshakeTests
         Assert.Equal("Telemetry", descriptor.Summary);
     }
 
+    [Fact]
+    public void CapabilityDescriptorFactoryUsesRegistryMetadata()
+    {
+        var factory = new CapabilityDescriptorFactory();
+
+        var descriptor = Assert.Single(factory.Create(new[] { "mapping:raster" }));
+
+        Assert.Equal("mapping:raster", descriptor.Name);
+        Assert.Equal("1.0.0", descriptor.Version);
+        Assert.Equal("Publishes raster coverage tiles, rate surfaces, and diagnostics.", descriptor.Summary);
+        Assert.Equal("raster", descriptor.Attributes["surface"]);
+        Assert.Equal("mapping", descriptor.Attributes["bundle"]);
+    }
+
     private static ServerCallContext CreateContext()
     {
         return TestServerCallContext.Create(

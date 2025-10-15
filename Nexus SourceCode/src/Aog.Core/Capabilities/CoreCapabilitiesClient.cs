@@ -94,19 +94,40 @@ public sealed class CapabilityDescriptorFactory
                 Name = trimmed,
             };
 
-            if (!string.IsNullOrWhiteSpace(_defaultVersion))
+            if (CapabilityRegistry.TryGetDefinition(trimmed, out var definition))
+            {
+                if (!string.IsNullOrWhiteSpace(definition.DefaultVersion))
+                {
+                    descriptor.Version = definition.DefaultVersion;
+                }
+
+                if (!string.IsNullOrWhiteSpace(definition.Summary))
+                {
+                    descriptor.Summary = definition.Summary;
+                }
+
+                foreach (var pair in definition.Attributes)
+                {
+                    descriptor.Attributes[pair.Key] = pair.Value;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(_defaultVersion) && string.IsNullOrWhiteSpace(descriptor.Version))
             {
                 descriptor.Version = _defaultVersion;
             }
 
-            if (!string.IsNullOrWhiteSpace(_defaultSummary))
+            if (!string.IsNullOrWhiteSpace(_defaultSummary) && string.IsNullOrWhiteSpace(descriptor.Summary))
             {
                 descriptor.Summary = _defaultSummary;
             }
 
             foreach (var kvp in _defaultAttributes)
             {
-                descriptor.Attributes[kvp.Key] = kvp.Value;
+                if (!descriptor.Attributes.ContainsKey(kvp.Key))
+                {
+                    descriptor.Attributes[kvp.Key] = kvp.Value;
+                }
             }
 
             yield return descriptor;

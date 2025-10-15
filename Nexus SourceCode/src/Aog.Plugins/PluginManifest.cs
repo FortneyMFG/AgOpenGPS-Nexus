@@ -69,8 +69,14 @@ public sealed class PluginManifest
     /// <summary>
     /// Gets the minimum Nexus runtime version compatible with the plugin.
     /// </summary>
+    private string _minimumRuntimeVersion = "1.0.0";
+
     [JsonPropertyName("minimumRuntimeVersion")]
-    public required string MinimumRuntimeVersion { get; init; }
+    public string MinimumRuntimeVersion
+    {
+        get => _minimumRuntimeVersion;
+        init => _minimumRuntimeVersion = value ?? "1.0.0";
+    }
 
     /// <summary>
     /// Gets the simulation providers declared by the plugin.

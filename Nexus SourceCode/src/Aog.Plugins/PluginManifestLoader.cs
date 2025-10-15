@@ -127,9 +127,9 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (manifest.SupportedCapabilities is null || manifest.SupportedCapabilities.Count == 0)
+        if (manifest.SupportedCapabilities is null)
         {
-            throw new InvalidDataException("Manifest must declare supportedCapabilities.");
+            throw new InvalidDataException("Manifest supportedCapabilities must not be null.");
         }
 
         foreach (var capability in manifest.SupportedCapabilities)
@@ -140,9 +140,9 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (manifest.RequiredTransports is null || manifest.RequiredTransports.Count == 0)
+        if (manifest.RequiredTransports is null)
         {
-            throw new InvalidDataException("Manifest must declare required transports.");
+            throw new InvalidDataException("Manifest requiredTransports must not be null.");
         }
 
         foreach (var transport in manifest.RequiredTransports)
@@ -205,9 +205,14 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (manifest.CapabilityLeases is null || manifest.CapabilityLeases.Count == 0)
+        if (manifest.CapabilityLeases is null)
         {
-            throw new InvalidDataException("Manifest must declare capability leases.");
+            throw new InvalidDataException("Manifest leases must not be null.");
+        }
+
+        if (manifest.CapabilityLeases.Count == 0)
+        {
+            return;
         }
 
         var seenLeaseCapabilities = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

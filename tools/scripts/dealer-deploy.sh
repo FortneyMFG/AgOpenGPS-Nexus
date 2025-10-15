@@ -67,7 +67,7 @@ for pkg in "${packages[@]}"; do
     dest="$resolved_output/packages/$(basename "$pkg")"
     cp "$pkg" "$dest"
     copied_packages+=("$dest")
-fi
+done
 
 if [[ -n "$profile" && -e "$profile" ]]; then
     if [[ -d "$profile" ]]; then

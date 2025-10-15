@@ -130,8 +130,8 @@ public sealed class CoverageExportVerifier
         using var tempDirectory = TemporaryDirectory.Create();
         ZipFile.ExtractToDirectory(zipPath, tempDirectory.Path);
 
-        var shapefilePath = Directory.EnumerateFiles(tempDirectory.Path, "*.shp", SearchOption.AllDirectories)
-            .FirstOrDefault();
+        var shapefilePath = Directory.EnumerateFiles(tempDirectory.Path, "*", SearchOption.AllDirectories)
+            .FirstOrDefault(path => path.EndsWith(".shp", StringComparison.OrdinalIgnoreCase));
         if (shapefilePath is null)
         {
             throw new InvalidDataException($"No .shp file found in archive '{zipPath}'.");

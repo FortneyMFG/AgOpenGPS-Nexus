@@ -1,4 +1,9 @@
+using System;
+using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Channels;
+using System.Threading.Tasks;
 using Aog.Core.V1;
 
 namespace Aog.Agio.Linux.SocketCan;
@@ -8,38 +13,68 @@ namespace Aog.Agio.Linux.SocketCan;
 /// </summary>
 public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCanFrameSource
 {
-    private readonly Channel<CanFrame> _channel;
+    private readonly ConcurrentDictionary<Guid, Channel<CanFrame>> _subscribers = new();
 
     public SocketCanFrameChannel()
     {
-        _channel = Channel.CreateUnbounded<CanFrame>(new UnboundedChannelOptions
-        {
-            AllowSynchronousContinuations = false,
-            SingleReader = false,
-            SingleWriter = true,
-        });
     }
 
     /// <inheritdoc />
-    public ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken)
+    public async ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken)
     {
         if (frame is null)
         {
             throw new ArgumentNullException(nameof(frame));
         }
 
-        if (_channel.Writer.TryWrite(frame))
+        foreach (var (subscriptionId, channel) in _subscribers)
         {
-            return ValueTask.CompletedTask;
-        }
+            if (channel.Writer.TryWrite(frame))
+            {
+                continue;
+            }
 
-        return _channel.Writer.WriteAsync(frame, cancellationToken);
+            try
+            {
+                await channel.Writer.WriteAsync(frame, cancellationToken).ConfigureAwait(false);
+            }
+            catch (ChannelClosedException)
+            {
+                _subscribers.TryRemove(subscriptionId, out _);
+            }
+        }
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<CanFrame> ReadAllAsync(CancellationToken cancellationToken)
+    public async IAsyncEnumerable<CanFrame> ReadAllAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        return _channel.Reader.ReadAllAsync(cancellationToken);
+        var subscriptionId = Guid.NewGuid();
+        var channel = Channel.CreateUnbounded<CanFrame>(new UnboundedChannelOptions
+        {
+            AllowSynchronousContinuations = false,
+            SingleReader = true,
+            SingleWriter = false,
+        });
+
+        if (!_subscribers.TryAdd(subscriptionId, channel))
+        {
+            channel.Writer.TryComplete();
+            throw new InvalidOperationException("Failed to register SocketCAN subscriber channel.");
+        }
+
+        try
+        {
+            await foreach (var frame in channel.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
+            {
+                yield return frame;
+            }
+        }
+        finally
+        {
+            _subscribers.TryRemove(subscriptionId, out _);
+            channel.Writer.TryComplete();
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -10,14 +11,15 @@ namespace Aog.Core.Tests.Simulation;
 
 internal sealed class SimulationPerformanceHarness
 {
+    private readonly IReadOnlyList<SimulationRouteConfiguration> _baselineRoutes;
     private readonly SimulationGraph _graph;
-    private readonly int _outputCount;
     private readonly TimeSpan _step;
 
     public SimulationPerformanceHarness(SimulationConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
+        _baselineRoutes = configuration.Routes ?? Array.Empty<SimulationRouteConfiguration>();
         var catalog = new SimulationCatalog();
         foreach (var descriptor in configuration.CreateProviderDescriptors())
         {
@@ -25,7 +27,6 @@ internal sealed class SimulationPerformanceHarness
         }
 
         _graph = catalog.BuildGraph();
-        _outputCount = _graph.Providers.Sum(provider => provider.Outputs.Count);
         _step = TimeSpan.FromMilliseconds(50);
     }
 
@@ -43,8 +44,14 @@ internal sealed class SimulationPerformanceHarness
         var recorder = new SimulationPerformanceBudgetRecorder();
         var bus = new InstrumentedSimBus(new InMemorySimBus(), recorder);
         var accumulator = new HarnessAccumulator();
+        var providers = ResolveScenarioProviders(scenario);
+        var totalOutputs = providers.Sum(provider => provider.Outputs.Count);
+        if (totalOutputs == 0)
+        {
+            throw new InvalidOperationException($"Scenario '{scenario.ScenarioId}' resolved no outputs to publish.");
+        }
 
-        foreach (var descriptor in _graph.Providers)
+        foreach (var descriptor in providers)
         {
             foreach (var topic in descriptor.Outputs)
             {
@@ -65,7 +72,7 @@ internal sealed class SimulationPerformanceHarness
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            foreach (var descriptor in _graph.Providers)
+            foreach (var descriptor in providers)
             {
                 var jitter = rng.NextDouble();
                 var payload = new SimPayload(descriptor.ProviderId, tick, jitter);
@@ -80,13 +87,14 @@ internal sealed class SimulationPerformanceHarness
 
         stopwatch.Stop();
 
-        var budgetSnapshot = recorder.Snapshot(stopwatch.Elapsed, accumulator.TotalMessages);
+        var expectedMessages = iterations * totalOutputs;
+        var budgetSnapshot = recorder.Snapshot(stopwatch.Elapsed, expectedMessages);
 
         return new SimulationPerformanceResult(
             iterations,
-            _graph.Providers.Count,
+            providers.Count,
             accumulator.TotalMessages,
-            _outputCount,
+            totalOutputs,
             stopwatch.Elapsed,
             accumulator.Checksum,
             budgetSnapshot);
@@ -107,6 +115,40 @@ internal sealed class SimulationPerformanceHarness
         }
 
         public double Checksum => _checksum;
+    }
+
+    private IReadOnlyList<SimulationProviderDescriptor> ResolveScenarioProviders(SimulationScenarioConfiguration scenario)
+    {
+        var routeSources = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var route in _baselineRoutes)
+        {
+            if (!string.IsNullOrWhiteSpace(route?.Source))
+            {
+                routeSources.Add(route.Source);
+            }
+        }
+
+        if (scenario.Routes is { Count: > 0 })
+        {
+            foreach (var route in scenario.Routes)
+            {
+                if (!string.IsNullOrWhiteSpace(route?.Source))
+                {
+                    routeSources.Add(route.Source);
+                }
+            }
+        }
+
+        var providers = new List<SimulationProviderDescriptor>();
+        foreach (var descriptor in _graph.Providers)
+        {
+            if (routeSources.Contains(descriptor.ProviderId))
+            {
+                providers.Add(descriptor);
+            }
+        }
+
+        return providers;
     }
 }
 

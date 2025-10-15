@@ -23,7 +23,8 @@ if (-not (Test-Path $RepoRoot)) {
 
 $tests = @(
     @{ Path = 'Nexus SourceCode/tests/Aog.Abstractions.Tests/Aog.Abstractions.Tests.csproj'; Filter = 'FullyQualifiedName~ContractCompatibilityTests' },
-    @{ Path = 'Nexus SourceCode/tests/Aog.Plugins.Tests/Aog.Plugins.Tests.csproj'; Filter = 'FullyQualifiedName~ContractCompatibilityTests' }
+    @{ Path = 'Nexus SourceCode/tests/Aog.Plugins.Tests/Aog.Plugins.Tests.csproj'; Filter = 'FullyQualifiedName~ContractCompatibilityTests' },
+    @{ Path = 'Nexus SourceCode/tests/Aog.Core.Tests/Aog.Core.Tests.csproj'; Filter = 'FullyQualifiedName~CapabilityRegistryDocumentationTests' }
 )
 
 foreach ($test in $tests) {

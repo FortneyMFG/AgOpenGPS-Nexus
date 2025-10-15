@@ -70,3 +70,6 @@ messages when required capabilities are absent.
    descriptors emit the expected metadata.
 4. Coordinate with the contracts governance owner before shipping to guarantee compatibility
    across Core, AgIO, and plugin bundles.
+5. CI enforces this freeze window by running `CapabilityRegistryDocumentationTests` via
+   `tools/ci/contracts.ps1`; new capabilities must land with corresponding documentation
+   updates.

@@ -11,7 +11,8 @@ namespace Aog.UI.Avalonia.ViewModels;
 public sealed class FieldHealthPanelViewModel : ObservableObject
 {
     private readonly ObservableCollection<FieldHealthSeverityBucketViewModel> _severityBuckets = new();
-    private readonly ObservableCollection<FieldHealthHistoryEntryViewModel> _historyEntries = new();
+    private readonly ObservableCollection<FieldHealthHistoryEntryViewModel> _allHistoryEntries = new();
+    private readonly ObservableCollection<FieldHealthHistoryEntryViewModel> _filteredHistoryEntries = new();
     private readonly ReadOnlyObservableCollection<FieldHealthSeverityBucketViewModel> _severityView;
     private readonly ReadOnlyObservableCollection<FieldHealthHistoryEntryViewModel> _historyView;
     private string _layerDisplayName = "Field health";
@@ -31,7 +32,7 @@ public sealed class FieldHealthPanelViewModel : ObservableObject
     public FieldHealthPanelViewModel()
     {
         _severityView = new ReadOnlyObservableCollection<FieldHealthSeverityBucketViewModel>(_severityBuckets);
-        _historyView = new ReadOnlyObservableCollection<FieldHealthHistoryEntryViewModel>(_historyEntries);
+        _historyView = new ReadOnlyObservableCollection<FieldHealthHistoryEntryViewModel>(_filteredHistoryEntries);
     }
 
     /// <summary>Gets the layer display name surfaced in the panel header.</summary>
@@ -115,6 +116,7 @@ public sealed class FieldHealthPanelViewModel : ObservableObject
         {
             if (SetProperty(ref _showActive, value))
             {
+                RefreshHistoryEntries();
                 OnPropertyChanged(nameof(FilterSummary));
             }
         }
@@ -128,6 +130,7 @@ public sealed class FieldHealthPanelViewModel : ObservableObject
         {
             if (SetProperty(ref _showMonitor, value))
             {
+                RefreshHistoryEntries();
                 OnPropertyChanged(nameof(FilterSummary));
             }
         }
@@ -141,6 +144,7 @@ public sealed class FieldHealthPanelViewModel : ObservableObject
         {
             if (SetProperty(ref _showResolved, value))
             {
+                RefreshHistoryEntries();
                 OnPropertyChanged(nameof(FilterSummary));
             }
         }
@@ -203,13 +207,37 @@ public sealed class FieldHealthPanelViewModel : ObservableObject
         Alert = string.IsNullOrWhiteSpace(snapshot.Alert) ? null : snapshot.Alert.Trim();
 
         ReplaceItems(_severityBuckets, snapshot.SeverityBuckets, bucket => new FieldHealthSeverityBucketViewModel(bucket.Severity, bucket.Count, bucket.AreaHectares, bucket.Description));
-        ReplaceItems(_historyEntries, snapshot.HistoryEntries, entry => new FieldHealthHistoryEntryViewModel(entry.Timestamp, entry.Severity, entry.Status, entry.Notes));
+        ReplaceItems(_allHistoryEntries, snapshot.HistoryEntries, entry => new FieldHealthHistoryEntryViewModel(entry.Timestamp, entry.Severity, entry.Status, entry.Notes));
 
         ShowActive = snapshot.ShowActive;
         ShowMonitor = snapshot.ShowMonitor;
         ShowResolved = snapshot.ShowResolved;
 
+        RefreshHistoryEntries();
         OnPropertyChanged(nameof(FilterSummary));
+    }
+
+    private void RefreshHistoryEntries()
+    {
+        _filteredHistoryEntries.Clear();
+        foreach (var entry in _allHistoryEntries)
+        {
+            if (ShouldInclude(entry))
+            {
+                _filteredHistoryEntries.Add(entry);
+            }
+        }
+    }
+
+    private bool ShouldInclude(FieldHealthHistoryEntryViewModel entry)
+    {
+        return entry.Status switch
+        {
+            var status when string.Equals(status, "Active", StringComparison.OrdinalIgnoreCase) => ShowActive,
+            var status when string.Equals(status, "Monitor", StringComparison.OrdinalIgnoreCase) => ShowMonitor,
+            var status when string.Equals(status, "Resolved", StringComparison.OrdinalIgnoreCase) => ShowResolved,
+            _ => true,
+        };
     }
 
     private static void ReplaceItems<TModel, TSnapshot>(ObservableCollection<TModel> collection, IEnumerable<TSnapshot> snapshots, Func<TSnapshot, TModel> factory)

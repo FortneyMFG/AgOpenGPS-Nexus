@@ -28,6 +28,11 @@ Adopt gRPC with protobuf IDLs as the authoritative inter-process API for Nexus s
 ### Legacy Dev Branch
 - The dev branch continues to lean on the same PGN transports while experimenting with SocketCAN and normalization inside bridge prototypes, rather than shipping a shared gRPC contract layer.【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L36】
 
+## Governance Updates
+- **Contract review board.** The Platform Architecture group now runs a bi-weekly contract clinic. Schema diffs require sign-off from Core, AgIO, and Plugin leads with golden-file verification across wire compatibility fixtures. Proposed breaking changes must ship dual-field shims and a downgrade guide before approval.
+- **Compatibility automation.** Generated proto descriptors feed a lint that rejects unreviewed field renames/removals and enforces reserved ranges. Integration tests replay recorded PGN/AOG-Link payloads through Bridge services to ensure codecs remain reversible.
+- **Change-control checklist.** Plugin authors must attach: protobuf diff summary, golden round-trip logs, bridge regression report, and documentation updates. Release tooling blocks package publication until the checklist is complete.
+
 ## References
 - [Section 03 — Communications & Transports](../SRS/sections/03_Comm_Transports.md)
 - [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/O-STACK-1_DotNet8Avalonia.md)

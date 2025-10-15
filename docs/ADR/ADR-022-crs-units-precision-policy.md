@@ -17,6 +17,11 @@ Consistent coordinate reference systems (CRS), units, and numeric precision are 
 - Enforcing conversions and audit logging adds processing overhead but prevents silent drift across deployments.
 - Legacy data sets must pass through normalization pipelines, increasing migration workload but yielding higher data quality.
 
+## Governance Updates
+- **CRS decision tooling.** A guided decision tree with distortion heatmaps now ships alongside CLI tools that flag when distortion exceeds thresholds, recommending alternative CRS selections.
+- **Operator education.** Training modules and visual overlays teach operators how CRS selection impacts analytics, driving better adoption of recommended projections.
+- **Alerting.** Pipelines emit warnings when incoming data deviates from site-approved CRS, ensuring redaction workflows catch misconfigured sources.
+
 ## Validation
 - CRS policy must select projections with ≤ 1 cm distortion across 640-acre test extents and document fallback strategies.
 - Conversion utilities must pass regression suites covering 50 assets with ≤ 0.1% conversion error across imperial/metric cases.

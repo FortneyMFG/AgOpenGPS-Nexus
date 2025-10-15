@@ -17,6 +17,11 @@ Accurate guidance and control require kinematic models that describe tractor, im
 - Maintaining detailed profiles increases setup effort but enables richer simulation, diagnostics, and analytics.
 - Sensor fusion introduces complexity that demands regression fixtures and cross-platform validation.
 
+## Governance Updates
+- **Calibration data exchange.** Field calibration sessions emit signed bundles (raw logs, solved parameters, environmental notes) stored alongside profile versions. Bundles must be replayable in simulation before publishing.
+- **Correlation testing.** Simulation outputs are compared against hardware logs for each profile update. Drift beyond tolerance blocks release and spins follow-up tasks.
+- **Lifecycle tracking.** Profiles carry effective dates and deprecation notices so operators can schedule recalibration windows proactively.
+
 ## Validation
 - Kinematic simulations must track hitch articulation within ≤ 2 cm error over 100 m paths compared to motion capture baselines.
 - Multi-steer fusion must converge within five cycles after switching pose sources while avoiding > 1° yaw oscillations.

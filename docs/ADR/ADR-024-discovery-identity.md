@@ -17,6 +17,11 @@ Multiple controllers, plugins, and firmware nodes must discover each other, exch
 - Security requirements increase implementation complexity but mitigate unauthorized access risks.
 - Discovery and identity services must integrate tightly with manifests and capability registries, requiring coordination across teams.
 
+## Governance Updates
+- **Zero-touch provisioning.** Device onboarding supports QR-code and pre-shared bootstrap token flows that enroll hardware without manual certificate copying.
+- **Disaster recovery.** Compromised identities trigger automated certificate revocation, credential rotation checklists, and offline recovery steps documented in the incident response runbook.
+- **Lease tuning.** Identity leases include adaptive renewal timers tolerant of high-latency field links while maintaining revocation responsiveness.
+
 ## Validation
 - Discovery handshake must complete within two seconds for five-node rigs and populate the identity registry with unique IDs verified across transports.
 - Security model must enforce mTLS authentication and reject unauthenticated clients with structured telemetry events.

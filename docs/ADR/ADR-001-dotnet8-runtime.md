@@ -28,6 +28,11 @@ Standardise the Nexus codebase on C# targeting .NET 8 for every first-party comp
 ### Legacy Dev Branch
 - The community dev branch follows the same Windows-only WinForms/WPF approach, reflecting the status-quo option of incremental modernization without a shared cross-platform runtime or packaging story.【F:docs/SRS/sections/01_OS_Support.md†L6-L13】【F:docs/SRS/sections/02_Framework_UI.md†L16-L29】
 
+## Governance Updates
+- **Supported runtime roster.** Nexus ships on .NET 8 through November 2026 with quarterly compatibility snapshots. Engineering pre-bakes manifests for the next LTS (currently .NET 10 preview) and publishes a readiness scorecard each June covering Core, AgIO, plugins, and tooling. A go/no-go decision is recorded 90 days before Microsoft GA so dependent teams can stage migrations without fire drills.
+- **Compatibility smoke regimen.** QA owns an annual matrix that runs desktop, NativeAOT, and containerised builds across Windows x64, Linux x64/ARM64, and the supported SBC images. The February and August cycles gate feature freeze, while monthly spot checks ensure NuGet dependency drifts stay inside the signed roster.
+- **Back-out playbook.** If a runtime uplift regresses hardware integrations, AgIO locks roll-forward, re-issues the prior runtime bundle, and coordinates with Plugin and Firmware owners to certify patched drivers within two weeks. Production rollbacks require communicating operator impact and re-running compatibility smokes before reopening the upgrade window.
+
 ## References
 - [Section 01 — OS Support](../SRS/sections/01_OS_Support.md)
 - [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/O-STACK-1_DotNet8Avalonia.md)

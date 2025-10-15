@@ -15,6 +15,11 @@ Adopt the plugin dependency map as the authoritative specification for the first
 4. **Lifecycle checks** — Device Manager and UI Shell surface dependency health badges using the matrix so operators know when required peers are absent or stale.【F:docs/plugins/nexus-plugin-dependency-map.md†L109-L205】
 5. **Roadmap integration** — ADR-031 becomes the umbrella decision covering ongoing manifest maintenance and CI validation tasks listed in the ADR roadmap.【F:docs/ADR/ADR-roadmap.md†L89-L111】
 
+## Governance Updates
+- **Machine-readable digests.** Bundle releases publish signed dependency manifests that CI and operators can ingest to audit compatibility and provenance.
+- **Release tooling integration.** Publishing flow cross-checks manifests against live dependency graphs, blocking promotion until conflicts or missing smoke coverage are resolved.
+- **Sandbox rehearsals.** Maintainers operate rehearsal environments mirroring production rigs. Successful rehearsals become a release checklist item and results are archived for later audits.
+
 ## Consequences
 - **Positive**
   - Prevents misconfigured deployments by failing fast when mandatory services are missing or incompatible.【F:docs/plugins/nexus-plugin-dependency-map.md†L19-L164】

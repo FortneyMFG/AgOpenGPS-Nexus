@@ -17,6 +17,11 @@ Deterministic PoseStream sequencing, automation timing, and telemetry diagnostic
 - Drift handling logic adds complexity to PoseStream ingestion and firmware transports, necessitating fault-injection coverage.
 - Diagnostics surfaces must expand to include latency histograms and drift events, increasing UI and telemetry workload.
 
+## Governance Updates
+- **Reference hardware catalog.** The clock team publishes approved GPSDO and PTP appliances with firmware versions and calibration procedures. Deployments outside the list require exception review.
+- **Test harnesses.** Simulated mixed-network scenarios validate drift correction routines before firmware ships. Harnesses run nightly and on hardware driver changes.
+- **Mockable interfaces.** Firmware and plugin teams must expose injectable clock providers so unit tests exercise skew handling without physical hardware.
+
 ## Validation
 - Drift monitors must detect ≥ 2 ms/minute drift within three minutes and trigger resynchronization routines validated via simulated skew scenarios.
 - PoseStream sequence enforcement must guarantee monotonic numbering with ≤ 1 frame reorder incidents across 24-hour soak tests.

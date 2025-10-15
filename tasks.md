@@ -18,6 +18,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-126 Mapping plugin architecture ADR _(In Review)_
 - [ ] NX-131 Field job session lifecycle ADR _(Proposed)_
 - [ ] NX-152 .NET 8 runtime enforcement per ADR-001 _(Planned)_
+- [ ] NX-190 Comprehensive ADR portfolio review _(In Review)_
 - [ ] NX-153 gRPC contract governance rollout _(Planned)_
 - [ ] NX-154 Avalonia companion run-mode delivery _(Planned)_
 - [ ] NX-155 Composite simulation fabric GA _(Planned)_
@@ -189,6 +190,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-115 | AOG-Link protocol specification and reference flows | Done |  | — | [SRS §3 Communications & Transports](docs/SRS/sections/03_Comm_Transports.md) | ADR-006 + SRS updates complete |
 | NX-116 | Shared `aog-link.proto` schemas with nanopb options | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Publish contracts aligned with `Aog.Abstractions` |
 | NX-152 | Enforce ADR-001 .NET 8 runtime baselines across solutions and CI | Planned |  | — | [ADR-001 .NET 8 runtime](docs/ADR/ADR-001-dotnet8-runtime.md) | Audit project targets, templates, and docs for `net8.0` compliance |
+| NX-190 | Comprehensive ADR portfolio review | In Review |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Apply 2025 governance updates across accepted and draft ADRs |
 | NX-153 | Operationalize ADR-002 gRPC contract governance and compatibility gates | Planned |  | — | [ADR-002 gRPC contracts](docs/ADR/ADR-002-grpc-contracts.md) | Add versioned schema reviews and bridge validation before releases |
 | NX-154 | Deliver ADR-003 Avalonia shell run modes (CompanionRemote/Local) | Planned |  | — | [ADR-003 Avalonia UI](docs/ADR/ADR-003-avalonia-ui.md) | Implement transport adapters, docs, and smoke tests for each mode |
 | NX-155 | Complete ADR-004 composite simulation fabric with regression packs | Planned |  | — | [ADR-004 Composite simulation](docs/ADR/ADR-004-composite-simulation.md) | Finalize SimClock/SimBus topic catalogs and seeded CI scenarios |

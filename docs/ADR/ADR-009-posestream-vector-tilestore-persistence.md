@@ -17,6 +17,11 @@ To support deterministic replay, analytics, and long-term storage, Nexus needs a
 - Storage services must implement compaction and integrity checks, increasing implementation complexity but ensuring crash recovery.
 - Legacy archives require migration to the new log structure, adding tooling work but yielding consistent retention policies.
 
+## Governance Updates
+- **Recovery drills.** Operations runs quarterly restore rehearsals simulating power loss, partial compaction, and filesystem corruption. Runbooks capture MTTR and remediation steps, and failures create Sev2 incidents for the persistence team.
+- **Forward compatibility markers.** TileStore manifests now embed minimum/maximum reader versions. Tooling rejects incompatible payloads and offers guided export to supported formats.
+- **Audit logging.** Restore operations and manual repairs append tamper-evident entries to the provenance ledger with operator, timestamp, and validation checksum.
+
 ## Validation
 - TileStore compaction must maintain ≤ 1.8× write amplification under sustained 20 Hz ingest over two-hour replay fixtures.
 - Vector↔tile transforms must round-trip within 0.25% aggregate error for tracked channels using analytical baselines.

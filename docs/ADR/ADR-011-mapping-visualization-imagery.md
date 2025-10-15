@@ -17,6 +17,11 @@ Nexus must render PoseStream-derived ribbons, heatmaps, and telemetry overlays w
 - Offline use cases improve through basemap cache and attribution handling but introduce storage management responsibilities.
 - Rendering pipeline refactors may necessitate additional automated screenshot diffs and regression fixtures.
 
+## Governance Updates
+- **Rendering baselines.** Golden screenshot packs accompany each imagery change and include GPU telemetry (frame time, VRAM, shader stats). Deviations >5% in runtime budgets or cache hit rates raise blocking alerts.
+- **Telemetry collectors.** Replay CI ingests GPU counters from supported hardware and posts dashboards correlating imagery changes with performance impacts. Any regression triggers a mandatory review by the imagery working group.
+- **Cache policy change control.** Modifying cache eviction or prefetch rules requires updating the baseline documentation and executing replay benchmarks with hot/cold cache scenarios.
+
 ## Validation
 - Basemap cache manager must maintain ≥ 92% hit rate during offline replay while respecting ≤ 3 GB disk footprint.
 - Imagery pipeline must sustain ≥ 55 FPS for ribbon/heatmap workloads on the reference GPU with ≤ 80% GPU utilization.

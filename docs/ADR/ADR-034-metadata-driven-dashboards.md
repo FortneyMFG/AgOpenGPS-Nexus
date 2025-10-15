@@ -17,6 +17,11 @@ UI overlays, dashboards, and inspectors need to consume layer metadata without h
 - Declarative layouts require rigorous metadata validation and performance tuning to maintain responsiveness on target GPUs.
 - Companion and remote clients must support the same metadata contracts, increasing coordination but improving consistency.
 
+## Governance Updates
+- **Schema versioning.** Widget schemas adopt semantic versioning with compatibility tests across Avalonia and companion clients before publication.
+- **Accessibility audits.** Quarterly audits verify color contrast, keyboard navigation, and screen reader cues, and results are linked to release notes.
+- **Cross-client tests.** CI runs shared dashboard suites on desktop and companion shells to confirm metadata-driven layouts render consistently.
+
 ## Validation
 - UI automation must cover at least 30 metadata-driven widgets with > 90% branch coverage in Avalonia tests.
 - Replay benchmarks must render 48-row rigs at ≥ 45 FPS average with ≤ 5 dropped frames per minute on the reference MX450 GPU.

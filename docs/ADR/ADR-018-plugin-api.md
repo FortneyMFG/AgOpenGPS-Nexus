@@ -17,6 +17,11 @@ Establish a gRPC-first plugin architecture composed of:
 - **Lifecycle model:** Plugins move through discovered → verified → started → healthy → degraded → stopped states. Core watches manifest directories and allows hot-plug/start/stop without restarting Core or the UI. Health RPCs provide heartbeat, metrics, and error surfaces; repeated failures trigger exponential backoff and operator notifications.
 - **Versioning & compatibility:** Core and plugin contracts use semantic versioning with feature flags for preview services. Manifests specify acceptable Core API ranges; incompatible plugins fail registration with actionable messages. Capabilities include schema hashes (e.g., layer definitions, registry hashes) to detect drift before data exchange.
 
+## Governance Updates
+- **Security threat model.** Capability manifests undergo threat modeling covering privilege escalation, manifest tampering, and supply-chain compromise. Mitigations feed into mandatory signed capability leases maintained in source control.
+- **Signed leases.** Runtime only activates capabilities when presented with a signed lease from the operator or fleet administrator. Leases encode scope, expiry, and audit references, and CI rejects unsigned manifests.
+- **Reference policies.** Deployment playbooks ship pre-built policy bundles for single-rig, co-op, and enterprise fleets. Operators can apply templates directly, reducing bespoke analysis while preserving least-privilege defaults.
+
 ## Consequences
 - **Positive impacts**
   - Core stays minimal and deterministic while enabling rapid plugin innovation (automation, analytics, hardware bridges).

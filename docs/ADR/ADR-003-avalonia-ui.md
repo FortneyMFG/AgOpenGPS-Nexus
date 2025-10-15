@@ -30,6 +30,11 @@ Connection policy, offline caches, and feature gating flow from shared configura
   - Scaffold the Avalonia solution and shell project structure (future NX tasks).
   - Define UI theming, metadata-driven widget strategy, and remote-client story around the Avalonia host.
 
+## Governance Updates
+- **Performance acceptance matrix.** Device bands (desktop, rugged tablet, mobile) must sustain ≥45 FPS, ≤80 ms input latency, and ≤1.2× baseline memory at steady state. Benchmark tables accompany every quarterly release candidate along with GPU trace captures for regression analysis.
+- **Quarterly UX smoke.** Scheduled runs in March, June, September, and December replay scripted tours across Windows, Linux, Android, and iOS. Regressions raise Sev2 defects that block release freeze until resolved or signed off by UX leadership.
+- **Golden screenshot packs.** Automated baseline renders detect deltas >1.5% pixel change. Approved updates require paired accessibility checks (contrast, keyboard focus order) and updated documentation for plugin authors who embed shared widgets.
+
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
 - Operators rely on the WinForms UI with selective WPF panels, so the legacy stack is confined to Windows desktops and lacks a cross-platform shell today.【F:docs/SRS/sections/02_Framework_UI.md†L6-L10】【F:docs/SRS/sections/05_Frontends.md†L7-L12】

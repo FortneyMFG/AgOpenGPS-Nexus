@@ -17,6 +17,11 @@ Field deployments accumulate large PoseStream, tile, and derived datasets that m
 - Privacy and retention enforcement add operational overhead yet reduce risk of data leakage.
 - Export workflows must integrate with provenance and determinism checks, increasing complexity but aligning datasets across systems.
 
+## Governance Updates
+- **Cost modeling.** Storage planners publish per-deployment cost models covering hot/cold tiers and maintenance CPU. Operators receive calculators to forecast spend before enabling features.
+- **Privacy propagation.** Privacy tags link to provenance so redaction requests automatically cascade through exports and derived datasets.
+- **Compliance audits.** Quarterly audits reconcile policy with regulatory obligations, documenting variances and remediation plans.
+
 ## Validation
 - Retention planner must enforce configurable windows (30/90/365 days) with automated tests proving compliance.
 - Compaction scheduler must keep disk utilization ≤ 70% under heavy ingest while limiting maintenance CPU to ≤ 15% on average.

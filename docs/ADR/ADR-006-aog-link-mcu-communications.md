@@ -49,6 +49,11 @@ Adopt AOG-Link v1, a compact protobuf/nanopb-based datagram protocol, as the sta
   - Direct MCU↔MCU sharing (speed, rate, sections with stale-source handling)
 - Deprecate PGN expansion in favor of static legacy maintenance.
 
+## Governance Updates
+- **Compliance kit.** Firmware partners receive a nanopb generator bundle, loopback transport simulator, and packet-capture fixtures that mirror production line noise. Certification requires passing the automated suite and publishing logs before hardware ships.
+- **Interoperability tiers.** Deployment guides now classify controllers as Legacy PGN-only, Hybrid, or Full AOG-Link. Each tier lists supported capabilities, fallback behaviors, and upgrade prerequisites so operators can plan migrations.
+- **Support cadence.** Annual interoperability summits review firmware updates, transport findings, and telemetry from the field. Findings convert into backlog tasks with explicit owners and due dates.
+
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
 - MCU and host communications ride on the classic PGN frame (0x80/0x81 header, CRC trailer) across UDP and serial links, so firmware today exchanges fixed-width byte payloads without protobuf schemas.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L24】

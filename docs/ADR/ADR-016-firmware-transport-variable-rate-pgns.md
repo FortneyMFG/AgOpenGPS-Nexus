@@ -17,6 +17,11 @@ Delivering layer definitions and feedback between Core, AgIO, and implement firm
 - Transport specifications improve safety by ensuring mismatched hashes fail-safe quickly, though they increase implementation complexity.
 - CI and simulation infrastructure must expand to cover latency, jitter, and error injection scenarios for both CAN and UDP paths.
 
+## Governance Updates
+- **Timing reference implementations.** Shared firmware examples include jitter injectors and watchdog tunables. Vendors must certify against the reference suite before distributing updates.
+- **Shared conformance lab.** Nexus QA operates a lab with CAN/UDP harnesses, publishing monthly health summaries and escalating regressions within 48 hours.
+- **Configurable safety thresholds.** Specifications now expose parameterized watchdog sensitivity with documented safe ranges, allowing deployments to adjust without forking firmware.
+
 ## Validation
 - Firmware simulators must demonstrate end-to-end PGN exchange with ≤ 15 ms jitter at 20 Hz over CAN and ≤ 25 ms over UDP.
 - Registry hash mismatches must trigger degraded mode within 200 ms and log actionable error codes for diagnostics.

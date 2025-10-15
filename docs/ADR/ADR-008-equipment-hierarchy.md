@@ -17,6 +17,11 @@ Legacy AOG configurations model implements as flat lists of sections with limite
 - PoseStream consumers can reference stable identifiers for toolbar/section mapping and telemetry.
 - Migration tooling must normalize legacy configs into the new schema, surfacing validation errors when overlaps are invalid.
 
+## Governance Updates
+- **Migration playbook.** A scripted converter ingests V5/V6 configurations, outputs diff reports (group priority, offsets, dependencies), and highlights operator-visible changes. Upgrades require capturing these reports and attaching them to release notes.
+- **Versioned schemas.** Equipment hierarchy definitions now carry semantic versions, with compatibility gates in the registry that reject edits lacking migration metadata or unit tests covering downgrade paths.
+- **Operator acceptance.** UI editors surface validation warnings sourced from the same schema validators, and human QA signs off on representative rigs each release cycle.
+
 ## Validation
 - JSON schema validation must round-trip at least 30 representative V5/V6 implement configurations without structural diffs beyond expected ID normalization.
 - Overlapping SectionGroup arbitration tests must demonstrate deterministic master override order with ≤ 50 ms resolution latency under concurrent commands.

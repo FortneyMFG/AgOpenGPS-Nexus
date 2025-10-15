@@ -17,6 +17,11 @@ Nexus must relate jobs, sessions, PoseStreams, and derived artifacts so provenan
 - Session orchestration introduces coordination overhead but enables deterministic resume and multi-stream management.
 - UI and automation pipelines must surface session awareness, requiring new UX patterns and telemetry events.
 
+## Governance Updates
+- **Transactional guarantees.** Session writes now leverage journaling with two-phase commit semantics between session state and storage backends. Crash recovery replays logs and reconciles provenance pointers automatically.
+- **Consistency tooling.** Maintenance CLI scans provenance graphs for orphaned edges, offering guided repair actions that operators can run during scheduled downtime.
+- **Operational playbooks.** Fleet administrators receive monthly health reports highlighting drift, reconciliation results, and outstanding repairs.
+
 ## Validation
 - Session lifecycle tests must demonstrate create/resume/switch flows that maintain referential integrity with zero orphaned references.
 - Snapshot storage must persist implement/equipment state with < 500 ms serialization latency and ≤ 5% storage overhead compared to raw configurations.

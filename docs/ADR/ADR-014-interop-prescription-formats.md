@@ -17,6 +17,11 @@ Nexus must import and export industry-standard agronomic formats—ISOXML TaskDa
 - Enforcing canonical formats and audit logging increases tooling complexity but mitigates field surprises and compliance risks.
 - Existing scripts and UI flows must adapt to new schemas and validation checks, requiring documentation and training updates.
 
+## Governance Updates
+- **Compatibility matrix.** The data interoperability team maintains a vendor-format matrix capturing quirks, firmware levels, and regression status. Matrix updates accompany each release and inform operator documentation.
+- **Schema diff automation.** Import/export tooling now emits structured diffs when incoming data deviates from expected schemas, surfacing actionable warnings for operators.
+- **Regression rehearsals.** Firmware releases trigger replay of the compatibility suite before publication, with failures blocking distribution until addressed.
+
 ## Validation
 - ISOXML TaskData importer/exporter must retain 100% of task attributes with ≤ 2 cm spatial error against canonical fixtures.
 - GeoTIFF/COG pipelines must preserve raster statistics (mean, stdev) within 0.2% after compression/decompression across sample datasets.

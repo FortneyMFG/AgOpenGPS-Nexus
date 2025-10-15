@@ -2,6 +2,11 @@
 
 This tracker consolidates current and planned Architecture Decision Records so the Nexus team can stage the PoseStream, section control, and variable-rate overhaul in one place. It links each ADR to the SRS requirements that must be satisfied before drafting or promoting the decision for review.【F:tasks.md†L131-L137】 Use it to coordinate sequencing, ensure prerequisite requirements are in place, and keep the community focused on the same backlog of decisions.
 
+## Governance Updates
+- **Living program board.** The roadmap now syncs with the architecture kanban each Monday, capturing burndown, dependency risk, and staffing flags. Updates generate summaries in `tasks.md` so execution plans stay aligned.
+- **Dependency telemetry.** Automated scripts highlight ADRs blocked on missing registries or tooling, prompting owners to file NX follow-ups before deadlines slip.
+- **Communication cadence.** Monthly review meetings publish minutes and action items linked from this roadmap, keeping community contributors informed about sequencing changes.
+
 ## Adopted decisions (foundation)
 
 | ADR | Title | Status | Key SRS coverage | Requirement anchors |

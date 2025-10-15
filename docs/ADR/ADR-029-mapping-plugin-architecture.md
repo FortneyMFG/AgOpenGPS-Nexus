@@ -82,6 +82,11 @@ Services:
 - Prototype a reference mapping plugin (grid-based) and add regression replay fixtures.
 - Update presets to reference mapping capabilities and extend the plugin loader to enforce capability dependencies.
 
+## Governance Updates
+- **Certification program.** Mapping plugins undergo standardized latency, accuracy, and resource benchmarks using published replay scenarios. Results determine certification tiers that inform operator catalogs.
+- **Multi-plugin coexistence.** Documentation now requires declaring hard dependencies and incompatibilities, and CI ensures preset bundles do not load conflicting plugins.
+- **Upgrade rehearsals.** Plugin maintainers stage upgrades in sandboxed environments with automated regression reports before promoting releases.
+
 ## Validation
 - **NullMapping readiness:** NullMapping provider start-up on reference hardware must complete in under 350 ms at the 95th percentile and publish a healthy capability state before sections/plugins request pose transforms.
 - **Capability enforcement:** Integration tests must fail within 2 seconds when a plugin advertises incompatible `mapping:*` capabilities, with actionable diagnostics surfaced through the Device Manager contract.

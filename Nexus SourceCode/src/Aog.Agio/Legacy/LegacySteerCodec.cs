@@ -237,7 +237,7 @@ public sealed class LegacySteerCodec
                 switchByte |= 0x01;
             }
 
-            if (metadata.IsSteerSwitchOn)
+            if (metadata.IsSteerSwitchOn || state.Engaged)
             {
                 switchByte |= 0x02;
             }
@@ -246,6 +246,10 @@ public sealed class LegacySteerCodec
             {
                 switchByte |= 0x04;
             }
+        }
+        else if (state.Engaged)
+        {
+            switchByte |= 0x02;
         }
 
         buffer[11] = switchByte;

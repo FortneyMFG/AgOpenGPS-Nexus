@@ -1,3 +1,7 @@
+using System;
+using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -34,15 +38,22 @@ public sealed class GpsdBackgroundService : BackgroundService
             {
                 await foreach (var report in _client.WatchAsync(stoppingToken).WithCancellation(stoppingToken))
                 {
+                    var latitude = FormatNullable(report.LatitudeDegrees, "F6");
+                    var longitude = FormatNullable(report.LongitudeDegrees, "F6");
+                    var altitude = FormatNullable(report.AltitudeMeters, "F1");
+                    var speed = FormatNullable(report.SpeedMetersPerSecond, "F2");
+                    var track = FormatNullable(report.TrackDegrees, "F1");
+                    var timestamp = report.Timestamp?.ToString("o", CultureInfo.InvariantCulture) ?? "n/a";
+
                     _logger.LogInformation(
-                        "gpsd TPV: Mode={Mode}, Lat={Latitude:F6}, Lon={Longitude:F6}, Alt={Altitude:F1}m, Speed={Speed:F2}m/s, Track={Track:F1}°, Time={Timestamp:o}",
-                        report.Mode,
-                        report.LatitudeDegrees,
-                        report.LongitudeDegrees,
-                        report.AltitudeMeters,
-                        report.SpeedMetersPerSecond,
-                        report.TrackDegrees,
-                        report.Timestamp);
+                        "gpsd TPV: Mode={Mode}, Lat={Latitude}, Lon={Longitude}, Alt={Altitude}m, Speed={Speed}m/s, Track={Track}°, Time={Timestamp}",
+                        report.Mode?.ToString(CultureInfo.InvariantCulture) ?? "n/a",
+                        latitude,
+                        longitude,
+                        altitude,
+                        speed,
+                        track,
+                        timestamp);
                 }
             }
             catch (GpsdSocketUnavailableException ex)
@@ -72,5 +83,11 @@ public sealed class GpsdBackgroundService : BackgroundService
                 break;
             }
         }
+    }
+    private static string FormatNullable(double? value, string format)
+    {
+        return value.HasValue
+            ? value.Value.ToString(format, CultureInfo.InvariantCulture)
+            : "n/a";
     }
 }

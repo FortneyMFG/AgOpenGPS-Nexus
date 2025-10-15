@@ -29,9 +29,26 @@ public sealed class SimulationPerformanceHarnessTests
 
         var result = await harness.RunScenarioAsync(scenario, iterations: 250);
 
+        var expectedProviders = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var route in configuration.Routes)
+        {
+            expectedProviders.Add(route.Source);
+        }
+
+        foreach (var route in scenario.Routes)
+        {
+            expectedProviders.Add(route.Source);
+        }
+
+        var providerLookup = configuration.Providers.ToDictionary(provider => provider.ProviderId, StringComparer.Ordinal);
+        var expectedOutputs = expectedProviders.Sum(providerId => providerLookup.TryGetValue(providerId, out var provider)
+            ? provider.Outputs.Count
+            : 0);
+
         result.Iterations.Should().Be(250);
-        result.ProviderCount.Should().Be(configuration.Providers.Count);
+        result.ProviderCount.Should().Be(expectedProviders.Count);
         result.TotalOutputs.Should().BeGreaterThan(0);
+        result.TotalOutputs.Should().Be(expectedOutputs);
         result.TotalMessages.Should().Be(result.Iterations * result.TotalOutputs);
         result.Elapsed.Should().BeLessThan(TimeSpan.FromMilliseconds(400));
         result.Checksum.Should().NotBe(0d);

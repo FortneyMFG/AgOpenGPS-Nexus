@@ -1,0 +1,210 @@
+{
+  "scenarios": [
+    {
+      "name": "weeds-escalation-history",
+      "options": {
+        "kind": "risk.weeds",
+        "schemaRef": "https://agopengps.org/schemas/FieldHealthRiskLayer.v1.json",
+        "notes": "Scouting pass before rain",
+        "tags": [
+          "block-a",
+          "priority"
+        ]
+      },
+      "operations": [
+        {
+          "ingest": {
+            "featureId": "feature:north-02",
+            "label": "Terrace edge",
+            "severity": "Moderate",
+            "observedAt": "2025-04-03T09:30:00Z",
+            "observer": "user:scout.alex",
+            "notes": "Moderate weed pressure along terrace.",
+            "attachments": [
+              "photo://north-02-a",
+              "photo://north-02-b"
+            ],
+            "sessionId": "session:spring-pass-01",
+            "areaHa": 1.15,
+            "geometryHash": "A1B2C3D4E5F6A7B8",
+            "status": "Monitor"
+          }
+        },
+        {
+          "ingest": {
+            "featureId": "feature:north-01",
+            "label": "North inlet",
+            "severity": "High",
+            "observedAt": "2025-04-03T10:45:00Z",
+            "observer": "user:scout.alex",
+            "notes": "Heavy infestation at inlet.",
+            "attachments": [],
+            "sessionId": "session:spring-pass-01",
+            "areaHa": 0.85,
+            "geometryHash": "ABCDEF1234567890",
+            "lastUpdatedAt": "2025-04-03T11:00:00Z",
+            "status": "Active"
+          }
+        },
+        {
+          "ingest": {
+            "featureId": "feature:south-hedge",
+            "label": "South hedge row",
+            "severity": "Low",
+            "observedAt": "2025-03-28T15:10:00Z",
+            "observer": "user:scout.jordan",
+            "notes": "Residual weeds after burn-down.",
+            "attachments": [
+              "photo://south-hedge"
+            ],
+            "sessionId": "session:prepass-00",
+            "areaHa": 0.42,
+            "geometryHash": "1234ABCD5678EF90",
+            "lastUpdatedAt": "2025-04-01T08:05:00Z",
+            "status": "Resolved"
+          }
+        },
+        {
+          "ingest": {
+            "featureId": "feature:north-02",
+            "label": "Terrace edge",
+            "severity": "High",
+            "observedAt": "2025-04-03T09:30:00Z",
+            "observer": "user:scout.alex",
+            "notes": "Escalated after rescout.",
+            "attachments": [
+              "photo://north-02-c"
+            ],
+            "sessionId": "session:spring-pass-02",
+            "areaHa": 1.2,
+            "geometryHash": "A1B2C3D4E5F6A7B8",
+            "lastUpdatedAt": "2025-04-05T16:20:00Z",
+            "status": "Active"
+          }
+        },
+        {
+          "updateLayerContext": {
+            "notes": "Escalated weeds near terrace",
+            "schemaRef": "https://agopengps.org/schemas/custom/FieldHealthRiskLayer.v1.json",
+            "tags": [
+              "Priority",
+              "block-a",
+              "north-2025"
+            ]
+          }
+        },
+        {
+          "updateHistoryToggles": {
+            "showActive": true,
+            "showMonitor": false,
+            "showResolved": true
+          }
+        }
+      ],
+      "expected": {
+        "metadata": {
+          "kind": "risk.weeds",
+          "schemaRef": "https://agopengps.org/schemas/custom/FieldHealthRiskLayer.v1.json",
+          "notes": "Escalated weeds near terrace",
+          "tags": [
+            "Priority",
+            "block-a",
+            "north-2025"
+          ],
+          "observations": [
+            {
+              "featureId": "feature:north-01",
+              "label": "North inlet",
+              "severity": "High",
+              "observedAt": "2025-04-03T10:45:00Z",
+              "observer": "user:scout.alex",
+              "notes": "Heavy infestation at inlet.",
+              "attachments": [],
+              "sessionId": "session:spring-pass-01",
+              "areaHa": 0.85,
+              "geometryHash": "ABCDEF1234567890",
+              "lastUpdatedAt": "2025-04-03T11:00:00Z",
+              "status": "Active"
+            },
+            {
+              "featureId": "feature:north-02",
+              "label": "Terrace edge",
+              "severity": "High",
+              "observedAt": "2025-04-03T09:30:00Z",
+              "observer": "user:scout.alex",
+              "notes": "Escalated after rescout.",
+              "attachments": [
+                "photo://north-02-c"
+              ],
+              "sessionId": "session:spring-pass-02",
+              "areaHa": 1.2,
+              "geometryHash": "A1B2C3D4E5F6A7B8",
+              "lastUpdatedAt": "2025-04-05T16:20:00Z",
+              "status": "Active"
+            },
+            {
+              "featureId": "feature:south-hedge",
+              "label": "South hedge row",
+              "severity": "Low",
+              "observedAt": "2025-03-28T15:10:00Z",
+              "observer": "user:scout.jordan",
+              "notes": "Residual weeds after burn-down.",
+              "attachments": [
+                "photo://south-hedge"
+              ],
+              "sessionId": "session:prepass-00",
+              "areaHa": 0.42,
+              "geometryHash": "1234ABCD5678EF90",
+              "lastUpdatedAt": "2025-04-01T08:05:00Z",
+              "status": "Resolved"
+            }
+          ],
+          "statistics": {
+            "totalAreaHa": 2.47,
+            "severityCounts": {
+              "none": 0,
+              "low": 1,
+              "moderate": 0,
+              "high": 2,
+              "critical": 0
+            },
+            "lastSurveyedAt": "2025-04-03T10:45:00Z"
+          },
+          "history": {
+            "entries": [
+              {
+                "featureId": "feature:north-02",
+                "status": "Monitor",
+                "severity": "Moderate",
+                "changedAt": "2025-04-03T09:30:00Z"
+              },
+              {
+                "featureId": "feature:north-01",
+                "status": "Active",
+                "severity": "High",
+                "changedAt": "2025-04-03T11:00:00Z"
+              },
+              {
+                "featureId": "feature:south-hedge",
+                "status": "Resolved",
+                "severity": "Low",
+                "changedAt": "2025-04-01T08:05:00Z"
+              },
+              {
+                "featureId": "feature:north-02",
+                "status": "Active",
+                "severity": "High",
+                "changedAt": "2025-04-05T16:20:00Z"
+              }
+            ],
+            "toggles": {
+              "showActive": true,
+              "showMonitor": false,
+              "showResolved": true
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -19,6 +19,7 @@ public sealed class AogLinkGateway : IAogLinkGateway
     private readonly AogLinkTranslator _translator;
     private readonly LegacyCompatibilityBridge _legacyBridge;
     private readonly IReadOnlyList<IAogLinkTransport> _transports;
+    private readonly AogLinkMeshBridge _meshBridge;
     private readonly BridgeHostOptions _options;
     private readonly ILogger<AogLinkGateway> _logger;
     private readonly CancellationTokenSource _cts = new();
@@ -28,12 +29,14 @@ public sealed class AogLinkGateway : IAogLinkGateway
         AogLinkTranslator translator,
         LegacyCompatibilityBridge legacyBridge,
         IEnumerable<IAogLinkTransport> transports,
+        AogLinkMeshBridge meshBridge,
         IOptions<BridgeHostOptions> options,
         ILogger<AogLinkGateway> logger)
     {
         _translator = translator ?? throw new ArgumentNullException(nameof(translator));
         _legacyBridge = legacyBridge ?? throw new ArgumentNullException(nameof(legacyBridge));
         _transports = transports?.ToArray() ?? throw new ArgumentNullException(nameof(transports));
+        _meshBridge = meshBridge ?? throw new ArgumentNullException(nameof(meshBridge));
         if (_transports.Count == 0)
         {
             throw new ArgumentException("At least one transport must be registered.", nameof(transports));
@@ -144,6 +147,15 @@ public sealed class AogLinkGateway : IAogLinkGateway
             default:
                 _logger.LogDebug("Received {Kind} from node {Source}.", kind, envelope.Header?.Source);
                 break;
+        }
+
+        try
+        {
+            await _meshBridge.HandleAsync(envelope, message, kind, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Mesh bridge failed to handle {Kind} from node {Source}.", kind, envelope.Header?.Source);
         }
     }
 

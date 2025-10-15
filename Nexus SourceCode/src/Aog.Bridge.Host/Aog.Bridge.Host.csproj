@@ -20,6 +20,10 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Aog.Core\Aog.Core.csproj" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(UseLocalAogAbstractions)' == 'true'">
     <ProjectReference Include="..\Aog.Abstractions\Aog.Abstractions.csproj" />
   </ItemGroup>

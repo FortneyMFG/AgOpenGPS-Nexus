@@ -2,7 +2,9 @@ using Aog.Abstractions.Runtime;
 using Aog.Agio.AogLink;
 using Aog.Agio.Legacy;
 using Aog.Agio.Safety;
+using Aog.Agio.Telemetry;
 using Aog.Agio.Timing;
+using Aog.Core.Mesh;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -78,6 +80,8 @@ public static class Program
                     .ValidateOnStart();
 
                 services
+                    .AddOptions<MeshTelemetryAggregatorOptions>()
+                    .BindConfiguration("AgioHost:Mesh")
                     .AddOptions<LegacyMeshOptions>()
                     .BindConfiguration("AgioHost:LegacyMesh")
                     .ValidateDataAnnotations()
@@ -86,6 +90,10 @@ public static class Program
                 services.AddSingleton(TimeProvider.System);
                 services.AddSingleton<IActuatorFailsafeService, ActuatorFailsafeService>();
                 services.AddSingleton<ISafetyLog, FileSafetyLog>();
+
+                services.AddSingleton<LiveTelemetryMeshService>();
+                services.AddSingleton<ILiveTelemetryMeshService>(provider => provider.GetRequiredService<LiveTelemetryMeshService>());
+                services.AddSingleton<MeshTelemetryAggregator>();
 
                 if (OperatingSystem.IsLinux())
                 {
@@ -111,6 +119,8 @@ public static class Program
 
                 var backend = AgioBackendLoader.Load(backendOptions);
                 backend.ConfigureServices(services);
+
+                services.AddSingleton<ILegacyPoseObserver>(provider => provider.GetRequiredService<MeshTelemetryAggregator>());
 
                 services.AddSingleton(backend);
                 services.AddSingleton(new AgioBackendRegistration(

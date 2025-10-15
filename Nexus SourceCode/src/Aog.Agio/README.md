@@ -101,3 +101,29 @@ dotnet run --project "tools/Aog.Tools.SafetyLog/Aog.Tools.SafetyLog.csproj" -- e
 
 The tool prints the absolute path to the generated archive and respects optional
 `--retention-days` and `--max-files` overrides when building the package.
+
+## Mesh presence integration
+
+The AGiO host publishes live pose telemetry onto the [ADR-047](../../../docs/ADR/ADR-047_LiveTelemetryMesh.md)
+mesh by default. `MeshTelemetryAggregator` listens to decoded pose samples, registers the
+host as a mesh device, and emits presence heartbeats plus trail snapshots at a configurable
+interval. Configure the bridge under `AgioHost:Mesh` to customise the device identifier,
+label, and trail behaviour:
+
+```json
+{
+  "AgioHost": {
+    "Mesh": {
+      "DeviceId": "tractor.alpha",
+      "DeviceLabel": "Tractor Alpha",
+      "Capabilities": [ "telemetry", "presence" ],
+      "TrailCapacity": 200,
+      "TrailPublishInterval": "00:00:02"
+    }
+  }
+}
+```
+
+Presence updates require that pose headers include `SeasonId` and `JobId` metadata. Trail
+payloads are serialized as JSON arrays (camelCase) with the most recent trail points and are
+published on `aog/live/{season}/{job}/trail` with `MeshDataTier.Trails` permissions.

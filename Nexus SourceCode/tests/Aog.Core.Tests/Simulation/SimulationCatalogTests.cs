@@ -106,6 +106,6 @@ public sealed class SimulationCatalogTests
 
         action.Should().Throw<InvalidOperationException>()
             .WithMessage("*sim.vehicle*")
-            .WithMessage("*time*");
+            .And.Which.Message.Should().Contain("time");
     }
 }

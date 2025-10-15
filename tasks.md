@@ -279,7 +279,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-318 Plugin manifest governance documentation _(Done)_ — ADR-031 manifest governance
 - [ ] NX-319 Zone policy operator guide _(Planned)_ — ADR-027 constraint UX docs
 - [ ] NX-320 Season/session migration playbook _(Planned)_ — ADR-040/041 lifecycle rollout
-- [ ] NX-321 Mesh provisioning runbook _(Planned)_ — ADR-047/048 connectivity rollout
+- [x] NX-321 Mesh provisioning runbook _(Done)_ — ADR-047/048 connectivity rollout
 - [ ] NX-322 Report template catalog documentation _(Planned)_ — ADR-051 report builder
 - [ ] NX-323 Performance budget telemetry dashboards _(Planned)_ — ADR-026 instrumentation rollout
 - [ ] NX-324 Mesh retention & privacy operations guide _(Planned)_ — ADR-047 retention planner
@@ -300,7 +300,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-079 Post-run report generator _(Done)_
 
 - [ ] NX-328 Constraint fault-injection regression suite _(Planned)_ — ADR-027 gating QA
-- [ ] NX-329 Mesh security and penetration tests _(Planned)_ — ADR-047/048 security validation
+- [x] NX-329 Mesh security and penetration tests _(Done)_ — ADR-047/048 security validation
 - [ ] NX-330 Session crash-recovery regression _(Planned)_ — ADR-041 session durability
 - [ ] NX-331 Report export audit & diff tests _(Planned)_ — ADR-051 report builder QA
 - [ ] NX-332 Autosteer closed-loop bench tests _(Planned)_ — ADR-033 guidance QA

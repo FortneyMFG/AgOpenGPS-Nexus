@@ -38,19 +38,24 @@ public sealed class CorrectionSourceAggregatorTests
             new[] { radioFactory, networkFactory },
             options =>
             {
-                options.SourceFailureBackoff = TimeSpan.Zero;
-                options.ExhaustedBackoff = TimeSpan.Zero;
+                options.SourceFailureBackoff = TimeSpan.FromMilliseconds(10);
+                options.ExhaustedBackoff = TimeSpan.FromMilliseconds(10);
             });
 
         var published = new List<byte[]>();
-        var result = await aggregator.RunAsync(
+        using var cts = new CancellationTokenSource();
+        var runTask = aggregator.RunAsync(
             (payload, token) =>
             {
                 published.Add(payload.ToArray());
                 return ValueTask.CompletedTask;
             },
-            CancellationToken.None);
+            cts.Token);
 
+        await WaitUntilAsync(() => networkSource.RunInvoked, TimeSpan.FromSeconds(1));
+        cts.Cancel();
+
+        var result = await runTask;
         Assert.Equal(CorrectionSourceOutcome.Cancelled, result.Outcome);
         Assert.Single(published);
         Assert.True(radioSource.RunInvoked);
@@ -84,8 +89,8 @@ public sealed class CorrectionSourceAggregatorTests
             options =>
             {
                 options.EnableNetworkSources = true;
-                options.SourceFailureBackoff = TimeSpan.Zero;
-                options.ExhaustedBackoff = TimeSpan.Zero;
+                options.SourceFailureBackoff = TimeSpan.FromMilliseconds(10);
+                options.ExhaustedBackoff = TimeSpan.FromMilliseconds(10);
                 options.PreferredOrder = new List<CorrectionSourceKind>
                 {
                     CorrectionSourceKind.LocalBaseStation,
@@ -94,18 +99,76 @@ public sealed class CorrectionSourceAggregatorTests
             });
 
         var published = new List<byte[]>();
-        var result = await aggregator.RunAsync(
+        using var cts = new CancellationTokenSource();
+        var runTask = aggregator.RunAsync(
             (payload, token) =>
             {
                 published.Add(payload.ToArray());
                 return ValueTask.CompletedTask;
             },
-            CancellationToken.None);
+            cts.Token);
 
+        await WaitUntilAsync(() => networkSource.RunInvoked, TimeSpan.FromSeconds(1));
+        cts.Cancel();
+
+        var result = await runTask;
         Assert.Equal(CorrectionSourceOutcome.Cancelled, result.Outcome);
         Assert.Single(published);
         Assert.Equal(1, baseFactory.InvocationCount);
         Assert.Equal(1, networkFactory.InvocationCount);
+    }
+
+    [Fact]
+    public async Task RunAsync_FallsBackWhenSourceCompletes()
+    {
+        var completingSource = new FakeCorrectionSource(
+            "local/base",
+            CorrectionSourceResult.Completed(),
+            new[] { new ReadOnlyMemory<byte>(new byte[] { 0x10 }) });
+
+        var fallbackSource = new FakeCorrectionSource(
+            "network/ntrip",
+            CorrectionSourceResult.Cancelled(),
+            new[] { new ReadOnlyMemory<byte>(new byte[] { 0x20 }) });
+
+        var localFactory = new FakeCorrectionSourceFactory(
+            CorrectionSourceKind.LocalBaseStation,
+            "local",
+            _ => ValueTask.FromResult<ICorrectionSource?>(completingSource));
+
+        var networkFactory = new FakeCorrectionSourceFactory(
+            CorrectionSourceKind.NetworkService,
+            "network",
+            _ => ValueTask.FromResult<ICorrectionSource?>(fallbackSource));
+
+        var aggregator = CreateAggregator(
+            new[] { localFactory, networkFactory },
+            options =>
+            {
+                options.EnableNetworkSources = true;
+                options.SourceFailureBackoff = TimeSpan.FromMilliseconds(10);
+                options.ExhaustedBackoff = TimeSpan.FromMilliseconds(10);
+            });
+
+        var published = new List<byte[]>();
+        using var cts = new CancellationTokenSource();
+        var runTask = aggregator.RunAsync(
+            (payload, token) =>
+            {
+                published.Add(payload.ToArray());
+                return ValueTask.CompletedTask;
+            },
+            cts.Token);
+
+        await WaitUntilAsync(() => completingSource.RunInvoked && fallbackSource.RunInvoked, TimeSpan.FromSeconds(1));
+        cts.Cancel();
+
+        var result = await runTask;
+
+        Assert.Equal(CorrectionSourceOutcome.Cancelled, result.Outcome);
+        Assert.True(completingSource.Disposed);
+        Assert.True(fallbackSource.Disposed);
+        Assert.Equal(new[] { 0x10, 0x20 }, published.SelectMany(b => b).ToArray());
     }
 
     [Fact]

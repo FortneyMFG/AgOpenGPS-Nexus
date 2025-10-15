@@ -143,8 +143,8 @@ NX-170,FALSE,FALSE,NX-157,,"Official Job Tasks plugin GA providing job save/resu
 NX-171,FALSE,FALSE,NX-157,,Official Telemetry Logging plugin GA capturing plugin feeds and replay exports
 NX-172,FALSE,FALSE,NX-157,,"Official File IO plugin GA handling imports/exports for layers, jobs, and prescriptions"
 NX-191,FALSE,FALSE,NX-116,,Zone proto + JSON schema handshake — ADR-027 spatial constraints contract release
-NX-192,FALSE,FALSE,NX-191,,PoseStream zone mask proto update — ADR-027 PoseStream mask contract
-NX-193,FALSE,FALSE,NX-191,,Layer registry hash handshake draft — ADR-032 layer controllers registry requirements
+NX-192,FALSE,TRUE,NX-191,,PoseStream zone mask proto update — ADR-027 PoseStream mask contract
+NX-193,FALSE,TRUE,NX-191,,Layer registry hash handshake draft — ADR-032 layer controllers registry requirements
 NX-194,FALSE,FALSE,"NX-153, NX-193",,Capability registry expansion for mapping/zone capabilities — ADR-029 mapping kernel contracts; ADR-031 manifest governance
 NX-195,FALSE,FALSE,NX-194,,Plugin manifest schema vNext with capability/lease metadata — ADR-031 official plugin bundle policy
 NX-196,FALSE,FALSE,NX-131,,Job/session schema refresh — ADR-030 job lifecycle; ADR-041 session metadata

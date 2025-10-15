@@ -19,6 +19,10 @@ Adopt a first-class zone model owned by Core:
 - **Common UX contract:** Frontends render zones with canonical symbology (boundary outlines, headland hatching, keep-out red fill, work-disabled amber cross-hatch), expose enable/disable toggles, per-zone buffers, and override policy switches.
 - **Interop:** Normalize imported/exported polygons (Shapefile, GeoPackage, ISOXML) into the shared schema, preserving provenance, priority, and buffers.
 
+### PoseStream mask contract
+
+PoseStream samples embed a `PoseZoneMask` message that captures the constraint state for the implement footprint. The mask exposes four canonical boolean flags—`inside_boundary`, `inside_headland`, `inside_keep_out`, and `inside_work_disabled`—that line up with policy decisions surfaced to automation and UI clients. Implementations also include the ordered list of intersecting zone identifiers and the SHA-256 (hex) hash of the zone registry snapshot (`zone_registry_hash`) that produced the evaluation so replay and controller pipelines can confirm they are operating on the same catalog. Consumers must treat unspecified flags as `false` for backwards compatibility and ignore unknown fields when newer registry data adds context.
+
 Example JSON representation:
 
 ```json

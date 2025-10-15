@@ -45,7 +45,8 @@ Adopt a Preset model that binds Equipment, Implement, and Layout selections into
   - Build Preset Switcher, Editor, and Layout Diff Viewer UI surfaces including multi-screen awareness and hotkeys.
   - Deliver TaskService with in-memory queue, progress streaming, and integration with preset application flows.
   - Seed catalog fixtures (e.g., "Planting – 12R", "Sprayer – 120ft") to validate multi-screen behavior and linked/snapshot flows.
-  - Provide migration tooling for layout JSON schemas (`migrate(LayoutJson, fromVersion)`), and regression tests covering inheritance, linking, and task execution.
+- Provide migration tooling for layout JSON schemas (`migrate(LayoutJson, fromVersion)`), and regression tests covering inheritance, linking, and task execution.
+- Coordinate with the layer registry hash handshake draft to ensure controller boot flows validate registry hashes before activating presets ([reference](../reference/layer-registry-handshake.md)).
 
 ## Legacy Implementation Notes
 ### AgOpenGPS v6

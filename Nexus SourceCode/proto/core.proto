@@ -54,6 +54,32 @@ message Pose {
 
   // Angular velocity around the vertical axis in radians per second.
   double yaw_rate_radps = 9;
+
+  // Zone mask describing constraint state for the implement footprint at this sample.
+  PoseZoneMask zone_mask = 10;
+}
+
+// PoseZoneMask summarises the spatial constraint context intersecting the implement
+// footprint when a Pose sample was generated. The bitmask allows automation, logging,
+// and replay services to reproduce operator-visible gating decisions per ADR-027.
+message PoseZoneMask {
+  // True when the implement footprint is within the configured boundary polygon.
+  bool inside_boundary = 1;
+
+  // True when the footprint is within a headland buffer derived from the boundary.
+  bool inside_headland = 2;
+
+  // True when the footprint intersects an enforced keep-out zone.
+  bool inside_keep_out = 3;
+
+  // True when the footprint intersects a work-disabled zone (drive allowed, work off).
+  bool inside_work_disabled = 4;
+
+  // Stable identifiers of the zones intersecting the footprint, ordered by priority.
+  repeated string active_zone_ids = 5;
+
+  // Hash of the zone registry snapshot that produced the mask, enabling drift detection.
+  string zone_registry_hash = 6;
 }
 
 // Imu captures unprocessed measurements from an inertial measurement unit.

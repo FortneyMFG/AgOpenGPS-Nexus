@@ -128,7 +128,12 @@ public sealed class PluginManifestLoader
             }
         }
 
-        var supportedCapabilities = manifest.SupportedCapabilities ?? Array.Empty<string>();
+        if (manifest.SupportedCapabilities is null)
+        {
+            throw new InvalidDataException("Manifest supportedCapabilities cannot be null; omit the section to leave it empty.");
+        }
+
+        var supportedCapabilities = manifest.SupportedCapabilities;
 
         foreach (var capability in supportedCapabilities)
         {
@@ -138,7 +143,12 @@ public sealed class PluginManifestLoader
             }
         }
 
-        var requiredTransports = manifest.RequiredTransports ?? Array.Empty<string>();
+        if (manifest.RequiredTransports is null)
+        {
+            throw new InvalidDataException("Manifest requiredTransports cannot be null; omit the section to leave it empty.");
+        }
+
+        var requiredTransports = manifest.RequiredTransports;
 
         foreach (var transport in requiredTransports)
         {
@@ -204,7 +214,12 @@ public sealed class PluginManifestLoader
             }
         }
 
-        var capabilityLeases = manifest.CapabilityLeases ?? Array.Empty<PluginCapabilityLease>();
+        if (manifest.CapabilityLeases is null)
+        {
+            throw new InvalidDataException("Manifest leases cannot be null; omit the section to leave it empty.");
+        }
+
+        var capabilityLeases = manifest.CapabilityLeases;
 
         if (!capabilityLeases.Any())
         {

@@ -66,6 +66,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
         PlatformDescription =
             $"Running on {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}) with {RuntimeInformation.FrameworkDescription}";
 
+        SeasonNavigator = SeasonNavigatorViewModel.CreateSample();
+
         // Load simulation configuration + summary and create the bar VM.
         var configuration = TryLoadSimulationConfiguration(out var summary);
         _simulationConfiguration = configuration;
@@ -131,6 +133,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the telemetry privacy view-model.</summary>
     public TelemetryPrivacyViewModel TelemetryPrivacy { get; }
+
+    /// <summary>Gets the season navigator view-model.</summary>
+    public SeasonNavigatorViewModel SeasonNavigator { get; }
 
     /// <summary>Gets the available UI themes.</summary>
     public IReadOnlyList<UiTheme> AvailableThemes { get; }

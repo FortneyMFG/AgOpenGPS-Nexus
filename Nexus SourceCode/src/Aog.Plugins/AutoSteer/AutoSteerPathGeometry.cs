@@ -137,15 +137,25 @@ internal static class AutoSteerPathGeometry
         double toTargetY,
         double targetDistance)
     {
+        return ComputePurePursuitTargetGeometry(state, toTargetX, toTargetY, targetDistance).SteeringAngleRadians;
+    }
+
+    public static PurePursuitTargetGeometry ComputePurePursuitTargetGeometry(
+        VehicleState state,
+        double toTargetX,
+        double toTargetY,
+        double targetDistance)
+    {
         if (targetDistance < 1e-6)
         {
-            return 0;
+            return new PurePursuitTargetGeometry(state.HeadingRadians, 0, 0, 0);
         }
 
         var headingToTarget = Math.Atan2(toTargetY, toTargetX);
         var headingError = AutoSteerMath.NormalizeAngle(headingToTarget - state.HeadingRadians);
         var curvature = 2 * Math.Sin(headingError) / Math.Max(targetDistance, 1e-6);
-        return Math.Atan(curvature * state.WheelbaseMeters);
+        var steering = Math.Atan(curvature * state.WheelbaseMeters);
+        return new PurePursuitTargetGeometry(headingToTarget, headingError, curvature, steering);
     }
 
     public static double ComputeCrossTrack(
@@ -157,3 +167,9 @@ internal static class AutoSteerPathGeometry
         return closest.DirectionX * vectorToClosestY - closest.DirectionY * vectorToClosestX;
     }
 }
+
+public readonly record struct PurePursuitTargetGeometry(
+    double HeadingToTargetRadians,
+    double HeadingErrorRadians,
+    double CurvaturePerMeter,
+    double SteeringAngleRadians);

@@ -29,5 +29,8 @@
     <None Include="Sections\Data\LegacyRateControlScenarios.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="FileIO\Data\sample-surface.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

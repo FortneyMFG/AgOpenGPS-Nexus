@@ -29,28 +29,34 @@ public static class FieldSafetyChecklistValidator
             errors.Add("Approver name is required.");
         }
 
-        if (checklist.Sections.Count == 0)
+        var sections = checklist.Sections ?? Array.Empty<ChecklistSection>();
+
+        if (sections.Count == 0)
         {
             errors.Add("Checklist must contain at least one section.");
         }
 
-        foreach (var section in checklist.Sections)
+        foreach (var section in sections)
         {
+            var sectionName = string.IsNullOrWhiteSpace(section.Name) ? "(unnamed section)" : section.Name;
+
             if (string.IsNullOrWhiteSpace(section.Name))
             {
                 errors.Add("Checklist section name is required.");
             }
 
-            if (section.Items.Count == 0)
+            var items = section.Items ?? Array.Empty<ChecklistItem>();
+
+            if (items.Count == 0)
             {
-                errors.Add($"Section '{section.Name}' must include at least one item.");
+                errors.Add($"Section '{sectionName}' must include at least one item.");
             }
 
-            foreach (var item in section.Items)
+            foreach (var item in items)
             {
                 if (string.IsNullOrWhiteSpace(item.Id))
                 {
-                    errors.Add($"Section '{section.Name}' contains an item without an id.");
+                    errors.Add($"Section '{sectionName}' contains an item without an id.");
                 }
 
                 if (string.IsNullOrWhiteSpace(item.Description))

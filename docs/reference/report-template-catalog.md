@@ -24,9 +24,9 @@ before generation.【F:docs/ADR/ADR-051_ReportBuilder.md†L17-L33】
 | Season Summary | `report.season-summary.v1` | Season | Multi-job timeline, weather timeline, scouting highlights | Crop Type, Yield, Field Health, Weather | PDF, CSV, GeoJSON |
 
 > **Readiness states** — A template is eligible for export only when each required
-section declares `Ready`, and optional sections may fall back to the template's
-empty-state copy. Templates should surface missing data explanations in section
-definitions so the UI can communicate gaps prior to export.【F:Nexus SourceCode/src/Aog.Core/Reporting/ReportTemplate.cs†L23-L107】
+section declares `Ready`, and optional sections may be skipped when their
+contributors aren't available. Section contributors are responsible for
+communicating missing data explanations to the UI prior to export.【F:Nexus SourceCode/src/Aog.Core/Reporting/ReportTemplate.cs†L23-L107】
 
 ## Template manifest schema
 
@@ -39,7 +39,7 @@ assets. The schema mirrors the runtime `ReportTemplate` record, capturing:
 | `name` | Localized display string surfaced in the UI template picker. |
 | `version` | Semantic version incremented for schema or layout changes. Minor versions cover cosmetic edits; major versions signal breaking section/output changes. |
 | `scope` | Enum: `Farm`, `Season`, `Job`, or `Session`. Determines context fetch and validation rules. |
-| `sections[]` | Ordered list of section descriptors (`sectionId`, `title`, `requiredData`, `isOptional`, `fallbackContent`). |
+| `sections[]` | Ordered list of section descriptors (`sectionId`, `isOptional`, optional `parameters`). |
 | `outputs[]` | Declares export payloads (`format`, `description`, optional `contentType`, `defaultFileName`). |
 | `metadata` | Optional free-form block for feature flags, preview thumbnails, or localization bundles. |
 
@@ -57,17 +57,14 @@ sections, or unsupported outputs.【F:Nexus SourceCode/src/Aog.Core/Reporting/Re
   "sections": [
     {
       "sectionId": "crop.analytics.summary",
-      "title": "Crop Acreage & Rotation",
-      "requiredData": ["cropType.actual", "genetics.variety"],
       "isOptional": false,
-      "fallbackContent": "Crop analytics become available after crop and genetics plugins sync at least one session."
+      "parameters": {
+        "layout": "wide"
+      }
     },
     {
       "sectionId": "yield.analytics.summary",
-      "title": "Yield vs. Plan",
-      "requiredData": ["yield.actual"],
-      "isOptional": true,
-      "fallbackContent": "Yield data is still importing. Export now to capture current context or retry when ingest completes."
+      "isOptional": true
     }
   ],
   "outputs": [
@@ -99,8 +96,8 @@ contributor; otherwise the builder rejects registration during boot or export.
 
 When a template includes an optional section, ensure the contributor exposes a
 `CapabilityState.Optional` flag so the builder can mark it as skippable without
-failing the export. Optional sections should still declare fallback copy so
-operators understand the trade-off of exporting early.【F:Nexus SourceCode/src/Aog.Core/Reporting/ReportTemplate.cs†L127-L177】
+failing the export. Optional sections should emit their own empty-state
+messaging so operators understand the trade-off of exporting early.【F:Nexus SourceCode/src/Aog.Core/Reporting/ReportTemplate.cs†L127-L177】
 
 ## Governance & change control
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Avalonia.Media;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -12,10 +13,16 @@ public sealed class SteerDashboardViewModel : ObservableObject
 {
     private readonly ObservableCollection<SteerTuningEventViewModel> _events = new();
     private readonly ReadOnlyObservableCollection<SteerTuningEventViewModel> _readOnlyEvents;
+    private readonly ObservableCollection<DashboardSeriesViewModel> _series = new();
+    private readonly ReadOnlyObservableCollection<DashboardSeriesViewModel> _readOnlySeries;
+    private readonly IReadOnlyList<DashboardTuningParameterViewModel> _tuningParameters;
 
-    private IReadOnlyList<double> _crossTrackErrorHistory = Array.Empty<double>();
-    private IReadOnlyList<double> _wheelAngleHistory = Array.Empty<double>();
-    private IReadOnlyList<double> _controllerOutputHistory = Array.Empty<double>();
+    private readonly DashboardSeriesViewModel _crossTrackSeries;
+    private readonly DashboardSeriesViewModel _wheelAngleSeries;
+    private readonly DashboardSeriesViewModel _controllerOutputSeries;
+    private readonly DashboardTuningParameterViewModel _proportionalParameter;
+    private readonly DashboardTuningParameterViewModel _integralParameter;
+    private readonly DashboardTuningParameterViewModel _derivativeParameter;
     private double _proportionalGain = 0.28;
     private double _integralGain = 0.02;
     private double _derivativeGain = 0.12;
@@ -27,28 +34,68 @@ public sealed class SteerDashboardViewModel : ObservableObject
     public SteerDashboardViewModel()
     {
         _readOnlyEvents = new ReadOnlyObservableCollection<SteerTuningEventViewModel>(_events);
+        _crossTrackSeries = new DashboardSeriesViewModel(
+            id: "autosteer.crossTrack",
+            title: "Cross-track error",
+            units: "meters",
+            stroke: Brushes.LimeGreen);
+        _wheelAngleSeries = new DashboardSeriesViewModel(
+            id: "autosteer.wheelAngle",
+            title: "Wheel angle",
+            units: "degrees",
+            stroke: new SolidColorBrush(Color.FromArgb(0xFF, 0x35, 0xA1, 0xFF)),
+            fill: new SolidColorBrush(Color.FromArgb(0x20, 0x35, 0xA1, 0xFF)));
+        _controllerOutputSeries = new DashboardSeriesViewModel(
+            id: "autosteer.controllerOutput",
+            title: "Controller output",
+            units: "fraction",
+            stroke: new SolidColorBrush(Color.FromArgb(0xFF, 0xFF, 0xD7, 0x00)),
+            fill: new SolidColorBrush(Color.FromArgb(0x20, 0xFF, 0xD7, 0x00)));
+
+        _series.Add(_crossTrackSeries);
+        _series.Add(_wheelAngleSeries);
+        _series.Add(_controllerOutputSeries);
+        _readOnlySeries = new ReadOnlyObservableCollection<DashboardSeriesViewModel>(_series);
+
+        _proportionalParameter = new DashboardTuningParameterViewModel(
+            id: "controller.p",
+            label: "P",
+            minimum: 0,
+            maximum: 2,
+            step: 0.01,
+            displayFormat: "{0:0.00}",
+            valueChanged: value => ProportionalGain = value);
+        _integralParameter = new DashboardTuningParameterViewModel(
+            id: "controller.i",
+            label: "I",
+            minimum: 0,
+            maximum: 0.5,
+            step: 0.005,
+            displayFormat: "{0:0.00}",
+            valueChanged: value => IntegralGain = value);
+        _derivativeParameter = new DashboardTuningParameterViewModel(
+            id: "controller.d",
+            label: "D",
+            minimum: 0,
+            maximum: 1,
+            step: 0.01,
+            displayFormat: "{0:0.00}",
+            valueChanged: value => DerivativeGain = value);
+
+        _tuningParameters = new[]
+        {
+            _proportionalParameter,
+            _integralParameter,
+            _derivativeParameter,
+        };
+
+        _proportionalParameter.SetValueFromOwner(_proportionalGain);
+        _integralParameter.SetValueFromOwner(_integralGain);
+        _derivativeParameter.SetValueFromOwner(_derivativeGain);
     }
 
-    /// <summary>Gets the most recent cross-track error samples (meters).</summary>
-    public IReadOnlyList<double> CrossTrackErrorHistory
-    {
-        get => _crossTrackErrorHistory;
-        private set => SetProperty(ref _crossTrackErrorHistory, value);
-    }
-
-    /// <summary>Gets the most recent wheel angle samples (degrees).</summary>
-    public IReadOnlyList<double> WheelAngleHistory
-    {
-        get => _wheelAngleHistory;
-        private set => SetProperty(ref _wheelAngleHistory, value);
-    }
-
-    /// <summary>Gets the most recent controller output samples (unitless).</summary>
-    public IReadOnlyList<double> ControllerOutputHistory
-    {
-        get => _controllerOutputHistory;
-        private set => SetProperty(ref _controllerOutputHistory, value);
-    }
+    /// <summary>Gets the dashboard series rendered in the metadata-driven layout.</summary>
+    public IReadOnlyList<DashboardSeriesViewModel> Series => _readOnlySeries;
 
     /// <summary>Gets or sets the proportional gain used by the AutoSteer controller.</summary>
     public double ProportionalGain
@@ -59,6 +106,7 @@ public sealed class SteerDashboardViewModel : ObservableObject
             if (SetProperty(ref _proportionalGain, Math.Clamp(value, 0, 2)))
             {
                 OnPropertyChanged(nameof(GainSummary));
+                _proportionalParameter.SetValueFromOwner(_proportionalGain);
             }
         }
     }
@@ -72,6 +120,7 @@ public sealed class SteerDashboardViewModel : ObservableObject
             if (SetProperty(ref _integralGain, Math.Clamp(value, 0, 0.5)))
             {
                 OnPropertyChanged(nameof(GainSummary));
+                _integralParameter.SetValueFromOwner(_integralGain);
             }
         }
     }
@@ -85,12 +134,16 @@ public sealed class SteerDashboardViewModel : ObservableObject
             if (SetProperty(ref _derivativeGain, Math.Clamp(value, 0, 1)))
             {
                 OnPropertyChanged(nameof(GainSummary));
+                _derivativeParameter.SetValueFromOwner(_derivativeGain);
             }
         }
     }
 
     /// <summary>Gets a formatted summary of the current tuning values.</summary>
     public string GainSummary => $"P {ProportionalGain:0.00} / I {IntegralGain:0.00} / D {DerivativeGain:0.00}";
+
+    /// <summary>Gets the metadata describing each exposed tuning parameter.</summary>
+    public IReadOnlyList<DashboardTuningParameterViewModel> TuningParameters => _tuningParameters;
 
     /// <summary>Gets a short status message describing the steering health.</summary>
     public string Status
@@ -109,13 +162,17 @@ public sealed class SteerDashboardViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(wheelAngles);
         ArgumentNullException.ThrowIfNull(controllerOutputs);
 
-        CrossTrackErrorHistory = crossTrackErrors.ToArray();
-        WheelAngleHistory = wheelAngles.ToArray();
-        ControllerOutputHistory = controllerOutputs.ToArray();
+        var crossTrack = crossTrackErrors.ToArray();
+        var wheels = wheelAngles.ToArray();
+        var outputs = controllerOutputs.ToArray();
 
-        if (CrossTrackErrorHistory.Count > 0)
+        _crossTrackSeries.SetValues(crossTrack);
+        _wheelAngleSeries.SetValues(wheels);
+        _controllerOutputSeries.SetValues(outputs);
+
+        if (crossTrack.Length > 0)
         {
-            var recent = CrossTrackErrorHistory[^1];
+            var recent = crossTrack[^1];
             Status = $"Cross-track error {recent:0.00} m";
         }
     }

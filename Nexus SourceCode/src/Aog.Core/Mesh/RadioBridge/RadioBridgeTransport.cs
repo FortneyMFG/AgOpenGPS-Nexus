@@ -239,10 +239,17 @@ public sealed class RadioBridgeTransport
         var topicHash = RadioBridgeTopicHasher.ComputeHash(message.Topic);
         var envelope = JsonSerializer.SerializeToUtf8Bytes(message, SerializerOptions);
         var payload = Compress(envelope);
+        var flags = RadioBridgeFrameFlags.Compressed;
+        if (_options.EnableForwardErrorCorrection)
+        {
+            payload = Hamming12_8.Encode(payload);
+            flags |= RadioBridgeFrameFlags.ForwardErrorCorrection;
+        }
+
         return new RadioBridgeFrame(
             Version: FrameVersion,
             PayloadType: RadioBridgePayloadType.Data,
-            Flags: RadioBridgeFrameFlags.Compressed,
+            Flags: flags,
             Sequence: sequence,
             Ack: 0,
             TopicHash: topicHash,
@@ -279,7 +286,10 @@ public sealed class RadioBridgeTransport
 
         try
         {
-            var message = DecodePublication(frame.Payload.Span, frame.Flags.HasFlag(RadioBridgeFrameFlags.Compressed));
+            var message = DecodePublication(
+                frame.Payload.Span,
+                frame.Flags.HasFlag(RadioBridgeFrameFlags.Compressed),
+                frame.Flags.HasFlag(RadioBridgeFrameFlags.ForwardErrorCorrection));
             PublicationReceived?.Invoke(message);
             return RadioBridgeProcessResult.Publication(frame.Sequence, message);
         }
@@ -302,9 +312,13 @@ public sealed class RadioBridgeTransport
         _ackQueue.Enqueue(ackFrame);
     }
 
-    private RadioBridgePublicationMessage DecodePublication(ReadOnlySpan<byte> payload, bool compressed)
+    private RadioBridgePublicationMessage DecodePublication(
+        ReadOnlySpan<byte> payload,
+        bool compressed,
+        bool forwardErrorCorrection)
     {
-        var envelope = compressed ? Decompress(payload) : payload.ToArray();
+        var decodedPayload = forwardErrorCorrection ? Hamming12_8.Decode(payload) : payload.ToArray();
+        var envelope = compressed ? Decompress(decodedPayload) : decodedPayload;
         var message = JsonSerializer.Deserialize<RadioBridgePublicationMessage>(envelope, SerializerOptions);
         if (message is null)
         {

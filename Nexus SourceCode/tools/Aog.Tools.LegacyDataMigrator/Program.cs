@@ -65,6 +65,8 @@ public static class Program
         string? output = null;
         string logsDirectory = "logs";
         string fieldHistoryFile = "field-history.csv";
+        string flagsFile = "Flags.txt";
+        string yieldFile = "yield.csv";
         bool verbose = false;
 
         for (var i = 1; i < args.Count; i++)
@@ -85,6 +87,12 @@ public static class Program
                     break;
                 case "--history":
                     fieldHistoryFile = RequireNext(args, ref i, arg);
+                    break;
+                case "--flags":
+                    flagsFile = RequireNext(args, ref i, arg);
+                    break;
+                case "--yield":
+                    yieldFile = RequireNext(args, ref i, arg);
                     break;
                 case "--verbose":
                 case "-v":
@@ -124,6 +132,8 @@ public static class Program
             OutputDirectory = output!,
             LogsDirectoryName = logsDirectory,
             FieldHistoryFileName = fieldHistoryFile,
+            FlagsFileName = flagsFile,
+            YieldTelemetryFileName = yieldFile,
         };
 
         return (options, verbose);
@@ -149,6 +159,8 @@ public static class Program
         Console.WriteLine("  -o, --output <path>      Destination directory for Nexus-compatible assets.");
         Console.WriteLine("      --logs <name>        Name or relative path of the legacy logs directory (default: logs).");
         Console.WriteLine("      --history <file>     Field history CSV relative to the input directory (default: field-history.csv).");
+        Console.WriteLine("      --flags <file>       Legacy flags file relative to the input directory (default: Flags.txt).");
+        Console.WriteLine("      --yield <file>       Legacy yield telemetry CSV within the logs directory (default: yield.csv).");
         Console.WriteLine("  -v, --verbose            Emit detailed summary for migrated assets.");
         Console.WriteLine("  -h, --help               Display this usage information.");
     }
@@ -162,6 +174,8 @@ public static class Program
         Console.WriteLine($"  IO events: {report.SectionCount}");
         Console.WriteLine($"  Plugin events: {report.PluginCount}");
         Console.WriteLine($"  Weather snapshots: {report.WeatherCount}");
+        Console.WriteLine($"  Yield samples: {report.YieldSampleCount}");
+        Console.WriteLine($"  Field health observations: {report.FieldHealthObservationCount}");
 
         if (report.FieldHistoryFields > 0 || verbose)
         {

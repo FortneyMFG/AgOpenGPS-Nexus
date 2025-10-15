@@ -10,6 +10,9 @@ or CI artefacts.【F:Nexus SourceCode/tools/Aog.Tools.Qa/Dashboard/QaDashboardAg
 Sample metric sets live under `tools/qa/metrics` and mirror the structure emitted by the HIL
 runner. A failing metric (e.g., section dropouts) is reflected in the aggregate with updated fail
 counts and in the scenario status, allowing the UI to flag regressions at a glance.【F:tools/qa/metrics/scenario-fault.json†L1-L9】
+The genetics plugin publishes its regression fixture as `genetics-regression.json`, surfacing
+plan/variety counts, coverage gaps, and barcode scan latency so ADR-046 workflows stay wired
+into QA automation.【F:tools/qa/metrics/genetics-regression.json†L1-L11】
 
 ## Aggregating metrics
 

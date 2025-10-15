@@ -21,12 +21,20 @@ public static class DashboardAndReportTests
         var dashboard = aggregator.Aggregate(metricsDir);
 
         dashboard.AllPassed.Should().BeFalse();
-        dashboard.Scenarios.Should().HaveCount(2);
-        dashboard.Metrics.Should().HaveCount(4);
+        dashboard.Scenarios.Should().HaveCount(3);
+        dashboard.Metrics.Should().HaveCount(8);
 
         var dropout = dashboard.Metrics.Single(m => m.Name == "sections.dropout_count");
         dropout.FailCount.Should().Be(1);
         dropout.PassCount.Should().Be(1);
+
+        var geneticsScenario = dashboard.Scenarios.Single(s => s.Scenario == "Genetics regression");
+        geneticsScenario.Status.Should().Be("warn");
+        geneticsScenario.Metrics.Should().Contain(m => m.Name == "genetics.variety.coverage_gap_pct" && m.Status == "warn");
+
+        var coverageGap = dashboard.Metrics.Single(m => m.Name == "genetics.variety.coverage_gap_pct");
+        coverageGap.WarnCount.Should().Be(1);
+        coverageGap.PassCount.Should().Be(0);
     }
 
     [Fact]

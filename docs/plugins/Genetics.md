@@ -32,3 +32,9 @@ The Genetics plugin tracks planned and actual seed varieties, barcode scans, and
 
 - Offline-first: all edits and barcode scans must persist locally and sync when connectivity returns; cloud is optional per ADR-030.【F:docs/ADR/ADR-030-field-job-sessions.md†L33-L86】
 - Legacy terminology should map to Sessions; historical “Run” labels are no longer used in UI or exports.【F:docs/ADR/ADR-041_JobSessions.md†L55-L73】
+
+## QA & Regression Fixtures
+
+- Genetics metrics are captured in `tools/qa/metrics/genetics-regression.json` so the QA dashboard
+  and post-run report suites can flag coverage gaps, barcode latency, and feature counts during
+  automated regressions aligned with ADR-046.【F:tools/qa/metrics/genetics-regression.json†L1-L11】【F:docs/qa/qa-dashboard.md†L1-L34】

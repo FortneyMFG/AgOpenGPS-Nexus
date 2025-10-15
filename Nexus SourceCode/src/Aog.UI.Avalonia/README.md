@@ -17,6 +17,15 @@ The toolbar is meant to demonstrate integration points for later plugin-owned at
 code-behind should not interact with it directly; bind to the view-model and rely on its commands and
 properties.
 
+## Device Manager compatibility dashboard (NX-309)
+
+The shell includes a Device Manager compatibility card powered by
+`DeviceManagerCompatibilityViewModel`. The card evaluates plugin manifests via
+`PluginCompatibilityEvaluator`, surfaces summary health (`Healthy`, `Warnings`, `Blocked`), and lists
+per-plugin issues that map to ADR-031 governance signals. When running inside the repository, the
+view-model loads manifests from `docs/plugins/manifests`; packaged builds fall back to a representative
+sample. UI bindings render capability badges, dependency issues, and a data-source banner so operators
+understand what telemetry is driving the dashboard.
 ## Crop quick-select UI (NX-302)
 
 `CropQuickSelectViewModel` models the crop quick-select card described in [ADR-045](../../../docs/ADR/ADR-045_CropTypePlugin.md).
@@ -37,3 +46,12 @@ summaries, policy descriptions, and manual override commands. Overrides emit str
 and ISOXML transfers. Each `ZoneImportWorkflowViewModel` simulates policy validation, progress updates,
 and completion logging while `ZoneTransferEventViewModel` captures an activity timeline aligned with
 ADR-027 interop requirements.
+
+## Preset switcher and orchestration status (NX-297)
+
+`PresetSwitcherViewModel` models the preset selection card described in
+[ADR-032](../../../docs/ADR/ADR-032-presets-and-layout-linking.md). Presets expose dependency health,
+background tasks, and orchestration progress through `PresetOptionViewModel` and
+`PresetTaskStatusViewModel` records. The static `CreateSample()` helper wires the planter, sprayer, and
+harvest fixtures into `MainWindowViewModel` so UI shells can exercise status messaging without
+service dependencies.

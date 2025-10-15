@@ -13,6 +13,9 @@ validation harnesses, and auto-tuning helpers.
   imported geometry before persisting it.
 - The implementation mirrors the tolerant readers used by V6 and accepts duplicate
   drive-through flags or optional headers to keep recovery workflows reliable.
+- NX-105 adds support for `BackPic.txt`/`BackPic.png` bundles, populating
+  `LegacyFieldData.BackgroundImagery` with the Bing map bounding box and PNG payload so
+  migration preserves legacy satellite backdrops.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldImporter.cs†L24-L153】【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L128】
 
 ## Coverage Analytics Parity Harness (NX-055)
 

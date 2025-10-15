@@ -12,10 +12,12 @@ public sealed class LegacyFieldData
 {
     public LegacyFieldData(
         IReadOnlyList<GuidanceTrackDefinition> tracks,
-        IReadOnlyList<FieldBoundary> boundaries)
+        IReadOnlyList<FieldBoundary> boundaries,
+        LegacyBackgroundImagery? backgroundImagery = null)
     {
         Tracks = tracks ?? throw new ArgumentNullException(nameof(tracks));
         Boundaries = boundaries ?? throw new ArgumentNullException(nameof(boundaries));
+        BackgroundImagery = backgroundImagery;
     }
 
     /// <summary>
@@ -27,6 +29,11 @@ public sealed class LegacyFieldData
     /// Gets the imported field boundaries and headlands.
     /// </summary>
     public IReadOnlyList<FieldBoundary> Boundaries { get; }
+
+    /// <summary>
+    /// Gets the optional legacy background imagery bounding box and PNG payload.
+    /// </summary>
+    public LegacyBackgroundImagery? BackgroundImagery { get; }
 }
 
 /// <summary>
@@ -125,4 +132,78 @@ public sealed class HeadlandRing
     }
 
     public IReadOnlyList<BoundaryVertex> Vertices { get; }
+}
+
+/// <summary>
+/// Represents the legacy background imagery payload associated with a field.
+/// </summary>
+public sealed class LegacyBackgroundImagery
+{
+    public LegacyBackgroundImagery(LegacyGeoBoundingBox boundingBox, ReadOnlyMemory<byte> imagePng)
+    {
+        BoundingBox = boundingBox;
+        ImagePng = imagePng;
+    }
+
+    /// <summary>
+    /// Gets the bounding box encompassing the imagery in legacy Geo coordinates.
+    /// </summary>
+    public LegacyGeoBoundingBox BoundingBox { get; }
+
+    /// <summary>
+    /// Gets the PNG payload backing the background imagery.
+    /// </summary>
+    public ReadOnlyMemory<byte> ImagePng { get; }
+}
+
+/// <summary>
+/// Represents a geographic bounding box persisted by legacy BackPic.txt files.
+/// </summary>
+public readonly struct LegacyGeoBoundingBox
+{
+    public LegacyGeoBoundingBox(double minNorthing, double maxNorthing, double minEasting, double maxEasting)
+    {
+        if (double.IsNaN(minNorthing))
+        {
+            throw new ArgumentException("Minimum northing must be a valid number.", nameof(minNorthing));
+        }
+
+        if (double.IsNaN(maxNorthing))
+        {
+            throw new ArgumentException("Maximum northing must be a valid number.", nameof(maxNorthing));
+        }
+
+        if (double.IsNaN(minEasting))
+        {
+            throw new ArgumentException("Minimum easting must be a valid number.", nameof(minEasting));
+        }
+
+        if (double.IsNaN(maxEasting))
+        {
+            throw new ArgumentException("Maximum easting must be a valid number.", nameof(maxEasting));
+        }
+
+        if (maxNorthing < minNorthing)
+        {
+            throw new ArgumentException("Maximum northing must be greater than or equal to minimum northing.", nameof(maxNorthing));
+        }
+
+        if (maxEasting < minEasting)
+        {
+            throw new ArgumentException("Maximum easting must be greater than or equal to minimum easting.", nameof(maxEasting));
+        }
+
+        MinNorthing = minNorthing;
+        MaxNorthing = maxNorthing;
+        MinEasting = minEasting;
+        MaxEasting = maxEasting;
+    }
+
+    public double MinNorthing { get; }
+
+    public double MaxNorthing { get; }
+
+    public double MinEasting { get; }
+
+    public double MaxEasting { get; }
 }

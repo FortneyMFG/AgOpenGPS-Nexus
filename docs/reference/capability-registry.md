@@ -19,6 +19,7 @@ messages when required capabilities are absent.
 | Name | Category | Default version | Summary | Attributes |
 | --- | --- | --- | --- | --- |
 | `guidance.control` | Guidance | 1.0.0 | Provides closed-loop autosteer control and arbitration services. | `bundle=guidance`, `mode=exclusive` |
+| `guidance.telemetry` | Guidance | 1.0.0 | Publishes guidance status, engage state, and lease health for operator dashboards. | `bundle=guidance`, `mode=shared` |
 | `mapping:raster` | Mapping | 1.0.0 | Publishes raster coverage tiles, rate surfaces, and diagnostics. | `bundle=mapping`, `surface=raster` |
 | `mapping:vector` | Mapping | 1.0.0 | Provides vector layer ingestion, editing, and export pipelines. | `bundle=mapping`, `surface=vector` |
 | `mapping:offline` | Mapping | 1.0.0 | Indicates the NullMapping provider is active and mapping features are offline. | `bundle=mapping`, `status=degraded` |
@@ -26,6 +27,12 @@ messages when required capabilities are absent.
 | `zones:evaluate` | Zones | 1.0.0 | Evaluates pose samples against zone constraints and publishes PoseZoneMask state. | `bundle=zones`, `role=evaluation` |
 | `zones:registry` | Zones | 1.0.0 | Publishes zone registry snapshots and validation hashes for consumers. | `bundle=zones`, `role=authority` |
 | `zones:edit` | Zones | 1.0.0 | Supports collaborative zone editing, journaling, and reconciliation workflows. | `bundle=zones`, `role=editor` |
+| `sections.control` | Sections | 1.0.0 | Commands boom and row actuators using Core arbitration policies. | `bundle=sections`, `mode=exclusive` |
+| `sections.telemetry` | Sections | 1.0.0 | Streams duty cycle, switch feedback, and diagnostics from section controllers. | `bundle=sections`, `mode=shared` |
+| `fileio.import` | Data Ops | 1.0.0 | Handles import workflows for agronomic layers, jobs, and provenance manifests. | `bundle=file-io`, `mode=shared` |
+| `fileio.export` | Data Ops | 1.0.0 | Exports agronomic layers, jobs, and provenance manifests in supported formats. | `bundle=file-io`, `mode=shared` |
+| `replay.guidance` | Replay | 1.0.0 | Provides deterministic guidance command replay streams for analysis. | `bundle=replay`, `mode=shared` |
+| `replay.pose` | Replay | 1.0.0 | Provides deterministic pose replay streams for overlay and validation. | `bundle=replay`, `mode=shared` |
 
 ## Usage notes
 - **Deterministic metadata.** Core uses the registry to seed capability descriptors so that

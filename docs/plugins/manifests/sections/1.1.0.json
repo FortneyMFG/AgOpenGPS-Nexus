@@ -12,6 +12,15 @@
     "defaultBoomCount": 12,
     "rateChangeLatencyMs": 120
   },
+  "supportedCapabilities": [
+    "sections.control",
+    "sections.telemetry"
+  ],
+  "requiredTransports": [
+    "AOG-Link",
+    "core://sections"
+  ],
+  "minimumRuntimeVersion": "1.0.0",
   "simProviders": [
     {
       "providerId": "sections.taskGenerator",
@@ -40,6 +49,20 @@
       "settings": {
         "samplePeriodMs": 200
       }
+    }
+  ],
+  "leases": [
+    {
+      "capability": "sections.control",
+      "mode": "Exclusive",
+      "timeoutSeconds": 5,
+      "recovery": "FailSafe"
+    },
+    {
+      "capability": "sections.telemetry",
+      "mode": "Shared",
+      "timeoutSeconds": 10,
+      "recovery": "GracefulDegradation"
     }
   ]
 }

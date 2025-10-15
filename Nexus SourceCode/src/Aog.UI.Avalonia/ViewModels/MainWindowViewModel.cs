@@ -69,6 +69,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             $"Running on {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}) with {RuntimeInformation.FrameworkDescription}";
 
         SeasonNavigator = SeasonNavigatorViewModel.CreateSample();
+        CropQuickSelect = CropQuickSelectViewModel.CreateSample();
 
         // Load simulation configuration + summary and create the bar VM.
         var configuration = TryLoadSimulationConfiguration(out var summary);
@@ -143,6 +144,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the season navigator view-model.</summary>
     public SeasonNavigatorViewModel SeasonNavigator { get; }
+
+    /// <summary>Gets the crop quick-select view-model surfaced in the field navigator.</summary>
+    public CropQuickSelectViewModel CropQuickSelect { get; }
 
     /// <summary>Gets the available UI themes.</summary>
     public IReadOnlyList<UiTheme> AvailableThemes { get; }

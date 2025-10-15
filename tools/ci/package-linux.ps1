@@ -64,6 +64,18 @@ if (-not $binary) {
     throw "No binary produced in $publishDir."
 }
 
+$expectedBinaryName = if ([string]::IsNullOrEmpty($binary.Extension)) {
+    $ArtifactName
+} else {
+    "$ArtifactName$($binary.Extension)"
+}
+
+if ($binary.Name -ne $expectedBinaryName) {
+    $renamedBinaryPath = Join-Path $binary.DirectoryName $expectedBinaryName
+    Move-Item -Path $binary.FullName -Destination $renamedBinaryPath -Force
+    $binary = Get-Item -Path $renamedBinaryPath
+}
+
 $artifactBase = "$ArtifactName-$Runtime"
 $singleFileName = if ([string]::IsNullOrEmpty($binary.Extension)) {
     $ArtifactName

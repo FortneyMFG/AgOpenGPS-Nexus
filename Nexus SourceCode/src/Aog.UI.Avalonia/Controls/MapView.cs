@@ -369,7 +369,7 @@ public sealed class MapView : SKElement
 
     private static SKPoint ToSkPoint(Point point) => new((float)point.X, (float)point.Y);
 
-    private static SKColor ToSkColor(Color color) => new(color.A, color.R, color.G, color.B);
+    private static SKColor ToSkColor(Color color) => new(color.R, color.G, color.B, color.A);
 
     private static SKPoint Rotate(SKPoint vector, float radians)
     {

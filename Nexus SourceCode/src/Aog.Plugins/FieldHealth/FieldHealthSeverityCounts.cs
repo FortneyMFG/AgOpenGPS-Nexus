@@ -1,3 +1,5 @@
+using System;
+
 namespace Aog.Plugins.FieldHealth;
 
 /// <summary>
@@ -17,4 +19,19 @@ public sealed record FieldHealthSeverityCounts(int None, int Low, int Moderate, 
         FieldHealthSeverity.Critical => this with { Critical = Critical + 1 },
         _ => this
     };
+
+    /// <summary>
+    /// Adds counts from another instance and returns a combined snapshot.
+    /// </summary>
+    public FieldHealthSeverityCounts Add(FieldHealthSeverityCounts other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        return new FieldHealthSeverityCounts(
+            None + other.None,
+            Low + other.Low,
+            Moderate + other.Moderate,
+            High + other.High,
+            Critical + other.Critical);
+    }
 }

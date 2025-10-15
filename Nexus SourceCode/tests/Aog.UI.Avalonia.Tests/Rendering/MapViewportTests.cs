@@ -69,8 +69,10 @@ internal static class PointAssertionsExtensions
         Point expected,
         double precision)
     {
-        assertions.Subject.X.Should().BeApproximately(expected.X, precision);
-        assertions.Subject.Y.Should().BeApproximately(expected.Y, precision);
+        var subject = assertions.Subject;
+
+        subject.X.Should().BeApproximately(expected.X, precision);
+        subject.Y.Should().BeApproximately(expected.Y, precision);
 
         return new AndConstraint<ObjectAssertions<Point>>(assertions);
     }

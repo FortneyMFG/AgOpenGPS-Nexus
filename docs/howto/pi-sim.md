@@ -74,14 +74,19 @@ A successful build confirms the SDK is installed correctly. Subsequent runs can 
 
 ## 5. Run the Simulation (No Hardware)
 
-1. Stay in the repo root and launch the composite simulator:
+1. Stay in the repo root and point the helper at the Core host project (a dedicated
+   sim host is still on the roadmap), then launch the composite simulator:
 
    ```bash
+   export NEXUS_SIM_PROJECT="Nexus SourceCode/src/Aog.Core.Host/Aog.Core.Host.csproj"
    ./tools/scripts/nexus.sh sim
    ```
 
+   The helper script reads the `NEXUS_SIM_PROJECT` override before falling back to its
+   defaults, so exporting the path guarantees a valid project target.【F:tools/scripts/nexus.sh†L18-L69】
+
 2. The script runs `dotnet run` for the simulation host. You should see log lines for the
-   SimClock, SimBus, and virtual sensors. Let it run for ~60 seconds.
+   SimClock, SimBus, and virtual sensors. Let it run for ~60 seconds.【F:tools/scripts/nexus.sh†L1-L99】
 3. Capture a baseline log for troubleshooting later by re-running with `tee`:
 
    ```bash

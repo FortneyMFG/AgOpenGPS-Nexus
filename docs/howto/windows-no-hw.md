@@ -1,14 +1,15 @@
 # Windows quick start: build a map in two minutes (no hardware required)
 
-This guide walks a new operator through launching the Nexus Windows UI, playing the
-embedded simulation, and watching a map come alive without connecting any hardware.
+This guide walks a new operator through launching the Nexus Windows UI, exploring the
+placeholder simulation controls, and saving defaults without connecting any hardware.
 It assumes you are working from a clean Windows 11 or Windows 10 (21H2+) machine.
 
 ## What you will do
 
 1. Prepare a working folder and install the .NET runtime (one-time setup).
 2. Launch the Avalonia desktop shell.
-3. Start the bundled simulation and watch the map update in real time.
+3. Inspect the bundled simulation scaffolding so you know what will change once
+   playback is wired up.
 4. Save the default connection profile for when you graduate to real hardware.
 
 The hands-on portion (steps 2–4) routinely completes in under two minutes once the
@@ -49,23 +50,23 @@ steps are identical.
 4. Within a few seconds the Avalonia window opens with a dark map pane on the left
    and setup controls on the right.【F:tools/scripts/nexus.ps1†L11-L117】【F:Nexus SourceCode/src/Aog.UI.Avalonia/MainWindow.axaml†L21-L175】
 
-## Step 3 — Play the embedded simulation (45 seconds)
+## Step 3 — Explore the placeholder simulation controls (45 seconds)
 
-The shell ships with a deterministic bicycle-model scenario and synthetic IMU stream.
-Use the built-in controls to start the run:
+The current Avalonia shell seeds the map with a fixed sample pose while the replay
+plumbing is under construction. Use the controls to understand what will change when
+the simulation loop is connected:
 
-1. Press **Play** in the *Simulation controls* card. The status changes to
-   `Playing`, and the highlighted vehicle dot begins moving on the map.【F:Nexus SourceCode/src/Aog.UI.Avalonia/MainWindow.axaml†L37-L111】【F:Nexus SourceCode/src/Aog.UI.Avalonia/Controls/MapView.cs†L11-L168】
-2. Use the radio buttons to switch between 0.5×, 1×, or 2× playback rates if you
-   want to speed through the lap.【F:Nexus SourceCode/src/Aog.UI.Avalonia/MainWindow.axaml†L54-L76】
-3. Drag the scrubber to jump forward or backward in the run. The pose and heading
-   update instantly because the simulation graph is deterministic.【F:Nexus SourceCode/src/Aog.UI.Avalonia/MainWindow.axaml†L77-L88】【F:Nexus SourceCode/src/Aog.UI.Avalonia/Resources/SimulationSample.json†L1-L33】
-4. Expand the *Stream routing* table to confirm that both the vehicle pose and IMU
-   streams are sourced from the simulation provider graph bundled with the app.【F:Nexus SourceCode/src/Aog.UI.Avalonia/MainWindow.axaml†L89-L123】【F:Nexus SourceCode/src/Aog.UI.Avalonia/Resources/SimulationSample.json†L1-L33】
-
-As the timeline advances the map view recenters on the simulated tractor, giving
-new users an immediate sense of orientation controls before real GNSS data is
-available.【F:Nexus SourceCode/src/Aog.UI.Avalonia/Controls/MapView.cs†L27-L168】
+1. Press **Play** in the *Simulation controls* card. The status flips between
+   `Playing` and `Paused`, but the map stays on the seeded pose because the
+   view-model does not stream updates yet.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/MainWindowViewModel.cs†L62-L122】【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/SimulationBarViewModel.cs†L21-L118】【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/SimulationBarViewModel.cs†L240-L276】
+2. Switch between the 0.5×, 1×, and 2× radio buttons to watch the playback-rate
+   label update. The selection only affects UI state until a replay controller is
+   registered.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/SimulationBarViewModel.cs†L19-L118】【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/SimulationBarViewModel.cs†L277-L320】
+3. Drag the scrubber to change the timestamp readout. Because no controller feeds the
+   map yet, the tractor icon remains in place even as the position label updates.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/SimulationBarViewModel.cs†L119-L223】
+4. Expand the *Stream routing* table to see which simulated routes the shell will wire
+   up once playback arrives. This helps you understand the data flow even before live
+   telemetry is available.【F:Nexus SourceCode/src/Aog.UI.Avalonia/MainWindow.axaml†L89-L123】【F:Nexus SourceCode/src/Aog.UI.Avalonia/Resources/SimulationSample.json†L1-L33】
 
 ## Step 4 — Save your connection defaults (15 seconds)
 
@@ -83,8 +84,8 @@ ready the first time you plug in a controller:
 
 You now have:
 
-- A running Avalonia shell that renders vehicle pose updates on the map.
-- A deterministic simulation graph you can replay at will.
+- A running Avalonia shell seeded with sample layers and a placeholder vehicle pose.
+- A deterministic simulation configuration you can inspect before playback wiring lands.
 - Saved connection settings for the future hardware handshake.
 
 From here you can experiment with editing the simulation JSON in
@@ -97,7 +98,7 @@ longer routes or multi-sensor setups before you step into the cab.【F:Nexus Sou
 | --- | --- |
 | `dotnet` is not recognized | Install the .NET 8 Desktop runtime and reopen PowerShell so the PATH updates.【F:Nexus SourceCode/README.md†L59-L83】 |
 | `Unknown target 'ui'` from the helper script | Double-check you are running `nexus.ps1` from inside the repository so the relative project paths resolve.【F:tools/scripts/nexus.ps1†L11-L117】 |
-| The window opens but the map stays still | Ensure the simulation is playing (status shows `Playing`) and the playback rate is not paused. You can also drag the scrubber to force an update.【F:Nexus SourceCode/src/Aog.UI.Avalonia/MainWindow.axaml†L47-L111】 |
+| The window opens but the map stays still | This is expected until the replay controller is hooked up. The UI seeds a sample pose so you can explore layers and settings before live data is available.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/MainWindowViewModel.cs†L62-L122】【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/SimulationBarViewModel.cs†L240-L276】 |
 | Saved settings disappear between runs | Verify you clicked **Save settings** and that your Windows profile has write permission to `%AppData%/AgOpenGPS/Nexus`. The UI persists the configuration there on Windows.【F:Nexus SourceCode/README.md†L79-L83】 |
 
 ## Next steps

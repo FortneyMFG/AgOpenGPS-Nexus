@@ -1,0 +1,15 @@
+{
+  "id": "geneticsPlan:north40-soy",
+  "layerId": "layer:genetics.plan.2025",
+  "jobId": "job:2025-plant-soy",
+  "createdAt": "2025-03-15T12:00:00Z",
+  "createdBy": "user:planner.annika",
+  "lastModifiedAt": "2025-03-16T08:30:00Z",
+  "brand": "Acme Seeds",
+  "product": "ZX-2045",
+  "traitStack": "Enlist",
+  "lot": "LOT-4432A",
+  "treatment": "fungicide",
+  "source": "manual",
+  "notes": "Planned for north 40 acres"
+}

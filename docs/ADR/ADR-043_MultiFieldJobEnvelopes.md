@@ -18,7 +18,9 @@ Allow jobs to mount multiple fields simultaneously. The mapping plugin (and othe
 fields as the active working envelope while still tracking per-field statistics. Core records the mounted `fieldIds`, immutable
 authoring metadata, and derived stats on the job and requires plugins to respect multi-field contexts when emitting coverage,
 guidance, or rate outputs. Plugin extensions may annotate per-field envelopes (e.g., crop type or profitability overlays)
-without mutating core geometry.
+without mutating core geometry. Core publishes the resolved union envelope via `onJobLoaded(jobContext)` and surfaces
+`activeEnvelopeChanged` notifications whenever the mounted field set is updated so plugins can rebuild spatial indices and UI
+overlays deterministically.
 
 ### Job payload fragment
 
@@ -54,9 +56,10 @@ without mutating core geometry.
   exported reports.
 - Spatial indexing (R-tree) must include all mounted fields so guidance and constraint lookups remain within latency budgets.
 - UI workflows need multi-field selection controls and a live indicator of the combined envelope.
-- Core publishes `onFarmLoaded` and `onJobLoaded` events with `fieldIds[]`, per-field acreage, and job metadata; plugins listen
-  for the subsequent `mountFields(fieldIds[])` call and may read job `extensions` to drive crop/genetics or profitability
-  overlays.
+- Core publishes `onFarmLoaded` and `onJobLoaded` events with `fieldIds[]`, per-field acreage, immutable IDs, and job metadata;
+  plugins listen for the subsequent `mountFields(fieldIds[])` call (Core-provided helper that resolves geometry) and may read
+  job `extensions` to drive crop/genetics or profitability overlays. Core also emits `onJobContextChanged` when the active
+  envelope changes so spatial caches and analytics recompute safely.
 
 ## Alternatives considered
 

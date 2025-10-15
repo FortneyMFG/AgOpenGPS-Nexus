@@ -1,5 +1,7 @@
 # Analytics & Export Plugin Requirements (Draft)
 
+Refer to [Core Lifecycle & Editing Interfaces](CoreLifecycle.md) for lifecycle hook details shared across plugin types.
+
 ## Overview
 
 Analytics and export plugins transform job/session data into reports, dashboards, and external formats. Season organizers and
@@ -7,7 +9,9 @@ multi-field envelopes require new filtering and provenance expectations.
 
 ## Runtime Contracts
 
-- Subscribe to `onFarmLoaded`, `onJobLoaded`, and `onSessionStart` to cache active context and trigger incremental analytics updates. Events include authoring metadata (`createdBy`, `createdAt`, `lastModifiedAt`) and plugin `extensions` for crop/profit overlays.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L72】
+- Subscribe to `onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, and `onSessionStart` to cache active context and trigger incremental analytics updates. Events include authoring metadata (`createdBy`, `createdAt`, `lastModifiedAt`) and plugin `extensions` for crop/profit overlays.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L74】
+- Listen for `onSessionPause`/`onSessionResume` to manage incremental analytics windows, and `onSessionWeatherUpdate` when weather-dependent compliance checks are required.【F:docs/SRS/sections/03_JobLifecycle.md†L38-L64】
+- Handle `onLayerStartEdit`/`onFeatureCommit` events to recalculate analytics when operators adjust crop, genetics, risk, or profit zones via the shared editing toolchain.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
 - Accept filters for `seasonId`, `jobId`, and `sessionId` to scope analytics outputs. Provide Season-first and Farm-first report
   presets to match UI navigation flows.【F:docs/SRS/sections/03_JobLifecycle.md†L74-L92】
 - Read `job.stats.fields[]` to present per-field summaries even when jobs span multiple fields. Aggregations should clearly

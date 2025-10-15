@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/ProfitLayer.v1.json",
+  "title": "ProfitLayer.v1",
+  "type": "object",
+  "allOf": [
+    { "$ref": "./Layer.v1.json" }
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Profit layer metadata (revenue, cost, profit per area, references).",
+      "additionalProperties": false,
+      "x-nexus-scope": "plugin",
+      "properties": {
+        "revenuePerArea": {
+          "type": "number",
+          "description": "Revenue per unit area (currency per acre/hectare).",
+          "x-nexus-scope": "plugin"
+        },
+        "costPerArea": {
+          "type": "number",
+          "description": "Cost per unit area.",
+          "x-nexus-scope": "plugin"
+        },
+        "profitPerArea": {
+          "type": "number",
+          "description": "Net profit per unit area.",
+          "x-nexus-scope": "plugin"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217 currency code.",
+          "x-nexus-scope": "plugin"
+        },
+        "yieldLayerId": {
+          "type": ["string", "null"],
+          "pattern": "^layer:[A-Za-z0-9._:-]+$",
+          "description": "Reference to the yield layer used for revenue calculations.",
+          "x-nexus-scope": "plugin"
+        },
+        "costRecordIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^cost:[A-Za-z0-9._:-]+$"
+          },
+          "description": "Cost records contributing to this profit layer.",
+          "x-nexus-scope": "plugin"
+        }
+      }
+    }
+  }
+}

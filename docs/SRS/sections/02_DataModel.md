@@ -17,10 +17,10 @@ domain-specific facts through `extensions` bags that Core stores verbatim.
 
 | Area | Core-owned | Plugin-extendable |
 | --- | --- | --- |
-| Identity & metadata | `id`, `name`, authoring metadata, relationship pointers | Derived analytics (`cropType.*`, profitability summaries), historical annotations |
-| Geometry | Farm/field polygons, headlands, shared assets | Zone drawings, prescription overlays stored as layers |
-| Operational hierarchy | Season/job/session creation, lifecycle events, journaling checkpoints | Session extensions, job-level agronomic insights |
-| Provenance | `jobId`, `sessionId`, `createdAt`, `hash`, actor | Additional provenance attributes per plugin (e.g., calibration IDs) |
+| Identity & metadata | `id`, `name`, authoring metadata, relationship pointers, immutable `createdBy/createdAt/lastModifiedAt` | Derived analytics (`cropType.*`, profitability summaries), historical annotations |
+| Geometry | Farm/field polygons, headlands, shared assets | Zone drawings, prescription overlays stored as layers via LayerEditService |
+| Operational hierarchy | Season/job/session creation, lifecycle events, journaling checkpoints, context publication events | Session extensions, job-level agronomic insights, plugin-specific lifecycle listeners |
+| Provenance | `jobId`, `sessionId`, `createdAt`, `hash`, actor | Additional provenance attributes per plugin (e.g., calibration IDs, source payload hashes) |
 
 ## Entities
 
@@ -40,7 +40,10 @@ domain-specific facts through `extensions` bags that Core stores verbatim.
 - **Geometry:** Stored as polygon exteriors and optional holes using `[lon, lat (, elevation)]` coordinates; headlands capture
   width, units, and optional pass counts.
 - **Plugin extensions:** Zone drawings, soil sampling layers, crop rotation histories recorded inside `extensions`.
-- **Schema:** `schemas/Field.v1.json` documents the geometry, metadata layout, authoring fields, and extension hooks.【F:schemas/Field.v1.json†L1-L142】
+- **Crop history:** `cropTypeHistory[]` (plugin-owned) records chronological crop assignments with `year`, `crop`, `status`,
+  `source`, `layerId`, and optional `notes`, enabling analytics without mutating core geometry.
+- **Schema:** `schemas/Field.v1.json` documents the geometry, metadata layout, authoring fields, crop history extensions, and
+  plugin hooks.【F:schemas/Field.v1.json†L1-L154】
 
 ### Season.v1
 - **Identity:** `season:<year-or-label>` unique across the operator’s deployment.
@@ -64,9 +67,12 @@ domain-specific facts through `extensions` bags that Core stores verbatim.
 - **Core attributes:** Name, start/end timestamps, environment snapshot, input summary, notes, `layerRefs[]`, authoring
   metadata.
 - **Relationships:** Belongs to a job; referenced by layers for provenance; surfaced to plugins via lifecycle events.
-- **Plugin extensions:** Session `extensions` collect crop-type actuals, rate summaries, operator journals, and other plugin
-  insights.
-- **Schema:** `schemas/Session.v1.json` captures required metadata, authoring fields, and flexible extension hooks.【F:schemas/Session.v1.json†L1-L99】
+- **Weather snapshot:** `weatherSnapshot` (core-owned) captures temperature, humidity, wind, rainfall, and pressure samples at
+  session start with optional incremental updates emitted via lifecycle events.
+- **Plugin extensions:** Session `extensions` collect crop-type actuals, rate summaries, operator journals, weather analytics,
+  and other plugin insights.
+- **Schema:** `schemas/Session.v1.json` captures required metadata, authoring fields, weather snapshots, and flexible extension
+  hooks.【F:schemas/Session.v1.json†L1-L115】
 
 ### Layer.v1 (update)
 - **Identity:** `layer:<slug>` stable across storage round-trips.
@@ -78,6 +84,43 @@ domain-specific facts through `extensions` bags that Core stores verbatim.
   provenance.
 - **Schema:** `schemas/Layer.v1.json` codifies provenance, authoring metadata, and extension requirements for reuse/move
   operations.【F:schemas/Layer.v1.json†L1-L117】
+
+### LayerEditEvent.v1 (new)
+- **Identity:** `layerEdit:<uuid>` immutable journal entries emitted by the Zone Drawing Framework.
+- **Core attributes:** `layerId`, `jobId`, `sessionId`, `actor`, `createdAt`, `operations[]` (create/update/delete descriptors),
+  `previousHash`, `nextHash` for undo/redo chains.
+- **Relationships:** Linked to layers and sessions; consumed by collaborative mesh replication and analytics plugins.
+- **Schema:** `schemas/LayerEditEvent.v1.json` enumerates operation payloads (geometry diffs, attribute patches) and provenance
+  metadata, marking geometry diffs as Core-owned and attribute payloads as plugin-extendable.
+
+### CropTypeHistoryRecord.v1 (new)
+- **Identity:** Embedded within `Field.cropTypeHistory[]`.
+- **Core attributes:** `year`, `crop`, `status` (`planned`, `actual`, `historical`), `source`, `layerId`, `recordedAt`,
+  authoring metadata.
+- **Relationships:** References layers produced by the Crop Type plugin; informs job/session crop context broadcasts.
+- **Schema:** `schemas/CropTypeHistoryRecord.v1.json` defines validation and plugin ownership flags.
+
+### GeneticsPlan.v1 & GeneticsVariety.v1 (new)
+- **Identity:** `layer:<namespace>` features persisted by the Genetics plugin.
+- **Core attributes:** Immutable IDs, layer references, authoring metadata, provenance to jobs/sessions.
+- **Plugin attributes:** `brand`, `product`, `traitStack`, `lot`, `treatment`, `source`, `notes`, `appliedAt` (actual layer), and
+  barcode/change-log metadata.
+- **Schema:** `schemas/GeneticsPlan.v1.json` and `schemas/GeneticsVariety.v1.json` separate Core-owned provenance from plugin
+  attribute namespaces.
+
+### CostRecord.v1 & ProfitLayer.v1 (new)
+- **CostRecord.v1:** Stores granular expenses with scope (`farmId`, `fieldId?`, `jobId?`, `sessionId?`), `category`, `amount`,
+  `currency`, `quantity`, authoring metadata, and optional layer references for attribution.
+- **ProfitLayer.v1:** Extends `Layer.v1` with `revenuePerArea`, `costPerArea`, `profitPerArea`, and links to source yield/cost
+  layers.
+- **Schema:** `schemas/CostRecord.v1.json` and `schemas/ProfitLayer.v1.json` mark financial fields as plugin-owned while Core
+  enforces ID and provenance integrity.
+
+### WeatherOverlay.v1 (new)
+- **Identity:** `layer:weather.overlay:<timestamp>`.
+- **Core attributes:** Weather raster grid metadata (units, spatial resolution), authoring metadata, provenance to source
+  station/API.
+- **Schema:** Documented via `schemas/WeatherOverlay.v1.json` with plugin-owned value arrays and Core-owned metadata.
 
 ## Relationships & Constraints
 

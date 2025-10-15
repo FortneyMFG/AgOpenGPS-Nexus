@@ -1,0 +1,19 @@
+{
+  "id": "cost:seed-north40-1",
+  "category": "seed",
+  "amount": 1850.75,
+  "currency": "USD",
+  "quantity": 50.0,
+  "quantityUnits": "bag",
+  "recordedAt": "2025-04-01T14:55:00Z",
+  "createdBy": "user:operator.maya",
+  "farmId": "farm:NorthHome",
+  "fieldId": "field:North40",
+  "jobId": "job:2025-plant-soy",
+  "sessionId": "session:1",
+  "layerId": "layer:genetics.variety.2025",
+  "metadata": {
+    "invoice": "INV-5521",
+    "supplier": "Rural Coop"
+  }
+}

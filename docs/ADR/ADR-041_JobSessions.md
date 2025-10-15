@@ -19,7 +19,9 @@ human-readable labels, and captures environmental metadata, input summaries, not
 metadata (`createdBy`, `createdAt`, `lastModifiedAt`). Sessions may be stored inline within `job.json` or as dedicated
 `sessions/<sessionId>.json` documents depending on storage preferences. Core emits plugin lifecycle events when sessions start,
 end, or change metadata, and exposes a per-session `extensions` bag for plugin-authored data such as crop genetics snapshots or
-profitability estimates.
+profitability estimates. Lifecycle contracts are explicit: plugins subscribe to `onSessionStart`, `onSessionPause`,
+`onSessionResume`, and `onSessionEnd` in addition to `onJobLoaded` and `onContextChanged` so they can checkpoint state without
+polling job storage.
 
 ### Session payload
 
@@ -49,9 +51,10 @@ profitability estimates.
 
 - Core must create Session 1 automatically on job start, persist it with autosave timers, and expose a "Start New Session" UI
   action that closes the current session and opens the next.
-- Plugin APIs gain `onSessionStart`, `onSessionEnd`, and `onSessionMetadataChange` hooks that carry `farmId`, `seasonId?`,
-  `jobId`, `sessionId`, and the mounted `fieldIds`. Plugins may subscribe to derived signals (e.g., paused/ resumed) but Core
-  sequences these canonical events.
+- Plugin APIs gain `onSessionStart`, `onSessionPause`, `onSessionResume`, and `onSessionEnd` hooks that carry `farmId`,
+  optional `seasonId`, immutable `jobId`, immutable `sessionId`, and the mounted `fieldIds`. Core publishes the active context
+  (`farm`, `season`, `job`, `session`) on an event bus so plugins can subscribe once and receive deterministic updates rather
+  than polling. Metadata edits fire `onSessionMetadataChange` events including diff summaries to support selective recompute.
 - Journaling expectations apply at the session level: coverage tiles, telemetry logs, and notes must checkpoint before declaring
   a session closed.
 - Backwards compatibility: jobs with no `sessions` array are treated as a single implicit session when loaded.

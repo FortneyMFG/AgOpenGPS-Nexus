@@ -5,9 +5,11 @@
 Mapping plugins render the working envelope, coverage, rate overlays, and historical layers for Nexus jobs. They must operate
 across multi-field envelopes, respect session metadata, and publish provenance suitable for analytics and reporting.
 
+Refer to [Core Lifecycle & Editing Interfaces](CoreLifecycle.md) for the canonical event and editing hook definitions exposed by Core.
+
 ## Runtime Contracts
 
-- **Lifecycle events:** Subscribe to `onFarmLoaded`, `onJobLoaded`, `onSessionStart`, `onSessionMetadataChange`, and `onSessionEnd` to hydrate caches, mount field geometry, and flush journals. Core broadcasts farm/job/session context including authoring metadata and plugin `extensions` for overlays.【F:docs/SRS/sections/03_JobLifecycle.md†L12-L72】【F:schemas/Job.v1.json†L1-L146】
+- **Lifecycle events:** Subscribe to `onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, `onSessionStart`, `onSessionPause`, `onSessionResume`, `onSessionMetadataChange`, and `onSessionEnd` to hydrate caches, mount field geometry, and flush journals. Core broadcasts farm/job/session context including authoring metadata and plugin `extensions` for overlays.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L74】【F:schemas/Job.v1.json†L1-L146】
 
 - **Multi-field envelopes:** Implement `mountFields(fieldIds[])` to receive one or more field IDs. Load all referenced polygons,
   compute a union envelope, and publish per-field indices for analytics consumers.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L21-L63】

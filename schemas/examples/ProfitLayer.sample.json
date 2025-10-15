@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "layer:profit.net.2025",
+  "kind": "profit",
+  "jobId": "job:2025-plant-soy",
+  "sessionId": "session:1",
+  "units": "USD/acre",
+  "createdAt": "2025-11-10T20:00:00Z",
+  "createdBy": "plugin:profit",
+  "lastModifiedAt": "2025-11-10T20:05:00Z",
+  "provenance": {
+    "source": "plugin:profit",
+    "transform": "yield-aggregation-v1",
+    "hash": "8a11f0b3",
+    "createdAt": "2025-11-10T20:00:00Z",
+    "actor": "plugin:profit"
+  },
+  "metadata": {
+    "revenuePerArea": 780.5,
+    "costPerArea": 420.1,
+    "profitPerArea": 360.4,
+    "currency": "USD",
+    "yieldLayerId": "layer:yield.actual.2025",
+    "costRecordIds": ["cost:seed-north40-1", "cost:fuel-north40-1"]
+  }
+}

@@ -63,6 +63,16 @@ and the broader Software Requirements Specification (SRS) set under `/docs/SRS`.
 - [ADR-002: Expose Nexus services over gRPC/protobuf contracts](docs/ADR/ADR-002-grpc-contracts.md)
 - [ADR-003: Use Avalonia for the cross-platform Nexus UI shell](docs/ADR/ADR-003-avalonia-ui.md)
 - [ADR-004: Establish the composite simulation fabric (SimClock + SimBus)](docs/ADR/ADR-004-composite-simulation.md)
+- [ADR-044: Zone drawing framework](docs/ADR/ADR-044_ZoneDrawingFramework.md)
+- [ADR-045: Crop type plugin & layers](docs/ADR/ADR-045_CropTypePlugin.md)
+- [ADR-046: Genetics plugin & layers](docs/ADR/ADR-046_GeneticsPlugin.md)
+- [ADR-047: Live telemetry mesh](docs/ADR/ADR-047_LiveTelemetryMesh.md)
+- [ADR-048: RadioBridge for ELRS/LoRa telemetry](docs/ADR/ADR-048_RadioBridge.md)
+- [ADR-049: Yield & analytics plugin](docs/ADR/ADR-049_YieldPlugin.md)
+- [ADR-050: Cost & profit plugin](docs/ADR/ADR-050_CostProfitPlugin.md)
+- [ADR-051: Report builder & export system](docs/ADR/ADR-051_ReportBuilder.md)
+- [ADR-052: Field health & risk plugin](docs/ADR/ADR-052_FieldHealthPlugin.md)
+- [ADR-053: Weather & environment plugin](docs/ADR/ADR-053_WeatherPlugin.md)
 
 ## Repository Layout
 

@@ -1,0 +1,22 @@
+{
+  "id": "layerEdit:12345",
+  "schemaVersion": "1.0.0",
+  "layerId": "layer:cropType.actual.2025",
+  "jobId": "job:2025-plant-soy",
+  "sessionId": "session:1",
+  "createdAt": "2025-05-05T09:15:22Z",
+  "actor": "user:operator.maya",
+  "hash": "c96f8fd1",
+  "previousHash": "b73c2140",
+  "nextHash": null,
+  "operations": [
+    {
+      "type": "update",
+      "featureId": "feature:polygon-12",
+      "geometryBefore": { "type": "Polygon", "coordinates": [[[0,0],[1,0],[1,1],[0,1],[0,0]]] },
+      "geometryAfter": { "type": "Polygon", "coordinates": [[[0,0],[1.1,0],[1,1.05],[0,1],[0,0]]] },
+      "attributesBefore": { "crop": "corn", "status": "planned" },
+      "attributesAfter": { "crop": "soybean", "status": "actual" }
+    }
+  ]
+}

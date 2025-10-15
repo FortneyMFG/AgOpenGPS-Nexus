@@ -9,6 +9,11 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - R-EXT-002 (SHOULD): Define a plugin boundary (UI, PGN handlers, analytics) that avoids shipping forked executables for every variation.
 - R-EXT-003 (SHOULD): Provide guidelines or templates for third-party modules so they integrate with packaging and settings.
 - R-EXT-010 (SHOULD, proposed-variable-layer): Allow plugins/modules to register new telemetry layers via dependency injection and published ID registries so they appear in dashboards without core code edits.【F:docs/SRS/options/O-BACKEND-4_LayerControllers.md†L19-L33】【F:docs/SRS/options/O-API-5_VersionedLayerSchemas.md†L32-L49】
+- R-EXT-080 (MUST, zone editing contracts): Require plugins that author spatial layers to integrate with LayerEditService (`registerEditableLayer`, `onLayerStartEdit`, `onFeatureCommit`, `onLayerUndo/Redo`) so Core enforces consistent geometry handling and provenance.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
+- R-EXT-081 (MUST, context bus): Publish strongly typed lifecycle events (`onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, `onSessionStart/Pause/Resume/End`, `onSessionWeatherUpdate`) and SDK helpers so plugins subscribe deterministically without bespoke event plumbing.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L74】
+- R-EXT-082 (SHOULD, analytics APIs): Provide shared query surfaces (`getYieldByCrop`, `getYieldByVariety`, `getPreviousCrop`, profit summaries) so plugins consume crop, genetics, yield, and profit analytics without duplicating aggregation logic.【F:docs/ADR/ADR-045_CropTypePlugin.md†L57-L71】【F:docs/ADR/ADR-049_YieldPlugin.md†L21-L59】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L21-L52】
+- R-EXT-083 (SHOULD, financial hooks): Allow plugins to submit `CostRecord` entries, consume profit overlays, and subscribe to cost-change events for downstream automation (e.g., invoice exports).【F:docs/ADR/ADR-050_CostProfitPlugin.md†L21-L52】
+- R-EXT-084 (SHOULD, report builder integration): Expose `registerReportSection()` and `onReportGenerate()` hooks with dependency declarations so plugins contribute report content safely.【F:docs/ADR/ADR-051_ReportBuilder.md†L21-L52】
 - R-EXT-004 (COULD): Support sandboxing or capability declarations for plugins to protect critical operations.
 - R-EXT-011 (SHOULD, governance): Establish contribution governance for community plugins (review queues, namespace reservation, security vetting) before enabling DI registration so unsafe modules cannot bypass safety-critical boundaries.
 - R-EXT-020 (SHOULD, official-bundle): Ship first-party capabilities (desktop UI, AgIO bridge, gauges, variable-rate controllers) as separately versioned plugins that install alongside core but can be disabled for headless or minimal deployments.
@@ -93,6 +98,8 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 - **ADR-007 PoseStream & SectionState architecture** couples plugin topic manifests to the unified pose timeline and SectionState diffs, informing capability declarations required by R-EXT-120.【F:docs/ADR/ADR-roadmap.md†L67-L73】
 - **ADR-018 Plugin API & capability discovery** will finalize manifest schema, permissions, and lifecycle expectations that deliver on R-EXT-000 through R-EXT-120 while enabling hot-plug workflows.【F:docs/ADR/ADR-roadmap.md†L142-L148】
 - **ADR-024 Discovery & identity** will define plugin/node identity, capability handshakes, and lease semantics required by R-COMM-030…R-COMM-032 and R-EXT-130…R-EXT-134.【F:docs/ADR/ADR-roadmap.md†L190-L196】
+- **ADR-044 Zone drawing framework** codifies LayerEditService APIs referenced by R-EXT-080.【F:docs/ADR/ADR-roadmap.md†L150-L171】
+- **ADR-045 Crop type plugin**, **ADR-046 Genetics plugin**, **ADR-049 Yield plugin**, **ADR-050 Cost & profit plugin**, and **ADR-051 Report builder** define the analytics/reporting hooks referenced in R-EXT-082…R-EXT-084.【F:docs/ADR/ADR-roadmap.md†L172-L320】
 
 ## Related specifications
 - Packaging, distribution, and catalog requirements: see Section 16 `Plugin Packaging, Updates, and Catalog`.

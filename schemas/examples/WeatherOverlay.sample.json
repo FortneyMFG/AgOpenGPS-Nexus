@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "layer:weather.overlay.2025-04-01T15:00Z",
+  "kind": "weather",
+  "jobId": "job:2025-plant-soy",
+  "sessionId": "session:1",
+  "createdAt": "2025-04-01T15:05:00Z",
+  "createdBy": "plugin:weather",
+  "lastModifiedAt": "2025-04-01T15:05:00Z",
+  "provenance": {
+    "source": "plugin:weather",
+    "transform": "sensor-grid-v1",
+    "hash": "5f9c2a8e",
+    "createdAt": "2025-04-01T15:05:00Z",
+    "actor": "plugin:weather"
+  },
+  "metadata": {
+    "variables": ["temperature", "rainfall", "windSpeed", "windDirection"],
+    "units": {
+      "temperature": "C",
+      "rainfall": "mm",
+      "windSpeed": "kph",
+      "windDirection": "deg"
+    },
+    "grid": {
+      "cellSizeMeters": 50,
+      "projection": "EPSG:3857"
+    },
+    "capturedAt": "2025-04-01T15:00:00Z",
+    "source": "station:HomeFarm"
+  }
+}

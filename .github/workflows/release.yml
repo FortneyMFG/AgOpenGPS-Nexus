@@ -95,7 +95,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          find release -maxdepth 2 -type f -name 'AgOpenGPS.Nexus*' -exec cp {} dist/ \;
+          find release -type f -name 'AgOpenGPS.Nexus*' -exec cp {} dist/ \;
 
       - name: Publish release assets
         uses: softprops/action-gh-release@v1

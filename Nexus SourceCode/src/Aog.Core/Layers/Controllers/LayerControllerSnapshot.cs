@@ -8,8 +8,11 @@ namespace Aog.Core.Layers.Controllers;
 /// <summary>
 /// Immutable snapshot emitted by a layer controller.
 /// </summary>
-public sealed class LayerControllerSnapshot
+public sealed class LayerControllerSnapshot : IDisposable
 {
+    private readonly IDisposable? _positionsOwner;
+    private bool _disposed;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LayerControllerSnapshot"/> class.
     /// </summary>
@@ -30,7 +33,8 @@ public sealed class LayerControllerSnapshot
         int sampleCount,
         DateTimeOffset? firstSampleTimestamp,
         DateTimeOffset? lastSampleTimestamp,
-        IReadOnlyList<PlanarPoint> positions)
+        IReadOnlyList<PlanarPoint> positions,
+        IDisposable? positionsOwner = null)
     {
         ControllerId = controllerId ?? throw new ArgumentNullException(nameof(controllerId));
         LayerId = layerId ?? throw new ArgumentNullException(nameof(layerId));
@@ -48,14 +52,8 @@ public sealed class LayerControllerSnapshot
         SampleCount = sampleCount;
         FirstSampleTimestamp = firstSampleTimestamp;
         LastSampleTimestamp = lastSampleTimestamp;
-        if (positions is null)
-        {
-            throw new ArgumentNullException(nameof(positions));
-        }
-
-        Positions = positions is ReadOnlyCollection<PlanarPoint>
-            ? positions
-            : new ReadOnlyCollection<PlanarPoint>(positions.Count > 0 ? new List<PlanarPoint>(positions) : Array.Empty<PlanarPoint>());
+        _positionsOwner = positionsOwner;
+        Positions = NormalizePositions(positions, positionsOwner);
     }
 
     /// <summary>
@@ -142,4 +140,43 @@ public sealed class LayerControllerSnapshot
     /// Gets the recorded position history for the snapshot window.
     /// </summary>
     public IReadOnlyList<PlanarPoint> Positions { get; }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _positionsOwner?.Dispose();
+        _disposed = true;
+    }
+
+    private static IReadOnlyList<PlanarPoint> NormalizePositions(
+        IReadOnlyList<PlanarPoint> positions,
+        IDisposable? owner)
+    {
+        if (positions is null)
+        {
+            throw new ArgumentNullException(nameof(positions));
+        }
+
+        if (owner is not null)
+        {
+            return positions;
+        }
+
+        if (positions is ReadOnlyCollection<PlanarPoint> readOnly)
+        {
+            return readOnly;
+        }
+
+        if (positions.Count == 0)
+        {
+            return Array.Empty<PlanarPoint>();
+        }
+
+        return new ReadOnlyCollection<PlanarPoint>(new List<PlanarPoint>(positions));
+    }
 }

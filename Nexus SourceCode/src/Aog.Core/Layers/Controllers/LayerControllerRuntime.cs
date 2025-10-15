@@ -11,13 +11,17 @@ public sealed class LayerControllerRuntime
 {
     private readonly Dictionary<string, ControllerEntry> _controllers;
     private readonly TimeProvider _timeProvider;
+    private readonly LayerControllerBufferPool _bufferPool;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LayerControllerRuntime"/> class.
     /// </summary>
     /// <param name="descriptors">Descriptors describing the controllers managed by the runtime.</param>
     /// <param name="timeProvider">Optional time provider used when scheduling emissions.</param>
-    public LayerControllerRuntime(IEnumerable<LayerControllerDescriptor> descriptors, TimeProvider? timeProvider = null)
+    public LayerControllerRuntime(
+        IEnumerable<LayerControllerDescriptor> descriptors,
+        TimeProvider? timeProvider = null,
+        LayerControllerBufferPool? bufferPool = null)
     {
         if (descriptors is null)
         {
@@ -25,6 +29,7 @@ public sealed class LayerControllerRuntime
         }
 
         _timeProvider = timeProvider ?? TimeProvider.System;
+        _bufferPool = bufferPool ?? new LayerControllerBufferPool();
 
         var descriptorList = descriptors.ToList();
         if (descriptorList.Count == 0)
@@ -48,8 +53,8 @@ public sealed class LayerControllerRuntime
             var nextEmission = _timeProvider.GetUtcNow();
             _controllers.Add(
                 descriptor.ControllerId,
-                new ControllerEntry(descriptor, nextEmission));
-        }
+                new ControllerEntry(descriptor, nextEmission, _bufferPool));
+    }
     }
 
     /// <summary>
@@ -121,10 +126,13 @@ public sealed class LayerControllerRuntime
     {
         private DateTimeOffset _nextEmission;
 
-        public ControllerEntry(LayerControllerDescriptor descriptor, DateTimeOffset initialEmission)
+        public ControllerEntry(
+            LayerControllerDescriptor descriptor,
+            DateTimeOffset initialEmission,
+            LayerControllerBufferPool bufferPool)
         {
             Descriptor = descriptor;
-            Accumulator = new LayerControllerAccumulator();
+            Accumulator = new LayerControllerAccumulator(bufferPool);
             _nextEmission = initialEmission;
         }
 

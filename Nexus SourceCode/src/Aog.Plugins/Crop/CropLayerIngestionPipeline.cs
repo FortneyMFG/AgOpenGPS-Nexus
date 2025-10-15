@@ -187,14 +187,32 @@ public sealed class CropLayerIngestionPipeline
 
     private void ApplyComposite(LayerEditEventEntry entry, LayerEditEventOperation operation)
     {
-        var compositeFeature = BuildFeature(entry, operation);
+        var removedSources = new Dictionary<string, CropZoneFeature>(StringComparer.Ordinal);
 
         foreach (var sourceId in operation.SourceFeatureIds)
         {
+            if (_features.TryGetValue(sourceId, out var existing))
+            {
+                removedSources[sourceId] = existing;
+            }
+
             _features.Remove(sourceId);
         }
 
-        _features[operation.FeatureId] = compositeFeature;
+        try
+        {
+            var compositeFeature = BuildFeature(entry, operation);
+            _features[operation.FeatureId] = compositeFeature;
+        }
+        catch
+        {
+            foreach (var pair in removedSources)
+            {
+                _features[pair.Key] = pair.Value;
+            }
+
+            throw;
+        }
     }
 
     private void ApplyCreate(LayerEditEventEntry entry, LayerEditEventOperation operation)

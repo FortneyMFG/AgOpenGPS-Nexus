@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Aog.Core.Paths;
+using Aog.Core.Zones;
 using CoverageAccumulator = Aog.Core.Coverage.CoverageAccumulator;
 
 namespace Aog.Plugins.Mapping;
@@ -91,6 +92,22 @@ public sealed class FieldStateStore
     }
 
     /// <summary>
+    /// Replaces the zone overlays for the specified field.
+    /// </summary>
+    /// <param name="fieldId">Field identifier.</param>
+    /// <param name="zones">Zone definitions to associate with the field.</param>
+    public void UpdateZones(string fieldId, IEnumerable<ZoneDefinition> zones)
+    {
+        if (zones is null)
+        {
+            throw new ArgumentNullException(nameof(zones));
+        }
+
+        var field = GetField(fieldId);
+        field.SetZones(zones);
+    }
+
+    /// <summary>
     /// Creates a snapshot of the specified field's state.
     /// </summary>
     public FieldStateSnapshot GetFieldSnapshot(string fieldId)
@@ -125,6 +142,17 @@ public sealed class FieldStateStore
     {
         var field = GetField(fieldId);
         return field.CreateAbLineSnapshots();
+    }
+
+    /// <summary>
+    /// Returns zone overlay metadata for the specified field.
+    /// </summary>
+    /// <param name="fieldId">Field identifier.</param>
+    /// <returns>Ordered zone overlay snapshots.</returns>
+    public IReadOnlyList<FieldZoneSnapshot> GetZoneSnapshots(string fieldId)
+    {
+        var field = GetField(fieldId);
+        return field.CreateZoneSnapshots();
     }
 
     /// <summary>
@@ -204,7 +232,8 @@ public sealed class FieldStateStore
             return new FieldStateSnapshot(
                 Geometry,
                 CreateCoverageSnapshot(),
-                CreateAbLineSnapshots());
+                CreateAbLineSnapshots(),
+                CreateZoneSnapshots());
         }
 
         public FieldCoverageSnapshot CreateCoverageSnapshot()
@@ -223,6 +252,20 @@ public sealed class FieldStateStore
             return _abLines.Values
                 .Select(state => state.CreateSnapshot())
                 .OrderBy(snapshot => snapshot.Id, StringComparer.Ordinal)
+                .ToArray();
+        }
+
+        public IReadOnlyList<FieldZoneSnapshot> CreateZoneSnapshots()
+        {
+            if (_zones.Count == 0)
+            {
+                return Array.Empty<FieldZoneSnapshot>();
+            }
+
+            return _zones
+                .Select(zone => zone.CreateSnapshot())
+                .OrderByDescending(snapshot => snapshot.Priority)
+                .ThenBy(snapshot => snapshot.ZoneId, StringComparer.Ordinal)
                 .ToArray();
         }
 
@@ -254,6 +297,29 @@ public sealed class FieldStateStore
             }
 
             return passes;
+        }
+        private readonly List<FieldZoneState> _zones = new();
+
+        public void SetZones(IEnumerable<ZoneDefinition> definitions)
+        {
+            _zones.Clear();
+
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach (var definition in definitions)
+            {
+                if (definition is null)
+                {
+                    throw new ArgumentException("Zone definitions cannot contain null entries.", nameof(definitions));
+                }
+
+                if (!seen.Add(definition.ZoneId))
+                {
+                    throw new ArgumentException($"Duplicate zone identifier '{definition.ZoneId}'.", nameof(definitions));
+                }
+
+                _zones.Add(new FieldZoneState(definition));
+            }
         }
     }
 
@@ -295,6 +361,84 @@ public sealed class FieldStateStore
                 Planner.Heading,
                 Planner.LaneSpacing,
                 distance);
+        }
+    }
+
+    private sealed class FieldZoneState
+    {
+        public FieldZoneState(ZoneDefinition definition)
+        {
+            Definition = definition ?? throw new ArgumentNullException(nameof(definition));
+        }
+
+        public ZoneDefinition Definition { get; }
+
+        public FieldZoneSnapshot CreateSnapshot()
+        {
+            var geometry = CreateGeometry(Definition.Geometry);
+            var area = ComputeArea(geometry);
+
+            return new FieldZoneSnapshot(
+                Definition.ZoneId,
+                Definition.Label,
+                Definition.Type,
+                Definition.Priority,
+                Definition.Enabled,
+                geometry,
+                Definition.Buffers,
+                Definition.ValidWhen,
+                Definition.Provenance,
+                area);
+        }
+
+        private static FieldZoneGeometry CreateGeometry(ZonePolygon polygon)
+        {
+            var outer = ToRing(polygon.Exterior);
+
+            if (polygon.Holes.Count == 0)
+            {
+                return new FieldZoneGeometry(outer);
+            }
+
+            var holes = new List<IReadOnlyList<PlanarPoint>>(polygon.Holes.Count);
+            foreach (var hole in polygon.Holes)
+            {
+                holes.Add(ToRing(hole));
+            }
+
+            return new FieldZoneGeometry(outer, holes);
+        }
+
+        private static IReadOnlyList<PlanarPoint> ToRing(ZoneLinearRing ring)
+        {
+            var vertices = new PlanarPoint[ring.Vertices.Count];
+            for (var i = 0; i < ring.Vertices.Count; i++)
+            {
+                var vertex = ring.Vertices[i];
+                vertices[i] = new PlanarPoint(vertex.Longitude, vertex.Latitude);
+            }
+
+            return new ReadOnlyCollection<PlanarPoint>(vertices);
+        }
+
+        private static double? ComputeArea(FieldZoneGeometry geometry)
+        {
+            if (geometry.OuterBoundary.Count < 3)
+            {
+                return null;
+            }
+
+            var area = Math.Abs(PlanarGeometryExtensions.ComputePolygonArea(geometry.OuterBoundary));
+
+            foreach (var hole in geometry.Holes)
+            {
+                if (hole.Count >= 3)
+                {
+                    area -= Math.Abs(PlanarGeometryExtensions.ComputePolygonArea(hole));
+                }
+            }
+
+            return area < 0 ? 0 : area;
         }
     }
 }
@@ -398,10 +542,12 @@ public sealed record FieldCoverageSnapshot(
 /// <param name="Geometry">Field geometry.</param>
 /// <param name="Coverage">Coverage statistics.</param>
 /// <param name="AbLines">Registered AB lines.</param>
+/// <param name="Zones">Registered zone overlays.</param>
 public sealed record FieldStateSnapshot(
     FieldGeometry Geometry,
     FieldCoverageSnapshot Coverage,
-    IReadOnlyList<AbLineSnapshot> AbLines);
+    IReadOnlyList<AbLineSnapshot> AbLines,
+    IReadOnlyList<FieldZoneSnapshot> Zones);
 
 /// <summary>
 /// Description of an AB line used by the mapping plugin.
@@ -522,3 +668,76 @@ public sealed record AbLinePassSnapshot(
     double HeadingRadians,
     double LaneSpacingMeters,
     double SignedDistanceMeters);
+
+/// <summary>
+/// Snapshot describing a zone overlay registered with the mapping plugin.
+/// </summary>
+/// <param name="ZoneId">Stable identifier for the zone.</param>
+/// <param name="Label">Human readable label for the zone.</param>
+/// <param name="Type">Zone classification.</param>
+/// <param name="Priority">Priority ordering when zones overlap.</param>
+/// <param name="Enabled">Indicates whether the zone is enabled.</param>
+/// <param name="Geometry">Polygon geometry expressed in planar coordinates.</param>
+/// <param name="Buffers">Drive and work buffers associated with the zone.</param>
+/// <param name="ValidWhen">Optional metadata describing when the zone applies.</param>
+/// <param name="Provenance">Optional provenance metadata.</param>
+/// <param name="AreaSquareMeters">Computed area of the polygon in square metres when available.</param>
+public sealed record FieldZoneSnapshot(
+    string ZoneId,
+    string Label,
+    ZoneType Type,
+    uint Priority,
+    bool Enabled,
+    FieldZoneGeometry Geometry,
+    ZoneBuffers Buffers,
+    ZoneValidWhen? ValidWhen,
+    ZoneProvenance? Provenance,
+    double? AreaSquareMeters);
+
+/// <summary>
+/// Polygon geometry describing a zone overlay in planar coordinates.
+/// </summary>
+public sealed class FieldZoneGeometry
+{
+    private static readonly IReadOnlyList<IReadOnlyList<PlanarPoint>> EmptyRings = Array.Empty<IReadOnlyList<PlanarPoint>>();
+
+    public FieldZoneGeometry(IReadOnlyList<PlanarPoint> outerBoundary, IReadOnlyList<IReadOnlyList<PlanarPoint>>? holes = null)
+    {
+        if (outerBoundary is null)
+        {
+            throw new ArgumentNullException(nameof(outerBoundary));
+        }
+
+        if (outerBoundary.Count == 0)
+        {
+            throw new ArgumentException("Outer boundary must contain at least one vertex.", nameof(outerBoundary));
+        }
+
+        OuterBoundary = new ReadOnlyCollection<PlanarPoint>(outerBoundary.ToArray());
+
+        if (holes is null || holes.Count == 0)
+        {
+            Holes = EmptyRings;
+            return;
+        }
+
+        var projected = new List<IReadOnlyList<PlanarPoint>>(holes.Count);
+        foreach (var ring in holes)
+        {
+            if (ring is null)
+            {
+                throw new ArgumentException("Hole rings cannot contain null entries.", nameof(holes));
+            }
+
+            projected.Add(new ReadOnlyCollection<PlanarPoint>(ring.ToArray()));
+        }
+
+        Holes = projected;
+    }
+
+    /// <summary>Gets the outer boundary polygon.</summary>
+    public IReadOnlyList<PlanarPoint> OuterBoundary { get; }
+
+    /// <summary>Gets the optional holes.</summary>
+    public IReadOnlyList<IReadOnlyList<PlanarPoint>> Holes { get; }
+}

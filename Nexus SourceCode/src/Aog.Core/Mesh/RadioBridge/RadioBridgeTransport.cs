@@ -75,6 +75,11 @@ public sealed class RadioBridgeTransport
     public int PendingOutboundCount => _pending.Count;
 
     /// <summary>
+    /// Gets the most recent link metrics supplied by the adapter.
+    /// </summary>
+    public RadioBridgeLinkMetrics LinkMetrics => _linkMetrics;
+
+    /// <summary>
     /// Enqueues a mesh publication for transport.
     /// </summary>
     /// <param name="message">Publication to send over the radio bridge.</param>

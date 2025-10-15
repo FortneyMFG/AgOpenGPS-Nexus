@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
 using Aog.Core.Logging;
+using Aog.Core.Mesh;
 using Aog.Core.V1;
 using FluentAssertions;
 using Google.Protobuf;
@@ -130,6 +132,20 @@ public class TelemetryParquetLoggerTests
                 Topic = "state",
                 Payload = new byte[] { 0x01, 0x02, 0x03 }
             });
+
+            var meshPublishedAt = new DateTimeOffset(2024, 1, 1, 12, 0, 5, TimeSpan.Zero);
+            await eventBus.PublishAsync(new MeshTelemetryEvent(
+                Sequence: 1,
+                PublisherDeviceId: "combine.alpha",
+                Topic: "aog/live/season:2024/job:123/coverage",
+                SeasonId: "season:2024",
+                JobId: "job:123",
+                LayerNamespace: "coverage",
+                Tier: MeshDataTier.Coverage,
+                PublishedAt: meshPublishedAt,
+                Payload: new byte[] { 0x10, 0x20 },
+                MetadataJson: JsonSerializer.Serialize(new { quality = "high" }),
+                PresenceJson: null));
         }
 
         AssertPose(options, timestamp);
@@ -137,6 +153,7 @@ public class TelemetryParquetLoggerTests
         AssertCan(options, timestamp);
         AssertIo(options, timestamp);
         AssertPlugin(options, timestamp);
+        AssertMesh(options, new DateTimeOffset(2024, 1, 1, 12, 0, 5, TimeSpan.Zero));
     }
 
     [Fact]
@@ -299,6 +316,36 @@ public class TelemetryParquetLoggerTests
         var payload = ReadColumn<byte[]?>(reader.Schema, rowGroup, "payload")[0];
         payload.Should().NotBeNull();
         payload!.Should().Equal(0x01, 0x02, 0x03);
+    }
+
+    private static void AssertMesh(TelemetryParquetLoggerOptions options, DateTimeOffset publishedAt)
+    {
+        using var stream = File.OpenRead(Path.Combine(options.OutputDirectory, options.MeshFileName));
+        using var reader = ParquetReader.Create(stream);
+        reader.RowGroupCount.Should().Be(1);
+
+        using var rowGroup = reader.OpenRowGroupReader(0);
+        ReadColumn<long>(reader.Schema, rowGroup, "sequence")[0].Should().Be(1);
+        ReadColumn<string>(reader.Schema, rowGroup, "publisher_device_id")[0].Should().Be("combine.alpha");
+        ReadColumn<string>(reader.Schema, rowGroup, "topic")[0].Should().Be("aog/live/season:2024/job:123/coverage");
+        ReadColumn<string>(reader.Schema, rowGroup, "season_id")[0].Should().Be("season:2024");
+        ReadColumn<string>(reader.Schema, rowGroup, "job_id")[0].Should().Be("job:123");
+        ReadColumn<string>(reader.Schema, rowGroup, "layer_namespace")[0].Should().Be("coverage");
+        ReadColumn<string>(reader.Schema, rowGroup, "tier")[0].Should().Be(nameof(MeshDataTier.Coverage));
+        ReadColumn<DateTime?>(reader.Schema, rowGroup, "published_at_utc")[0]
+            .Should().Be(publishedAt.UtcDateTime);
+
+        var payload = ReadColumn<byte[]?>(reader.Schema, rowGroup, "payload")[0];
+        payload.Should().NotBeNull();
+        payload!.Should().Equal(0x10, 0x20);
+
+        var metadataJson = ReadColumn<string?>(reader.Schema, rowGroup, "metadata_json")[0];
+        metadataJson.Should().NotBeNull();
+        using var metadataDoc = JsonDocument.Parse(metadataJson!);
+        metadataDoc.RootElement.GetProperty("quality").GetString().Should().Be("high");
+
+        var presenceJson = ReadColumn<string?>(reader.Schema, rowGroup, "presence_json")[0];
+        presenceJson.Should().BeNull();
     }
 
     private static T[] ReadColumn<T>(Schema schema, ParquetRowGroupReader reader, string columnName)

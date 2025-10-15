@@ -61,8 +61,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 - [ ] NX-211 ZoneStore persistence service _(Planned)_ — ADR-027 ZoneService storage and indexing
 - [ ] NX-212 ZoneService gRPC host & watcher plumbing _(Planned)_ — ADR-027 ZoneService implementation
-- [ ] NX-213 PoseStream zone mask propagation _(Planned)_ — ADR-027 constraint mask propagation
-- [ ] NX-214 Constraint gate integration into ControlArbiter _(Planned)_ — ADR-027 constraint gating
+- [x] NX-213 PoseStream zone mask propagation _(Done)_ — ADR-027 constraint mask propagation
+- [x] NX-214 Constraint gate integration into ControlArbiter _(Done)_ — ADR-027 constraint gating
 - [ ] NX-215 Layer controller runtime scaffolding _(Planned)_ — ADR-032 layer controllers
 - [ ] NX-216 Layer controller DI registry & buffer pools _(Planned)_ — ADR-032 controller runtime details
 - [ ] NX-217 PoseStream ingestion wiring for controllers _(Planned)_ — ADR-032 ingestion pipeline
@@ -153,8 +153,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-254 Genetics analytics callbacks _(Planned)_ — ADR-046 analytics integration
 - [ ] NX-255 Genetics plugin regression fixtures _(Planned)_ — ADR-046 QA hooks
 - [ ] NX-256 Yield sensor normalization module _(Planned)_ — ADR-049 yield plugin
-- [ ] NX-257 Yield smoothing & binning pipeline _(Planned)_ — ADR-049 analytics pipelines
-- [ ] NX-258 Yield import wizard plumbing _(Planned)_ — ADR-049 import workflows
+- [x] NX-257 Yield smoothing & binning pipeline _(Done)_ — ADR-049 analytics pipelines
+- [x] NX-258 Yield import wizard plumbing _(Done)_ — ADR-049 import workflows
 - [ ] NX-259 Yield analytics API surface _(Planned)_ — ADR-049 analytics integration
 - [ ] NX-260 Yield plugin regression fixtures _(Planned)_ — ADR-049 QA hooks
 - [ ] NX-261 Cost/profit plugin ingestion & ledger _(Planned)_ — ADR-050 cost/profit plugin
@@ -392,7 +392,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-211 | ZoneStore persistence service | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 ZoneService storage and indexing |
 | NX-212 | ZoneService gRPC host & watcher plumbing | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 ZoneService implementation |
 | NX-213 | PoseStream zone mask propagation | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint mask propagation |
-| NX-214 | Constraint gate integration into ControlArbiter | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint gating |
+| NX-214 | Constraint gate integration into ControlArbiter | Done | AI | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | Constraint gate enforces keep-out/work-disabled policies |
 | NX-215 | Layer controller runtime scaffolding | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 layer controllers |
 | NX-216 | Layer controller DI registry & buffer pools | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 controller runtime details |
 | NX-217 | PoseStream ingestion wiring for controllers | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 ingestion pipeline |
@@ -487,8 +487,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-254 | Genetics analytics callbacks | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 analytics integration |
 | NX-255 | Genetics plugin regression fixtures | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 QA hooks |
 | NX-256 | Yield sensor normalization module | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 yield plugin |
-| NX-257 | Yield smoothing & binning pipeline | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 analytics pipelines |
-| NX-258 | Yield import wizard plumbing | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 import workflows |
+| NX-257 | Yield smoothing & binning pipeline | Done |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 analytics pipelines |
+| NX-258 | Yield import wizard plumbing | Done |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 import workflows |
 | NX-259 | Yield analytics API surface | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 analytics integration |
 | NX-260 | Yield plugin regression fixtures | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 QA hooks |
 | NX-261 | Cost/profit plugin ingestion & ledger | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 cost/profit plugin |

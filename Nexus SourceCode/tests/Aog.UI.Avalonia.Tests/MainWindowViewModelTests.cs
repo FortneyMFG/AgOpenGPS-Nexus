@@ -94,6 +94,20 @@ public sealed class MainWindowViewModelTests
         viewModel.LayerInspector.RateAvailabilityDisplay.Should().NotBeNullOrWhiteSpace();
     }
 
+    [Fact]
+    public void MeshSharePanel_SurfacesSampleDevices()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.MeshSharePanel.Should().NotBeNull();
+        viewModel.MeshSharePanel.Devices.Should().NotBeEmpty();
+        viewModel.MeshSharePanel.Devices.Should().AllSatisfy(device =>
+        {
+            device.DisplayName.Should().NotBeNullOrWhiteSpace();
+            device.DeviceId.Should().NotBeNullOrWhiteSpace();
+        });
+    }
+
     private static MainWindowViewModel CreateViewModel()
     {
         var connectionStore = new InMemoryConnectionSettingsStore();

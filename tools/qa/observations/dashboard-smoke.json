@@ -1,0 +1,9 @@
+{
+  "scenario": "Dashboard smoke",
+  "source": "ui-automation",
+  "samples": [
+    { "widgetId": "steering", "series": "steering.pose.rms_error", "sampleCount": 120, "status": "pass" },
+    { "widgetId": "steering", "series": "steering.engage_latency_ms", "sampleCount": 1, "status": "warn" },
+    { "widgetId": "sections", "series": "sections.dropout_count", "sampleCount": 0, "status": "fail" }
+  ]
+}

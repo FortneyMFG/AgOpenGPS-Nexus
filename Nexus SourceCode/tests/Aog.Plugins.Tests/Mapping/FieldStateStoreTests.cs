@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
 using Aog.Core.Paths;
+using Aog.Core.Zones;
 using Xunit;
 
 namespace Aog.Plugins.Mapping.Tests;
@@ -119,6 +120,135 @@ public sealed class FieldStateStoreTests
         Assert.Equal(160, published[1].TotalAreaSquareMeters, 3);
     }
 
+    [Fact]
+    public void UpdateZones_StoresSnapshotsOrderedByPriority()
+    {
+        var store = new FieldStateStore();
+        store.MountFields(new[]
+        {
+            new FieldGeometry("field-1", CreateSquare(120))
+        });
+
+        var zones = new[]
+        {
+            CreateZoneDefinition(
+                zoneId: "zone-keepout",
+                type: ZoneType.KeepOut,
+                priority: 40,
+                originX: 10,
+                originY: 10,
+                size: 20),
+            CreateZoneDefinition(
+                zoneId: "zone-boundary",
+                type: ZoneType.Boundary,
+                priority: 100,
+                originX: 0,
+                originY: 0,
+                size: 120),
+            CreateZoneDefinition(
+                zoneId: "zone-workdisabled",
+                type: ZoneType.WorkDisabled,
+                priority: 60,
+                originX: 30,
+                originY: 30,
+                size: 15,
+                enabled: false)
+        };
+
+        store.UpdateZones("field-1", zones);
+
+        var snapshots = store.GetZoneSnapshots("field-1");
+        Assert.Equal(3, snapshots.Count);
+
+        Assert.Collection(
+            snapshots,
+            first =>
+            {
+                Assert.Equal("zone-boundary", first.ZoneId);
+                Assert.Equal(ZoneType.Boundary, first.Type);
+                Assert.Equal(14400, first.AreaSquareMeters, 3);
+                Assert.True(first.Enabled);
+            },
+            second =>
+            {
+                Assert.Equal("zone-workdisabled", second.ZoneId);
+                Assert.Equal(ZoneType.WorkDisabled, second.Type);
+                Assert.False(second.Enabled);
+            },
+            third =>
+            {
+                Assert.Equal("zone-keepout", third.ZoneId);
+                Assert.Equal(ZoneType.KeepOut, third.Type);
+                Assert.Equal(400, third.AreaSquareMeters, 3);
+            });
+    }
+
+    [Fact]
+    public void UpdateZones_ComputesAreaWithHoles()
+    {
+        var store = new FieldStateStore();
+        store.MountFields(new[]
+        {
+            new FieldGeometry("field-1", CreateSquare(200))
+        });
+
+        var exterior = new ZoneLinearRing(new[]
+        {
+            new ZoneCoordinate(0, 0),
+            new ZoneCoordinate(0, 80),
+            new ZoneCoordinate(80, 80),
+            new ZoneCoordinate(80, 0),
+            new ZoneCoordinate(0, 0)
+        });
+
+        var hole = new ZoneLinearRing(new[]
+        {
+            new ZoneCoordinate(20, 20),
+            new ZoneCoordinate(20, 40),
+            new ZoneCoordinate(40, 40),
+            new ZoneCoordinate(40, 20),
+            new ZoneCoordinate(20, 20)
+        });
+
+        var polygon = new ZonePolygon(exterior, new[] { hole });
+        var definition = new ZoneDefinition(
+            "zone-headland",
+            ZoneType.Headland,
+            "Headland",
+            priority: 50,
+            enabled: true,
+            polygon,
+            new ZoneBuffers(1, 1));
+
+        store.UpdateZones("field-1", new[] { definition });
+
+        var snapshot = Assert.Single(store.GetZoneSnapshots("field-1"));
+        Assert.Equal(ZoneType.Headland, snapshot.Type);
+        Assert.Equal(80 * 80 - 20 * 20, snapshot.AreaSquareMeters, 3);
+        Assert.Single(snapshot.Geometry.Holes);
+        Assert.Equal(5, snapshot.Geometry.OuterBoundary.Count);
+    }
+
+    [Fact]
+    public void UpdateZones_ThrowsWhenDuplicateIdentifiers()
+    {
+        var store = new FieldStateStore();
+        store.MountFields(new[]
+        {
+            new FieldGeometry("field-1", CreateSquare(100))
+        });
+
+        var zone = CreateZoneDefinition(
+            zoneId: "zone-duplicate",
+            type: ZoneType.KeepOut,
+            priority: 10,
+            originX: 0,
+            originY: 0,
+            size: 10);
+
+        Assert.Throws<ArgumentException>(() => store.UpdateZones("field-1", new[] { zone, zone }));
+    }
+
     private static IReadOnlyList<PlanarPoint> CreateSquare(double edgeLength)
     {
         return new[]
@@ -128,5 +258,34 @@ public sealed class FieldStateStoreTests
             new PlanarPoint(edgeLength, edgeLength),
             new PlanarPoint(0, edgeLength)
         };
+    }
+
+    private static ZoneDefinition CreateZoneDefinition(
+        string zoneId,
+        ZoneType type,
+        uint priority,
+        double originX,
+        double originY,
+        double size,
+        bool enabled = true)
+    {
+        var exterior = new ZoneLinearRing(new[]
+        {
+            new ZoneCoordinate(originX, originY),
+            new ZoneCoordinate(originX, originY + size),
+            new ZoneCoordinate(originX + size, originY + size),
+            new ZoneCoordinate(originX + size, originY),
+            new ZoneCoordinate(originX, originY)
+        });
+
+        var polygon = new ZonePolygon(exterior);
+        return new ZoneDefinition(
+            zoneId,
+            type,
+            $"{type}:{zoneId}",
+            priority,
+            enabled,
+            polygon,
+            new ZoneBuffers(1, 2));
     }
 }

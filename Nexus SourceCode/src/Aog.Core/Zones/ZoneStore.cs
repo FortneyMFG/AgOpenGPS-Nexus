@@ -265,6 +265,64 @@ public sealed class ZoneStore
         }
     }
 
+    /// <summary>
+    /// Returns zones that contain the specified coordinate.
+    /// </summary>
+    /// <param name="longitude">Longitude (or X) coordinate.</param>
+    /// <param name="latitude">Latitude (or Y) coordinate.</param>
+    /// <param name="includeDisabled">Include disabled zones when <c>true</c>.</param>
+    public IReadOnlyList<ZoneDefinition> GetZonesContaining(double longitude, double latitude, bool includeDisabled = true)
+    {
+        if (!double.IsFinite(longitude))
+        {
+            throw new ArgumentOutOfRangeException(nameof(longitude), longitude, "Longitude must be a finite value.");
+        }
+
+        if (!double.IsFinite(latitude))
+        {
+            throw new ArgumentOutOfRangeException(nameof(latitude), latitude, "Latitude must be a finite value.");
+        }
+
+        var point = _geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
+
+        lock (_sync)
+        {
+            if (_zones.Count == 0)
+            {
+                return Array.AsReadOnly(Array.Empty<ZoneDefinition>());
+            }
+
+            var matches = _spatialIndex.Query(point.EnvelopeInternal);
+            if (matches.Count == 0)
+            {
+                return Array.AsReadOnly(Array.Empty<ZoneDefinition>());
+            }
+
+            var filtered = new List<ZoneDefinition>(matches.Count);
+
+            foreach (var record in matches)
+            {
+                if (!includeDisabled && !record.Definition.Enabled)
+                {
+                    continue;
+                }
+
+                if (record.PreparedGeometry.Contains(point))
+                {
+                    filtered.Add(record.Definition);
+                }
+            }
+
+            if (filtered.Count == 0)
+            {
+                return Array.AsReadOnly(Array.Empty<ZoneDefinition>());
+            }
+
+            filtered.Sort(CompareZones);
+            return new ReadOnlyCollection<ZoneDefinition>(filtered);
+        }
+    }
+
     private static int CompareZones(ZoneDefinition left, ZoneDefinition right)
     {
         var priority = right.Priority.CompareTo(left.Priority);

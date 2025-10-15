@@ -69,6 +69,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             $"Running on {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}) with {RuntimeInformation.FrameworkDescription}";
 
         SeasonNavigator = SeasonNavigatorViewModel.CreateSample();
+        CropQuickSelect = CropQuickSelectViewModel.CreateSample();
 
         // Load simulation configuration + summary and create the bar VM.
         var configuration = TryLoadSimulationConfiguration(out var summary);
@@ -84,11 +85,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         var layerEditJournal = new LayerEditEventJournalService(TimeProvider.System);
         ZoneEditorToolbar = new ZoneEditorToolbarViewModel(layerEditJournal);
+        ZonePolicyPanel = new ZoneConstraintPolicyViewModel();
+        ZoneImportExportPanel = new ZoneImportExportPanelViewModel();
 
         _mapLayers = BuildSampleLayers();
         _guidanceTracks = BuildSampleGuidance();
         LayerLegend = LayerLegendViewModel.FromLayers(_mapLayers);
         LayerInspector = BuildSampleInspector(_mapLayers);
+        MeshSharePanel = MeshSharePanelViewModel.CreateSample();
 
         ApplySamplePluginState();
         SeedDashboards();
@@ -146,6 +150,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets the season navigator view-model.</summary>
     public SeasonNavigatorViewModel SeasonNavigator { get; }
 
+    /// <summary>Gets the crop quick-select view-model surfaced in the field navigator.</summary>
+    public CropQuickSelectViewModel CropQuickSelect { get; }
+
     /// <summary>Gets the available UI themes.</summary>
     public IReadOnlyList<UiTheme> AvailableThemes { get; }
 
@@ -174,6 +181,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the zone editor toolbar view-model powering map editing affordances.</summary>
     public ZoneEditorToolbarViewModel ZoneEditorToolbar { get; }
+
+    /// <summary>Gets the zone policy panel view-model that surfaces override toggles.</summary>
+    public ZoneConstraintPolicyViewModel ZonePolicyPanel { get; }
+
+    /// <summary>Gets the zone import/export panel view-model describing transfer workflows.</summary>
+    public ZoneImportExportPanelViewModel ZoneImportExportPanel { get; }
     /// <summary>Gets the legend describing the active map layers.</summary>
     public LayerLegendViewModel LayerLegend { get; }
 
@@ -182,6 +195,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the compatibility dashboard view-model consumed by the Device Manager card.</summary>
     public DeviceManagerCompatibilityViewModel DeviceManagerCompatibility { get; }
+    /// <summary>Gets the mesh share/subscribe panel view-model.</summary>
+    public MeshSharePanelViewModel MeshSharePanel { get; }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.

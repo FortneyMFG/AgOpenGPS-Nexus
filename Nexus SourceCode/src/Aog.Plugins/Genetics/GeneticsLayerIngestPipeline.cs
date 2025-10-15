@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Aog.Core.Paths;
@@ -126,6 +127,8 @@ public sealed class GeneticsLayerIngestPipeline
     private readonly object _sync = new();
     private readonly Dictionary<string, GeneticsPlanFeature> _plans = new(StringComparer.Ordinal);
     private readonly Dictionary<(string ZoneKey, string SessionKey), GeneticsVarietyFeature> _varieties = new();
+    private readonly Dictionary<Guid, GeneticsAnalyticsCallback> _analyticsCallbacks = new();
+    private GeneticsAnalyticsSnapshot _latestAnalytics;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GeneticsLayerIngestPipeline"/> class.
@@ -137,6 +140,7 @@ public sealed class GeneticsLayerIngestPipeline
         _options = options ?? new GeneticsLayerIngestOptions();
         _options.Validate();
         _clock = clock ?? (() => DateTimeOffset.UtcNow);
+        _latestAnalytics = CreateAnalyticsSnapshotUnsafe();
     }
 
     /// <summary>
@@ -161,6 +165,10 @@ public sealed class GeneticsLayerIngestPipeline
         var notes = NormalizeOptional(request.Notes);
         var jobId = NormalizeOptional(request.JobId);
 
+        GeneticsPlanFeature feature;
+        GeneticsAnalyticsSnapshot previousSnapshot;
+        GeneticsAnalyticsSnapshot currentSnapshot;
+
         lock (_sync)
         {
             _plans.TryGetValue(zoneKey, out var existing);
@@ -176,7 +184,7 @@ public sealed class GeneticsLayerIngestPipeline
             var effectiveTreatment = treatment ?? existing?.Treatment;
             var effectiveJobId = jobId ?? existing?.JobId;
 
-            var feature = new GeneticsPlanFeature(
+            feature = new GeneticsPlanFeature(
                 zoneDisplayId,
                 featureId,
                 _options.PlanLayerId,
@@ -194,8 +202,13 @@ public sealed class GeneticsLayerIngestPipeline
                 geometry);
 
             _plans[zoneKey] = feature;
-            return feature;
+            previousSnapshot = _latestAnalytics;
+            currentSnapshot = CreateAnalyticsSnapshotUnsafe();
+            _latestAnalytics = currentSnapshot;
         }
+
+        NotifyAnalyticsCallbacks(previousSnapshot, currentSnapshot);
+        return feature;
     }
 
     /// <summary>
@@ -225,6 +238,10 @@ public sealed class GeneticsLayerIngestPipeline
         var jobId = NormalizeRequired(request.JobId, nameof(request.JobId));
         var changeLog = NormalizeChangeLog(request.ChangeLog);
 
+        GeneticsVarietyFeature feature;
+        GeneticsAnalyticsSnapshot previousSnapshot;
+        GeneticsAnalyticsSnapshot currentSnapshot;
+
         lock (_sync)
         {
             _varieties.TryGetValue(dictionaryKey, out var existing);
@@ -240,9 +257,9 @@ public sealed class GeneticsLayerIngestPipeline
             var effectiveLot = lot ?? existing?.Lot;
             var effectiveTreatment = treatment ?? existing?.Treatment;
             var effectiveBarcode = barcode ?? existing?.Barcode;
-            var effectiveChangeLog = changeLog ?? existing?.ChangeLog ?? Array.Empty<GeneticsChangeLogEntry>();
+            var effectiveChangeLog = ResolveChangeLog(changeLog, existing, createdBy, lastModifiedAt, brand, product, effectiveTraitStack, effectiveLot, effectiveTreatment, effectiveSource, effectiveBarcode, effectiveNotes);
 
-            var feature = new GeneticsVarietyFeature(
+            feature = new GeneticsVarietyFeature(
                 zoneDisplayId,
                 featureId,
                 _options.VarietyLayerId,
@@ -264,8 +281,13 @@ public sealed class GeneticsLayerIngestPipeline
                 geometry);
 
             _varieties[dictionaryKey] = feature;
-            return feature;
+            previousSnapshot = _latestAnalytics;
+            currentSnapshot = CreateAnalyticsSnapshotUnsafe();
+            _latestAnalytics = currentSnapshot;
         }
+
+        NotifyAnalyticsCallbacks(previousSnapshot, currentSnapshot);
+        return feature;
     }
 
     /// <summary>
@@ -313,10 +335,25 @@ public sealed class GeneticsLayerIngestPipeline
     public bool RemovePlan(string zoneId)
     {
         var zoneKey = CreateStableKey(NormalizeRequired(zoneId, nameof(zoneId)));
+        GeneticsAnalyticsSnapshot previousSnapshot;
+        GeneticsAnalyticsSnapshot currentSnapshot;
+        bool removed;
+
         lock (_sync)
         {
-            return _plans.Remove(zoneKey);
+            removed = _plans.Remove(zoneKey);
+            if (!removed)
+            {
+                return false;
+            }
+
+            previousSnapshot = _latestAnalytics;
+            currentSnapshot = CreateAnalyticsSnapshotUnsafe();
+            _latestAnalytics = currentSnapshot;
         }
+
+        NotifyAnalyticsCallbacks(previousSnapshot, currentSnapshot);
+        return true;
     }
 
     /// <summary>
@@ -326,10 +363,25 @@ public sealed class GeneticsLayerIngestPipeline
     {
         var zoneKey = CreateStableKey(NormalizeRequired(zoneId, nameof(zoneId)));
         var sessionKey = CreateStableKey(NormalizeRequired(sessionId, nameof(sessionId)));
+        GeneticsAnalyticsSnapshot previousSnapshot;
+        GeneticsAnalyticsSnapshot currentSnapshot;
+        bool removed;
+
         lock (_sync)
         {
-            return _varieties.Remove((zoneKey, sessionKey));
+            removed = _varieties.Remove((zoneKey, sessionKey));
+            if (!removed)
+            {
+                return false;
+            }
+
+            previousSnapshot = _latestAnalytics;
+            currentSnapshot = CreateAnalyticsSnapshotUnsafe();
+            _latestAnalytics = currentSnapshot;
         }
+
+        NotifyAnalyticsCallbacks(previousSnapshot, currentSnapshot);
+        return true;
     }
 
     /// <summary>
@@ -379,6 +431,53 @@ public sealed class GeneticsLayerIngestPipeline
         }
     }
 
+    /// <summary>
+    /// Gets the latest analytics snapshot produced by the pipeline.
+    /// </summary>
+    public GeneticsAnalyticsSnapshot LatestAnalytics
+    {
+        get
+        {
+            lock (_sync)
+            {
+                return _latestAnalytics;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Registers an analytics callback invoked whenever plan or variety features change.
+    /// </summary>
+    /// <param name="callback">Callback invoked with the latest and previous analytics snapshot.</param>
+    /// <param name="replayLatest">When <c>true</c>, replays the current snapshot immediately.</param>
+    public IDisposable RegisterAnalyticsCallback(GeneticsAnalyticsCallback callback, bool replayLatest = true)
+    {
+        if (callback is null)
+        {
+            throw new ArgumentNullException(nameof(callback));
+        }
+
+        var id = Guid.NewGuid();
+
+        lock (_analyticsCallbacks)
+        {
+            _analyticsCallbacks[id] = callback;
+        }
+
+        if (replayLatest)
+        {
+            GeneticsAnalyticsSnapshot snapshot;
+            lock (_sync)
+            {
+                snapshot = _latestAnalytics;
+            }
+
+            callback(snapshot, previous: null);
+        }
+
+        return new AnalyticsSubscription(this, id);
+    }
+
     private static string NormalizeRequired(string? value, string parameterName)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -424,6 +523,102 @@ public sealed class GeneticsLayerIngestPipeline
         });
 
         return new ReadOnlyCollection<GeneticsChangeLogEntry>(ordered);
+    }
+
+    private IReadOnlyList<GeneticsChangeLogEntry> ResolveChangeLog(
+        IReadOnlyList<GeneticsChangeLogEntry>? requested,
+        GeneticsVarietyFeature? existing,
+        string actor,
+        DateTimeOffset? lastModifiedAt,
+        string brand,
+        string product,
+        string? traitStack,
+        string? lot,
+        string? treatment,
+        string? source,
+        string? barcode,
+        string? notes)
+    {
+        if (requested is not null)
+        {
+            return requested;
+        }
+
+        if (existing is null)
+        {
+            return Array.Empty<GeneticsChangeLogEntry>();
+        }
+
+        var timestamp = lastModifiedAt ?? _clock();
+        var entries = new List<GeneticsChangeLogEntry>(existing.ChangeLog);
+        var mutations = DetectMutations(existing, brand, product, traitStack, lot, treatment, source, barcode, notes);
+        foreach (var mutation in mutations)
+        {
+            entries.Add(new GeneticsChangeLogEntry(timestamp, actor, mutation.Field, mutation.Previous, mutation.Current));
+        }
+
+        return entries;
+    }
+
+    private static List<(string Field, string? Previous, string? Current)> DetectMutations(
+        GeneticsVarietyFeature existing,
+        string brand,
+        string product,
+        string? traitStack,
+        string? lot,
+        string? treatment,
+        string? source,
+        string? barcode,
+        string? notes)
+    {
+        var mutations = new List<(string Field, string? Previous, string? Current)>();
+
+        if (!string.Equals(existing.Brand, brand, StringComparison.Ordinal))
+        {
+            mutations.Add(("brand", existing.Brand, brand));
+        }
+
+        if (!string.Equals(existing.Product, product, StringComparison.Ordinal))
+        {
+            mutations.Add(("product", existing.Product, product));
+        }
+
+        if (!string.Equals(existing.TraitStack, traitStack, StringComparison.Ordinal))
+        {
+            mutations.Add(("traitStack", existing.TraitStack, traitStack));
+        }
+
+        if (!string.Equals(existing.Lot, lot, StringComparison.Ordinal))
+        {
+            mutations.Add(("lot", existing.Lot, lot));
+        }
+
+        if (!string.Equals(existing.Treatment, treatment, StringComparison.Ordinal))
+        {
+            mutations.Add(("treatment", existing.Treatment, treatment));
+        }
+
+        if (!string.Equals(existing.Source, source, StringComparison.Ordinal))
+        {
+            mutations.Add(("source", existing.Source, source));
+        }
+
+        if (!string.Equals(existing.Barcode, barcode, StringComparison.Ordinal))
+        {
+            mutations.Add(("barcode", existing.Barcode, barcode));
+        }
+
+        if (!string.Equals(existing.Notes, notes, StringComparison.Ordinal))
+        {
+            mutations.Add(("notes", existing.Notes, notes));
+        }
+
+        if (mutations.Count > 1)
+        {
+            mutations.Sort((left, right) => string.CompareOrdinal(left.Field, right.Field));
+        }
+
+        return mutations;
     }
 
     private static string CreatePlanFeatureId(string zoneKey) => $"geneticsPlan:{zoneKey}";
@@ -482,4 +677,250 @@ public sealed class GeneticsLayerIngestPipeline
         var hex = Convert.ToHexString(hash).ToLowerInvariant(CultureInfo.InvariantCulture);
         return hex[..12];
     }
+
+    private GeneticsAnalyticsSnapshot CreateAnalyticsSnapshotUnsafe()
+    {
+        var generatedAt = _clock();
+
+        var planSummaries = _plans.Values
+            .GroupBy(plan => new PlanKey(plan.JobId, plan.Brand, plan.Product, plan.TraitStack, plan.Lot, plan.Treatment), PlanKey.Comparer)
+            .Select(group => new GeneticsPlanAnalytics(
+                group.Key.JobId,
+                group.Key.Brand,
+                group.Key.Product,
+                group.Key.TraitStack,
+                group.Key.Lot,
+                group.Key.Treatment,
+                group.Count(),
+                group.Sum(feature => feature.Geometry.AreaSquareMeters)))
+            .OrderBy(summary => summary.Brand, StringComparer.Ordinal)
+            .ThenBy(summary => summary.Product, StringComparer.Ordinal)
+            .ThenBy(summary => summary.Lot, StringComparer.Ordinal)
+            .ThenBy(summary => summary.JobId, StringComparer.Ordinal)
+            .ToList();
+
+        var varietySummaries = _varieties.Values
+            .GroupBy(variety => new VarietyKey(variety.JobId, variety.Brand, variety.Product, variety.TraitStack, variety.Lot, variety.Treatment, variety.Barcode), VarietyKey.Comparer)
+            .Select(group => new GeneticsVarietyAnalytics(
+                group.Key.JobId,
+                group.Key.Brand,
+                group.Key.Product,
+                group.Key.TraitStack,
+                group.Key.Lot,
+                group.Key.Treatment,
+                group.Key.Barcode,
+                group.Select(feature => feature.SessionId).Distinct(StringComparer.Ordinal).Count(),
+                group.Count(),
+                group.Sum(feature => feature.Geometry.AreaSquareMeters)))
+            .OrderBy(summary => summary.JobId, StringComparer.Ordinal)
+            .ThenBy(summary => summary.Brand, StringComparer.Ordinal)
+            .ThenBy(summary => summary.Product, StringComparer.Ordinal)
+            .ThenBy(summary => summary.Lot, StringComparer.Ordinal)
+            .ThenBy(summary => summary.Barcode, StringComparer.Ordinal)
+            .ToList();
+
+        var plannedLots = _plans.Values
+            .Where(feature => !string.IsNullOrEmpty(feature.Lot))
+            .GroupBy(feature => feature.Lot!, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => new LotAggregate(group.Count(), group.Sum(feature => feature.Geometry.AreaSquareMeters)),
+                StringComparer.Ordinal);
+
+        var appliedLots = _varieties.Values
+            .Where(feature => !string.IsNullOrEmpty(feature.Lot))
+            .GroupBy(feature => feature.Lot!, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => new LotAggregate(group.Count(), group.Sum(feature => feature.Geometry.AreaSquareMeters)),
+                StringComparer.Ordinal);
+
+        var lotKeys = plannedLots.Keys
+            .Concat(appliedLots.Keys)
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(key => key, StringComparer.Ordinal)
+            .ToList();
+
+        var lotSummaries = new List<GeneticsLotStatistic>(lotKeys.Count);
+        foreach (var lotKey in lotKeys)
+        {
+            plannedLots.TryGetValue(lotKey, out var planned);
+            appliedLots.TryGetValue(lotKey, out var applied);
+
+            lotSummaries.Add(new GeneticsLotStatistic(
+                lotKey,
+                planned?.AreaSquareMeters ?? 0,
+                applied?.AreaSquareMeters ?? 0,
+                planned?.Count ?? 0,
+                applied?.Count ?? 0));
+        }
+
+        return new GeneticsAnalyticsSnapshot(
+            generatedAt,
+            planSummaries,
+            varietySummaries,
+            lotSummaries);
+    }
+
+    private void NotifyAnalyticsCallbacks(GeneticsAnalyticsSnapshot previous, GeneticsAnalyticsSnapshot current)
+    {
+        GeneticsAnalyticsCallback[] callbacks;
+        lock (_analyticsCallbacks)
+        {
+            if (_analyticsCallbacks.Count == 0)
+            {
+                return;
+            }
+
+            callbacks = _analyticsCallbacks.Values.ToArray();
+        }
+
+        foreach (var callback in callbacks)
+        {
+            callback(current, previous);
+        }
+    }
+
+    private void UnregisterAnalyticsCallback(Guid id)
+    {
+        lock (_analyticsCallbacks)
+        {
+            _analyticsCallbacks.Remove(id);
+        }
+    }
+
+    private readonly struct PlanKey
+    {
+        public PlanKey(string? jobId, string brand, string product, string? traitStack, string? lot, string? treatment)
+        {
+            JobId = jobId;
+            Brand = brand;
+            Product = product;
+            TraitStack = traitStack;
+            Lot = lot;
+            Treatment = treatment;
+        }
+
+        public string? JobId { get; }
+
+        public string Brand { get; }
+
+        public string Product { get; }
+
+        public string? TraitStack { get; }
+
+        public string? Lot { get; }
+
+        public string? Treatment { get; }
+
+        public static IEqualityComparer<PlanKey> Comparer { get; } = new PlanKeyEqualityComparer();
+
+        private sealed class PlanKeyEqualityComparer : IEqualityComparer<PlanKey>
+        {
+            public bool Equals(PlanKey x, PlanKey y)
+            {
+                return string.Equals(x.JobId, y.JobId, StringComparison.Ordinal)
+                    && string.Equals(x.Brand, y.Brand, StringComparison.Ordinal)
+                    && string.Equals(x.Product, y.Product, StringComparison.Ordinal)
+                    && string.Equals(x.TraitStack, y.TraitStack, StringComparison.Ordinal)
+                    && string.Equals(x.Lot, y.Lot, StringComparison.Ordinal)
+                    && string.Equals(x.Treatment, y.Treatment, StringComparison.Ordinal);
+            }
+
+            public int GetHashCode(PlanKey obj)
+            {
+                var hash = new HashCode();
+                hash.Add(obj.JobId, StringComparer.Ordinal);
+                hash.Add(obj.Brand, StringComparer.Ordinal);
+                hash.Add(obj.Product, StringComparer.Ordinal);
+                hash.Add(obj.TraitStack, StringComparer.Ordinal);
+                hash.Add(obj.Lot, StringComparer.Ordinal);
+                hash.Add(obj.Treatment, StringComparer.Ordinal);
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    private readonly struct VarietyKey
+    {
+        public VarietyKey(string jobId, string brand, string product, string? traitStack, string? lot, string? treatment, string? barcode)
+        {
+            JobId = jobId;
+            Brand = brand;
+            Product = product;
+            TraitStack = traitStack;
+            Lot = lot;
+            Treatment = treatment;
+            Barcode = barcode;
+        }
+
+        public string JobId { get; }
+
+        public string Brand { get; }
+
+        public string Product { get; }
+
+        public string? TraitStack { get; }
+
+        public string? Lot { get; }
+
+        public string? Treatment { get; }
+
+        public string? Barcode { get; }
+
+        public static IEqualityComparer<VarietyKey> Comparer { get; } = new VarietyKeyEqualityComparer();
+
+        private sealed class VarietyKeyEqualityComparer : IEqualityComparer<VarietyKey>
+        {
+            public bool Equals(VarietyKey x, VarietyKey y)
+            {
+                return string.Equals(x.JobId, y.JobId, StringComparer.Ordinal)
+                    && string.Equals(x.Brand, y.Brand, StringComparer.Ordinal)
+                    && string.Equals(x.Product, y.Product, StringComparer.Ordinal)
+                    && string.Equals(x.TraitStack, y.TraitStack, StringComparison.Ordinal)
+                    && string.Equals(x.Lot, y.Lot, StringComparison.Ordinal)
+                    && string.Equals(x.Treatment, y.Treatment, StringComparison.Ordinal)
+                    && string.Equals(x.Barcode, y.Barcode, StringComparison.Ordinal);
+            }
+
+            public int GetHashCode(VarietyKey obj)
+            {
+                var hash = new HashCode();
+                hash.Add(obj.JobId, StringComparer.Ordinal);
+                hash.Add(obj.Brand, StringComparer.Ordinal);
+                hash.Add(obj.Product, StringComparer.Ordinal);
+                hash.Add(obj.TraitStack, StringComparer.Ordinal);
+                hash.Add(obj.Lot, StringComparer.Ordinal);
+                hash.Add(obj.Treatment, StringComparer.Ordinal);
+                hash.Add(obj.Barcode, StringComparer.Ordinal);
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    private sealed class AnalyticsSubscription : IDisposable
+    {
+        private readonly GeneticsLayerIngestPipeline _pipeline;
+        private readonly Guid _id;
+        private bool _disposed;
+
+        public AnalyticsSubscription(GeneticsLayerIngestPipeline pipeline, Guid id)
+        {
+            _pipeline = pipeline;
+            _id = id;
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _pipeline.UnregisterAnalyticsCallback(_id);
+            _disposed = true;
+        }
+    }
+
+    private sealed record LotAggregate(int Count, double AreaSquareMeters);
 }

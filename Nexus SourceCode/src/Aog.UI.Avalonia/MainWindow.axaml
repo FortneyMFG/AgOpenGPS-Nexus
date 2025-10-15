@@ -331,6 +331,89 @@
             </StackPanel>
           </Border>
 
+          <!-- Mesh sharing panel -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding MeshSharePanel}"
+                  x:DataType="vm:MeshSharePanelViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Mesh sharing" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <ItemsControl ItemsSource="{Binding Devices}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:MeshDeviceAccessViewModel">
+                    <Border Padding="12" Margin="0,4"
+                            CornerRadius="10"
+                            Background="{DynamicResource ThemeBackgroundBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                            BorderThickness="1">
+                      <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                          <TextBlock Text="{Binding DeviceId}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding PresenceDisplay}" FontWeight="SemiBold"/>
+                          <TextBlock Text="{Binding LastSeenDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding CapabilitySummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+
+                        <StackPanel Spacing="4" IsVisible="{Binding HasShareGrants}">
+                          <TextBlock Text="Shares" FontWeight="SemiBold"/>
+                          <ItemsControl ItemsSource="{Binding ShareGrants}">
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate x:DataType="vm:MeshAccessGrantViewModel">
+                                <Border Padding="8" Margin="0,2"
+                                        CornerRadius="6"
+                                        Background="{DynamicResource ThemeBackgroundBrush}"
+                                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                                        BorderThickness="1">
+                                  <StackPanel Spacing="2">
+                                    <TextBlock Text="{Binding ScopeDisplay}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding TierDisplay}"/>
+                                    <TextBlock Text="{Binding LayerDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Note}" Foreground="{DynamicResource ThemeForegroundLowBrush}" FontSize="11" TextWrapping="Wrap" IsVisible="{Binding HasNote}"/>
+                                  </StackPanel>
+                                </Border>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4" IsVisible="{Binding HasSubscribeGrants}">
+                          <TextBlock Text="Subscriptions" FontWeight="SemiBold"/>
+                          <ItemsControl ItemsSource="{Binding SubscribeGrants}">
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate x:DataType="vm:MeshAccessGrantViewModel">
+                                <Border Padding="8" Margin="0,2"
+                                        CornerRadius="6"
+                                        Background="{DynamicResource ThemeBackgroundBrush}"
+                                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                                        BorderThickness="1">
+                                  <StackPanel Spacing="2">
+                                    <TextBlock Text="{Binding ScopeDisplay}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding TierDisplay}"/>
+                                    <TextBlock Text="{Binding LayerDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Note}" Foreground="{DynamicResource ThemeForegroundLowBrush}" FontSize="11" TextWrapping="Wrap" IsVisible="{Binding HasNote}"/>
+                                  </StackPanel>
+                                </Border>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                        </StackPanel>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
           <!-- Layer legend -->
           <Border Padding="16" CornerRadius="12"
                   Background="{DynamicResource ThemeBackgroundBrush}"
@@ -469,6 +552,205 @@
                   </ItemsControl>
                 </StackPanel>
               </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- Zone policies -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding ZonePolicyPanel}" x:DataType="vm:ZoneConstraintPolicyViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Zone policies" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding PolicySummary}" TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <ItemsControl ItemsSource="{Binding Toggles}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ZoneConstraintToggleViewModel">
+                    <Border Padding="12"
+                            Margin="0,4"
+                            CornerRadius="8"
+                            Background="{DynamicResource ThemeBackgroundBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                            BorderThickness="1">
+                      <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                          <ToggleSwitch Content="{Binding EnforcementDisplay}"
+                                        IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding BufferSummary}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        <TextBlock Text="{Binding PolicySummary}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding OverridePolicyHint}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding HasOverridePolicyHint}"/>
+                        <TextBlock Text="{Binding OverrideStatusDisplay}"
+                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                   TextWrapping="Wrap"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding SupportsManualOverride}">
+                          <Button Content="Apply override"
+                                  Command="{Binding ApplyOverrideCommand}"
+                                  MinWidth="120"/>
+                          <Button Content="Clear override"
+                                  Command="{Binding ClearOverrideCommand}"
+                                  MinWidth="120"/>
+                        </StackPanel>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <Border Padding="12"
+                      CornerRadius="8"
+                      Background="{DynamicResource ThemeBackgroundBrush}"
+                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                      BorderThickness="1">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="Override history" FontWeight="SemiBold"/>
+                  <ItemsControl ItemsSource="{Binding OverrideHistory}" IsVisible="{Binding HasOverrideHistory}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:ZoneOverrideEventViewModel">
+                        <Border Padding="8"
+                                Margin="0,4"
+                                CornerRadius="6"
+                                Background="{DynamicResource ThemeBackgroundBrush}"
+                                BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                                BorderThickness="1">
+                          <StackPanel Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <TextBlock Text="{Binding ZoneTypeDisplay}" FontWeight="SemiBold"/>
+                              <TextBlock Text="{Binding ActionDisplay}" FontWeight="SemiBold"/>
+                              <TextBlock Text="{Binding TimestampDisplay}"
+                                         Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                              <TextBlock Text="{Binding ExpiryDisplay}"
+                                         Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding DetailDisplay}"
+                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                       TextWrapping="Wrap"/>
+                          </StackPanel>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Text="No overrides recorded." Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                             HorizontalAlignment="Center" IsVisible="{Binding HasNoOverrideHistory}"/>
+                </StackPanel>
+              </Border>
+
+              <TextBlock Text="{Binding StatusMessage}"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource ThemeForegroundBrush}"/>
+            </StackPanel>
+          </Border>
+
+          <!-- Zone import/export -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding ZoneImportExportPanel}" x:DataType="vm:ZoneImportExportPanelViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Zone import &amp; export" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <ItemsControl ItemsSource="{Binding Workflows}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ZoneImportWorkflowViewModel">
+                    <Border Padding="12"
+                            Margin="0,4"
+                            CornerRadius="8"
+                            Background="{DynamicResource ThemeBackgroundBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                            BorderThickness="1">
+                      <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding WorkflowName}" FontWeight="SemiBold"/>
+                          <Border Padding="6,2"
+                                  CornerRadius="6"
+                                  Background="{DynamicResource ThemeBackgroundBrush}"
+                                  BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                                  BorderThickness="1">
+                            <TextBlock Text="{Binding WorkflowTypeDisplay}" FontSize="11" FontWeight="SemiBold"/>
+                          </Border>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding TransportSummary}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding PolicySummary}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                   TextWrapping="Wrap"/>
+                        <ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" Height="6"/>
+                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding StatusDisplay}"/>
+                          <TextBlock Text="{Binding LastRunDisplay, StringFormat=Last run: {0}}"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Button Content="{Binding ActionLabel}"
+                                  Command="{Binding ExecuteCommand}"
+                                  MinWidth="140"/>
+                        </StackPanel>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <Border Padding="12"
+                      CornerRadius="8"
+                      Background="{DynamicResource ThemeBackgroundBrush}"
+                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                      BorderThickness="1">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="Activity log" FontWeight="SemiBold"/>
+                  <ItemsControl ItemsSource="{Binding ActivityLog}" IsVisible="{Binding HasActivity}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:ZoneTransferEventViewModel">
+                        <Border Padding="8"
+                                Margin="0,4"
+                                CornerRadius="6"
+                                Background="{DynamicResource ThemeBackgroundBrush}"
+                                BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                                BorderThickness="1">
+                          <StackPanel Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <TextBlock Text="{Binding WorkflowName}" FontWeight="SemiBold"/>
+                              <TextBlock Text="{Binding ActionDisplay}" FontWeight="SemiBold"/>
+                              <TextBlock Text="{Binding TimestampDisplay}"
+                                         Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding Detail}"
+                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                       TextWrapping="Wrap"/>
+                          </StackPanel>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Text="No zone transfers recorded yet."
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                             HorizontalAlignment="Center"
+                             IsVisible="{Binding HasNoActivity}"/>
+                </StackPanel>
+              </Border>
             </StackPanel>
           </Border>
 
@@ -616,19 +898,133 @@
             </StackPanel>
           </Border>
 
+          <!-- Crop quick-select -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding CropQuickSelect}" x:DataType="vm:CropQuickSelectViewModel">
+            <StackPanel Spacing="16">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Crop quick-select" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding PanelDescription}" TextWrapping="Wrap"
+                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <Border Padding="12" CornerRadius="10"
+                      Background="{DynamicResource ThemeBackgroundBrush}"
+                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                      BorderThickness="1">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="{Binding ActiveFieldDisplay}" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding SeasonContextDisplay}"
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding CurrentPlanDisplay}"
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding LastActionDisplay}"
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Spacing="4">
+                <TextBlock Text="{Binding SelectionStatus}" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding SelectionDetails}" TextWrapping="Wrap"
+                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <ItemsControl ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:CropQuickSelectGroupViewModel">
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold"/>
+                      <TextBlock Text="{Binding Description}" TextWrapping="Wrap"
+                                 Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+
+                      <ItemsControl ItemsSource="{Binding Options}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <WrapPanel Spacing="12"/>
+                          </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:CropQuickSelectOptionViewModel">
+                            <Border Margin="0,0,12,12" Padding="0"
+                                    CornerRadius="10"
+                                    BorderThickness="1.5"
+                                    BorderBrush="{Binding AccentBrush}">
+                              <Border.Styles>
+                                <Style Selector="Border">
+                                  <Setter Property="Background" Value="{Binding AccentBackgroundBrush}"/>
+                                  <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="Background" Value="{Binding AccentBrush}"/>
+                                  </DataTrigger>
+                                </Style>
+                              </Border.Styles>
+
+                              <Button Command="{Binding SelectCommand}"
+                                      Background="Transparent"
+                                      BorderBrush="Transparent"
+                                      Padding="12"
+                                      HorizontalContentAlignment="Stretch"
+                                      MinWidth="220">
+                                <Button.Styles>
+                                  <Style Selector="Button">
+                                    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                      <Setter Property="Foreground" Value="White"/>
+                                    </DataTrigger>
+                                  </Style>
+                                </Button.Styles>
+
+                                <StackPanel Spacing="6">
+                                  <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{Binding Crop}" FontSize="16" FontWeight="SemiBold"/>
+                                    <Border Background="{Binding AccentBrush}" Opacity="0.85"
+                                            CornerRadius="4" Padding="6,2"
+                                            IsVisible="{Binding HasTag}">
+                                      <TextBlock Text="{Binding TagLabel}" FontSize="10" FontWeight="SemiBold" Foreground="White"/>
+                                    </Border>
+                                  </StackPanel>
+
+                                  <TextBlock Text="{Binding Variety}" FontWeight="SemiBold"
+                                             FontSize="13"
+                                             IsVisible="{Binding HasVariety}"/>
+
+                                  <TextBlock Text="{Binding SeasonWindow}"
+                                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+
+                                  <TextBlock Text="{Binding RotationSummary}" TextWrapping="Wrap"
+                                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+
+                                  <TextBlock Text="{Binding Notes}" TextWrapping="Wrap"
+                                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                                </StackPanel>
+                              </Button>
+                            </Border>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
           <!-- Simulation controls -->
           <Border Padding="16" CornerRadius="8"
                   Background="{DynamicResource ThemeBackgroundBrush}"
                   BorderBrush="{DynamicResource ThemeBorderLowBrush}"
                   BorderThickness="1">
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
+            <!-- 6 rows: 0..5 used below -->
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
               <TextBlock Text="Simulation controls" FontWeight="SemiBold"/>
 
               <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
                 <StackPanel>
                   <TextBlock Text="{Binding SimulationBar.ActiveScenarioTitle}" FontWeight="SemiBold"/>
                   <TextBlock Text="{Binding SimulationBar.ActiveScenarioDescription}" TextWrapping="Wrap"/>
-                  <TextBlock Text="Options: {Binding SimulationBar.ActiveScenarioOptions}"
+                  <TextBlock Text="{Binding SimulationBar.ActiveScenarioOptions, StringFormat=Options: {0}}"
                              Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
                 </StackPanel>
 

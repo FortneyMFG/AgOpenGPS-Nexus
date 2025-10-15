@@ -88,6 +88,26 @@ public sealed class ZoneStoreTests
     }
 
     [Fact]
+    public void GetZonesContaining_ReturnsOrderedMatches()
+    {
+        var store = new ZoneStore(4326);
+        store.MountZones(new[]
+        {
+            CreateSquareZone("zone:boundary", 0, 0, 4, priority: 10, enabled: true),
+            CreateSquareZone("zone:keepout", 0, 0, 4, priority: 80, enabled: true),
+            CreateSquareZone("zone:disabled", 0, 0, 4, priority: 50, enabled: false)
+        });
+
+        var all = store.GetZonesContaining(1, 1, includeDisabled: true);
+        Assert.Equal(3, all.Count);
+        Assert.Equal(new[] { "zone:keepout", "zone:disabled", "zone:boundary" }, all.Select(z => z.ZoneId).ToArray());
+
+        var activeOnly = store.GetZonesContaining(1, 1, includeDisabled: false);
+        Assert.Equal(2, activeOnly.Count);
+        Assert.Equal(new[] { "zone:keepout", "zone:boundary" }, activeOnly.Select(z => z.ZoneId).ToArray());
+    }
+
+    [Fact]
     public void MountZones_ThrowsWhenDuplicateIdentifiersDetected()
     {
         var store = new ZoneStore(4326);

@@ -1,0 +1,244 @@
+{
+  "scenarios": [
+    {
+      "name": "merge-and-flush",
+      "options": {
+        "minimumPublishInterval": "00:15:00",
+        "mergePartialSamples": true,
+        "changeEpsilon": 1.0
+      },
+      "operations": [
+        {
+          "ingest": {
+            "capturedAt": "2025-05-01T12:00:00Z",
+            "source": "sensor:wx-01",
+            "temperatureC": 21.4,
+            "humidityPct": 68.0,
+            "windKph": 12.5,
+            "windDirectionDeg": 190.0,
+            "windGustKph": 20.1,
+            "rainfallMm": 0.4,
+            "pressureKpa": 100.8,
+            "dewPointC": 15.2,
+            "wetBulbC": 17.8,
+            "deltaTC": 3.6,
+            "evapotranspirationMm": 0.9,
+            "solarIrradianceWm2": 680.0,
+            "uvIndex": 5.4,
+            "cloudCoverPct": 35.0,
+            "visibilityKm": 12.3,
+            "soilTempC": 16.3,
+            "soilMoisturePct": 42.0,
+            "leafWetnessPct": 22.0
+          },
+          "expectPublished": {
+            "capturedAt": "2025-05-01T12:00:00Z",
+            "source": "sensor:wx-01",
+            "temperatureC": 21.4,
+            "humidityPct": 68.0,
+            "windKph": 12.5,
+            "windDirectionDeg": 190.0,
+            "windGustKph": 20.1,
+            "rainfallMm": 0.4,
+            "pressureKpa": 100.8,
+            "dewPointC": 15.2,
+            "wetBulbC": 17.8,
+            "deltaTC": 3.6,
+            "evapotranspirationMm": 0.9,
+            "solarIrradianceWm2": 680.0,
+            "uvIndex": 5.4,
+            "cloudCoverPct": 35.0,
+            "visibilityKm": 12.3,
+            "soilTempC": 16.3,
+            "soilMoisturePct": 42.0,
+            "leafWetnessPct": 22.0
+          }
+        },
+        {
+          "ingest": {
+            "capturedAt": "2025-05-01T12:05:00Z",
+            "source": "sensor:wx-01",
+            "rainfallMm": 0.6
+          },
+          "expectPublished": null
+        },
+        {
+          "flush": true,
+          "expectPublished": {
+            "capturedAt": "2025-05-01T12:15:00Z",
+            "source": "sensor:wx-01",
+            "temperatureC": 21.4,
+            "humidityPct": 68.0,
+            "windKph": 12.5,
+            "windDirectionDeg": 190.0,
+            "windGustKph": 20.1,
+            "rainfallMm": 0.6,
+            "pressureKpa": 100.8,
+            "dewPointC": 15.2,
+            "wetBulbC": 17.8,
+            "deltaTC": 3.6,
+            "evapotranspirationMm": 0.9,
+            "solarIrradianceWm2": 680.0,
+            "uvIndex": 5.4,
+            "cloudCoverPct": 35.0,
+            "visibilityKm": 12.3,
+            "soilTempC": 16.3,
+            "soilMoisturePct": 42.0,
+            "leafWetnessPct": 22.0
+          }
+        }
+      ],
+      "expected": {
+        "latestSnapshot": {
+          "capturedAt": "2025-05-01T12:15:00Z",
+          "source": "sensor:wx-01",
+          "temperatureC": 21.4,
+          "humidityPct": 68.0,
+          "windKph": 12.5,
+          "windDirectionDeg": 190.0,
+          "windGustKph": 20.1,
+          "rainfallMm": 0.6,
+          "pressureKpa": 100.8,
+          "dewPointC": 15.2,
+          "wetBulbC": 17.8,
+          "deltaTC": 3.6,
+          "evapotranspirationMm": 0.9,
+          "solarIrradianceWm2": 680.0,
+          "uvIndex": 5.4,
+          "cloudCoverPct": 35.0,
+          "visibilityKm": 12.3,
+          "soilTempC": 16.3,
+          "soilMoisturePct": 42.0,
+          "leafWetnessPct": 22.0
+        }
+      }
+    },
+    {
+      "name": "force-publish",
+      "options": {
+        "minimumPublishInterval": "00:10:00",
+        "mergePartialSamples": true,
+        "changeEpsilon": 0.001
+      },
+      "operations": [
+        {
+          "ingest": {
+            "capturedAt": "2025-05-02T14:00:00Z",
+            "source": "sensor:wx-02",
+            "temperatureC": 18.0,
+            "humidityPct": 55.0,
+            "windKph": 9.2,
+            "windDirectionDeg": 205.0,
+            "windGustKph": 14.8,
+            "rainfallMm": 0.0,
+            "pressureKpa": 101.4,
+            "dewPointC": 10.8,
+            "wetBulbC": 12.4,
+            "deltaTC": 5.6,
+            "evapotranspirationMm": 0.3,
+            "solarIrradianceWm2": 540.0,
+            "uvIndex": 3.8,
+            "cloudCoverPct": 28.0,
+            "visibilityKm": 18.5,
+            "soilTempC": 14.1,
+            "soilMoisturePct": 38.0,
+            "leafWetnessPct": 16.0
+          },
+          "expectPublished": {
+            "capturedAt": "2025-05-02T14:00:00Z",
+            "source": "sensor:wx-02",
+            "temperatureC": 18.0,
+            "humidityPct": 55.0,
+            "windKph": 9.2,
+            "windDirectionDeg": 205.0,
+            "windGustKph": 14.8,
+            "rainfallMm": 0.0,
+            "pressureKpa": 101.4,
+            "dewPointC": 10.8,
+            "wetBulbC": 12.4,
+            "deltaTC": 5.6,
+            "evapotranspirationMm": 0.3,
+            "solarIrradianceWm2": 540.0,
+            "uvIndex": 3.8,
+            "cloudCoverPct": 28.0,
+            "visibilityKm": 18.5,
+            "soilTempC": 14.1,
+            "soilMoisturePct": 38.0,
+            "leafWetnessPct": 16.0
+          }
+        },
+        {
+          "ingest": {
+            "capturedAt": "2025-05-02T14:03:00Z",
+            "source": "sensor:wx-02",
+            "temperatureC": 19.5,
+            "humidityPct": 52.0,
+            "windKph": 11.0,
+            "windDirectionDeg": 210.0,
+            "windGustKph": 18.0,
+            "rainfallMm": 0.1,
+            "pressureKpa": 101.1,
+            "dewPointC": 11.0,
+            "wetBulbC": 12.9,
+            "deltaTC": 6.6,
+            "evapotranspirationMm": 0.4,
+            "solarIrradianceWm2": 560.0,
+            "uvIndex": 4.1,
+            "cloudCoverPct": 24.0,
+            "visibilityKm": 18.7,
+            "soilTempC": 14.3,
+            "soilMoisturePct": 37.0,
+            "leafWetnessPct": 14.0,
+            "forcePublish": true
+          },
+          "expectPublished": {
+            "capturedAt": "2025-05-02T14:03:00Z",
+            "source": "sensor:wx-02",
+            "temperatureC": 19.5,
+            "humidityPct": 52.0,
+            "windKph": 11.0,
+            "windDirectionDeg": 210.0,
+            "windGustKph": 18.0,
+            "rainfallMm": 0.1,
+            "pressureKpa": 101.1,
+            "dewPointC": 11.0,
+            "wetBulbC": 12.9,
+            "deltaTC": 6.6,
+            "evapotranspirationMm": 0.4,
+            "solarIrradianceWm2": 560.0,
+            "uvIndex": 4.1,
+            "cloudCoverPct": 24.0,
+            "visibilityKm": 18.7,
+            "soilTempC": 14.3,
+            "soilMoisturePct": 37.0,
+            "leafWetnessPct": 14.0
+          }
+        }
+      ],
+      "expected": {
+        "latestSnapshot": {
+          "capturedAt": "2025-05-02T14:03:00Z",
+          "source": "sensor:wx-02",
+          "temperatureC": 19.5,
+          "humidityPct": 52.0,
+          "windKph": 11.0,
+          "windDirectionDeg": 210.0,
+          "windGustKph": 18.0,
+          "rainfallMm": 0.1,
+          "pressureKpa": 101.1,
+          "dewPointC": 11.0,
+          "wetBulbC": 12.9,
+          "deltaTC": 6.6,
+          "evapotranspirationMm": 0.4,
+          "solarIrradianceWm2": 560.0,
+          "uvIndex": 4.1,
+          "cloudCoverPct": 24.0,
+          "visibilityKm": 18.7,
+          "soilTempC": 14.3,
+          "soilMoisturePct": 37.0,
+          "leafWetnessPct": 14.0
+        }
+      }
+    }
+  ]
+}

@@ -26,3 +26,8 @@ NX-228 adds the RadioBridge transport stack which handles framing, acknowledgeme
 compression and retry scheduling for low-bandwidth links. Follow-up tasks (NX-227
 and beyond) will layer additional diagnostics, ACL enforcement and hardware adapters
 that push these publications out to radio devices.
+
+NX-229 introduces the `MeshRetentionStore` and `MeshRetentionWorker`. The worker
+subscribes to the in-memory mesh, records publications into a bounded retention
+window, and emits `MeshTelemetryEvent` instances on the shared event bus so
+telemetry loggers can persist mesh activity for offline analysis and sync.

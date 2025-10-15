@@ -89,6 +89,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         _guidanceTracks = BuildSampleGuidance();
         LayerLegend = LayerLegendViewModel.FromLayers(_mapLayers);
         LayerInspector = BuildSampleInspector(_mapLayers);
+        MeshSharePanel = MeshSharePanelViewModel.CreateSample();
 
         ApplySamplePluginState();
         SeedDashboards();
@@ -177,6 +178,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the inspector exposing the pinned layer observation.</summary>
     public LayerInspectorViewModel LayerInspector { get; }
+
+    /// <summary>Gets the mesh share/subscribe panel view-model.</summary>
+    public MeshSharePanelViewModel MeshSharePanel { get; }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.

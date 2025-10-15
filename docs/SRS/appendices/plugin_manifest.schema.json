@@ -1,6 +1,89 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agopengps.org/schemas/plugin_manifest.schema.json",
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[-0-9A-Za-z.]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "classification": {
+      "type": "string",
+      "enum": ["Hard", "Soft", "Suggest"],
+      "default": "Hard"
+    },
+    "capabilityDescriptor": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "$ref": "#/$defs/semver" },
+        "features": {
+          "type": "object",
+          "description": "Optional feature flags the capability implements with semantic versions.",
+          "additionalProperties": { "$ref": "#/$defs/semver" },
+          "default": {}
+        }
+      }
+    },
+    "profileDescriptor": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "$ref": "#/$defs/semver" }
+      }
+    },
+    "capabilityRequirement": {
+      "type": "object",
+      "required": ["id", "range"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "range": { "type": "string" },
+        "features": {
+          "type": "object",
+          "description": "Feature-level range requirements declared by the consumer.",
+          "additionalProperties": { "type": "string" },
+          "default": {}
+        },
+        "classification": { "$ref": "#/$defs/classification" }
+      }
+    },
+    "profileRequirement": {
+      "type": "object",
+      "required": ["id", "range"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "range": { "type": "string" },
+        "classification": { "$ref": "#/$defs/classification" }
+      }
+    },
+    "relationshipRequirement": {
+      "type": "object",
+      "required": ["id"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "range": { "type": "string" },
+        "reason": { "type": "string" },
+        "classification": { "$ref": "#/$defs/classification" }
+      }
+    },
+    "conformanceAttestation": {
+      "type": "object",
+      "required": ["profile", "runner", "result", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "profile": { "type": "string" },
+        "runner": { "type": "string" },
+        "result": { "type": "string", "enum": ["pass", "fail"] },
+        "sha256": { "type": "string" }
+      }
+    }
+  },
   "title": "AgOpenGPS Plugin Manifest",
   "type": "object",
   "required": [
@@ -84,6 +167,60 @@
         "filesystem": { "type": "array", "items": { "type": "string" } }
       }
     },
+    "provides": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/capabilityDescriptor" },
+          "default": []
+        },
+        "profiles": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/profileDescriptor" },
+          "default": []
+        }
+      },
+      "default": {}
+    },
+    "requires": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/capabilityRequirement" },
+          "default": []
+        },
+        "profiles": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/profileRequirement" },
+          "default": []
+        },
+        "peerOf": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationshipRequirement" },
+          "default": []
+        },
+        "conflictsWith": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationshipRequirement" },
+          "default": []
+        },
+        "replaces": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationshipRequirement" },
+          "default": []
+        },
+        "extends": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationshipRequirement" },
+          "default": []
+        }
+      },
+      "default": {}
+    },
     "contributes": {
       "type": "object",
       "additionalProperties": false,
@@ -135,6 +272,17 @@
         "properties": {
           "id": { "type": "string" },
           "version": { "type": "string" }
+        }
+      }
+    },
+    "attestations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "conformance": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/conformanceAttestation" },
+          "default": []
         }
       }
     },

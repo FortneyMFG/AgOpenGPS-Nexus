@@ -144,6 +144,9 @@ public sealed class PluginManifestLoader
             }
         }
 
+        ValidateProvides(manifest);
+        ValidateRequirements(manifest);
+
         if (!string.IsNullOrWhiteSpace(manifest.MinimumRuntimeVersion) &&
             !SemanticVersionPattern.IsMatch(manifest.MinimumRuntimeVersion))
         {
@@ -231,6 +234,146 @@ public sealed class PluginManifestLoader
                 {
                     throw new InvalidDataException($"Lease timeout must be positive for capability '{lease.Capability}'.");
                 }
+            }
+        }
+    }
+
+    private static void ValidateProvides(PluginManifest manifest)
+    {
+        if (manifest.Provides is null)
+        {
+            throw new InvalidDataException("Manifest provides section must be present.");
+        }
+
+        foreach (var capability in manifest.Provides.Capabilities)
+        {
+            if (capability is null)
+            {
+                throw new InvalidDataException("Provides.capabilities entries cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(capability.Id))
+            {
+                throw new InvalidDataException("Provides.capabilities entries require an id.");
+            }
+
+            if (string.IsNullOrWhiteSpace(capability.Version) || !SemanticVersionPattern.IsMatch(capability.Version))
+            {
+                throw new InvalidDataException($"Capability '{capability.Id}' must declare a semantic version.");
+            }
+
+            foreach (var feature in capability.Features)
+            {
+                if (string.IsNullOrWhiteSpace(feature.Key))
+                {
+                    throw new InvalidDataException($"Capability '{capability.Id}' declares an empty feature name.");
+                }
+
+                if (string.IsNullOrWhiteSpace(feature.Value) || !SemanticVersionPattern.IsMatch(feature.Value))
+                {
+                    throw new InvalidDataException($"Capability '{capability.Id}' feature '{feature.Key}' must specify a semantic version.");
+                }
+            }
+        }
+
+        foreach (var profile in manifest.Provides.Profiles)
+        {
+            if (profile is null)
+            {
+                throw new InvalidDataException("Provides.profiles entries cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(profile.Id))
+            {
+                throw new InvalidDataException("Provides.profiles entries require an id.");
+            }
+
+            if (string.IsNullOrWhiteSpace(profile.Version) || !SemanticVersionPattern.IsMatch(profile.Version))
+            {
+                throw new InvalidDataException($"Profile '{profile.Id}' must declare a semantic version.");
+            }
+        }
+    }
+
+    private static void ValidateRequirements(PluginManifest manifest)
+    {
+        if (manifest.Requires is null)
+        {
+            throw new InvalidDataException("Manifest requires section must be present.");
+        }
+
+        foreach (var capability in manifest.Requires.Capabilities)
+        {
+            if (capability is null)
+            {
+                throw new InvalidDataException("Requires.capabilities entries cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(capability.Id))
+            {
+                throw new InvalidDataException("Requires.capabilities entries require an id.");
+            }
+
+            if (string.IsNullOrWhiteSpace(capability.Range))
+            {
+                throw new InvalidDataException($"Capability requirement '{capability.Id}' must include a range.");
+            }
+
+            foreach (var feature in capability.Features)
+            {
+                if (string.IsNullOrWhiteSpace(feature.Key))
+                {
+                    throw new InvalidDataException($"Capability requirement '{capability.Id}' declares an empty feature name.");
+                }
+
+                if (string.IsNullOrWhiteSpace(feature.Value))
+                {
+                    throw new InvalidDataException($"Capability requirement '{capability.Id}' feature '{feature.Key}' must include a range.");
+                }
+            }
+        }
+
+        foreach (var profile in manifest.Requires.Profiles)
+        {
+            if (profile is null)
+            {
+                throw new InvalidDataException("Requires.profiles entries cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(profile.Id))
+            {
+                throw new InvalidDataException("Requires.profiles entries require an id.");
+            }
+
+            if (string.IsNullOrWhiteSpace(profile.Range))
+            {
+                throw new InvalidDataException($"Profile requirement '{profile.Id}' must include a range.");
+            }
+        }
+
+        ValidateRelationshipList(manifest.Requires.PeerOf, "peerOf");
+        ValidateRelationshipList(manifest.Requires.ConflictsWith, "conflictsWith");
+        ValidateRelationshipList(manifest.Requires.Replaces, "replaces");
+        ValidateRelationshipList(manifest.Requires.Extends, "extends");
+    }
+
+    private static void ValidateRelationshipList(IEnumerable<PluginRelationshipRequirement> relationships, string name)
+    {
+        foreach (var relationship in relationships)
+        {
+            if (relationship is null)
+            {
+                throw new InvalidDataException($"Requires.{name} entries cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(relationship.Id))
+            {
+                throw new InvalidDataException($"Requires.{name} entries require an id.");
+            }
+
+            if (relationship.Range is not null && string.IsNullOrWhiteSpace(relationship.Range))
+            {
+                throw new InvalidDataException($"Requires.{name} entry '{relationship.Id}' specifies an empty range.");
             }
         }
     }

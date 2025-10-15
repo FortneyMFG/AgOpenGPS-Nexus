@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Aog.UI.Avalonia.ViewModels;
@@ -87,8 +88,18 @@ public sealed class SessionLifecyclePanelViewModel : ObservableObject
         get => _activeSession;
         private set
         {
+            if (_activeSession is not null)
+            {
+                _activeSession.PropertyChanged -= OnActiveSessionPropertyChanged;
+            }
+
             if (SetProperty(ref _activeSession, value))
             {
+                if (_activeSession is not null)
+                {
+                    _activeSession.PropertyChanged += OnActiveSessionPropertyChanged;
+                }
+
                 OnPropertyChanged(nameof(HasActiveSession));
                 RefreshCommandStates();
             }
@@ -275,6 +286,14 @@ public sealed class SessionLifecyclePanelViewModel : ObservableObject
         _pauseSessionCommand.RaiseCanExecuteChanged();
         _resumeSessionCommand.RaiseCanExecuteChanged();
         _completeSessionCommand.RaiseCanExecuteChanged();
+    }
+
+    private void OnActiveSessionPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(SessionTimelineEntryViewModel.State))
+        {
+            RefreshCommandStates();
+        }
     }
 
     private static string CreateSessionName(int sequence)

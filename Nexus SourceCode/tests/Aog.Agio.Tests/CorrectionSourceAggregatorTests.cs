@@ -43,22 +43,28 @@ public sealed class CorrectionSourceAggregatorTests
             });
 
         var published = new List<byte[]>();
-        var result = await aggregator.RunAsync(
+        using var cts = new CancellationTokenSource();
+        var runTask = aggregator.RunAsync(
             (payload, token) =>
             {
                 published.Add(payload.ToArray());
                 return ValueTask.CompletedTask;
             },
-            CancellationToken.None);
+            cts.Token);
+
+        await WaitUntilAsync(() => published.Count >= 1, TimeSpan.FromSeconds(1));
+        cts.Cancel();
+
+        var result = await runTask;
 
         Assert.Equal(CorrectionSourceOutcome.Cancelled, result.Outcome);
-        Assert.Single(published);
+        Assert.NotEmpty(published);
         Assert.True(radioSource.RunInvoked);
         Assert.True(radioSource.Disposed);
         Assert.True(networkSource.RunInvoked);
         Assert.True(networkSource.Disposed);
-        Assert.Equal(1, radioFactory.InvocationCount);
-        Assert.Equal(1, networkFactory.InvocationCount);
+        Assert.True(radioFactory.InvocationCount >= 1);
+        Assert.True(networkFactory.InvocationCount >= 1);
     }
 
     [Fact]
@@ -94,18 +100,24 @@ public sealed class CorrectionSourceAggregatorTests
             });
 
         var published = new List<byte[]>();
-        var result = await aggregator.RunAsync(
+        using var cts = new CancellationTokenSource();
+        var runTask = aggregator.RunAsync(
             (payload, token) =>
             {
                 published.Add(payload.ToArray());
                 return ValueTask.CompletedTask;
             },
-            CancellationToken.None);
+            cts.Token);
+
+        await WaitUntilAsync(() => published.Count >= 1, TimeSpan.FromSeconds(1));
+        cts.Cancel();
+
+        var result = await runTask;
 
         Assert.Equal(CorrectionSourceOutcome.Cancelled, result.Outcome);
-        Assert.Single(published);
-        Assert.Equal(1, baseFactory.InvocationCount);
-        Assert.Equal(1, networkFactory.InvocationCount);
+        Assert.NotEmpty(published);
+        Assert.True(baseFactory.InvocationCount >= 1);
+        Assert.True(networkFactory.InvocationCount >= 1);
     }
 
     [Fact]

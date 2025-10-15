@@ -123,10 +123,17 @@ public static class ReportExportAuditor
             }
 
             var format = pair.Key["requestedOutput.".Length..];
-            if (!string.IsNullOrWhiteSpace(format))
+            if (string.IsNullOrWhiteSpace(format))
             {
-                set.Add(format);
+                continue;
             }
+
+            if (!bool.TryParse(pair.Value, out var isRequested) || !isRequested)
+            {
+                continue;
+            }
+
+            set.Add(format);
         }
 
         return set;

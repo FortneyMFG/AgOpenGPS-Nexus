@@ -46,9 +46,19 @@ public sealed class LayerLegendViewModel
                 layer.Style.IsPlanned,
                 layer.Style.IsPlanned
                     ? "Target metadata sourced from the prescription controller."
-                    : "Live rate samples aggregated from the section controller."))
+                    : BuildMeasuredDescription(layer.LayerId)))
             .ToArray();
 
         return new LayerLegendViewModel(legendEntries);
+    }
+
+    private static string BuildMeasuredDescription(string layerId)
+    {
+        if (layerId.Contains("profit", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Profit overlay derived from yield revenue and ledger costs.";
+        }
+
+        return "Live rate samples aggregated from the section controller.";
     }
 }

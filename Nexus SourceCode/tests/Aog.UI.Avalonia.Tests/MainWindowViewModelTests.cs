@@ -57,6 +57,17 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
+    public void LayoutDiff_SurfacesSampleChanges()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.LayoutDiff.Should().NotBeNull();
+        viewModel.LayoutDiff.HasChanges.Should().BeTrue();
+        viewModel.LayoutDiff.Changes.Should().HaveCountGreaterThan(0);
+        viewModel.LayoutDiff.HasLinkedPreset.Should().BeTrue();
+    }
+
+    [Fact]
     public void MapOverlays_ExposeCoverageAndGuidance()
     {
         var viewModel = CreateViewModel();
@@ -99,6 +110,18 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
+    public void FieldHealthSeverity_SurfaceSampleScale()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.FieldHealthSeverity.Should().NotBeNull();
+        viewModel.FieldHealthSeverity.LayerDisplayName.Should().Contain("Flood", StringComparison.OrdinalIgnoreCase);
+        viewModel.FieldHealthSeverity.Entries.Should().HaveCountGreaterThan(3);
+        viewModel.FieldHealthSeverity.Entries.Select(entry => entry.Severity)
+            .Should().Contain(new[] { "Critical", "High", "Moderate", "Low", "None" });
+    }
+
+    [Fact]
     public void CompanionSnapshot_MirrorsMetadataDrivenState()
     {
         var viewModel = CreateViewModel();
@@ -132,6 +155,17 @@ public sealed class MainWindowViewModelTests
         snapshot.ReplayTimeline.SpeedSamples.Should().HaveCount(viewModel.ReplayTimeline.SpeedSamples.Count);
         snapshot.ReplayTimeline.HeadingSamples.Should().HaveCount(viewModel.ReplayTimeline.HeadingSamples.Count);
         snapshot.ReplayTimeline.Bookmarks.Should().HaveCount(viewModel.ReplayTimeline.Bookmarks.Count);
+        snapshot.FieldHealth.LayerDisplayName.Should().Be(viewModel.FieldHealthSeverity.LayerDisplayName);
+        snapshot.FieldHealth.FilterSummary.Should().Be(viewModel.FieldHealthSeverity.FilterSummary);
+        snapshot.FieldHealth.Entries.Should().HaveCount(viewModel.FieldHealthSeverity.Entries.Count);
+        snapshot.FieldHealth.Entries.Select(entry => entry.Severity)
+            .Should().BeEquivalentTo(viewModel.FieldHealthSeverity.Entries.Select(entry => entry.Severity));
+        var sourceSeverity = viewModel.FieldHealthSeverity.Entries.First();
+        var snapshotSeverity = snapshot.FieldHealth.Entries.First(entry => entry.Severity == sourceSeverity.Severity);
+        snapshotSeverity.Color.Should().Be(sourceSeverity.Color.ToString());
+    }
+
+    [Fact]
     public void MeshSharePanel_SurfacesSampleDevices()
     {
         var viewModel = CreateViewModel();
@@ -142,6 +176,21 @@ public sealed class MainWindowViewModelTests
         {
             device.DisplayName.Should().NotBeNullOrWhiteSpace();
             device.DeviceId.Should().NotBeNullOrWhiteSpace();
+        });
+    }
+
+    [Fact]
+    public void RadioProvisioningPanel_SurfacesProvisioningState()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.RadioProvisioningPanel.Should().NotBeNull();
+        viewModel.RadioProvisioningPanel.Devices.Should().NotBeEmpty();
+        viewModel.RadioProvisioningPanel.Profiles.Should().NotBeEmpty();
+        viewModel.RadioProvisioningPanel.AuditTrail.Should().NotBeEmpty();
+        viewModel.RadioProvisioningPanel.Devices.Should().AllSatisfy(device =>
+        {
+            device.Steps.Should().NotBeEmpty();
         });
     }
 

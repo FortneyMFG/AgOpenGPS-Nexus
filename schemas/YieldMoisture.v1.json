@@ -2,19 +2,257 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agopengps.org/schemas/YieldMoisture.v1.json",
   "title": "YieldMoisture.v1",
-  "type": "object",
-  "additionalProperties": false,
   "x-nexus-layerId": "yield.moisture",
-  "required": ["layerId", "jobId", "sessionId", "units", "createdBy", "createdAt"],
-  "properties": {
-    "layerId": {"type": "string", "pattern": "^layer:[A-Za-z0-9._:-]+$", "description": "Layer identifier", "x-nexus-scope": "core"},
-    "jobId": {"type": "string", "pattern": "^job:[A-Za-z0-9._:-]+$", "description": "Job identifier", "x-nexus-scope": "core"},
-    "sessionId": {"type": "string", "pattern": "^session:[A-Za-z0-9._:-]+$", "description": "Session identifier", "x-nexus-scope": "core"},
-    "fieldId": {"type": ["string", "null"], "pattern": "^field:[A-Za-z0-9._:-]+$", "description": "Optional field", "x-nexus-scope": "core"},
-    "units": {"type": "string", "description": "Units (e.g., % moisture)", "x-nexus-scope": "core"},
-    "sensorModel": {"type": ["string", "null"], "description": "Sensor model or calibration id", "x-nexus-scope": "plugin"},
-    "createdBy": {"type": "string", "description": "Actor generating the layer", "x-nexus-scope": "core"},
-    "createdAt": {"type": "string", "format": "date-time", "description": "Creation timestamp", "x-nexus-scope": "core"},
-    "extensions": {"type": "object", "description": "Plugin metadata", "additionalProperties": true, "x-nexus-scope": "plugin"}
-  }
+  "type": "object",
+  "allOf": [
+    { "$ref": "./Layer.v1.json" },
+    {
+      "type": "object",
+      "required": ["id", "kind", "jobId", "sessionId", "units", "metadata"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^layer:yield\\.moisture\\.[A-Za-z0-9._:-]+$",
+          "description": "Layer identifier bound to the yield.moisture family.",
+          "x-nexus-scope": "core"
+        },
+        "kind": {
+          "const": "yield.moisture",
+          "description": "Layer kind representing harvested grain moisture.",
+          "x-nexus-scope": "core"
+        },
+        "jobId": {
+          "type": "string",
+          "pattern": "^job:[A-Za-z0-9._:-]+$",
+          "description": "Job producing the moisture measurements.",
+          "x-nexus-scope": "core"
+        },
+        "sessionId": {
+          "type": "string",
+          "pattern": "^session:[A-Za-z0-9._:-]+$",
+          "description": "Session producing the moisture layer.",
+          "x-nexus-scope": "core"
+        },
+        "fieldId": {
+          "type": ["string", "null"],
+          "pattern": "^field:[A-Za-z0-9._:-]+$",
+          "description": "Optional field identifier for the layer scope.",
+          "x-nexus-scope": "core"
+        },
+        "units": {
+          "type": "string",
+          "description": "Units of measure (e.g., % moisture, g/kg).",
+          "x-nexus-scope": "core"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Moisture layer metadata describing smoothing, calibration, and aggregation context.",
+          "additionalProperties": false,
+          "required": ["grid", "smoothing", "calibration", "aggregation"],
+          "x-nexus-scope": "plugin",
+          "properties": {
+            "grid": {
+              "type": "object",
+              "description": "Grid definition for tile generation.",
+              "additionalProperties": false,
+              "required": ["cellSizeMeters", "projection"],
+              "properties": {
+                "cellSizeMeters": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "description": "Edge length for raster cells in meters.",
+                  "x-nexus-scope": "plugin"
+                },
+                "projection": {
+                  "type": "string",
+                  "description": "CRS identifier used to index the grid (e.g., EPSG:32615).",
+                  "x-nexus-scope": "core"
+                }
+              }
+            },
+            "smoothing": {
+              "type": "object",
+              "description": "Parameters describing the smoothing pipeline applied to raw telemetry.",
+              "additionalProperties": false,
+              "required": ["method"],
+              "properties": {
+                "method": {
+                  "type": "string",
+                  "enum": ["none", "movingAverage", "gaussian", "kalman", "savitzkyGolay"],
+                  "description": "Algorithm used for smoothing/lag correction.",
+                  "x-nexus-scope": "plugin"
+                },
+                "windowSeconds": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Window length used by the smoothing algorithm in seconds.",
+                  "x-nexus-scope": "plugin"
+                },
+                "lagCompensationSeconds": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Forward prediction applied to offset combine travel lag in seconds.",
+                  "x-nexus-scope": "plugin"
+                },
+                "passes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Number of smoothing passes that were executed.",
+                  "x-nexus-scope": "plugin"
+                }
+              }
+            },
+            "calibration": {
+              "type": "object",
+              "description": "Calibration profile applied to normalize the moisture telemetry.",
+              "additionalProperties": false,
+              "required": ["profileId"],
+              "properties": {
+                "profileId": {
+                  "type": "string",
+                  "pattern": "^calibration:[A-Za-z0-9._:-]+$",
+                  "description": "Identifier of the calibration or sensor profile applied.",
+                  "x-nexus-scope": "plugin"
+                },
+                "appliedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Timestamp when the calibration profile was last applied.",
+                  "x-nexus-scope": "plugin"
+                },
+                "source": {
+                  "type": ["string", "null"],
+                  "description": "Origin of the calibration factors (e.g., manual, OEM import).",
+                  "x-nexus-scope": "plugin"
+                },
+                "sensorModel": {
+                  "type": ["string", "null"],
+                  "description": "Sensor or monitor model this calibration profile targets.",
+                  "x-nexus-scope": "plugin"
+                },
+                "notes": {
+                  "type": ["string", "null"],
+                  "description": "Free-form notes describing calibration context.",
+                  "x-nexus-scope": "plugin"
+                },
+                "factors": {
+                  "type": "object",
+                  "description": "Per-sensor calibration multipliers applied during normalization.",
+                  "additionalProperties": { "type": "number" },
+                  "x-nexus-scope": "plugin"
+                }
+              }
+            },
+            "aggregation": {
+              "type": "object",
+              "description": "Aggregation metadata used to derive analytics and color bins.",
+              "additionalProperties": false,
+              "required": ["basis", "bins"],
+              "properties": {
+                "basis": {
+                  "type": "string",
+                  "description": "Basis used for aggregation (e.g., area, time, pass).",
+                  "x-nexus-scope": "plugin"
+                },
+                "scopes": {
+                  "type": "array",
+                  "description": "Scopes that received aggregation rollups.",
+                  "items": {
+                    "type": "string",
+                    "enum": ["job", "field", "farm", "season", "crop", "variety"]
+                  },
+                  "x-nexus-scope": "plugin"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Timestamp when aggregations were last regenerated.",
+                  "x-nexus-scope": "plugin"
+                },
+                "bins": {
+                  "type": "object",
+                  "description": "Color ramp/binning configuration shared with the UI.",
+                  "additionalProperties": false,
+                  "required": ["scheme"],
+                  "properties": {
+                    "scheme": {
+                      "type": "string",
+                      "enum": ["quantile", "equalInterval", "custom"],
+                      "description": "Binning scheme used for the layer legend.",
+                      "x-nexus-scope": "plugin"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "Number of bins when scheme is quantile or equalInterval.",
+                      "x-nexus-scope": "plugin"
+                    },
+                    "breaks": {
+                      "type": "array",
+                      "items": { "type": "number" },
+                      "minItems": 2,
+                      "description": "Explicit break values when scheme=custom.",
+                      "x-nexus-scope": "plugin"
+                    },
+                    "labels": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Optional human readable labels for bins.",
+                      "x-nexus-scope": "plugin"
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": { "properties": { "scheme": { "const": "custom" } } },
+                      "then": { "required": ["breaks"] },
+                      "else": { "required": ["count"] }
+                    }
+                  ]
+                }
+              }
+            },
+            "statistics": {
+              "type": "object",
+              "description": "Summary statistics calculated from the aggregated grid.",
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Number of samples contributing to the layer.",
+                  "x-nexus-scope": "plugin"
+                },
+                "mean": {
+                  "type": "number",
+                  "description": "Mean moisture for the aggregated scope in layer units.",
+                  "x-nexus-scope": "plugin"
+                },
+                "median": {
+                  "type": "number",
+                  "description": "Median moisture for the aggregated scope in layer units.",
+                  "x-nexus-scope": "plugin"
+                },
+                "stdDev": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Standard deviation of moisture values.",
+                  "x-nexus-scope": "plugin"
+                },
+                "min": {
+                  "type": "number",
+                  "description": "Minimum observed value in layer units.",
+                  "x-nexus-scope": "plugin"
+                },
+                "max": {
+                  "type": "number",
+                  "description": "Maximum observed value in layer units.",
+                  "x-nexus-scope": "plugin"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

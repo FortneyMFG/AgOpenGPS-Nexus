@@ -119,6 +119,25 @@ public sealed class WeatherIngestPipelineTests
     }
 
     [Fact]
+    public async Task IngestAsync_PublishesHeartbeatAfterIntervalEvenWhenUnchanged()
+    {
+        var baseTime = new DateTimeOffset(2024, 4, 1, 8, 0, 0, TimeSpan.Zero);
+        var pipeline = CreatePipeline(options => options.MinimumPublishInterval = TimeSpan.FromMinutes(10));
+
+        var first = CreateBaseSample(baseTime);
+        var unchanged = CreateBaseSample(baseTime.AddMinutes(10));
+
+        var initial = await pipeline.IngestAsync(first);
+        initial.Should().NotBeNull();
+
+        var heartbeat = await pipeline.IngestAsync(unchanged);
+
+        heartbeat.Should().NotBeNull();
+        heartbeat!.CapturedAt.Should().Be(unchanged.CapturedAt);
+        heartbeat.Source.Should().Be(unchanged.Source);
+    }
+
+    [Fact]
     public async Task IngestAsync_IgnoresStaleSamples()
     {
         var pipeline = CreatePipeline();

@@ -79,9 +79,12 @@ public sealed class SectionIoOrchestrator
             var publishPending = _inFlightMask.HasValue;
             var inFlightMatches = publishPending && _inFlightMask.Value == mask;
 
-            if (lastMatches && (!publishPending || inFlightMatches))
+            if (lastMatches)
             {
-                return;
+                if (!publishPending || inFlightMatches)
+                {
+                    return;
+                }
             }
 
             if (!lastMatches && inFlightMatches)

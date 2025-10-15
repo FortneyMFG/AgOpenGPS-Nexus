@@ -23,6 +23,17 @@ message Header {
 
   // Free-form source identifier (e.g. "sim", "gps", "autosteer").
   string source = 4;
+
+  // Optional job identifier associated with the telemetry entry. Aligns with
+  // ADR-041 session lifecycle provenance requirements.
+  string job_id = 5;
+
+  // Optional session identifier for the telemetry sample. Enables
+  // deterministic session replay boundaries.
+  string session_id = 6;
+
+  // Optional season identifier linked to the active job context.
+  string season_id = 7;
 }
 
 // Pose represents the fused navigation solution for the vehicle in WGS84 and

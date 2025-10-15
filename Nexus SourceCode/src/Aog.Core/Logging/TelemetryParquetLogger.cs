@@ -60,31 +60,31 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         var poseWriter = await ParquetTopicWriter<Pose>.CreateAsync(
             options.ResolvePath(options.PoseFileName),
             TelemetryParquetSchemas.Pose.Schema,
-            TelemetryParquetRowBuilder.CreatePoseColumns,
+            TelemetryParquetRowBuilder.CreatePoseColumns(options),
             cancellationToken).ConfigureAwait(false);
 
         var imuWriter = await ParquetTopicWriter<Imu>.CreateAsync(
             options.ResolvePath(options.ImuFileName),
             TelemetryParquetSchemas.Imu.Schema,
-            TelemetryParquetRowBuilder.CreateImuColumns,
+            TelemetryParquetRowBuilder.CreateImuColumns(options),
             cancellationToken).ConfigureAwait(false);
 
         var canWriter = await ParquetTopicWriter<CanFrame>.CreateAsync(
             options.ResolvePath(options.CanFileName),
             TelemetryParquetSchemas.Can.Schema,
-            TelemetryParquetRowBuilder.CreateCanColumns,
+            TelemetryParquetRowBuilder.CreateCanColumns(options),
             cancellationToken).ConfigureAwait(false);
 
         var ioWriter = await ParquetTopicWriter<SectionMask>.CreateAsync(
             options.ResolvePath(options.IoFileName),
             TelemetryParquetSchemas.Io.Schema,
-            TelemetryParquetRowBuilder.CreateIoColumns,
+            TelemetryParquetRowBuilder.CreateIoColumns(options),
             cancellationToken).ConfigureAwait(false);
 
         var pluginWriter = await ParquetTopicWriter<PluginTelemetryEvent>.CreateAsync(
             options.ResolvePath(options.PluginFileName),
             TelemetryParquetSchemas.Plugin.Schema,
-            TelemetryParquetRowBuilder.CreatePluginColumns,
+            TelemetryParquetRowBuilder.CreatePluginColumns(options),
             cancellationToken).ConfigureAwait(false);
 
         var subscriptions = new List<IDisposable>
@@ -150,6 +150,23 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         /// File name for plugin-published payloads.
         /// </summary>
         public string PluginFileName { get; init; } = "plugin.parquet";
+
+        /// <summary>
+        /// Optional job identifier used to populate telemetry provenance when
+        /// message headers do not specify one. Aligns with ADR-041.
+        /// </summary>
+        public string? JobId { get; init; }
+
+        /// <summary>
+        /// Optional session identifier stamped onto each telemetry row when
+        /// available.
+        /// </summary>
+        public string? SessionId { get; init; }
+
+        /// <summary>
+        /// Optional season identifier associated with the active job context.
+        /// </summary>
+        public string? SeasonId { get; init; }
 
         internal void Validate()
         {
@@ -252,6 +269,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
             public static readonly DataField<string?> Frame = new("frame");
             public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<string?> JobId = new("job_id");
+            public static readonly DataField<string?> SeasonId = new("season_id");
+            public static readonly DataField<string?> SessionId = new("session_id");
             public static readonly DataField<double> LatitudeDeg = new("latitude_deg");
             public static readonly DataField<double> LongitudeDeg = new("longitude_deg");
             public static readonly DataField<double> AltitudeM = new("altitude_m");
@@ -265,6 +285,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                 Timestamp,
                 Frame,
                 Source,
+                JobId,
+                SeasonId,
+                SessionId,
                 LatitudeDeg,
                 LongitudeDeg,
                 AltitudeM,
@@ -281,6 +304,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
             public static readonly DataField<string?> Frame = new("frame");
             public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<string?> JobId = new("job_id");
+            public static readonly DataField<string?> SeasonId = new("season_id");
+            public static readonly DataField<string?> SessionId = new("session_id");
             public static readonly DataField<double> AccelXMps2 = new("accel_x_mps2");
             public static readonly DataField<double> AccelYMps2 = new("accel_y_mps2");
             public static readonly DataField<double> AccelZMps2 = new("accel_z_mps2");
@@ -296,6 +322,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                 Timestamp,
                 Frame,
                 Source,
+                JobId,
+                SeasonId,
+                SessionId,
                 AccelXMps2,
                 AccelYMps2,
                 AccelZMps2,
@@ -314,6 +343,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
             public static readonly DataField<string?> Frame = new("frame");
             public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<string?> JobId = new("job_id");
+            public static readonly DataField<string?> SeasonId = new("season_id");
+            public static readonly DataField<string?> SessionId = new("session_id");
             public static readonly DataField<uint> ArbitrationId = new("arbitration_id");
             public static readonly DataField<byte[]?> Payload = new("payload");
             public static readonly DataField<bool> IsExtendedId = new("is_extended_id");
@@ -323,6 +355,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                 Timestamp,
                 Frame,
                 Source,
+                JobId,
+                SeasonId,
+                SessionId,
                 ArbitrationId,
                 Payload,
                 IsExtendedId,
@@ -335,6 +370,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
             public static readonly DataField<string?> Frame = new("frame");
             public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<string?> JobId = new("job_id");
+            public static readonly DataField<string?> SeasonId = new("season_id");
+            public static readonly DataField<string?> SessionId = new("session_id");
             public static readonly DataField<uint> SectionCount = new("section_count");
             public static readonly DataField<uint> Mask = new("mask");
             public static readonly Schema Schema = new(
@@ -342,6 +380,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                 Timestamp,
                 Frame,
                 Source,
+                JobId,
+                SeasonId,
+                SessionId,
                 SectionCount,
                 Mask);
         }
@@ -351,6 +392,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DataField<ulong> Sequence = new("sequence");
             public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
             public static readonly DataField<string?> Source = new("source");
+            public static readonly DataField<string?> JobId = new("job_id");
+            public static readonly DataField<string?> SeasonId = new("season_id");
+            public static readonly DataField<string?> SessionId = new("session_id");
             public static readonly DataField<string> PluginId = new("plugin_id");
             public static readonly DataField<string> Topic = new("topic");
             public static readonly DataField<byte[]?> Payload = new("payload");
@@ -358,6 +402,9 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                 Sequence,
                 Timestamp,
                 Source,
+                JobId,
+                SeasonId,
+                SessionId,
                 PluginId,
                 Topic,
                 Payload);
@@ -366,91 +413,111 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
 
     private static class TelemetryParquetRowBuilder
     {
-        public static DataColumn[] CreatePoseColumns(Pose message)
-        {
-            var header = message.Header;
-            return new[]
+        public static Func<Pose, DataColumn[]> CreatePoseColumns(TelemetryParquetLoggerOptions options)
+            => message =>
             {
-                HeaderColumns.Sequence(TelemetryParquetSchemas.Pose.Sequence, header),
-                HeaderColumns.Timestamp(TelemetryParquetSchemas.Pose.Timestamp, header),
-                HeaderColumns.Frame(TelemetryParquetSchemas.Pose.Frame, header),
-                HeaderColumns.Source(TelemetryParquetSchemas.Pose.Source, header),
-                new DataColumn(TelemetryParquetSchemas.Pose.LatitudeDeg, new[] { message.LatitudeDeg }),
-                new DataColumn(TelemetryParquetSchemas.Pose.LongitudeDeg, new[] { message.LongitudeDeg }),
-                new DataColumn(TelemetryParquetSchemas.Pose.AltitudeM, new[] { message.AltitudeM }),
-                new DataColumn(TelemetryParquetSchemas.Pose.HeadingRad, new[] { message.HeadingRad }),
-                new DataColumn(TelemetryParquetSchemas.Pose.RollRad, new[] { message.RollRad }),
-                new DataColumn(TelemetryParquetSchemas.Pose.PitchRad, new[] { message.PitchRad }),
-                new DataColumn(TelemetryParquetSchemas.Pose.SpeedMps, new[] { message.SpeedMps }),
-                new DataColumn(TelemetryParquetSchemas.Pose.YawRateRadps, new[] { message.YawRateRadps })
+                var header = message.Header;
+                return new[]
+                {
+                    HeaderColumns.Sequence(TelemetryParquetSchemas.Pose.Sequence, header),
+                    HeaderColumns.Timestamp(TelemetryParquetSchemas.Pose.Timestamp, header),
+                    HeaderColumns.Frame(TelemetryParquetSchemas.Pose.Frame, header),
+                    HeaderColumns.Source(TelemetryParquetSchemas.Pose.Source, header),
+                    HeaderColumns.JobId(TelemetryParquetSchemas.Pose.JobId, header, options),
+                    HeaderColumns.SeasonId(TelemetryParquetSchemas.Pose.SeasonId, header, options),
+                    HeaderColumns.SessionId(TelemetryParquetSchemas.Pose.SessionId, header, options),
+                    new DataColumn(TelemetryParquetSchemas.Pose.LatitudeDeg, new[] { message.LatitudeDeg }),
+                    new DataColumn(TelemetryParquetSchemas.Pose.LongitudeDeg, new[] { message.LongitudeDeg }),
+                    new DataColumn(TelemetryParquetSchemas.Pose.AltitudeM, new[] { message.AltitudeM }),
+                    new DataColumn(TelemetryParquetSchemas.Pose.HeadingRad, new[] { message.HeadingRad }),
+                    new DataColumn(TelemetryParquetSchemas.Pose.RollRad, new[] { message.RollRad }),
+                    new DataColumn(TelemetryParquetSchemas.Pose.PitchRad, new[] { message.PitchRad }),
+                    new DataColumn(TelemetryParquetSchemas.Pose.SpeedMps, new[] { message.SpeedMps }),
+                    new DataColumn(TelemetryParquetSchemas.Pose.YawRateRadps, new[] { message.YawRateRadps })
+                };
             };
-        }
 
-        public static DataColumn[] CreateImuColumns(Imu message)
-        {
-            var header = message.Header;
-            return new[]
+        public static Func<Imu, DataColumn[]> CreateImuColumns(TelemetryParquetLoggerOptions options)
+            => message =>
             {
-                HeaderColumns.Sequence(TelemetryParquetSchemas.Imu.Sequence, header),
-                HeaderColumns.Timestamp(TelemetryParquetSchemas.Imu.Timestamp, header),
-                HeaderColumns.Frame(TelemetryParquetSchemas.Imu.Frame, header),
-                HeaderColumns.Source(TelemetryParquetSchemas.Imu.Source, header),
-                new DataColumn(TelemetryParquetSchemas.Imu.AccelXMps2, new[] { message.AccelXMps2 }),
-                new DataColumn(TelemetryParquetSchemas.Imu.AccelYMps2, new[] { message.AccelYMps2 }),
-                new DataColumn(TelemetryParquetSchemas.Imu.AccelZMps2, new[] { message.AccelZMps2 }),
-                new DataColumn(TelemetryParquetSchemas.Imu.GyroXRadps, new[] { message.GyroXRadps }),
-                new DataColumn(TelemetryParquetSchemas.Imu.GyroYRadps, new[] { message.GyroYRadps }),
-                new DataColumn(TelemetryParquetSchemas.Imu.GyroZRadps, new[] { message.GyroZRadps }),
-                new DataColumn(TelemetryParquetSchemas.Imu.MagXUt, new[] { message.MagXUt }),
-                new DataColumn(TelemetryParquetSchemas.Imu.MagYUt, new[] { message.MagYUt }),
-                new DataColumn(TelemetryParquetSchemas.Imu.MagZUt, new[] { message.MagZUt }),
-                new DataColumn(TelemetryParquetSchemas.Imu.TemperatureC, new[] { message.TemperatureC })
+                var header = message.Header;
+                return new[]
+                {
+                    HeaderColumns.Sequence(TelemetryParquetSchemas.Imu.Sequence, header),
+                    HeaderColumns.Timestamp(TelemetryParquetSchemas.Imu.Timestamp, header),
+                    HeaderColumns.Frame(TelemetryParquetSchemas.Imu.Frame, header),
+                    HeaderColumns.Source(TelemetryParquetSchemas.Imu.Source, header),
+                    HeaderColumns.JobId(TelemetryParquetSchemas.Imu.JobId, header, options),
+                    HeaderColumns.SeasonId(TelemetryParquetSchemas.Imu.SeasonId, header, options),
+                    HeaderColumns.SessionId(TelemetryParquetSchemas.Imu.SessionId, header, options),
+                    new DataColumn(TelemetryParquetSchemas.Imu.AccelXMps2, new[] { message.AccelXMps2 }),
+                    new DataColumn(TelemetryParquetSchemas.Imu.AccelYMps2, new[] { message.AccelYMps2 }),
+                    new DataColumn(TelemetryParquetSchemas.Imu.AccelZMps2, new[] { message.AccelZMps2 }),
+                    new DataColumn(TelemetryParquetSchemas.Imu.GyroXRadps, new[] { message.GyroXRadps }),
+                    new DataColumn(TelemetryParquetSchemas.Imu.GyroYRadps, new[] { message.GyroYRadps }),
+                    new DataColumn(TelemetryParquetSchemas.Imu.GyroZRadps, new[] { message.GyroZRadps }),
+                    new DataColumn(TelemetryParquetSchemas.Imu.MagXUt, new[] { message.MagXUt }),
+                    new DataColumn(TelemetryParquetSchemas.Imu.MagYUt, new[] { message.MagYUt }),
+                    new DataColumn(TelemetryParquetSchemas.Imu.MagZUt, new[] { message.MagZUt }),
+                    new DataColumn(TelemetryParquetSchemas.Imu.TemperatureC, new[] { message.TemperatureC })
+                };
             };
-        }
 
-        public static DataColumn[] CreateCanColumns(CanFrame message)
-        {
-            var header = message.Header;
-            return new[]
+        public static Func<CanFrame, DataColumn[]> CreateCanColumns(TelemetryParquetLoggerOptions options)
+            => message =>
             {
-                HeaderColumns.Sequence(TelemetryParquetSchemas.Can.Sequence, header),
-                HeaderColumns.Timestamp(TelemetryParquetSchemas.Can.Timestamp, header),
-                HeaderColumns.Frame(TelemetryParquetSchemas.Can.Frame, header),
-                HeaderColumns.Source(TelemetryParquetSchemas.Can.Source, header),
-                new DataColumn(TelemetryParquetSchemas.Can.ArbitrationId, new[] { message.ArbitrationId }),
-                new DataColumn(TelemetryParquetSchemas.Can.Payload, new byte[]?[] { message.Payload.Length == 0 ? Array.Empty<byte>() : message.Payload.ToByteArray() }),
-                new DataColumn(TelemetryParquetSchemas.Can.IsExtendedId, new[] { message.IsExtendedId }),
-                new DataColumn(TelemetryParquetSchemas.Can.IsRemoteRequest, new[] { message.IsRemoteRequest })
+                var header = message.Header;
+                return new[]
+                {
+                    HeaderColumns.Sequence(TelemetryParquetSchemas.Can.Sequence, header),
+                    HeaderColumns.Timestamp(TelemetryParquetSchemas.Can.Timestamp, header),
+                    HeaderColumns.Frame(TelemetryParquetSchemas.Can.Frame, header),
+                    HeaderColumns.Source(TelemetryParquetSchemas.Can.Source, header),
+                    HeaderColumns.JobId(TelemetryParquetSchemas.Can.JobId, header, options),
+                    HeaderColumns.SeasonId(TelemetryParquetSchemas.Can.SeasonId, header, options),
+                    HeaderColumns.SessionId(TelemetryParquetSchemas.Can.SessionId, header, options),
+                    new DataColumn(TelemetryParquetSchemas.Can.ArbitrationId, new[] { message.ArbitrationId }),
+                    new DataColumn(TelemetryParquetSchemas.Can.Payload, new byte[]?[] { message.Payload.Length == 0 ? Array.Empty<byte>() : message.Payload.ToByteArray() }),
+                    new DataColumn(TelemetryParquetSchemas.Can.IsExtendedId, new[] { message.IsExtendedId }),
+                    new DataColumn(TelemetryParquetSchemas.Can.IsRemoteRequest, new[] { message.IsRemoteRequest })
+                };
             };
-        }
 
-        public static DataColumn[] CreateIoColumns(SectionMask message)
-        {
-            var header = message.Header;
-            return new[]
+        public static Func<SectionMask, DataColumn[]> CreateIoColumns(TelemetryParquetLoggerOptions options)
+            => message =>
             {
-                HeaderColumns.Sequence(TelemetryParquetSchemas.Io.Sequence, header),
-                HeaderColumns.Timestamp(TelemetryParquetSchemas.Io.Timestamp, header),
-                HeaderColumns.Frame(TelemetryParquetSchemas.Io.Frame, header),
-                HeaderColumns.Source(TelemetryParquetSchemas.Io.Source, header),
-                new DataColumn(TelemetryParquetSchemas.Io.SectionCount, new[] { message.SectionCount }),
-                new DataColumn(TelemetryParquetSchemas.Io.Mask, new[] { message.Mask })
+                var header = message.Header;
+                return new[]
+                {
+                    HeaderColumns.Sequence(TelemetryParquetSchemas.Io.Sequence, header),
+                    HeaderColumns.Timestamp(TelemetryParquetSchemas.Io.Timestamp, header),
+                    HeaderColumns.Frame(TelemetryParquetSchemas.Io.Frame, header),
+                    HeaderColumns.Source(TelemetryParquetSchemas.Io.Source, header),
+                    HeaderColumns.JobId(TelemetryParquetSchemas.Io.JobId, header, options),
+                    HeaderColumns.SeasonId(TelemetryParquetSchemas.Io.SeasonId, header, options),
+                    HeaderColumns.SessionId(TelemetryParquetSchemas.Io.SessionId, header, options),
+                    new DataColumn(TelemetryParquetSchemas.Io.SectionCount, new[] { message.SectionCount }),
+                    new DataColumn(TelemetryParquetSchemas.Io.Mask, new[] { message.Mask })
+                };
             };
-        }
 
-        public static DataColumn[] CreatePluginColumns(PluginTelemetryEvent message)
-        {
-            var header = message.Header;
-            return new[]
+        public static Func<PluginTelemetryEvent, DataColumn[]> CreatePluginColumns(TelemetryParquetLoggerOptions options)
+            => message =>
             {
-                HeaderColumns.Sequence(TelemetryParquetSchemas.Plugin.Sequence, header),
-                HeaderColumns.Timestamp(TelemetryParquetSchemas.Plugin.Timestamp, header),
-                HeaderColumns.Source(TelemetryParquetSchemas.Plugin.Source, header),
-                new DataColumn(TelemetryParquetSchemas.Plugin.PluginId, new[] { HeaderColumns.NormalizeString(message.PluginId) ?? string.Empty }),
-                new DataColumn(TelemetryParquetSchemas.Plugin.Topic, new[] { HeaderColumns.NormalizeString(message.Topic) ?? string.Empty }),
-                new DataColumn(TelemetryParquetSchemas.Plugin.Payload, new byte[]?[] { message.Payload.Length == 0 ? Array.Empty<byte>() : message.Payload.ToArray() })
+                var header = message.Header;
+                return new[]
+                {
+                    HeaderColumns.Sequence(TelemetryParquetSchemas.Plugin.Sequence, header),
+                    HeaderColumns.Timestamp(TelemetryParquetSchemas.Plugin.Timestamp, header),
+                    HeaderColumns.Source(TelemetryParquetSchemas.Plugin.Source, header),
+                    HeaderColumns.JobId(TelemetryParquetSchemas.Plugin.JobId, header, options),
+                    HeaderColumns.SeasonId(TelemetryParquetSchemas.Plugin.SeasonId, header, options),
+                    HeaderColumns.SessionId(TelemetryParquetSchemas.Plugin.SessionId, header, options),
+                    new DataColumn(TelemetryParquetSchemas.Plugin.PluginId, new[] { HeaderColumns.NormalizeString(message.PluginId) ?? string.Empty }),
+                    new DataColumn(TelemetryParquetSchemas.Plugin.Topic, new[] { HeaderColumns.NormalizeString(message.Topic) ?? string.Empty }),
+                    new DataColumn(TelemetryParquetSchemas.Plugin.Payload, new byte[]?[] { message.Payload.Length == 0 ? Array.Empty<byte>() : message.Payload.ToArray() })
+                };
             };
-        }
 
         private static class HeaderColumns
         {
@@ -465,6 +532,15 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
 
             public static DataColumn Source(DataField<string?> field, Header? header)
                 => new(field, new[] { NormalizeString(header?.Source) });
+
+            public static DataColumn JobId(DataField<string?> field, Header? header, TelemetryParquetLoggerOptions options)
+                => new(field, new[] { ResolveContext(header?.JobId, options.JobId) });
+
+            public static DataColumn SeasonId(DataField<string?> field, Header? header, TelemetryParquetLoggerOptions options)
+                => new(field, new[] { ResolveContext(header?.SeasonId, options.SeasonId) });
+
+            public static DataColumn SessionId(DataField<string?> field, Header? header, TelemetryParquetLoggerOptions options)
+                => new(field, new[] { ResolveContext(header?.SessionId, options.SessionId) });
 
             private static DateTime? NormalizeTimestamp(Timestamp? timestamp)
             {
@@ -487,6 +563,12 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                 }
 
                 return value;
+            }
+
+            private static string? ResolveContext(string? headerValue, string? fallback)
+            {
+                var normalized = NormalizeString(headerValue);
+                return normalized ?? NormalizeString(fallback);
             }
         }
     }

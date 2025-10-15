@@ -97,7 +97,7 @@ jobs:
           mkdir -p dist
           shopt -s nullglob globstar
           found=0
-          for file in release/artifacts/**/AgOpenGPS.Nexus*; do
+          for file in release/**/AgOpenGPS.Nexus*; do
             if [ -f "$file" ]; then
               cp "$file" dist/
               found=1

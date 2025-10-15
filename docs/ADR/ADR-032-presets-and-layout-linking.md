@@ -3,6 +3,10 @@
 ## Status
 Proposed
 
+**Relevant Plugin(s):** UI Shell (Presets), Device Manager, Mapping, Autosteer, Section Control, Rate Control, Job Tasks, Variable Mapping
+
+
+
 ## Context
 Operators need to rapidly switch between tractor + implement combinations while preserving UI layouts and long-running preparation tasks. Current workflows require manual tweaking of machine profiles, implement settings, and screen layouts each time the job type changes (planting, spraying, harvest). This is error-prone, delays fieldwork, and causes layout drift when improvements are not propagated across machines. The UI also lacks a way to expose progress for the background jobs triggered when configurations change.
 

@@ -3,6 +3,9 @@
 ## Status
 Drafting (target review window: 2025-12-05 week)
 
+**Relevant Plugin(s):** Autosteer, Guidance Planner, Mapping, Section Control
+
+
 ## Context
 Accurate guidance and control require kinematic models that describe tractor, implement, and hitch behavior. Legacy profiles provide limited geometry, leading to inconsistent PoseStream projections and autosteer hand-offs. ADR-017 defines the profile schema, kinematic models, and sensor fusion expectations so ADR-033 guidance and ADR-008 hierarchy share a consistent foundation.
 

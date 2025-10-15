@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-12-22 week)
 
+**Relevant Plugin(s):** Mapping, Variable Mapping, Telemetry Logging, Job Tasks, UI Shell
+
+
+
 ## Context
 Field deployments accumulate large PoseStream, tile, and derived datasets that must comply with retention, privacy, and storage constraints. Without coordinated lifecycle policies, devices risk running out of space or violating retention rules. ADR-025 defines storage management expectations aligned with ADR-009 persistence, ADR-019 provenance, and ADR-020 determinism workflows.
 

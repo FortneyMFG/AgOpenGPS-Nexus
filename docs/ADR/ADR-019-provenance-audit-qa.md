@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-12-12 week)
 
+**Relevant Plugin(s):** Mapping, Variable Mapping, Telemetry Logging, Job Tasks, UI Shell
+
+
+
 ## Context
 As Nexus orchestrates multi-layer analytics and prescriptions, the platform must track provenance, quality status, and audit trails across storage, UI, and export pipelines. Current workflows lack unified identifiers and hash checks, making compliance reporting and troubleshooting difficult. ADR-019 defines provenance registry expectations aligned with ADR-023 session models, ADR-013 derived products, and ADR-009 persistence.
 

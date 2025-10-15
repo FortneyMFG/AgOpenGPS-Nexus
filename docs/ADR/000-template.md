@@ -3,6 +3,9 @@
 ## Status
 Proposed | Accepted | Superseded | Deprecated
 
+**Relevant Plugin(s):** List the concrete plugin areas this decision impacts (e.g., Mapping, Autosteer, Rate Control, Device Manager) or set to Full Stack if platform-wide.
+
+
 ## Context
 What problem are we solving? Reference sections/options/requirements.
 

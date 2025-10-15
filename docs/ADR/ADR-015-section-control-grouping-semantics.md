@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-11-08 week)
 
+**Relevant Plugin(s):** Section Control, Rate Control, Autosteer, Mapping, Device Manager, Variable Mapping
+
+
+
 ## Context
 Nexus needs deterministic section control behavior that honors manual overrides, automation, and plugin contributions while managing overlapping groups and toolbar-level lookahead. Legacy systems rely on ad-hoc priority rules and offer limited observability. ADR-015 defines the control graph and arbitration rules aligned with ADR-008 hierarchy, ADR-007 PoseStream cadence, and ADR-018 plugin capabilities.
 

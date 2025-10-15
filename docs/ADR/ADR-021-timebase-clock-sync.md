@@ -3,6 +3,9 @@
 ## Status
 Drafting (target review window: 2025-12-18 week)
 
+**Relevant Plugin(s):** Autosteer, Section Control, Rate Control, Mapping, AgIO Host Services, GNSS/IMU Fusion, NTRIP Client
+
+
 ## Context
 Deterministic PoseStream sequencing, automation timing, and telemetry diagnostics require a canonical timebase across Core, plugins, and firmware. Without defined drift detection and reconciliation, distributed nodes risk sequence breaks and latency violations. ADR-021 sets the clock authority, synchronization strategy, and diagnostic expectations aligned with ADR-007 PoseStream, ADR-016 firmware transport, and ADR-020 determinism checks.
 

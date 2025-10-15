@@ -3,6 +3,10 @@
 ## Status
 Proposed
 
+**Relevant Plugin(s):** Mapping, Variable Mapping, Rate Control, Section Control, Telemetry Logging
+
+
+
 ## Context
 Guidance, section control, and variable-rate features all require spatial queries, yet many rigs operate without GNSS hardware or only need speed-based automation. Today the legacy mapping stack is bundled into the runtime, coupling UI overlays, layer math, and file import pipelines to Core releases.【F:docs/aog-v6-mapping-brief.md†L10-L53】 The team also wants to iterate on new layer formats (ISOXML, GeoJSON, GeoTIFF) and mapping algorithms without breaking Core’s determinism guarantees or bloating deployments that run headless. A dedicated ADR is needed to define the split between a lean geospatial kernel that ships with Core and pluggable mapping engines that can evolve independently.
 

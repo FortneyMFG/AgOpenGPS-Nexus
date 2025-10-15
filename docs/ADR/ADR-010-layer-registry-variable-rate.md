@@ -3,6 +3,10 @@
 ## Status
 Drafting (target review window: 2025-11-05 week)
 
+**Relevant Plugin(s):** Mapping, Variable Mapping, Rate Control, Section Control, Planter Monitor, Telemetry Logging
+
+
+
 ## Context
 Variable-rate workflows, analytics, and dashboards require a canonical catalog of layers with defined units, precision, and discovery metadata. Nexus currently lacks a central registry, forcing plugins and UI code to hard-code identifiers and color ramps. ADR-010 introduces the LayerDefinition schema and supporting tooling so mapping, presets, and capability manifests align on consistent metadata while remaining compatible with ADR-009 persistence and ADR-031 manifest governance.
 

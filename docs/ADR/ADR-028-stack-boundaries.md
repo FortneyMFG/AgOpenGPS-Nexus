@@ -3,6 +3,9 @@
 ## Status
 Accepted
 
+**Relevant Plugin(s):** Full Stack
+
+
 ## Context
 Contributors requested a single reference that maps how firmware, hardware services, the Core runtime, and feature plugins divide responsibilities so features can be planned without blurring safety and contract boundaries. Existing SRS sections and ADRs already define expectations for transports, hardware governance, and plugin lifecycle, but they are scattered across documents, making it easy to misplace functionality or duplicate work.【F:docs/SRS/sections/03_Comm_Transports.md†L3-L35】【F:docs/SRS/sections/06_Hardware_IO.md†L3-L27】【F:docs/ADR/ADR-018-plugin-api.md†L6-L34】
 

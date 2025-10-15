@@ -3,6 +3,9 @@
 ## Status
 Drafting (target review window: 2025-12-15 week)
 
+**Relevant Plugin(s):** Device Manager, AgIO Host Services, Autosteer, Section Control, Rate Control, Mapping, Telemetry Logging
+
+
 ## Context
 Multiple controllers, plugins, and firmware nodes must discover each other, exchange capabilities, and present operator-friendly identities across transports. Current discovery flows lack consistent naming, leases, and security posture, creating confusion and risk in multi-node rigs. ADR-024 defines discovery, identity, and security expectations aligned with ADR-018 plugin API, ADR-016 firmware transports, and ADR-031 manifest governance.
 

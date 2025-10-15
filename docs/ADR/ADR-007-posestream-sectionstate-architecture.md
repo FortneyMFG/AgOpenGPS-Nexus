@@ -3,6 +3,9 @@
 ## Status
 In Review (target sign-off window: 2025-10-24 week)
 
+**Relevant Plugin(s):** Mapping, Variable Mapping, Autosteer, Section Control, Rate Control, Telemetry Logging
+
+
 ## Context
 Nexus requires a single authoritative timeline that carries tractor, implement, toolbar, and section poses alongside diffed SectionState updates. Existing prototypes rely on disparate logs and cadence assumptions that break determinism, complicate automation gating, and make replay analysis inconsistent. ADR-007 formalizes PoseStream expectations so downstream ADRs for equipment hierarchy, persistence, guidance, and control share the same temporal guarantees while inheriting stack boundaries set by ADR-028.
 

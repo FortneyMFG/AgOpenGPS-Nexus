@@ -3,6 +3,9 @@
 ## Status
 Drafting (target review window: 2026-01-09 week)
 
+**Relevant Plugin(s):** Full Stack
+
+
 ## Context
 As Nexus integrates PoseStream, controllers, and visualization pipelines, performance regressions can undermine determinism and usability. The platform needs explicit CPU, IO, and FPS budgets tied to instrumentation and CI alerts. ADR-026 formalizes performance targets leveraging ADR-020 determinism guardrails, ADR-021 timebase insights, and ADR-025 data lifecycle expectations.
 

@@ -3,6 +3,9 @@
 ## Status
 Accepted
 
+**Relevant Plugin(s):** Full Stack
+
+
 ## Context
 The Nexus runtime needs a unified, typed inter-process API that Core, UI, plugins, and automation tools can share while remaining portable across Windows and Linux deployments. Options exploration highlights gRPC/protobuf surfaces published via `Aog.Abstractions` as the preferred evolution path because it isolates hardware integration details inside AgIO/Bridge services and lets higher-level processes communicate over a consistent contract surface.【F:docs/SRS/sections/03_Comm_Transports.md†L4-L58】【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L36】 Contributors also want determinism, versioning, and compatibility bridges while introducing new transports.【F:docs/SRS/sections/03_Comm_Transports.md†L26-L60】【F:docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】 The MCU communications stack is now defined separately by ADR-006 (AOG-Link) so this decision focuses strictly on intra-host service boundaries.
 

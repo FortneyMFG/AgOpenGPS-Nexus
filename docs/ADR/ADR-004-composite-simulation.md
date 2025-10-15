@@ -3,6 +3,9 @@
 ## Status
 Accepted
 
+**Relevant Plugin(s):** Simulation & Replay providers, Mapping, Autosteer, Section Control, Rate Control, Telemetry Logging
+
+
 ## Context
 Nexus development depends on deterministic simulation for CI, operator training, and plugin validation. The backend and extensibility sections highlight the need for a composite simulation loop where Core owns the authoritative clock, plugins publish to a shared bus, and hardware inputs can pre-empt simulated data without duplicating routing logic.【F:docs/SRS/sections/04_Backend_Services.md†L1-L70】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L18-L71】 Option O-STACK-1 reinforces this model by positioning AgIO’s simulation backend alongside Windows and Linux backends using the same contracts.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L47】
 

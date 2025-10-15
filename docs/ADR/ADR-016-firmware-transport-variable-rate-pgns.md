@@ -3,6 +3,9 @@
 ## Status
 Drafting (target review window: 2025-11-18 week)
 
+**Relevant Plugin(s):** Rate Control, Section Control, Variable Mapping, AgIO Host Services, Planter Monitor, ISOBUS Bridge
+
+
 ## Context
 Delivering layer definitions and feedback between Core, AgIO, and implement firmware requires deterministic CAN/UDP messages aligned with the new layer registry and section control semantics. Legacy PGNs do not cover registry hashes or degraded mode signaling. ADR-016 specifies the transport contracts so firmware, simulators, and the AgIO bridge can exchange variable-rate information with bounded latency.
 

@@ -3,6 +3,9 @@
 ## Status
 Accepted
 
+**Relevant Plugin(s):** UI Shell (Avalonia & Companion clients)
+
+
 ## Context
 Nexus must deliver a desktop experience that runs identically on Windows and Linux hosts while remaining touch-friendly and metadata-driven. The UI framework section documents the need for high-DPI scaling, multi-monitor layouts, and remote clients without abandoning existing operators.【F:docs/SRS/sections/02_Framework_UI.md†L1-L70】 Option O-STACK-1 describes Avalonia as the shared Windows/Linux UI toolkit aligned with the .NET 8 stack, and contributors favour it for reuse of C# expertise and deployability on Raspberry Pi-class hardware.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L47】【F:docs/SRS/sections/02_Framework_UI.md†L72-L83】
 

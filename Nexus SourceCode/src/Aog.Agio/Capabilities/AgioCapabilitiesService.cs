@@ -54,7 +54,18 @@ public sealed class AgioCapabilitiesService : CapabilitiesService.CapabilitiesSe
 
             if (_capabilitiesByName.TryGetValue(capability.Name, out var supported))
             {
-                response.AcceptedCapabilities.Add(supported.Clone());
+                if (supported.Equals(capability))
+                {
+                    response.AcceptedCapabilities.Add(supported.Clone());
+                }
+                else
+                {
+                    response.Rejections.Add(new CapabilityRejection
+                    {
+                        Capability = capability.Clone(),
+                        Reason = "Capability metadata mismatch between request and AGiO host.",
+                    });
+                }
             }
             else
             {

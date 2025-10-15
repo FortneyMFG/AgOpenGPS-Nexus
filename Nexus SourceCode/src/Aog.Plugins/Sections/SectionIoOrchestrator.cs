@@ -73,14 +73,12 @@ public sealed class SectionIoOrchestrator
             throw new ArgumentNullException(nameof(sections));
         }
 
-        var mask = _calculator.ComputeMask(speedMps, sections);
+        var computedMask = _calculator.ComputeMask(speedMps, sections);
+        uint mask;
 
         lock (_gate)
         {
-            if (!_constraintGate.SectionsAllowed)
-            {
-                mask = 0;
-            }
+            mask = _constraintGate.SectionsAllowed ? computedMask : 0u;
 
             if (_lastMask.HasValue && _lastMask.Value == mask)
             {

@@ -78,7 +78,14 @@ public sealed class SectionIoOrchestrator
             var lastMatches = _lastMask.HasValue && _lastMask.Value == mask;
             var inFlightMatches = _inFlightMask.HasValue && _inFlightMask.Value == mask;
 
-            if (inFlightMatches || (lastMatches && !_inFlightMask.HasValue))
+            if (lastMatches)
+            {
+                if (!_inFlightMask.HasValue || inFlightMatches)
+                {
+                    return;
+                }
+            }
+            else if (inFlightMatches)
             {
                 return;
             }

@@ -96,7 +96,7 @@ jobs:
         run: |
           mkdir -p dist
           shopt -s nullglob globstar
-          for file in release/AgOpenGPS.Nexus*; do
+          for file in release/AgOpenGPS.Nexus* release/**/AgOpenGPS.Nexus*; do
             if [ -f "$file" ]; then
               cp "$file" dist/
             fi

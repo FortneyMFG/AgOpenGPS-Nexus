@@ -124,6 +124,48 @@ Draft authors should reference the listed requirements and tasks before opening 
   - Schema registration handshake must reject mismatched layer hashes with actionable diagnostics and emit `LayerRegistryMismatch` telemetry verified across three replay fixtures.
   - Golden replay outputs from controllers must match analytical baselines within 0.5% per-channel variance over a 60-minute run (yield, rate, downforce).
 
+### ADR-040 — Season organizers
+- **Owner:** Core Owner — Lifecycle & Reporting pod
+- **Stage:** Drafting (target review window: 2025-03-28 week)
+- **Dependencies:** ADR-030 (job lifecycle services, proposed); ADR-029 (mapping plugin architecture) for shared storage layout
+- **Scope:** Introduce the `Season` entity as an optional organizer above jobs so planning tools and analytics can group work across farms while preserving historical date windows and optimizer state.【F:docs/ADR/ADR-040_SeasonOrganizers.md†L9-L52】
+- **Key decisions:** Season identity, job membership rules, optimizer state storage, navigation UX updates, and synchronization behavior across devices.【F:docs/ADR/ADR-040_SeasonOrganizers.md†L15-L52】
+- **SRS alignment:** Data model (§02 Season hierarchy), Job lifecycle (§03 Season-first navigation), Mapping & layers (§04 provenance scopes).【F:docs/SRS/sections/02_DataModel.md†L15-L92】【F:docs/SRS/sections/03_JobLifecycle.md†L12-L59】【F:docs/SRS/sections/04_MappingLayers.md†L10-L83】
+- **Primary requirements:** R-DATA-029…R-DATA-033 (job metadata + provenance), R-UX-010…R-UX-018 (navigator flows), R-ANL-010 (seasonal analytics).【F:docs/SRS/sections/02_DataModel.md†L95-L152】【F:docs/SRS/sections/03_JobLifecycle.md†L21-L74】
+- **Tasks:** Publish Season schema, add navigator Season step, update reporting filters, extend sync tooling, author migration scripts for existing jobs.【F:docs/ADR/ADR-040_SeasonOrganizers.md†L55-L73】
+- **Acceptance hooks:**
+  - Season-first navigator demo groups ≥3 jobs across ≥2 farms with correct filtering and breadcrumb updates.
+  - Analytics/export plugins accept a `seasonId` filter and produce scoped summaries in regression fixtures.
+  - Synchronization diff tests verify deduplicated `jobIds` and stable season metadata across round-trips.
+
+### ADR-041 — Job sessions
+- **Owner:** Core Owner — Lifecycle & UI pod
+- **Stage:** Drafting (target review window: 2025-04-04 week)
+- **Dependencies:** ADR-030 (job lifecycle services); ADR-032 (layer controllers) for session-scoped provenance
+- **Scope:** Replace legacy “runs” with structured sessions capturing environment, input, notes, and layer references with deterministic plugin hooks for start/stop flows.【F:docs/ADR/ADR-041_JobSessions.md†L9-L52】
+- **Key decisions:** Session storage layout (embedded vs. folder), metadata fields, autosave policy, journaling triggers, plugin hook shapes, and backwards-compatibility for jobs lacking session metadata.【F:docs/ADR/ADR-041_JobSessions.md†L15-L66】
+- **SRS alignment:** Data model (§02 Session entity), Job lifecycle (§03 session lifecycle & resume), Mapping & layers (§04 layer provenance + reuse).【F:docs/SRS/sections/02_DataModel.md†L40-L152】【F:docs/SRS/sections/03_JobLifecycle.md†L33-L92】【F:docs/SRS/sections/04_MappingLayers.md†L32-L132】
+- **Primary requirements:** R-DATA-029…R-DATA-031 (job metadata/journaling), R-DATA-017…R-DATA-018 (provenance), R-UX-015 (Start Session UX).【F:docs/SRS/sections/02_DataModel.md†L95-L152】【F:docs/SRS/sections/03_JobLifecycle.md†L33-L92】
+- **Tasks:** Implement session autosave, expose Start/End Session UI actions, publish plugin session hooks, migrate documentation and telemetry labels from Run to Session.【F:docs/ADR/ADR-041_JobSessions.md†L55-L73】
+- **Acceptance hooks:**
+  - Headless regression fixture demonstrates session start/end with autosave and journal checkpoints surviving crash recovery.
+  - Plugins under test receive `onSessionStart`/`onSessionEnd` events with correct `jobId`, `sessionId`, and `fieldIds` payloads.
+  - UI copy review confirms “Session” terminology replaces “Run” across lifecycle panels and reports.
+
+### ADR-043 — Multi-field job envelopes
+- **Owner:** Core Owner — Mapping & Lifecycle pod
+- **Stage:** Drafting (target review window: 2025-04-11 week)
+- **Dependencies:** ADR-029 (mapping plugin architecture), ADR-027 (spatial constraints) for shared geometry indexing
+- **Scope:** Permit jobs to mount multiple fields simultaneously, define the union envelope contract, and require per-field analytics rollups alongside aggregated coverage.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L63】
+- **Key decisions:** Storage of `fieldIds`, envelope union rules, per-field stats layout, plugin API expectations, and UI flows for multi-field selection and visualization.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L15-L75】
+- **SRS alignment:** Data model (§02 Farm→Field hierarchy), Job lifecycle (§03 mount/unmount events), Mapping & layers (§04 multi-field envelopes & stats).【F:docs/SRS/sections/02_DataModel.md†L15-L92】【F:docs/SRS/sections/03_JobLifecycle.md†L59-L112】【F:docs/SRS/sections/04_MappingLayers.md†L10-L132】
+- **Primary requirements:** R-DATA-026…R-DATA-031 (geometry + job metadata), R-MAP-015…R-MAP-028 (multi-field mapping), R-UX-020 (multi-field selection UX).【F:docs/SRS/sections/02_DataModel.md†L95-L152】【F:docs/SRS/sections/03_JobLifecycle.md†L59-L112】【F:docs/SRS/sections/04_MappingLayers.md†L83-L132】
+- **Tasks:** Update job schema, extend mapping plugin API for `mountFields`, build per-field stat aggregation, update analytics exports, and deliver multi-field navigator UX flows.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L47-L75】
+- **Acceptance hooks:**
+  - Mapping plugin regression renders continuous coverage across two adjacent fields without reopening the job and reports per-field stats.
+  - Analytics/export plugins emit season/job/session scoped outputs that honor per-field aggregates.
+  - Performance harness shows union envelope queries staying within ≤ 25 ms p95 under 10-field mounts.
+
 ### ADR-033 — Guidance planner & autosteer orchestration
 - **Owner:** Core Owner — Guidance & Autonomy pod
 - **Stage:** Drafting (target review window: 2025-11-21 week)

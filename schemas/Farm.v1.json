@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/Farm.v1.json",
+  "title": "Farm.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "createdBy", "createdAt", "lastModifiedAt"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$",
+      "default": "1.0.0",
+      "description": "Schema semantic version for farm documents.",
+      "x-nexus-scope": "core"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^farm:[A-Za-z0-9._-]+$",
+      "description": "Stable farm identifier scoped to the operator's organization.",
+      "x-nexus-scope": "core"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display name presented in navigators and reports.",
+      "x-nexus-scope": "core"
+    },
+    "assets": {
+      "type": "array",
+      "description": "Imagery or shared geometry assets referenced by fields belonging to the farm.",
+      "x-nexus-scope": "core",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "uri"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^asset:[A-Za-z0-9._:-]+$",
+            "description": "Optional identifier used for provenance tracking.",
+            "x-nexus-scope": "core"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["imagery", "elevation", "vector"],
+            "description": "Asset category used for tooling hints.",
+            "x-nexus-scope": "core"
+          },
+          "uri": {
+            "type": "string",
+            "format": "uri-reference",
+            "description": "Location of the asset (relative path, file URI, or remote URL).",
+            "x-nexus-scope": "core"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Operator notes about the asset provenance or usage.",
+            "x-nexus-scope": "core"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Freeform notes shared across all fields in the farm.",
+      "x-nexus-scope": "core"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor that created the farm document (user:*, system:*).",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the farm document was created (UTC).",
+      "x-nexus-scope": "core"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the most recent farm-level modification.",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin-owned metadata (e.g., crop plans, profitability analyses). Keys follow <namespace>.<topic> naming.",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/Layer.v1.json",
+  "title": "Layer.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "createdAt", "createdBy", "lastModifiedAt"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$",
+      "default": "1.0.0",
+      "description": "Schema semantic version for layers.",
+      "x-nexus-scope": "core"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^layer:[A-Za-z0-9._:-]+$",
+      "description": "Stable layer identifier referenced by jobs and sessions.",
+      "x-nexus-scope": "core"
+    },
+    "kind": {
+      "type": "string",
+      "description": "Layer type (coverage, rate, elevation, guidance, etc.).",
+      "x-nexus-scope": "core"
+    },
+    "jobId": {
+      "type": ["string", "null"],
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Job that produced the layer.",
+      "x-nexus-scope": "core"
+    },
+    "sessionId": {
+      "type": ["string", "null"],
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Session within the job that produced or reused the layer.",
+      "x-nexus-scope": "core"
+    },
+    "units": {
+      "type": "string",
+      "description": "Engineering units for numeric values (e.g., gal/ac).",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when the layer was created.",
+      "x-nexus-scope": "core"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor that produced the layer (user:*, system:*).",
+      "x-nexus-scope": "core"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when layer metadata was last updated.",
+      "x-nexus-scope": "core"
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source", "transform", "hash", "createdAt"],
+      "additionalProperties": false,
+      "x-nexus-scope": "core",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Originating system, plugin, or import reference.",
+          "x-nexus-scope": "core"
+        },
+        "transform": {
+          "type": "string",
+          "description": "Transform applied to produce the layer (e.g., raw, resampled).",
+          "x-nexus-scope": "core"
+        },
+        "hash": {
+          "type": "string",
+          "description": "Deterministic hash of the layer payload used for reuse detection.",
+          "x-nexus-scope": "core"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the provenance record was generated.",
+          "x-nexus-scope": "core"
+        },
+        "actor": {
+          "type": "string",
+          "description": "Operator or automation actor responsible for the layer change.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Layer-type specific metadata; structure defined by layer definitions.",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri-reference"
+      },
+      "description": "External resources associated with the layer (tiles, rasters, documents).",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin-owned metadata complementing layer provenance (analytics rollups, profitability, etc.). Keys follow <namespace>.<topic> naming.",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/Season.v1.json",
+  "title": "Season.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "dateRange", "createdBy", "createdAt", "lastModifiedAt"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$",
+      "default": "1.0.0",
+      "description": "Schema semantic version for season documents.",
+      "x-nexus-scope": "core"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^season:[A-Za-z0-9._:-]+$",
+      "description": "Stable identifier for the season (e.g., crop year).",
+      "x-nexus-scope": "core"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display name shown in navigators and reports.",
+      "x-nexus-scope": "core"
+    },
+    "dateRange": {
+      "type": "object",
+      "required": ["start", "end"],
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date",
+          "description": "Season start date (inclusive).",
+          "x-nexus-scope": "core"
+        },
+        "end": {
+          "type": "string",
+          "format": "date",
+          "description": "Season end date (inclusive).",
+          "x-nexus-scope": "core"
+        }
+      },
+      "x-nexus-scope": "core"
+    },
+    "jobIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^job:[A-Za-z0-9._:-]+$"
+      },
+      "description": "Jobs associated with the season.",
+      "x-nexus-scope": "core"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Operator notes for the season.",
+      "x-nexus-scope": "core"
+    },
+    "optimizerState": {
+      "type": "object",
+      "description": "Optional opaque planner or optimizer metadata persisted with the season.",
+      "x-nexus-scope": "core"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor that created the season (user:*, system:*).",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the season was created (UTC).",
+      "x-nexus-scope": "core"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the most recent season modification.",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin-owned metadata such as crop rotation targets or profitability plans. Keys follow <namespace>.<topic> naming.",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

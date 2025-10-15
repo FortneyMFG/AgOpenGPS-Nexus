@@ -48,7 +48,11 @@ public static class LayerControllerServiceCollectionExtensions
             var bufferPool = provider.GetRequiredService<LayerControllerBufferPool>();
             return new LayerControllerRuntime(descriptors, timeProvider, bufferPool);
         });
-        services.AddSingleton<LayerControllerTileWriter>();
+        services.AddSingleton(provider =>
+        {
+            var tileStore = provider.GetService<ILayerTileStore>();
+            return new LayerControllerTileWriter(tileStore);
+        });
         services.AddSingleton(provider =>
         {
             var runtime = provider.GetRequiredService<LayerControllerRuntime>();

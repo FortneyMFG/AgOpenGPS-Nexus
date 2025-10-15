@@ -56,6 +56,8 @@
   lease posture and capability coverage for ADR-031 governance.
 - [Metadata-driven UI style guide](reference/metadata-driven-ui-style-guide.md) — layout and
   theming guidance for ADR-034 dashboards, inspectors, and legends.
+- [Report template catalog](reference/report-template-catalog.md) —
+  versioned manifests, section contributors, and export governance for ADR-051.
 
 ## Contribution Guides
 

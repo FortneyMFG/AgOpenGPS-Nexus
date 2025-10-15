@@ -71,3 +71,6 @@
 - [Composite simulation fabric GA](scenarios/composite-simulation-fabric.md) — SimClock/SimBus validation steps.
 - [gRPC contract governance](qa/grpc-contract-governance.md) — protobuf review and release gating.
 - [Plugin lease & manifest governance](plugins/plugin-lease-manifest-governance.md) — ADR-018 compliance checklist.
+- [Plugin manifest governance playbook](howto/plugin-manifest-governance.md) — ADR-031 release workflow and artefacts.
+- [Device Manager compatibility dashboard](howto/device-manager-compatibility-dashboard.md) — ADR-031 bundle health UI guide.
+- [Plugin QA handshake checklist](qa/plugin-qa-handshake.md) — ADR-031 manifest validation process.

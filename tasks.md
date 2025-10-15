@@ -221,7 +221,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-306 Field health severity UX _(Planned)_ — ADR-052 field health visualization
 - [ ] NX-307 Weather timeline & overlay UX _(Planned)_ — ADR-053 weather visualization
 - [ ] NX-308 Report builder preview & share UI _(Planned)_ — ADR-051 report builder UI
-- [ ] NX-309 Device Manager compatibility dashboard _(Planned)_ — ADR-031 manifest governance UI
+- [x] NX-309 Device Manager compatibility dashboard _(Done)_ — ADR-031 manifest governance UI
 - [ ] NX-310 Mesh share/subscribe UI _(Planned)_ — ADR-047 live mesh UX
 - [ ] NX-311 Radio provisioning UI flows _(Planned)_ — ADR-048 provisioning UX
 - [ ] NX-312 Companion metadata-driven parity pass _(Planned)_ — ADR-034 remote parity
@@ -276,7 +276,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-124 Spatial constraint zones ADR & SRS sync _(In Progress)_
 - [x] NX-134 Official plugin dependency map & manifests _(Done)_
 
-- [ ] NX-318 Plugin manifest governance documentation _(Planned)_ — ADR-031 manifest governance
+- [x] NX-318 Plugin manifest governance documentation _(Done)_ — ADR-031 manifest governance
 - [ ] NX-319 Zone policy operator guide _(Planned)_ — ADR-027 constraint UX docs
 - [ ] NX-320 Season/session migration playbook _(Planned)_ — ADR-040/041 lifecycle rollout
 - [ ] NX-321 Mesh provisioning runbook _(Planned)_ — ADR-047/048 connectivity rollout
@@ -285,7 +285,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-324 Mesh retention & privacy operations guide _(Planned)_ — ADR-047 retention planner
 - [ ] NX-325 Weather compliance export documentation _(Planned)_ — ADR-053 compliance outputs
 - [ ] NX-326 Metadata-driven UI style guide _(Planned)_ — ADR-034 UI refactor
-- [ ] NX-327 Plugin QA handshake update _(Planned)_ — ADR-031 manifest governance QA
+- [x] NX-327 Plugin QA handshake update _(Done)_ — ADR-031 manifest governance QA
 
 ### Section H — Safety & QA
 - [x] NX-070 Heartbeats & failsafe watchdogs
@@ -556,7 +556,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-306 | Field health severity UX | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 field health visualization |
 | NX-307 | Weather timeline & overlay UX | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather visualization |
 | NX-308 | Report builder preview & share UI | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder UI |
-| NX-309 | Device Manager compatibility dashboard | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance UI |
+| NX-309 | Device Manager compatibility dashboard | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance UI |
 | NX-310 | Mesh share/subscribe UI | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 live mesh UX |
 | NX-311 | Radio provisioning UI flows | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 provisioning UX |
 | NX-312 | Companion metadata-driven parity pass | Planned |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | ADR-034 remote parity |
@@ -613,7 +613,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-151 | Backlog update for ADR + official plugin tasks | Done | AI | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Extend tasks.md/.csv with ADR coverage and plugin roadmap |
 | NX-124 | Spatial constraint zones ADR & SRS sync | In Progress | AI | — | [SRS §3 Communications](docs/SRS/sections/03_Comm_Transports.md) | Add ZoneService requirements and constraint policies |
 | NX-141 | Companion/mobile stack rollout documentation | In Progress | AI | — | [SRS §5 Frontends](docs/SRS/sections/05_Frontends.md) | Capture CompanionRemote, LocalInProc, and LocalOutOfProc run modes across docs |
-| NX-318 | Plugin manifest governance documentation | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
+| NX-318 | Plugin manifest governance documentation | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
 | NX-319 | Zone policy operator guide | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint UX docs |
 | NX-320 | Season/session migration playbook | Planned |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040/041 lifecycle rollout |
 | NX-321 | Mesh provisioning runbook | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047/048 connectivity rollout |
@@ -622,7 +622,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-324 | Mesh retention & privacy operations guide | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 retention planner |
 | NX-325 | Weather compliance export documentation | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 compliance outputs |
 | NX-326 | Metadata-driven UI style guide | Planned |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | ADR-034 UI refactor |
-| NX-327 | Plugin QA handshake update | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance QA |
+| NX-327 | Plugin QA handshake update | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance QA |
 
 ### Section H — Safety & QA
 

@@ -97,6 +97,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
         ApplySamplePluginState();
         SeedDashboards();
 
+        DeviceManagerCompatibility = DeviceManagerCompatibilityViewModel.CreateSample();
+
         if (configuration?.Scenarios is not null)
         {
             _scenarioDefinitions.AddRange(configuration.Scenarios);
@@ -191,6 +193,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets the inspector exposing the pinned layer observation.</summary>
     public LayerInspectorViewModel LayerInspector { get; }
 
+    /// <summary>Gets the compatibility dashboard view-model consumed by the Device Manager card.</summary>
+    public DeviceManagerCompatibilityViewModel DeviceManagerCompatibility { get; }
     /// <summary>Gets the mesh share/subscribe panel view-model.</summary>
     public MeshSharePanelViewModel MeshSharePanel { get; }
 

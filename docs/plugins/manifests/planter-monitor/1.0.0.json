@@ -8,6 +8,29 @@
     "core": ">=1.0.0",
     "sim": ">=1.0.0"
   },
+  "supportedCapabilities": [
+    "planter.monitor.telemetry",
+    "planter.monitor.analytics"
+  ],
+  "requiredTransports": [
+    "AOG-Link",
+    "SimBus"
+  ],
+  "minimumRuntimeVersion": "1.0.0",
+  "leases": [
+    {
+      "capability": "planter.monitor.telemetry",
+      "mode": "Exclusive",
+      "timeoutSeconds": 5,
+      "recovery": "GracefulDegradation"
+    },
+    {
+      "capability": "planter.monitor.analytics",
+      "mode": "Shared",
+      "timeoutSeconds": 5,
+      "recovery": "GracefulDegradation"
+    }
+  ],
   "settings": {
     "rowCount": 16,
     "defaultTargetPopulation": 34000

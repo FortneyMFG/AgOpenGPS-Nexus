@@ -75,7 +75,7 @@ jobs:
         with:
           name: linux-artifacts
           path: |
-            artifacts/linux/AgOpenGPS.Nexus*
+            artifacts/linux/**
           if-no-files-found: error
 
   publish:
@@ -97,7 +97,7 @@ jobs:
           mkdir -p dist
           shopt -s nullglob globstar
           found=0
-          for file in $(find release -type f -name 'AgOpenGPS.Nexus*'); do
+          for file in release/artifacts/**/AgOpenGPS.Nexus*; do
             if [ -f "$file" ]; then
               cp "$file" dist/
               found=1

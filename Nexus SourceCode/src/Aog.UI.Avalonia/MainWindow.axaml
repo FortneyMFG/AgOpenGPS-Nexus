@@ -414,6 +414,109 @@
             </StackPanel>
           </Border>
 
+          <!-- Radio provisioning flows -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding RadioProvisioning}"
+                  x:DataType="vm:RadioProvisioningFlowViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Radio provisioning" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Summary}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding SecurityNote}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeAccentBrush}"/>
+                <TextBlock Text="{Binding DocumentationSummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <ItemsControl ItemsSource="{Binding Stages}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:RadioProvisioningStageViewModel">
+                    <Border Padding="12" Margin="0,4"
+                            CornerRadius="8"
+                            Background="{DynamicResource ThemeBackgroundBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                            BorderThickness="1">
+                      <StackPanel Spacing="8">
+                        <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        <TextBlock Text="{Binding Callout}" Foreground="{DynamicResource ThemeForegroundLowBrush}" FontStyle="Italic">
+                          <TextBlock.Styles>
+                            <Style Selector="TextBlock">
+                              <Setter Property="IsVisible" Value="False"/>
+                              <DataTrigger Binding="{Binding HasCallout}" Value="True">
+                                <Setter Property="IsVisible" Value="True"/>
+                              </DataTrigger>
+                            </Style>
+                          </TextBlock.Styles>
+                        </TextBlock>
+
+                        <ItemsControl ItemsSource="{Binding Steps}" Margin="0,4,0,0">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:RadioProvisioningStepViewModel">
+                              <StackPanel Margin="0,4" Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                  <TextBlock Text="•" FontWeight="Bold" VerticalAlignment="Top"/>
+                                  <TextBlock Text="{Binding PrimaryText}" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding SecondaryText}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap">
+                                  <TextBlock.Styles>
+                                    <Style Selector="TextBlock">
+                                      <Setter Property="IsVisible" Value="False"/>
+                                      <DataTrigger Binding="{Binding HasSecondaryText}" Value="True">
+                                        <Setter Property="IsVisible" Value="True"/>
+                                      </DataTrigger>
+                                    </Style>
+                                  </TextBlock.Styles>
+                                </TextBlock>
+                                <Border Padding="8" Margin="22,0,0,0"
+                                        CornerRadius="6"
+                                        Background="{DynamicResource ThemeBackgroundBrush}"
+                                        BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                                        BorderThickness="1">
+                                  <Border.Styles>
+                                    <Style Selector="Border">
+                                      <Setter Property="IsVisible" Value="False"/>
+                                      <DataTrigger Binding="{Binding HasCommand}" Value="True">
+                                        <Setter Property="IsVisible" Value="True"/>
+                                      </DataTrigger>
+                                    </Style>
+                                  </Border.Styles>
+                                  <TextBlock Text="{Binding Command}" TextWrapping="Wrap" FontFamily="Consolas, Courier New, monospace" xml:space="preserve"/>
+                                </Border>
+                              </StackPanel>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <StackPanel Spacing="8">
+                <TextBlock Text="Provisioning profile fields" FontSize="16" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding ProfileSchemaSummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+                <ItemsControl ItemsSource="{Binding ProfileFields}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:RadioProvisioningProfileFieldViewModel">
+                      <Border Padding="10" Margin="0,4"
+                              CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <StackPanel Spacing="4">
+                          <TextBlock Text="{Binding Field}" FontWeight="SemiBold"/>
+                          <TextBlock Text="{Binding Description}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
           <!-- Layer legend -->
           <Border Padding="16" CornerRadius="12"
                   Background="{DynamicResource ThemeBackgroundBrush}"

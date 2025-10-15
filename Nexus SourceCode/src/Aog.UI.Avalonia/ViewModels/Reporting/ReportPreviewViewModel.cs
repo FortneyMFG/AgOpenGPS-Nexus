@@ -245,10 +245,17 @@ public sealed class ReportPreviewViewModel : INotifyPropertyChanged
             }
 
             var format = pair.Key["requestedOutput.".Length..];
-            if (!string.IsNullOrWhiteSpace(format))
+            if (string.IsNullOrWhiteSpace(format))
             {
-                formats.Add(format);
+                continue;
             }
+
+            if (!bool.TryParse(pair.Value, out var isRequested) || !isRequested)
+            {
+                continue;
+            }
+
+            formats.Add(format);
         }
 
         return formats;

@@ -258,6 +258,14 @@ public sealed class AutoSteerLiteTuningState
             _filteredLookAhead = lookAheadFilter * _filteredLookAhead + (1 - lookAheadFilter) * rawLookAhead;
         }
 
+        if (constraintContext is not null)
+        {
+            // Reapply constraint modifiers to the filtered value so it respects the
+            // current clearance even if the smoothing filter was previously seeded
+            // with a larger look-ahead distance.
+            _filteredLookAhead = ApplyConstraintModifiers(_filteredLookAhead, constraintContext);
+        }
+
         return _filteredLookAhead;
     }
 

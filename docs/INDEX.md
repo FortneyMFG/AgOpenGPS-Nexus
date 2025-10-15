@@ -56,6 +56,8 @@
   lease posture and capability coverage for ADR-031 governance.
 - [Metadata-driven UI style guide](reference/metadata-driven-ui-style-guide.md) — layout and
   theming guidance for ADR-034 dashboards, inspectors, and legends.
+- [Report template catalog](reference/report-template-catalog.md) —
+  versioned manifests, section contributors, and export governance for ADR-051.
 
 ## Contribution Guides
 
@@ -77,4 +79,5 @@
 - [Plugin lease & manifest governance](plugins/plugin-lease-manifest-governance.md) — ADR-018 compliance checklist.
 - [Plugin manifest governance playbook](howto/plugin-manifest-governance.md) — ADR-031 release workflow and artefacts.
 - [Device Manager compatibility dashboard](howto/device-manager-compatibility-dashboard.md) — ADR-031 bundle health UI guide.
+- [Weather compliance export playbook](howto/weather-compliance-export.md) — ADR-053 reporting workflow for regulatory bundles.
 - [Plugin QA handshake checklist](qa/plugin-qa-handshake.md) — ADR-031 manifest validation process.

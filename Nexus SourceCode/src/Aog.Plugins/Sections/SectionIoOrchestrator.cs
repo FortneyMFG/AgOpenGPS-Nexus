@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
+using Aog.Core.Safety;
 using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
 
@@ -20,6 +21,7 @@ public sealed class SectionIoOrchestrator
     private readonly string _frame;
     private readonly object _gate = new();
     private uint? _lastMask;
+    private ConstraintGateSnapshot _constraintGate;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SectionIoOrchestrator"/> class.
@@ -52,6 +54,7 @@ public sealed class SectionIoOrchestrator
         _source = source;
         _frame = frame;
         _timeProvider = timeProvider ?? TimeProvider.System;
+        _constraintGate = ConstraintGateSnapshot.CreateClear(_timeProvider.GetUtcNow());
     }
 
     /// <summary>
@@ -74,6 +77,11 @@ public sealed class SectionIoOrchestrator
 
         lock (_gate)
         {
+            if (!_constraintGate.SectionsAllowed)
+            {
+                mask = 0;
+            }
+
             if (_lastMask.HasValue && _lastMask.Value == mask)
             {
                 return;
@@ -105,6 +113,21 @@ public sealed class SectionIoOrchestrator
     {
         lock (_gate)
         {
+            _lastMask = null;
+        }
+    }
+
+    /// <summary>
+    /// Updates the cached constraint gate snapshot governing section outputs.
+    /// </summary>
+    /// <param name="snapshot">Latest constraint gate snapshot.</param>
+    public void UpdateConstraintGate(ConstraintGateSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        lock (_gate)
+        {
+            _constraintGate = snapshot;
             _lastMask = null;
         }
     }

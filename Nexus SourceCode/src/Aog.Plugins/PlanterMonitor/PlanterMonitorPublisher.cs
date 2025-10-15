@@ -61,20 +61,12 @@ public sealed class PlanterMonitorPublisher
 
     private PlanterRowStatus CreateStatus(RowPopulationMeasurement measurement)
     {
-        if (measurement.RowIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(measurement.RowIndex), measurement.RowIndex, "Row index cannot be negative.");
-        }
+        PlanterMonitorMath.ValidateMeasurement(_options, measurement);
 
-        if (_options.RowCount > 0 && measurement.RowIndex >= _options.RowCount)
-        {
-            throw new ArgumentOutOfRangeException(nameof(measurement.RowIndex), measurement.RowIndex, "Row index exceeds configured row count.");
-        }
-
-        ValidatePopulation(measurement.TargetPopulationPerMeter, nameof(measurement.TargetPopulationPerMeter));
-        ValidatePopulation(measurement.ActualPopulationPerMeter, nameof(measurement.ActualPopulationPerMeter));
-
-        var evaluation = Evaluate(measurement.TargetPopulationPerMeter, measurement.ActualPopulationPerMeter);
+        var evaluation = PlanterMonitorMath.Evaluate(
+            _options,
+            measurement.TargetPopulationPerMeter,
+            measurement.ActualPopulationPerMeter);
 
         var header = new Header
         {
@@ -96,46 +88,5 @@ public sealed class PlanterMonitorPublisher
         };
     }
 
-    private (double SkipRate, double DoubleRate, PlanterRowQuality Quality) Evaluate(double target, double actual)
-    {
-        if (target <= 0 || double.IsNaN(target))
-        {
-            return (0d, 0d, PlanterRowQuality.Unknown);
-        }
-
-        if (double.IsNaN(actual))
-        {
-            return (0d, 0d, PlanterRowQuality.Unknown);
-        }
-
-        var ratio = actual / target;
-        var deviation = ratio - 1d;
-
-        if (double.IsNaN(deviation))
-        {
-            return (0d, 0d, PlanterRowQuality.Unknown);
-        }
-
-        if (deviation <= -_options.SkipThreshold)
-        {
-            var relative = Math.Clamp((-deviation) / _options.SkipThreshold, 0d, 1d);
-            return (relative, 0d, PlanterRowQuality.Skip);
-        }
-
-        if (deviation >= _options.DoubleThreshold)
-        {
-            var relative = Math.Clamp(deviation / _options.DoubleThreshold, 0d, 1d);
-            return (0d, relative, PlanterRowQuality.Double);
-        }
-
-        return (0d, 0d, PlanterRowQuality.Ok);
-    }
-
-    private static void ValidatePopulation(double value, string parameterName)
-    {
-        if (double.IsNaN(value) || double.IsInfinity(value) || value < 0)
-        {
-            throw new ArgumentOutOfRangeException(parameterName, value, "Population values must be finite and non-negative.");
-        }
     }
 }

@@ -101,10 +101,15 @@ public sealed class LegacyUdpGateway
             filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
         }
 
-        _actuatorFailsafe.ReportHeartbeat();
-
-        var frame = _steerCodec.EncodeSteerCommand(filteredCommand, filteredSections, metadata);
-        await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var frame = _steerCodec.EncodeSteerCommand(filteredCommand, filteredSections, metadata);
+            await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _actuatorFailsafe.ReportHeartbeat();
+        }
     }
 
     /// <summary>

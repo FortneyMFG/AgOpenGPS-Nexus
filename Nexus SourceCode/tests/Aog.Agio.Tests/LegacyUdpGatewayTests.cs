@@ -123,6 +123,101 @@ public sealed class LegacyUdpGatewayTests
     }
 
     [Fact]
+    public async Task PublishSteerCommandAsync_FirstCommandAfterTimeoutAppliesFailsafeDefaults()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
+        var transport = new RecordingTransport();
+        var poseObserver = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var failsafe = new TransitioningFailsafeService
+        {
+            SafeSteer = new SteerCmd
+            {
+                Enable = false,
+                TargetWheelAngleDeg = -15.5,
+                FeedForward = 0.0,
+                ControllerOutput = 0.0,
+            },
+            SafeSections = new SectionMask
+            {
+                SectionCount = 8,
+                Mask = 0x0000,
+            },
+        };
+
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            poseObserver,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
+            new FixedTimeProvider(DateTimeOffset.UtcNow),
+            failsafe);
+
+        var unsafeCommand = new SteerCmd
+        {
+            Enable = true,
+            TargetWheelAngleDeg = 6.5,
+            FeedForward = 0.25,
+            ControllerOutput = 0.75,
+        };
+
+        var unsafeSections = new SectionMask
+        {
+            SectionCount = 8,
+            Mask = 0x00FF,
+        };
+
+        await gateway.PublishSteerCommandAsync(unsafeCommand, unsafeSections).ConfigureAwait(false);
+
+        Assert.False(failsafe.ReportedBeforeFilter);
+
+        var firstFrame = Assert.Single(transport.Frames);
+        Assert.True(steerCodec.TryDecodeSteerCommand(firstFrame.Span, out var failsafeCommand, out _, out var failsafeSections));
+        Assert.False(failsafeCommand.Enable);
+        Assert.Equal(failsafe.SafeSteer.TargetWheelAngleDeg, failsafeCommand.TargetWheelAngleDeg, 3);
+        Assert.Equal(failsafe.SafeSections.Mask, failsafeSections.Mask);
+
+        transport.Frames.Clear();
+
+        var resumedCommand = new SteerCmd
+        {
+            Enable = true,
+            TargetWheelAngleDeg = -2.25,
+            FeedForward = -0.1,
+            ControllerOutput = -0.35,
+        };
+
+        var resumedSections = new SectionMask
+        {
+            SectionCount = 8,
+            Mask = 0x000F,
+        };
+
+        await gateway.PublishSteerCommandAsync(resumedCommand, resumedSections).ConfigureAwait(false);
+
+        Assert.Equal(2, failsafe.ReportHeartbeatCalls);
+        Assert.True(failsafe.HasActiveHeartbeat);
+        Assert.False(failsafe.ReportedBeforeFilter);
+
+        var resumedFrame = Assert.Single(transport.Frames);
+        Assert.True(steerCodec.TryDecodeSteerCommand(resumedFrame.Span, out var decodedCommand, out _, out var decodedSections));
+        Assert.Equal(resumedCommand.Enable, decodedCommand.Enable);
+        Assert.Equal(resumedCommand.TargetWheelAngleDeg, decodedCommand.TargetWheelAngleDeg, 3);
+        Assert.Equal(resumedSections.Mask, decodedSections.Mask);
+    }
+
+    [Fact]
     public async Task HandleDatagramAsync_ForwardsPoseToObserver()
     {
         var poseCodec = new LegacyPoseCodec();
@@ -614,6 +709,54 @@ public sealed class LegacyUdpGatewayTests
             LastSectionMask = mask;
             SectionFilterOrder = ++_callOrder;
             return SectionResult;
+        }
+    }
+
+    private sealed class TransitioningFailsafeService : IActuatorFailsafeService
+    {
+        private bool _heartbeatActive;
+        private bool _filterStarted;
+
+        public SteerCmd SafeSteer { get; set; } = new();
+
+        public SectionMask SafeSections { get; set; } = new();
+
+        public bool ReportedBeforeFilter { get; private set; }
+
+        public int ReportHeartbeatCalls { get; private set; }
+
+        public bool HasActiveHeartbeat => _heartbeatActive;
+
+        public DateTimeOffset? LastHeartbeatUtc => null;
+
+        public TimeSpan HeartbeatTimeout => TimeSpan.Zero;
+
+        public void ReportHeartbeat()
+        {
+            if (!_filterStarted)
+            {
+                ReportedBeforeFilter = true;
+            }
+
+            ReportHeartbeatCalls++;
+            _heartbeatActive = true;
+            _filterStarted = false;
+        }
+
+        public void ClearHeartbeat()
+        {
+            _heartbeatActive = false;
+        }
+
+        public SteerCmd FilterSteerCommand(SteerCmd command)
+        {
+            _filterStarted = true;
+            return _heartbeatActive ? command : SafeSteer;
+        }
+
+        public SectionMask FilterSectionMask(SectionMask mask)
+        {
+            return _heartbeatActive ? mask : SafeSections;
         }
     }
 

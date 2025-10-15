@@ -32,6 +32,12 @@ Nexus is the next-generation AgOpenGPS stack that blends community experience wi
 2. Pick an NX ticket from `tasks.md`, confirm the owning ADR/SRS sections, and align on scope.
 3. Follow `AGENTS.md` for branch naming, ownership bands, and PR expectations. Every change ties to one NX ticket.
 4. Run documentation, schema, and test updates together; deterministic storage and replay are core principles.
+5. When you're ready to exercise the code, follow the [developer setup quick start](docs/howto/developer-setup.md) to either download the packaged release bundles or build/run the solution locally.
+
+## Continuous Integration & Release Automation
+
+- The **Nexus CI** workflow (`.github/workflows/ci.yml`) runs on every push and pull request. It restores, builds, and tests the .NET 8 solution on Windows and Linux runners before executing repository linting, contract governance checks, the simulation smoke harness, and packaging smoke tests for each platform.
+- The **Nexus Release Packaging** workflow (`.github/workflows/release.yml`) triggers for tags that match `v*` (or manually via workflow dispatch). It rebuilds and tests the solution on dedicated Windows and Linux jobs, packages self-contained single-file binaries using `tools/ci/package-windows.ps1` and `tools/ci/package-linux.ps1`, and publishes zip bundles directly to the GitHub release so operators can download ready-to-run archives for each platform.
 
 ## Continuous Integration & Release Automation
 
@@ -46,6 +52,7 @@ Nexus is the next-generation AgOpenGPS stack that blends community experience wi
 ## Additional Resources
 
 - [docs/INDEX.md](docs/INDEX.md) — curated links into ADRs, SRS sections, and plugin guides.
+- [docs/howto/developer-setup.md](docs/howto/developer-setup.md) — step-by-step instructions for downloading release builds or running from source.
 - [docs/CONTRIBUTING-PLUGINS.md](docs/CONTRIBUTING-PLUGINS.md) — packaging, manifest, and signing requirements for plugin authors.
 - [docs/plugins](docs/plugins) — feature-specific requirements (Mapping, Rate Control, Genetics, Yield, Profit, Multi-Machine, ISOBUS Bridge, Telemetry Logging, Replay, File I/O, and planned Soil/Lab, Map Composer, 3D Terrain).
 

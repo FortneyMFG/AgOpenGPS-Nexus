@@ -1,0 +1,117 @@
+{
+  "exportId": "WCX-2025-00042",
+  "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "generatedAt": "2025-04-02T18:45:12Z",
+  "reportBuilderTemplate": "weather-compliance.v1",
+  "regulatoryPrograms": ["EPA_PESTICIDE_LOG", "STATE_X_SPRAY_WINDOW"],
+  "artifacts": [
+    {
+      "type": "pdf",
+      "path": "weather-summary.pdf",
+      "checksum": {
+        "algorithm": "SHA-256",
+        "value": "f73cbe5b270f7bf8f9d6b00d79e0a124c8fe8746f7383eab76a187e61733742a"
+      },
+      "sections": ["overview", "threshold-evaluations", "ingest-status"]
+    },
+    {
+      "type": "json",
+      "path": "session-weather.json",
+      "checksum": {
+        "algorithm": "SHA-256",
+        "value": "c03f26e90b4e836d2f488841c6d8b92b3dbb59838ed4de6d7f7c0fbd14324681"
+      }
+    },
+    {
+      "type": "geojson",
+      "path": "weather-overlay.geojson",
+      "checksum": {
+        "algorithm": "SHA-256",
+        "value": "aa5fb798d8a3f42381c270b39bd27190f5a7f4e70a1e2e3f708c05440dd94790"
+      },
+      "metadata": {
+        "variable": "wind",
+        "gridResolutionMeters": 50,
+        "crs": "EPSG:32614",
+        "interpolationConfidence": 0.82
+      }
+    }
+  ],
+  "weatherSnapshotHistory": [
+    {
+      "capturedAt": "2025-04-02T17:55:00Z",
+      "source": {
+        "type": "station",
+        "id": "WX-BASE-001"
+      },
+      "temperatureC": 16.1,
+      "humidityPct": 64.0,
+      "windSpeedMps": 3.5,
+      "windGustMps": 4.1,
+      "rainfallMm": 0.0,
+      "pressureKPa": 100.5,
+      "dewPointC": 9.3,
+      "wetBulbC": 12.0,
+      "deltaTC": 4.1,
+      "solarIrradianceWm2": 420,
+      "uvIndex": 3,
+      "visibilityKm": 16.0,
+      "evapotranspirationMm": 0.05,
+      "soilTempC": 12.5,
+      "soilMoisturePct": 28.4,
+      "leafWetnessPct": 0.0
+    },
+    {
+      "capturedAt": "2025-04-02T18:25:00Z",
+      "source": {
+        "type": "manual",
+        "operator": "j.smith",
+        "note": "Verified station after drizzle"
+      },
+      "temperatureC": 15.2,
+      "humidityPct": 69.0,
+      "windSpeedMps": 5.8,
+      "windGustMps": 7.5,
+      "rainfallMm": 0.4,
+      "pressureKPa": 100.2,
+      "dewPointC": 10.1,
+      "wetBulbC": 12.4,
+      "deltaTC": 3.1,
+      "solarIrradianceWm2": 380,
+      "uvIndex": 2,
+      "visibilityKm": 12.0,
+      "evapotranspirationMm": 0.03,
+      "soilTempC": 12.1,
+      "soilMoisturePct": 30.0,
+      "leafWetnessPct": 12.0
+    }
+  ],
+  "thresholdEvaluations": [
+    {
+      "metric": "windSpeedMps",
+      "limit": 5.0,
+      "unit": "m/s",
+      "status": "violation",
+      "interval": {
+        "start": "2025-04-02T18:20:00Z",
+        "end": "2025-04-02T18:32:00Z"
+      },
+      "details": "Wind exceeded state pesticide spray limit for 12 minutes.",
+      "pdfAnchor": "section://threshold-evaluations#wind"
+    }
+  ],
+  "signatures": [
+    {
+      "role": "operator",
+      "identity": "urn:nexus:operator:j.smith",
+      "signedAt": "2025-04-02T19:05:44Z",
+      "signature": "MEQCIEV6s1sgec0+Ovp1VvKXg..."
+    },
+    {
+      "role": "regulatory",
+      "identity": "urn:nexus:regulator:state-x",
+      "signedAt": "2025-04-03T14:12:08Z",
+      "signature": "MEUCIF3b1ozP9oPpGKv9PMP4a..."
+    }
+  ]
+}

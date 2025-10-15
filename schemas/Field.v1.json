@@ -4,7 +4,7 @@
   "title": "Field.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "farmId", "name", "polygons", "createdBy", "createdAt", "lastModifiedAt"],
+  "required": ["id", "farmId", "name", "polygons"],
   "properties": {
     "schemaVersion": {
       "type": "string",

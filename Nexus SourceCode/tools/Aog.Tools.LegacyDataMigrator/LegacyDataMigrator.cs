@@ -122,6 +122,20 @@ public sealed class LegacyDataMigrator
         else
         {
             report = AppendSkipped(report, logsRoot + " (missing)");
+            var expectedLogs = new[]
+            {
+                Path.Combine(logsRoot, "pose.csv"),
+                Path.Combine(logsRoot, "imu.csv"),
+                Path.Combine(logsRoot, "can.csv"),
+                Path.Combine(logsRoot, "sections.csv"),
+                Path.Combine(logsRoot, "plugin.csv"),
+                Path.Combine(logsRoot, "weather.csv"),
+            };
+
+            foreach (var missing in expectedLogs)
+            {
+                report = AppendSkipped(report, missing + " (missing)");
+            }
         }
 
         var fieldHistoryPath = options.ResolveFieldHistoryPath();
@@ -1103,7 +1117,7 @@ internal static class LegacyCanCsvParser
                 ParseTimestamp(parts[1]),
                 Normalize(parts[2]),
                 Normalize(parts[3]),
-                uint.Parse(parts[4], CultureInfo.InvariantCulture),
+                ParseArbitrationId(parts[4]),
                 ParsePayload(parts[5]),
                 bool.Parse(parts[6]),
                 bool.Parse(parts[7])));
@@ -1121,6 +1135,32 @@ internal static class LegacyCanCsvParser
 
         var timestamp = DateTime.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal);
         return DateTime.SpecifyKind(timestamp, DateTimeKind.Utc);
+    }
+
+    private static uint ParseArbitrationId(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0;
+        }
+
+        var trimmed = value.Trim();
+        if (trimmed.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+        {
+            return uint.Parse(trimmed.AsSpan(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        }
+
+        if (trimmed.StartsWith("#", StringComparison.Ordinal))
+        {
+            return uint.Parse(trimmed.AsSpan(1), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        }
+
+        if (trimmed.All(char.IsLetterOrDigit) && trimmed.Any(c => char.IsLetter(c)))
+        {
+            return uint.Parse(trimmed, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        }
+
+        return uint.Parse(trimmed, CultureInfo.InvariantCulture);
     }
 
     private static byte[]? ParsePayload(string value)

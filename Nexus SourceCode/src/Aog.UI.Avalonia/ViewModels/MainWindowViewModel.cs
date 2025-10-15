@@ -94,6 +94,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         LayerLegend = LayerLegendViewModel.FromLayers(_mapLayers);
         LayerInspector = BuildSampleInspector(_mapLayers);
         MeshSharePanel = MeshSharePanelViewModel.CreateSample();
+        ProfitAnalytics = ProfitAnalyticsViewModel.CreateSample();
 
         ApplySamplePluginState();
         SeedDashboards();
@@ -196,6 +197,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the inspector exposing the pinned layer observation.</summary>
     public LayerInspectorViewModel LayerInspector { get; }
+
+    /// <summary>Gets the profitability analytics view-model powering the profit card.</summary>
+    public ProfitAnalyticsViewModel ProfitAnalytics { get; }
 
     /// <summary>Gets the compatibility dashboard view-model consumed by the Device Manager card.</summary>
     public DeviceManagerCompatibilityViewModel DeviceManagerCompatibility { get; }
@@ -365,6 +369,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         var actualCells = new List<MapLayerCell>();
         var plannedCells = new List<MapLayerCell>();
+        var profitCells = new List<MapLayerCell>();
 
         for (var x = -3; x <= 3; x++)
         {
@@ -373,9 +378,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 var center = new Point(10 + x * spacing, 10 + y * spacing);
                 var actualCoverage = Math.Clamp(0.15 + (y + 2) * 0.18 + Math.Sin(x * 0.7) * 0.05, 0, 1);
                 var plannedCoverage = Math.Clamp(0.3 + (y + 1) * 0.14 + Math.Cos(x * 0.5) * 0.07, 0, 1);
+                var profitValue = ((Math.Sin(x * 0.8) * 120) + (Math.Cos((y + 1) * 0.55) * 95)) + ((y - 1) * 42) - 65;
 
                 actualCells.Add(new MapLayerCell(center, size, actualCoverage));
                 plannedCells.Add(new MapLayerCell(center, size, plannedCoverage));
+                profitCells.Add(new MapLayerCell(center, size, profitValue));
             }
         }
 
@@ -396,10 +403,19 @@ public class MainWindowViewModel : INotifyPropertyChanged
             isPlanned: true,
             outlineColor: Color.FromArgb(120, 24, 34, 84));
 
+        var profitStyle = new LayerVisualizationStyle(
+            Color.FromArgb(230, 178, 62, 94),
+            Color.FromArgb(230, 16, 110, 85),
+            -180,
+            420,
+            units: "USD/ha",
+            outlineColor: Color.FromArgb(140, 33, 46, 51));
+
         return new List<MapLayer>
         {
             new("layer:coverage.actual", "Actual coverage", actualStyle, actualCells),
             new("layer:coverage.planned", "Planned rate", plannedStyle, plannedCells),
+            new("layer:profit.net", "Profit per hectare", profitStyle, profitCells),
         };
     }
 

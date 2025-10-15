@@ -866,11 +866,23 @@ public sealed class PluginCompatibilityEvaluator
         {
             if (string.IsNullOrWhiteSpace(replacement.Relationship.Range))
             {
-                return true;
+                if (IsVersionSatisfied(replacement.Manifest.Version, versionRequirement, out _))
+                {
+                    return true;
+                }
+
+                continue;
             }
 
             if (!TryParseVersionRange(replacement.Relationship.Range!, out var replacementRange))
             {
+                // fall back to checking the replacement plugin's own version when the declared
+                // range is malformed or omitted.
+                if (IsVersionSatisfied(replacement.Manifest.Version, versionRequirement, out _))
+                {
+                    return true;
+                }
+
                 continue;
             }
 

@@ -129,6 +129,17 @@ public sealed class MainWindowViewModelTests
         snapshot.ReplayTimeline.SpeedSamples.Should().HaveCount(viewModel.ReplayTimeline.SpeedSamples.Count);
         snapshot.ReplayTimeline.HeadingSamples.Should().HaveCount(viewModel.ReplayTimeline.HeadingSamples.Count);
         snapshot.ReplayTimeline.Bookmarks.Should().HaveCount(viewModel.ReplayTimeline.Bookmarks.Count);
+    public void MeshSharePanel_SurfacesSampleDevices()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.MeshSharePanel.Should().NotBeNull();
+        viewModel.MeshSharePanel.Devices.Should().NotBeEmpty();
+        viewModel.MeshSharePanel.Devices.Should().AllSatisfy(device =>
+        {
+            device.DisplayName.Should().NotBeNullOrWhiteSpace();
+            device.DeviceId.Should().NotBeNullOrWhiteSpace();
+        });
     }
 
     private static MainWindowViewModel CreateViewModel()

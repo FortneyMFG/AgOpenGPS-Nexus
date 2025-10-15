@@ -123,6 +123,62 @@ public sealed class ReportBuilderServiceTests
         Assert.True(contributor.RenderCalled);
     }
 
+    [Fact]
+    public async Task GenerateAsync_PopulatesTelemetryMetadata()
+    {
+        var service = new ReportBuilderService();
+        var template = CreateTemplate(
+            "template:meta",
+            sections: new[]
+            {
+                new ReportTemplateSection("section:alpha"),
+                new ReportTemplateSection("section:beta", isOptional: true),
+            },
+            outputs: new[]
+            {
+                new ReportTemplateOutput("pdf", "Portable Document"),
+                new ReportTemplateOutput("geojson", "GeoJSON"),
+            });
+        service.RegisterTemplate(template);
+
+        var contributor = new FakeSectionContributor("section:alpha")
+        {
+            PreparationResult = new ReportSectionPreparationResult(true),
+            RenderResult = new ReportSectionResult(
+                "section:alpha",
+                ReportSectionStatus.Success,
+                message: "Ready",
+                artifacts: new List<ReportArtifact>
+                {
+                    new ReportArtifact("pdf", "alpha.pdf", Encoding.UTF8.GetBytes("pdf")),
+                },
+                diagnostics: new Dictionary<string, string> { ["source"] = "test" }),
+        };
+        service.RegisterSectionContributor(contributor);
+
+        var options = new ReportGenerationOptions(requestedOutputs: new[] { "pdf", "geojson" });
+        var result = await service.GenerateAsync(
+            template.Id,
+            new ReportScope(ReportScopeKind.Job, "job-99"),
+            options);
+
+        var metadata = result.Metadata;
+        Assert.Equal("2", metadata["requestedOutput.count"]);
+        Assert.Equal("true", metadata["requestedOutput.pdf"]);
+        Assert.Equal("true", metadata["requestedOutput.geojson"]);
+        Assert.Equal("1", metadata["outputs.produced.pdf.count"]);
+        Assert.Equal("alpha.pdf", metadata["outputs.produced.pdf.names"]);
+        Assert.Equal("2", metadata["sections.count"]);
+        Assert.Equal("1", metadata["sections.success"]);
+        Assert.Equal("1", metadata["sections.skipped"]);
+        Assert.Equal("0", metadata["sections.missing"]);
+        Assert.Equal("0", metadata["sections.error"]);
+        Assert.Equal("Success", metadata["section.section:alpha.status"]);
+        Assert.Equal("Skipped", metadata["section.section:beta.status"]);
+        Assert.Equal("Ready", metadata["section.section:alpha.message"]);
+        Assert.Equal("source=test", metadata["section.section:alpha.diagnostics"]);
+    }
+
     private static ReportTemplate CreateTemplate(
         string id,
         IEnumerable<ReportTemplateSection>? sections = null,

@@ -21,6 +21,8 @@ Each yield layer persists structured metadata describing the grid, smoothing pip
 - `metadata.aggregation` defines rollup scopes and the binning scheme (quantile, equalInterval, or custom) shared with front-ends, including explicit breakpoints for custom palettes.【F:schemas/YieldActual.v1.json†L149-L204】
 - `metadata.statistics` publishes summary metrics (count, mean, median, std-dev, range, and total mass for yield.actual) that feed analytics APIs and report templates without reprocessing tiles.【F:schemas/YieldActual.v1.json†L205-L241】
 
+The runtime implementation leverages `CombineYieldLayerAggregator` to apply configurable kernel smoothing and produce `YieldLayerMetadata` snapshots covering grid, calibration, aggregation bins, and statistics. Import tooling such as `YieldImportService` reuses the same pipeline when normalised `CombineYieldMeasurement` samples arrive from ISOXML, shapefile, or CSV sources.
+
 Clients relying on historical ad-hoc `extensions` fields should migrate to these structured properties; plugin-owned analytics may continue to live under `extensions` with namespace-qualified keys for downstream consumers.
 
 ## Analytics & Reporting

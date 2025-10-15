@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -217,7 +218,70 @@ public sealed class ReportBuilderService : IReportBuilderService
             ["templateVersion"] = template.Version,
             ["scopeKind"] = scope.Kind.ToString(),
             ["scopeId"] = scope.Identifier,
+            ["requestedOutput.count"] = requestedOutputs.Count
+                .ToString(CultureInfo.InvariantCulture),
         };
+
+        foreach (var format in requestedOutputs.OrderBy(value => value, StringComparer.OrdinalIgnoreCase))
+        {
+            metadata[$"requestedOutput.{format}"] = "true";
+        }
+
+        if (sectionResults.Count > 0)
+        {
+            metadata["sections.count"] = sectionResults.Count
+                .ToString(CultureInfo.InvariantCulture);
+            metadata["sections.success"] = sectionResults.Count(result => result.Status == ReportSectionStatus.Success)
+                .ToString(CultureInfo.InvariantCulture);
+            metadata["sections.missing"] = sectionResults.Count(result => result.Status == ReportSectionStatus.MissingData)
+                .ToString(CultureInfo.InvariantCulture);
+            metadata["sections.error"] = sectionResults.Count(result => result.Status == ReportSectionStatus.Error)
+                .ToString(CultureInfo.InvariantCulture);
+            metadata["sections.skipped"] = sectionResults.Count(result => result.Status == ReportSectionStatus.Skipped)
+                .ToString(CultureInfo.InvariantCulture);
+        }
+
+        foreach (var section in sectionResults)
+        {
+            var keyPrefix = $"section.{section.SectionId}";
+            metadata[$"{keyPrefix}.status"] = section.Status.ToString();
+            if (!string.IsNullOrWhiteSpace(section.Message))
+            {
+                metadata[$"{keyPrefix}.message"] = section.Message!;
+            }
+
+            if (section.Diagnostics.Count > 0)
+            {
+                metadata[$"{keyPrefix}.diagnostics"] = string.Join(",",
+                    section.Diagnostics
+                        .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
+                        .Select(pair => $"{pair.Key}={pair.Value}"));
+            }
+        }
+
+        if (artifacts.Count > 0)
+        {
+            metadata["outputs.produced.count"] = artifacts.Count
+                .ToString(CultureInfo.InvariantCulture);
+        }
+
+        foreach (var artifactGroup in artifacts
+            .GroupBy(artifact => artifact.Format, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(group => group.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            var names = artifactGroup
+                .Select(artifact => artifact.Name)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .ToArray();
+
+            metadata[$"outputs.produced.{artifactGroup.Key}.count"] = artifactGroup.Count()
+                .ToString(CultureInfo.InvariantCulture);
+
+            if (names.Length > 0)
+            {
+                metadata[$"outputs.produced.{artifactGroup.Key}.names"] = string.Join(",", names);
+            }
+        }
 
         return new ReportGenerationResult(
             template,

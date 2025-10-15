@@ -260,7 +260,7 @@ NX-305,FALSE,FALSE,"NX-263, NX-299",,Profit heatmap & analytics UI — ADR-050 p
 NX-306,FALSE,FALSE,"NX-266, NX-299",,Field health severity UX — ADR-052 field health visualization
 NX-307,FALSE,FALSE,"NX-271, NX-299",,Weather timeline & overlay UX — ADR-053 weather visualization
 NX-308,FALSE,FALSE,NX-230,,Report builder preview & share UI — ADR-051 report builder UI
-NX-309,FALSE,FALSE,NX-208,,Device Manager compatibility dashboard — ADR-031 manifest governance UI
+NX-309,FALSE,TRUE,NX-208,,Device Manager compatibility dashboard — ADR-031 manifest governance UI
 NX-310,FALSE,FALSE,NX-227,,Mesh share/subscribe UI — ADR-047 live mesh UX
 NX-311,FALSE,FALSE,"NX-238, NX-310",,Radio provisioning UI flows — ADR-048 provisioning UX
 NX-312,FALSE,TRUE,NX-301,,Companion metadata-driven parity pass — ADR-034 remote parity
@@ -269,7 +269,7 @@ NX-314,FALSE,FALSE,NX-313,,Pure pursuit control port with fixtures — ADR-033 g
 NX-315,FALSE,FALSE,NX-279,,Turn planner library port — ADR-033 guidance planner porting
 NX-316,FALSE,FALSE,"NX-214, NX-314",,Constraint-aware lookahead tuning — ADR-033 lookahead + ADR-027 gating
 NX-317,FALSE,FALSE,NX-316,,Firmware-in-loop stability validation — ADR-033 closed-loop validation
-NX-318,FALSE,FALSE,NX-208,,Plugin manifest governance documentation — ADR-031 manifest governance
+NX-318,FALSE,TRUE,NX-208,,Plugin manifest governance documentation — ADR-031 manifest governance
 NX-319,FALSE,FALSE,NX-292,,Zone policy operator guide — ADR-027 constraint UX docs
 NX-320,FALSE,FALSE,"NX-223, NX-295",,Season/session migration playbook — ADR-040/041 lifecycle rollout
 NX-321,FALSE,FALSE,NX-311,,Mesh provisioning runbook — ADR-047/048 connectivity rollout
@@ -278,7 +278,7 @@ NX-323,FALSE,FALSE,NX-231,,Performance budget telemetry dashboards — ADR-026 i
 NX-324,FALSE,FALSE,NX-229,,Mesh retention & privacy operations guide — ADR-047 retention planner
 NX-325,FALSE,FALSE,NX-274,,Weather compliance export documentation — ADR-053 compliance outputs
 NX-326,FALSE,TRUE,NX-301,,Metadata-driven UI style guide — ADR-034 UI refactor
-NX-327,FALSE,FALSE,NX-284,,Plugin QA handshake update — ADR-031 manifest governance QA
+NX-327,FALSE,TRUE,NX-284,,Plugin QA handshake update — ADR-031 manifest governance QA
 NX-328,FALSE,FALSE,"NX-214, NX-276, NX-277",,Constraint fault-injection regression suite — ADR-027 gating QA
 NX-329,FALSE,FALSE,"NX-227, NX-238",,Mesh security and penetration tests — ADR-047/048 security validation
 NX-330,FALSE,FALSE,NX-222,,Session crash-recovery regression — ADR-041 session durability

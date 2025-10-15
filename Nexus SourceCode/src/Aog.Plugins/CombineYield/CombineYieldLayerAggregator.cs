@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
@@ -44,6 +45,56 @@ public sealed class CombineYieldLayerAggregator
 
             return new CellAccumulator(newYieldSum, MoistureSum, newCount, MoistureCount);
         }
+    }
+
+    private readonly struct RawCell
+    {
+        public RawCell(double averageYield, double? averageMoisture, int sampleCount, int moistureCount)
+        {
+            AverageYield = averageYield;
+            AverageMoisture = averageMoisture;
+            SampleCount = sampleCount;
+            MoistureCount = moistureCount;
+        }
+
+        public double AverageYield { get; }
+
+        public double? AverageMoisture { get; }
+
+        public int SampleCount { get; }
+
+        public int MoistureCount { get; }
+
+        public bool HasMoisture => MoistureCount > 0;
+    }
+
+    private readonly struct SmoothedCell
+    {
+        public SmoothedCell(double yield, double? moisture, int sampleCount)
+        {
+            Yield = yield;
+            Moisture = moisture;
+            SampleCount = sampleCount;
+        }
+
+        public double Yield { get; }
+
+        public double? Moisture { get; }
+
+        public int SampleCount { get; }
+    }
+
+    private readonly struct WeightedValue
+    {
+        public WeightedValue(double value, int weight)
+        {
+            Value = value;
+            Weight = weight;
+        }
+
+        public double Value { get; }
+
+        public int Weight { get; }
     }
 
     private readonly IEventBus _eventBus;
@@ -159,19 +210,23 @@ public sealed class CombineYieldLayerAggregator
             CellSizeMeters = _options.CellSizeMeters
         };
 
-        foreach (var entry in _cells.OrderBy(e => e.Key.Row).ThenBy(e => e.Key.Column))
+        var rawCells = CreateRawCells();
+        var smoothedCells = SmoothCells(rawCells);
+        ApplyOutlierClamp(smoothedCells, rawCells);
+
+        foreach (var entry in smoothedCells.OrderBy(e => e.Key.Row).ThenBy(e => e.Key.Column))
         {
-            var accumulator = entry.Value;
-            var cell = new CombineYieldCell
+            var cell = entry.Value;
+            var layerCell = new CombineYieldCell
             {
                 Column = (uint)entry.Key.Column,
                 Row = (uint)entry.Key.Row,
-                AverageYieldKgPerHectare = accumulator.YieldSum / accumulator.Count,
-                AverageMoisturePercent = accumulator.MoistureCount > 0 ? accumulator.MoistureSum / accumulator.MoistureCount : 0d,
-                SampleCount = (uint)accumulator.Count
+                AverageYieldKgPerHectare = cell.Yield,
+                AverageMoisturePercent = cell.Moisture.GetValueOrDefault(),
+                SampleCount = (uint)cell.SampleCount
             };
 
-            layer.Cells.Add(cell);
+            layer.Cells.Add(layerCell);
         }
 
         var hash = ComputeHash(layer);
@@ -182,7 +237,9 @@ public sealed class CombineYieldLayerAggregator
             timestamp,
             _options.Actor);
 
-        return new CombineYieldLayerPublication(layer, provenance);
+        var metadata = CreateMetadata(timestamp, smoothedCells);
+
+        return new CombineYieldLayerPublication(layer, provenance, metadata);
     }
 
     private static string ComputeHash(CombineYieldLayer layer)
@@ -211,6 +268,286 @@ public sealed class CombineYieldLayerAggregator
         var hash = sha.ComputeHash(bytes);
         return Convert.ToHexString(hash);
     }
+
+    private Dictionary<(int Column, int Row), RawCell> CreateRawCells()
+    {
+        var raw = new Dictionary<(int Column, int Row), RawCell>(_cells.Count);
+        foreach (var entry in _cells)
+        {
+            var accumulator = entry.Value;
+            var averageYield = accumulator.Count > 0 ? accumulator.YieldSum / accumulator.Count : 0d;
+            double? averageMoisture = null;
+            if (accumulator.MoistureCount > 0)
+            {
+                averageMoisture = accumulator.MoistureSum / accumulator.MoistureCount;
+            }
+
+            raw[entry.Key] = new RawCell(averageYield, averageMoisture, accumulator.Count, accumulator.MoistureCount);
+        }
+
+        return raw;
+    }
+
+    private Dictionary<(int Column, int Row), SmoothedCell> SmoothCells(IReadOnlyDictionary<(int Column, int Row), RawCell> rawCells)
+    {
+        var radius = _options.SmoothingKernelSize / 2;
+        var result = new Dictionary<(int Column, int Row), SmoothedCell>(rawCells.Count);
+
+        foreach (var entry in rawCells)
+        {
+            var (column, row) = entry.Key;
+            var cell = entry.Value;
+
+            double yieldSum = 0;
+            int yieldWeight = 0;
+            double moistureSum = 0;
+            int moistureWeight = 0;
+
+            for (var dy = -radius; dy <= radius; dy++)
+            {
+                for (var dx = -radius; dx <= radius; dx++)
+                {
+                    var neighborKey = (column + dx, row + dy);
+                    if (!rawCells.TryGetValue(neighborKey, out var neighbor))
+                    {
+                        continue;
+                    }
+
+                    yieldSum += neighbor.AverageYield * neighbor.SampleCount;
+                    yieldWeight += neighbor.SampleCount;
+
+                    if (neighbor.HasMoisture)
+                    {
+                        moistureSum += neighbor.AverageMoisture!.Value * neighbor.SampleCount;
+                        moistureWeight += neighbor.SampleCount;
+                    }
+                }
+            }
+
+            var smoothedYield = yieldWeight > 0 ? yieldSum / yieldWeight : cell.AverageYield;
+            double? smoothedMoisture = null;
+            if (moistureWeight > 0)
+            {
+                smoothedMoisture = moistureSum / moistureWeight;
+            }
+            else if (cell.HasMoisture)
+            {
+                smoothedMoisture = cell.AverageMoisture;
+            }
+
+            result[entry.Key] = new SmoothedCell(smoothedYield, smoothedMoisture, cell.SampleCount);
+        }
+
+        return result;
+    }
+
+    private void ApplyOutlierClamp(IDictionary<(int Column, int Row), SmoothedCell> smoothedCells, IReadOnlyDictionary<(int Column, int Row), RawCell> rawCells)
+    {
+        if (_options.OutlierClampFraction <= 0 || rawCells.Count == 0)
+        {
+            return;
+        }
+
+        var rawYields = rawCells.Values
+            .Select(cell => cell.AverageYield)
+            .Where(double.IsFinite)
+            .ToList();
+
+        if (rawYields.Count == 0)
+        {
+            return;
+        }
+
+        var min = rawYields.Min();
+        var max = rawYields.Max();
+        var range = max - min;
+        if (range <= 0)
+        {
+            return;
+        }
+
+        var extension = range * _options.OutlierClampFraction;
+        var lower = Math.Max(0, min - extension);
+        var upper = max + extension;
+
+        foreach (var key in smoothedCells.Keys.ToList())
+        {
+            var cell = smoothedCells[key];
+            var clampedYield = Math.Clamp(cell.Yield, lower, upper);
+            smoothedCells[key] = new SmoothedCell(clampedYield, cell.Moisture, cell.SampleCount);
+        }
+    }
+
+    private YieldLayerMetadata CreateMetadata(
+        DateTimeOffset timestamp,
+        IReadOnlyDictionary<(int Column, int Row), SmoothedCell> smoothedCells)
+    {
+        var weightedValues = smoothedCells.Values
+            .Where(cell => cell.SampleCount > 0 && double.IsFinite(cell.Yield))
+            .Select(cell => new WeightedValue(cell.Yield, cell.SampleCount))
+            .ToList();
+
+        var totalSamples = weightedValues.Sum(value => value.Weight);
+        var mean = totalSamples > 0 ? weightedValues.Sum(value => value.Value * value.Weight) / totalSamples : 0;
+        var min = weightedValues.Count > 0 ? weightedValues.Min(value => value.Value) : 0;
+        var max = weightedValues.Count > 0 ? weightedValues.Max(value => value.Value) : 0;
+        var median = totalSamples > 0 ? ComputeWeightedQuantile(weightedValues, totalSamples, 0.5) : 0;
+        var stdDev = totalSamples > 0
+            ? Math.Sqrt(weightedValues.Sum(value => value.Weight * Math.Pow(value.Value - mean, 2)) / totalSamples)
+            : 0;
+
+        var cellAreaHa = (_options.CellSizeMeters * _options.CellSizeMeters) / 10_000d;
+        var totalMassKg = smoothedCells.Values.Sum(cell => cell.Yield * cellAreaHa);
+
+        var binning = CreateBinningMetadata(weightedValues, totalSamples, min, max);
+
+        var grid = new YieldGridMetadata(_options.CellSizeMeters, _options.Projection);
+        var smoothing = new YieldSmoothingMetadata(
+            _options.SmoothingMethod,
+            _options.SmoothingWindowSeconds ?? 0,
+            _options.SmoothingLagCompensationSeconds ?? 0,
+            _options.SmoothingPasses);
+
+        var calibration = new YieldCalibrationMetadata(
+            _options.CalibrationProfileId,
+            _options.CalibrationAppliedAt,
+            _options.CalibrationSource,
+            _options.CalibrationSensorModel,
+            _options.CalibrationNotes,
+            new ReadOnlyDictionary<string, double>(new Dictionary<string, double>(_options.CalibrationFactors)));
+
+        var scopes = Array.AsReadOnly(_options.AggregationScopes.ToArray());
+
+        var aggregation = new YieldAggregationMetadata(
+            _options.AggregationBasis,
+            scopes,
+            timestamp,
+            binning);
+
+        var statistics = new YieldStatisticsMetadata(
+            totalSamples,
+            mean,
+            median,
+            stdDev,
+            min,
+            max,
+            totalMassKg);
+
+        return new YieldLayerMetadata(grid, smoothing, calibration, aggregation, statistics);
+    }
+
+    private YieldBinningMetadata CreateBinningMetadata(List<WeightedValue> values, int totalSamples, double min, double max)
+    {
+        var scheme = _options.BinningScheme switch
+        {
+            YieldBinningScheme.EqualInterval => "equalInterval",
+            YieldBinningScheme.Custom => "custom",
+            _ => "quantile"
+        };
+
+        return _options.BinningScheme switch
+        {
+            YieldBinningScheme.Custom =>
+                YieldBinningMetadata.Create(
+                    scheme,
+                    Math.Max((_options.CustomBinBreaks?.Length ?? 1) - 1, 0),
+                    _options.CustomBinBreaks,
+                    _options.CustomBinLabels),
+            YieldBinningScheme.EqualInterval =>
+                YieldBinningMetadata.Create(
+                    scheme,
+                    _options.BinningBinCount,
+                    ComputeEqualIntervalBreaks(min, max, _options.BinningBinCount),
+                    null),
+            _ =>
+                YieldBinningMetadata.Create(
+                    scheme,
+                    _options.BinningBinCount,
+                    ComputeQuantileBreaks(values, totalSamples, _options.BinningBinCount),
+                    null)
+        };
+    }
+
+    private static IReadOnlyList<double> ComputeEqualIntervalBreaks(double min, double max, int binCount)
+    {
+        var actualCount = Math.Max(binCount, 1);
+        var breaks = new double[actualCount + 1];
+
+        if (!double.IsFinite(min) || !double.IsFinite(max))
+        {
+            Array.Fill(breaks, 0);
+            return breaks;
+        }
+
+        var range = max - min;
+        if (range <= 0)
+        {
+            for (var i = 0; i < breaks.Length; i++)
+            {
+                breaks[i] = min;
+            }
+
+            return breaks;
+        }
+
+        var step = range / actualCount;
+        for (var i = 0; i <= actualCount; i++)
+        {
+            breaks[i] = min + step * i;
+        }
+
+        return breaks;
+    }
+
+    private static IReadOnlyList<double> ComputeQuantileBreaks(List<WeightedValue> values, int totalSamples, int binCount)
+    {
+        var actualCount = Math.Max(binCount, 1);
+        var breaks = new double[actualCount + 1];
+
+        if (values.Count == 0 || totalSamples <= 0)
+        {
+            Array.Fill(breaks, 0);
+            return breaks;
+        }
+
+        values.Sort((a, b) => a.Value.CompareTo(b.Value));
+
+        for (var i = 0; i <= actualCount; i++)
+        {
+            var quantile = actualCount == 0 ? 0 : (double)i / actualCount;
+            breaks[i] = ComputeWeightedQuantile(values, totalSamples, quantile);
+        }
+
+        return breaks;
+    }
+
+    private static double ComputeWeightedQuantile(List<WeightedValue> sortedValues, int totalWeight, double quantile)
+    {
+        if (sortedValues.Count == 0)
+        {
+            return 0;
+        }
+
+        if (totalWeight <= 0)
+        {
+            return sortedValues[0].Value;
+        }
+
+        quantile = Math.Clamp(quantile, 0, 1);
+        var target = quantile * (totalWeight - 1);
+        var cumulative = 0;
+
+        foreach (var value in sortedValues)
+        {
+            cumulative += value.Weight;
+            if (target < cumulative)
+            {
+                return value.Value;
+            }
+        }
+
+        return sortedValues[^1].Value;
+    }
 }
 
 /// <summary>
@@ -218,4 +555,5 @@ public sealed class CombineYieldLayerAggregator
 /// </summary>
 /// <param name="Layer">Aggregated layer payload.</param>
 /// <param name="Provenance">Provenance metadata describing the aggregation.</param>
-public sealed record CombineYieldLayerPublication(CombineYieldLayer Layer, LayerProvenance Provenance);
+/// <param name="Metadata">Metadata describing smoothing, calibration, aggregation, and statistics.</param>
+public sealed record CombineYieldLayerPublication(CombineYieldLayer Layer, LayerProvenance Provenance, YieldLayerMetadata Metadata);

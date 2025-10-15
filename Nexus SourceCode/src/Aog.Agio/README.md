@@ -127,3 +127,38 @@ label, and trail behaviour:
 Presence updates require that pose headers include `SeasonId` and `JobId` metadata. Trail
 payloads are serialized as JSON arrays (camelCase) with the most recent trail points and are
 published on `aog/live/{season}/{job}/trail` with `MeshDataTier.Trails` permissions.
+
+## RadioBridge ELRS adapter
+
+The RadioBridge ELRS adapter (NX-236/NX-239) forwards mesh publications over ELRS or simulated
+radio links using the transport defined in [ADR-048](../../../docs/ADR/ADR-048_RadioBridge.md).
+Enable the adapter by configuring `AgioHost:RadioBridge:Elrs`:
+
+```json
+{
+  "AgioHost": {
+    "RadioBridge": {
+      "Elrs": {
+        "Enabled": true,
+        "DeviceId": "bridge.elrs.alpha",
+        "DeviceLabel": "Field Radio Bridge",
+        "Endpoint": "sim://loopback",
+        "SendInterval": "00:00:00.100",
+        "DiagnosticsInterval": "00:00:05",
+        "DiagnosticsSeasonId": "system",
+        "DiagnosticsJobId": "radio"
+      }
+    }
+  }
+}
+```
+
+- **Endpoint** — Use `sim://` for integration tests or `serial://ttyUSB0?baud=420000` for hardware.
+- **SendInterval** — Controls how frequently the adapter scans for retransmissions.
+- **DiagnosticsInterval** — Publishes JSON summaries on
+  `aog/live/{DiagnosticsSeasonId}/{DiagnosticsJobId}/{DeviceId}.radio` with RSSI and retry counters.
+
+The adapter registers itself with the mesh, relays outbound publications to the radio bridge, and
+feeds inbound publications back into the mesh. It ships with firmware stubs and a simulator under
+`Aog.Agio.RadioBridge.Simulation` that unit tests and firmware teams can use while hardware
+drivers evolve (NX-241).

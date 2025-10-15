@@ -54,6 +54,21 @@ public sealed class CombineYieldLayerAggregatorTests
         cell.AverageMoisturePercent.Should().Be(18);
         cell.SampleCount.Should().Be(1);
 
+        published.Metadata.Should().NotBeNull();
+        published.Metadata.Grid.CellSizeMeters.Should().Be(10);
+        published.Metadata.Grid.Projection.Should().Be("EPSG:4978");
+        published.Metadata.Smoothing.Method.Should().Be("movingAverage");
+        published.Metadata.Statistics.SampleCount.Should().Be(1);
+        published.Metadata.Statistics.Mean.Should().Be(8500);
+        published.Metadata.Statistics.Median.Should().Be(8500);
+        published.Metadata.Statistics.StdDev.Should().Be(0);
+        published.Metadata.Statistics.TotalMassKg.Should().BeApproximately(85, 1e-6);
+        published.Metadata.Aggregation.Bins.Scheme.Should().Be("quantile");
+        published.Metadata.Aggregation.Bins.Count.Should().Be(5);
+        published.Metadata.Calibration.ProfileId.Should().Be("calibration:default");
+        published.Metadata.Aggregation.Scopes.Should().Contain("job");
+        published.Metadata.Aggregation.Scopes.Should().Contain("field");
+
         published.Provenance.Source.Should().Be("sim");
         published.Provenance.Transform.Should().Be("aggregate:combine-yield");
         published.Provenance.Actor.Should().Be("plugin:combine-yield");
@@ -84,6 +99,8 @@ public sealed class CombineYieldLayerAggregatorTests
         cell.AverageYieldKgPerHectare.Should().BeApproximately(10000, 1e-3);
         cell.AverageMoisturePercent.Should().BeApproximately(15, 1e-3);
         cell.SampleCount.Should().Be(2);
+        published.Metadata.Statistics.SampleCount.Should().Be(2);
+        published.Metadata.Statistics.Mean.Should().BeApproximately(10000, 1e-3);
     }
 
     [Fact]
@@ -131,6 +148,7 @@ public sealed class CombineYieldLayerAggregatorTests
         snapshot.Layer.Cells[0].AverageYieldKgPerHectare.Should().Be(4000);
         snapshot.Layer.Header.Sequence.Should().Be(0);
         snapshot.Provenance.Hash.Should().NotBeNullOrEmpty();
+        snapshot.Metadata.Statistics.SampleCount.Should().Be(1);
     }
 
     [Fact]
@@ -172,6 +190,35 @@ public sealed class CombineYieldLayerAggregatorTests
         var action = () => aggregator.IngestAsync(new CombineYieldMeasurement(-1, 0, 5000)).AsTask();
 
         await action.Should().ThrowAsync<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public async Task Smoothing_BlendsNeighboringCells()
+    {
+        var bus = new InMemoryEventBus();
+        var options = CreateOptions();
+        options.SmoothingKernelSize = 3;
+        options.OutlierClampFraction = 0;
+        var aggregator = new CombineYieldLayerAggregator(bus, options, new FakeTimeProvider());
+
+        CombineYieldLayerPublication? latest = null;
+        using var subscription = bus.Subscribe<CombineYieldLayerPublication>((publication, _) =>
+        {
+            latest = publication;
+            return ValueTask.CompletedTask;
+        });
+
+        await aggregator.IngestAsync(new CombineYieldMeasurement(1, 1, 12000));
+        await aggregator.IngestAsync(new CombineYieldMeasurement(11, 1, 6000));
+
+        latest.Should().NotBeNull();
+        var cells = latest!.Layer.Cells.OrderBy(cell => cell.Column).ToArray();
+        cells.Should().HaveCount(2);
+        cells[0].AverageYieldKgPerHectare.Should().BeApproximately(9000, 1e-6);
+        cells[1].AverageYieldKgPerHectare.Should().BeApproximately(9000, 1e-6);
+        latest.Metadata.Statistics.SampleCount.Should().Be(2);
+        latest.Metadata.Statistics.StdDev.Should().Be(0);
+        latest.Metadata.Aggregation.Bins.Count.Should().Be(options.BinningBinCount);
     }
 
     private static string ComputeExpectedHash(CombineYieldLayer layer)

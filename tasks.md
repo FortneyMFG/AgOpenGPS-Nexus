@@ -153,8 +153,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-254 Genetics analytics callbacks _(Planned)_ — ADR-046 analytics integration
 - [ ] NX-255 Genetics plugin regression fixtures _(Planned)_ — ADR-046 QA hooks
 - [ ] NX-256 Yield sensor normalization module _(Planned)_ — ADR-049 yield plugin
-- [ ] NX-257 Yield smoothing & binning pipeline _(Planned)_ — ADR-049 analytics pipelines
-- [ ] NX-258 Yield import wizard plumbing _(Planned)_ — ADR-049 import workflows
+- [x] NX-257 Yield smoothing & binning pipeline _(Done)_ — ADR-049 analytics pipelines
+- [x] NX-258 Yield import wizard plumbing _(Done)_ — ADR-049 import workflows
 - [ ] NX-259 Yield analytics API surface _(Planned)_ — ADR-049 analytics integration
 - [ ] NX-260 Yield plugin regression fixtures _(Planned)_ — ADR-049 QA hooks
 - [ ] NX-261 Cost/profit plugin ingestion & ledger _(Planned)_ — ADR-050 cost/profit plugin
@@ -487,8 +487,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-254 | Genetics analytics callbacks | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 analytics integration |
 | NX-255 | Genetics plugin regression fixtures | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 QA hooks |
 | NX-256 | Yield sensor normalization module | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 yield plugin |
-| NX-257 | Yield smoothing & binning pipeline | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 analytics pipelines |
-| NX-258 | Yield import wizard plumbing | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 import workflows |
+| NX-257 | Yield smoothing & binning pipeline | Done |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 analytics pipelines |
+| NX-258 | Yield import wizard plumbing | Done |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 import workflows |
 | NX-259 | Yield analytics API surface | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 analytics integration |
 | NX-260 | Yield plugin regression fixtures | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 QA hooks |
 | NX-261 | Cost/profit plugin ingestion & ledger | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 cost/profit plugin |

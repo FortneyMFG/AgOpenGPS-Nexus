@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -128,7 +129,8 @@ public sealed class PluginManifestLoader
             }
         }
 
-        foreach (var capability in manifest.SupportedCapabilities)
+        var supportedCapabilities = manifest.SupportedCapabilities ?? Array.Empty<string>();
+        foreach (var capability in supportedCapabilities)
         {
             if (string.IsNullOrWhiteSpace(capability))
             {
@@ -136,7 +138,8 @@ public sealed class PluginManifestLoader
             }
         }
 
-        foreach (var transport in manifest.RequiredTransports)
+        var requiredTransports = manifest.RequiredTransports ?? Array.Empty<string>();
+        foreach (var transport in requiredTransports)
         {
             if (string.IsNullOrWhiteSpace(transport))
             {
@@ -197,15 +200,17 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (manifest.CapabilityLeases.Count > 0)
+        var capabilityLeases = manifest.CapabilityLeases ?? Array.Empty<PluginCapabilityLease>();
+
+        if (capabilityLeases.Count > 0)
         {
-            if (manifest.SupportedCapabilities.Count == 0)
+            if (supportedCapabilities.Count == 0)
             {
                 throw new InvalidDataException("Manifest must declare supportedCapabilities when capability leases are present.");
             }
 
             var seenLeaseCapabilities = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var lease in manifest.CapabilityLeases)
+            foreach (var lease in capabilityLeases)
             {
                 if (lease is null)
                 {
@@ -217,7 +222,7 @@ public sealed class PluginManifestLoader
                     throw new InvalidDataException("Lease capability names must be non-empty.");
                 }
 
-                if (!manifest.SupportedCapabilities.Contains(lease.Capability, StringComparer.OrdinalIgnoreCase))
+                if (!supportedCapabilities.Contains(lease.Capability, StringComparer.OrdinalIgnoreCase))
                 {
                     throw new InvalidDataException($"Lease capability '{lease.Capability}' must be listed in supportedCapabilities.");
                 }

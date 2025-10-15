@@ -110,6 +110,10 @@ public sealed class LegacyUdpGatewayTests
         Assert.True(failsafe.ReportHeartbeatCalled);
         Assert.Same(command, failsafe.LastSteerCommand);
         Assert.Same(sections, failsafe.LastSectionMask);
+        Assert.NotEqual(0, failsafe.SteerFilterOrder);
+        Assert.NotEqual(0, failsafe.SectionFilterOrder);
+        Assert.True(failsafe.SteerFilterOrder < failsafe.ReportHeartbeatOrder);
+        Assert.True(failsafe.SectionFilterOrder < failsafe.ReportHeartbeatOrder);
 
         var frame = Assert.Single(transport.Frames);
         Assert.True(steerCodec.TryDecodeSteerCommand(frame.Span, out var decoded, out _, out var decodedSections));
@@ -574,6 +578,14 @@ public sealed class LegacyUdpGatewayTests
 
         public SectionMask? LastSectionMask { get; private set; }
 
+        public int SteerFilterOrder { get; private set; }
+
+        public int SectionFilterOrder { get; private set; }
+
+        public int ReportHeartbeatOrder { get; private set; }
+
+        private int _callOrder;
+
         public bool HasActiveHeartbeat => true;
 
         public DateTimeOffset? LastHeartbeatUtc => null;
@@ -583,6 +595,7 @@ public sealed class LegacyUdpGatewayTests
         public void ReportHeartbeat()
         {
             ReportHeartbeatCalled = true;
+            ReportHeartbeatOrder = ++_callOrder;
         }
 
         public void ClearHeartbeat()
@@ -592,12 +605,14 @@ public sealed class LegacyUdpGatewayTests
         public SteerCmd FilterSteerCommand(SteerCmd command)
         {
             LastSteerCommand = command;
+            SteerFilterOrder = ++_callOrder;
             return SteerResult;
         }
 
         public SectionMask FilterSectionMask(SectionMask mask)
         {
             LastSectionMask = mask;
+            SectionFilterOrder = ++_callOrder;
             return SectionResult;
         }
     }

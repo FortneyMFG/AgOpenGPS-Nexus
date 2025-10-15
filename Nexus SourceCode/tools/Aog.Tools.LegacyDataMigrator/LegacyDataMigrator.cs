@@ -777,6 +777,9 @@ internal static class TelemetrySchemas
         public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
         public static readonly DataField<string?> Frame = new("frame");
         public static readonly DataField<string?> Source = new("source");
+        public static readonly DataField<string?> JobId = new("job_id");
+        public static readonly DataField<string?> SeasonId = new("season_id");
+        public static readonly DataField<string?> SessionId = new("session_id");
         public static readonly DataField<double> LatitudeDeg = new("latitude_deg");
         public static readonly DataField<double> LongitudeDeg = new("longitude_deg");
         public static readonly DataField<double> AltitudeM = new("altitude_m");
@@ -790,6 +793,9 @@ internal static class TelemetrySchemas
             Timestamp,
             Frame,
             Source,
+            JobId,
+            SeasonId,
+            SessionId,
             LatitudeDeg,
             LongitudeDeg,
             AltitudeM,
@@ -806,6 +812,9 @@ internal static class TelemetrySchemas
         public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
         public static readonly DataField<string?> Frame = new("frame");
         public static readonly DataField<string?> Source = new("source");
+        public static readonly DataField<string?> JobId = new("job_id");
+        public static readonly DataField<string?> SeasonId = new("season_id");
+        public static readonly DataField<string?> SessionId = new("session_id");
         public static readonly DataField<double> AccelXMps2 = new("accel_x_mps2");
         public static readonly DataField<double> AccelYMps2 = new("accel_y_mps2");
         public static readonly DataField<double> AccelZMps2 = new("accel_z_mps2");
@@ -821,6 +830,9 @@ internal static class TelemetrySchemas
             Timestamp,
             Frame,
             Source,
+            JobId,
+            SeasonId,
+            SessionId,
             AccelXMps2,
             AccelYMps2,
             AccelZMps2,
@@ -839,6 +851,9 @@ internal static class TelemetrySchemas
         public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
         public static readonly DataField<string?> Frame = new("frame");
         public static readonly DataField<string?> Source = new("source");
+        public static readonly DataField<string?> JobId = new("job_id");
+        public static readonly DataField<string?> SeasonId = new("season_id");
+        public static readonly DataField<string?> SessionId = new("session_id");
         public static readonly DataField<uint> ArbitrationId = new("arbitration_id");
         public static readonly DataField<byte[]?> Payload = new("payload");
         public static readonly DataField<bool> IsExtendedId = new("is_extended_id");
@@ -848,6 +863,9 @@ internal static class TelemetrySchemas
             Timestamp,
             Frame,
             Source,
+            JobId,
+            SeasonId,
+            SessionId,
             ArbitrationId,
             Payload,
             IsExtendedId,
@@ -860,6 +878,9 @@ internal static class TelemetrySchemas
         public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
         public static readonly DataField<string?> Frame = new("frame");
         public static readonly DataField<string?> Source = new("source");
+        public static readonly DataField<string?> JobId = new("job_id");
+        public static readonly DataField<string?> SeasonId = new("season_id");
+        public static readonly DataField<string?> SessionId = new("session_id");
         public static readonly DataField<uint> SectionCount = new("section_count");
         public static readonly DataField<uint> Mask = new("mask");
         public static readonly Schema Schema = new(
@@ -867,6 +888,9 @@ internal static class TelemetrySchemas
             Timestamp,
             Frame,
             Source,
+            JobId,
+            SeasonId,
+            SessionId,
             SectionCount,
             Mask);
     }
@@ -876,6 +900,9 @@ internal static class TelemetrySchemas
         public static readonly DataField<ulong> Sequence = new("sequence");
         public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
         public static readonly DataField<string?> Source = new("source");
+        public static readonly DataField<string?> JobId = new("job_id");
+        public static readonly DataField<string?> SeasonId = new("season_id");
+        public static readonly DataField<string?> SessionId = new("session_id");
         public static readonly DataField<string> PluginId = new("plugin_id");
         public static readonly DataField<string> Topic = new("topic");
         public static readonly DataField<byte[]?> Payload = new("payload");
@@ -883,6 +910,9 @@ internal static class TelemetrySchemas
             Sequence,
             Timestamp,
             Source,
+            JobId,
+            SeasonId,
+            SessionId,
             PluginId,
             Topic,
             Payload);

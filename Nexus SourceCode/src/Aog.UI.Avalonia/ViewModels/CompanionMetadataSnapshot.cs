@@ -12,7 +12,8 @@ public sealed record CompanionMetadataSnapshot(
     CompanionLegendSnapshot Legend,
     CompanionInspectorSnapshot Inspector,
     CompanionDashboardSnapshot Dashboard,
-    CompanionReplayTimelineSnapshot ReplayTimeline)
+    CompanionReplayTimelineSnapshot ReplayTimeline,
+    CompanionFieldHealthSnapshot FieldHealth)
 {
     /// <summary>
     /// Creates a snapshot from the supplied metadata-driven view-models.
@@ -26,12 +27,14 @@ public sealed record CompanionMetadataSnapshot(
         LayerLegendViewModel legend,
         LayerInspectorViewModel inspector,
         SteerDashboardViewModel dashboard,
-        ReplayTimelineViewModel timeline)
+        ReplayTimelineViewModel timeline,
+        FieldHealthSeverityPanelViewModel fieldHealth)
     {
         ArgumentNullException.ThrowIfNull(legend);
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(dashboard);
         ArgumentNullException.ThrowIfNull(timeline);
+        ArgumentNullException.ThrowIfNull(fieldHealth);
 
         var legendEntries = legend.Entries
             .Select(entry => new CompanionLegendEntry(
@@ -84,6 +87,17 @@ public sealed record CompanionMetadataSnapshot(
                 bookmark.TimestampDisplay))
             .ToArray();
 
+        var fieldHealthEntries = fieldHealth.Entries
+            .Select(entry => new CompanionFieldHealthSeverityEntry(
+                entry.Severity,
+                entry.DisplayName,
+                entry.Summary,
+                entry.RecommendedAction,
+                entry.AreaImpactDisplay,
+                entry.Notes,
+                entry.Color.ToString()))
+            .ToArray();
+
         return new CompanionMetadataSnapshot(
             new CompanionLegendSnapshot(legendEntries),
             new CompanionInspectorSnapshot(
@@ -110,7 +124,15 @@ public sealed record CompanionMetadataSnapshot(
                 timeline.ExportStatus,
                 timeline.SpeedSamples.ToArray(),
                 timeline.HeadingSamples.ToArray(),
-                bookmarks));
+                bookmarks),
+            new CompanionFieldHealthSnapshot(
+                fieldHealth.LayerDisplayName,
+                fieldHealth.StatusMessage,
+                fieldHealth.TotalAreaDisplay,
+                fieldHealth.LastSurveyedDisplay,
+                fieldHealth.ObserverDisplay,
+                fieldHealth.FilterSummary,
+                fieldHealthEntries));
     }
 
     private static string? ExtractColor(IBrush? brush)
@@ -197,6 +219,40 @@ public sealed record CompanionDashboardSnapshot(
     string GainSummary,
     IReadOnlyList<CompanionDashboardSeries> Series,
     IReadOnlyList<CompanionDashboardParameter> TuningParameters);
+
+/// <summary>Field health severity metadata for companion clients.</summary>
+/// <param name="LayerDisplayName">Display name for the active layer.</param>
+/// <param name="StatusMessage">Status summary describing current severity.</param>
+/// <param name="TotalAreaDisplay">Formatted display of the impacted area.</param>
+/// <param name="LastSurveyedDisplay">Formatted last scouted timestamp.</param>
+/// <param name="ObserverDisplay">Display value identifying the observer.</param>
+/// <param name="FilterSummary">Summary of active history filters.</param>
+/// <param name="Entries">Severity entries published by the plugin.</param>
+public sealed record CompanionFieldHealthSnapshot(
+    string LayerDisplayName,
+    string StatusMessage,
+    string TotalAreaDisplay,
+    string LastSurveyedDisplay,
+    string ObserverDisplay,
+    string FilterSummary,
+    IReadOnlyList<CompanionFieldHealthSeverityEntry> Entries);
+
+/// <summary>Represents a single severity entry in the companion snapshot.</summary>
+/// <param name="Severity">Severity identifier.</param>
+/// <param name="DisplayName">Human readable severity name.</param>
+/// <param name="Summary">Summary of the severity state.</param>
+/// <param name="RecommendedAction">Recommended operator action.</param>
+/// <param name="AreaImpactDisplay">Formatted impact description.</param>
+/// <param name="Notes">Optional supplemental notes.</param>
+/// <param name="Color">Colour encoded as ARGB.</param>
+public sealed record CompanionFieldHealthSeverityEntry(
+    string Severity,
+    string DisplayName,
+    string Summary,
+    string RecommendedAction,
+    string? AreaImpactDisplay,
+    string? Notes,
+    string Color);
 
 /// <summary>Metadata describing a dashboard series.</summary>
 /// <param name="Id">Series identifier.</param>

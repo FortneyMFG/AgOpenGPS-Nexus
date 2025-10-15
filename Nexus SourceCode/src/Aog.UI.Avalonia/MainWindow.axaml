@@ -457,6 +457,76 @@
             </StackPanel>
           </Border>
 
+          <!-- Field health severity -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding FieldHealthSeverity}" x:DataType="vm:FieldHealthSeverityPanelViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Field health severity" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <WrapPanel Orientation="Horizontal">
+                <StackPanel Margin="0,0,24,8">
+                  <TextBlock Text="Layer" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding LayerDisplayName}" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Margin="0,0,24,8">
+                  <TextBlock Text="Impacted area" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding TotalAreaDisplay}" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Margin="0,0,24,8">
+                  <TextBlock Text="Last scouted" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding LastSurveyedDisplay}" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Margin="0,0,24,8">
+                  <TextBlock Text="Observer" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding ObserverDisplay}" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Margin="0,0,24,8">
+                  <TextBlock Text="History filters" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding FilterSummary}" FontWeight="SemiBold"/>
+                </StackPanel>
+              </WrapPanel>
+
+              <ItemsControl ItemsSource="{Binding Entries}" IsVisible="{Binding HasEntries}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Spacing="8"/>
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:FieldHealthSeverityEntryViewModel">
+                    <Border Padding="12"
+                            CornerRadius="8"
+                            Background="{DynamicResource ThemeBackgroundBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                            BorderThickness="1">
+                      <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Border Width="16"
+                                  Height="16"
+                                  CornerRadius="4"
+                                  Background="{Binding SwatchBrush}"/>
+                          <StackPanel>
+                            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          </StackPanel>
+                        </StackPanel>
+                        <TextBlock Text="{Binding AreaImpactDisplay}" FontSize="11" FontWeight="SemiBold" IsVisible="{Binding HasAreaImpact}"/>
+                        <TextBlock Text="{Binding RecommendedAction}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding Notes}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}" IsVisible="{Binding HasNotes}"/>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
           <!-- Layer inspector -->
           <Border Padding="16" CornerRadius="12"
                   Background="{DynamicResource ThemeBackgroundBrush}"

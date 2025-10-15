@@ -147,6 +147,13 @@ public sealed class PluginManifestLoader
             }
         }
 
+        {
+            if (string.IsNullOrWhiteSpace(transport))
+            {
+                throw new InvalidDataException("Required transport names must be non-empty.");
+            }
+        }
+
         if (!string.IsNullOrWhiteSpace(manifest.MinimumRuntimeVersion) &&
             !SemanticVersionPattern.IsMatch(manifest.MinimumRuntimeVersion))
         {

@@ -40,11 +40,16 @@ assets. The schema mirrors the runtime `ReportTemplate` record, capturing:
 | `version` | Semantic version incremented for schema or layout changes. Minor versions cover cosmetic edits; major versions signal breaking section/output changes. |
 | `scope` | Enum: `Farm`, `Season`, `Job`, or `Session`. Determines context fetch and validation rules. |
 | `sections[]` | Ordered list of section descriptors (`sectionId`, `isOptional`, optional `parameters`). |
-| `outputs[]` | Declares export payloads (`format`, `description`, optional `contentType`, `defaultFileName`). |
+| `outputs[]` | Declares export payloads (`format`, `description`, optional `parameters` passed to the renderer). |
 | `metadata` | Optional free-form block for feature flags, preview thumbnails, or localization bundles. |
 
 Templates are validated before registration to prevent duplicate IDs, missing
 sections, or unsupported outputs.【F:Nexus SourceCode/src/Aog.Core/Reporting/ReportBuilderService.cs†L16-L96】【F:Nexus SourceCode/src/Aog.Core/Reporting/ReportTemplate.cs†L23-L177】
+
+> **Note:** Runtime section and output descriptors only capture identifiers,
+> optionality, and parameter bags. Presentation fields such as section titles,
+> required data hints, or fallback copy must be supplied by the consuming UI or
+> documentation until the runtime models grow dedicated properties.
 
 ### Example `ReportTemplate.v1`
 

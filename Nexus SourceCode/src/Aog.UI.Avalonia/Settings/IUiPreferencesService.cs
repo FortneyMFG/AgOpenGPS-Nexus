@@ -1,4 +1,5 @@
 using System;
+using Aog.UI.Avalonia.Hosting;
 
 namespace Aog.UI.Avalonia.Settings;
 
@@ -21,4 +22,8 @@ public interface IUiPreferencesService
     /// <summary>Updates the telemetry opt-in flag.</summary>
     /// <param name="isOptedIn">Whether telemetry uploads are enabled.</param>
     void UpdateTelemetryOptIn(bool isOptedIn);
+
+    /// <summary>Updates the persisted run mode preference.</summary>
+    /// <param name="mode">The run mode to record.</param>
+    void UpdateRunMode(AvaloniaRunMode mode);
 }

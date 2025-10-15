@@ -1,3 +1,5 @@
+using Aog.Abstractions.Runtime;
+using Aog.Agio.AogLink;
 using Aog.Agio.Safety;
 using Aog.Agio.Timing;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +15,8 @@ public static class Program
     public static async Task<int> Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration().CreateLogger();
+
+        DotNetRuntimeBaseline.EnsureSupported();
 
         try
         {
@@ -66,6 +70,12 @@ public static class Program
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+                services
+                    .AddOptions<AogLinkTransportOptions>()
+                    .BindConfiguration("AgioHost:AogLink")
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
                 services.AddSingleton(TimeProvider.System);
                 services.AddSingleton<IActuatorFailsafeService, ActuatorFailsafeService>();
                 services.AddSingleton<ISafetyLog, FileSafetyLog>();
@@ -80,6 +90,13 @@ public static class Program
                 }
 
                 services.AddHostedService<TimingCapabilitiesLoggerService>();
+
+                services.AddSingleton<IAogLinkTransportDriver, EthernetAogLinkTransportDriver>();
+                services.AddSingleton<IAogLinkTransportDriver, SerialAogLinkTransportDriver>();
+                services.AddSingleton<IAogLinkTransportDriver, CanAogLinkTransportDriver>();
+                services.AddSingleton<AogLinkBridge>();
+                services.AddSingleton<AogLinkTransportManager>();
+                services.AddHostedService(provider => provider.GetRequiredService<AogLinkTransportManager>());
 
                 var backendOptions = context.Configuration
                     .GetSection("AgioHost:Backend")

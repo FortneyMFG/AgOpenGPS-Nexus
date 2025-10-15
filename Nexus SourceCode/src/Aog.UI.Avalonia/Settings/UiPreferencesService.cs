@@ -1,4 +1,5 @@
 using System;
+using Aog.UI.Avalonia.Hosting;
 
 namespace Aog.UI.Avalonia.Settings;
 
@@ -69,6 +70,21 @@ public sealed class UiPreferencesService : IUiPreferencesService
             }
 
             _current.TelemetryOptIn = isOptedIn;
+            Persist();
+        }
+    }
+
+    /// <inheritdoc />
+    public void UpdateRunMode(AvaloniaRunMode mode)
+    {
+        lock (_gate)
+        {
+            if (_current.RunMode == mode)
+            {
+                return;
+            }
+
+            _current.RunMode = mode;
             Persist();
         }
     }

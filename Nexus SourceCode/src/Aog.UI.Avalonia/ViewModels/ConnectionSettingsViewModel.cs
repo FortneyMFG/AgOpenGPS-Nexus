@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Settings;
 
 namespace Aog.UI.Avalonia.ViewModels;
@@ -11,15 +12,17 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// <summary>
 /// View-model backing the connection settings panel in the shell.
 /// </summary>
-public class ConnectionSettingsViewModel : INotifyPropertyChanged
+public class ConnectionSettingsViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly IConnectionSettingsStore _store;
     private readonly AsyncCommand _saveCommand;
+    private readonly IAvaloniaRunModeService _runModeService;
 
     private ConnectionSettings _persistedSettings;
     private string _agioEndpoint = string.Empty;
     private AgioBackendKind _selectedBackend;
     private GpsSourcePolicy _selectedGpsSourcePolicy;
+    private AvaloniaRunMode _selectedRunMode;
     private string? _statusMessage;
     private bool _hasError;
     private bool _isSaving;
@@ -28,17 +31,21 @@ public class ConnectionSettingsViewModel : INotifyPropertyChanged
     /// Initializes a new instance of the <see cref="ConnectionSettingsViewModel"/> class.
     /// </summary>
     /// <param name="store">The persistence store used to load and save settings.</param>
-    public ConnectionSettingsViewModel(IConnectionSettingsStore store)
+    public ConnectionSettingsViewModel(IConnectionSettingsStore store, IAvaloniaRunModeService runModeService)
     {
         ArgumentNullException.ThrowIfNull(store);
+        ArgumentNullException.ThrowIfNull(runModeService);
         _store = store;
+        _runModeService = runModeService;
 
         _persistedSettings = _store.Load();
         _agioEndpoint = _persistedSettings.AgioEndpoint;
         _selectedBackend = _persistedSettings.Backend;
         _selectedGpsSourcePolicy = _persistedSettings.GpsSourcePolicy;
+        _selectedRunMode = _runModeService.CurrentMode;
 
         _saveCommand = new AsyncCommand(SaveAsync, CanSave);
+        _runModeService.ModeChanged += OnRunModeChanged;
     }
 
     /// <summary>
@@ -55,6 +62,11 @@ public class ConnectionSettingsViewModel : INotifyPropertyChanged
     /// Gets the list of available GPS source policies.
     /// </summary>
     public IReadOnlyList<GpsSourcePolicy> AvailableGpsSourcePolicies { get; } = Enum.GetValues<GpsSourcePolicy>();
+
+    /// <summary>
+    /// Gets the list of supported run modes.
+    /// </summary>
+    public IReadOnlyList<AvaloniaRunMode> AvailableRunModes => _runModeService.SupportedModes;
 
     /// <summary>
     /// Gets or sets the AGiO endpoint the UI should connect to.
@@ -110,6 +122,25 @@ public class ConnectionSettingsViewModel : INotifyPropertyChanged
             _selectedGpsSourcePolicy = value;
             OnPropertyChanged();
             NotifyCanExecuteChanged();
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the selected run mode for the UI shell.
+    /// </summary>
+    public AvaloniaRunMode SelectedRunMode
+    {
+        get => _selectedRunMode;
+        set
+        {
+            if (value == _selectedRunMode)
+            {
+                return;
+            }
+
+            _selectedRunMode = value;
+            OnPropertyChanged();
+            _ = ApplyRunModeAsync(value);
         }
     }
 
@@ -222,6 +253,35 @@ public class ConnectionSettingsViewModel : INotifyPropertyChanged
         {
             IsSaving = false;
         }
+    }
+
+    private async Task ApplyRunModeAsync(AvaloniaRunMode mode)
+    {
+        try
+        {
+            var result = await _runModeService.SetModeAsync(mode).ConfigureAwait(true);
+            HasError = false;
+            StatusMessage = result.RequiresRestart
+                ? $"Run mode set to {mode}. Restart required to finalise transport wiring."
+                : $"Run mode set to {mode}.";
+        }
+        catch (Exception ex)
+        {
+            HasError = true;
+            StatusMessage = $"Failed to apply run mode: {ex.Message}";
+        }
+    }
+
+    private void OnRunModeChanged(object? sender, AvaloniaRunModeChangedEventArgs e)
+    {
+        _selectedRunMode = e.Mode;
+        OnPropertyChanged(nameof(SelectedRunMode));
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        _runModeService.ModeChanged -= OnRunModeChanged;
     }
 
     private void NotifyCanExecuteChanged() => _saveCommand.NotifyCanExecuteChanged();

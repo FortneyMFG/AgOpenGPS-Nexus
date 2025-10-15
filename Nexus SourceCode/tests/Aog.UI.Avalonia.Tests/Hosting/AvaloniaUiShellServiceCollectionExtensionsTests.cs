@@ -29,6 +29,10 @@ public class AvaloniaUiShellServiceCollectionExtensionsTests
         services.Should().ContainSingle(descriptor => descriptor.ServiceType == typeof(IConnectionSettingsStore)
             && descriptor.ImplementationType == typeof(JsonConnectionSettingsStore))
             .Which.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        services.Should().ContainSingle(descriptor => descriptor.ServiceType == typeof(IRunModePlatform))
+            .Which.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        services.Should().ContainSingle(descriptor => descriptor.ServiceType == typeof(IAvaloniaRunModeService))
+            .Which.Lifetime.Should().Be(ServiceLifetime.Singleton);
     }
 
     [Fact]
@@ -44,5 +48,7 @@ public class AvaloniaUiShellServiceCollectionExtensionsTests
         services.Count(descriptor => descriptor.ServiceType == typeof(MainWindowViewModel)).Should().Be(1);
         services.Count(descriptor => descriptor.ServiceType == typeof(ConnectionSettingsViewModel)).Should().Be(1);
         services.Count(descriptor => descriptor.ServiceType == typeof(IConnectionSettingsStore)).Should().Be(1);
+        services.Count(descriptor => descriptor.ServiceType == typeof(IRunModePlatform)).Should().Be(1);
+        services.Count(descriptor => descriptor.ServiceType == typeof(IAvaloniaRunModeService)).Should().Be(1);
     }
 }

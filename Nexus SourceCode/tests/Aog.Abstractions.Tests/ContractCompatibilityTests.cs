@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Aog.Core.V1;
-using Aog.Protos.Agio.V1;
-using Aog.Protos.Capabilities.V1;
+using Aog.Abstractions.Contracts;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Xunit;
@@ -22,41 +20,9 @@ public class ContractCompatibilityTests
 
         var baselineBytes = Convert.FromBase64String(File.ReadAllText(baselinePath));
         var baseline = FileDescriptorSet.Parser.ParseFrom(baselineBytes);
-        var current = BuildDescriptorSet(new[]
-        {
-            CoreReflection.Descriptor,
-            CapabilitiesReflection.Descriptor,
-            AgioSimReflection.Descriptor
-        });
+        var current = GrpcContractRegistry.DescriptorSet;
 
         Assert.Equal(baseline.ToByteArray(), current.ToByteArray());
-    }
-
-    private static FileDescriptorSet BuildDescriptorSet(IEnumerable<FileDescriptor> roots)
-    {
-        var queue = new Stack<FileDescriptor>(roots);
-        var visited = new Dictionary<string, FileDescriptor>(StringComparer.Ordinal);
-        while (queue.Count > 0)
-        {
-            var descriptor = queue.Pop();
-            if (!visited.TryAdd(descriptor.Name, descriptor))
-            {
-                continue;
-            }
-
-            foreach (var dependency in descriptor.Dependencies)
-            {
-                queue.Push(dependency);
-            }
-        }
-
-        var set = new FileDescriptorSet();
-        foreach (var file in visited.Values.OrderBy(f => f.Name, StringComparer.Ordinal))
-        {
-            set.File.Add(file.Proto);
-        }
-
-        return set;
     }
 
     private static string GetSourceRoot()

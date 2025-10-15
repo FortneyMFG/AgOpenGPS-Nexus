@@ -21,6 +21,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAvaloniaUiShell(this IServiceCollection services)
     {
         services.TryAddSingleton<App>();
+        services.TryAddSingleton<IRunModePlatform, SystemRunModePlatform>();
+        services.TryAddSingleton<IAvaloniaRunModeService, AvaloniaRunModeService>();
         services.TryAddSingleton<IConnectionSettingsStore, JsonConnectionSettingsStore>();
         services.TryAddSingleton<IUiPreferencesStore, JsonUiPreferencesStore>();
         services.TryAddSingleton<IUiPreferencesService, UiPreferencesService>();

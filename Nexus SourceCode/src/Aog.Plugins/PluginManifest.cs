@@ -55,8 +55,32 @@ public sealed class PluginManifest
     public Dictionary<string, JsonElement> Settings { get; init; } = new();
 
     /// <summary>
+    /// Gets the capabilities advertised by the plugin bundle.
+    /// </summary>
+    [JsonPropertyName("supportedCapabilities")]
+    public List<string> SupportedCapabilities { get; init; } = new();
+
+    /// <summary>
+    /// Gets the transports required for the plugin to function.
+    /// </summary>
+    [JsonPropertyName("requiredTransports")]
+    public List<string> RequiredTransports { get; init; } = new();
+
+    /// <summary>
+    /// Gets the minimum Nexus runtime version compatible with the plugin.
+    /// </summary>
+    [JsonPropertyName("minimumRuntimeVersion")]
+    public required string MinimumRuntimeVersion { get; init; }
+
+    /// <summary>
     /// Gets the simulation providers declared by the plugin.
     /// </summary>
     [JsonPropertyName("simProviders")]
     public List<PluginSimProvider> SimulationProviders { get; init; } = new();
+
+    /// <summary>
+    /// Gets the lease declarations describing how the plugin acquires capabilities.
+    /// </summary>
+    [JsonPropertyName("leases")]
+    public List<PluginCapabilityLease> CapabilityLeases { get; init; } = new();
 }

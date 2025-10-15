@@ -57,14 +57,26 @@ public sealed class PluginManifest
     /// <summary>
     /// Gets the capabilities advertised by the plugin bundle.
     /// </summary>
+    private List<string> _supportedCapabilities = new();
+
     [JsonPropertyName("supportedCapabilities")]
-    public List<string> SupportedCapabilities { get; init; } = new();
+    public List<string> SupportedCapabilities
+    {
+        get => _supportedCapabilities;
+        init => _supportedCapabilities = value ?? new();
+    }
 
     /// <summary>
     /// Gets the transports required for the plugin to function.
     /// </summary>
+    private List<string> _requiredTransports = new();
+
     [JsonPropertyName("requiredTransports")]
-    public List<string> RequiredTransports { get; init; } = new();
+    public List<string> RequiredTransports
+    {
+        get => _requiredTransports;
+        init => _requiredTransports = value ?? new();
+    }
 
     /// <summary>
     /// Gets the minimum Nexus runtime version compatible with the plugin.
@@ -81,12 +93,24 @@ public sealed class PluginManifest
     /// <summary>
     /// Gets the simulation providers declared by the plugin.
     /// </summary>
+    private List<PluginSimProvider> _simulationProviders = new();
+
     [JsonPropertyName("simProviders")]
-    public List<PluginSimProvider> SimulationProviders { get; init; } = new();
+    public List<PluginSimProvider> SimulationProviders
+    {
+        get => _simulationProviders;
+        init => _simulationProviders = value ?? new();
+    }
 
     /// <summary>
     /// Gets the lease declarations describing how the plugin acquires capabilities.
     /// </summary>
+    private List<PluginCapabilityLease> _capabilityLeases = new();
+
     [JsonPropertyName("leases")]
-    public List<PluginCapabilityLease> CapabilityLeases { get; init; } = new();
+    public List<PluginCapabilityLease> CapabilityLeases
+    {
+        get => _capabilityLeases;
+        init => _capabilityLeases = value ?? new();
+    }
 }

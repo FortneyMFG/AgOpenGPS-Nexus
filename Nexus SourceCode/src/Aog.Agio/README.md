@@ -162,3 +162,42 @@ The adapter registers itself with the mesh, relays outbound publications to the 
 feeds inbound publications back into the mesh. It ships with firmware stubs and a simulator under
 `Aog.Agio.RadioBridge.Simulation` that unit tests and firmware teams can use while hardware
 drivers evolve (NX-241).
+
+## RadioBridge LoRa adapter
+
+The RadioBridge LoRa adapter (NX-237/NX-244) targets concentrators and modems that expose
+LoRa links. It reuses the RadioBridge transport with forward error correction enabled and a
+slower retry cadence tuned for low-bitrate radios. Configure the adapter via
+`AgioHost:RadioBridge:Lora`:
+
+```json
+{
+  "AgioHost": {
+    "RadioBridge": {
+      "Lora": {
+        "Enabled": true,
+        "DeviceId": "bridge.lora.alpha",
+        "DeviceLabel": "LoRa Radio Bridge",
+        "Endpoint": "lora://ttyACM0?baud=57600",
+        "SendInterval": "00:00:00.250",
+        "DiagnosticsInterval": "00:00:05",
+        "DiagnosticsSeasonId": "system",
+        "DiagnosticsJobId": "radio-lora",
+        "EnableForwardErrorCorrection": true
+      }
+    }
+  }
+}
+```
+
+- **Endpoint** — Accepts `lora://` URIs for serial concentrators (defaults to 57 600 baud) and
+  `sim://lora-loopback` for integration tests.
+- **EnableForwardErrorCorrection** — Emits Hamming(12,8) parity blocks on data frames to improve
+  resilience when RSSI degrades. Disable this flag for legacy firmware that cannot decode the FEC
+  bit.
+- Mesh publications forwarded by the LoRa adapter include diagnostic metadata such as
+  `radio.kind=lora` and `radio.fec=enabled` so downstream services can differentiate transports.
+
+Diagnostics for the LoRa adapter follow the same topic layout as ELRS but include additional
+fields indicating the configured send interval and whether FEC is active. This documentation
+bundle pairs with the provisioning kit described in [RadioBridge provisioning](../../docs/howto/radio/radiobridge-provisioning.md).

@@ -95,12 +95,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          shopt -s nullglob globstar
-          for file in release/AgOpenGPS.Nexus* release/**/AgOpenGPS.Nexus*; do
-            if [ -f "$file" ]; then
-              cp "$file" dist/
-            fi
-          done
+          find release -maxdepth 2 -type f -name 'AgOpenGPS.Nexus*' -exec cp {} dist/ \;
 
       - name: Publish release assets
         uses: softprops/action-gh-release@v1

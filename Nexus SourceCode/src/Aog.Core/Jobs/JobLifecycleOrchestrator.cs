@@ -51,6 +51,11 @@ public sealed class JobLifecycleOrchestrator : IJobLifecycleOrchestrator, IDispo
                 throw new InvalidOperationException($"A job with identifier '{jobId}' already exists.");
             }
 
+            if (sanitized.MountImmediately && _activeJobId is not null)
+            {
+                throw new InvalidOperationException("Another job is already active.");
+            }
+
             var metadata = new JobMetadata(
                 jobId,
                 slug,
@@ -70,11 +75,6 @@ public sealed class JobLifecycleOrchestrator : IJobLifecycleOrchestrator, IDispo
 
             if (sanitized.MountImmediately)
             {
-                if (_activeJobId is not null)
-                {
-                    throw new InvalidOperationException("Another job is already active.");
-                }
-
                 SetActiveJob(record, timestamp, events);
             }
 

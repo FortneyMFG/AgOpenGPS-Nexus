@@ -187,6 +187,147 @@
           <TextBlock Text="Use the mouse wheel to zoom and drag with the left mouse button to pan the map." TextWrapping="Wrap"/>
           <TextBlock Text="The highlighted dot shows the current vehicle position and heading." TextWrapping="Wrap"/>
 
+          <!-- Layer legend -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding LayerLegend}" x:DataType="vm:LayerLegendViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Layer legend" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="Legend entries derive from the layer registry metadata and update automatically when plugins publish new layers." TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <ItemsControl ItemsSource="{Binding Entries}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:LayerLegendEntryViewModel">
+                    <Border Padding="12"
+                            Margin="0,4"
+                            CornerRadius="8"
+                            Background="{DynamicResource ThemeBackgroundBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                            BorderThickness="1">
+                      <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                          <Border Padding="6,2"
+                                  CornerRadius="6"
+                                  Background="{DynamicResource ThemeBackgroundBrush}"
+                                  BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                                  BorderThickness="1">
+                            <TextBlock Text="{Binding ModeDisplay}" FontSize="11" FontWeight="SemiBold"/>
+                          </Border>
+                        </StackPanel>
+                        <Border Height="16" CornerRadius="6" Background="{Binding GradientBrush}"/>
+                        <TextBlock Text="{Binding RangeDisplay}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <!-- Layer inspector -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding LayerInspector}" x:DataType="vm:LayerInspectorViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="Layer inspector" FontSize="20" FontWeight="SemiBold"/>
+                <Border Padding="6,2"
+                        CornerRadius="6"
+                        Background="{DynamicResource ThemeBackgroundBrush}"
+                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                        BorderThickness="1">
+                  <TextBlock Text="{Binding ModeDisplay}" FontSize="11" FontWeight="SemiBold"/>
+                </Border>
+              </StackPanel>
+
+              <StackPanel Spacing="4">
+                <TextBlock Text="{Binding LayerName}" FontSize="16" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Description}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <Border Padding="12" CornerRadius="8" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
+                  <StackPanel Spacing="4">
+                    <TextBlock Text="Value" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding ValueDisplay}" FontSize="18" FontWeight="SemiBold"/>
+                    <TextBlock Text="Target" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding TargetDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Padding="12" CornerRadius="8" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
+                  <StackPanel Spacing="4">
+                    <TextBlock Text="Quality" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding QualityDisplay}" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding RateAvailabilityDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                    <TextBlock Text="Sample weight" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding WeightDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="Last sample" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding TimestampDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding LocationDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="4">
+                  <TextBlock Text="Source" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding SourceDisplay}" TextWrapping="Wrap"/>
+                </StackPanel>
+              </Grid>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Transport metadata" FontWeight="SemiBold"/>
+                  <ItemsControl ItemsSource="{Binding TransportMetadata}" Margin="0,4,0,0">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:LayerInspectorFieldViewModel">
+                        <StackPanel Spacing="2">
+                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+                          <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
+                          <TextBlock Text="{Binding Description}"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                     FontSize="11"
+                                     TextWrapping="Wrap"
+                                     IsVisible="{Binding HasDescription}"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="6">
+                  <TextBlock Text="Payload metadata" FontWeight="SemiBold"/>
+                  <ItemsControl ItemsSource="{Binding PayloadMetadata}" Margin="0,4,0,0">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:LayerInspectorFieldViewModel">
+                        <StackPanel Spacing="2">
+                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+                          <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
+                          <TextBlock Text="{Binding Description}"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                     FontSize="11"
+                                     TextWrapping="Wrap"
+                                     IsVisible="{Binding HasDescription}"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </Border>
+
           <!-- Season navigator -->
           <Border Padding="16" CornerRadius="12"
                   Background="{DynamicResource ThemeBackgroundBrush}"

@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
+using Aog.Core.Layers;
 using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
 
@@ -52,7 +56,7 @@ public sealed class CombineYieldLayerAggregator
     /// <summary>
     /// Initializes a new instance of the <see cref="CombineYieldLayerAggregator"/> class.
     /// </summary>
-    /// <param name="eventBus">Event bus used to publish <see cref="CombineYieldLayer"/> messages.</param>
+    /// <param name="eventBus">Event bus used to publish <see cref="CombineYieldLayerPublication"/> messages.</param>
     /// <param name="options">Aggregation options.</param>
     /// <param name="timeProvider">Optional time provider for deterministic testing.</param>
     public CombineYieldLayerAggregator(IEventBus eventBus, CombineYieldOptions options, TimeProvider? timeProvider = null)
@@ -103,9 +107,9 @@ public sealed class CombineYieldLayerAggregator
     }
 
     /// <summary>
-    /// Creates an immutable snapshot of the current aggregated cells.
+    /// Creates an immutable snapshot of the current aggregated cells and provenance.
     /// </summary>
-    public CombineYieldLayer CreateLayerSnapshot()
+    public CombineYieldLayerPublication CreateLayerSnapshot()
     {
         var now = _timeProvider.GetUtcNow();
         return CreateLayer(now, advanceSequence: false);
@@ -133,12 +137,12 @@ public sealed class CombineYieldLayerAggregator
             return;
         }
 
-        var layer = CreateLayer(timestamp, advanceSequence: true);
-        await _eventBus.PublishAsync(layer, cancellationToken).ConfigureAwait(false);
+        var publication = CreateLayer(timestamp, advanceSequence: true);
+        await _eventBus.PublishAsync(publication, cancellationToken).ConfigureAwait(false);
         _lastPublish = timestamp;
     }
 
-    private CombineYieldLayer CreateLayer(DateTimeOffset timestamp, bool advanceSequence)
+    private CombineYieldLayerPublication CreateLayer(DateTimeOffset timestamp, bool advanceSequence)
     {
         var header = new Header
         {
@@ -170,6 +174,48 @@ public sealed class CombineYieldLayerAggregator
             layer.Cells.Add(cell);
         }
 
-        return layer;
+        var hash = ComputeHash(layer);
+        var provenance = new LayerProvenance(
+            _options.Source,
+            _options.Transform,
+            hash,
+            timestamp,
+            _options.Actor);
+
+        return new CombineYieldLayerPublication(layer, provenance);
+    }
+
+    private static string ComputeHash(CombineYieldLayer layer)
+    {
+        using var sha = SHA256.Create();
+        var builder = new StringBuilder();
+        builder.AppendFormat(
+            CultureInfo.InvariantCulture,
+            "{0};{1:F3};",
+            layer.Crop,
+            layer.CellSizeMeters);
+
+        foreach (var cell in layer.Cells.OrderBy(cell => cell.Row).ThenBy(cell => cell.Column))
+        {
+            builder.AppendFormat(
+                CultureInfo.InvariantCulture,
+                "{0},{1},{2:G17},{3:G17},{4};",
+                cell.Column,
+                cell.Row,
+                cell.AverageYieldKgPerHectare,
+                cell.AverageMoisturePercent,
+                cell.SampleCount);
+        }
+
+        var bytes = Encoding.UTF8.GetBytes(builder.ToString());
+        var hash = sha.ComputeHash(bytes);
+        return Convert.ToHexString(hash);
     }
 }
+
+/// <summary>
+/// Publication containing a combine yield layer and associated provenance.
+/// </summary>
+/// <param name="Layer">Aggregated layer payload.</param>
+/// <param name="Provenance">Provenance metadata describing the aggregation.</param>
+public sealed record CombineYieldLayerPublication(CombineYieldLayer Layer, LayerProvenance Provenance);

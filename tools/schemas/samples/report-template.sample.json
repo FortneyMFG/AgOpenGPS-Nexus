@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.reports.season-summary",
+  "name": "Season Summary",
+  "version": "1.0.0",
+  "description": "Summarizes crop, guidance, and weather insights for the selected season.",
+  "scope": "season",
+  "tags": ["season", "summary"],
+  "sections": [
+    {
+      "sectionId": "org.agopengps.reports.sections.guidance-summary",
+      "title": "Guidance Performance",
+      "layout": {
+        "region": "body",
+        "order": 10,
+        "column": 0,
+        "columnSpan": 2
+      },
+      "options": {
+        "includeCharts": true,
+        "maxSessions": 5
+      }
+    },
+    {
+      "sectionId": "org.agopengps.reports.sections.crop-overview",
+      "layout": {
+        "region": "body",
+        "order": 20,
+        "column": 2,
+        "columnSpan": 1
+      },
+      "when": {
+        "requiresCapabilities": ["crop", "genetics"]
+      }
+    },
+    {
+      "sectionId": "org.agopengps.reports.sections.weather-timeline",
+      "required": false,
+      "layout": {
+        "region": "appendix",
+        "order": 30,
+        "column": 0,
+        "columnSpan": 3
+      },
+      "when": {
+        "requiresCapabilities": ["weather"]
+      }
+    }
+  ],
+  "outputs": {
+    "pdf": {
+      "pageSize": "Letter",
+      "orientation": "landscape",
+      "includeTableOfContents": true,
+      "theme": "agopengps.light",
+      "margins": {
+        "top": 0.5,
+        "right": 0.5,
+        "bottom": 0.5,
+        "left": 0.5
+      }
+    },
+    "csv": [
+      {
+        "sectionId": "org.agopengps.reports.sections.guidance-summary",
+        "filename": "guidance-summary.csv",
+        "columns": ["fieldName", "hoursEngaged", "overlapPercent", "coverageHectares"]
+      },
+      {
+        "sectionId": "org.agopengps.reports.sections.crop-overview",
+        "filename": "crop-overview.csv"
+      }
+    ],
+    "geoJson": [
+      {
+        "sectionId": "org.agopengps.reports.sections.weather-timeline",
+        "filename": "season-weather.geojson",
+        "featureRole": "weather.anomalies"
+      }
+    ]
+  }
+}

@@ -22,6 +22,7 @@ Adopt the plugin dependency map as the authoritative specification for the first
 - **Machine-readable digests.** Bundle releases publish signed dependency manifests that CI and operators can ingest to audit compatibility and provenance.
 - **Release tooling integration.** Publishing flow cross-checks manifests against live dependency graphs, blocking promotion until conflicts or missing smoke coverage are resolved.
 - **Sandbox rehearsals.** Maintainers operate rehearsal environments mirroring production rigs. Successful rehearsals become a release checklist item and results are archived for later audits.
+- **Capability matrix.** Maintain the [official bundle capability matrix](../reference/official-bundle-capability-matrix.md) alongside the dependency map so governance reviews track both dependency posture and lease expectations.
 
 ## Consequences
 - **Positive**

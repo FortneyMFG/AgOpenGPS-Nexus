@@ -7,7 +7,7 @@ AGiO transports/backends, Avalonia UI layout, and simulation providers/routes/op
 
 ## Layout
 
-- `*.schema.json` — Authoritative schemas for each configuration surface (core, AGiO, UI, simulation, plugin manifests, job metadata, season organizers, session documents).
+- `*.schema.json` — Authoritative schemas for each configuration surface (core, AGiO, UI, simulation, plugin manifests, report templates, job metadata, season organizers, session documents).
 - `samples/*.sample.json` — Example configuration files used for smoke validation.
 - `validate.py` — Helper that validates configuration files against the schemas.
 
@@ -28,6 +28,10 @@ python tools/schemas/validate.py --schema core.schema.json path/to/core.json
 Job metadata (`job.json`) and session payloads (`sessions/<id>.json`) are validated with
 `job.schema.json` and `job-session.schema.json`, reflecting the lifecycle updates captured
 in ADR-030 and ADR-041.
+
+Report Builder contracts are captured in `report-template.schema.json`, with plugin manifest
+handshakes described by the `reportSections` definition inside `plugin.schema.json` (ADR-051).
+Samples illustrate how templates reference plugin-supplied sections.
 
 The validator relies on the [`jsonschema`](https://pypi.org/project/jsonschema/) Python
 package:

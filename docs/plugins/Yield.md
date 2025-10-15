@@ -11,6 +11,18 @@ Yield plugins ingest combine telemetry, imports, and external datasets to produc
 - Support data ingest from machine telemetry, ISOXML TaskData, and CSV/GeoTIFF imports. Normalize to registry expectations (CRS, units) per the NX-113 flow before writing layers.【F:docs/SRS/sections/04_MappingLayers.md†L84-L106】【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】
 - Emit per-field and per-zone aggregates, linking results to crop type and genetics context to enable cross-filter analytics.【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】
 
+## Layer Metadata Expectations
+
+Each yield layer persists structured metadata describing the grid, smoothing pipeline, calibration profile, and aggregation bins exposed to the UI and analytics surfaces.
+
+- `metadata.grid.cellSizeMeters` / `projection` describe the rasterization grid used for tiles, guaranteeing consumers can align tiles with other agronomic overlays.【F:schemas/YieldActual.v1.json†L38-L70】
+- `metadata.smoothing` records the algorithm (`none`, `movingAverage`, `gaussian`, `kalman`, or `savitzkyGolay`) plus window, lag compensation, and pass count so replay pipelines and QA fixtures can reproduce normalization choices.【F:schemas/YieldActual.v1.json†L71-L110】
+- `metadata.calibration` captures the applied calibration profile (ID, sensor model, moisture basis for test weight, notes, factors) to satisfy provenance requirements and enable troubleshooting of normalization drift.【F:schemas/YieldActual.v1.json†L111-L148】【F:schemas/YieldTestWeight.v1.json†L111-L151】
+- `metadata.aggregation` defines rollup scopes and the binning scheme (quantile, equalInterval, or custom) shared with front-ends, including explicit breakpoints for custom palettes.【F:schemas/YieldActual.v1.json†L149-L204】
+- `metadata.statistics` publishes summary metrics (count, mean, median, std-dev, range, and total mass for yield.actual) that feed analytics APIs and report templates without reprocessing tiles.【F:schemas/YieldActual.v1.json†L205-L241】
+
+Clients relying on historical ad-hoc `extensions` fields should migrate to these structured properties; plugin-owned analytics may continue to live under `extensions` with namespace-qualified keys for downstream consumers.
+
 ## Analytics & Reporting
 
 - Provide APIs for profit and report builder plugins to request yield × crop type/genetics breakdowns, field/season rollups, and temporal comparisons.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L21-L52】【F:docs/ADR/ADR-051_ReportBuilder.md†L21-L52】

@@ -1,5 +1,4 @@
-# Telemetry Logging Plugin Requirements (Draft)
-
+# Telemetry Logging Plugin Requirements
 ## Overview
 
 Telemetry logging plugins capture session-scoped data for replay, analytics, and compliance. They must integrate with the session lifecycle, multi-machine mesh, and report tooling while guaranteeing deterministic replays.
@@ -12,6 +11,12 @@ Telemetry logging plugins capture session-scoped data for replay, analytics, and
 - Integrate with the multi-machine mesh to capture collaborative events, ensuring share profiles govern whether remote data is included.【F:docs/plugins/MultiMachine.md†L1-L80】
 - Capture equipment hour counters, fault codes, and implement usage metrics needed by the Equipment Health plugin, tagging logs with machine IDs so maintenance schedules stay accurate.【F:docs/plugins/EquipmentHealth.md†L1-L160】
 - Record work order checkpoints (start, pause, checklist updates) so contractor billing and proof-of-work exports can replay crew progress.【F:docs/ADR/ADR-041_JobSessions.md†L46-L55】
+
+## Session Artifacts
+
+- The GA coordinator writes telemetry into `<root>/<jobSlug>/<sessionId>/pose.parquet`, `imu.parquet`, `can.parquet`, `io.parquet`, and `plugin.parquet` as sessions are mounted.【F:Nexus SourceCode/src/Aog.Plugins/TelemetryLogging/TelemetryLoggingCoordinator.cs†L118-L148】
+- Each directory includes `session.json` containing `schemaVersion`, job context, start/end timestamps, optional close reasons, and file names so export tooling can locate artifacts without crawling raw Parquet files.【F:Nexus SourceCode/src/Aog.Plugins/TelemetryLogging/TelemetryLogManifest.cs†L6-L97】【F:Nexus SourceCode/src/Aog.Plugins/TelemetryLogging/TelemetryLoggingCoordinator.cs†L135-L142】
+- Manifests can be converted into `TelemetryReplayOptions` via `TelemetryLogManifest.CreateReplayOptions` to hydrate deterministic replay pipelines.【F:Nexus SourceCode/src/Aog.Plugins/TelemetryLogging/TelemetryLogManifest.cs†L99-L120】
 
 ## UX & Tooling
 

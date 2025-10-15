@@ -62,7 +62,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-211 ZoneStore persistence service _(Planned)_ — ADR-027 ZoneService storage and indexing
 - [ ] NX-212 ZoneService gRPC host & watcher plumbing _(Planned)_ — ADR-027 ZoneService implementation
 - [x] NX-213 PoseStream zone mask propagation _(Done)_ — ADR-027 constraint mask propagation
-- [ ] NX-214 Constraint gate integration into ControlArbiter _(Planned)_ — ADR-027 constraint gating
+- [x] NX-214 Constraint gate integration into ControlArbiter _(Done)_ — ADR-027 constraint gating
 - [ ] NX-215 Layer controller runtime scaffolding _(Planned)_ — ADR-032 layer controllers
 - [ ] NX-216 Layer controller DI registry & buffer pools _(Planned)_ — ADR-032 controller runtime details
 - [ ] NX-217 PoseStream ingestion wiring for controllers _(Planned)_ — ADR-032 ingestion pipeline
@@ -392,7 +392,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-211 | ZoneStore persistence service | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 ZoneService storage and indexing |
 | NX-212 | ZoneService gRPC host & watcher plumbing | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 ZoneService implementation |
 | NX-213 | PoseStream zone mask propagation | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint mask propagation |
-| NX-214 | Constraint gate integration into ControlArbiter | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint gating |
+| NX-214 | Constraint gate integration into ControlArbiter | Done | AI | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | Constraint gate enforces keep-out/work-disabled policies |
 | NX-215 | Layer controller runtime scaffolding | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 layer controllers |
 | NX-216 | Layer controller DI registry & buffer pools | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 controller runtime details |
 | NX-217 | PoseStream ingestion wiring for controllers | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 ingestion pipeline |

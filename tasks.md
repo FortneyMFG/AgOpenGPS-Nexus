@@ -168,8 +168,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-269 Field health report sections _(Planned)_ — ADR-052 reporting integration
 - [ ] NX-270 Field health plugin regression fixtures _(Planned)_ — ADR-052 QA hooks
 - [ ] NX-271 Weather ingest pipeline _(Planned)_ — ADR-053 weather plugin
-- [ ] NX-272 Weather sensor adapter integrations _(Planned)_ — ADR-053 sensor integrations
-- [ ] NX-273 Weather overlay data feed _(Planned)_ — ADR-053 visualization pipeline
+- [x] NX-272 Weather sensor adapter integrations _(Done)_ — ADR-053 sensor integrations
+- [x] NX-273 Weather overlay data feed _(Done)_ — ADR-053 visualization pipeline
 - [ ] NX-274 Weather report sections _(Planned)_ — ADR-053 reporting integration
 - [ ] NX-275 Weather plugin regression fixtures _(Planned)_ — ADR-053 QA hooks
 - [ ] NX-276 Autosteer plugin constraint gating updates _(Planned)_ — ADR-027 gating + ADR-033 guidance planner
@@ -502,8 +502,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-269 | Field health report sections | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 reporting integration |
 | NX-270 | Field health plugin regression fixtures | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 QA hooks |
 | NX-271 | Weather ingest pipeline | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather plugin |
-| NX-272 | Weather sensor adapter integrations | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 sensor integrations |
-| NX-273 | Weather overlay data feed | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 visualization pipeline |
+| NX-272 | Weather sensor adapter integrations | Done |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 sensor integrations |
+| NX-273 | Weather overlay data feed | Done |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 visualization pipeline |
 | NX-274 | Weather report sections | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 reporting integration |
 | NX-275 | Weather plugin regression fixtures | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 QA hooks |
 | NX-276 | Autosteer plugin constraint gating updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-027 gating + ADR-033 guidance planner |

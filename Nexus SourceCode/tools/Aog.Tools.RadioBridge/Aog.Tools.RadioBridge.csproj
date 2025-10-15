@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Aog.Tools.RadioBridge</RootNamespace>
+  </PropertyGroup>
+</Project>

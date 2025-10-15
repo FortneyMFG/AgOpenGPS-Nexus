@@ -17,7 +17,11 @@ ADR-018 introduces lease-based access control and manifest enforcement for plugi
 
 ## CI & Release Gates
 
-- **Manifest lint.** `nexus plugin lint` verifies schema compliance, lease declarations, and dependency constraints.
+- **Manifest lint.** `./tools/scripts/nexus.sh plugin lint` (or the PowerShell variant)
+  verifies schema compliance, lease declarations, and dependency constraints before
+  manifests are promoted.
+- **Capability export.** `./tools/scripts/nexus.sh plugin capabilities` publishes the
+  capability/lease matrix consumed by Device Manager and CI dashboards.
 - **Lease simulation.** Plugin regression suite runs simulated Core lease arbitration scenarios to ensure plugins back off/resume correctly.
 - **Bridge compatibility.** For plugins migrating from AgIO, CI runs dual-stack tests where both legacy and Nexus transports operate simultaneously.
 - **Human QA.** Record hardware validation (who/when) in `tasks.md` before promoting the plugin bundle.

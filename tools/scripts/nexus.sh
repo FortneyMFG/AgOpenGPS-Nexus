@@ -8,6 +8,7 @@ Usage: nexus.sh <command> [options]
 Commands:
   run <target> [-- <args>...]   Run a Nexus host (core, agio, ui) via dotnet run.
   sim [-- <args>...]            Launch the composite simulation host.
+  plugin <cmd> [options]        Plugin manifest tooling (lint, capabilities).
   help                          Show this help text.
 
 Environment overrides:
@@ -15,6 +16,8 @@ Environment overrides:
   NEXUS_AGIO_PROJECT  Relative path to the AgIO host .csproj.
   NEXUS_UI_PROJECT    Relative path to the UI .csproj.
   NEXUS_SIM_PROJECT   Relative path to the simulation entry .csproj.
+  NEXUS_PLUGIN_TOOL_PROJECT
+                       Relative path to the plugin compliance tool .csproj.
   DOTNET              dotnet executable to invoke (default: dotnet).
 USAGE
 }
@@ -30,6 +33,8 @@ declare -A defaults=(
   # project lands. Override via NEXUS_SIM_PROJECT when that host exists.
   [sim]="Nexus SourceCode/src/Aog.Core.Host/Aog.Core.Host.csproj"
 )
+
+plugin_tool_default="Nexus SourceCode/tools/Aog.Tools.PluginCompliance/Aog.Tools.PluginCompliance.csproj"
 
 resolve_project() {
   local target="$1"
@@ -107,6 +112,22 @@ case "${command}" in
     ;;
   sim)
     run_target "sim" "$@"
+    ;;
+  plugin)
+    ensure_dotnet
+    local project_rel="${NEXUS_PLUGIN_TOOL_PROJECT:-$plugin_tool_default}"
+    local project_path="${repo_root}/${project_rel}"
+    if [[ ! -f "${project_path}" ]]; then
+      >&2 printf 'error: expected plugin tool at %s\n' "${project_path}"
+      >&2 printf '       override via NEXUS_PLUGIN_TOOL_PROJECT.\n'
+      exit 1
+    fi
+    local dotnet_cmd="${DOTNET:-dotnet}"
+    if [[ $# -gt 0 ]]; then
+      "${dotnet_cmd}" run --project "${project_path}" -- "$@"
+    else
+      "${dotnet_cmd}" run --project "${project_path}" -- help
+    fi
     ;;
   help|-h|--help)
     usage

@@ -64,7 +64,10 @@ BenchmarkDotNet.Artifacts/
 # .NET
 project.lock.json
 project.fragment.lock.json
-artifacts/
+artifacts/*
+!artifacts/nuget/
+artifacts/nuget/*
+!artifacts/nuget/.gitkeep
 
 # Tye
 .tye/

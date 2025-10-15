@@ -26,20 +26,11 @@ Create a two-part architecture:
 
 ### Message contracts
 
-Define or extend the following protobuf contracts under `Aog.Abstractions` with versioned messages:
+Reuse the frozen `Pose` message defined in `Aog.Abstractions` (`proto/core.proto`) so plugins continue to receive orientation,
+header metadata, and yaw/roll/pitch rates required by downstream consumers. New mapping-specific RPCs will rely on additional
+contracts such as:
 
 ```proto
-message Pose {
-  uint64 frame_id = 1;
-  int64 mono_time_ns = 2;
-  double lat = 3;
-  double lon = 4;
-  double alt_m = 5;
-  double heading_deg = 6;
-  double speed_mps = 7;
-  double accuracy_m = 8;
-}
-
 message LayerQuery {
   double lat = 1;
   double lon = 2;

@@ -59,6 +59,11 @@ public sealed class IsobusRouter
 
         if (_handshake.TryCreateHandshakeResponse(message, out var response))
         {
+            if (IsobusMessage.TryFromCanFrame(response, out var responseMessage))
+            {
+                _diagnostics.Record(responseMessage, timestamp);
+            }
+
             await _eventBus.PublishAsync(response, cancellationToken).ConfigureAwait(false);
         }
 

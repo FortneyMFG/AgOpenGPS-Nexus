@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Aog.Agio;
 using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
 
@@ -26,6 +27,7 @@ public sealed class LegacyUdpGateway
     private readonly ILegacySectionObserver _sectionObserver;
     private readonly ILegacyMeshPresencePublisher _meshPresencePublisher;
     private readonly TimeProvider _timeProvider;
+    private readonly IActuatorFailsafeService _actuatorFailsafe;
     private long _sequence;
     private long _steerCommandSequence;
     private long _steerStateSequence;
@@ -42,7 +44,8 @@ public sealed class LegacyUdpGateway
         ILegacySteerStateObserver steerStateObserver,
         ILegacySectionObserver sectionObserver,
         ILegacyMeshPresencePublisher meshPresencePublisher,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IActuatorFailsafeService? actuatorFailsafe = null)
     {
         _poseCodec = poseCodec ?? throw new ArgumentNullException(nameof(poseCodec));
         _discoveryCodec = discoveryCodec ?? throw new ArgumentNullException(nameof(discoveryCodec));
@@ -55,6 +58,7 @@ public sealed class LegacyUdpGateway
         _sectionObserver = sectionObserver ?? throw new ArgumentNullException(nameof(sectionObserver));
         _meshPresencePublisher = meshPresencePublisher ?? throw new ArgumentNullException(nameof(meshPresencePublisher));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        _actuatorFailsafe = actuatorFailsafe ?? NullActuatorFailsafeService.Instance;
     }
 
     /// <summary>
@@ -89,7 +93,17 @@ public sealed class LegacyUdpGateway
             throw new ArgumentNullException(nameof(command));
         }
 
-        var frame = _steerCodec.EncodeSteerCommand(command, sections, metadata);
+        _actuatorFailsafe.ReportHeartbeat();
+
+        var filteredCommand = _actuatorFailsafe.FilterSteerCommand(command);
+        SectionMask? filteredSections = null;
+
+        if (sections is not null)
+        {
+            filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
+        }
+
+        var frame = _steerCodec.EncodeSteerCommand(filteredCommand, filteredSections, metadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 
@@ -170,5 +184,36 @@ public sealed class LegacyUdpGateway
 
         await _poseObserver.OnPoseAsync(pose, metadata, cancellationToken).ConfigureAwait(false);
         await _meshPresencePublisher.PublishPresenceAsync(pose, metadata, cancellationToken).ConfigureAwait(false);
+    }
+
+    private sealed class NullActuatorFailsafeService : IActuatorFailsafeService
+    {
+        public static NullActuatorFailsafeService Instance { get; } = new();
+
+        public bool HasActiveHeartbeat => false;
+
+        public DateTimeOffset? LastHeartbeatUtc => null;
+
+        public TimeSpan HeartbeatTimeout => TimeSpan.Zero;
+
+        public void ReportHeartbeat()
+        {
+        }
+
+        public void ClearHeartbeat()
+        {
+        }
+
+        public SteerCmd FilterSteerCommand(SteerCmd command)
+        {
+            ArgumentNullException.ThrowIfNull(command);
+            return command;
+        }
+
+        public SectionMask FilterSectionMask(SectionMask mask)
+        {
+            ArgumentNullException.ThrowIfNull(mask);
+            return mask;
+        }
     }
 }

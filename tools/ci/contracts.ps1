@@ -35,4 +35,7 @@ foreach ($test in $tests) {
 
     Write-Host "Running contract compatibility tests for $($test.Path)" -ForegroundColor Cyan
     dotnet test $projectPath --configuration Release --filter $test.Filter --verbosity minimal
+    if ($LASTEXITCODE -ne 0) {
+        throw "Contract compatibility tests failed for '$($test.Path)' with exit code $LASTEXITCODE."
+    }
 }

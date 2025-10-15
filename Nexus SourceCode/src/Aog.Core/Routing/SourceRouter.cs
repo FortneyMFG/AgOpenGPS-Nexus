@@ -14,7 +14,9 @@ public sealed class SourceRouter
     private readonly IEventBus _eventBus;
     private readonly Dictionary<string, TopicState> _topics = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _preferredSources;
+    private readonly Queue<PendingPublication> _pendingPublications = new();
     private readonly object _gate = new();
+    private bool _isPublishing;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SourceRouter"/> class.
@@ -48,18 +50,30 @@ public sealed class SourceRouter
         var normalizedTopic = NormalizeTopic(topic, nameof(topic));
         var normalizedSource = NormalizeSourceId(sourceId, nameof(sourceId));
 
-        TopicRoute? previous;
-        TopicRoute? current;
+        ValueTask<TopicRoute?> publication;
+        var startPublisher = false;
+
         lock (_gate)
         {
             var state = GetOrCreateState(normalizedTopic);
-            previous = state.CurrentRoute;
+            var previous = state.CurrentRoute;
             state.Sources[normalizedSource] = new TopicSourceRegistration(normalizedSource, kind, priorityOffset);
             state.CurrentRoute = ComputeRoute(state);
-            current = state.CurrentRoute;
+
+            publication = EnqueuePublishIfChangedLocked(
+                normalizedTopic,
+                previous,
+                state.CurrentRoute,
+                cancellationToken,
+                out startPublisher);
         }
 
-        return PublishIfChangedAsync(normalizedTopic, previous, current, cancellationToken);
+        if (startPublisher)
+        {
+            _ = ProcessPublicationQueueAsync();
+        }
+
+        return publication;
     }
 
     /// <summary>
@@ -73,9 +87,8 @@ public sealed class SourceRouter
         var normalizedTopic = NormalizeTopic(topic, nameof(topic));
         var normalizedSource = NormalizeSourceId(sourceId, nameof(sourceId));
 
-        TopicRoute? previous;
-        TopicRoute? current;
-        var publish = false;
+        ValueTask<TopicRoute?> publication;
+        var startPublisher = false;
 
         lock (_gate)
         {
@@ -84,15 +97,21 @@ public sealed class SourceRouter
                 return ValueTask.FromResult<TopicRoute?>(null);
             }
 
-            previous = state.CurrentRoute;
+            var previous = state.CurrentRoute;
             if (!state.Sources.Remove(normalizedSource))
             {
                 return ValueTask.FromResult(previous);
             }
 
             state.CurrentRoute = ComputeRoute(state);
-            current = state.CurrentRoute;
-            publish = !Equals(previous, current);
+            var current = state.CurrentRoute;
+
+            publication = EnqueuePublishIfChangedLocked(
+                normalizedTopic,
+                previous,
+                current,
+                cancellationToken,
+                out startPublisher);
 
             if (state.Sources.Count == 0 && state.OverrideSourceId is null && !_preferredSources.ContainsKey(normalizedTopic))
             {
@@ -100,12 +119,12 @@ public sealed class SourceRouter
             }
         }
 
-        if (publish)
+        if (startPublisher)
         {
-            return PublishIfChangedAsync(normalizedTopic, previous, current, cancellationToken);
+            _ = ProcessPublicationQueueAsync();
         }
 
-        return ValueTask.FromResult(current);
+        return publication;
     }
 
     /// <summary>
@@ -121,18 +140,23 @@ public sealed class SourceRouter
             ? null
             : NormalizeSourceId(sourceId!, nameof(sourceId));
 
-        TopicRoute? previous;
-        TopicRoute? current;
-        var publish = false;
+        ValueTask<TopicRoute?> publication;
+        var startPublisher = false;
 
         lock (_gate)
         {
             var state = GetOrCreateState(normalizedTopic);
-            previous = state.CurrentRoute;
+            var previous = state.CurrentRoute;
             state.OverrideSourceId = normalizedSource;
             state.CurrentRoute = ComputeRoute(state);
-            current = state.CurrentRoute;
-            publish = !Equals(previous, current);
+            var current = state.CurrentRoute;
+
+            publication = EnqueuePublishIfChangedLocked(
+                normalizedTopic,
+                previous,
+                current,
+                cancellationToken,
+                out startPublisher);
 
             if (state.Sources.Count == 0 && state.OverrideSourceId is null && !_preferredSources.ContainsKey(normalizedTopic))
             {
@@ -140,12 +164,12 @@ public sealed class SourceRouter
             }
         }
 
-        if (publish)
+        if (startPublisher)
         {
-            return PublishIfChangedAsync(normalizedTopic, previous, current, cancellationToken);
+            _ = ProcessPublicationQueueAsync();
         }
 
-        return ValueTask.FromResult(current);
+        return publication;
     }
 
     /// <summary>
@@ -163,29 +187,78 @@ public sealed class SourceRouter
         }
     }
 
-    private ValueTask<TopicRoute?> PublishIfChangedAsync(
+    private ValueTask<TopicRoute?> EnqueuePublishIfChangedLocked(
         string topic,
         TopicRoute? previous,
         TopicRoute? current,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        out bool startPublisher)
     {
         if (Equals(previous, current))
         {
+            startPublisher = false;
             return ValueTask.FromResult(current);
         }
 
-        return PublishAsync(topic, previous, current, cancellationToken);
+        var completion = new TaskCompletionSource<TopicRoute?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _pendingPublications.Enqueue(new PendingPublication(
+            new TopicRouteChanged(topic, previous, current),
+            cancellationToken,
+            completion,
+            current));
+
+        startPublisher = !_isPublishing;
+        if (startPublisher)
+        {
+            _isPublishing = true;
+        }
+
+        return new ValueTask<TopicRoute?>(completion.Task);
     }
 
-    private async ValueTask<TopicRoute?> PublishAsync(
-        string topic,
-        TopicRoute? previous,
-        TopicRoute? current,
-        CancellationToken cancellationToken)
+    private async Task ProcessPublicationQueueAsync()
     {
-        await _eventBus.PublishAsync(new TopicRouteChanged(topic, previous, current), cancellationToken)
-            .ConfigureAwait(false);
-        return current;
+        while (true)
+        {
+            PendingPublication pending;
+
+            lock (_gate)
+            {
+                if (_pendingPublications.Count == 0)
+                {
+                    _isPublishing = false;
+                    return;
+                }
+
+                pending = _pendingPublications.Dequeue();
+            }
+
+            try
+            {
+                await _eventBus.PublishAsync(pending.Change, pending.CancellationToken)
+                    .ConfigureAwait(false);
+                pending.Completion.TrySetResult(pending.Result);
+            }
+            catch (OperationCanceledException ex)
+            {
+                if (pending.CancellationToken.IsCancellationRequested)
+                {
+                    pending.Completion.TrySetCanceled(pending.CancellationToken);
+                }
+                else if (ex.CancellationToken.CanBeCanceled)
+                {
+                    pending.Completion.TrySetCanceled(ex.CancellationToken);
+                }
+                else
+                {
+                    pending.Completion.TrySetCanceled();
+                }
+            }
+            catch (Exception ex)
+            {
+                pending.Completion.TrySetException(ex);
+            }
+        }
     }
 
     private TopicState GetOrCreateState(string topic)
@@ -270,6 +343,29 @@ public sealed class SourceRouter
         }
 
         return value.Trim();
+    }
+
+    private sealed class PendingPublication
+    {
+        public PendingPublication(
+            TopicRouteChanged change,
+            CancellationToken cancellationToken,
+            TaskCompletionSource<TopicRoute?> completion,
+            TopicRoute? result)
+        {
+            Change = change;
+            CancellationToken = cancellationToken;
+            Completion = completion;
+            Result = result;
+        }
+
+        public TopicRouteChanged Change { get; }
+
+        public CancellationToken CancellationToken { get; }
+
+        public TaskCompletionSource<TopicRoute?> Completion { get; }
+
+        public TopicRoute? Result { get; }
     }
 
     private sealed class TopicState

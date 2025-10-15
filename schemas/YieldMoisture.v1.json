@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agopengps.org/schemas/YieldMoisture.v1.json",
   "title": "YieldMoisture.v1",
+  "x-nexus-actual": true,
   "x-nexus-layerId": "yield.moisture",
   "type": "object",
   "allOf": [

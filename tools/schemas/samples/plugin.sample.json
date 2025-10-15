@@ -10,8 +10,22 @@
   },
   "settings": {
     "defaultMode": "pure-pursuit",
-    "maxLookAhead": 12.5
+    "maxLookAhead": 12.5,
+    "lookAheadSeconds": {
+      "type": "number",
+      "default": 0.8,
+      "description": "Time horizon used by the pure pursuit controller."
+    }
   },
+  "supportedCapabilities": [
+    "guidance.control",
+    "guidance.telemetry"
+  ],
+  "requiredTransports": [
+    "AOG-Link",
+    "core://guidance"
+  ],
+  "minimumRuntimeVersion": "1.0.0",
   "simProviders": [
     {
       "providerId": "autosteer.vehicle",
@@ -30,6 +44,20 @@
         "horizontalNoise": 0.15,
         "dropoutProbability": 0.01
       }
+    }
+  ],
+  "leases": [
+    {
+      "capability": "guidance.control",
+      "mode": "Exclusive",
+      "timeoutSeconds": 5,
+      "recovery": "FailSafe"
+    },
+    {
+      "capability": "guidance.telemetry",
+      "mode": "Shared",
+      "timeoutSeconds": 10,
+      "recovery": "GracefulDegradation"
     }
   ]
 }

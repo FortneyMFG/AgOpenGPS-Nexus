@@ -11,6 +11,15 @@
   "settings": {
     "defaultRecording": "~/telemetry/guidance.parquet"
   },
+  "supportedCapabilities": [
+    "replay.guidance",
+    "replay.pose"
+  ],
+  "requiredTransports": [
+    "storage://logs",
+    "core://replay"
+  ],
+  "minimumRuntimeVersion": "1.0.0",
   "simProviders": [
     {
       "providerId": "replay.guidance",
@@ -29,6 +38,20 @@
       "settings": {
         "timeScale": 1.0
       }
+    }
+  ],
+  "leases": [
+    {
+      "capability": "replay.guidance",
+      "mode": "Shared",
+      "timeoutSeconds": 5,
+      "recovery": "GracefulDegradation"
+    },
+    {
+      "capability": "replay.pose",
+      "mode": "Shared",
+      "timeoutSeconds": 5,
+      "recovery": "GracefulDegradation"
     }
   ]
 }

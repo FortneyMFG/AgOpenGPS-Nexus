@@ -9,7 +9,11 @@
     "name",
     "version",
     "requiredApis",
-    "simProviders"
+    "supportedCapabilities",
+    "requiredTransports",
+    "minimumRuntimeVersion",
+    "simProviders",
+    "leases"
   ],
   "additionalProperties": false,
   "properties": {
@@ -48,17 +52,53 @@
     "settings": {
       "type": "object",
       "default": {},
-      "additionalProperties": { "$ref": "#/$defs/value" },
+      "additionalProperties": {
+        "anyOf": [
+          { "$ref": "#/$defs/value" },
+          { "$ref": "#/$defs/settingDefinition" }
+        ]
+      },
       "description": "Optional plugin-level settings surfaced to the host."
+    },
+    "supportedCapabilities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/capabilityId" },
+      "description": "Capabilities implemented by the plugin and advertised during the Core handshake."
+    },
+    "requiredTransports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Transports or endpoints the plugin requires to function (e.g., AOG-Link, core://guidance)."
+    },
+    "minimumRuntimeVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[-0-9A-Za-z.]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "description": "Minimum Nexus runtime version validated during plugin activation."
     },
     "simProviders": {
       "type": "array",
       "minItems": 1,
       "items": { "$ref": "#/$defs/simProvider" },
       "description": "Simulation providers bundled with the plugin."
+    },
+    "leases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/lease" },
+      "description": "Lease declarations describing how the plugin acquires and maintains capability ownership."
     }
   },
   "$defs": {
+    "capabilityId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]+(?:[.:_-][A-Za-z0-9-]+)+$"
+    },
     "value": {
       "anyOf": [
         { "type": "string" },
@@ -69,6 +109,34 @@
           "items": { "type": "number" }
         }
       ]
+    },
+    "settingDefinition": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "array",
+            "object"
+          ]
+        },
+        "description": { "type": "string" },
+        "default": true,
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" },
+        "items": true,
+        "enum": {
+          "type": "array",
+          "minItems": 1
+        },
+        "properties": true
+      },
+      "additionalProperties": true
     },
     "simProvider": {
       "type": "object",
@@ -104,6 +172,29 @@
           "default": {},
           "additionalProperties": { "$ref": "#/$defs/value" },
           "description": "Provider-specific tunables."
+        }
+      }
+    },
+    "lease": {
+      "type": "object",
+      "required": ["capability", "mode"],
+      "additionalProperties": false,
+      "properties": {
+        "capability": { "$ref": "#/$defs/capabilityId" },
+        "mode": {
+          "type": "string",
+          "enum": ["Exclusive", "Shared", "exclusive", "shared"],
+          "description": "Acquisition mode requested from the Core capability arbiter."
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Lease renewal timeout budget in seconds."
+        },
+        "recovery": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z]*(?:[A-Z][A-Za-z]*)*$",
+          "description": "Recovery strategy applied when the lease cannot be renewed."
         }
       }
     }

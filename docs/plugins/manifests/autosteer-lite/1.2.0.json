@@ -12,6 +12,15 @@
     "defaultMode": "pure-pursuit",
     "maxLookAheadMeters": 12.5
   },
+  "supportedCapabilities": [
+    "guidance.control",
+    "guidance.telemetry"
+  ],
+  "requiredTransports": [
+    "AOG-Link",
+    "core://guidance"
+  ],
+  "minimumRuntimeVersion": "1.0.0",
   "simProviders": [
     {
       "providerId": "autosteer.controller",
@@ -45,6 +54,20 @@
           "yawRate": 0.5
         }
       }
+    }
+  ],
+  "leases": [
+    {
+      "capability": "guidance.control",
+      "mode": "Exclusive",
+      "timeoutSeconds": 5,
+      "recovery": "FailSafe"
+    },
+    {
+      "capability": "guidance.telemetry",
+      "mode": "Shared",
+      "timeoutSeconds": 10,
+      "recovery": "GracefulDegradation"
     }
   ]
 }

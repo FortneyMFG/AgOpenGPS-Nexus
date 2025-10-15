@@ -12,6 +12,15 @@
     "defaultCellSizeMeters": 12.0,
     "defaultExportFormat": "geojson"
   },
+  "supportedCapabilities": [
+    "fileio.import",
+    "fileio.export"
+  ],
+  "requiredTransports": [
+    "storage://local",
+    "core://storage"
+  ],
+  "minimumRuntimeVersion": "1.0.0",
   "simProviders": [
     {
       "providerId": "fileio.surfaceImporter",
@@ -32,6 +41,20 @@
         "exportFormats": ["geojson"],
         "includeBbox": true
       }
+    }
+  ],
+  "leases": [
+    {
+      "capability": "fileio.import",
+      "mode": "Shared",
+      "timeoutSeconds": 15,
+      "recovery": "GracefulDegradation"
+    },
+    {
+      "capability": "fileio.export",
+      "mode": "Shared",
+      "timeoutSeconds": 15,
+      "recovery": "GracefulDegradation"
     }
   ]
 }

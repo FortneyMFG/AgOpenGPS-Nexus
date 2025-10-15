@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/Job.v1.json",
+  "title": "Job.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "farmId", "fieldIds", "operation", "createdBy", "createdAt", "lastModifiedAt"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$",
+      "default": "1.0.0",
+      "description": "Schema semantic version for job documents.",
+      "x-nexus-scope": "core"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Stable identifier for the job across systems.",
+      "x-nexus-scope": "core"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable job name shown in navigators and analytics.",
+      "x-nexus-scope": "core"
+    },
+    "seasonId": {
+      "type": ["string", "null"],
+      "pattern": "^season:[A-Za-z0-9._:-]+$",
+      "description": "Optional reference to the season that organizes the job.",
+      "x-nexus-scope": "core"
+    },
+    "farmId": {
+      "type": "string",
+      "pattern": "^farm:[A-Za-z0-9._:-]+$",
+      "description": "Primary farm associated with the job.",
+      "x-nexus-scope": "core"
+    },
+    "fieldIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^field:[A-Za-z0-9._:-]+$"
+      },
+      "description": "Fields mounted by the job.",
+      "x-nexus-scope": "core"
+    },
+    "operation": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operation classification (planting, spraying, harvest, etc.).",
+      "x-nexus-scope": "core"
+    },
+    "time": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-nexus-scope": "core",
+      "properties": {
+        "planned": {
+          "type": "string",
+          "format": "date",
+          "description": "Planned start date for the job.",
+          "x-nexus-scope": "core"
+        },
+        "actualStart": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Actual start timestamp for the job.",
+          "x-nexus-scope": "core"
+        },
+        "actualEnd": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Actual end timestamp for the job.",
+          "x-nexus-scope": "core"
+        }
+      },
+      "description": "Planned and actual timing metadata for the job."
+    },
+    "sessions": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string", "pattern": "^session:[A-Za-z0-9._:-]+$" },
+          { "$ref": "./Session.v1.json" }
+        ]
+      },
+      "description": "Sessions executed within the job, either as identifiers or embedded session documents.",
+      "x-nexus-scope": "core"
+    },
+    "stats": {
+      "type": "object",
+      "description": "Aggregated statistics for the job and per-field rollups.",
+      "x-nexus-scope": "core",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["fieldId"],
+            "additionalProperties": true,
+            "properties": {
+              "fieldId": {
+                "type": "string",
+                "pattern": "^field:[A-Za-z0-9._:-]+$",
+                "x-nexus-scope": "core"
+              }
+            }
+          },
+          "description": "Per-field statistics recorded for the job.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Operator notes for the overall job.",
+      "x-nexus-scope": "core"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor that created the job (user:*, system:*).",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the job was created (UTC).",
+      "x-nexus-scope": "core"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the most recent job modification.",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin-owned metadata (crop genetics, profitability, zone analytics). Keys follow <namespace>.<topic> naming.",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

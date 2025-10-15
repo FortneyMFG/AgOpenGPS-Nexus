@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/Session.v1.json",
+  "title": "Session.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "startedAt", "createdBy", "createdAt", "lastModifiedAt"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$",
+      "default": "1.0.0",
+      "description": "Schema semantic version for session documents.",
+      "x-nexus-scope": "core"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Stable identifier unique within a job.",
+      "x-nexus-scope": "core"
+    },
+    "name": {
+      "type": "string",
+      "description": "Operator-friendly session label.",
+      "x-nexus-scope": "core"
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when the session started.",
+      "x-nexus-scope": "core"
+    },
+    "endedAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "UTC timestamp when the session ended, null while active.",
+      "x-nexus-scope": "core"
+    },
+    "env": {
+      "type": "object",
+      "description": "Environmental snapshot captured when the session was created.",
+      "x-nexus-scope": "core",
+      "properties": {
+        "tempC": { "type": "number", "x-nexus-scope": "core" },
+        "humidityPct": { "type": "number", "minimum": 0, "maximum": 100, "x-nexus-scope": "core" },
+        "windKph": { "type": "number", "minimum": 0, "x-nexus-scope": "core" },
+        "windDeg": { "type": "number", "minimum": 0, "maximum": 360, "x-nexus-scope": "core" },
+        "pressureKpa": { "type": "number", "minimum": 0, "x-nexus-scope": "core" }
+      },
+      "additionalProperties": {
+        "type": ["number", "string"],
+        "x-nexus-scope": "plugin"
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Freeform summary of inputs/materials used during the session.",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Operator notes describing events observed during the session.",
+      "x-nexus-scope": "core"
+    },
+    "layerRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^layer:[A-Za-z0-9._:-]+$"
+      },
+      "description": "Layer identifiers produced or reused in the session.",
+      "x-nexus-scope": "core"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor that created the session (user:*, system:*).",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the session was created (UTC).",
+      "x-nexus-scope": "core"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the most recent session metadata change.",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin-owned metadata (crop genetics, profitability, journal entries). Keys follow <namespace>.<topic> naming.",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

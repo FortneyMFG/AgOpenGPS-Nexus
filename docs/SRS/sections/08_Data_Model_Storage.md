@@ -71,6 +71,9 @@ Offline use, storage footprint, interoperability, migration effort, tooling avai
 - **ADR-027 Spatial constraints & zone policies** delivers the zone storage, buffering, and provenance needed for R-DATA-026…R-DATA-028 while binding pose masks to storage.【F:docs/ADR/ADR-roadmap.md†L27-L41】
 - **ADR-029 Mapping plugin architecture** splits the geospatial kernel from plugin engines so R-DATA-010…R-DATA-025 remain satisfied without bloating Core deployments.【F:docs/ADR/ADR-roadmap.md†L30-L36】
 - **ADR-030 Field job sessions & lifecycle services** implements the job metadata, journaling, and filesystem layout defined in R-DATA-029…R-DATA-031.【F:docs/ADR/ADR-roadmap.md†L38-L44】
+- **ADR-040 Season organizers** codifies cross-farm seasonal grouping, schema expectations, and navigation flows captured in this section and §03 Job Lifecycle.【F:docs/ADR/ADR-roadmap.md†L104-L132】
+- **ADR-041 Job sessions** finalizes session metadata, journaling cadence, and plugin hooks documented in §03 Job Lifecycle.【F:docs/ADR/ADR-roadmap.md†L113-L149】
+- **ADR-043 Multi-field job envelopes** defines storage for `fieldIds[]`, per-field stats, and union envelope semantics referenced in §04 Mapping & Layers.【F:docs/ADR/ADR-roadmap.md†L121-L149】
 - **ADR-032 Presets & layout linking** captures preset/layout provenance expectations under R-DATA-029…R-DATA-032 and ties them to task orchestration.【F:docs/ADR/ADR-roadmap.md†L72-L80】
 - **ADR-022 CRS/units & precision policy** will define canonical CRS defaults, numeric precision tiers, and unit normalization so PoseStreams, tiles, and exports stay aligned under R-DATA-019…R-DATA-022.【F:docs/ADR/ADR-roadmap.md†L145-L151】
 - **ADR-023 Session/job model & provenance graph** will wire sessions and provenance metadata together, satisfying R-DATA-017…R-DATA-032 and linking analytics outputs to storage.【F:docs/ADR/ADR-roadmap.md†L153-L159】

@@ -66,6 +66,8 @@ public sealed class SourceRoutingMap
         var next = BuildLookup(routes);
         List<StreamRouteChangedEvent> changes;
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         lock (_gate)
         {
             var previous = new Dictionary<string, StreamRoute>(_routes, StringComparer.OrdinalIgnoreCase);
@@ -78,7 +80,10 @@ public sealed class SourceRoutingMap
             }
         }
 
-        await PublishChangesAsync(changes, cancellationToken).ConfigureAwait(false);
+        if (changes.Count != 0)
+        {
+            await PublishChangesAsync(changes, CancellationToken.None).ConfigureAwait(false);
+        }
     }
 
     /// <summary>
@@ -94,6 +99,8 @@ public sealed class SourceRoutingMap
         StreamRoute? previous;
         var changed = false;
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         lock (_gate)
         {
             if (!_routes.TryGetValue(route.Stream, out previous) || previous != route)
@@ -105,7 +112,7 @@ public sealed class SourceRoutingMap
 
         if (changed)
         {
-            await _eventBus.PublishAsync(new StreamRouteChangedEvent(route.Stream, previous, route), cancellationToken)
+            await _eventBus.PublishAsync(new StreamRouteChangedEvent(route.Stream, previous, route), CancellationToken.None)
                 .ConfigureAwait(false);
         }
     }
@@ -123,6 +130,8 @@ public sealed class SourceRoutingMap
         StreamRoute? previous = null;
         var removed = false;
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         lock (_gate)
         {
             if (_routes.TryGetValue(stream, out previous))
@@ -134,7 +143,7 @@ public sealed class SourceRoutingMap
 
         if (removed && previous is not null)
         {
-            await _eventBus.PublishAsync(new StreamRouteChangedEvent(stream, previous, null), cancellationToken)
+            await _eventBus.PublishAsync(new StreamRouteChangedEvent(stream, previous, null), CancellationToken.None)
                 .ConfigureAwait(false);
         }
     }

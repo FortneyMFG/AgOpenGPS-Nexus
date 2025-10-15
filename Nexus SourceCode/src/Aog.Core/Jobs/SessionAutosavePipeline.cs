@@ -120,8 +120,7 @@ public sealed class SessionAutosavePipeline : IAsyncDisposable
     {
         ArgumentNullException.ThrowIfNull(entry);
 
-        SessionDocument? snapshot = null;
-        List<SessionJournalEntry>? batch = null;
+        FlushWork? flushWork = null;
 
         lock (_mutex)
         {
@@ -131,19 +130,16 @@ public sealed class SessionAutosavePipeline : IAsyncDisposable
 
             if (ShouldFlushDueToJournalLimits())
             {
-                snapshot = _session;
-                batch = DrainJournalBuffer();
-                _sessionDirty = false;
-                _nextAutosaveAt = _timeProvider.GetUtcNow() + _autosaveInterval;
+                flushWork = PrepareFlushUnsafe(_timeProvider.GetUtcNow());
             }
         }
 
-        if (snapshot is null || batch is null)
+        if (flushWork is null)
         {
             return ValueTask.CompletedTask;
         }
 
-        return new ValueTask(_sink.PersistAsync(snapshot, batch, cancellationToken));
+        return new ValueTask(PersistAsyncWithRecoveryAsync(flushWork, cancellationToken));
     }
 
     /// <summary>
@@ -151,8 +147,7 @@ public sealed class SessionAutosavePipeline : IAsyncDisposable
     /// </summary>
     public Task FlushIfDueAsync(CancellationToken cancellationToken = default)
     {
-        SessionDocument? snapshot = null;
-        List<SessionJournalEntry>? batch = null;
+        FlushWork? flushWork = null;
 
         lock (_mutex)
         {
@@ -169,13 +164,10 @@ public sealed class SessionAutosavePipeline : IAsyncDisposable
                 return Task.CompletedTask;
             }
 
-            snapshot = _session;
-            batch = DrainJournalBuffer();
-            _sessionDirty = false;
-            _nextAutosaveAt = now + _autosaveInterval;
+            flushWork = PrepareFlushUnsafe(now);
         }
 
-        return _sink.PersistAsync(snapshot!, batch!, cancellationToken);
+        return PersistAsyncWithRecoveryAsync(flushWork!, cancellationToken);
     }
 
     /// <summary>
@@ -184,8 +176,7 @@ public sealed class SessionAutosavePipeline : IAsyncDisposable
     /// </summary>
     public Task FlushAsync(CancellationToken cancellationToken = default)
     {
-        SessionDocument? snapshot = null;
-        List<SessionJournalEntry>? batch = null;
+        FlushWork? flushWork = null;
 
         lock (_mutex)
         {
@@ -196,19 +187,15 @@ public sealed class SessionAutosavePipeline : IAsyncDisposable
                 return Task.CompletedTask;
             }
 
-            snapshot = _session;
-            batch = DrainJournalBuffer();
-            _sessionDirty = false;
-            _nextAutosaveAt = _timeProvider.GetUtcNow() + _autosaveInterval;
+            flushWork = PrepareFlushUnsafe(_timeProvider.GetUtcNow());
         }
 
-        return _sink.PersistAsync(snapshot!, batch!, cancellationToken);
+        return PersistAsyncWithRecoveryAsync(flushWork!, cancellationToken);
     }
 
     public async ValueTask DisposeAsync()
     {
-        SessionDocument? snapshot = null;
-        List<SessionJournalEntry>? batch = null;
+        FlushWork? flushWork = null;
 
         lock (_mutex)
         {
@@ -221,15 +208,13 @@ public sealed class SessionAutosavePipeline : IAsyncDisposable
 
             if (HasPendingChanges())
             {
-                snapshot = _session;
-                batch = DrainJournalBuffer();
-                _sessionDirty = false;
+                flushWork = PrepareFlushUnsafe(_timeProvider.GetUtcNow());
             }
         }
 
-        if (snapshot is not null && batch is not null)
+        if (flushWork is not null)
         {
-            await _sink.PersistAsync(snapshot, batch, CancellationToken.None).ConfigureAwait(false);
+            await PersistAsyncWithRecoveryAsync(flushWork, CancellationToken.None).ConfigureAwait(false);
         }
     }
 
@@ -258,12 +243,79 @@ public sealed class SessionAutosavePipeline : IAsyncDisposable
         return _sessionDirty || _journalBuffer.Count > 0;
     }
 
-    private List<SessionJournalEntry> DrainJournalBuffer()
+    private FlushWork PrepareFlushUnsafe(DateTimeOffset now)
+    {
+        var previousDirty = _sessionDirty;
+        var previousNextAutosaveAt = _nextAutosaveAt;
+        var batch = DrainJournalBuffer(out var drainedBytes);
+        _sessionDirty = false;
+        _nextAutosaveAt = now + _autosaveInterval;
+        return new FlushWork(_session, batch, previousDirty, previousNextAutosaveAt, drainedBytes);
+    }
+
+    private List<SessionJournalEntry> DrainJournalBuffer(out int drainedBytes)
     {
         var batch = new List<SessionJournalEntry>(_journalBuffer);
         _journalBuffer.Clear();
+        drainedBytes = _journalBytes;
         _journalBytes = 0;
         return batch;
+    }
+
+    private Task PersistAsyncWithRecoveryAsync(FlushWork flushWork, CancellationToken cancellationToken)
+    {
+        return PersistCoreAsync();
+
+        async Task PersistCoreAsync()
+        {
+            try
+            {
+                await _sink.PersistAsync(flushWork.Snapshot, flushWork.JournalBatch, cancellationToken).ConfigureAwait(false);
+            }
+            catch
+            {
+                lock (_mutex)
+                {
+                    RestoreFlushStateUnsafe(flushWork);
+                }
+
+                throw;
+            }
+        }
+    }
+
+    private void RestoreFlushStateUnsafe(FlushWork flushWork)
+    {
+        _sessionDirty = flushWork.PreviousSessionDirty || _sessionDirty;
+
+        if (flushWork.JournalBatch.Count > 0)
+        {
+            _journalBuffer.InsertRange(0, flushWork.JournalBatch);
+            _journalBytes += flushWork.DrainedJournalBytes;
+        }
+
+        if (_nextAutosaveAt > flushWork.PreviousNextAutosaveAt)
+        {
+            _nextAutosaveAt = flushWork.PreviousNextAutosaveAt;
+        }
+    }
+
+    private sealed class FlushWork
+    {
+        public FlushWork(SessionDocument snapshot, List<SessionJournalEntry> journalBatch, bool previousSessionDirty, DateTimeOffset previousNextAutosaveAt, int drainedJournalBytes)
+        {
+            Snapshot = snapshot;
+            JournalBatch = journalBatch;
+            PreviousSessionDirty = previousSessionDirty;
+            PreviousNextAutosaveAt = previousNextAutosaveAt;
+            DrainedJournalBytes = drainedJournalBytes;
+        }
+
+        public SessionDocument Snapshot { get; }
+        public List<SessionJournalEntry> JournalBatch { get; }
+        public bool PreviousSessionDirty { get; }
+        public DateTimeOffset PreviousNextAutosaveAt { get; }
+        public int DrainedJournalBytes { get; }
     }
 
     private void ThrowIfDisposed()

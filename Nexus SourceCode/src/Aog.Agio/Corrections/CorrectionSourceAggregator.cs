@@ -121,21 +121,28 @@ public sealed class CorrectionSourceAggregator : ICorrectionSource
                 {
                     case CorrectionSourceOutcome.Completed:
                         _logger.LogInformation(
-                            "GNSS correction source {Source} completed. Stopping aggregator.",
+                            "GNSS correction source {Source} completed. Trying next provider after backoff.",
                             activeSource.Name);
-                        return result;
+                        break;
 
                     case CorrectionSourceOutcome.Cancelled:
                         _logger.LogInformation(
-                            "GNSS correction source {Source} cancelled. Stopping aggregator.",
+                            "GNSS correction source {Source} cancelled. Trying next provider after backoff.",
                             activeSource.Name);
-                        return result;
+                        break;
 
                     case CorrectionSourceOutcome.Faulted:
                         _logger.LogWarning(
                             result.Error,
                             "GNSS correction source {Source} faulted. Trying next provider.",
                             activeSource.Name);
+                        break;
+
+                    default:
+                        _logger.LogWarning(
+                            "GNSS correction source {Source} returned unexpected outcome {Outcome}. Trying next provider.",
+                            activeSource.Name,
+                            result.Outcome);
                         break;
                 }
 

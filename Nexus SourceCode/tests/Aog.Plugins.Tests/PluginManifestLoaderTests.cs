@@ -82,6 +82,35 @@ public sealed class PluginManifestLoaderTests
     }
 
     [Fact]
+    public async Task LoadAsync_V1Manifest_OmitsOptionalSections()
+    {
+        const string json = """
+        {
+          "schemaVersion": "1.0.0",
+          "id": "org.agopengps.plugins.legacy",
+          "name": "Legacy Plugin",
+          "version": "1.0.0",
+          "requiredApis": { "core": ">=1.0.0" },
+          "simProviders": [
+            {
+              "providerId": "legacy.sim",
+              "type": "Aog.Plugins.Legacy.Provider",
+              "topics": ["pose"]
+            }
+          ]
+        }
+        """;
+
+        await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        var manifest = await _loader.LoadAsync(stream);
+
+        manifest.SupportedCapabilities.Should().BeEmpty();
+        manifest.RequiredTransports.Should().BeEmpty();
+        manifest.MinimumRuntimeVersion.Should().Be("1.0.0");
+        manifest.CapabilityLeases.Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task LoadAsync_InvalidManifest_Throws()
     {
         const string json = """

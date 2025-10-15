@@ -251,7 +251,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-313 Stanley controller parity harness _(Planned)_ — ADR-033 guidance planner porting
 - [ ] NX-314 Pure pursuit control port with fixtures _(Planned)_ — ADR-033 guidance planner porting
 - [ ] NX-315 Turn planner library port _(Planned)_ — ADR-033 guidance planner porting
-- [ ] NX-316 Constraint-aware lookahead tuning _(Planned)_ — ADR-033 lookahead + ADR-027 gating
+- [x] NX-316 Constraint-aware lookahead tuning _(Done)_ — ADR-033 lookahead + ADR-027 gating
 - [ ] NX-317 Firmware-in-loop stability validation _(Planned)_ — ADR-033 closed-loop validation
 
 ### Section G — Packaging, DevEx, Docs
@@ -587,7 +587,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-313 | Stanley controller parity harness | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
 | NX-314 | Pure pursuit control port with fixtures | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
 | NX-315 | Turn planner library port | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
-| NX-316 | Constraint-aware lookahead tuning | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md), [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-033 lookahead + ADR-027 gating |
+| NX-316 | Constraint-aware lookahead tuning | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md), [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-033 lookahead + ADR-027 gating |
 | NX-317 | Firmware-in-loop stability validation | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 closed-loop validation |
 
 ### Section G — Packaging, DevEx, Docs

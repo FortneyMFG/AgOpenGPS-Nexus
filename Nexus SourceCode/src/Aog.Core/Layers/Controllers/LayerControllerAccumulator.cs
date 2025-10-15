@@ -9,7 +9,8 @@ namespace Aog.Core.Layers.Controllers;
 /// </summary>
 internal sealed class LayerControllerAccumulator
 {
-    private readonly List<PlanarPoint> _positions = new();
+    private readonly List<PlanarPoint> _positions;
+    private readonly LayerControllerBufferPool _bufferPool;
 
     private double _normalizedSum;
     private double _engineeringWeightedSum;
@@ -34,6 +35,12 @@ internal sealed class LayerControllerAccumulator
     private bool? _lastRateUnavailable;
 
     private PlanarPoint? _lastPosition;
+
+    public LayerControllerAccumulator(LayerControllerBufferPool bufferPool)
+    {
+        _bufferPool = bufferPool ?? throw new ArgumentNullException(nameof(bufferPool));
+        _positions = new List<PlanarPoint>(_bufferPool.PositionsInitialCapacity);
+    }
 
     public bool HasSamples => _sampleCount > 0 || _areaSum > 0d || _positions.Count > 0;
 
@@ -147,11 +154,25 @@ internal sealed class LayerControllerAccumulator
             ? _denominatorSum
             : area;
 
-        var positions = containsFreshData
-            ? (IReadOnlyList<PlanarPoint>)_positions.ToArray()
-            : _lastPosition is { } lastPosition
-                ? new[] { lastPosition }
-                : Array.Empty<PlanarPoint>();
+        IReadOnlyList<PlanarPoint> positions;
+        IDisposable? positionsOwner = null;
+
+        if (containsFreshData)
+        {
+            var pooled = _bufferPool.LeasePositions(_positions);
+            positions = pooled;
+            positionsOwner = pooled.IsPooled ? pooled : null;
+        }
+        else if (_lastPosition is { } lastPosition)
+        {
+            var pooled = _bufferPool.LeaseSinglePosition(lastPosition);
+            positions = pooled;
+            positionsOwner = pooled.IsPooled ? pooled : null;
+        }
+        else
+        {
+            positions = Array.Empty<PlanarPoint>();
+        }
 
         var snapshot = new LayerControllerSnapshot(
             controllerId,
@@ -170,7 +191,8 @@ internal sealed class LayerControllerAccumulator
             containsFreshData ? _sampleCount : 0,
             containsFreshData ? _windowFirstSample : null,
             containsFreshData ? _windowLastSample : null,
-            positions);
+            positions,
+            positionsOwner);
 
         if (resetAfterEmission)
         {

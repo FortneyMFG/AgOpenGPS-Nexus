@@ -58,7 +58,7 @@ public class LayerControllerRuntimeTests
         var snapshots = runtime.CollectDueSnapshots();
 
         snapshots.Should().HaveCount(1);
-        var snapshot = snapshots.Single();
+        using var snapshot = snapshots.Single();
         snapshot.ControllerId.Should().Be("controller-1");
         snapshot.LayerId.Should().Be("layer-1");
         snapshot.ContainsFreshData.Should().BeTrue();
@@ -104,7 +104,7 @@ public class LayerControllerRuntimeTests
 
         clock.Advance(TimeSpan.FromMilliseconds(200));
 
-        var snapshot = runtime.CollectDueSnapshots().Single();
+        using var snapshot = runtime.CollectDueSnapshots().Single();
         snapshot.ContainsFreshData.Should().BeTrue();
         snapshot.EngineeringValue.Should().BeApproximately(3.0, 1e-6);
         snapshot.RateUnavailable.Should().BeTrue();
@@ -127,10 +127,12 @@ public class LayerControllerRuntimeTests
             CreateSample(clock.GetUtcNow(), engineering: 15, normalized: 0.4, quality: 0.8, area: 0.3, rateUnavailable: false));
 
         clock.Advance(TimeSpan.FromMilliseconds(120));
-        runtime.CollectDueSnapshots().Single();
+        using (runtime.CollectDueSnapshots().Single())
+        {
+        }
 
         clock.Advance(TimeSpan.FromMilliseconds(120));
-        var holdSnapshot = runtime.CollectDueSnapshots(emitHoldFrames: true).Single();
+        using var holdSnapshot = runtime.CollectDueSnapshots(emitHoldFrames: true).Single();
 
         holdSnapshot.ContainsFreshData.Should().BeFalse();
         holdSnapshot.EngineeringValue.Should().BeApproximately(15, 1e-6);
@@ -155,7 +157,9 @@ public class LayerControllerRuntimeTests
             CreateSample(clock.GetUtcNow(), engineering: 20, normalized: 0.5, quality: 0.8, area: 0.8));
 
         clock.Advance(TimeSpan.FromMilliseconds(120));
-        runtime.CollectDueSnapshots();
+        using (runtime.CollectDueSnapshots().Single())
+        {
+        }
 
         clock.Advance(TimeSpan.FromMilliseconds(120));
         var snapshots = runtime.CollectDueSnapshots(emitHoldFrames: false);
@@ -175,7 +179,7 @@ public class LayerControllerRuntimeTests
             "controller-1",
             CreateSample(clock.GetUtcNow(), engineering: 12, normalized: 0.6, quality: 0.9, area: 0.5));
 
-        var snapshot = runtime.CollectDueSnapshots(force: true).Single();
+        using var snapshot = runtime.CollectDueSnapshots(force: true).Single();
         snapshot.ContainsFreshData.Should().BeTrue();
     }
 

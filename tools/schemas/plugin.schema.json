@@ -92,6 +92,12 @@
       "minItems": 1,
       "items": { "$ref": "#/$defs/lease" },
       "description": "Lease declarations describing how the plugin acquires and maintains capability ownership."
+    },
+    "reportSections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/reportSection" },
+      "description": "Report Builder sections exported by the plugin."
     }
   },
   "$defs": {
@@ -197,6 +203,221 @@
           "description": "Recovery strategy applied when the lease cannot be renewed."
         }
       }
+    },
+    "reportSection": {
+      "type": "object",
+      "required": [
+        "id",
+        "displayName",
+        "version",
+        "scopes",
+        "capabilities",
+        "provides"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/reportSectionId" },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human readable name rendered in the Report Builder catalog."
+        },
+        "description": {
+          "type": "string",
+          "description": "Summary of the analytics or visuals produced by the section."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[-0-9A-Za-z.]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+          "description": "Semantic version of the section contract exposed by the plugin."
+        },
+        "scopes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/reportScope" },
+          "description": "Report scopes (farm/season/job/session) supported by the section."
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/reportCapability" },
+          "description": "Data dependencies advertised to the Report Builder orchestrator."
+        },
+        "provides": {
+          "$ref": "#/$defs/reportOutputs"
+        },
+        "defaultLayout": {
+          "$ref": "#/$defs/sectionLayout"
+        },
+        "optionsSchema": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Optional JSON Schema URI for validating template-specified options."
+        },
+        "defaultOptions": {
+          "type": "object",
+          "default": {},
+          "description": "Suggested options applied when a template omits overrides.",
+          "additionalProperties": true
+        },
+        "defaultExports": {
+          "$ref": "#/$defs/defaultExports"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Implementation notes for operators or template authors."
+        },
+        "deprecated": {
+          "type": "boolean",
+          "description": "Marks the section as deprecated while keeping backwards compatibility."
+        }
+      },
+      "description": "Manifest contract describing a report section contributed by the plugin."
+    },
+    "reportSectionId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)+$",
+      "description": "Stable identifier used by templates when referencing the section."
+    },
+    "reportScope": {
+      "type": "string",
+      "enum": ["farm", "season", "job", "session"],
+      "description": "Context scopes that the section is able to render against."
+    },
+    "reportCapability": {
+      "type": "string",
+      "enum": [
+        "crop",
+        "genetics",
+        "yield",
+        "profit",
+        "risk",
+        "weather",
+        "telemetry",
+        "guidance",
+        "zones",
+        "jobs",
+        "notes"
+      ],
+      "description": "Named dataset or capability required by the section renderer."
+    },
+    "reportOutputs": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "pdf": {
+          "type": "boolean",
+          "default": true,
+          "description": "Indicates that the section can render into the PDF output."
+        },
+        "csv": {
+          "type": "boolean",
+          "default": false,
+          "description": "Indicates that the section can produce a tabular CSV export."
+        },
+        "geoJson": {
+          "type": "boolean",
+          "default": false,
+          "description": "Indicates that the section can emit GeoJSON features."
+        }
+      },
+      "description": "Declares which export surfaces the section supports."
+    },
+    "sectionLayout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "region": {
+          "type": "string",
+          "enum": ["cover", "header", "body", "footer", "appendix"],
+          "description": "Preferred report region for the section's primary rendering."
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Relative ordering hint used by default templates."
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Zero-based column index for multi-column PDF layouts."
+        },
+        "columnSpan": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3,
+          "description": "Number of columns the section prefers to occupy."
+        },
+        "rowSpan": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6,
+          "description": "Relative height budget for the section within a template."
+        }
+      },
+      "description": "Default layout hint consumed by templates when no override is provided."
+    },
+    "defaultExports": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "csv": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/csvExportHint" },
+          "uniqueItems": true,
+          "description": "Suggested CSV exports emitted when the template does not override."
+        },
+        "geoJson": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/geoJsonExportHint" },
+          "uniqueItems": true,
+          "description": "Suggested GeoJSON exports emitted when the template does not override."
+        }
+      },
+      "description": "Default export bundle suggestions provided by the section."
+    },
+    "csvExportHint": {
+      "type": "object",
+      "required": ["filename"],
+      "additionalProperties": false,
+      "properties": {
+        "filename": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.csv$",
+          "description": "Default filename proposed for the CSV artifact."
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "Optional ordered list of exported column identifiers."
+        }
+      },
+      "description": "Hint describing a CSV export emitted by the section."
+    },
+    "geoJsonExportHint": {
+      "type": "object",
+      "required": ["filename"],
+      "additionalProperties": false,
+      "properties": {
+        "filename": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.geojson$",
+          "description": "Default filename proposed for the GeoJSON artifact."
+        },
+        "featureRole": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$",
+          "description": "Semantic role advertised for the exported features."
+        }
+      },
+      "description": "Hint describing a GeoJSON export emitted by the section."
     }
   }
 }

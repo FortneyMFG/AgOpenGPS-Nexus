@@ -177,7 +177,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-277 Sections plugin constraint gating updates _(Planned)_ — ADR-027 gating
 - [x] NX-278 Guidance lane publishing contracts _(Done)_ — ADR-033 guidance planner
 - [x] NX-279 Turn planner integration in guidance plugin _(Done)_ — ADR-033 guidance planner
-- [ ] NX-280 Guidance plugin regression suite _(Planned)_ — ADR-033 QA coverage
+- [x] NX-280 Guidance plugin regression suite _(Done)_ — ADR-033 QA coverage
 - [ ] NX-281 Mapping plugin zone overlay updates _(Planned)_ — ADR-027 zones + ADR-029 mapping kernel
 - [ ] NX-282 Variable rate plugin zone gating _(Planned)_ — ADR-027 gating semantics
 - [x] NX-283 Device Manager plugin capability surfacing _(Done)_ — ADR-031 compatibility dashboard
@@ -251,7 +251,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 - [x] NX-313 Stanley controller parity harness _(Done)_ — ADR-033 guidance planner porting
 - [x] NX-314 Pure pursuit control port with fixtures _(Done)_ — ADR-033 guidance planner porting
-- [ ] NX-315 Turn planner library port _(Planned)_ — ADR-033 guidance planner porting
+- [x] NX-315 Turn planner library port _(Done)_ — ADR-033 guidance planner porting
 - [x] NX-316 Constraint-aware lookahead tuning _(Done)_ — ADR-033 lookahead + ADR-027 gating
 - [x] NX-317 Firmware-in-loop stability validation _(Done)_ — ADR-033 closed-loop validation
 
@@ -513,7 +513,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-277 | Sections plugin constraint gating updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating |
 | NX-278 | Guidance lane publishing contracts | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner |
 | NX-279 | Turn planner integration in guidance plugin | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner |
-| NX-280 | Guidance plugin regression suite | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 QA coverage |
+| NX-280 | Guidance plugin regression suite | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 QA coverage |
 | NX-281 | Mapping plugin zone overlay updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-029](docs/ADR/ADR-029-mapping-plugin-architecture.md) | ADR-027 zones + ADR-029 mapping kernel |
 | NX-282 | Variable rate plugin zone gating | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating semantics |
 | NX-283 | Device Manager plugin capability surfacing | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 compatibility dashboard |
@@ -589,7 +589,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-113 | External agronomic map ingest pipeline | Done |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | CSV importer emits Layer.v1 documents |
 | NX-313 | Stanley controller parity harness | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
 | NX-314 | Pure pursuit control port with fixtures | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
-| NX-315 | Turn planner library port | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
+| NX-315 | Turn planner library port | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
 | NX-316 | Constraint-aware lookahead tuning | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md), [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-033 lookahead + ADR-027 gating |
 | NX-317 | Firmware-in-loop stability validation | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 closed-loop validation |
 

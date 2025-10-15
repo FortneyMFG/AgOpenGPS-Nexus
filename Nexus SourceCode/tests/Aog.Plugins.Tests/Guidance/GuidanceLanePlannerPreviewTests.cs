@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Aog.Core.Guidance;
+using Aog.Core.Paths;
 using Aog.Plugins.AutoSteer;
 using Aog.Plugins.Guidance;
 using FluentAssertions;

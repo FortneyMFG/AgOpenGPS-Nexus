@@ -22,5 +22,7 @@ Key behaviors:
   Share/Subscribe profiles. Access denials are tallied into diagnostics for operator
   tooling.
 
-Follow-up tasks (NX-228 and beyond) will add the RadioBridge transport adapters that push
-these publications out to hardware links.
+NX-228 adds the RadioBridge transport stack which handles framing, acknowledgements,
+compression and retry scheduling for low-bandwidth links. Follow-up tasks (NX-227
+and beyond) will layer additional diagnostics, ACL enforcement and hardware adapters
+that push these publications out to radio devices.

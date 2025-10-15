@@ -48,6 +48,11 @@
 - [LayerEditEvent.v1.json](../schemas/LayerEditEvent.v1.json)
 - [schemas/examples](../schemas/examples) — sample payloads for validation
 
+## Reference
+
+- [CRS normalization matrix](reference/crs-normalization-matrix.md) — canonical storage,
+  processing, and audit expectations per ADR-022.
+
 ## Contribution Guides
 
 - [AGENTS.md](../AGENTS.md) — repository conventions and task workflow.

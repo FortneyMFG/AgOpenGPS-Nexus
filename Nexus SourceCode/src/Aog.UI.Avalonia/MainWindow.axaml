@@ -38,7 +38,7 @@
               BorderBrush="{DynamicResource ThemeBorderMidBrush}"
               BorderThickness="1">
         <controls:MapView VehiclePose="{Binding VehiclePose}"
-                          CoverageCells="{Binding CoverageCells}"
+                          Layers="{Binding MapLayers}"
                           GuidanceTracks="{Binding GuidanceTracks}"/>
       </Border>
 

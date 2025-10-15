@@ -53,3 +53,17 @@ validation harnesses, and auto-tuning helpers.
   minimum look-ahead distance. The calculator validates its output before returning it so
   callers can rely on sane defaults.
 
+## Legacy Metadata + History Import (NX-106–NX-111)
+
+- `LegacyFieldImporter` now reads `Field.txt`, `Flags.txt`, `Contour.txt`, `RecPath.txt`,
+  `Tram.txt`, and `Sections.txt` alongside geometry files so the importer surfaces operator
+  metadata, scouting flags, contour resume buffers, recorded path logs, tram templates, and
+  worked-area cells in a single `LegacyFieldData` bundle.
+- New domain models (`LegacyFieldOverview`, `LegacyFlag`, `LegacyContourResume`,
+  `LegacyRecordedPath`, `LegacyTramTemplate`, `LegacyWorkedAreaHistory`) encapsulate the
+  imported assets, making it trivial for UI and service layers to reason about provenance and
+  keep audit trails intact.
+- The regression fixtures under `tests/Aog.Core.Tests/Legacy/Data/SampleField` now include
+  representative `Field.txt`, `Flags.txt`, `Contour.txt`, `RecPath.txt`, `Tram.txt`, and
+  `Sections.txt` exports so future importer changes have a parity harness to lean on.
+

@@ -21,6 +21,7 @@ public sealed class LegacyFieldImporterTests
 
         var data = importer.Import(temp.Path);
 
+        // --- Tracks ---
         data.Tracks.Should().HaveCount(2);
         data.Tracks[0].Name.Should().Be("Main AB");
         data.Tracks[0].Mode.Should().Be(LegacyTrackMode.AbLine);
@@ -30,6 +31,7 @@ public sealed class LegacyFieldImporterTests
         data.Tracks[1].CurvePoints.Should().HaveCount(3);
         data.Tracks[1].CurvePoints[0].Point.Should().Be(new PlanarPoint(12, 12));
 
+        // --- Boundaries and Headlands ---
         data.Boundaries.Should().HaveCount(2);
         data.Boundaries[0].IsDriveThrough.Should().BeTrue();
         data.Boundaries[0].Perimeter.Should().HaveCount(4);
@@ -39,6 +41,42 @@ public sealed class LegacyFieldImporterTests
         data.Boundaries[1].IsDriveThrough.Should().BeFalse();
         data.Boundaries[1].Perimeter.Should().HaveCount(3);
 
+        // --- Overview ---
+        data.Overview.Should().NotBeNull();
+        data.Overview!.FieldName.Should().Be("North Farm West");
+        data.Overview.OperatorName.Should().Be("Casey Jensen");
+        data.Overview.Origin.Should().Be(new GeographicCoordinate(51.123456, -114.123789));
+        data.Overview.ConvergenceAngleDegrees.Should().BeApproximately(0.45, 1e-6);
+
+        // --- Flags ---
+        data.Flags.Should().HaveCount(3);
+        data.Flags[0].Label.Should().Be("North Rock");
+        data.Flags[0].Location.Should().Be(new PlanarPoint(5, 12.5));
+        data.Flags[1].Color.Should().Be("Blue");
+
+        // --- Contour ---
+        data.Contour.IsRecording.Should().BeTrue();
+        data.Contour.SavedStrips.Should().HaveCount(2);
+        data.Contour.PendingStrip.Should().NotBeNull();
+        data.Contour.PendingStrip!.Vertices.Should().Contain(new PlanarPoint(6, 7));
+
+        // --- Recorded Paths ---
+        data.RecordedPaths.Should().HaveCount(2);
+        data.RecordedPaths[0].Name.Should().Be("Training Pass");
+        data.RecordedPaths[0].Samples.Should().HaveCount(3);
+
+        // --- Tram Templates ---
+        data.TramTemplates.Should().HaveCount(2);
+        data.TramTemplates[0].Name.Should().Be("North Tram");
+        data.TramTemplates[0].Passes.Should().HaveCount(2);
+
+        // --- Worked Area ---
+        data.WorkedArea.LayerId.Should().Be("layer:coverage.actual");
+        data.WorkedArea.CellSizeMeters.Should().BeApproximately(5.5, 1e-9);
+        data.WorkedArea.SavedCells.Should().HaveCount(2);
+        data.WorkedArea.PendingCells.Should().HaveCount(2);
+
+        // --- Background Imagery ---
         data.BackgroundImagery.Should().NotBeNull();
         data.BackgroundImagery!.BoundingBox.MinNorthing.Should().Be(5.25);
         data.BackgroundImagery.BoundingBox.MaxNorthing.Should().Be(205.25);
@@ -57,6 +95,13 @@ public sealed class LegacyFieldImporterTests
 
         data.Tracks.Should().BeEmpty();
         data.Boundaries.Should().BeEmpty();
+        data.Flags.Should().BeEmpty();
+        data.RecordedPaths.Should().BeEmpty();
+        data.TramTemplates.Should().BeEmpty();
+        data.Contour.IsRecording.Should().BeFalse();
+        data.WorkedArea.SavedCells.Should().BeEmpty();
+        data.WorkedArea.PendingCells.Should().BeEmpty();
+        data.Overview.Should().BeNull();
         data.BackgroundImagery.Should().BeNull();
     }
 
@@ -96,7 +141,8 @@ public sealed class LegacyFieldImporterTests
         File.WriteAllBytes(pngPath, bytes);
     }
 
-    private const string SampleBackPicBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PtX9YQAAAABJRU5ErkJggg==";
+    private const string SampleBackPicBase64 =
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PtX9YQAAAABJRU5ErkJggg==";
 
     private sealed class TempDirectory : IDisposable
     {

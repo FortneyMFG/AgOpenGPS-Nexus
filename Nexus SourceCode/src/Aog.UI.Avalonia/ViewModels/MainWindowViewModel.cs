@@ -33,7 +33,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     private UiTheme _selectedTheme;
 
-    private readonly IReadOnlyList<CoverageCell> _coverageCells;
+    private readonly IReadOnlyList<MapLayer> _mapLayers;
     private readonly IReadOnlyList<GuidanceTrack> _guidanceTracks;
 
     /// <summary>
@@ -78,7 +78,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         PlanterPanel = new PlanterPanelViewModel();
         ReplayTimeline = new ReplayTimelineViewModel();
 
-        _coverageCells = BuildSampleCoverage();
+        _mapLayers = BuildSampleLayers();
         _guidanceTracks = BuildSampleGuidance();
 
         ApplySamplePluginState();
@@ -152,8 +152,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets the replay timeline analytics view-model.</summary>
     public ReplayTimelineViewModel ReplayTimeline { get; }
 
-    /// <summary>Gets the coverage cells rendered on the map.</summary>
-    public IReadOnlyList<CoverageCell> CoverageCells => _coverageCells;
+    /// <summary>Gets the map layers rendered on the map.</summary>
+    public IReadOnlyList<MapLayer> MapLayers => _mapLayers;
 
     /// <summary>Gets the guidance tracks rendered on the map.</summary>
     public IReadOnlyList<GuidanceTrack> GuidanceTracks => _guidanceTracks;
@@ -306,23 +306,49 @@ public class MainWindowViewModel : INotifyPropertyChanged
         ReplayTimeline.ApplySampleData(speeds, headings, bookmarks);
     }
 
-    private static IReadOnlyList<CoverageCell> BuildSampleCoverage()
+    private static IReadOnlyList<MapLayer> BuildSampleLayers()
     {
-        var cells = new List<CoverageCell>();
         const double spacing = 6;
         const double size = 5.5;
+
+        var actualCells = new List<MapLayerCell>();
+        var plannedCells = new List<MapLayerCell>();
 
         for (var x = -3; x <= 3; x++)
         {
             for (var y = -2; y <= 4; y++)
             {
-                var coverage = Math.Clamp(0.15 + (y + 2) * 0.18 + Math.Sin(x * 0.7) * 0.05, 0, 1);
                 var center = new Point(10 + x * spacing, 10 + y * spacing);
-                cells.Add(new CoverageCell(center, size, coverage));
+                var actualCoverage = Math.Clamp(0.15 + (y + 2) * 0.18 + Math.Sin(x * 0.7) * 0.05, 0, 1);
+                var plannedCoverage = Math.Clamp(0.3 + (y + 1) * 0.14 + Math.Cos(x * 0.5) * 0.07, 0, 1);
+
+                actualCells.Add(new MapLayerCell(center, size, actualCoverage));
+                plannedCells.Add(new MapLayerCell(center, size, plannedCoverage));
             }
         }
 
-        return cells;
+        var actualStyle = new LayerVisualizationStyle(
+            Color.FromArgb(220, 34, 139, 34),
+            Color.FromArgb(230, 17, 201, 141),
+            0,
+            1,
+            units: "fraction",
+            outlineColor: Color.FromArgb(160, 33, 46, 51));
+
+        var plannedStyle = new LayerVisualizationStyle(
+            Color.FromArgb(160, 30, 64, 174),
+            Color.FromArgb(200, 255, 215, 0),
+            0,
+            1,
+            units: "fraction",
+            isPlanned: true,
+            outlineColor: Color.FromArgb(120, 24, 34, 84));
+
+        return new List<MapLayer>
+        {
+            new("layer:coverage.actual", "Actual coverage", actualStyle, actualCells),
+            new("layer:coverage.planned", "Planned rate", plannedStyle, plannedCells),
+        };
     }
 
     private static IReadOnlyList<GuidanceTrack> BuildSampleGuidance()

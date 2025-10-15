@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
+using Aog.Core.Mesh;
 using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
 using Parquet;
@@ -22,6 +23,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
     private readonly ParquetTopicWriter<CanFrame> _canWriter;
     private readonly ParquetTopicWriter<SectionMask> _ioWriter;
     private readonly ParquetTopicWriter<PluginTelemetryEvent> _pluginWriter;
+    private readonly ParquetTopicWriter<MeshTelemetryEvent> _meshWriter;
     private readonly IReadOnlyList<IDisposable> _subscriptions;
 
     private TelemetryParquetLogger(
@@ -30,6 +32,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         ParquetTopicWriter<CanFrame> canWriter,
         ParquetTopicWriter<SectionMask> ioWriter,
         ParquetTopicWriter<PluginTelemetryEvent> pluginWriter,
+        ParquetTopicWriter<MeshTelemetryEvent> meshWriter,
         IReadOnlyList<IDisposable> subscriptions)
     {
         _poseWriter = poseWriter;
@@ -37,6 +40,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         _canWriter = canWriter;
         _ioWriter = ioWriter;
         _pluginWriter = pluginWriter;
+        _meshWriter = meshWriter;
         _subscriptions = subscriptions;
     }
 
@@ -87,16 +91,23 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             TelemetryParquetRowBuilder.CreatePluginColumns(options),
             cancellationToken).ConfigureAwait(false);
 
+        var meshWriter = await ParquetTopicWriter<MeshTelemetryEvent>.CreateAsync(
+            options.ResolvePath(options.MeshFileName),
+            TelemetryParquetSchemas.Mesh.Schema,
+            TelemetryParquetRowBuilder.CreateMeshColumns(options),
+            cancellationToken).ConfigureAwait(false);
+
         var subscriptions = new List<IDisposable>
         {
             eventBus.Subscribe<Pose>((message, token) => poseWriter.WriteAsync(message, token)),
             eventBus.Subscribe<Imu>((message, token) => imuWriter.WriteAsync(message, token)),
             eventBus.Subscribe<CanFrame>((message, token) => canWriter.WriteAsync(message, token)),
             eventBus.Subscribe<SectionMask>((message, token) => ioWriter.WriteAsync(message, token)),
-            eventBus.Subscribe<PluginTelemetryEvent>((message, token) => pluginWriter.WriteAsync(message, token))
+            eventBus.Subscribe<PluginTelemetryEvent>((message, token) => pluginWriter.WriteAsync(message, token)),
+            eventBus.Subscribe<MeshTelemetryEvent>((message, token) => meshWriter.WriteAsync(message, token))
         };
 
-        return new TelemetryParquetLogger(poseWriter, imuWriter, canWriter, ioWriter, pluginWriter, subscriptions);
+        return new TelemetryParquetLogger(poseWriter, imuWriter, canWriter, ioWriter, pluginWriter, meshWriter, subscriptions);
     }
 
     /// <inheritdoc />
@@ -112,6 +123,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         await _canWriter.DisposeAsync().ConfigureAwait(false);
         await _ioWriter.DisposeAsync().ConfigureAwait(false);
         await _pluginWriter.DisposeAsync().ConfigureAwait(false);
+        await _meshWriter.DisposeAsync().ConfigureAwait(false);
 
         GC.SuppressFinalize(this);
     }
@@ -152,6 +164,11 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         public string PluginFileName { get; init; } = "plugin.parquet";
 
         /// <summary>
+        /// File name for mesh publications captured by the retention worker.
+        /// </summary>
+        public string MeshFileName { get; init; } = "mesh.parquet";
+
+        /// <summary>
         /// Optional job identifier used to populate telemetry provenance when
         /// message headers do not specify one. Aligns with ADR-041.
         /// </summary>
@@ -176,6 +193,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             ArgumentException.ThrowIfNullOrWhiteSpace(CanFileName);
             ArgumentException.ThrowIfNullOrWhiteSpace(IoFileName);
             ArgumentException.ThrowIfNullOrWhiteSpace(PluginFileName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(MeshFileName);
         }
 
         internal string ResolvePath(string fileName)
@@ -409,6 +427,33 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                 Topic,
                 Payload);
         }
+
+        internal static class Mesh
+        {
+            public static readonly DataField<long> Sequence = new("sequence");
+            public static readonly DataField<string> PublisherDeviceId = new("publisher_device_id");
+            public static readonly DataField<string> Topic = new("topic");
+            public static readonly DataField<string> SeasonId = new("season_id");
+            public static readonly DataField<string> JobId = new("job_id");
+            public static readonly DataField<string> LayerNamespace = new("layer_namespace");
+            public static readonly DataField<string> Tier = new("tier");
+            public static readonly DateTimeDataField PublishedAt = new("published_at_utc", DateTimeFormat.DateAndTime);
+            public static readonly DataField<byte[]?> Payload = new("payload");
+            public static readonly DataField<string?> MetadataJson = new("metadata_json");
+            public static readonly DataField<string?> PresenceJson = new("presence_json");
+            public static readonly Schema Schema = new(
+                Sequence,
+                PublisherDeviceId,
+                Topic,
+                SeasonId,
+                JobId,
+                LayerNamespace,
+                Tier,
+                PublishedAt,
+                Payload,
+                MetadataJson,
+                PresenceJson);
+        }
     }
 
     private static class TelemetryParquetRowBuilder
@@ -517,6 +562,22 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                     new DataColumn(TelemetryParquetSchemas.Plugin.Topic, new[] { HeaderColumns.NormalizeString(message.Topic) ?? string.Empty }),
                     new DataColumn(TelemetryParquetSchemas.Plugin.Payload, new byte[]?[] { message.Payload.Length == 0 ? Array.Empty<byte>() : message.Payload.ToArray() })
                 };
+            };
+
+        public static Func<MeshTelemetryEvent, DataColumn[]> CreateMeshColumns(TelemetryParquetLoggerOptions options)
+            => message => new[]
+            {
+                new DataColumn(TelemetryParquetSchemas.Mesh.Sequence, new[] { message.Sequence }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.PublisherDeviceId, new[] { message.PublisherDeviceId }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.Topic, new[] { message.Topic }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.SeasonId, new[] { message.SeasonId }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.JobId, new[] { message.JobId }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.LayerNamespace, new[] { message.LayerNamespace }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.Tier, new[] { message.Tier.ToString() }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.PublishedAt, new DateTime[] { message.PublishedAt.UtcDateTime }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.Payload, new byte[]?[] { message.Payload.Length == 0 ? Array.Empty<byte>() : message.Payload }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.MetadataJson, new[] { message.MetadataJson }),
+                new DataColumn(TelemetryParquetSchemas.Mesh.PresenceJson, new[] { message.PresenceJson })
             };
 
         private static class HeaderColumns

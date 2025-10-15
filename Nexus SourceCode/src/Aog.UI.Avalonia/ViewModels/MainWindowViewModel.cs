@@ -85,11 +85,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         var layerEditJournal = new LayerEditEventJournalService(TimeProvider.System);
         ZoneEditorToolbar = new ZoneEditorToolbarViewModel(layerEditJournal);
+        ZonePolicyPanel = new ZoneConstraintPolicyViewModel();
+        ZoneImportExportPanel = new ZoneImportExportPanelViewModel();
 
         _mapLayers = BuildSampleLayers();
         _guidanceTracks = BuildSampleGuidance();
         LayerLegend = LayerLegendViewModel.FromLayers(_mapLayers);
         LayerInspector = BuildSampleInspector(_mapLayers);
+        MeshSharePanel = MeshSharePanelViewModel.CreateSample();
 
         ApplySamplePluginState();
         SeedDashboards();
@@ -176,11 +179,20 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the zone editor toolbar view-model powering map editing affordances.</summary>
     public ZoneEditorToolbarViewModel ZoneEditorToolbar { get; }
+
+    /// <summary>Gets the zone policy panel view-model that surfaces override toggles.</summary>
+    public ZoneConstraintPolicyViewModel ZonePolicyPanel { get; }
+
+    /// <summary>Gets the zone import/export panel view-model describing transfer workflows.</summary>
+    public ZoneImportExportPanelViewModel ZoneImportExportPanel { get; }
     /// <summary>Gets the legend describing the active map layers.</summary>
     public LayerLegendViewModel LayerLegend { get; }
 
     /// <summary>Gets the inspector exposing the pinned layer observation.</summary>
     public LayerInspectorViewModel LayerInspector { get; }
+
+    /// <summary>Gets the mesh share/subscribe panel view-model.</summary>
+    public MeshSharePanelViewModel MeshSharePanel { get; }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.

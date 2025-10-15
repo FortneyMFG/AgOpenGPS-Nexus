@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Aog.Core.Paths;
 using Aog.Plugins.Genetics;
 using FluentAssertions;
@@ -213,6 +214,53 @@ public sealed class GeneticsLayerIngestPipelineTests
     }
 
     [Fact]
+    public void UpsertVariety_AutoChangeLogRecordsMutations()
+    {
+        var now = new DateTimeOffset(2025, 7, 1, 6, 0, 0, TimeSpan.Zero);
+        var pipeline = new GeneticsLayerIngestPipeline(clock: () => now);
+
+        pipeline.UpsertVariety(new GeneticsVarietyIngestRequest
+        {
+            ZoneId = "Zone 1",
+            SessionId = "session:auto",
+            JobId = "job:auto",
+            OuterBoundary = CreateSquare(9),
+            Brand = "Brand",
+            Product = "Product",
+            Lot = "LOT-1",
+            Barcode = "BAR-1",
+            Notes = "Initial"
+        });
+
+        now = now.AddMinutes(15);
+
+        var updated = pipeline.UpsertVariety(new GeneticsVarietyIngestRequest
+        {
+            ZoneId = "Zone 1",
+            SessionId = "session:auto",
+            JobId = "job:auto",
+            OuterBoundary = CreateSquare(9),
+            Brand = "Brand",
+            Product = "Product",
+            Lot = "LOT-2",
+            Barcode = "BAR-2",
+            Notes = "Updated"
+        });
+
+        updated.ChangeLog.Should().HaveCount(3);
+        updated.ChangeLog[0].Field.Should().Be("barcode");
+        updated.ChangeLog[0].Previous.Should().Be("BAR-1");
+        updated.ChangeLog[0].Current.Should().Be("BAR-2");
+        updated.ChangeLog[1].Field.Should().Be("lot");
+        updated.ChangeLog[1].Previous.Should().Be("LOT-1");
+        updated.ChangeLog[1].Current.Should().Be("LOT-2");
+        updated.ChangeLog[2].Field.Should().Be("notes");
+        updated.ChangeLog[2].Previous.Should().Be("Initial");
+        updated.ChangeLog[2].Current.Should().Be("Updated");
+        updated.ChangeLog.Should().OnlyContain(entry => entry.ChangedAt == now && entry.Actor == "plugin:genetics");
+    }
+
+    [Fact]
     public void RemoveVariety_RemovesEntry()
     {
         var pipeline = new GeneticsLayerIngestPipeline(clock: () => new DateTimeOffset(2025, 6, 1, 9, 0, 0, TimeSpan.Zero));
@@ -229,5 +277,85 @@ public sealed class GeneticsLayerIngestPipelineTests
 
         pipeline.RemoveVariety("Block A", "session:2").Should().BeTrue();
         pipeline.TryGetVariety("Block A", "session:2", out _).Should().BeFalse();
+    }
+
+    [Fact]
+    public void RegisterAnalyticsCallback_ReportsAggregatedState()
+    {
+        var now = new DateTimeOffset(2025, 8, 1, 8, 0, 0, TimeSpan.Zero);
+        var pipeline = new GeneticsLayerIngestPipeline(clock: () => now);
+        var notifications = new List<(GeneticsAnalyticsSnapshot Current, GeneticsAnalyticsSnapshot? Previous)>();
+
+        using var subscription = pipeline.RegisterAnalyticsCallback((current, previous) =>
+        {
+            notifications.Add((current, previous));
+        });
+
+        notifications.Should().HaveCount(1);
+        notifications[0].Current.Plans.Should().BeEmpty();
+        notifications[0].Current.Varieties.Should().BeEmpty();
+        notifications[0].Previous.Should().BeNull();
+
+        now = now.AddMinutes(5);
+
+        pipeline.UpsertPlan(new GeneticsPlanIngestRequest
+        {
+            ZoneId = "Analytics Zone",
+            OuterBoundary = CreateSquare(12),
+            Brand = "Brand",
+            Product = "Product",
+            Lot = "LOT-1",
+            JobId = "job:analytics"
+        });
+
+        now = now.AddMinutes(10);
+
+        pipeline.UpsertVariety(new GeneticsVarietyIngestRequest
+        {
+            ZoneId = "Analytics Zone",
+            SessionId = "session:analytics",
+            JobId = "job:analytics",
+            OuterBoundary = CreateSquare(12),
+            Brand = "Brand",
+            Product = "Product",
+            Lot = "LOT-1",
+            Barcode = "BAR-1"
+        });
+
+        notifications.Should().HaveCount(3);
+        notifications[1].Previous.Should().NotBeNull();
+        notifications[2].Previous.Should().NotBeNull();
+
+        var latest = notifications.Last().Current;
+        latest.Plans.Should().ContainSingle();
+        latest.Varieties.Should().ContainSingle();
+        latest.Lots.Should().ContainSingle();
+
+        var planSummary = latest.Plans.Single();
+        planSummary.JobId.Should().Be("job:analytics");
+        planSummary.Lot.Should().Be("LOT-1");
+        planSummary.FeatureCount.Should().Be(1);
+        planSummary.TotalAreaSquareMeters.Should().BeApproximately(144, 1e-6);
+
+        var varietySummary = latest.Varieties.Single();
+        varietySummary.JobId.Should().Be("job:analytics");
+        varietySummary.Lot.Should().Be("LOT-1");
+        varietySummary.Barcode.Should().Be("BAR-1");
+        varietySummary.FeatureCount.Should().Be(1);
+        varietySummary.SessionCount.Should().Be(1);
+        varietySummary.TotalAreaSquareMeters.Should().BeApproximately(144, 1e-6);
+
+        var lotSummary = latest.Lots.Single();
+        lotSummary.Lot.Should().Be("LOT-1");
+        lotSummary.PlannedFeatureCount.Should().Be(1);
+        lotSummary.AppliedFeatureCount.Should().Be(1);
+        lotSummary.PlannedAreaSquareMeters.Should().BeApproximately(144, 1e-6);
+        lotSummary.AppliedAreaSquareMeters.Should().BeApproximately(144, 1e-6);
+
+        var pipelineSnapshot = pipeline.LatestAnalytics;
+        pipelineSnapshot.GeneratedAt.Should().Be(latest.GeneratedAt);
+        pipelineSnapshot.Plans.Should().BeEquivalentTo(latest.Plans);
+        pipelineSnapshot.Varieties.Should().BeEquivalentTo(latest.Varieties);
+        pipelineSnapshot.Lots.Should().BeEquivalentTo(latest.Lots);
     }
 }

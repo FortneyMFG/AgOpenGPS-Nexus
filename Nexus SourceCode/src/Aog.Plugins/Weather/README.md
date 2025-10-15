@@ -10,6 +10,11 @@ support ADR-053.
 - `WeatherOverlayFeed` converts published `WeatherObservation` instances into
   `AgronomicLayerDocument` overlays. The feed works with any `WeatherOverlayMetric`
   and publishes layers through the core event bus for UI consumption.
+- `WeatherReportSummarySectionContributor` and
+  `WeatherReportTimelineSectionContributor` register session-scoped report
+  sections with the report builder. Both rely on
+  `IWeatherSnapshotProvider` to source ordered snapshots before rendering
+  aggregate summaries and detailed observation timelines, fulfilling NX-274.
 
 Together the adapter and overlay feed unlock live weather telemetry across the
 sensor stack, satisfying NX-272 and NX-273.

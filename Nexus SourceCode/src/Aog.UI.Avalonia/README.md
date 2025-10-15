@@ -24,3 +24,16 @@ Groups expose curated rotations, favorites, and recent assignments via `CropQuic
 and `CropQuickSelectOptionViewModel`. The MainWindow binds to the sample instance returned by
 `CropQuickSelectViewModel.CreateSample()`, illustrating how plugins can publish crop context for field
 envelopes without code-behind wiring.
+## Zone constraint policies (NX-292)
+
+`ZoneConstraintPolicyViewModel` exposes the ADR-027 gating contract and manual override workflow. The
+panel renders four canonical zone toggles (boundary, headland, keep-out, work-disabled) with buffer
+summaries, policy descriptions, and manual override commands. Overrides emit structured history entries
+(`ZoneOverrideEventViewModel`) so automation, replay, and audit surfaces share the same provenance.
+
+## Zone import/export workflows (NX-293)
+
+`ZoneImportExportPanelViewModel` coordinates sample import/export pipelines for Shapefile, GeoPackage,
+and ISOXML transfers. Each `ZoneImportWorkflowViewModel` simulates policy validation, progress updates,
+and completion logging while `ZoneTransferEventViewModel` captures an activity timeline aligned with
+ADR-027 interop requirements.

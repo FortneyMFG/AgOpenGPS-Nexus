@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Aog.Abstractions.Contracts;
+using Aog.Abstractions.Runtime;
 using Aog.Core.Capabilities;
 using Aog.Core.Host.Capabilities;
 using Aog.Protos.Capabilities.V1;
@@ -18,6 +20,8 @@ public static class Program
     public static async Task<int> Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration().CreateLogger();
+
+        DotNetRuntimeBaseline.EnsureSupported();
 
         try
         {
@@ -90,6 +94,10 @@ public static class Program
                     {
                         attributes = new Dictionary<string, string>(options.DefaultCapabilityAttributes, StringComparer.OrdinalIgnoreCase);
                     }
+
+                    attributes ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    attributes[GrpcContractRegistry.FingerprintCapabilityAttribute] =
+                        GrpcContractRegistry.DescriptorFingerprint;
 
                     return new CapabilityDescriptorFactory(
                         options.DefaultCapabilityVersion,

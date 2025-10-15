@@ -123,12 +123,12 @@ NX-121,FALSE,FALSE,NX-116,,AOG-Link RS-485/serial driver using COBS + CRC and sl
 NX-122,FALSE,FALSE,NX-116,,AOG-Link CAN/CAN-FD driver implementing AOG-CAN ID layout and segmentation
 NX-131,FALSE,FALSE,"NX-001, NX-002",,"Field job session lifecycle ADR covering JobsService, job.json metadata, and UI flows"
 NX-151,FALSE,TRUE,,,Backlog update aligning tasks backlog with ADR and official plugin roadmap
-NX-152,FALSE,FALSE,,,"Enforce ADR-001 .NET 8 runtime baselines across solutions, templates, and CI"
-NX-153,FALSE,FALSE,,,"Operationalize ADR-002 gRPC contract governance, compatibility gates, and bridge validation"
-NX-154,FALSE,FALSE,,,"Deliver ADR-003 Avalonia run modes (CompanionRemote, LocalInProc, LocalOutOfProc) with docs and tests"
-NX-155,FALSE,FALSE,,,Complete ADR-004 composite simulation fabric with SimClock/SimBus catalogs and seeded regression packs
-NX-156,FALSE,FALSE,,,"Roll out ADR-006 AOG-Link transports (Ethernet, RS-485, CAN) plus gRPC/PGN bridge translation"
-NX-157,FALSE,FALSE,,,"Implement ADR-018 plugin API leases, permission gate, manifest watcher, and AgIO migration"
+NX-152,FALSE,TRUE,,,"Enforce ADR-001 .NET 8 runtime baselines across solutions, templates, and CI"
+NX-153,FALSE,TRUE,,,"Operationalize ADR-002 gRPC contract governance, compatibility gates, and bridge validation"
+NX-154,FALSE,TRUE,,,"Deliver ADR-003 Avalonia run modes (CompanionRemote, LocalInProc, LocalOutOfProc) with docs and tests"
+NX-155,FALSE,TRUE,,,Complete ADR-004 composite simulation fabric with SimClock/SimBus catalogs and seeded regression packs
+NX-156,FALSE,TRUE,,,"Roll out ADR-006 AOG-Link transports (Ethernet, RS-485, CAN) plus gRPC/PGN bridge translation"
+NX-157,FALSE,TRUE,,,"Implement ADR-018 plugin API leases, permission gate, manifest watcher, and AgIO migration"
 NX-160,FALSE,FALSE,"NX-161, NX-166, NX-156",,"Official AutoSteer plugin GA covering pose fusion, AB tracking, and actuator transport"
 NX-161,FALSE,FALSE,"NX-157, NX-155",,"Official Mapping plugin GA delivering field state store, AB lines, boundaries, and coverage feeds"
 NX-162,FALSE,FALSE,"NX-161, NX-156",,Official Sections plugin GA providing coverage-aware IO orchestration

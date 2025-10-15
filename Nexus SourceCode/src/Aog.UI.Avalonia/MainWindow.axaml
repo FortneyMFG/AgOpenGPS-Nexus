@@ -380,7 +380,7 @@
                            TextWrapping="Wrap"/>
               </StackPanel>
 
-              <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="12" ColumnSpacing="12">
+              <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12" ColumnSpacing="12">
                 <TextBlock Grid.Column="0" Grid.Row="0" Text="AGiO endpoint" VerticalAlignment="Center"/>
                 <TextBox   Grid.Column="1" Grid.Row="0"
                            Text="{Binding AgioEndpoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -391,8 +391,13 @@
                            Items="{Binding AvailableBackends}"
                            SelectedItem="{Binding SelectedBackend, Mode=TwoWay}"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="GPS source policy" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="Run mode" VerticalAlignment="Center"/>
                 <ComboBox  Grid.Column="1" Grid.Row="2"
+                           Items="{Binding AvailableRunModes}"
+                           SelectedItem="{Binding SelectedRunMode, Mode=TwoWay}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="GPS source policy" VerticalAlignment="Center"/>
+                <ComboBox  Grid.Column="1" Grid.Row="3"
                            Items="{Binding AvailableGpsSourcePolicies}"
                            SelectedItem="{Binding SelectedGpsSourcePolicy, Mode=TwoWay}"/>
               </Grid>

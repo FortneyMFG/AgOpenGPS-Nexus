@@ -53,3 +53,12 @@
 - [AGENTS.md](../AGENTS.md) — repository conventions and task workflow.
 - [Plugin contribution guide](CONTRIBUTING-PLUGINS.md)
 - [tasks.md](../tasks.md) — active backlog with NX identifiers.
+
+## Operational Playbooks & How-To Guides
+
+- [Runtime baseline enforcement](support/dotnet-runtime-baseline.md) — .NET 8 guardrails and review checklist.
+- [Avalonia run modes](howto/avalonia-run-modes.md) — CompanionRemote, LocalInProc, and LocalOutOfProc configuration.
+- [AOG-Link transport rollout](howto/aog-link-transport-rollout.md) — Ethernet, RS-485, and CAN staging guidance.
+- [Composite simulation fabric GA](scenarios/composite-simulation-fabric.md) — SimClock/SimBus validation steps.
+- [gRPC contract governance](qa/grpc-contract-governance.md) — protobuf review and release gating.
+- [Plugin lease & manifest governance](plugins/plugin-lease-manifest-governance.md) — ADR-018 compliance checklist.

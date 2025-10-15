@@ -27,6 +27,9 @@ public sealed class PluginManifestLoaderTests
             "gain": 1.5,
             "enabled": true
           },
+          "supportedCapabilities": ["guidance.control"],
+          "requiredTransports": ["AOG-Link"],
+          "minimumRuntimeVersion": "1.0.0",
           "simProviders": [
             {
               "providerId": "autosteer.vehicle",
@@ -35,6 +38,14 @@ public sealed class PluginManifestLoaderTests
               "settings": {
                 "wheelbase": 2.8
               }
+            }
+          ],
+          "leases": [
+            {
+              "capability": "guidance.control",
+              "mode": "Exclusive",
+              "timeoutSeconds": 5,
+              "recovery": "GracefulDegradation"
             }
           ]
         }
@@ -53,6 +64,13 @@ public sealed class PluginManifestLoaderTests
         manifest.Settings["gain"].GetDouble().Should().Be(1.5);
         manifest.Settings.Should().ContainKey("enabled");
         manifest.Settings["enabled"].GetBoolean().Should().BeTrue();
+        manifest.SupportedCapabilities.Should().ContainSingle().Which.Should().Be("guidance.control");
+        manifest.RequiredTransports.Should().ContainSingle().Which.Should().Be("AOG-Link");
+        manifest.MinimumRuntimeVersion.Should().Be("1.0.0");
+        manifest.CapabilityLeases.Should().ContainSingle();
+        manifest.CapabilityLeases[0].Capability.Should().Be("guidance.control");
+        manifest.CapabilityLeases[0].Mode.Should().Be(PluginLeaseMode.Exclusive);
+        manifest.CapabilityLeases[0].TimeoutSeconds.Should().Be(5);
 
         manifest.SimulationProviders.Should().ContainSingle();
         var provider = manifest.SimulationProviders[0];
@@ -73,6 +91,9 @@ public sealed class PluginManifestLoaderTests
           "name": "",
           "version": "1.0.0",
           "requiredApis": {},
+          "supportedCapabilities": [],
+          "requiredTransports": [],
+          "minimumRuntimeVersion": "1.0.0",
           "simProviders": []
         }
         """;
@@ -93,11 +114,22 @@ public sealed class PluginManifestLoaderTests
           "name": "Disk Plugin",
           "version": "1.0.1",
           "requiredApis": { "core": ">=1.0.0" },
+          "supportedCapabilities": ["sample.capability"],
+          "requiredTransports": ["AOG-Link"],
+          "minimumRuntimeVersion": "1.0.0",
           "simProviders": [
             {
               "providerId": "disk.sim",
               "type": "Aog.Plugins.Disk.Provider",
               "topics": ["disk.topic"]
+            }
+          ],
+          "leases": [
+            {
+              "capability": "sample.capability",
+              "mode": "Shared",
+              "timeoutSeconds": 10,
+              "recovery": "GracefulDegradation"
             }
           ]
         }
@@ -112,6 +144,9 @@ public sealed class PluginManifestLoaderTests
             manifest.Id.Should().Be("org.agopengps.plugins.disk");
             manifest.SimulationProviders.Should().ContainSingle();
             manifest.SimulationProviders[0].ProviderId.Should().Be("disk.sim");
+            manifest.SupportedCapabilities.Should().Contain("sample.capability");
+            manifest.RequiredTransports.Should().Contain("AOG-Link");
+            manifest.CapabilityLeases.Should().ContainSingle(lease => lease.Capability == "sample.capability");
         }
         finally
         {
@@ -132,10 +167,21 @@ public sealed class PluginManifestLoaderTests
           "name": "Invalid Topics Plugin",
           "version": "1.0.0",
           "requiredApis": { "core": ">=1.0.0" },
+          "supportedCapabilities": ["invalid.capability"],
+          "requiredTransports": ["AOG-Link"],
+          "minimumRuntimeVersion": "1.0.0",
           "simProviders": [
             {
               "providerId": "invalid.provider",
               "type": "Aog.Plugins.Invalid.Provider"
+            }
+          ],
+          "leases": [
+            {
+              "capability": "invalid.capability",
+              "mode": "Exclusive",
+              "timeoutSeconds": 5,
+              "recovery": "FailSafe"
             }
           ]
         }

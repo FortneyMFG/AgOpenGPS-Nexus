@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Aog.Core.V1;
+using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Telemetry;
 using Aog.UI.Avalonia.Theming;
@@ -71,7 +75,8 @@ public sealed class MainWindowViewModelTests
     private static MainWindowViewModel CreateViewModel()
     {
         var connectionStore = new InMemoryConnectionSettingsStore();
-        var connection = new ConnectionSettingsViewModel(connectionStore);
+        var runModeService = new TestRunModeService();
+        var connection = new ConnectionSettingsViewModel(connectionStore, runModeService);
         var preferencesStore = new InMemoryUiPreferencesStore();
         var preferencesService = new UiPreferencesService(preferencesStore);
         var themeManager = new TestThemeManager();
@@ -101,6 +106,24 @@ public sealed class MainWindowViewModelTests
         public void Save(UiPreferences preferences)
         {
             _preferences = preferences.Clone();
+        }
+    }
+
+    private sealed class TestRunModeService : IAvaloniaRunModeService
+    {
+        private AvaloniaRunMode _mode = AvaloniaRunMode.CompanionRemote;
+
+        public event EventHandler<AvaloniaRunModeChangedEventArgs>? ModeChanged;
+
+        public AvaloniaRunMode CurrentMode => _mode;
+
+        public IReadOnlyList<AvaloniaRunMode> SupportedModes { get; } = Enum.GetValues<AvaloniaRunMode>();
+
+        public Task<RunModeChangeResult> SetModeAsync(AvaloniaRunMode mode, CancellationToken cancellationToken = default)
+        {
+            _mode = mode;
+            ModeChanged?.Invoke(this, new AvaloniaRunModeChangedEventArgs(mode));
+            return Task.FromResult(new RunModeChangeResult(mode, requiresRestart: false));
         }
     }
 

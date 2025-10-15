@@ -75,6 +75,25 @@ public sealed class MainWindowViewModelTests
         viewModel.ReplayTimeline.SpeedSamples.Should().HaveCountGreaterThan(10);
     }
 
+    [Fact]
+    public void InspectorAndLegend_SurfaceLayerMetadata()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.LayerLegend.Should().NotBeNull();
+        viewModel.LayerLegend.HasEntries.Should().BeTrue();
+        viewModel.LayerLegend.Entries.Should().HaveCount(viewModel.MapLayers.Count);
+        viewModel.LayerLegend.Entries.Select(entry => entry.DisplayName)
+            .Should().Contain("Actual coverage");
+
+        viewModel.LayerInspector.Should().NotBeNull();
+        viewModel.LayerInspector.LayerName.Should().NotBeNullOrWhiteSpace();
+        viewModel.LayerInspector.ValueDisplay.Should().Contain("%");
+        viewModel.LayerInspector.TransportMetadata.Should().NotBeEmpty();
+        viewModel.LayerInspector.PayloadMetadata.Should().NotBeEmpty();
+        viewModel.LayerInspector.RateAvailabilityDisplay.Should().NotBeNullOrWhiteSpace();
+    }
+
     private static MainWindowViewModel CreateViewModel()
     {
         var connectionStore = new InMemoryConnectionSettingsStore();

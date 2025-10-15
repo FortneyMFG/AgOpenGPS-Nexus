@@ -166,6 +166,26 @@ Draft authors should reference the listed requirements and tasks before opening 
   - Analytics/export plugins emit season/job/session scoped outputs that honor per-field aggregates.
   - Performance harness shows union envelope queries staying within ≤ 25 ms p95 under 10-field mounts.
 
+## Emerging plugin & automation proposals
+
+The following ADRs are drafting to capture upcoming plugin initiatives referenced in the 2025 roadmap refresh. Owners should anchor requirement coverage in the SRS before promoting proposals for review.
+
+| ADR | Title | Stage | Highlights |
+| --- | --- | --- | --- |
+| ADR-054 (drafting) | Task & Work Order Orchestration | Defines TaskService work orders, checklist journaling, and preset/session bindings building on ADR-032/ADR-041 for NX-170 deployment. |
+| ADR-055 (drafting) | Inventory & Material Ledger | Establishes `InventoryLot.v1`, stock reconciliation, and Profit plugin integration for lot-aware costing and compliance. |
+| ADR-056 (drafting) | Equipment Health & Maintenance | Leverages telemetry hours/cycle counters to drive maintenance schedules, predictive alerts, and fleet health dashboards sourced from Device Manager and Sessions provenance. |
+| ADR-057 (drafting) | Soil & Lab Data Manager | Normalizes soil sampling imports (CSV/shapefile/grid) into `soil.*` layers, ties recommendations into ADR-013 derivations, and archives lab provenance. |
+| ADR-058 (drafting) | Map Composer & Print Studio | Formalizes Print View templates, legends, and Report Builder integration for landlord/regulator-ready PDF exports. |
+| ADR-059 (drafting) | Terrain & Drainage Planner | Specifies elevation ingest, slope/aspect computation, drain tile sketching, and export hooks for erosion mitigation planning. |
+| ADR-060 (drafting) | AI Agronomic Advisor | Governs ML model packaging, data access, and recommendation layer outputs within the ADR-013 derivation framework and replay determinism constraints. |
+| ADR-061 (drafting) | Sync Dashboard & Web Companion | Documents read-only remote dashboards that mirror `/Seasons/` folders via cloud sync (Drive, Syncthing) without control privileges. |
+| ADR-062 (drafting) | Marketplace & Plugin Catalog UI | Covers signed catalog manifests, install/update/rollback UX, and health telemetry integration for plugin governance. |
+| ADR-063 (drafting) | Telemetry Replay & Training Simulator | Extends replay UX with record/replay capture, benchmarking hooks, and CI integration for deterministic training scenarios. |
+| ADR-064 (drafting) | Regulatory & Traceability Exports | Produces pesticide/compliance PDFs, signed JSON exports, and optional hash-chain audit features leveraging ADR-019 provenance. |
+| ADR-065 (drafting) | Rules & Automation Engine | Introduces declarative when/then automation rules executed inside the Core sandbox with safety gating and plugin extension points. |
+| ADR-066 (drafting) | GNSS Correction Services | Manages NTRIP/PPP/base station connections, credential storage, and correction log retention for post-processing accuracy. |
+
 ### ADR-044 — Zone drawing framework
 - **Owner:** Core Owner — Mapping & Lifecycle pod
 - **Stage:** Drafting (target review window: 2025-04-18 week)

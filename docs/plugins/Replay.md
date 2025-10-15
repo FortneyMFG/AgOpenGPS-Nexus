@@ -10,13 +10,16 @@ Replay plugins consume telemetry logs and deterministic fixtures to reproduce se
 - Feed PoseStream, SectionState, LayerEditEvent, and mesh events into SimBus with deterministic timing using SimClock. Replay must honor multi-field envelopes and union geometries when recreating coverage.【F:docs/ADR/ADR-004-composite-simulation.md†L21-L78】【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L12-L75】
 - Recreate session provenance, including crop type and genetics overlays, so analytics plugins can verify outputs against recorded history.【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】
 - Provide hooks for automation plugins to subscribe to replayed events, enabling regression packs that compare outputs to golden datasets.
+- Expose a "Training Simulator" mode that records operator inputs, plays back telemetry, and scores guidance/rate algorithms against reference baselines for onboarding and GA training.
 
 ## UX Requirements
 
 - Offer controls for play/pause/seek/speed tied to the shared SimClock. Display progress, session metadata, and asset availability (layers, logs, reports).
 - Surface fixture metadata (source, scenario tags, last validation date) and warnings when replay fidelity cannot be guaranteed (missing data, schema mismatch).
+- Provide record/replay toggles so operators can capture sessions from hardware rigs, annotate training goals, and replay them later for coaching or CI benchmarking.
 
 ## Compatibility Notes
 
-- Replay outputs must match analytics baselines within tolerances defined in ADR-004 amendment. Fixtures covering multi-field envelopes, zone edits, and profit/yield analytics are required before release.【F:docs/ADR/ADR-004-composite-simulation.md†L43-L78】
+- Replay outputs must match analytics baselines within tolerances defined in ADR-004 amendment. Fixtures covering multi-field envelopes, zone edits, profit/yield analytics, and automation rule triggers are required before release.【F:docs/ADR/ADR-004-composite-simulation.md†L43-L78】
 - Sessions replace legacy Run terminology in all replay UI, logs, and exports.
+- GA builds must integrate with CI to execute benchmark packs (guidance accuracy, rate response, automation rule evaluations) using deterministic fixtures recorded via Telemetry Logging.

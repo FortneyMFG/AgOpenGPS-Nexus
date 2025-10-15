@@ -61,7 +61,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 - [ ] NX-211 ZoneStore persistence service _(Planned)_ — ADR-027 ZoneService storage and indexing
 - [ ] NX-212 ZoneService gRPC host & watcher plumbing _(Planned)_ — ADR-027 ZoneService implementation
-- [ ] NX-213 PoseStream zone mask propagation _(Planned)_ — ADR-027 constraint mask propagation
+- [x] NX-213 PoseStream zone mask propagation _(Done)_ — ADR-027 constraint mask propagation
 - [ ] NX-214 Constraint gate integration into ControlArbiter _(Planned)_ — ADR-027 constraint gating
 - [ ] NX-215 Layer controller runtime scaffolding _(Planned)_ — ADR-032 layer controllers
 - [ ] NX-216 Layer controller DI registry & buffer pools _(Planned)_ — ADR-032 controller runtime details

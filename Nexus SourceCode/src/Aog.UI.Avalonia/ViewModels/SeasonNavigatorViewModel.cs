@@ -50,7 +50,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
                     id: "job:2025-plant-corn",
                     name: "Corn planting – South Farm",
                     farmName: "South Farm",
-                    fieldName: "North 80",
+                    fieldNames: new[] { "North 80", "Northwest 20" },
                     operationType: "Planting",
                     status: "In progress",
                     scheduledFor: new DateTimeOffset(2025, 4, 12, 0, 0, 0, TimeSpan.Zero),
@@ -61,7 +61,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
                     id: "job:2025-preseason-scout",
                     name: "Pre-season scouting sweep",
                     farmName: "Prairie Ridge",
-                    fieldName: "Ridge Block",
+                    fieldNames: new[] { "Ridge Block" },
                     operationType: "Scouting",
                     status: "Scheduled",
                     scheduledFor: new DateTimeOffset(2025, 4, 18, 0, 0, 0, TimeSpan.Zero),
@@ -72,7 +72,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
                     id: "job:2025-variable-rate",
                     name: "Variable-rate prescription rollout",
                     farmName: "South Farm",
-                    fieldName: "Headland Strip",
+                    fieldNames: new[] { "Headland Strip" },
                     operationType: "Application",
                     status: "Drafting",
                     scheduledFor: null,
@@ -97,7 +97,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
                     id: "job:2024-soy-harvest",
                     name: "Soybean harvest",
                     farmName: "Prairie Ridge",
-                    fieldName: "South 60",
+                    fieldNames: new[] { "South 60" },
                     operationType: "Harvest",
                     status: "Completed",
                     scheduledFor: new DateTimeOffset(2024, 9, 20, 0, 0, 0, TimeSpan.Zero),
@@ -108,7 +108,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
                     id: "job:2024-corn-harvest",
                     name: "Corn harvest",
                     farmName: "Prairie Ridge",
-                    fieldName: "North Ridge",
+                    fieldNames: new[] { "North Ridge" },
                     operationType: "Harvest",
                     status: "In progress",
                     scheduledFor: new DateTimeOffset(2024, 10, 1, 0, 0, 0, TimeSpan.Zero),
@@ -133,7 +133,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
                     id: "job:2025-layout-review",
                     name: "Field layout review",
                     farmName: "High Plains",
-                    fieldName: "Eastern Pivot",
+                    fieldNames: new[] { "Eastern Pivot" },
                     operationType: "Planning",
                     status: "In review",
                     scheduledFor: null,
@@ -144,7 +144,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
                     id: "job:2025-equipment-calibration",
                     name: "Equipment calibration prep",
                     farmName: "South Farm",
-                    fieldName: "Shop",
+                    fieldNames: new[] { "Shop" },
                     operationType: "Preparation",
                     status: "Not started",
                     scheduledFor: new DateTimeOffset(2025, 2, 5, 0, 0, 0, TimeSpan.Zero),
@@ -382,7 +382,7 @@ public sealed class SeasonJobViewModel
         string id,
         string name,
         string farmName,
-        string fieldName,
+        IReadOnlyList<string> fieldNames,
         string operationType,
         string status,
         DateTimeOffset? scheduledFor,
@@ -393,14 +393,24 @@ public sealed class SeasonJobViewModel
         ArgumentException.ThrowIfNullOrEmpty(id);
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentException.ThrowIfNullOrEmpty(farmName);
-        ArgumentException.ThrowIfNullOrEmpty(fieldName);
         ArgumentException.ThrowIfNullOrEmpty(operationType);
         ArgumentException.ThrowIfNullOrEmpty(status);
+        ArgumentNullException.ThrowIfNull(fieldNames);
+
+        if (fieldNames.Count == 0)
+        {
+            throw new ArgumentException("At least one field must be provided for a job.", nameof(fieldNames));
+        }
+
+        if (fieldNames.Any(string.IsNullOrWhiteSpace))
+        {
+            throw new ArgumentException("Field names cannot be empty.", nameof(fieldNames));
+        }
 
         Id = id;
         Name = name;
         FarmName = farmName;
-        FieldName = fieldName;
+        FieldNames = fieldNames;
         OperationType = operationType;
         Status = status;
         ScheduledFor = scheduledFor;
@@ -418,8 +428,11 @@ public sealed class SeasonJobViewModel
     /// <summary>Gets the farm associated with the job.</summary>
     public string FarmName { get; }
 
-    /// <summary>Gets the field associated with the job.</summary>
-    public string FieldName { get; }
+    /// <summary>Gets the fields associated with the job.</summary>
+    public IReadOnlyList<string> FieldNames { get; }
+
+    /// <summary>Gets the primary field name for display.</summary>
+    public string PrimaryFieldName => FieldNames[0];
 
     /// <summary>Gets the operation type for the job.</summary>
     public string OperationType { get; }
@@ -443,7 +456,12 @@ public sealed class SeasonJobViewModel
     public string ActivitySummary => $"{OperationType} · {Status}";
 
     /// <summary>Gets a display subtitle describing the farm and field.</summary>
-    public string Subtitle => $"{FarmName} · {FieldName}";
+    public string Subtitle => FieldNames.Count switch
+    {
+        1 => $"{FarmName} · {FieldNames[0]}",
+        2 => $"{FarmName} · {FieldNames[0]} & {FieldNames[1]}",
+        _ => $"{FarmName} · {FieldNames[0]} + {FieldNames.Count - 1} more",
+    };
 
     /// <summary>Gets a schedule summary for the job.</summary>
     public string ScheduleDisplay => ScheduledFor.HasValue
@@ -455,14 +473,30 @@ public sealed class SeasonJobViewModel
         ? $"Last worked {LastWorkedAt:MMM d, yyyy}"
         : "No activity recorded";
 
+    /// <summary>Gets a description of how many fields participate in the job.</summary>
+    public string FieldCountDisplay => FieldNames.Count == 1 ? "1 field" : $"{FieldNames.Count} fields";
+
+    /// <summary>Gets a summary string describing the field roster.</summary>
+    public string FieldSummary => BuildFieldSummary();
+
     /// <summary>Determines if the job matches the provided search term.</summary>
     public bool MatchesSearch(string query)
     {
         return Name.Contains(query, StringComparison.OrdinalIgnoreCase)
             || FarmName.Contains(query, StringComparison.OrdinalIgnoreCase)
-            || FieldName.Contains(query, StringComparison.OrdinalIgnoreCase)
+            || FieldNames.Any(field => field.Contains(query, StringComparison.OrdinalIgnoreCase))
             || OperationType.Contains(query, StringComparison.OrdinalIgnoreCase)
             || Status.Contains(query, StringComparison.OrdinalIgnoreCase)
             || Notes.Contains(query, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string BuildFieldSummary()
+    {
+        return FieldNames.Count switch
+        {
+            1 => FieldNames[0],
+            2 => string.Join(" & ", FieldNames),
+            _ => $"{FieldNames[0]}, {FieldNames[1]} + {FieldNames.Count - 2} more",
+        };
     }
 }

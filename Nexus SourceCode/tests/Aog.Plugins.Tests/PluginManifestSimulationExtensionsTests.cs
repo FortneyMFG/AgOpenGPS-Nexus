@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json;
 using Aog.Core.Simulation;
 using FluentAssertions;
@@ -105,6 +106,45 @@ public sealed class PluginManifestSimulationExtensionsTests
         Action act = () => manifest.RegisterSimulationProviders(null!);
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("catalog");
+    }
+
+    [Fact]
+    public void RegisterSimulationProviders_WhenConflictingProviderExists_DoesNotMutateCatalog()
+    {
+        var manifest = new PluginManifest
+        {
+            SchemaVersion = "1.0.0",
+            Id = "org.agopengps.plugins.bundle",
+            Name = "Simulation Bundle",
+            Version = "1.0.0",
+            RequiredApis = { ["core"] = ">=1.0.0" },
+            SimulationProviders =
+            {
+                new PluginSimProvider
+                {
+                    ProviderId = "autosteer.vehicle",
+                    Type = "Aog.Plugins.Autosteer.VehicleProvider",
+                    Topics = { "pose" }
+                },
+                new PluginSimProvider
+                {
+                    ProviderId = "gnss.basic",
+                    Type = "Aog.Plugins.Sim.GnssProvider",
+                    Topics = { "pose" }
+                }
+            }
+        };
+
+        var catalog = new SimulationCatalog();
+        catalog.Register(new SimulationProviderDescriptor("gnss.basic", new[] { "pose" }));
+
+        Action act = () => manifest.RegisterSimulationProviders(catalog);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*conflicts with an existing provider*");
+
+        catalog.Providers.Should().ContainSingle(descriptor => descriptor.ProviderId == "gnss.basic");
+        catalog.Providers.Should().NotContain(descriptor => descriptor.ProviderId == "autosteer.vehicle");
     }
 
     private static JsonElement Json(string json)

@@ -129,6 +129,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-098 ISOBUS communications plugin _(Done)_
 - [x] NX-100 Combine yield monitoring plugin
 - [x] NX-114 Variable-rate controller plugin _(Done)_
+- [x] NX-401 Simulation catalog atomic provider registration _(Done)_
 - [ ] NX-160 Official AutoSteer plugin GA _(Planned)_
 - [ ] NX-161 Official Mapping plugin GA _(Planned)_
 - [ ] NX-162 Official Sections plugin GA _(Planned)_

@@ -60,6 +60,9 @@ internal sealed class JobDocument
 
     [JsonPropertyName("extensions")]
     public Dictionary<string, JsonElement>? Extensions { get; init; }
+
+    [JsonPropertyName("equipment")]
+    public JobEquipmentDocument? Equipment { get; init; }
 }
 
 internal sealed class JobContextDocument
@@ -186,6 +189,21 @@ internal sealed class JobStatisticsDocument
 
     [JsonPropertyName("completedSessionCount")]
     public int? CompletedSessionCount { get; init; }
+}
+
+internal sealed class JobEquipmentDocument
+{
+    [JsonPropertyName("vehicleId")]
+    public string? VehicleId { get; init; }
+
+    [JsonPropertyName("implementId")]
+    public string? ImplementId { get; init; }
+
+    [JsonPropertyName("presetId")]
+    public string? PresetId { get; init; }
+
+    [JsonPropertyName("layoutId")]
+    public string? LayoutId { get; init; }
 }
 
 internal sealed class JobSessionDocument

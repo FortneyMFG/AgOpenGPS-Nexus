@@ -21,7 +21,8 @@ public sealed record class JobSnapshot(
     JobSpatialSnapshot? Spatial = null,
     JobAssetSnapshot? Assets = null,
     JobStatisticsSnapshot? Stats = null,
-    IReadOnlyDictionary<string, JsonElement>? Extensions = null);
+    IReadOnlyDictionary<string, JsonElement>? Extensions = null,
+    JobEquipmentSnapshot? Equipment = null);
 
 /// <summary>
 /// Spatial hints captured for a job.
@@ -76,6 +77,19 @@ public sealed record class JobAssetSnapshot(
     IReadOnlyList<string>? GuidanceSets = null,
     IReadOnlyList<string>? Prescriptions = null,
     IReadOnlyList<JobAttachmentSnapshot>? Attachments = null);
+
+/// <summary>
+/// Equipment, preset, and layout bindings captured when orchestrating a job.
+/// </summary>
+/// <param name="VehicleId">Identifier of the vehicle or power unit assigned to the job.</param>
+/// <param name="ImplementId">Identifier of the implement paired with the vehicle.</param>
+/// <param name="PresetId">Preset applied when the job was orchestrated.</param>
+/// <param name="LayoutId">Layout snapshot linked to the job.</param>
+public sealed record class JobEquipmentSnapshot(
+    string? VehicleId = null,
+    string? ImplementId = null,
+    string? PresetId = null,
+    string? LayoutId = null);
 
 /// <summary>
 /// Attachment metadata stored with a job.

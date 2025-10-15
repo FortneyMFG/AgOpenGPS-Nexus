@@ -4,7 +4,10 @@
   "title": "GeneticsVariety.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "layerId", "jobId", "sessionId", "createdAt", "createdBy", "brand", "product"],
+  "x-nexus-layerId": "genetics.variety",
+  "x-nexus-planned": false,
+  "x-nexus-requiresSession": true,
+  "required": ["id", "layerId", "jobId", "sessionId", "appliedAt", "source", "createdAt", "createdBy", "brand", "product"],
   "properties": {
     "id": {
       "type": "string",

@@ -7,7 +7,7 @@ The Genetics plugin tracks planned and actual seed varieties, barcode scans, and
 ## Runtime Contracts
 
 - Subscribe to lifecycle events (`onFarmLoaded`, `onJobLoaded`, `onSessionStart`, `onSessionMetadataChange`, `onSessionEnd`) to preload crop context and capture operator updates. Session events supply the provenance required by ADR-041.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L74】
-- Register editable layers `genetics.plan` and `genetics.variety` with the Layer Registry. Planned layers reference target hybrids; actual layers record applied varieties, lot numbers, and barcode metadata.【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】
+- Register editable layers `genetics.plan` and `genetics.variety` with the Layer Registry. Planned layers reference target hybrids; actual layers record applied varieties, lot numbers, and barcode metadata. Registry entries and presentation guidance live in the [Genetics Layer Registry](../reference/layer-registry-genetics.md).【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】【F:docs/reference/layer-registry-genetics.md†L1-L24】
 - Use the LayerEditService to manage per-zone variety edits. Attribute panels expose brand, product, trait stack, treatment, and source information. Every edit emits a `LayerEditEvent.v1` journal for collaborative replay.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】【F:schemas/LayerEditEvent.v1.json†L1-L140】
 - When coverage is active, session-aware writes ensure that as-applied layers include `jobId`, `sessionId`, and provenance linking to barcode scans and operator actions.
 

@@ -35,7 +35,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-198 Multi-field job envelope schema updates _(Planned)_ — ADR-043 multi-field job envelopes
 - [ ] NX-199 Layer edit event schema definition _(Planned)_ — ADR-044 zone drawing framework journal
 - [ ] NX-200 Crop layer definitions and registries _(Planned)_ — ADR-045 crop type plugin requirements
-- [ ] NX-201 Genetics layer definitions and registries _(Planned)_ — ADR-046 genetics plugin contracts
+- [x] NX-201 Genetics layer definitions and registries _(Done)_ — ADR-046 genetics plugin contracts
 - [ ] NX-202 Yield layer schema refresh _(Planned)_ — ADR-049 yield analytics plugin
 - [ ] NX-203 Cost/profit layer schema _(Planned)_ — ADR-050 cost & profit plugin
 - [ ] NX-204 Field health risk schema _(Planned)_ — ADR-052 field health plugin
@@ -363,7 +363,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-198 | Multi-field job envelope schema updates | Planned |  | — | [ADR-043](docs/ADR/ADR-043_MultiFieldJobEnvelopes.md) | ADR-043 multi-field job envelopes |
 | NX-199 | Layer edit event schema definition | Planned |  | — | [ADR-044](docs/ADR/ADR-044_ZoneDrawingFramework.md) | ADR-044 zone drawing framework journal |
 | NX-200 | Crop layer definitions and registries | Planned |  | — | [ADR-045](docs/ADR/ADR-045_CropTypePlugin.md) | ADR-045 crop type plugin requirements |
-| NX-201 | Genetics layer definitions and registries | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 genetics plugin contracts |
+| NX-201 | Genetics layer definitions and registries | Done |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 genetics plugin contracts |
 | NX-202 | Yield layer schema refresh | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 yield analytics plugin |
 | NX-203 | Cost/profit layer schema | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 cost & profit plugin |
 | NX-204 | Field health risk schema | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 field health plugin |

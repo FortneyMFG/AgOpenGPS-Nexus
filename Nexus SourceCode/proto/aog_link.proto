@@ -1,0 +1,194 @@
+syntax = "proto3";
+
+package aog.link.v1;
+
+import "google/protobuf/timestamp.proto";
+import "capabilities.proto";
+import "core.proto";
+import "nanopb.proto";
+
+option csharp_namespace = "Aog.Link.V1";
+
+// Nanopb defaults keep envelopes well under CAN-FD single frame budgets.
+option (nanopb_fileopt).max_size = 512;
+option (nanopb_fileopt).package = "aog_link";
+
+// LinkClass maps directly onto the two-bit "class" portion of the AOG-Link
+// frame header. Classes partition message types so MCUs can filter traffic
+// efficiently.
+enum LinkClass {
+  option (nanopb_enumopt).enum_intsize = IS_8;
+
+  LINK_CLASS_SYSTEM = 0;
+  LINK_CLASS_TELEMETRY = 1;
+  LINK_CLASS_COMMAND = 2;
+  LINK_CLASS_ACK = 3;
+}
+
+// MessageType identifies the payload encoded within an AOG-Link frame. IDs are
+// grouped by LinkClass and align with the message families published through
+// the gRPC contracts.
+enum MessageType {
+  option (nanopb_enumopt).enum_intsize = IS_16;
+
+  LINK_MESSAGE_TYPE_UNSPECIFIED = 0;
+
+  // System / discovery messages (class SYSTEM)
+  LINK_MESSAGE_TYPE_DISCOVERY_ANNOUNCE = 1;
+  LINK_MESSAGE_TYPE_DISCOVERY_RESPONSE = 2;
+  LINK_MESSAGE_TYPE_HEARTBEAT = 3;
+  LINK_MESSAGE_TYPE_TIMESYNC = 4;
+
+  // Telemetry messages (class TELEMETRY)
+  LINK_MESSAGE_TYPE_TELEMETRY_POSE = 100;
+  LINK_MESSAGE_TYPE_TELEMETRY_IMU = 101;
+  LINK_MESSAGE_TYPE_TELEMETRY_SECTION_MASK = 102;
+  LINK_MESSAGE_TYPE_TELEMETRY_STEER_STATE = 103;
+  LINK_MESSAGE_TYPE_TELEMETRY_TIMING = 104;
+
+  // Command messages (class COMMAND)
+  LINK_MESSAGE_TYPE_COMMAND_STEER = 200;
+  LINK_MESSAGE_TYPE_COMMAND_SECTION_MASK = 201;
+
+  // Acknowledgement messages (class ACK)
+  LINK_MESSAGE_TYPE_COMMAND_ACK = 250;
+}
+
+// NodeRole describes the function of an endpoint participating on the link.
+enum NodeRole {
+  option (nanopb_enumopt).enum_intsize = IS_8;
+
+  NODE_ROLE_UNSPECIFIED = 0;
+  NODE_ROLE_HOST = 1;
+  NODE_ROLE_CONTROLLER = 2;
+  NODE_ROLE_SENSOR = 3;
+}
+
+// NodePriority allows the bridge to arbitrate between multiple publishers
+// advertising the same class of telemetry or command channel.
+enum NodePriority {
+  option (nanopb_enumopt).enum_intsize = IS_8;
+
+  NODE_PRIORITY_LOW = 0;
+  NODE_PRIORITY_DEFAULT = 1;
+  NODE_PRIORITY_HIGH = 2;
+  NODE_PRIORITY_CRITICAL = 3;
+}
+
+// AckStatus communicates the disposition of a command acknowledgement.
+enum AckStatus {
+  option (nanopb_enumopt).enum_intsize = IS_8;
+
+  ACK_STATUS_OK = 0;
+  ACK_STATUS_RETRY = 1;
+  ACK_STATUS_REJECTED = 2;
+  ACK_STATUS_UNSUPPORTED = 3;
+}
+
+// FrameFlags carry auxiliary metadata alongside the fixed-width header fields.
+message FrameFlags {
+  option (nanopb_msgopt).msgid = 1;
+
+  bool needs_ack = 1;
+  bool is_reply = 2;
+  bool fragmented = 3;
+  NodePriority priority = 4;
+}
+
+// FrameHeader mirrors the physical AOG-Link header shared across UDP, serial
+// (COBS), and CAN/CAN-FD transports. All numeric fields map directly to the
+// wire representation to avoid per-transport packing logic.
+message FrameHeader {
+  option (nanopb_msgopt).msgid = 2;
+
+  uint32 version = 1 [(nanopb).int_size = IS_8];
+  LinkClass message_class = 2;
+  MessageType message_type = 3;
+  uint32 sequence = 4 [(nanopb).int_size = IS_16];
+  uint32 source = 5 [(nanopb).int_size = IS_16];
+  uint32 destination = 6 [(nanopb).int_size = IS_16];
+  uint32 payload_length = 7 [(nanopb).int_size = IS_16];
+  FrameFlags flags = 8;
+}
+
+// NodeIdentity uniquely identifies a participant on the link.
+message NodeIdentity {
+  option (nanopb_msgopt).msgid = 3;
+
+  uint32 node_id = 1 [(nanopb).int_size = IS_16];
+  NodeRole role = 2;
+  NodePriority priority = 3;
+  string hardware_model = 4 [(nanopb).max_length = 31];
+  string firmware_version = 5 [(nanopb).max_length = 15];
+}
+
+// DiscoveryAnnounce is multicast by nodes when they join the network so the
+// bridge can respond with configuration and capability negotiation.
+message DiscoveryAnnounce {
+  option (nanopb_msgopt).msgid = 4;
+
+  NodeIdentity identity = 1;
+  uint32 session_id = 2 [(nanopb).int_size = IS_16];
+  repeated string capability_ids = 3 [(nanopb).max_count = 16, (nanopb).max_length = 31];
+}
+
+// DiscoveryResponse is unicasted by the bridge to confirm participation and to
+// share the canonical capability descriptors aligned with the gRPC surface.
+message DiscoveryResponse {
+  option (nanopb_msgopt).msgid = 5;
+
+  NodeIdentity identity = 1;
+  repeated nexus.capabilities.v1.CapabilityDescriptor capabilities = 2 [(nanopb).max_count = 16];
+}
+
+// Heartbeat keeps the MCU watchdogs and bridge arbitration logic informed
+// about active publishers and consumers.
+message Heartbeat {
+  option (nanopb_msgopt).msgid = 6;
+
+  NodeIdentity identity = 1;
+  uint64 uptime_ms = 2;
+  uint32 stale_sequence_threshold = 3 [(nanopb).int_size = IS_16];
+}
+
+// TimeSync shares the bridge notion of current wall-clock and monotonic time
+// so MCUs can align telemetry timestamps.
+message TimeSync {
+  option (nanopb_msgopt).msgid = 7;
+
+  google.protobuf.Timestamp current_time = 1;
+  uint64 monotonic_time_ms = 2;
+}
+
+// CommandAck acknowledges a command frame identified by sequence and type.
+message CommandAck {
+  option (nanopb_msgopt).msgid = 8;
+
+  uint32 acknowledged_sequence = 1 [(nanopb).int_size = IS_16];
+  MessageType acknowledged_type = 2;
+  AckStatus status = 3;
+  uint32 retry_delay_ms = 4 [(nanopb).int_size = IS_16];
+}
+
+// LinkEnvelope wraps the gRPC-aligned payloads with the common header metadata.
+message LinkEnvelope {
+  option (nanopb_msgopt).msgid = 9;
+
+  FrameHeader header = 1;
+
+  oneof payload {
+    DiscoveryAnnounce discovery_announce = 10;
+    DiscoveryResponse discovery_response = 11;
+    Heartbeat heartbeat = 12;
+    TimeSync time_sync = 13;
+    CommandAck command_ack = 14;
+
+    aog.core.v1.Pose pose = 20;
+    aog.core.v1.Imu imu = 21;
+    aog.core.v1.SectionMask section_mask = 22;
+    aog.core.v1.TimingCaps timing = 23;
+    aog.core.v1.SteerCmd steer_command = 30;
+    aog.core.v1.SteerState steer_state = 31;
+  }
+}
+

@@ -14,7 +14,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-005 Capabilities handshake service
 - [x] NX-104 Metadata-driven variable-rate layer mapping ADR _(Done)_
 - [x] NX-115 AOG-Link protocol specification _(Done)_
-- [ ] NX-116 Shared aog-link.proto schemas _(Planned)_
+- [x] NX-116 Shared aog-link.proto schemas _(Done)_
 - [ ] NX-126 Mapping plugin architecture ADR _(In Review)_
 - [ ] NX-131 Field job session lifecycle ADR _(Proposed)_
 - [x] NX-152 .NET 8 runtime enforcement per ADR-001 _(Done)_
@@ -96,7 +96,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-027 Legacy UDP gateway skeleton
 - [x] NX-029 Agio.Linux SocketCAN backend
 - [x] NX-066 GNSS provider policy + TCP/UDP support
-- [ ] NX-117 Bridge service host (gRPC ⇄ AOG-Link) _(Planned)_
+- [x] NX-117 Bridge service host (gRPC ⇄ AOG-Link) _(Done)_
 - [ ] NX-118 gRPC ⇄ AOG-Link translator _(Planned)_
 - [ ] NX-119 AOG-Link ⇄ PGN compatibility bridge _(Planned)_
 - [ ] NX-120 AOG-Link Ethernet/UDP driver _(Planned)_
@@ -344,7 +344,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-104 | ADR: Metadata-driven variable-rate layer mapping & imports | Done |  | — | [SRS §8 Data Model & Storage](docs/SRS/sections/08_Data_Model_Storage.md) | Superseded by ADR-010 roadmap planning; see ADR tracker for replacement scope |
 | NX-150 | ADR roadmap: PoseStream, layers, and control revamp | In progress |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Track upcoming ADR-007…ADR-020 deliverables and linked SRS requirements |
 | NX-115 | AOG-Link protocol specification and reference flows | Done |  | — | [SRS §3 Communications & Transports](docs/SRS/sections/03_Comm_Transports.md) | ADR-006 + SRS updates complete |
-| NX-116 | Shared `aog-link.proto` schemas with nanopb options | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Publish contracts aligned with `Aog.Abstractions` |
+| NX-116 | Shared `aog-link.proto` schemas with nanopb options | Done |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Publish contracts aligned with `Aog.Abstractions` |
 | NX-152 | Enforce ADR-001 .NET 8 runtime baselines across solutions and CI | Done | AI | — | [ADR-001 .NET 8 runtime](docs/ADR/ADR-001-dotnet8-runtime.md) | Runtime baseline playbook + SDK pinning in `global.json` |
 | NX-190 | Comprehensive ADR portfolio review | In Review |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Apply 2025 governance updates across accepted and draft ADRs |
 | NX-153 | Operationalize ADR-002 gRPC contract governance and compatibility gates | Done | AI | — | [ADR-002 gRPC contracts](docs/ADR/ADR-002-grpc-contracts.md) | Checklist for clinics, golden fixtures, and release gating |
@@ -428,7 +428,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-027 | Legacy UDP gateway skeleton | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Loopback test |
 | NX-029 | Agio.Linux SocketCAN backend (CAN→gRPC) | Done |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Streams CAN frames + section relays |
 | NX-066 | GNSS source policy + TCP/UDP provider | Done |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Aggregates `IPositionSource` feeds |
-| NX-117 | Bridge service host for gRPC ⇄ AOG-Link | Planned |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Standalone daemon mediating inter-process, AOG-Link, and PGN flows |
+| NX-117 | Bridge service host for gRPC ⇄ AOG-Link | Done |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Standalone daemon mediating inter-process, AOG-Link, and PGN flows |
 | NX-118 | gRPC ⇄ AOG-Link translator layer | Planned |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Map service calls/streams onto nanopb datagrams with ack/retry semantics |
 | NX-119 | AOG-Link ⇄ PGN compatibility bridge | Planned |  | — | [SRS Option O-COMM-6](docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md) | Maintain legacy devices during migration |
 | NX-120 | AOG-Link Ethernet/UDP driver | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Implement multicast/unicast transport with command retries |

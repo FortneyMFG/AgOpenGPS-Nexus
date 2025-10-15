@@ -43,7 +43,9 @@ documents move or headings change.
 
 ### SRS §3.2 Capabilities Exchange
 - Describes the Core ↔ AGiO capability negotiation contract.
-- Initial proto (`proto/capabilities.proto`) defines `HandshakeRequest`/`HandshakeResponse`
+- Initial proto
+  ([`proto/capabilities.proto`](../../Nexus%20SourceCode/proto/capabilities.proto)) defines
+  `HandshakeRequest`/`HandshakeResponse`
   with node identity, session identifier, declared capabilities, and rejection metadata to
   unblock Core↔AGiO smoke tests.
 
@@ -96,8 +98,8 @@ documents move or headings change.
 - The engineering plan outlined in [`options/O-STACK-1_DotNet8Avalonia.md`](options/O-STACK-1_DotNet8Avalonia.md)
   is now the active roadmap for Nexus development. All early-phase tasks (Waves 0–2) should
   align with this stack (C#/.NET 8 + Avalonia + gRPC contracts).
-- `tasks.md` tracks the NX-### backlog described in the Engineering Brief. Keep it in sync
-  with the SRS milestones and update milestone tags when waves complete.
+- [`tasks.md`](../../tasks.md) tracks the NX-### backlog described in the Engineering Brief.
+  Keep it in sync with the SRS milestones and update milestone tags when waves complete.
 - Contracts-first policy: define protobuf and JSON schemas before implementing dependent
   services. Once the initial versions land, freeze updates for 72 hours to stabilise
   downstream work.
@@ -108,8 +110,15 @@ documents move or headings change.
 ## Open Questions
 
 - Assign CODEOWNERs for proto, schemas, core, AGiO, plugins, UI. Capture the assignments in
-  `AGENTS.md` and create `/CODEOWNERS` to match.
+  [`AGENTS.md`](../../AGENTS.md) and create `/CODEOWNERS` to match.
 - Define validation tooling for JSON schemas (likely `dotnet` global tool or simple script)
   so CI can enforce schema compliance from Wave 1 onward.
+
+## Related ADRs
+
+- [ADR-001 — Adopt .NET 8 C# Stack](../ADR/ADR-001-dotnet8-runtime.md)
+- [ADR-004 — Composite Simulation](../ADR/ADR-004-composite-simulation.md)
+- [ADR-018 — Plugin API](../ADR/ADR-018-plugin-api.md)
+- [ADR-028 — Stack Boundaries](../ADR/ADR-028-stack-boundaries.md)
 
 Add new sections chronologically with newest entries at the top.

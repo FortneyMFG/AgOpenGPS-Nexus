@@ -40,3 +40,9 @@ Offline usability, rollback capability, operator effort, package integrity, comp
 ## Open questions
 - How do we validate updates before rollout when rigs stay offline for months?
 - What metadata should accompany each release (checksums, firmware versions)?
+
+## Related ADRs
+
+- [ADR-019 — Provenance, Audit, & QA](../../ADR/ADR-019-provenance-audit-qa.md)
+- [ADR-024 — Discovery & Identity](../../ADR/ADR-024-discovery-identity.md)
+- [ADR-028 — Stack Boundaries](../../ADR/ADR-028-stack-boundaries.md)

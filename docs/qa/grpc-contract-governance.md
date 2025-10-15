@@ -13,7 +13,8 @@ ADR-002 establishes gRPC + protobuf as the shared contract surface for Nexus ser
 1. **Author prep.** Run `buf lint`/`buf breaking` locally (using the repository config) and capture the diff summary with semantic version recommendations.
 2. **Clinic review.** Present the change, updated manifests, and bridge impact. Secure sign-off from Core, AgIO, and Plugin leads.
 3. **Golden validation.** Replay the gRPC payloads through the Bridge regression harness and attach the round-trip logs.
-4. **Documentation.** Update ADR references, changelogs, and how-to guides that rely on the modified contract. Link to affected tasks in `tasks.md`.
+4. **Documentation.** Update ADR references, changelogs, and how-to guides that rely on the
+   modified contract. Link to affected tasks in [`tasks.md`](../../tasks.md).
 5. **Publication.** Merge the change only after the `Aog.Abstractions` package is built and published to the internal feed with the agreed semantic version.
 
 ## Release Exit Criteria

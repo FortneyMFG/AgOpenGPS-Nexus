@@ -37,3 +37,13 @@ Refactors the backend navigation/mapping services to manage per-section layer co
 ## Rough effort
 L — Touches ingestion, mapping, rendering, and configuration code paths with new controller abstractions and replay harnesses.
 
+## References
+- [Section 04 — Mapping Layers](../sections/04_MappingLayers.md)
+- [Section 08 — Data Model Storage](../sections/08_Data_Model_Storage.md)
+- [Section 09 — Control Automation](../sections/09_Control_Automation.md)
+
+## Related ADRs
+- [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)
+- [ADR-020 — Determinism & Replay CI](../../ADR/ADR-020-determinism-replay-ci.md)
+- [ADR-032 — Presets and Layout Linking](../../ADR/ADR-032-presets-and-layout-linking.md)
+

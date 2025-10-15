@@ -80,3 +80,10 @@ Core services discover devices via transports, the catalog resolver computes upd
 - Plugin surface and updater extensibility: see [Section 12 — Extensibility & Plugins](12_Extensibility_Plugins.md).
 - Packaging for catalogs and offline bundles: see Section 14 `Offline-First Updates` and Section 16 `Plugin Packaging, Updates, and Catalog` for shared distribution policies.
 - JSON schema definitions for catalogs and bundles: see [Appendix — DFU Catalog Schema](../appendices/DFU_Catalog_Schema.md).
+
+## Related ADRs
+
+- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
+- [ADR-018 — Plugin API](../../ADR/ADR-018-plugin-api.md)
+- [ADR-048 — RadioBridge](../../ADR/ADR-048_RadioBridge.md)

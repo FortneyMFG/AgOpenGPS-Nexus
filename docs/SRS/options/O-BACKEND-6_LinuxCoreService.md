@@ -52,3 +52,12 @@ L (multi-phase). Requires architecture refactor, new service host, API contracts
 
 ## References
 - Community discussions on cross-platform goals and splitting UI/business logic (Telegram/GitHub threads, Feb 2024).
+- [Section 03 — Communications & Transports](../sections/03_Comm_Transports.md)
+- [Section 04 — Backend Services](../sections/04_Backend_Services.md)
+- [Section 05 — Frontends](../sections/05_Frontends.md)
+
+## Related ADRs
+- [ADR-004 — Composite Simulation](../../ADR/ADR-004-composite-simulation.md)
+- [ADR-006 — AgIO Link MCU Communications](../../ADR/ADR-006-aog-link-mcu-communications.md)
+- [ADR-020 — Determinism & Replay CI](../../ADR/ADR-020-determinism-replay-ci.md)
+- [ADR-028 — Stack Boundaries](../../ADR/ADR-028-stack-boundaries.md)

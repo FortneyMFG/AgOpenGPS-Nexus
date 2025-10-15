@@ -40,3 +40,10 @@ M (requires new service plus extensive regression validation).
 ## References
 - Legacy PGN documentation maintained in project wiki/forums.
 - Discussions on modernizing transport while keeping PGNs for compatibility.
+- [Section 03 — Communications & Transports](../sections/03_Comm_Transports.md)
+- [Section 07 — Interprocess API](../sections/07_Interprocess_API.md)
+
+## Related ADRs
+- [ADR-006 — AgIO Link MCU Communications](../../ADR/ADR-006-aog-link-mcu-communications.md)
+- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
+- [ADR-020 — Determinism & Replay CI](../../ADR/ADR-020-determinism-replay-ci.md)

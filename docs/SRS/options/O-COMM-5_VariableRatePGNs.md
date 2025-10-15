@@ -35,3 +35,13 @@ Defines a set of CAN/UDP PGNs and sequencing rules that stream variable-rate lay
 ## Rough effort
 M — Requires firmware updates, AgIO decoding changes, schema negotiation logic, and documentation but reuses the established transport stack.
 
+## References
+- [Section 06 — Hardware I/O](../sections/06_Hardware_IO.md)
+- [Section 09 — Control Automation](../sections/09_Control_Automation.md)
+- [AgIO PGN baseline](../references/AgIO_PGN_Baseline.md)
+
+## Related ADRs
+- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
+- [ADR-047 — Live Telemetry Mesh](../../ADR/ADR-047_LiveTelemetryMesh.md)
+

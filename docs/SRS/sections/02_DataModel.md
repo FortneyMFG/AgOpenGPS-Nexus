@@ -161,3 +161,10 @@ Additional constraints:
 
 - How should optimizer state be versioned to ensure backwards compatibility between season planners?
 - What access controls are required when seasons span multiple organizations or contractors?
+
+## Related ADRs
+
+- [ADR-023 — Session & Job Model](../../ADR/ADR-023-session-job-model.md)
+- [ADR-030 — Field Job Sessions](../../ADR/ADR-030-field-job-sessions.md)
+- [ADR-040 — Season Organizers](../../ADR/ADR-040_SeasonOrganizers.md)
+- [ADR-043 — Multi-Field Job Envelopes](../../ADR/ADR-043_MultiFieldJobEnvelopes.md)

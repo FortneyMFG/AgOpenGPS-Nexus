@@ -27,7 +27,7 @@ Circle the best answer for each question. Passing score is 4/5.
    - D. Once QA reviews the soak report
 5. Which resource provides a simulator scenario aligned with the migration
    workflow?
-   - A. `docs/scenarios/legacy-auto-run`
-   - B. `docs/howto/windows-packaging.md`
-   - C. `tools/scripts/dealer-deploy.ps1`
-   - D. `docs/porting/AutoSteerLite-Tuning.md`
+   - A. [docs/scenarios/legacy-auto-run](../../scenarios/legacy-auto-run/README.md)
+   - B. [docs/howto/windows-packaging.md](../../howto/windows-packaging.md)
+   - C. [tools/scripts/dealer-deploy.ps1](../../../tools/scripts/dealer-deploy.ps1)
+   - D. [docs/porting/AutoSteerLite-Tuning.md](../../porting/AutoSteerLite-Tuning.md)

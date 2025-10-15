@@ -75,7 +75,8 @@ A successful build confirms the SDK is installed correctly. Subsequent runs can 
 ## 5. Run the Simulation (No Hardware)
 
 1. Stay in the repo root and point the helper at the Core host project (a dedicated
-   sim host is still on the roadmap), then launch the composite simulator:
+   sim host is still on the roadmap), then launch the composite simulator with
+   [`nexus.sh`](../../tools/scripts/nexus.sh):
 
    ```bash
    export NEXUS_SIM_PROJECT="Nexus SourceCode/src/Aog.Core.Host/Aog.Core.Host.csproj"
@@ -83,7 +84,8 @@ A successful build confirms the SDK is installed correctly. Subsequent runs can 
    ```
 
    The helper script reads the `NEXUS_SIM_PROJECT` override before falling back to its
-   defaults, so exporting the path guarantees a valid project target.【F:tools/scripts/nexus.sh†L18-L69】
+   defaults, so exporting the path guarantees a valid project target. The project file
+   lives at [`Aog.Core.Host/Aog.Core.Host.csproj`](../../Nexus%20SourceCode/src/Aog.Core.Host/Aog.Core.Host.csproj).【F:tools/scripts/nexus.sh†L18-L69】
 
 2. The script runs `dotnet run` for the simulation host. You should see log lines for the
    SimClock, SimBus, and virtual sensors. Let it run for ~60 seconds.【F:tools/scripts/nexus.sh†L1-L99】
@@ -131,7 +133,7 @@ A successful build confirms the SDK is installed correctly. Subsequent runs can 
 ## 7. Switch Nexus to GPS Input
 
 Until the AGiO packaging (NX-062) ships, run the AGiO host directly. Export the project
-path override because the host project still lives under `Aog.Agio`:
+path override because the host project still lives under [`Aog.Agio`](../../Nexus%20SourceCode/src/Aog.Agio/Aog.Agio.csproj):
 
 ```bash
 export NEXUS_AGIO_PROJECT="Nexus SourceCode/src/Aog.Agio/Aog.Agio.csproj"
@@ -175,8 +177,8 @@ If you want the Pi to auto-start Nexus components:
 ## 10. Next Steps
 
 - Document your exact hardware (receiver model, antenna, power notes) in the team wiki.
-- Once Core/UI tickets land, repeat the flow with the UI connected to confirm end-to-end
-  rendering.
+- Pair this guide with the [Windows no-hardware quick start](windows-no-hw.md) to rehearse
+  UI validation before heading to the cab.
 - Contribute logs and feedback to `#nexus-dev` so packaging tasks (NX-062) can bundle the
   right dependencies.
 

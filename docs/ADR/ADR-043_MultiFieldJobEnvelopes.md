@@ -91,3 +91,10 @@ metadata, bounding box/centroid hints, and the CRS used for the envelope. Plugin
 - Importers should populate `fieldIds` from legacy job folders by inspecting the field boundary loaded during the job.
 - Plugins must not assume a single field; compatibility shims should log warnings when older plugins ignore extra field IDs.
 - Per-field statistics in existing logs should map into the new `job.stats.fields` array during migration.
+
+## References
+
+- [Section 02 — Data Model](../SRS/sections/02_DataModel.md)
+- [Section 03 — Job Lifecycle](../SRS/sections/03_JobLifecycle.md)
+- [Section 04 — Mapping Layers](../SRS/sections/04_MappingLayers.md)
+- [ADR-040 — Season Organizers](ADR-040_SeasonOrganizers.md)

@@ -3,7 +3,9 @@
 Support analysts can now roll weekly field feedback uploads into a structured JSON
 summary using the `support-tool` CLI. The aggregator scans JSON or JSONL files, filters
 out-of-window events, and tallies build, component, and issue trends so the results can feed
-internal dashboards without exposing customer-identifying data.【F:Nexus SourceCode/tools/Aog.Tools.Support/FieldFeedbackAggregator.cs†L19-L129】
+internal dashboards without exposing customer-identifying data.【F:Nexus SourceCode/tools/Aog.Tools.Support/FieldFeedbackAggregator.cs†L19-L129】 Tie the output back to the
+[dealer escalation process](dealer-escalation-process.md) so every ticket reflects the same
+snapshot of affected builds and components.
 
 ## Input format
 
@@ -34,4 +36,6 @@ The resulting JSON includes:
 
 The aggregator emits the output path on success so CI jobs can publish the JSON as an artefact.
 The weekly dealer escalation review (NX-095) pulls the latest snapshot to quantify severity and
-assign follow-up owners before contacting regional support leads.【F:Nexus SourceCode/tools/Aog.Tools.Support/Program.cs†L26-L71】
+assign follow-up owners before contacting regional support leads.【F:Nexus SourceCode/tools/Aog.Tools.Support/Program.cs†L26-L71】 Share the same file with the
+[community preview program](community-preview-program.md) so preview fleets can compare their
+telemetry against production trends before promoting a build.

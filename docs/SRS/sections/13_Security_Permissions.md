@@ -39,3 +39,10 @@ Offline usability, credential safety, operator workflow impact, implementation c
 ## Open questions
 - How do we migrate stored passwords when introducing encryption?
 - Do we need per-operator audit logs for regulatory compliance?
+
+## Related ADRs
+
+- [ADR-019 — Provenance, Audit, & QA](../../ADR/ADR-019-provenance-audit-qa.md)
+- [ADR-024 — Discovery & Identity](../../ADR/ADR-024-discovery-identity.md)
+- [ADR-028 — Stack Boundaries](../../ADR/ADR-028-stack-boundaries.md)
+- [ADR-031 — Official Plugin Bundle](../../ADR/ADR-031-official-plugin-bundle.md)

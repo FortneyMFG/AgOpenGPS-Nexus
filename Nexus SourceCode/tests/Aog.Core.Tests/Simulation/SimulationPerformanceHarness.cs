@@ -40,7 +40,8 @@ internal sealed class SimulationPerformanceHarness
             throw new ArgumentOutOfRangeException(nameof(iterations));
         }
 
-        var bus = new InMemorySimBus();
+        var recorder = new SimulationPerformanceBudgetRecorder();
+        var bus = new InstrumentedSimBus(new InMemorySimBus(), recorder);
         var accumulator = new HarnessAccumulator();
 
         foreach (var descriptor in _graph.Providers)
@@ -79,13 +80,16 @@ internal sealed class SimulationPerformanceHarness
 
         stopwatch.Stop();
 
+        var budgetSnapshot = recorder.Snapshot(stopwatch.Elapsed, accumulator.TotalMessages);
+
         return new SimulationPerformanceResult(
             iterations,
             _graph.Providers.Count,
             accumulator.TotalMessages,
             _outputCount,
             stopwatch.Elapsed,
-            accumulator.Checksum);
+            accumulator.Checksum,
+            budgetSnapshot);
     }
 
     private sealed record struct SimPayload(string ProviderId, int Tick, double Value);
@@ -112,7 +116,8 @@ internal sealed record SimulationPerformanceResult(
     int TotalMessages,
     int TotalOutputs,
     TimeSpan Elapsed,
-    double Checksum)
+    double Checksum,
+    SimulationPerformanceBudgetSnapshot BudgetSnapshot)
 {
     public double MessagesPerIteration => (double)TotalMessages / Iterations;
 }

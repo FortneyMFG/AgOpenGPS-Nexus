@@ -29,3 +29,11 @@ realistic environment without building a configuration from scratch.
 
 For headless runs, pass the file to the tooling scripts, e.g. `nexus sim --config
 ./docs/scenarios/library.json --scenario headland-training`.
+
+## Performance Budgets
+The `performance-matrix.json` catalog is exercised by the
+`SimulationPerformanceHarness` integration tests. Each run now wraps the
+simulation bus with the `InstrumentedSimBus` and aggregates publish timings via
+`SimulationPerformanceBudgetRecorder`. The resulting budget snapshot enforces
+CPU-oriented thresholds (messages per second, max publish duration) so ADR-026
+performance budgets stay measurable in CI.

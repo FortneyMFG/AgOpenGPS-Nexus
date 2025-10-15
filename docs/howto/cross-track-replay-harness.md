@@ -2,10 +2,13 @@
 
 The cross-track slice exercises the replay plumbing between the PoseStream
 recordings and the AutoSteer guidance preview so we can validate controller
-behaviour without the full mapping stack. The integration test added for
-NX-235 writes a deterministic set of pose samples that simulate a machine
-acquiring the guidance line from a 1.5 m offset and then replays the samples
-through the `TelemetryReplayController`.
+behaviour without the full mapping stack. Start from the
+[`baseline-guidance`](../scenarios/README.md#baseline-guidance) preset so the
+SimBus topics, seed fixtures, and SimClock wiring stay aligned with the
+[composite simulation fabric checklist](../scenarios/composite-simulation-fabric.md).
+The integration test added for NX-235 writes a deterministic set of pose
+samples that simulate a machine acquiring the guidance line from a 1.5 m
+offset and then replays the samples through the `TelemetryReplayController`.
 
 ## What the harness validates
 
@@ -17,11 +20,16 @@ through the `TelemetryReplayController`.
 - **Metrics surface:** A summary structure captures max, final, RMS error, and
   replay duration so future slices (section arbiter, guidance preview) can plug
   into the same assertions.
+- **Legacy parity:** Compare outputs against the
+  [`legacy-auto-run`](../scenarios/legacy-auto-run/README.md) soak logs to ensure
+  replay behaviour remains aligned with historical UDP harness results.
 
 ## Running the test
 
 Run the targeted unit test to regenerate the replay parquet fixtures and
-execute the slice:
+execute the slice. Running it after the [Avalonia run-mode smoke
+checklist](avalonia-run-modes.md) keeps interactive validation and headless
+replay aligned:
 
 ```bash
 dotnet test "Nexus SourceCode/tests/Aog.Core.Tests/Aog.Core.Tests.csproj" \

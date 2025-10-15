@@ -6,11 +6,12 @@ run scenario plus sample verification logs captured with the soak harness.
 
 ## Files
 
-- `legacy-auto-run.json` — scenario definitions that bind the Nexus runtime to
-  legacy UDP pose, steering, and section streams.
-- `verification/soak-report.sample.json` — example output from
-  `legacy-tool soak --seconds 30` showing balanced frame counts.
-- `verification/checklist.md` — operator checklist used after the soak run.
+- [`legacy-auto-run.json`](legacy-auto-run.json) — scenario definitions that bind the Nexus
+  runtime to legacy UDP pose, steering, and section streams.
+- [`verification/soak-report.sample.json`](verification/soak-report.sample.json) — example
+  output from `legacy-tool soak --seconds 30` showing balanced frame counts.
+- [`verification/checklist.md`](verification/checklist.md) — operator checklist used after the
+  soak run.
 
 ## Usage
 
@@ -22,7 +23,7 @@ run scenario plus sample verification logs captured with the soak harness.
 
 ## Verification logs
 
-Sample soak report (`verification/soak-report.sample.json`):
+Sample soak report ([`verification/soak-report.sample.json`](verification/soak-report.sample.json)):
 
 ```json
 {

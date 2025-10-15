@@ -71,3 +71,9 @@ interpret gauge metadata (IDs, scaling, validity) supplied via JSON definitions.
 ## References
 - J1939/ISOBUS mappings in [Section 15 – Engine & Machine Gauges](../sections/15_Engine_Machine_Gauges.md).
 - Current PGN framing documented in [AgIO PGN baseline](../references/AgIO_PGN_Baseline.md).
+
+## Related ADRs
+
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
+- [ADR-047 — Live Telemetry Mesh](../../ADR/ADR-047_LiveTelemetryMesh.md)
+- [ADR-017 — Profiles & Kinematics](../../ADR/ADR-017-profiles-kinematics.md)

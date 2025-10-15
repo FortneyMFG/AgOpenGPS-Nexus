@@ -9,7 +9,7 @@ applied consistently across the fleet.
 
 - .NET SDK 8.0 on the provisioning workstation.
 - Access to the Nexus source tree (the provisioning CLI lives in
-  `Nexus SourceCode/tools/Aog.Tools.RadioBridge`).
+  [`tools/Aog.Tools.RadioBridge`](../../Nexus%20SourceCode/tools/Aog.Tools.RadioBridge)).
 - Mesh credentials for the farm or lab environment where the bridge devices will be staged.
 
 ## Generate provisioning profiles
@@ -32,11 +32,13 @@ $ dotnet run -- provision \
 
 If no output path is supplied the profile is emitted to stdout so that air-gapped environments can
 paste the document into secured tooling. The CLI also supports deterministic keys for lab fixtures:
-`dotnet run -- provision --device-id bridge.elrs.dev --key 0123456789ABCDEF`.
+`dotnet run -- provision --device-id bridge.elrs.dev --key 0123456789ABCDEF`. The entry point lives in
+[`Aog.Tools.RadioBridge.csproj`](../../Nexus%20SourceCode/tools/Aog.Tools.RadioBridge/Aog.Tools.RadioBridge.csproj) so you can
+embed it into provisioning automation.
 
 ### Profile schema
 
-Each provisioning file follows the `RadioBridgeProvisioningProfile` contract:
+Each provisioning file follows the [`RadioBridgeProvisioningProfile`](../../Nexus%20SourceCode/tools/Aog.Tools.RadioBridge/RadioBridgeProvisioningProfile.cs) contract:
 
 | Field | Description |
 | ----- | ----------- |
@@ -54,8 +56,8 @@ back to git.
 
 1. Copy the provisioning profile onto the device running `Aog.Agio`. The recommended path is
    `/opt/nexus/radio/<device-id>.json` with permissions restricted to the service account.
-2. Update `appsettings.json` (or the environment variables used in production) with the appropriate
-   RadioBridge adapter settings. For LoRa bridges, enable forward error correction and point the
+2. Update [`appsettings.json`](../../Nexus%20SourceCode/src/Aog.Agio/appsettings.json) (or the environment
+   variables used in production) with the appropriate RadioBridge adapter settings. For LoRa bridges, enable forward error correction and point the
    endpoint at the serial concentrator:
 
    ```json
@@ -74,12 +76,13 @@ back to git.
 
    ELRS bridges use the same structure under `RadioBridge:Elrs` and typically run with
    `EnableForwardErrorCorrection` set to `false`.
-3. Restart the AGiO service so that the adapter picks up the new configuration.
+3. Restart the [`Aog.Agio` host](../../Nexus%20SourceCode/src/Aog.Agio/Aog.Agio.csproj) so that the adapter picks up the new configuration.
 
 ## Validation checklist
 
 - `dotnet test Nexus SourceCode/tests/Aog.Core.Tests --filter RadioBridgeTransportTests` — verifies
-  retry logic and Hamming(12,8) decoding (NX-242).
+  retry logic and Hamming(12,8) decoding (NX-242) using
+  [`RadioBridgeTransportTests`](../../Nexus%20SourceCode/tests/Aog.Core.Tests/Mesh/RadioBridgeTransportTests.cs).
 - Inspect mesh diagnostics for the new device: the payload should include `radio.kind`,
   `radio.fec`, RSSI, and retry counters.
 - Trigger a test publication (for example by replaying a coverage topic) and confirm the bridge

@@ -58,3 +58,10 @@ This reference captures representative hardware stacks that operators deploy tod
 
 * See the [AgIO ↔ Hardware PGN Baseline](./AgIO_PGN_Baseline.md) for messaging requirements that any platform must support via USB, serial, or CAN adapters.
 * Sections under `sections/HW` capture controller and sensor requirements that pair with these compute platforms.
+
+## Related ADRs
+
+- [ADR-001 — Adopt .NET 8 C# Stack](../../ADR/ADR-001-dotnet8-runtime.md)
+- [ADR-003 — Avalonia UI](../../ADR/ADR-003-avalonia-ui.md)
+- [ADR-006 — AgIO Link MCU Communications](../../ADR/ADR-006-aog-link-mcu-communications.md)
+- [ADR-048 — RadioBridge](../../ADR/ADR-048_RadioBridge.md)

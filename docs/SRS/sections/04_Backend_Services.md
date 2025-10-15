@@ -51,3 +51,10 @@ Determinism, offline resilience, ease of customization, testability, deployment 
 ## Open questions
 - Where do we draw the boundary between UI thread work and background services today?
 - Which services must be isolated before we can offer remote supervision?
+
+## Related ADRs
+
+- [ADR-004 — Composite Simulation](../../ADR/ADR-004-composite-simulation.md)
+- [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)
+- [ADR-020 — Determinism & Replay CI](../../ADR/ADR-020-determinism-replay-ci.md)
+- [ADR-028 — Stack Boundaries](../../ADR/ADR-028-stack-boundaries.md)

@@ -63,3 +63,9 @@ device.
 - Updates §03 Communications & Transports with mesh QoS, topics, and ACL rules.
 - Extends §10 Telemetry with presence/trail expectations and stale indicators.
 - Adds plugin documentation requirements for share/subscribe UI in §05 Frontends.
+
+## References
+
+- [Section 03 — Communications & Transports](../SRS/sections/03_Comm_Transports.md)
+- [Section 05 — Frontends](../SRS/sections/05_Frontends.md)
+- [Section 10 — Telemetry & Health](../SRS/sections/10_Telemetry_Health.md)

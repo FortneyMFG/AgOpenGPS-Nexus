@@ -7,7 +7,8 @@ network shares for regional dealers.
 ## What the toolkit does
 
 - Copies release packages and translated machine profiles into a structured
-  bundle using `dealer-deploy.ps1` (Windows) or `dealer-deploy.sh` (Linux/macOS).
+  bundle using [`dealer-deploy.ps1`](../../tools/scripts/dealer-deploy.ps1) (Windows) or
+  [`dealer-deploy.sh`](../../tools/scripts/dealer-deploy.sh) (Linux/macOS).
 - Generates a SHA-256 manifest so dealers can validate downloads offline.
 - Drops a pre-filled checklist that walks the installer through verification,
   including the new `legacy-tool translate` and `legacy-tool soak` commands.

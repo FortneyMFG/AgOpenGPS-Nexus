@@ -38,3 +38,10 @@ M (requires API scaffolding, UI rewrites, and sync features).
 
 ## References
 - Community discussions on headless deployments, kiosk mode, and remote displays (GitHub Discussions Feb 2024).
+- [Section 05 — Frontends](../sections/05_Frontends.md)
+- [Section 07 — Interprocess API](../sections/07_Interprocess_API.md)
+
+## Related ADRs
+- [ADR-003 — Avalonia UI](../../ADR/ADR-003-avalonia-ui.md)
+- [ADR-018 — Plugin API](../../ADR/ADR-018-plugin-api.md)
+- [ADR-028 — Stack Boundaries](../../ADR/ADR-028-stack-boundaries.md)

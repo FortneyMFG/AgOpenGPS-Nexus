@@ -124,3 +124,9 @@ Gauges are read-only telemetry values surfaced as layer-aware overlays and UI wi
 - Engine RPM and coolant temperature track known replay logs after applying the documented scaling and offsets.
 - Simulated packet loss triggers the stale indicator when the TTL expires.
 - Reloading JSON configuration adds/removes gauges without requiring code changes.
+
+## Related ADRs
+
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
+- [ADR-034 — Metadata-Driven Dashboards](../../ADR/ADR-034-metadata-driven-dashboards.md)
+- [ADR-052 — Field Health Plugin](../../ADR/ADR-052_FieldHealthPlugin.md)

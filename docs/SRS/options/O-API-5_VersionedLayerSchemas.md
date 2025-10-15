@@ -29,8 +29,20 @@ Extends interprocess contracts so JSON/protobuf definitions describe layer metad
 ## Borrowables
 - Existing AgOpenGPS configuration serialization can be extended with the new metadata fields.
 - AgIO settings exchange flows provide a blueprint for schema negotiation and logging.
-- Templates in `docs/templates/SECTION.md` and `OPTION.md` can host living documentation of each schema revision.
+- Templates in [docs/templates/SECTION.md](../../templates/SECTION.md) and
+  [docs/templates/OPTION.md](../../templates/OPTION.md) can host living documentation of
+  each schema revision.
 
 ## Rough effort
 M — Requires schema design, serialization tooling, validation, and contributor education but largely builds on existing configuration exchange mechanisms.
+
+## References
+- [Section 02 — Data Model](../sections/02_DataModel.md)
+- [Section 08 — Data Model Storage](../sections/08_Data_Model_Storage.md)
+- [Section 12 — Extensibility & Plugins](../sections/12_Extensibility_Plugins.md)
+
+## Related ADRs
+- [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)
+- [ADR-019 — Provenance, Audit, & QA](../../ADR/ADR-019-provenance-audit-qa.md)
+- [ADR-032 — Presets and Layout Linking](../../ADR/ADR-032-presets-and-layout-linking.md)
 

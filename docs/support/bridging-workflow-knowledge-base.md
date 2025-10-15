@@ -45,7 +45,8 @@ when coaching dealers and growers through mixed deployments.
 2. **Latency budget** — Monitor timing capsules (NX-066) to verify <30 ms round-trip latency for
    section commands. If exceeded, downgrade map detail or remove non-essential plugins.
 3. **Operator briefing** — Provide the mixed-mode quick reference card (template in
-   `docs/templates/operator-briefing.md`) and record the acknowledgement in the deployment ticket.
+   `docs/templates/operator-briefing.md`) and record the acknowledgement in the deployment
+   ticket.
 
 ## Troubleshooting playbooks
 

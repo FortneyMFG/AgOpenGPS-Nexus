@@ -9,10 +9,10 @@ field rollout.
 
 | File | Purpose |
 | --- | --- |
-| `agenda.md` | Timetable for the classroom and lab sessions. |
-| `instructor-script.md` | Talking points that reinforce the slides and demos. |
-| `hands-on-checklist.md` | Step-by-step operator exercise using sample data. |
-| `knowledge-check.md` | Quiz used to confirm readiness before deployment. |
+| [`agenda.md`](agenda.md) | Timetable for the classroom and lab sessions. |
+| [`instructor-script.md`](instructor-script.md) | Talking points that reinforce the slides and demos. |
+| [`hands-on-checklist.md`](hands-on-checklist.md) | Step-by-step operator exercise using sample data. |
+| [`knowledge-check.md`](knowledge-check.md) | Quiz used to confirm readiness before deployment. |
 
 Print or export to PDF before travelling; on-site networks are often unreliable.
 

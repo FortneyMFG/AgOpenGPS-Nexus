@@ -3,7 +3,9 @@
 This tracker consolidates current and planned Architecture Decision Records so the Nexus team can stage the PoseStream, section control, and variable-rate overhaul in one place. It links each ADR to the SRS requirements that must be satisfied before drafting or promoting the decision for review.【F:tasks.md†L131-L137】 Use it to coordinate sequencing, ensure prerequisite requirements are in place, and keep the community focused on the same backlog of decisions.
 
 ## Governance Updates
-- **Living program board.** The roadmap now syncs with the architecture kanban each Monday, capturing burndown, dependency risk, and staffing flags. Updates generate summaries in `tasks.md` so execution plans stay aligned.
+- **Living program board.** The roadmap now syncs with the architecture kanban each Monday,
+  capturing burndown, dependency risk, and staffing flags. Updates generate summaries in
+  [`tasks.md`](../../tasks.md) so execution plans stay aligned.
 - **Dependency telemetry.** Automated scripts highlight ADRs blocked on missing registries or tooling, prompting owners to file NX follow-ups before deadlines slip.
 - **Communication cadence.** Monthly review meetings publish minutes and action items linked from this roadmap, keeping community contributors informed about sequencing changes.
 
@@ -649,7 +651,9 @@ The following ADRs are drafting to capture upcoming plugin initiatives reference
   - Alerting pipeline must page on-call when budgets exceed thresholds for two consecutive CI runs, verified via synthetic breach tests.
 ## How to use this tracker
 - **Before drafting an ADR**, confirm the associated requirements are satisfied or add missing ones to the SRS within the relevant section (Sections 03, 07–12 already include new requirement IDs for this program).【F:docs/SRS/sections/03_Comm_Transports.md†L6-L28】【F:docs/SRS/sections/07_Interprocess_API.md†L6-L28】【F:docs/SRS/sections/08_Data_Model_Storage.md†L6-L31】【F:docs/SRS/sections/09_Control_Automation.md†L8-L22】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L17】【F:docs/SRS/sections/11_Testing_CI_CDPipelines.md†L6-L19】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L28】
-- **During implementation**, link work items to the corresponding NX task in `tasks.md` and update this file with progress notes or additional prerequisites discovered by prototypes or field feedback.【F:tasks.md†L131-L149】
+- **During implementation**, link work items to the corresponding NX task in
+  [`tasks.md`](../../tasks.md) and update this file with progress notes or additional
+  prerequisites discovered by prototypes or field feedback.【F:tasks.md†L131-L149】
 - **When an ADR is approved**, move it to the adopted table above and ensure the SRS section references are updated to point to the final record.
 
 ### Global acceptance hooks for PoseStream, layer, and control proposals

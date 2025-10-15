@@ -35,3 +35,13 @@ Updates the desktop UI so widgets, charts, and inspectors consume layer metadata
 ## Rough effort
 L — Touches core rendering, inspector UX, dashboard frameworks, and configuration workflows to make them metadata-driven.
 
+## References
+- [Section 02 — Framework & UI](../sections/02_Framework_UI.md)
+- [Section 04 — Mapping Layers](../sections/04_MappingLayers.md)
+- [Section 05 — Frontends](../sections/05_Frontends.md)
+
+## Related ADRs
+- [ADR-032 — Presets and Layout Linking](../../ADR/ADR-032-presets-and-layout-linking.md)
+- [ADR-034 — Metadata-Driven Dashboards](../../ADR/ADR-034-metadata-driven-dashboards.md)
+- [ADR-052 — Field Health Plugin](../../ADR/ADR-052_FieldHealthPlugin.md)
+

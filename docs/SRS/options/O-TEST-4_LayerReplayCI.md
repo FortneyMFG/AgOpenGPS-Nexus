@@ -39,3 +39,12 @@ Builds a deterministic replay and benchmarking suite that validates aggregation 
 ## Rough effort
 M — Significant investment in replay assets, CI scripting, and documentation but amortizes risk for future layer additions.
 
+## References
+- [Section 04 — Mapping Layers](../sections/04_MappingLayers.md)
+- [Section 11 — Testing, CI, & CD Pipelines](../sections/11_Testing_CI_CDPipelines.md)
+
+## Related ADRs
+- [ADR-004 — Composite Simulation](../../ADR/ADR-004-composite-simulation.md)
+- [ADR-020 — Determinism & Replay CI](../../ADR/ADR-020-determinism-replay-ci.md)
+- [ADR-032 — Presets and Layout Linking](../../ADR/ADR-032-presets-and-layout-linking.md)
+

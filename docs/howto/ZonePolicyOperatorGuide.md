@@ -1,9 +1,12 @@
 # Zone Policy Operator Guide
 
 This guide explains how Nexus surfaces spatial constraint policies to operators and how those
-policies influence automation behaviour in the field. It complements ADR-027 and the UI
+policies influence automation behaviour in the field. It complements
+[ADR-027 — Spatial constraints & zone policies](../ADR/ADR-027-spatial-constraints.md) and the UI
 policy toggles implemented in the Avalonia shell so crews know when automation is gated and
-what steps are required to resume work.
+what steps are required to resume work. Operators can cross-reference the
+[SRS control & automation section](../SRS/sections/09_Control_Automation.md) for the underlying
+safety requirements enforced by Core.
 
 ## Constraint states surfaced to the operator
 
@@ -22,7 +25,9 @@ Operators should watch for the following annunciators:
   outputs off while logging the affected zones for audit purposes.【F:Nexus SourceCode/src/Aog.Core/Safety/ControlArbiter.cs†L186-L205】
 
 The Avalonia shell mirrors these states via the Zone Constraint Policy panel so operators can
-acknowledge overrides and review the history of manual actions.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/ZoneConstraintPolicyViewModel.cs†L132-L205】
+acknowledge overrides and review the history of manual actions.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/ZoneConstraintPolicyViewModel.cs†L132-L205】 See the
+[metadata-driven UI style guide](../reference/metadata-driven-ui-style-guide.md) for the
+canonical annunciator layout shared across desktop and companion shells.
 
 ## Responding to gate events
 
@@ -42,9 +47,11 @@ understand why automation was bypassed.
 
 Use the Zone Import & Export panel to bring in shapefiles, GeoPackages, or ISOXML bundles.
 Each workflow runs validation passes that check geometry integrity, buffer configuration, and
-policy compatibility before applying the catalog update.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/ZoneImportExportPanelViewModel.cs†L18-L99】
-When the import completes, review the activity log and ensure the newly imported zones appear
-with the expected labels and priorities.
+policy compatibility before applying the catalog update.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/ZoneImportExportPanelViewModel.cs†L18-L99】 Pair imports with the
+[season/session migration playbook](season-session-migration-playbook.md) when preparing fleets
+for ADR-040/041 rollouts so legacy zones stay aligned with new session metadata. When the
+import completes, review the activity log and ensure the newly imported zones appear with the
+expected labels and priorities.
 
 ## Field-readiness checklist
 

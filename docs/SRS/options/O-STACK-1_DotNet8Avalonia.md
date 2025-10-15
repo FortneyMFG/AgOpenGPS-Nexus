@@ -37,6 +37,16 @@ Leverage `Grpc.Net.Client`, `Grpc.AspNetCore`, `Google.Protobuf`, `Microsoft.Ext
 - Windows-native UI polish may still require optional host shells (WinUI/WPF) for advanced integrations.
 - Hardware vendors must provide .NET-friendly SDKs or gRPC shims to integrate with the AgIO abstraction layer.
 
+## References
+- [Section 01 — OS Support](../sections/01_OS_Support.md)
+- [Section 02 — Framework & UI](../sections/02_Framework_UI.md)
+- [Section 07 — Interprocess API](../sections/07_Interprocess_API.md)
+
+## Related ADRs
+- [ADR-001 — Adopt .NET 8 C# Stack](../../ADR/ADR-001-dotnet8-runtime.md)
+- [ADR-003 — Avalonia UI](../../ADR/ADR-003-avalonia-ui.md)
+- [ADR-028 — Stack Boundaries](../../ADR/ADR-028-stack-boundaries.md)
+
 ## Validation hooks
 - Simulation plugin exercises GNSS/IMU/section flows without hardware.
 - Replay plugin reuses unified gRPC contracts to validate new telemetry features against historical logs.

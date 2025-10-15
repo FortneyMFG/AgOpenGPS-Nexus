@@ -33,7 +33,8 @@ leases, or runtime compatibility.
    - Exercise at least one representative rig per affected capability.
    - Confirm firmware update flows and lease arbitration behave as documented.
 5. **Sign-off**
-   - QA partner records results in the task tracker (`tasks.md`/`AOG Nexus - Tasks.csv`).
+   - QA partner records results in the task tracker
+     ([`tasks.md`](../../tasks.md)/[`AOG Nexus - Tasks.csv`](../../AOG%20Nexus%20-%20Tasks.csv)).
    - Governance steward signs the manifest digest and schedules release notes.
    - Plugin owner merges once all defects are resolved or waived with explicit
      operator guidance.

@@ -186,3 +186,10 @@ Combine operators require the same deterministic telemetry pipeline as engine ga
 - Engine RPM and coolant temperature scale accurately against replay logs with known raw bytes.
 - Packet loss simulations trigger stale indicators after TTL expiration.
 - Reloading JSON configuration adds/removes gauges without code changes.
+
+## Related ADRs
+
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
+- [ADR-034 — Metadata-Driven Dashboards](../../ADR/ADR-034-metadata-driven-dashboards.md)
+- [ADR-047 — Live Telemetry Mesh](../../ADR/ADR-047_LiveTelemetryMesh.md)
+- [ADR-052 — Field Health Plugin](../../ADR/ADR-052_FieldHealthPlugin.md)

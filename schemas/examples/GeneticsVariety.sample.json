@@ -1,0 +1,27 @@
+{
+  "id": "geneticsVariety:north40-session1",
+  "layerId": "layer:genetics.variety.2025",
+  "jobId": "job:2025-plant-soy",
+  "sessionId": "session:1",
+  "createdAt": "2025-04-01T15:12:00Z",
+  "createdBy": "user:operator.maya",
+  "lastModifiedAt": "2025-04-01T15:20:10Z",
+  "appliedAt": "2025-04-01T15:11:45Z",
+  "brand": "Acme Seeds",
+  "product": "ZX-2045",
+  "traitStack": "Enlist",
+  "lot": "LOT-4432A",
+  "treatment": "fungicide",
+  "source": "coverage",
+  "barcode": "ZX2045-4432A",
+  "changeLog": [
+    {
+      "changedAt": "2025-04-01T15:18:00Z",
+      "actor": "user:operator.maya",
+      "field": "lot",
+      "previous": "LOT-4432A",
+      "current": "LOT-4432B"
+    }
+  ],
+  "notes": "Swapped lot after first hopper refill"
+}

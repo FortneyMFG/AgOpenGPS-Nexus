@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/CropTypeHistoryRecord.v1.json",
+  "title": "CropTypeHistoryRecord.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["year", "crop", "status", "source", "recordedAt"],
+  "properties": {
+    "year": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 2100,
+      "description": "Calendar year for the crop assignment.",
+      "x-nexus-scope": "plugin"
+    },
+    "crop": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Crop name or identifier.",
+      "x-nexus-scope": "plugin"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "actual", "historical"],
+      "description": "Lifecycle status of the crop record.",
+      "x-nexus-scope": "plugin"
+    },
+    "source": {
+      "type": "string",
+      "description": "Origin of the record (manual, import, sensor, plugin).",
+      "x-nexus-scope": "plugin"
+    },
+    "layerId": {
+      "type": ["string", "null"],
+      "pattern": "^layer:[A-Za-z0-9._:-]+$",
+      "description": "Reference layer representing the crop geometry.",
+      "x-nexus-scope": "plugin"
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the record was captured (UTC).",
+      "x-nexus-scope": "plugin"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional operator notes about the crop assignment.",
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

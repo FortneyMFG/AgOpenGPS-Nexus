@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/LayerEditEvent.v1.json",
+  "title": "LayerEditEvent.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "layerId", "jobId", "createdAt", "actor", "operations", "hash"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$",
+      "default": "1.0.0",
+      "description": "Schema semantic version for layer edit events.",
+      "x-nexus-scope": "core"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^layerEdit:[A-Za-z0-9._:-]+$",
+      "description": "Stable identifier for the edit event.",
+      "x-nexus-scope": "core"
+    },
+    "layerId": {
+      "type": "string",
+      "pattern": "^layer:[A-Za-z0-9._:-]+$",
+      "description": "Layer affected by this edit.",
+      "x-nexus-scope": "core"
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Job context for the edit.",
+      "x-nexus-scope": "core"
+    },
+    "sessionId": {
+      "type": ["string", "null"],
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Optional session context.",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when the edit was recorded.",
+      "x-nexus-scope": "core"
+    },
+    "actor": {
+      "type": "string",
+      "description": "Actor performing the edit (user:*, system:*).",
+      "x-nexus-scope": "core"
+    },
+    "hash": {
+      "type": "string",
+      "description": "Deterministic hash representing the event payload for journal integrity.",
+      "x-nexus-scope": "core"
+    },
+    "previousHash": {
+      "type": ["string", "null"],
+      "description": "Hash of the previous edit in the undo stack.",
+      "x-nexus-scope": "core"
+    },
+    "nextHash": {
+      "type": ["string", "null"],
+      "description": "Hash of the next edit when redo is available.",
+      "x-nexus-scope": "core"
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/operation" },
+      "description": "Ordered set of geometry or attribute operations applied in this edit.",
+      "x-nexus-scope": "core"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Plugin-owned metadata (e.g., edit tags, automated reasoning).",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  },
+  "$defs": {
+    "operation": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["create", "update", "delete"],
+          "description": "Operation applied to the layer.",
+          "x-nexus-scope": "core"
+        },
+        "featureId": {
+          "type": "string",
+          "description": "Identifier of the affected feature.",
+          "x-nexus-scope": "core"
+        },
+        "geometryBefore": {
+          "type": ["object", "null"],
+          "description": "GeoJSON geometry before the edit (core-owned).",
+          "x-nexus-scope": "core"
+        },
+        "geometryAfter": {
+          "type": ["object", "null"],
+          "description": "GeoJSON geometry after the edit (core-owned).",
+          "x-nexus-scope": "core"
+        },
+        "attributesBefore": {
+          "type": ["object", "null"],
+          "description": "Plugin-owned attributes before the edit.",
+          "x-nexus-scope": "plugin"
+        },
+        "attributesAfter": {
+          "type": ["object", "null"],
+          "description": "Plugin-owned attributes after the edit.",
+          "x-nexus-scope": "plugin"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -17,6 +17,10 @@ Detail how we observe system health, log events, and surface telemetry (packet r
 - R-TH-021 (SHOULD, visualization LOD): Specify near-vehicle level-of-detail, opacity stacking, and legend behaviors so rendering engines and diagnostics overlays remain consistent across desktop and headless deployments.
 - R-TH-022 (MUST, constraint alerts): Emit real-time alerts and annunciators when keep-out zones inhibit guidance or when product is gated by work-disabled areas, including distance-to-violation indicators for autosteer.
 - R-TH-023 (SHOULD, constraint audit): Log zone-driven gates and operator overrides (zoneId, action, plugin command, result) to the audit stream so replay and compliance reviews can trace safety decisions.
+- R-TH-030 (MUST, collaborative mesh telemetry): Stream presence, trail, coverage, and layer-delta topics over the Live Telemetry Mesh with QoS tiers, stale indicators, and ACL enforcement so multi-machine crews share context safely.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L66】
+- R-TH-031 (SHOULD, radio diagnostics): Expose RadioBridge counters (RSSI, retry rate, FEC usage, encryption status) in UI dashboards and logs to diagnose ELRS/LoRa links.【F:docs/ADR/ADR-048_RadioBridge.md†L21-L56】
+- R-TH-032 (SHOULD, edit history telemetry): Forward `LayerEditEvent` summaries to telemetry feeds so collaborative edits appear in health dashboards and reports.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
+- R-TH-033 (SHOULD, weather logging health): Track weather auto-logging cadence, API import status, and sensor availability to alert operators when environmental data falls behind schedule.【F:docs/ADR/ADR-053_WeatherPlugin.md†L33-L49】
 
 ## Options
 - O-TH-0: Status quo — Manual monitors/logs with operator-driven analysis.
@@ -48,6 +52,8 @@ Latency, usability in the cab, offline capability, scalability, data retention p
 ## Upcoming ADR coverage
 - **ADR-011 Mapping & visualization pipeline** will answer R-TH-020 and R-TH-021 by specifying render ordering, GPU textures, interpolation rules, and overview pyramids shared between UI and replay tooling.【F:docs/ADR/ADR-roadmap.md†L51-L57】
 - **ADR-019 Provenance, audit, and QA** will connect telemetry overlays to quality scores and provenance tags defined in Section 11 so dashboards expose lineage along with visualization state.【F:docs/ADR/ADR-roadmap.md†L115-L121】
+- **ADR-047 Live telemetry mesh** will define presence/trail QoS, stale detection, and ACL requirements aligned with R-TH-030 and R-TH-032.【F:docs/ADR/ADR-roadmap.md†L211-L232】
+- **ADR-048 RadioBridge** covers radio framing, retry policies, and diagnostics referenced by R-TH-031.【F:docs/ADR/ADR-roadmap.md†L233-L248】
 
 ## Open questions
 - What metrics matter most for field reliability (packet loss, GNSS age, CPU load)?

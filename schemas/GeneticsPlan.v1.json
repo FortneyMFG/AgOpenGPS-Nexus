@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/GeneticsPlan.v1.json",
+  "title": "GeneticsPlan.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "layerId", "jobId", "createdAt", "createdBy", "brand", "product"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^geneticsPlan:[A-Za-z0-9._:-]+$",
+      "description": "Identifier for the genetics plan record.",
+      "x-nexus-scope": "plugin"
+    },
+    "layerId": {
+      "type": "string",
+      "pattern": "^layer:[A-Za-z0-9._:-]+$",
+      "description": "Layer reference storing the planned geometry.",
+      "x-nexus-scope": "core"
+    },
+    "jobId": {
+      "type": ["string", "null"],
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Optional job that owns the plan.",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the plan entry was created.",
+      "x-nexus-scope": "core"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor that created the plan entry.",
+      "x-nexus-scope": "core"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the last modification.",
+      "x-nexus-scope": "core"
+    },
+    "brand": {
+      "type": "string",
+      "description": "Seed brand.",
+      "x-nexus-scope": "plugin"
+    },
+    "product": {
+      "type": "string",
+      "description": "Product name or identifier.",
+      "x-nexus-scope": "plugin"
+    },
+    "traitStack": {
+      "type": "string",
+      "description": "Trait stack description (e.g., VT2P).",
+      "x-nexus-scope": "plugin"
+    },
+    "lot": {
+      "type": "string",
+      "description": "Seed lot identifier.",
+      "x-nexus-scope": "plugin"
+    },
+    "treatment": {
+      "type": "string",
+      "description": "Seed treatment information.",
+      "x-nexus-scope": "plugin"
+    },
+    "source": {
+      "type": "string",
+      "description": "Origin of the plan (manual, import, API).",
+      "x-nexus-scope": "plugin"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional plan notes.",
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

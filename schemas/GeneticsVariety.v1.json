@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/GeneticsVariety.v1.json",
+  "title": "GeneticsVariety.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "layerId", "jobId", "sessionId", "createdAt", "createdBy", "brand", "product"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^geneticsVariety:[A-Za-z0-9._:-]+$",
+      "description": "Identifier for the recorded variety segment.",
+      "x-nexus-scope": "plugin"
+    },
+    "layerId": {
+      "type": "string",
+      "pattern": "^layer:[A-Za-z0-9._:-]+$",
+      "description": "Layer reference storing the actual geometry.",
+      "x-nexus-scope": "core"
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Job that produced the variety record.",
+      "x-nexus-scope": "core"
+    },
+    "sessionId": {
+      "type": "string",
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Session during which the variety was applied.",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the variety record was created.",
+      "x-nexus-scope": "core"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor that recorded the variety entry.",
+      "x-nexus-scope": "core"
+    },
+    "lastModifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the last modification.",
+      "x-nexus-scope": "core"
+    },
+    "appliedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the variety was applied or detected.",
+      "x-nexus-scope": "plugin"
+    },
+    "brand": {
+      "type": "string",
+      "description": "Seed brand.",
+      "x-nexus-scope": "plugin"
+    },
+    "product": {
+      "type": "string",
+      "description": "Product name or identifier.",
+      "x-nexus-scope": "plugin"
+    },
+    "traitStack": {
+      "type": "string",
+      "description": "Trait stack description.",
+      "x-nexus-scope": "plugin"
+    },
+    "lot": {
+      "type": "string",
+      "description": "Seed lot identifier.",
+      "x-nexus-scope": "plugin"
+    },
+    "treatment": {
+      "type": "string",
+      "description": "Seed treatment information.",
+      "x-nexus-scope": "plugin"
+    },
+    "source": {
+      "type": "string",
+      "description": "Origin of the record (coverage, manual, import).",
+      "x-nexus-scope": "plugin"
+    },
+    "barcode": {
+      "type": "string",
+      "description": "Barcode value scanned for the variety (if available).",
+      "x-nexus-scope": "plugin"
+    },
+    "changeLog": {
+      "type": "array",
+      "description": "History of barcode/lot/treatment changes applied during the session.",
+      "x-nexus-scope": "plugin",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["changedAt", "actor", "field"],
+        "properties": {
+          "changedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the change.",
+            "x-nexus-scope": "plugin"
+          },
+          "actor": {
+            "type": "string",
+            "description": "Actor who performed the change.",
+            "x-nexus-scope": "plugin"
+          },
+          "field": {
+            "type": "string",
+            "description": "Attribute that changed (brand, product, lot, treatment, barcode).",
+            "x-nexus-scope": "plugin"
+          },
+          "previous": {
+            "type": ["string", "null"],
+            "description": "Previous value.",
+            "x-nexus-scope": "plugin"
+          },
+          "current": {
+            "type": ["string", "null"],
+            "description": "New value after the change.",
+            "x-nexus-scope": "plugin"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional operator notes.",
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

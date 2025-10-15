@@ -18,7 +18,9 @@ Introduce a first-class `Season` entity that optionally sits above jobs. A seaso
 creation metadata, a date range, the jobs it covers, freeform notes, and an opaque optimizer payload for planners to checkpoint
 their state. Seasons may span multiple farms and can be created ahead of any job execution to support planning and reporting
 flows. Core owns the identifier, lifecycle, and synchronization of season documents while plugins consume read-only snapshots
-through shared context events.
+through shared context events. Seasons participate in the global context publish/subscribe system: Core emits
+`onFarmLoaded(farmContext)` followed by `onSeasonLoaded(seasonContext)` and `onJobLoaded(jobContext)` so plugins can hydrate
+cached analytics and register interest in seasonal overlays before sessions begin.
 
 ### Season payload
 
@@ -38,14 +40,18 @@ through shared context events.
 
 ### Extension hooks
 
-- **Core context broadcast:** When a season is loaded or its membership changes, Core updates the shared job context payload
-  (see ADR-041) so plugins receive `onJobLoaded` notifications that include `seasonId`, `seasonName`, and derived analytics such
-  as total acreage.
-- **Plugin extensions:** Season documents expose a `extensions` object for plugin-owned metadata (e.g., seasonal crop
-  rotations, budget snapshots). Core persists the blob but does not interpret plugin keys.
-- **Cross-plugin coordination:** Analytics and reporting plugins may subscribe to `onSeasonLoaded` via the event bus, using the
-  optimizer payload and job roster to seed forecasts or roll up completed work. Crop-type history or profitability projections
-  live inside plugin extensions to avoid bloating the core schema.
+- **Context fan-out:** When a season is loaded or its membership changes, Core republishes the active context over the lifecycle
+  bus. Plugins receive `onSeasonLoaded` followed by `onJobLoaded` events that include `seasonId`, `seasonName`, immutable farm
+  and field IDs, authoring metadata, and derived acreage totals.
+- **Core-owned vs. plugin-extendable:** Season documents mark immutable IDs, labels, and audit metadata as Core-owned fields
+  while the `extensions` object and nested plugin namespaces remain plugin-owned. Plugin writers may store crop rotation
+  projections, seasonal profitability snapshots, or agronomic advisories inside `extensions` without mutating core columns.
+- **Lifecycle guarantees:** Prior to any session starting, Core publishes the resolved farm/season/job context so plugins such as
+  Crop Type, Genetics, Yield, or Profit can attach state and register overlays. The event contract requires plugins to tolerate
+  replay of `onSeasonLoaded` when membership changes while honoring idempotent updates.
+- **Cross-plugin coordination:** Analytics and reporting plugins subscribe to `onSeasonLoaded` and `onContextChanged` events to
+  recalculate aggregates. Season optimizer payloads may be interpreted by specialized plugins (e.g., Profit, Report Builder) but
+  Core treats the payload as opaque binary or JSON blobs.
 
 ## Consequences
 

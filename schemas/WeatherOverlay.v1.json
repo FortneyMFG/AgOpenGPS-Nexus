@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/WeatherOverlay.v1.json",
+  "title": "WeatherOverlay.v1",
+  "type": "object",
+  "allOf": [
+    { "$ref": "./Layer.v1.json" }
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Weather overlay metadata (variables, units, resolution).",
+      "additionalProperties": false,
+      "x-nexus-scope": "plugin",
+      "properties": {
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["temperature", "rainfall", "windSpeed", "windDirection", "humidity", "pressure"]
+          },
+          "description": "Variables included in the overlay tiles.",
+          "x-nexus-scope": "plugin"
+        },
+        "units": {
+          "type": "object",
+          "description": "Units per variable.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "x-nexus-scope": "plugin"
+        },
+        "grid": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cellSizeMeters": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Cell size of the raster grid in meters.",
+              "x-nexus-scope": "plugin"
+            },
+            "projection": {
+              "type": "string",
+              "description": "CRS identifier used for the grid.",
+              "x-nexus-scope": "core"
+            }
+          }
+        },
+        "capturedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp representing the overlay snapshot.",
+          "x-nexus-scope": "core"
+        },
+        "source": {
+          "type": "string",
+          "description": "Origin of the overlay (sensor network, API, manual).",
+          "x-nexus-scope": "core"
+        }
+      }
+    }
+  }
+}

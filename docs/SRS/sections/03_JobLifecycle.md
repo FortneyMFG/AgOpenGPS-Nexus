@@ -21,21 +21,29 @@ updates to plugins so spatial renderers, rate controllers, and analytics stay al
 | Event | Trigger | Payload | Plugin expectations |
 | --- | --- | --- | --- |
 | `onFarmLoaded` | Operator selects a farm in the navigator | `farmId`, farm metadata snapshot, mounted field roster | Preload geometry, imagery, and plugin extensions for the farm. |
-| `onJobLoaded` | Job mounted or resumed | `farmId`, `seasonId?`, `jobId`, `fieldIds[]`, job metadata (core + `extensions`) | Initialize caches, stage per-field stats, prep overlays. |
-| `onSessionStart` | Session opened (new or resume) | `farmId`, `seasonId?`, `jobId`, `sessionId`, `fieldIds[]`, env snapshot | Bind provenance context, prime journaling buffers. |
-| `onSessionMetadataChange` | Operator updates session metadata | Updated session document | Persist changes, refresh dashboards, honor authoring metadata immutability. |
+| `onSeasonLoaded` | Season selected or job references a season | `seasonId`, `name`, `jobIds[]`, date range, optimizer state, `extensions` | Prestage seasonal analytics, budget snapshots, and crop rotation context. |
+| `onJobLoaded` | Job mounted or resumed | `farmId`, `seasonId?`, `jobId`, `fieldIds[]`, job metadata (core + `extensions`), immutable IDs | Initialize caches, stage per-field stats, prep overlays, and subscribe to envelope updates. |
+| `onContextChanged` | Farm/season/job/session IDs change (field mount, season swap) | Diff summary + latest context snapshot | Reconcile caches idempotently; rebuild spatial indices, refresh analytics. |
+| `onSessionStart` | Session opened (new or resume) | `farmId`, `seasonId?`, `jobId`, `sessionId`, `fieldIds[]`, env snapshot, crop/genetics context | Bind provenance context, prime journaling buffers, auto-fill crop/genetics defaults. |
+| `onSessionPause` | Operator pauses work | Context snapshot + pause reason | Suspend live logging, mark telemetry streams paused without closing session. |
+| `onSessionResume` | Operator resumes after pause | Context snapshot + resume timestamp | Resume coverage logging, refresh analytics caches. |
+| `onSessionMetadataChange` | Operator updates session metadata | Updated session document with diff summary | Persist changes, refresh dashboards, honor authoring metadata immutability. |
+| `onSessionWeatherUpdate` | Weather auto-logging records a new sample | Weather delta payload (temp, humidity, wind, rainfall, pressure, source) | Update session weather snapshot, notify spraying/analytics plugins. |
 | `onSessionEnd` | Operator ends the session or job completes | `farmId`, `seasonId?`, `jobId`, `sessionId`, summary stats | Flush journals, finalize layers, update analytics snapshots. |
+| `onLayerStartEdit` | Zone Drawing Framework enters edit mode | Layer context (layerId, jobId, sessionId?, editable attributes) | Prepare attribute editors, suspend conflicting automation. |
+| `onFeatureCommit` | Geometry/attribute change committed | `LayerEditEvent` payload | Update analytics, sync collaborative meshes, refresh overlays. |
+| `onLayerUndo`/`onLayerRedo` | Undo stack mutates | `LayerEditEvent` pointer + diff summary | Rollback/redo analytics caches, update UI history. |
 
-- Core emits `onFarmLoaded` → `onJobLoaded` → `onSessionStart` in order during mounts. Crash recovery replays `onJobLoaded` and resumes the active session before firing `onSessionStart`.
+- Core emits `onFarmLoaded` → `onSeasonLoaded` (when applicable) → `onJobLoaded` → `onSessionStart` in order during mounts. Crash recovery replays `onJobLoaded`, replays pending `onContextChanged` diffs, and resumes the active session before firing `onSessionStart`.
 - Existing jobs without sessions surface as a single implicit session; UI prompts operators to create additional sessions when resuming legacy jobs.【F:docs/ADR/ADR-041_JobSessions.md†L12-L60】
 
 ## Autosave & Journaling
 
-- **Autosave cadence:** Minimum every 60 seconds or when >5 MB of coverage tiles are written, whichever comes first.
+- **Autosave cadence:** Minimum every 60 seconds or when >5 MB of coverage tiles are written, whichever comes first. Layer edits trigger autosave when 10 or more `LayerEditEvent` entries are buffered.
 - **Crash safety:** Journal entries persist to disk before acknowledging `onSessionEnd`. Recovery replays incomplete batches.
 - **Metadata:** Session documents (embedded or `sessions/<id>.json`) update atomically. Notes and inputs include timestamps and
   user attribution where available.
-- **Layer provenance:** Layers created during the session append provenance records referencing `jobId` and `sessionId`; reused layers keep the original `hash` and `source` while updating the mounting job. Authoring metadata flows into `Layer.v1` alongside plugin-provided `extensions`.【F:schemas/Layer.v1.json†L1-L117】
+- **Layer provenance:** Layers created during the session append provenance records referencing `jobId` and `sessionId`; reused layers keep the original `hash` and `source` while updating the mounting job. Authoring metadata flows into `Layer.v1` alongside plugin-provided `extensions`. Layer edits emit `LayerEditEvent.v1` journals with deterministic hashes for undo/redo and collaborative replication.【F:schemas/Layer.v1.json†L1-L117】【F:schemas/LayerEditEvent.v1.json†L1-L140】
 
 ## Multi-Field Mount/Unmount
 
@@ -43,6 +51,7 @@ updates to plugins so spatial renderers, rate controllers, and analytics stay al
 - Field unmounts occur only when jobs close or operators explicitly remove a field; Core updates `fieldIds` and notifies plugins
   prior to persisting changes.
 - Per-field stats accumulate in `job.stats.fields[]`, retaining historical coverage even if a field is later unmounted.
+- `onContextChanged` fires after field mount/unmount, season reassignment, or crop context updates so plugins can rehydrate caches without redundant restarts.
 
 ## Resume & Last-Open Pointers
 

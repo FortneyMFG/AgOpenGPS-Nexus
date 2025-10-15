@@ -3,11 +3,11 @@
 ## Overview
 
 Mapping plugins render coverage, rate, and guidance layers while respecting farm/field geometry and job/session provenance.
-Multi-field job envelopes must provide continuous navigation across adjacent fields without breaking statistics or journaling. Core publishes lifecycle events (`onFarmLoaded`, `onJobLoaded`, `onSessionStart`) so mapping engines can hydrate caches, consume job or session `extensions`, and expose plugin-authored overlays (crop type, profitability, genetics) alongside core coverage.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L40】
+Multi-field job envelopes must provide continuous navigation across adjacent fields without breaking statistics or journaling. Core publishes lifecycle events (`onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, `onSessionStart`) so mapping engines can hydrate caches, consume job or session `extensions`, and expose plugin-authored overlays (crop type, profitability, genetics, field health, weather) alongside core coverage.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L64】 Zone editing flows reuse the shared LayerEditService contracts defined in ADR-044.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
 
 ## Multi-Field Envelope Handling
 
-- Mapping plugins receive `mountFields(fieldIds[])` and must load all referenced field polygons, build a union envelope, and maintain an R-tree for per-field spatial queries. Job `extensions` provide optional crop-type or profitability overlays aligned with mounted fields.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L12-L68】【F:schemas/Job.v1.json†L1-L146】
+- Mapping plugins receive `mountFields(fieldIds[])` and must load all referenced field polygons, build a union envelope, and maintain an R-tree for per-field spatial queries. Job `extensions` provide optional crop-type, genetics, profitability, and risk overlays aligned with mounted fields.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L12-L68】【F:schemas/Job.v1.json†L1-L146】
 - When rendering coverage, plugins accumulate totals both for the job aggregate and per-field rollups stored in
   `job.stats.fields[]` and exposed via analytics exports.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L47-L75】
 - Guidance and section control consumers rely on the union envelope to avoid operator prompts when crossing internal lanes; the
@@ -16,7 +16,7 @@ Multi-field job envelopes must provide continuous navigation across adjacent fie
 
 ## Session Context & Layer Provenance
 
-- Mapping, rate, guidance, and analytics plugins receive `jobId`, `sessionId`, and `fieldIds[]` in context events. Outputs must attach provenance referencing the active session, inherit authoring metadata, and include `layerId` entries in `session.layerRefs[]` when persisted.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L40】【F:schemas/Session.v1.json†L1-L99】
+- Mapping, rate, guidance, and analytics plugins receive `jobId`, `sessionId`, and `fieldIds[]` in context events. Outputs must attach provenance referencing the active session, inherit authoring metadata, and include `layerId` entries in `session.layerRefs[]` when persisted.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L66】【F:schemas/Session.v1.json†L1-L115】
 - Layer documents record `jobId`, optional `sessionId`, `units`, and a `provenance` block containing `source`, `transform`,
   `hash`, `createdAt`, and optional `actor`. Reused layers update `jobId`/`sessionId` while appending provenance history instead
   of duplicating payloads.【F:schemas/Layer.v1.json†L1-L117】
@@ -34,7 +34,7 @@ Multi-field job envelopes must provide continuous navigation across adjacent fie
 
 ## Storage & Journaling Expectations
 
-- Session autosave triggers flush coverage tiles and provenance updates before acknowledging `onSessionEnd` events.【F:docs/SRS/sections/03_JobLifecycle.md†L45-L66】
+- Session autosave triggers flush coverage tiles, LayerEditEvent journals, and provenance updates before acknowledging `onSessionEnd` events.【F:docs/SRS/sections/03_JobLifecycle.md†L66-L92】
 - Layers inherit the job’s folder layout (`/Jobs/<Job>/layers/<layerId>/`) with metadata stored in `Layer.v1` documents and tiles
   stored under `tiles/` with recommended cell sizes documented in layer-specific ADRs.
 - Journaling retains both planned and actual layers with timestamped provenance entries, enabling later audits to reconstruct the
@@ -51,10 +51,27 @@ Multi-field job envelopes must provide continuous navigation across adjacent fie
 
 | Plugin Type | Required Updates |
 | --- | --- |
-| Mapping | Implement `mountFields(fieldIds[])`, `setActiveSession(sessionId)`, and `writeLayer(layerId, payload, provenance)` APIs; publish per-field stats. |
+| Mapping | Implement `mountFields(fieldIds[])`, `setActiveSession(sessionId)`, `writeLayer(layerId, payload, provenance)`, and LayerEditService hooks (`onLayerStartEdit`, `onFeatureCommit`, `onLayerUndo/Redo`); publish per-field stats. |
 | Rate/Sections | Consume `jobId`, `sessionId`, and `fieldIds[]` in lifecycle events; write session-aware layers with provenance. |
-| Guidance | Respect multi-field envelopes for lookahead and coverage overlays; include session metadata in telemetry outputs. |
-| Analytics/Export | Filter by `seasonId`, `jobId`, and `sessionId`; honor provenance when generating planned vs. actual reports. |
+| Guidance | Respect multi-field envelopes for lookahead and coverage overlays; include session metadata in telemetry outputs; pause automation while LayerEditService is active to avoid conflicting edits. |
+| Analytics/Export | Filter by `seasonId`, `jobId`, and `sessionId`; honor provenance when generating planned vs. actual reports; consume plugin overlays (crop type, genetics, yield, profit, risk, weather) via context events. |
+
+## Shared Zone Drawing Framework
+
+- Layer editing is centralized in Core’s LayerEditService (ADR-044). Plugins declare editable layers and attribute schemas via manifests and respond to `onLayerStartEdit`, `onFeatureCommit`, and `onLayerUndo/Redo` events.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
+- Toolbar modes include polygon, rectangle, brush, and eraser tools supplied by Core; plugins contribute attribute panels (crop, genetics, risk, profit tags) declaratively.
+- LayerEditEvent journals persist geometry/attribute operations with deterministic hashes. Collaborative scenarios replicate journals via the Live Telemetry Mesh (ADR-047).【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L33-L62】
+
+## Layer Catalog Additions
+
+- **Crop Type:** `cropType.planned`, `cropType.actual`, `cropType.history` store crop, year, status, source, and notes aligned with Field crop history and job/session context.【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】
+- **Genetics:** `genetics.plan`, `genetics.variety` capture seed brand/product/lot/treatment with provenance to coverage events and barcode change logs.【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】
+- **Yield:** `yield.actual`, `yield.moisture`, `yield.testWeight` store normalized harvest metrics with smoothing metadata and aggregation bins.【F:docs/ADR/ADR-049_YieldPlugin.md†L21-L52】
+- **Profit:** `profit.net` overlays combine yield-derived revenue and cost inputs, referencing `CostRecord` transactions and source layers.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L21-L52】
+- **Risk:** `risk.flood`, `risk.compaction`, `risk.weeds`, `risk.other` annotate severity and observations, leveraging LayerEditService for edits.【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L21-L44】
+- **Weather:** `weather.overlay` visualizes rainfall, temperature, and wind vectors sourced from sensors/APIs and linked to session weather snapshots.【F:docs/ADR/ADR-053_WeatherPlugin.md†L21-L49】
+
+Each layer definition includes unit metadata, provenance expectations, and accessibility requirements (color ramps, legends) maintained in plugin manifests and schema files under `/schemas`.
 
 ## Open Questions
 

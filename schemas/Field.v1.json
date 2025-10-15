@@ -76,6 +76,12 @@
       "description": "Timestamp of the most recent modification to the field geometry or metadata.",
       "x-nexus-scope": "core"
     },
+    "cropTypeHistory": {
+      "type": "array",
+      "description": "Chronological crop assignments managed by the Crop Type plugin.",
+      "x-nexus-scope": "plugin",
+      "items": { "$ref": "./CropTypeHistoryRecord.v1.json" }
+    },
     "extensions": {
       "type": "object",
       "description": "Plugin-owned metadata (soil zones, crop history, profitability markers). Keys follow <namespace>.<topic> naming.",

@@ -1,0 +1,9 @@
+{
+  "year": 2024,
+  "crop": "corn",
+  "status": "historical",
+  "source": "session:2024-harvest",
+  "layerId": "layer:cropType.history.2024",
+  "recordedAt": "2024-11-15T18:20:00Z",
+  "notes": "High residue following wet fall"
+}

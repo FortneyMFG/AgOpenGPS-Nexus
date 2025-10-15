@@ -52,6 +52,62 @@
         "x-nexus-scope": "plugin"
       }
     },
+    "weatherSnapshot": {
+      "type": "object",
+      "description": "Latest weather sample recorded for the session (auto-logged or manual).",
+      "x-nexus-scope": "core",
+      "additionalProperties": false,
+      "properties": {
+        "capturedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the weather sample was captured (UTC).",
+          "x-nexus-scope": "core"
+        },
+        "source": {
+          "type": "string",
+          "description": "Origin of the weather sample (sensor ID, API name, manual).",
+          "x-nexus-scope": "core"
+        },
+        "temperatureC": {
+          "type": "number",
+          "description": "Air temperature in Celsius.",
+          "x-nexus-scope": "core"
+        },
+        "humidityPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Relative humidity percentage.",
+          "x-nexus-scope": "core"
+        },
+        "windKph": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Wind speed in kilometers per hour.",
+          "x-nexus-scope": "core"
+        },
+        "windDirectionDeg": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 360,
+          "description": "Wind direction degrees.",
+          "x-nexus-scope": "core"
+        },
+        "rainfallMm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Rainfall accumulation in millimeters during the logging interval.",
+          "x-nexus-scope": "core"
+        },
+        "pressureKpa": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Atmospheric pressure in kilopascals.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
     "inputs": {
       "type": "object",
       "description": "Freeform summary of inputs/materials used during the session.",

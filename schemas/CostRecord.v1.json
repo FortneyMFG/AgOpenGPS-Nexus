@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/CostRecord.v1.json",
+  "title": "CostRecord.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "category", "amount", "currency", "recordedAt", "createdBy"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^cost:[A-Za-z0-9._:-]+$",
+      "description": "Identifier for the cost entry.",
+      "x-nexus-scope": "plugin"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["seed", "chem", "fuel", "labor", "misc"],
+      "description": "Cost category classification.",
+      "x-nexus-scope": "plugin"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monetary amount.",
+      "x-nexus-scope": "plugin"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "ISO 4217 currency code.",
+      "x-nexus-scope": "plugin"
+    },
+    "quantity": {
+      "type": ["number", "null"],
+      "description": "Quantity applied (optional).",
+      "x-nexus-scope": "plugin"
+    },
+    "quantityUnits": {
+      "type": ["string", "null"],
+      "description": "Units for the quantity value.",
+      "x-nexus-scope": "plugin"
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the cost was incurred.",
+      "x-nexus-scope": "plugin"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Actor that recorded the cost entry.",
+      "x-nexus-scope": "plugin"
+    },
+    "farmId": {
+      "type": ["string", "null"],
+      "pattern": "^farm:[A-Za-z0-9._:-]+$",
+      "description": "Farm scope if applicable.",
+      "x-nexus-scope": "plugin"
+    },
+    "fieldId": {
+      "type": ["string", "null"],
+      "pattern": "^field:[A-Za-z0-9._:-]+$",
+      "description": "Field scope if applicable.",
+      "x-nexus-scope": "plugin"
+    },
+    "jobId": {
+      "type": ["string", "null"],
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Job scope if applicable.",
+      "x-nexus-scope": "plugin"
+    },
+    "sessionId": {
+      "type": ["string", "null"],
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Session scope if applicable.",
+      "x-nexus-scope": "plugin"
+    },
+    "layerId": {
+      "type": ["string", "null"],
+      "pattern": "^layer:[A-Za-z0-9._:-]+$",
+      "description": "Layer reference if the cost applies to a spatial overlay.",
+      "x-nexus-scope": "plugin"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Plugin-owned metadata (supplier, invoice numbers, notes).",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

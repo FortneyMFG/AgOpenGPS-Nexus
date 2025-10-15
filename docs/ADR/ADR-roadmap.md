@@ -166,6 +166,146 @@ Draft authors should reference the listed requirements and tasks before opening 
   - Analytics/export plugins emit season/job/session scoped outputs that honor per-field aggregates.
   - Performance harness shows union envelope queries staying within ≤ 25 ms p95 under 10-field mounts.
 
+### ADR-044 — Zone drawing framework
+- **Owner:** Core Owner — Mapping & Lifecycle pod
+- **Stage:** Drafting (target review window: 2025-04-18 week)
+- **Dependencies:** ADR-040/041/043 (context lifecycle), ADR-029 (mapping plugin architecture)
+- **Scope:** Provide a shared geometry editing system (`LayerEditService`, toolbar, undo/redo, attribute panels) so Core and plugins draw/edit spatial layers with consistent provenance and IDs.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L9-L74】
+- **Key decisions:** Editing APIs (`drawLayer`, `editFeature`, `mergeZones`, `splitZone`), event contracts (`onLayerStartEdit`, `onFeatureCommit`), storage of `LayerEditEvent` journals, toolbar UX, and plugin registration for editable layers.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
+- **SRS alignment:** Data model (§02 layer provenance), Job lifecycle (§03 edit events), Frontends (§05 shared toolbar), Plugins (§12 edit subscriptions).【F:docs/SRS/sections/02_DataModel.md†L1-L160】【F:docs/SRS/sections/03_JobLifecycle.md†L1-L120】【F:docs/SRS/sections/05_Frontends.md†L1-L150】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L1-L120】
+- **Primary requirements:** R-DATA-040…R-DATA-052 (edit provenance), R-UX-030…R-UX-044 (drawing UX), R-EXT-080…R-EXT-099 (plugin edit hooks).
+- **Tasks:** Implement LayerEditService, persist `LayerEditEvent` schema, wire toolbar into UI shell, update plugin manifests for editable layer declarations, author regression fixtures for undo/redo and collaborative edits.
+- **Acceptance hooks:**
+  - Collaborative edit replay reproduces identical geometry after undo/redo with ≤ 1 cm centroid delta.
+  - Crop Type and Field Health plugins receive `onFeatureCommit` events and update analytics without manual refresh.
+  - LayerEditEvent schema validation passes for at least 10 recorded edit scenarios (draw, merge, split, undo).
+
+### ADR-045 — Crop type plugin & layers
+- **Owner:** Plugins Owner — Agronomy pod
+- **Stage:** Drafting (target review window: 2025-04-25 week)
+- **Dependencies:** ADR-044 (zone tool), ADR-040/041/043 (context lifecycle)
+- **Scope:** Deliver planned/actual/history crop layers, extend Field schema with `cropTypeHistory[]`, auto-fill job/session crop context, and expose analytics hooks for rotation queries.【F:docs/ADR/ADR-045_CropTypePlugin.md†L9-L74】
+- **Key decisions:** Layer attribute schema, crop history storage strategy, UI flows for quick crop selection, analytics APIs for previous crop queries, and integration with report builder.【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】
+- **SRS alignment:** Data model (§02 field crop history), Job lifecycle (§03 crop context on session start), Mapping layers (§04 crop overlays), Analytics (§08 rotation stats).【F:docs/SRS/sections/02_DataModel.md†L90-L200】【F:docs/SRS/sections/03_JobLifecycle.md†L1-L120】【F:docs/SRS/sections/04_MappingLayers.md†L1-L160】【F:docs/SRS/sections/08_Data_Model_Storage.md†L1-L140】
+- **Primary requirements:** R-DATA-060…R-DATA-068, R-ANL-020…R-ANL-028, R-UX-050…R-UX-056.
+- **Tasks:** Implement crop layer schemas, update Field schema, build quick-select UI, wire analytics API, populate report builder sections.
+- **Acceptance hooks:**
+  - Editing crop zones updates Field crop history and job/session context within one autosave cycle.
+  - Rotation analytics return correct previous-crop values across multi-field jobs in regression fixtures.
+  - Report builder crop summary template renders planned vs. actual acreage with provenance links.
+
+### ADR-046 — Genetics plugin & layers
+- **Owner:** Plugins Owner — Agronomy pod
+- **Stage:** Drafting (target review window: 2025-05-02 week)
+- **Dependencies:** ADR-045 (crop context), ADR-044 (zone tool), ADR-047 (telemetry mesh for live sharing)
+- **Scope:** Capture planned and actual seed genetics with barcode/lot tracking, auto-write layers during planting, and export CSV/GeoJSON/ISOXML packages.【F:docs/ADR/ADR-046_GeneticsPlugin.md†L9-L74】
+- **Key decisions:** Genetics layer schemas, barcode change logging, UI picker and legend behavior, integration with coverage events, export formats, and provenance requirements.【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L71】
+- **SRS alignment:** Job lifecycle (§03 coverage hooks), Mapping layers (§04 genetics layers), Data model (§08 provenance), Extensibility (§12 plugin registration).【F:docs/SRS/sections/03_JobLifecycle.md†L59-L140】【F:docs/SRS/sections/04_MappingLayers.md†L90-L200】【F:docs/SRS/sections/08_Data_Model_Storage.md†L1-L140】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L60-L140】
+- **Primary requirements:** R-DATA-070…R-DATA-085, R-EXT-110…R-EXT-129, R-UX-060…R-UX-068.
+- **Tasks:** Author genetics schemas, build picker UI with barcode support, wire coverage integration, implement export pipelines, add report builder sections.
+- **Acceptance hooks:**
+  - Live planting session auto-writes genetics layers with ≤ 2s latency from coverage events.
+  - Barcode scan updates active variety and records change log entries validated by schema tests.
+  - ISOXML export passes validator against representative monitor datasets.
+
+### ADR-047 — Live telemetry mesh
+- **Owner:** Core Owner — Connectivity pod
+- **Stage:** Drafting (target review window: 2025-05-09 week)
+- **Dependencies:** ADR-048 (radio bridge), ADR-040/041/043 (context lifecycle)
+- **Scope:** Establish pub/sub mesh over `aog/live/{season}/{job}/{layer}` topics with device/share/subscribe profiles, QoS tiers, and privacy controls for collaborative operations.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L9-L70】
+- **Key decisions:** Topic taxonomy, presence/trail cadence, QoS tiers, ACL enforcement, UI visualization, layer replication strategy, and LayerEditEvent journal integration.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L70】
+- **SRS alignment:** Communications (§03 mesh transport), Telemetry (§10 presence/trails), Extensibility (§12 collaborative plugins).【F:docs/SRS/sections/03_Comm_Transports.md†L40-L140】【F:docs/SRS/sections/10_Telemetry_Health.md†L1-L120】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L1-L120】
+- **Primary requirements:** R-COMM-050…R-COMM-072, R-TH-030…R-TH-042, R-EXT-140…R-EXT-155.
+- **Tasks:** Implement mesh service, design presence/trail payloads, build share/subscribe UI, add diagnostics, integrate with zone/yield plugins.
+- **Acceptance hooks:**
+  - Mesh latency ≤ 300 ms p95 for presence updates across three devices on ELRS link.
+  - ACL tests verify unauthorized devices cannot subscribe to protected layers.
+  - Offline replay reconstructs collaborative edits from LayerEditEvent journals without divergence.
+
+### ADR-048 — RadioBridge for ELRS/LoRa telemetry
+- **Owner:** Core Owner — Connectivity pod
+- **Stage:** Drafting (target review window: 2025-05-09 week)
+- **Dependencies:** ADR-047 (mesh service)
+- **Scope:** Define binary framing, reliability, encryption, and diagnostics for ELRS/LoRa links carrying mesh traffic.【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+- **Key decisions:** Header layout, selective repeat ARQ parameters, topic ID registry, encryption scheme, telemetry counters, provisioning workflow.【F:docs/ADR/ADR-048_RadioBridge.md†L17-L60】
+- **SRS alignment:** Communications (§03 radio transport), Telemetry (§10 diagnostics), Support docs (§support) for provisioning.【F:docs/SRS/sections/03_Comm_Transports.md†L90-L160】【F:docs/SRS/sections/10_Telemetry_Health.md†L60-L120】
+- **Primary requirements:** R-COMM-073…R-COMM-084, R-TH-043…R-TH-050.
+- **Tasks:** Implement framing library, build ELRS/LoRa adapters, author provisioning docs, integrate key management, add CI tests for retry/fec logic.
+- **Acceptance hooks:**
+  - Packet loss recovery keeps application drop rate < 2% at 5 kbps channel with 10% raw loss.
+  - Encryption handshake completes < 1 s and rejects invalid keys with operator-visible alerts.
+  - Diagnostics panel displays live RSSI, retry, and drop counters.
+
+### ADR-049 — Yield & analytics plugin
+- **Owner:** Plugins Owner — Analytics pod
+- **Stage:** Drafting (target review window: 2025-05-16 week)
+- **Dependencies:** ADR-045 (crop), ADR-046 (genetics), ADR-044 (zone tool)
+- **Scope:** Capture yield/moisture/test weight layers with provenance, smoothing, imports, and analytics APIs (yield by crop/variety).【F:docs/ADR/ADR-049_YieldPlugin.md†L9-L66】
+- **Key decisions:** Sensor normalization, aggregation bins, API design, import wizard UX, color ramp expectations, export formats.【F:docs/ADR/ADR-049_YieldPlugin.md†L21-L59】
+- **SRS alignment:** Data model (§08 yield storage), Frontends (§05 map overlays), Extensibility (§12 analytics APIs).【F:docs/SRS/sections/05_Frontends.md†L90-L170】【F:docs/SRS/sections/08_Data_Model_Storage.md†L60-L160】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L80-L140】
+- **Primary requirements:** R-DATA-086…R-DATA-110, R-ANL-030…R-ANL-048, R-UX-070…R-UX-082.
+- **Tasks:** Build ingest pipeline, persist layers with provenance, implement analytics APIs, develop import wizard and map overlays, produce export tooling.
+- **Acceptance hooks:**
+  - Yield smoothing pipeline reproduces baseline regression results within ±1.5% across fixtures.
+  - Analytics API cross-tests confirm consistent outputs when filtering by crop and variety.
+  - Import wizard validates ISOXML datasets and surfaces unit conversions without manual editing.
+
+### ADR-050 — Cost & profit plugin
+- **Owner:** Plugins Owner — Analytics pod
+- **Stage:** Drafting (target review window: 2025-05-23 week)
+- **Dependencies:** ADR-049 (yield), ADR-046 (genetics), ADR-045 (crop)
+- **Scope:** Track cost records, compute profit layers, and expose financial rollups per field/farm/season with CSV/PDF exports.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L9-L59】
+- **Key decisions:** Cost schema categories, integration with other plugins, profit layer metadata, visualization standards, export formats.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L21-L52】
+- **SRS alignment:** Data model (§08 economics), Frontends (§05 financial overlays), Extensibility (§12 analytics/reporting).【F:docs/SRS/sections/05_Frontends.md†L120-L190】【F:docs/SRS/sections/08_Data_Model_Storage.md†L90-L190】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L100-L160】
+- **Primary requirements:** R-DATA-111…R-DATA-128, R-ANL-049…R-ANL-060, R-UX-083…R-UX-092.
+- **Tasks:** Implement CostRecord/ProfitLayer schemas, build cost entry UI, wire analytics rollups, integrate exports, feed report builder.
+- **Acceptance hooks:**
+  - Profit layer generation completes within 2 minutes for 500-acre job with 10 cost categories.
+  - CSV/PDF exports balance costs vs. revenue totals within ±$1 rounding tolerance.
+  - UI heatmap correctly reflects negative and positive profit zones with accessible color ramps.
+
+### ADR-051 — Report builder & export system
+- **Owner:** Core Owner — Reporting pod
+- **Stage:** Drafting (target review window: 2025-05-30 week)
+- **Dependencies:** ADR-045…ADR-050 for data sources, ADR-047 for shared data access policies
+- **Scope:** Centralize report generation via templates, plugin-provided sections, and multi-format exports (PDF/CSV/GeoJSON).【F:docs/ADR/ADR-051_ReportBuilder.md†L9-L55】
+- **Key decisions:** Template schema, section registration hooks, export packaging, caching strategy, UI preview flows.【F:docs/ADR/ADR-051_ReportBuilder.md†L21-L52】
+- **SRS alignment:** Data model (§08 reporting), Frontends (§05 report UI), Extensibility (§12 plugin hooks).【F:docs/SRS/sections/05_Frontends.md†L150-L210】【F:docs/SRS/sections/08_Data_Model_Storage.md†L120-L210】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L120-L190】
+- **Primary requirements:** R-ANL-061…R-ANL-078, R-UX-093…R-UX-104, R-EXT-156…R-EXT-170.
+- **Tasks:** Define template schema, implement report builder service, build preview/share UI, integrate plugin sections, add CI snapshot tests.
+- **Acceptance hooks:**
+  - Built-in templates generate matching golden PDFs/CSVs for regression fixtures.
+  - Plugins can contribute sections declaratively with automated validation of dependencies.
+  - Report generation handles offline mode by queuing pending exports and syncing when connectivity returns.
+
+### ADR-052 — Field health & risk plugin
+- **Owner:** Plugins Owner — Agronomy pod
+- **Stage:** Drafting (target review window: 2025-05-30 week)
+- **Dependencies:** ADR-044 (zone tool), ADR-045 (crop context), ADR-049/050 (analytics consumers)
+- **Scope:** Capture risk overlays (flood, compaction, weeds, other) with severity metadata and historical views for analytics/reporting.【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L9-L55】
+- **Key decisions:** Severity schema, color coding, historical navigation, analytics integration, report builder hooks.【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L21-L44】
+- **SRS alignment:** Mapping layers (§04 risk overlays), Data model (§08 risk storage), Frontends (§05 severity legends).【F:docs/SRS/sections/04_MappingLayers.md†L120-L220】【F:docs/SRS/sections/05_Frontends.md†L160-L220】【F:docs/SRS/sections/08_Data_Model_Storage.md†L140-L210】
+- **Primary requirements:** R-DATA-129…R-DATA-142, R-ANL-079…R-ANL-086, R-UX-105…R-UX-112.
+- **Tasks:** Define risk layer schemas, implement severity legends, integrate analytics callbacks, surface historical toggles, wire report builder sections.
+- **Acceptance hooks:**
+  - Severity color scale passes accessibility contrast checks and matches analytics outputs.
+  - Yield/profit analytics adjust when risk severity changes in regression fixtures.
+  - Report builder scouting section lists observed risks with timestamps and observers.
+
+### ADR-053 — Weather & environment plugin
+- **Owner:** Plugins Owner — Analytics pod
+- **Stage:** Drafting (target review window: 2025-06-06 week)
+- **Dependencies:** ADR-040/041 (session metadata), ADR-047 (optional live sharing)
+- **Scope:** Log weather snapshots, ingest sensor/API data, render environmental overlays, and extend session metadata for analytics and compliance.【F:docs/ADR/ADR-053_WeatherPlugin.md†L9-L55】
+- **Key decisions:** Auto-logging cadence, overlay visualization, API/import integration, data retention, report builder hooks.【F:docs/ADR/ADR-053_WeatherPlugin.md†L21-L49】
+- **SRS alignment:** Job lifecycle (§03 weather events), Data model (§02 session weather), Mapping layers (§04 weather overlay), Frontends (§05 weather UI).【F:docs/SRS/sections/02_DataModel.md†L120-L210】【F:docs/SRS/sections/03_JobLifecycle.md†L80-L160】【F:docs/SRS/sections/04_MappingLayers.md†L150-L230】【F:docs/SRS/sections/05_Frontends.md†L170-L230】
+- **Primary requirements:** R-DATA-143…R-DATA-156, R-ANL-087…R-ANL-094, R-UX-113…R-UX-120.
+- **Tasks:** Extend session schema with weather snapshots, build sensor/API ingest pipeline, implement overlay rendering, provide timeline UI, integrate with report builder.
+- **Acceptance hooks:**
+  - Auto-logging writes weather snapshots at configured interval with drift < 10 seconds across a one-hour session.
+  - Weather overlay visualizes rainfall/temp/wind vectors with validated unit conversions.
+  - Report builder weather sections include timeline summaries and comply with export format requirements.
+
 ### ADR-033 — Guidance planner & autosteer orchestration
 - **Owner:** Core Owner — Guidance & Autonomy pod
 - **Stage:** Drafting (target review window: 2025-11-21 week)

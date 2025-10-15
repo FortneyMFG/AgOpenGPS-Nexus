@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
 using Aog.Core.Logging;

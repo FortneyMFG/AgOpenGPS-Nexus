@@ -132,6 +132,9 @@ public sealed class MainWindowViewModelTests
         snapshot.ReplayTimeline.SpeedSamples.Should().HaveCount(viewModel.ReplayTimeline.SpeedSamples.Count);
         snapshot.ReplayTimeline.HeadingSamples.Should().HaveCount(viewModel.ReplayTimeline.HeadingSamples.Count);
         snapshot.ReplayTimeline.Bookmarks.Should().HaveCount(viewModel.ReplayTimeline.Bookmarks.Count);
+    }
+
+    [Fact]
     public void MeshSharePanel_SurfacesSampleDevices()
     {
         var viewModel = CreateViewModel();
@@ -142,6 +145,21 @@ public sealed class MainWindowViewModelTests
         {
             device.DisplayName.Should().NotBeNullOrWhiteSpace();
             device.DeviceId.Should().NotBeNullOrWhiteSpace();
+        });
+    }
+
+    [Fact]
+    public void RadioProvisioningPanel_SurfacesProvisioningState()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.RadioProvisioningPanel.Should().NotBeNull();
+        viewModel.RadioProvisioningPanel.Devices.Should().NotBeEmpty();
+        viewModel.RadioProvisioningPanel.Profiles.Should().NotBeEmpty();
+        viewModel.RadioProvisioningPanel.AuditTrail.Should().NotBeEmpty();
+        viewModel.RadioProvisioningPanel.Devices.Should().AllSatisfy(device =>
+        {
+            device.Steps.Should().NotBeEmpty();
         });
     }
 

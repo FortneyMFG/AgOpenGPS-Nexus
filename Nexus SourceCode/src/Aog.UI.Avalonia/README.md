@@ -55,3 +55,13 @@ background tasks, and orchestration progress through `PresetOptionViewModel` and
 `PresetTaskStatusViewModel` records. The static `CreateSample()` helper wires the planter, sprayer, and
 harvest fixtures into `MainWindowViewModel` so UI shells can exercise status messaging without
 service dependencies.
+
+## Radio provisioning UI flows (NX-311)
+
+`RadioProvisioningPanelViewModel` surfaces the provisioning workflows aligned with
+[ADR-048](../../../docs/ADR/ADR-048_RadioBridge.md). The panel assembles
+`RadioProvisioningDeviceViewModel` records that track handshake, topic registry, key exchange, and
+reliability steps for each bridge, while `RadioProvisioningProfileViewModel` and
+`RadioProvisioningAuditEntryViewModel` expose generated keysets and operator-facing audit history. The
+sample card in `MainWindow` binds to `RadioProvisioningPanelViewModel.CreateSample()` so designers can
+exercise queue, diagnostics, and follow-up messaging without mesh hardware.

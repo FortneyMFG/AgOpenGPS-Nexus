@@ -331,11 +331,109 @@
             </StackPanel>
           </Border>
 
+          <!-- Profit analytics -->
           <!-- Layout diff viewer -->
           <Border Padding="16" CornerRadius="12"
                   Background="{DynamicResource ThemeBackgroundBrush}"
                   BorderBrush="{DynamicResource ThemeBorderLowBrush}"
                   BorderThickness="1"
+                  DataContext="{Binding ProfitAnalytics}"
+                  x:DataType="vm:ProfitAnalyticsViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Profit analytics" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding ScopeSummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                <TextBlock Text="{Binding LayerId}" FontSize="12" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                <TextBlock Text="{Binding LastUpdatedDisplay}" FontSize="12" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="16">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="Revenue" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding TotalRevenueDisplay}" FontSize="18" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="4">
+                  <TextBlock Text="Costs" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding TotalCostDisplay}" FontSize="18" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="4">
+                  <TextBlock Text="Net profit" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding NetProfitDisplay}" FontSize="18" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding MarginDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="3" Spacing="4">
+                  <TextBlock Text="Avg profit / ha" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding AverageProfitPerHectareDisplay}" FontSize="18" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding PositiveShareDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                </StackPanel>
+              </Grid>
+
+              <StackPanel Spacing="4">
+                <TextBlock Text="Legend" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding Legend}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <UniformGrid Columns="3"/>
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ProfitLegendBandViewModel">
+                      <Border Padding="10" Margin="2"
+                              CornerRadius="6"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <StackPanel Spacing="4">
+                          <Border Height="12" CornerRadius="4" Background="{Binding SwatchBrush}"/>
+                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+                          <TextBlock Text="{Binding RangeDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="4">
+                <TextBlock Text="Hotspots" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding Breakdowns}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ProfitBreakdownViewModel">
+                      <Border Padding="12" Margin="0,4"
+                              CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <Grid ColumnDefinitions="2*,*,*,*,*,*" ColumnSpacing="12">
+                          <TextBlock Text="{Binding ZoneName}" FontWeight="SemiBold"/>
+                          <TextBlock Grid.Column="1" Text="{Binding AreaDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          <TextBlock Grid.Column="2" Text="{Binding RevenueDisplay}"/>
+                          <TextBlock Grid.Column="3" Text="{Binding CostDisplay}"/>
+                          <TextBlock Grid.Column="4" Text="{Binding ProfitDisplay}" Foreground="{Binding ProfitBrush}" FontWeight="SemiBold"/>
+                          <TextBlock Grid.Column="5" Text="{Binding ProfitPerHectareDisplay}" Foreground="{Binding ProfitBrush}"/>
+                          <TextBlock Grid.Column="6" Text="{Binding MarginDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="4" IsVisible="{Binding HasAlerts}">
+                <TextBlock Text="Alerts" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding Alerts}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                      <Border Padding="8" Margin="0,2"
+                              CornerRadius="6"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                              BorderThickness="1">
+                        <TextBlock Text="{Binding}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
                   DataContext="{Binding LayoutDiff}"
                   x:DataType="vm:LayoutDiffViewModel">
             <StackPanel Spacing="12">

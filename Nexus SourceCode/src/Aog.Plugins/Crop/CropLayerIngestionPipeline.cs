@@ -187,32 +187,46 @@ public sealed class CropLayerIngestionPipeline
 
     private void ApplyComposite(LayerEditEventEntry entry, LayerEditEventOperation operation)
     {
-        foreach (var sourceId in operation.SourceFeatureIds)
+        var pendingRemovals = new HashSet<string>(operation.SourceFeatureIds ?? Array.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+        var feature = BuildFeature(entry, operation, pendingRemovals);
+
+        foreach (var sourceId in pendingRemovals)
         {
             _features.Remove(sourceId);
         }
 
-        ApplyCreate(entry, operation);
+        _features[operation.FeatureId] = feature;
     }
 
     private void ApplyCreate(LayerEditEventEntry entry, LayerEditEventOperation operation)
+    {
+        var feature = BuildFeature(entry, operation, null);
+        _features[operation.FeatureId] = feature;
+    }
+
+    private CropZoneFeature BuildFeature(LayerEditEventEntry entry, LayerEditEventOperation operation, ISet<string>? pendingRemovals)
     {
         if (string.IsNullOrWhiteSpace(operation.FeatureId))
         {
             throw new InvalidOperationException("Create operations must include a feature identifier.");
         }
 
-        if (_features.ContainsKey(operation.FeatureId))
+        var featureId = operation.FeatureId;
+
+        if (_features.ContainsKey(featureId))
         {
-            throw new InvalidOperationException($"Feature '{operation.FeatureId}' already exists in layer '{_layerId}'.");
+            if (pendingRemovals is null || !pendingRemovals.Contains(featureId))
+            {
+                throw new InvalidOperationException($"Feature '{featureId}' already exists in layer '{_layerId}'.");
+            }
         }
 
-        var geometry = CloneGeometry(operation.GeometryAfterNode, operation.FeatureId, required: true);
+        var geometry = CloneGeometry(operation.GeometryAfterNode, featureId, required: true);
         var attributes = ExtractAttributes(operation.AttributesAfterNode, null, requireAll: true);
         var area = ComputeArea(operation.Summary, null);
 
-        var feature = new CropZoneFeature(
-            operation.FeatureId,
+        return new CropZoneFeature(
+            featureId,
             attributes.Crop,
             attributes.Year,
             attributes.Status,
@@ -223,8 +237,6 @@ public sealed class CropLayerIngestionPipeline
             attributes.Notes,
             entry.CreatedAt,
             entry.Actor);
-
-        _features[operation.FeatureId] = feature;
     }
 
     private void ApplyUpdate(LayerEditEventEntry entry, LayerEditEventOperation operation)

@@ -19,3 +19,13 @@ The in-memory implementation is intentionally lightweight and free from I/O so
 unit tests and simulation harnesses can exercise lifecycle flows deterministically.
 Disk-backed persistence and TaskService integration will attach in follow-up
 NX-289/NX-290 tasks.
+
+## Regression fixtures (NX-290)
+
+`JobTasksFixtureCatalog` seeds deterministic job snapshots and lifecycle
+scenarios for regression tests and simulation harnesses. The catalog exposes
+`CreateSampleSnapshot()` for disk round-trips and
+`CreateLifecycleScenarioAsync()` for orchestrator event scripts. Fixtures reuse
+`JobSeasonSessionOrchestrator` so downstream components share the same
+provenance and timestamps when verifying persistence, resume markers, or UI
+progress indicators.

@@ -70,6 +70,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         SeasonNavigator = SeasonNavigatorViewModel.CreateSample();
         CropQuickSelect = CropQuickSelectViewModel.CreateSample();
+        PresetSwitcher = PresetSwitcherViewModel.CreateSample();
 
         // Load simulation configuration + summary and create the bar VM.
         var configuration = TryLoadSimulationConfiguration(out var summary);
@@ -152,6 +153,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the crop quick-select view-model surfaced in the field navigator.</summary>
     public CropQuickSelectViewModel CropQuickSelect { get; }
+
+    /// <summary>Gets the preset switcher view-model that surfaces orchestration status.</summary>
+    public PresetSwitcherViewModel PresetSwitcher { get; }
 
     /// <summary>Gets the available UI themes.</summary>
     public IReadOnlyList<UiTheme> AvailableThemes { get; }

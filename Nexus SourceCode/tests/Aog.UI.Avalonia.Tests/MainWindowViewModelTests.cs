@@ -51,6 +51,9 @@ public sealed class MainWindowViewModelTests
         viewModel.PlanterPanel.Rows.Should().HaveCountGreaterThan(0);
         viewModel.PlanterPanel.Rows.Single(row => row.RowIndex == 2).Quality.Should().Be(PlanterRowQuality.Double);
         viewModel.PlanterPanel.Summary.Should().Contain("Rows:");
+
+        viewModel.PresetSwitcher.Should().NotBeNull();
+        viewModel.PresetSwitcher.Presets.Should().NotBeEmpty();
     }
 
     [Fact]

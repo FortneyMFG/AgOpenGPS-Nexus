@@ -46,3 +46,12 @@ summaries, policy descriptions, and manual override commands. Overrides emit str
 and ISOXML transfers. Each `ZoneImportWorkflowViewModel` simulates policy validation, progress updates,
 and completion logging while `ZoneTransferEventViewModel` captures an activity timeline aligned with
 ADR-027 interop requirements.
+
+## Preset switcher and orchestration status (NX-297)
+
+`PresetSwitcherViewModel` models the preset selection card described in
+[ADR-032](../../../docs/ADR/ADR-032-presets-and-layout-linking.md). Presets expose dependency health,
+background tasks, and orchestration progress through `PresetOptionViewModel` and
+`PresetTaskStatusViewModel` records. The static `CreateSample()` helper wires the planter, sprayer, and
+harvest fixtures into `MainWindowViewModel` so UI shells can exercise status messaging without
+service dependencies.

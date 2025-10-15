@@ -250,3 +250,54 @@ public sealed class MeshPublication
     /// </summary>
     public object? State { get; }
 }
+
+/// <summary>
+/// Snapshot of mesh service diagnostics and counters.
+/// </summary>
+/// <param name="CapturedAt">Timestamp when the snapshot was taken.</param>
+/// <param name="RegisteredDeviceCount">Number of devices currently registered with the mesh.</param>
+/// <param name="ActiveSubscriptionCount">Number of active subscription streams.</param>
+/// <param name="ActivePresenceCount">Number of presence heartbeats that have not expired.</param>
+/// <param name="Acl">Aggregated access control violation counters.</param>
+/// <param name="Traffic">Aggregated traffic counters.</param>
+public sealed record MeshDiagnosticsSnapshot(
+    DateTimeOffset CapturedAt,
+    int RegisteredDeviceCount,
+    int ActiveSubscriptionCount,
+    int ActivePresenceCount,
+    MeshDiagnosticsAclSnapshot Acl,
+    MeshDiagnosticsTrafficSnapshot Traffic);
+
+/// <summary>
+/// Aggregated access control violation counters for the mesh service.
+/// </summary>
+/// <param name="PublishDenied">Number of publish attempts blocked by share ACLs.</param>
+/// <param name="PublishDeniedUnknownDevice">Number of publish attempts rejected for unknown devices.</param>
+/// <param name="SubscribeDenied">Number of subscribe attempts blocked by subscribe ACLs.</param>
+/// <param name="SubscribeDeniedUnknownDevice">Number of subscribe attempts rejected for unknown devices.</param>
+/// <param name="PresenceDenied">Number of presence updates blocked by share ACLs.</param>
+/// <param name="PresenceDeniedUnknownDevice">Number of presence updates rejected for unknown devices.</param>
+public sealed record MeshDiagnosticsAclSnapshot(
+    long PublishDenied,
+    long PublishDeniedUnknownDevice,
+    long SubscribeDenied,
+    long SubscribeDeniedUnknownDevice,
+    long PresenceDenied,
+    long PresenceDeniedUnknownDevice);
+
+/// <summary>
+/// Aggregated traffic counters for the mesh service.
+/// </summary>
+/// <param name="PublicationsAccepted">Number of publish requests accepted by the mesh.</param>
+/// <param name="PresenceBroadcasts">Number of presence updates accepted and broadcast.</param>
+/// <param name="PresenceExpirations">Number of presence snapshots expired due to TTL.</param>
+/// <param name="SubscriptionsOpened">Number of subscription streams successfully opened.</param>
+/// <param name="FanoutDelivered">Number of publication fan-out deliveries performed.</param>
+/// <param name="FanoutDropped">Number of deliveries dropped because subscribers were unavailable.</param>
+public sealed record MeshDiagnosticsTrafficSnapshot(
+    long PublicationsAccepted,
+    long PresenceBroadcasts,
+    long PresenceExpirations,
+    long SubscriptionsOpened,
+    long FanoutDelivered,
+    long FanoutDropped);

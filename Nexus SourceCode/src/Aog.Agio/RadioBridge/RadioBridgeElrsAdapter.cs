@@ -78,7 +78,7 @@ public sealed class RadioBridgeElrsAdapter : IHostedService, IDisposable
 
         _link = _linkFactory.Create(_options);
         _link.LinkMetricsChanged += OnLinkMetricsChanged;
-        OnLinkMetricsChanged(_link.CurrentMetrics);
+        UpdateTransportLinkMetrics(_link.CurrentMetrics);
 
         _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
@@ -372,6 +372,11 @@ public sealed class RadioBridgeElrsAdapter : IHostedService, IDisposable
     }
 
     private void OnLinkMetricsChanged(RadioBridgeLinkMetrics metrics)
+    {
+        UpdateTransportLinkMetrics(metrics);
+    }
+
+    private void UpdateTransportLinkMetrics(RadioBridgeLinkMetrics metrics)
     {
         if (_transport is null)
         {

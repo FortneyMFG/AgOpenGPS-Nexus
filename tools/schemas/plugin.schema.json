@@ -8,8 +8,8 @@
     "id",
     "name",
     "version",
-    "requiredApis",
     "minimumRuntimeVersion",
+    "requiredApis",
     "simProviders"
   ],
   "additionalProperties": false,

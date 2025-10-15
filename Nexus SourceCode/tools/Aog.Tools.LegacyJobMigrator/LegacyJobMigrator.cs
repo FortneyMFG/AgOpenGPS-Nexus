@@ -142,16 +142,13 @@ public sealed class LegacyJobMigrator
             WriteIndented = options.WriteIndented,
         });
 
-        var tempPath = Path.GetTempFileName();
+        var outputDirectory = Path.GetDirectoryName(outputPath) ?? Environment.CurrentDirectory;
+        Directory.CreateDirectory(outputDirectory);
+
+        var tempPath = Path.Combine(outputDirectory, $".{Path.GetFileName(outputPath)}.{Guid.NewGuid():N}.tmp");
         try
         {
             await File.WriteAllTextAsync(tempPath, json, cancellationToken).ConfigureAwait(false);
-            var outputDirectory = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrEmpty(outputDirectory))
-            {
-                Directory.CreateDirectory(outputDirectory);
-            }
-
             File.Move(tempPath, outputPath, overwrite: true);
         }
         finally

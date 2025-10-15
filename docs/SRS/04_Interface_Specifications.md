@@ -22,13 +22,13 @@
 ### 0xD9 – Gauge Block (u8, up to six signals)
 - **Layout (CAN):**
   - Bytes 0–5: `segmentPayload`
-    - When `segment` (byte 6) is `0`, the payload contains `gaugeId0..gaugeId5`.
-    - When `segment` is `1`, the payload contains `value0..value5` aligned with the previously delivered IDs.
+    - When `segment` (byte 6) is `0`, the payload contains `gaugeId0..gaugeId5` in ascending index order. Only the first `count` bytes are populated; remaining bytes are set to `0`.
+    - When `segment` is `1`, the payload contains `value0..value5` aligned with the most recently delivered IDs. Only the first `count` bytes are populated; remaining bytes are set to `0xFF`.
   - Byte 6: `segment`
-    - `0`: Gauge ID segment (announces up to six IDs).
-    - `1`: Value segment (delivers the matching byte values).
-  - Byte 7: `count` (number of gauges in this block, 1–6).
-- **CAN sequencing:** Send an ID segment first (segment = 0) followed immediately by a value segment (segment = 1) using the same `count`. Receivers cache the most recent ID segment per source and apply subsequent value segments until a new ID segment arrives. Missing values use `0xFF`.
+    - `0`: Gauge ID segment (announces up to six IDs that will be refreshed by the paired value segment).
+    - `1`: Value segment (delivers the matching byte values for the cached IDs).
+  - Byte 7: `count` (number of gauges in this block, 1–6, matching both the ID and value segments).
+- **CAN sequencing:** Transmit an ID segment first (`segment = 0`) followed immediately by a value segment (`segment = 1`) using the same `count`. Receivers cache the most recent ID segment per source and apply subsequent value segments until a new ID segment arrives. Missing values use `0xFF`.
 - **UDP extension:** Continue to support the variable-length `[gId0..gIdN][value0..valueN]` envelope inside a single datagram; the CAN segmentation rule does not apply to UDP payloads.
 - **Guidance:** Use 0xD9 for gauges that natively fit in 8 bits and reserve 0xDA for wider ranges.
 

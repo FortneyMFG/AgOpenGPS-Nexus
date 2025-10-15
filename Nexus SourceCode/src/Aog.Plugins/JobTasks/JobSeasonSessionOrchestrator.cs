@@ -275,6 +275,10 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
         {
             var state = GetJobState(jobId);
             var (session, index) = state.GetSessionWithIndex(sessionId);
+            if (session.State == JobSessionState.Completed)
+            {
+                return CloneSession(session);
+            }
             var now = _timeProvider.GetUtcNow();
 
             var updated = session with

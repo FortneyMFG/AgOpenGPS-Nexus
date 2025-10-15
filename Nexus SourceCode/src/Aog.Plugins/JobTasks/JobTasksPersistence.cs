@@ -82,12 +82,23 @@ public sealed class JobTasksPersistence
 
         var snapshot = JobDocumentFactory.ToSnapshot(document);
         var layout = snapshot.Layout;
+        var normalizedJobRoot = Path.GetFullPath(jobRoot);
+        var manifestRoot = string.IsNullOrWhiteSpace(layout.JobRoot)
+            ? normalizedJobRoot
+            : Path.GetFullPath(layout.JobRoot);
+
+        var defaultDataDirectory = Path.GetFullPath(Path.Combine(normalizedJobRoot, "data"));
+        var defaultResumeFile = Path.GetFullPath(Path.Combine(normalizedJobRoot, "Resume.txt"));
+        var defaultAttachmentsDirectory = Path.GetFullPath(Path.Combine(normalizedJobRoot, "attachments"));
+
         var resolvedLayout = layout with
         {
-            JobRoot = string.IsNullOrWhiteSpace(layout.JobRoot) ? jobRoot : layout.JobRoot,
-            DataDirectory = string.IsNullOrWhiteSpace(layout.DataDirectory) ? Path.Combine(jobRoot, "data") : layout.DataDirectory,
-            ResumeFile = string.IsNullOrWhiteSpace(layout.ResumeFile) ? Path.Combine(jobRoot, "Resume.txt") : layout.ResumeFile,
-            AttachmentsDirectory = layout.AttachmentsDirectory
+            JobRoot = normalizedJobRoot,
+            DataDirectory = ResolveLayoutPath(layout.DataDirectory, manifestRoot, normalizedJobRoot, defaultDataDirectory),
+            ResumeFile = ResolveLayoutPath(layout.ResumeFile, manifestRoot, normalizedJobRoot, defaultResumeFile),
+            AttachmentsDirectory = layout.AttachmentsDirectory is null
+                ? null
+                : ResolveLayoutPath(layout.AttachmentsDirectory, manifestRoot, normalizedJobRoot, defaultAttachmentsDirectory)
         };
 
         if (resolvedLayout.AttachmentsDirectory is null)
@@ -95,11 +106,45 @@ public sealed class JobTasksPersistence
             var defaultAttachments = Path.Combine(resolvedLayout.JobRoot, "attachments");
             if (Directory.Exists(defaultAttachments))
             {
-                resolvedLayout = resolvedLayout with { AttachmentsDirectory = defaultAttachments };
+                resolvedLayout = resolvedLayout with { AttachmentsDirectory = Path.GetFullPath(defaultAttachments) };
             }
         }
 
         return snapshot with { Layout = resolvedLayout };
+    }
+
+    private static string ResolveLayoutPath(string? candidate, string manifestRoot, string jobRoot, string fallback)
+    {
+        if (string.IsNullOrWhiteSpace(candidate))
+        {
+            return fallback;
+        }
+
+        var normalizedFallback = Path.GetFullPath(fallback);
+        var normalizedJobRoot = Path.GetFullPath(jobRoot);
+        var normalizedManifestRoot = Path.GetFullPath(manifestRoot);
+
+        var absoluteCandidate = Path.IsPathFullyQualified(candidate)
+            ? Path.GetFullPath(candidate)
+            : Path.GetFullPath(Path.Combine(normalizedManifestRoot, candidate));
+
+        var relativeToManifest = Path.GetRelativePath(normalizedManifestRoot, absoluteCandidate);
+        if (IsOutsideRoot(relativeToManifest))
+        {
+            return normalizedFallback;
+        }
+
+        var rebased = Path.GetFullPath(Path.Combine(normalizedJobRoot, relativeToManifest));
+        return IsOutsideRoot(Path.GetRelativePath(normalizedJobRoot, rebased))
+            ? normalizedFallback
+            : rebased;
+    }
+
+    private static bool IsOutsideRoot(string relativePath)
+    {
+        return relativePath == ".."
+            || relativePath.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal)
+            || (Path.DirectorySeparatorChar == '\\' && relativePath.StartsWith("../", StringComparison.Ordinal));
     }
 
     private static void EnsureDirectories(JobStoreLayout layout)

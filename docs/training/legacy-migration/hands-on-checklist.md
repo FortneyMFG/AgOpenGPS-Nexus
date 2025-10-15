@@ -10,16 +10,15 @@ Record the operator name and workstation ID at the top of the printed copy.
 2. **Run the translator**
    - Open a terminal and execute:
      ```
-     legacy-tool translate --machine ./Machine.xml --fields ./Fields --output ./translated
+     legacy-tool translate --input ./Machine.xml --output ./translated/machine-profile.json
      ```
-   - Confirm `translated/machine-profile.json` and `translated/field-assets/`
-     are created with the current timestamp.
+   - Confirm `translated/machine-profile.json` is created with the current timestamp.
    - Review the console output for warnings and resolve any issues before
      proceeding.
 3. **Validate IO timing**
-   - Replay the provided soak capture:
+   - Start the synthetic soak:
      ```
-     legacy-tool soak --capture ./udp-soak.bin --seconds 30 --report translated/soak-report.json
+     legacy-tool soak --seconds 30 --output translated/soak-report.json
      ```
    - Open the JSON report and confirm pose, steering, and section frames all
      equal 30 with an effective rate near 90 Hz.

@@ -144,6 +144,16 @@ public readonly struct IsobusMessage
         var priority = datagram[6];
         var length = datagram[7];
 
+        if (pgn > 0x3FFFF)
+        {
+            return false;
+        }
+
+        if (length > 223)
+        {
+            return false;
+        }
+
         if (length + 8 != datagram.Length)
         {
             return false;

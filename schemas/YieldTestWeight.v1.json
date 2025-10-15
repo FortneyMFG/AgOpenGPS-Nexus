@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agopengps.org/schemas/YieldTestWeight.v1.json",
   "title": "YieldTestWeight.v1",
+  "x-nexus-actual": true,
   "x-nexus-layerId": "yield.testWeight",
   "type": "object",
   "allOf": [

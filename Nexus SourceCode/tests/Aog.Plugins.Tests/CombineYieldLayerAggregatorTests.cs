@@ -8,6 +8,7 @@ using Aog.Core.Eventing;
 using Aog.Core.V1;
 using Aog.Plugins.CombineYield;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace Aog.Plugins.Tests;

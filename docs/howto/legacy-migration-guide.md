@@ -24,19 +24,17 @@ migration before touching production hardware.
      directory. Ensure the directory snapshot is read-only before continuing.
    - Record current firmware versions and confirm the bench harness matches the
      in-field wiring.
-2. **Translate configuration with `legacy-tool translate`**
-   - Run `legacy-tool translate --machine ./Machine.xml --fields ./Fields` to
-     produce a `machine-profile.json` and `field-assets/` folder.
-   - Archive the CLI output alongside the original XML/TXT files. The JSON
-     bundle is the source of truth for Nexus after migration.
-   - Review warnings emitted by the translator. Address missing offsets or
-     duplicate sections inside the legacy configuration before retrying.
-3. **Validate IO timing with `legacy-tool soak`**
-   - Replay a 30-second UDP capture on the bench and run
-     `legacy-tool soak --seconds 30 --report soak.json`.
-   - Confirm pose, steering command/state, and section frames report matched
-     totals. Investigate discrepancies before moving to the live machine.
-   - File the soak report with the migration ticket so QA can audit the run.
+2. **Translate configuration with `legacy-tool translate`** 
+   - Run `legacy-tool translate --input ./Machine.xml --output ./translated/machine-profile.json` to capture the machine profile, tuning, and section layout in a single JSON report. 
+   - Archive the CLI output alongside the original XML/TXT files. The JSON 
+     report is the source of truth for Nexus after migration. 
+   - Review warnings emitted by the translator. Address missing offsets or 
+     duplicate sections inside the legacy configuration before retrying. 
+3. **Validate IO timing with `legacy-tool soak`** 
+   - Execute `legacy-tool soak --seconds 30 --output ./translated/soak-report.json` to run a synthetic 30-second stress test against the legacy codecs. 
+   - Confirm pose, steering command/state, and section frames report matched 
+     totals. Investigate discrepancies before moving to the live machine. 
+   - File the soak report with the migration ticket so QA can audit the run. 
 4. **Import geometry via the Nexus wizard**
    - Launch Nexus and open **File → Import legacy assets…**.
    - Select the translated `field-assets/` folder. Preview each boundary and

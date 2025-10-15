@@ -20,6 +20,7 @@
     "costPerArea": 420.1,
     "profitPerArea": 360.4,
     "currency": "USD",
+    "costLayerIds": ["layer:cost.input.seed.2025"],
     "yieldLayerId": "layer:yield.actual.2025",
     "costRecordIds": ["cost:seed-north40-1", "cost:fuel-north40-1"]
   }

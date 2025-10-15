@@ -80,6 +80,12 @@
       "description": "Layer reference if the cost applies to a spatial overlay.",
       "x-nexus-scope": "plugin"
     },
+    "inventoryLotId": {
+      "type": ["string", "null"],
+      "pattern": "^inventory:[A-Za-z0-9._:-]+$",
+      "description": "Inventory lot reference when the cost deducts from tracked stock.",
+      "x-nexus-scope": "plugin"
+    },
     "metadata": {
       "type": "object",
       "description": "Plugin-owned metadata (supplier, invoice numbers, notes).",

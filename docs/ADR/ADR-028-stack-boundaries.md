@@ -37,6 +37,11 @@ The plugin manifest declares the capability bands below. Each band maps to the C
 4. **Plugin execution:** Plugins subscribe to the exported services, apply their domain logic, and emit commands or analytics only within the scopes granted in their manifest. Health and lease updates flow back into Core for supervision.【F:docs/ADR/ADR-018-plugin-api.md†L12-L34】
 5. **Operator interface:** UI shells consume Core and plugin feeds, drive configuration, and display health/constraint status without bypassing arbitration, preserving a single audit trail.【F:docs/ADR/ADR-003-avalonia-ui.md†L15-L28】【F:docs/ADR/ADR-018-plugin-api.md†L12-L26】
 
+## Governance Updates
+- **Drift monitoring.** Quarterly audits review each layer against the responsibility matrix. Variances become NX tasks with owners and due dates, and the report archives live in the architecture workspace.
+- **CI guardrails.** Static analysis checks flag cross-layer references. Pull requests adding new dependencies must include a justification linking to ADR updates or waivers approved by architecture leads.
+- **Program reporting.** Release notes summarize boundary audits so stakeholders know which exceptions remain and when remediation is scheduled.
+
 ## Consequences
 - **Aligned planning:** Contributors can assign features to the correct layer without reopening earlier ADRs because the responsibilities table summarizes contract boundaries.【F:docs/ADR/ADR-018-plugin-api.md†L12-L34】
 - **Safety clarity:** Automation developers see where constraint gates, leases, and watchdogs live, reducing the chance of bypassing Core arbitration.【F:docs/SRS/sections/09_Control_Automation.md†L16-L56】

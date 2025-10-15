@@ -17,6 +17,11 @@ Turning PoseStream-derived datasets (yield, soil, NDVI) into actionable prescrip
 - Formalizing recipes and QA metrics increases initial tooling complexity but improves observability and auditing.
 - Exporters and interop adapters must consume derived outputs using consistent metadata and provenance links.
 
+## Governance Updates
+- **Human-in-the-loop QA.** Representative agronomic partners review quarterly derived-product updates using curated field datasets. Approvals and feedback are logged in the provenance system.
+- **Reference datasets.** Public benchmark packs define acceptable variance thresholds per product type. CI enforces these bounds and blocks releases exceeding tolerance.
+- **Change notification.** Recipe adjustments trigger alerts to dependent prescription services and include reproducibility bundles for verification before rollout.
+
 ## Validation
 - Prescription derivations must complete within four minutes for a 160-acre reference field, including smoothing and ROI masking stages.
 - QA report generator must compute coverage, variance, and RMSE metrics with ≤ 0.5% deviation from analytical goldens across the regression suite.

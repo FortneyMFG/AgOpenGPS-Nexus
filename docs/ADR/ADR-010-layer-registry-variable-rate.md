@@ -17,6 +17,11 @@ Variable-rate workflows, analytics, and dashboards require a canonical catalog o
 - Registry publication and hash enforcement introduce operational overhead but provide deterministic compatibility checks across deployments.
 - Migration guides must translate prior variable-rate catalogs into the new schema to keep historical data actionable.
 
+## Governance Updates
+- **Registry beta.** The Layer Registry launched a constrained beta that reserves identifier namespaces and enforces submission templates. Early adopters sign contribution agreements covering SLA response within five business days.
+- **Governance charter.** Published workflow defines proposal intake, review quorum, deprecation policy, and appeals. Automation syncs accepted definitions into CI so downstream ADRs consume the same catalog.
+- **Deprecation handling.** Deprecated layers require dual publishing windows with compatibility adapters, and removal dates are broadcast 90 days in advance via release notes and operator mailers.
+
 ## Validation
 - LayerDefinition validator must reject inconsistent units/precision combinations with explicit error codes and ≥ 95% branch coverage in unit tests.
 - Registry publish automation must emit signed manifests and propagate updates to plugin registries within three minutes, demonstrated in CI.

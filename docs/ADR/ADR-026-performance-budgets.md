@@ -17,6 +17,11 @@ As Nexus integrates PoseStream, controllers, and visualization pipelines, perfor
 - Budget enforcement may block merges when regressions occur, increasing short-term friction but improving long-term stability.
 - Telemetry and CI systems incur additional load to collect, store, and visualize performance data.
 
+## Governance Updates
+- **Metric schema standardization.** Shared telemetry schema defines metric names, units, and labels, enforced through CI to ensure comparability across Core and plugins.
+- **Open exporters.** Standard exporters (OpenTelemetry collectors) ship with default dashboards, enabling consistent observability across environments.
+- **Alert rehearsals.** On-call teams run semi-annual dry runs of alert playbooks, verifying paging routes, mitigation steps, and communication templates.
+
 ## Validation
 - Budget catalog must enumerate CPU/IO/FPS thresholds and export JSON consumed by CI pipelines.
 - Instrumentation must capture 95th percentile latency metrics and publish to dashboards within 60 seconds of run completion.

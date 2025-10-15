@@ -44,6 +44,11 @@ Example JSON representation:
   - Update guidance and section plugins to subscribe to zones, integrate keep-out costs, and honor constraint gates.
   - Ship UI editors/importers aligned with the shared schema and provenance logging.
 
+## Governance Updates
+- **Policy engine.** Constraints evaluate through a policy engine that supports conditional rules (crop stage, weather) without recompiling plugins. Policies are versioned and auditable.
+- **Offline editors.** Operators receive offline editing tools with simulation previews that validate constraint changes before deployment.
+- **Change management.** Constraint updates require sign-off from agronomy and safety leads, with provenance entries capturing rationale and expected outcomes.
+
 ## Validation
 - **Zone propagation latency:** 95th percentile zone-mask propagation latency must remain ≤ 120 ms from ingest to section arbiter under a 20 Hz PoseStream load on the reference simulation fixture.
 - **Constraint fault injection:** Forced keep-out toggles must block section enable within two PoseStream frames and emit override telemetry with actor, reason, and expiry populated for audit.

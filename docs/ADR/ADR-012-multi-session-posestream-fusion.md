@@ -17,6 +17,11 @@ Operations often blend PoseStreams from multiple machines and seasons (e.g., pla
 - Fusion introduces computational overhead and dependency on precise CRS utilities, requiring performance and accuracy monitoring.
 - Provenance tracking becomes mandatory across merged datasets, necessitating updates to storage schemas and UI surfacing.
 
+## Governance Updates
+- **Fusion recipe registry.** Recipes are published as signed manifests referencing provenance records and CRS configurations. Registry entries include owner, validation status, and retirement plan.
+- **Stress suite coverage.** Dense overlap, conflicting CRS, and noisy GNSS fixtures must pass determinism and accuracy thresholds before recipes become defaults. Failures block promotion until mitigations are merged.
+- **Audit trail.** Recipe updates automatically notify dependent analytics teams and append change summaries to the provenance ledger for traceability.
+
 ## Validation
 - Fusion outputs must maintain ≤ 3 cm positional drift after CRS reprojection when merging two RTK-quality PoseStreams.
 - Priority arbitration must uphold configured authority hierarchies across 200 randomized scenarios, logging the selected source for audit.

@@ -17,6 +17,11 @@ The Nexus guidance stack must reconcile legacy planners (AB, curve, turn) and co
 - Porting and refactoring legacy planners introduces significant testing burden but unlocks integration with plugins and telemetry.
 - Autosteer firmware must adapt to new orchestration signals, requiring validation on hardware benches.
 
+## Governance Updates
+- **Validation ladder.** Guidance programs progress through simulation-only, hardware-in-the-loop, and field pilot stages with documented exit criteria tied to spatial constraint metrics.
+- **Fallback behaviors.** Automation loss triggers documented manual handover cues (audio, HUD banners) consistent across products. Playbooks include operator drills prior to release.
+- **Telemetry capture.** Each validation stage records telemetry and incident reports which feed back into guidance tuning cycles.
+
 ## Validation
 - Guidance regression suite must achieve ≤ 4 cm lateral RMS error versus legacy traces across AB, curve, and adaptive headland fixtures.
 - Constraint fault-injection tests must force autosteer disengagement within 150 ms of zone mask conflicts while logging controlling constraints.

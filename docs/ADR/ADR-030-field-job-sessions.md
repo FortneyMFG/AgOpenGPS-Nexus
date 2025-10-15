@@ -27,6 +27,11 @@ Establish Jobs as a first-class concept spanning Core, UI, and plugins with the 
 - **Shared layout & preset context.** Jobs may reference presets or layouts by link or snapshot, letting seasonal layout updates propagate automatically while preserving overrides when required.
 - **Follow-up work.** Implement the `aog.job.v1` schema and helpers, build the JobsService host, refresh the UI menu and drawer, port ISOXML/KML importers, add Drive-In discovery with geofence indexing, wire autosave + coverage journaling, and provide migration tools for V6 archives.
 
+## Governance Updates
+- **Schema migration tooling.** JobsService ships a semantic diff tool that highlights layout, asset, and provenance changes between versions. Migration PRs must attach generated reports.
+- **Transactional hooks.** Plugin hook contracts declare commit/rollback semantics. Core enforces these hooks so partial failures revert gracefully and log reasons.
+- **Release gates.** Before promoting schema changes, maintainers run full job lifecycle rehearsals (create, execute, archive) covering automation hooks and UI integrations.
+
 ## Validation
 - **Crash recovery:** Resume-from-crash workflows must restore the previously active job within 8 seconds and avoid duplicating more than one PoseStream segment in journal entries.
 - **Migration coverage:** The legacy archive migration harness must successfully convert at least 50 representative V6 jobs without schema validation failures, emitting warnings whenever fields are downgraded or skipped.

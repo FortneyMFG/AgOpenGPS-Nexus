@@ -17,6 +17,11 @@ Nexus relies on deterministic replays to validate PoseStream, TileStore, and con
 - Teams must update workflows to address determinism failures promptly, potentially slowing merges but improving reliability.
 - Replay tooling must support hash comparisons and diagnostics, increasing complexity but aiding investigations.
 
+## Governance Updates
+- **Unified dashboards.** Determinism hashes, runtime budgets, and hardware telemetry feed a shared Grafana board with release gating thresholds. Deviations beyond two cycles trigger automatic release holds.
+- **Escalation criteria.** Reliability charter defines Sev2 when replay drift exceeds tolerance for two consecutive builds, escalating to the program review board within 24 hours.
+- **Budget alignment.** Performance budget ADR alignment ensures replay CI reports include CPU, GPU, and memory deltas compared to baselines, enabling quick root-cause triage.
+
 ## Validation
 - Replay harness must execute 60-minute fixtures in under 12 minutes wall-clock on CI agents while maintaining determinism across OS variants.
 - Hash verification tooling must detect single-sample perturbations and fail CI within one minute of regression detection.

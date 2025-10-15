@@ -17,6 +17,11 @@ Nexus needs deterministic section control behavior that honors manual overrides,
 - Arbitration logic introduces complexity that requires thorough simulation, replay, and UI feedback loops.
 - Plugins must adapt to new lifecycle hooks and permission gating to participate in control decisions.
 
+## Governance Updates
+- **Formal verification.** Section controller state charts undergo automated invariant checks (deadlock, mutual exclusion). Results ship with implementation PRs and feed into CI gating.
+- **Simulation integration.** SimBus scenarios exercise safety interlocks and override paths. Plugins introducing new behaviors must add constraint-aware simulations before release.
+- **Operator override logging.** Overrides now emit structured provenance entries (timestamp, operator, reason) aligned with audit retention policies.
+
 ## Validation
 - Section control simulator must keep overlap error ≤ 8% against agronomic goldens across diverse replay fixtures.
 - Manual overrides must pre-empt plugin commands within 100 ms and log actor plus duration in telemetry streams.

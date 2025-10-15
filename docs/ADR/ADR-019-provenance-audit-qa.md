@@ -17,6 +17,11 @@ As Nexus orchestrates multi-layer analytics and prescriptions, the platform must
 - Additional storage and UI surfaces are required to store and present provenance metadata, increasing implementation scope.
 - CI pipelines must compute and compare hashes, adding runtime overhead but preventing silent drift.
 
+## Governance Updates
+- **Retention SLAs.** Provenance logs retain seven years of audit entries by default, with configurable reductions only after legal approval. Automated jobs verify retention boundaries monthly.
+- **Tamper-evident storage.** Hash chains and Merkle proofs back every provenance bundle, allowing auditors to verify integrity offline.
+- **Incident response integration.** Incident playbooks include mandatory provenance checkpoint review and recovery steps, ensuring audit trails remain trustworthy during outages.
+
 ## Validation
 - Provenance records must apply SHA-256 hash stamps to PoseStream and tile artifacts with 100% match against regression goldens.
 - UI badges must reflect QA state transitions within two seconds of provenance updates with verified telemetry events.

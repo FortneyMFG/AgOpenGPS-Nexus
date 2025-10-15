@@ -17,6 +17,11 @@ Nexus requires a single authoritative timeline that carries tractor, implement, 
 - Replay tooling must ingest PoseStream outputs and preserve ordering to remain within determinism budgets.
 - Legacy components will require shims to adapt multi-stream pose logs into the new combined format.
 
+## Governance Updates
+- **Schema evolution rules.** PoseStream payloads accept additive-only field changes with reserved IDs tracked in a central registry. Dual-write shims cover consumers for at least one minor release before removals and require downgrade verification in replay CI.
+- **Chaos validation.** Integration suites now include packet duplication, reorder, and ±75 ms clock skew bursts. Contributors must publish deterministic expectations for each case and prove downstream tallies stay within tolerance.
+- **Consumer sign-off.** Equipment hierarchy, guidance, and persistence teams run acceptance scripts on recorded agronomic traces before PoseStream schema changes graduate from feature flags.
+
 ## Validation
 - PoseStream diff compression must maintain ≤ 2.5 KB median frame payload at 20 Hz for 48-section rigs under replay testing.
 - Opportunity/event tallies derived from PoseStream must match analytical goldens within 1% per hectare across the regression suite.

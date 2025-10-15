@@ -25,6 +25,11 @@ Plugins register simulation providers against this fabric and must respect seede
   - Define the topic catalog and schema ownership within the forthcoming protobuf contracts (NX-003/NX-004).
   - Implement regression vectors and seeded scenarios as part of the CI smoke suite (future NX testing tasks).
 
+## Governance Updates
+- **SimBus topic registry.** Core maintains a signed YAML registry enumerating topic names, payload schemas, version history, and maximum payload sizes. Pull requests that introduce new topics must update the registry and attach determinism fixtures before CI accepts the change.
+- **Determinism lint tooling.** A command-line validator rejects builds when topics lack registered schemas or publish payloads exceeding size budgets. Plugin authors receive local tooling to rehearse registration before opening PRs.
+- **Regression fixture cadence.** Quarterly scenario packs replay weather, GNSS drift, and failure injections. New topics must supply at least two chaos scripts (e.g., packet duplication, latency spikes) that Core incorporates into the shared suite.
+
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
 - Simulation lives inside the monolithic `CSim` helper, which synthesizes GNSS/IMU data in-process without a shared bus or external plugin hooks, limiting reuse and determinism across tools.【F:docs/porting/V6-Inventory.md†L45-L49】

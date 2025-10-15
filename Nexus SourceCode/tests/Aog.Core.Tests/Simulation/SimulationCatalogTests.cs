@@ -90,4 +90,22 @@ public sealed class SimulationCatalogTests
         summary.Should().Contain("outputs: [time]");
         summary.Should().Contain("inputs: []");
     }
+
+    [Fact]
+    public void BuildGraph_Throws_WhenInputTopicIsUnresolved()
+    {
+        var vehicle = new SimulationProviderDescriptor(
+            "sim.vehicle",
+            outputs: new[] { "pose" },
+            inputs: new[] { "time" });
+
+        var catalog = new SimulationCatalog();
+        catalog.Register(vehicle);
+
+        var action = () => catalog.BuildGraph();
+
+        action.Should().Throw<InvalidOperationException>()
+            .WithMessage("*sim.vehicle*")
+            .WithMessage("*time*");
+    }
 }

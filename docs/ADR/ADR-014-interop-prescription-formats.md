@@ -1,0 +1,30 @@
+# ADR-014: Interop for prescription and agronomic formats
+
+## Status
+Drafting (target review window: 2025-11-26 week)
+
+## Context
+Nexus must import and export industry-standard agronomic formats—ISOXML TaskData, GeoTIFF/COG rasters, Shapefile/GeoPackage vectors, MBTiles tilesets—while honoring units, CRS, and attribute mapping. Current pipelines rely on bespoke scripts that lose metadata and introduce spatial error. ADR-014 defines canonical interop behavior aligned with ADR-010 layer registry metadata, ADR-022 CRS policy, and ADR-013 derivation outputs.
+
+## Decision
+- Adopt ISOXML TaskData as the primary vector prescription format, with GeoPackage as a fallback and GeoTIFF/COG for raster outputs, ensuring consistent naming and attribute conventions.
+- Normalize units and CRS according to ADR-022, including audit logging for every transformation and conversion.
+- Provide import/export tooling that maps attributes into Nexus layer metadata and captures provenance links for ADR-019.
+- Supply sample fixtures and validation harnesses to maintain compatibility across releases and detect regressions.
+
+## Consequences
+- Operators gain predictable import/export flows across major agronomic systems, improving interoperability and data retention.
+- Enforcing canonical formats and audit logging increases tooling complexity but mitigates field surprises and compliance risks.
+- Existing scripts and UI flows must adapt to new schemas and validation checks, requiring documentation and training updates.
+
+## Validation
+- ISOXML TaskData importer/exporter must retain 100% of task attributes with ≤ 2 cm spatial error against canonical fixtures.
+- GeoTIFF/COG pipelines must preserve raster statistics (mean, stdev) within 0.2% after compression/decompression across sample datasets.
+- Interop audit log must capture CRS transformations and unit conversions for every import/export, verified via automated scenarios.
+
+## References
+- [Communications & transports requirements](../SRS/sections/03_Comm_Transports.md)
+- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
+- [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
+- [ADR-013: Derived products and prescription analytics](ADR-013-derived-products-analytics-prescriptions.md)
+- [ADR-022: CRS, units, and precision policy](ADR-022-crs-units-precision-policy.md)

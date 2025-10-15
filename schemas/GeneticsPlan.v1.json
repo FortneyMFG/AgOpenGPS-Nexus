@@ -4,6 +4,8 @@
   "title": "GeneticsPlan.v1",
   "type": "object",
   "additionalProperties": false,
+  "x-nexus-layerId": "genetics.plan",
+  "x-nexus-planned": true,
   "required": ["id", "layerId", "jobId", "createdAt", "createdBy", "brand", "product"],
   "properties": {
     "id": {

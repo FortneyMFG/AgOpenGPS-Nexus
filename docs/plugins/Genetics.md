@@ -13,7 +13,7 @@ The Genetics plugin tracks planned and actual seed varieties, barcode scans, and
 
 ## Data Model & Storage
 
-- Store planned and actual layers using the JSON schemas `schemas/GeneticsPlan.v1.json` and `schemas/GeneticsVariety.v1.json`. Fields include seed identifiers, lot numbers, treatment codes, barcode payloads, and authoring metadata.【F:schemas/GeneticsPlan.v1.json†L1-L120】【F:schemas/GeneticsVariety.v1.json†L1-L120】
+- Store planned and actual layers using the JSON schemas `schemas/GeneticsPlan.v1.json` and `schemas/GeneticsVariety.v1.json`. Fields include seed identifiers, lot numbers, treatment codes, barcode payloads, and authoring metadata.【F:schemas/GeneticsPlan.v1.json†L1-L120】【F:schemas/GeneticsVariety.v1.json†L1-L120】 Layer registry metadata flags `genetics.plan` as planned and `genetics.variety` as session-bound actual layers so controllers negotiate capabilities deterministically.【F:docs/reference/layer-registry-genetics.md†L1-L33】
 - Reference crop type context from `cropType.planned`/`cropType.actual` layers to support rotation analytics and agronomic reports.【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】
 
 ## UX Requirements

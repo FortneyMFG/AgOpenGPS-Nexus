@@ -93,8 +93,6 @@ public sealed class LegacyUdpGateway
             throw new ArgumentNullException(nameof(command));
         }
 
-        _actuatorFailsafe.ReportHeartbeat();
-
         var filteredCommand = _actuatorFailsafe.FilterSteerCommand(command);
         SectionMask? filteredSections = null;
 
@@ -102,6 +100,8 @@ public sealed class LegacyUdpGateway
         {
             filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
         }
+
+        _actuatorFailsafe.ReportHeartbeat();
 
         var frame = _steerCodec.EncodeSteerCommand(filteredCommand, filteredSections, metadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);

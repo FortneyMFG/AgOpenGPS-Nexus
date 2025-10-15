@@ -161,7 +161,7 @@ public sealed class SeasonNavigatorViewModel : ObservableObject
     }
 
     /// <summary>Gets the seasons available in the navigator after filtering.</summary>
-    public ReadOnlyObservableCollection<SeasonSummaryViewModel> Seasons => _readOnlyFilteredSeasons;
+    public IReadOnlyList<SeasonSummaryViewModel> Seasons => _readOnlyFilteredSeasons;
 
     /// <summary>Gets or sets the selected season in the navigator.</summary>
     public SeasonSummaryViewModel? SelectedSeason

@@ -94,6 +94,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         LayerLegend = LayerLegendViewModel.FromLayers(_mapLayers);
         LayerInspector = BuildSampleInspector(_mapLayers);
         MeshSharePanel = MeshSharePanelViewModel.CreateSample();
+        RadioProvisioning = RadioProvisioningFlowViewModel.CreateSample();
 
         ApplySamplePluginState();
         SeedDashboards();
@@ -201,6 +202,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public DeviceManagerCompatibilityViewModel DeviceManagerCompatibility { get; }
     /// <summary>Gets the mesh share/subscribe panel view-model.</summary>
     public MeshSharePanelViewModel MeshSharePanel { get; }
+    /// <summary>Gets the RadioBridge provisioning workflow view-model.</summary>
+    public RadioProvisioningFlowViewModel RadioProvisioning { get; }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.

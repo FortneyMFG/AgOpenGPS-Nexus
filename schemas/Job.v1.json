@@ -13,6 +13,81 @@
       "description": "Schema semantic version for job documents.",
       "x-nexus-scope": "core"
     },
+    "envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["polygons"],
+      "description": "Resolved union geometry spanning all mounted fields for the job.",
+      "x-nexus-scope": "core",
+      "properties": {
+        "polygons": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/polygon" },
+          "description": "Union polygons describing the mounted field envelope in the project CRS.",
+          "x-nexus-scope": "core"
+        },
+        "members": {
+          "type": "array",
+          "description": "Optional per-field envelope geometry retained for analytics and overlay alignment.",
+          "items": {
+            "type": "object",
+            "required": ["fieldId", "polygons"],
+            "additionalProperties": false,
+            "properties": {
+              "fieldId": {
+                "type": "string",
+                "pattern": "^field:[A-Za-z0-9._:-]+$",
+                "description": "Identifier of the mounted field represented by the member envelope.",
+                "x-nexus-scope": "core"
+              },
+              "polygons": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/$defs/polygon" },
+                "description": "Resolved polygons for the mounted field after clipping and normalization.",
+                "x-nexus-scope": "core"
+              },
+              "areaHa": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Total hectares represented by the member envelope.",
+                "x-nexus-scope": "core"
+              },
+              "extensions": {
+                "type": "object",
+                "description": "Plugin-owned metadata aligned to the member envelope (e.g., crop type overlays).",
+                "additionalProperties": true,
+                "x-nexus-scope": "plugin"
+              }
+            }
+          },
+          "x-nexus-scope": "core"
+        },
+        "boundingBox": {
+          "$ref": "#/$defs/boundingBox",
+          "description": "Axis-aligned bounding box enclosing the union envelope.",
+          "x-nexus-scope": "core"
+        },
+        "centroid": {
+          "$ref": "#/$defs/coordinate",
+          "description": "Centroid of the union envelope expressed as [lon, lat] or [lon, lat, elevation].",
+          "x-nexus-scope": "core"
+        },
+        "areaHa": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total hectares covered by the union envelope.",
+          "x-nexus-scope": "core"
+        },
+        "crsEpsg": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "EPSG code describing the coordinate reference system used for the envelope polygons.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
     "id": {
       "type": "string",
       "pattern": "^job:[A-Za-z0-9._:-]+$",
@@ -106,6 +181,12 @@
                 "type": "string",
                 "pattern": "^field:[A-Za-z0-9._:-]+$",
                 "x-nexus-scope": "core"
+              },
+              "areaHa": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Hectares attributed to the field for rollup analytics.",
+                "x-nexus-scope": "core"
               }
             }
           },
@@ -141,6 +222,74 @@
       "description": "Plugin-owned metadata (crop genetics, profitability, zone analytics). Keys follow <namespace>.<topic> naming.",
       "additionalProperties": true,
       "x-nexus-scope": "plugin"
+    }
+  },
+  "$defs": {
+    "coordinate": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 3,
+      "description": "Coordinate expressed as [lon, lat] or [lon, lat, elevation].",
+      "x-nexus-scope": "core"
+    },
+    "ring": {
+      "type": "array",
+      "minItems": 4,
+      "items": { "$ref": "#/$defs/coordinate" },
+      "description": "Linear ring with closed coordinates (first == last).",
+      "x-nexus-scope": "core"
+    },
+    "polygon": {
+      "type": "object",
+      "required": ["exterior"],
+      "additionalProperties": false,
+      "properties": {
+        "exterior": { "$ref": "#/$defs/ring", "x-nexus-scope": "core" },
+        "holes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ring" },
+          "description": "Interior holes within the polygon.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "boundingBox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minLon", "minLat", "maxLon", "maxLat"],
+      "properties": {
+        "minLon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "Minimum longitude bound for the envelope.",
+          "x-nexus-scope": "core"
+        },
+        "minLat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "Minimum latitude bound for the envelope.",
+          "x-nexus-scope": "core"
+        },
+        "maxLon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "Maximum longitude bound for the envelope.",
+          "x-nexus-scope": "core"
+        },
+        "maxLat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "Maximum latitude bound for the envelope.",
+          "x-nexus-scope": "core"
+        }
+      }
     }
   }
 }

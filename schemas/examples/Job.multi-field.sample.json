@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "job:2025-plant-soy",
+  "name": "2025 Soy Planting - North Farm",
+  "seasonId": "season:2025",
+  "farmId": "farm:NorthHome",
+  "fieldIds": [
+    "field:North40",
+    "field:DrivewayWest"
+  ],
+  "operation": "planting",
+  "time": {
+    "planned": "2025-03-07",
+    "actualStart": "2025-03-07T13:05:00Z",
+    "actualEnd": "2025-03-07T18:45:00Z"
+  },
+  "sessions": [
+    "session:1",
+    "session:2"
+  ],
+  "envelope": {
+    "polygons": [
+      {
+        "exterior": [
+          [-94.612300, 41.562100],
+          [-94.610900, 41.562100],
+          [-94.610900, 41.564800],
+          [-94.612300, 41.564800],
+          [-94.612300, 41.562100]
+        ]
+      },
+      {
+        "exterior": [
+          [-94.609400, 41.561600],
+          [-94.607900, 41.561600],
+          [-94.607900, 41.563400],
+          [-94.609400, 41.563400],
+          [-94.609400, 41.561600]
+        ]
+      }
+    ],
+    "members": [
+      {
+        "fieldId": "field:North40",
+        "polygons": [
+          {
+            "exterior": [
+              [-94.612300, 41.562100],
+              [-94.610900, 41.562100],
+              [-94.610900, 41.564800],
+              [-94.612300, 41.564800],
+              [-94.612300, 41.562100]
+            ]
+          }
+        ],
+        "areaHa": 16.2
+      },
+      {
+        "fieldId": "field:DrivewayWest",
+        "polygons": [
+          {
+            "exterior": [
+              [-94.609400, 41.561600],
+              [-94.607900, 41.561600],
+              [-94.607900, 41.563400],
+              [-94.609400, 41.563400],
+              [-94.609400, 41.561600]
+            ]
+          }
+        ],
+        "areaHa": 4.8
+      }
+    ],
+    "boundingBox": {
+      "minLon": -94.612300,
+      "minLat": 41.561600,
+      "maxLon": -94.607900,
+      "maxLat": 41.564800
+    },
+    "centroid": [-94.610100, 41.563000],
+    "areaHa": 21.0,
+    "crsEpsg": 4326
+  },
+  "stats": {
+    "fields": [
+      {
+        "fieldId": "field:North40",
+        "areaHa": 16.2
+      },
+      {
+        "fieldId": "field:DrivewayWest",
+        "areaHa": 4.8
+      }
+    ]
+  },
+  "notes": "Mounts both parcels so coverage remains continuous across the driveway.",
+  "createdBy": "user:planner.annika",
+  "createdAt": "2025-03-01T18:05:00Z",
+  "lastModifiedAt": "2025-05-05T07:10:00Z",
+  "extensions": {
+    "cropType.history": {
+      "field:North40": "corn-2024",
+      "field:DrivewayWest": "cover-rye-2024"
+    }
+  }
+}

@@ -75,19 +75,13 @@ public sealed class SectionIoOrchestrator
 
         var mask = _calculator.ComputeMask(speedMps, sections);
 
-        ConstraintGateSnapshot gate;
         lock (_gate)
         {
-            gate = _constraintGate;
-        }
+            if (!_constraintGate.SectionsAllowed)
+            {
+                mask = 0;
+            }
 
-        if (!gate.SectionsAllowed)
-        {
-            mask = 0;
-        }
-
-        lock (_gate)
-        {
             if (_lastMask.HasValue && _lastMask.Value == mask)
             {
                 return;

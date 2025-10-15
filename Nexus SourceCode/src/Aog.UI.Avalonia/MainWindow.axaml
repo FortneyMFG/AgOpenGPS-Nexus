@@ -37,9 +37,147 @@
               Background="{DynamicResource ThemeBackgroundBrush}"
               BorderBrush="{DynamicResource ThemeBorderMidBrush}"
               BorderThickness="1">
-        <controls:MapView VehiclePose="{Binding VehiclePose}"
-                          Layers="{Binding MapLayers}"
-                          GuidanceTracks="{Binding GuidanceTracks}"/>
+        <Grid>
+          <controls:MapView VehiclePose="{Binding VehiclePose}"
+                            Layers="{Binding MapLayers}"
+                            GuidanceTracks="{Binding GuidanceTracks}"/>
+
+          <Border HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  Margin="16"
+                  Padding="16"
+                  MaxWidth="360"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  CornerRadius="10"
+                  DataContext="{Binding ZoneEditorToolbar}">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Zone editor" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding ActiveLayerDisplayName}" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding SessionStatusDisplay}"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Start session" Command="{Binding StartSessionCommand}" MinWidth="110"/>
+                <Button Content="Commit edit" Command="{Binding CommitSessionCommand}" MinWidth="110"/>
+                <Button Content="Cancel" Command="{Binding CancelSessionCommand}" MinWidth="80"/>
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Button Content="Undo" Command="{Binding UndoCommand}" MinWidth="80"/>
+                <Button Content="Redo" Command="{Binding RedoCommand}" MinWidth="80"/>
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding UndoCount, StringFormat=Undo: {0}}"
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding RedoCount, StringFormat=Redo: {0}}"
+                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                </StackPanel>
+              </StackPanel>
+
+              <StackPanel Spacing="6">
+                <TextBlock Text="Tools" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding Tools}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ZoneEditorToolOptionViewModel">
+                      <Border Margin="0,4,8,4"
+                              Padding="8"
+                              CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <StackPanel Spacing="4">
+                          <Button Content="{Binding DisplayName}"
+                                  Command="{Binding SelectCommand}"
+                                  HorizontalAlignment="Stretch"
+                                  MinWidth="120">
+                            <Button.Styles>
+                              <Style Selector="Button">
+                                <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                  <Setter Property="Background" Value="#FF2D5D9F"/>
+                                  <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                              </Style>
+                            </Button.Styles>
+                          </Button>
+                          <TextBlock Text="{Binding Description}"
+                                     FontSize="11"
+                                     TextWrapping="Wrap"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          <TextBlock Text="{Binding Shortcut, StringFormat=Shortcut: {0}}"
+                                     FontSize="10"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="6">
+                <TextBlock Text="Snapping &amp; inspectors" FontWeight="SemiBold"/>
+                <ToggleSwitch Content="Snap to field boundaries"
+                              IsChecked="{Binding SnapToFieldBoundaries, Mode=TwoWay}"/>
+                <ToggleSwitch Content="Snap to guidance lines"
+                              IsChecked="{Binding SnapToGuidance, Mode=TwoWay}"/>
+                <ToggleSwitch Content="Show attribute inspector"
+                              IsChecked="{Binding ShowAttributePanel, Mode=TwoWay}"/>
+              </StackPanel>
+
+              <Border Padding="8"
+                      CornerRadius="8"
+                      Background="{DynamicResource ThemeBackgroundBrush}"
+                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                      BorderThickness="1">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="Committed edits" FontWeight="SemiBold"/>
+                  <ScrollViewer MaxHeight="160">
+                    <ItemsControl ItemsSource="{Binding JournalEntries}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ZoneEditorJournalEntryViewModel">
+                          <Border Padding="8"
+                                  Margin="0,4"
+                                  CornerRadius="6"
+                                  Background="{DynamicResource ThemeBackgroundBrush}"
+                                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                                  BorderThickness="1">
+                            <StackPanel Spacing="4">
+                              <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{Binding Sequence, StringFormat=#{0}}"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Tool}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}"
+                                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                              </StackPanel>
+                              <TextBlock Text="{Binding OperationSummary}" FontWeight="SemiBold"/>
+                              <TextBlock Text="{Binding DetailSummary}"
+                                         Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                         TextWrapping="Wrap"/>
+                            </StackPanel>
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </ScrollViewer>
+                </StackPanel>
+              </Border>
+
+              <TextBlock Text="{Binding StatusMessage}"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource ThemeForegroundBrush}"/>
+            </StackPanel>
+          </Border>
+        </Grid>
       </Border>
 
       <!-- Right: Info + Controls -->
@@ -48,6 +186,147 @@
           <TextBlock Text="{Binding PlatformDescription}" TextWrapping="Wrap"/>
           <TextBlock Text="Use the mouse wheel to zoom and drag with the left mouse button to pan the map." TextWrapping="Wrap"/>
           <TextBlock Text="The highlighted dot shows the current vehicle position and heading." TextWrapping="Wrap"/>
+
+          <!-- Layer legend -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding LayerLegend}" x:DataType="vm:LayerLegendViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Layer legend" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="Legend entries derive from the layer registry metadata and update automatically when plugins publish new layers." TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <ItemsControl ItemsSource="{Binding Entries}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:LayerLegendEntryViewModel">
+                    <Border Padding="12"
+                            Margin="0,4"
+                            CornerRadius="8"
+                            Background="{DynamicResource ThemeBackgroundBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                            BorderThickness="1">
+                      <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                          <Border Padding="6,2"
+                                  CornerRadius="6"
+                                  Background="{DynamicResource ThemeBackgroundBrush}"
+                                  BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                                  BorderThickness="1">
+                            <TextBlock Text="{Binding ModeDisplay}" FontSize="11" FontWeight="SemiBold"/>
+                          </Border>
+                        </StackPanel>
+                        <Border Height="16" CornerRadius="6" Background="{Binding GradientBrush}"/>
+                        <TextBlock Text="{Binding RangeDisplay}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <!-- Layer inspector -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding LayerInspector}" x:DataType="vm:LayerInspectorViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="Layer inspector" FontSize="20" FontWeight="SemiBold"/>
+                <Border Padding="6,2"
+                        CornerRadius="6"
+                        Background="{DynamicResource ThemeBackgroundBrush}"
+                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                        BorderThickness="1">
+                  <TextBlock Text="{Binding ModeDisplay}" FontSize="11" FontWeight="SemiBold"/>
+                </Border>
+              </StackPanel>
+
+              <StackPanel Spacing="4">
+                <TextBlock Text="{Binding LayerName}" FontSize="16" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Description}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <Border Padding="12" CornerRadius="8" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
+                  <StackPanel Spacing="4">
+                    <TextBlock Text="Value" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding ValueDisplay}" FontSize="18" FontWeight="SemiBold"/>
+                    <TextBlock Text="Target" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding TargetDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Padding="12" CornerRadius="8" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
+                  <StackPanel Spacing="4">
+                    <TextBlock Text="Quality" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding QualityDisplay}" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding RateAvailabilityDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                    <TextBlock Text="Sample weight" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding WeightDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="Last sample" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding TimestampDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  <TextBlock Text="{Binding LocationDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="4">
+                  <TextBlock Text="Source" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding SourceDisplay}" TextWrapping="Wrap"/>
+                </StackPanel>
+              </Grid>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Transport metadata" FontWeight="SemiBold"/>
+                  <ItemsControl ItemsSource="{Binding TransportMetadata}" Margin="0,4,0,0">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:LayerInspectorFieldViewModel">
+                        <StackPanel Spacing="2">
+                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+                          <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
+                          <TextBlock Text="{Binding Description}"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                     FontSize="11"
+                                     TextWrapping="Wrap"
+                                     IsVisible="{Binding HasDescription}"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="6">
+                  <TextBlock Text="Payload metadata" FontWeight="SemiBold"/>
+                  <ItemsControl ItemsSource="{Binding PayloadMetadata}" Margin="0,4,0,0">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:LayerInspectorFieldViewModel">
+                        <StackPanel Spacing="2">
+                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+                          <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
+                          <TextBlock Text="{Binding Description}"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                     FontSize="11"
+                                     TextWrapping="Wrap"
+                                     IsVisible="{Binding HasDescription}"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </Border>
 
           <!-- Season navigator -->
           <Border Padding="16" CornerRadius="12"

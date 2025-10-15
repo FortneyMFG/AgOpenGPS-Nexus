@@ -61,6 +61,27 @@
         "critical": 0
       },
       "lastSurveyedAt": "2025-04-02T16:00:00Z"
+    },
+    "history": {
+      "entries": [
+        {
+          "featureId": "feature:risk-zone-01",
+          "status": "active",
+          "severity": "high",
+          "changedAt": "2025-04-02T16:02:00Z"
+        },
+        {
+          "featureId": "feature:risk-zone-02",
+          "status": "monitor",
+          "severity": "moderate",
+          "changedAt": "2025-04-02T16:04:00Z"
+        }
+      ],
+      "toggles": {
+        "showActive": true,
+        "showMonitor": true,
+        "showResolved": false
+      }
     }
   }
 }

@@ -52,6 +52,7 @@ public sealed class LegacySoakRunner
             steerCommandObserver,
             steerStateObserver,
             sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
             timeProvider);
 
         var framesPerStream = (int)Math.Round(options.UdpRatePerStreamHz * options.DurationSeconds);

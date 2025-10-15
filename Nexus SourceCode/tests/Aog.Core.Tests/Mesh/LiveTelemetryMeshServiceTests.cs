@@ -156,4 +156,165 @@ public sealed class LiveTelemetryMeshServiceTests
         clock.Advance(TimeSpan.FromSeconds(2));
         service.ListPresence().Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task Diagnostics_TracksAclViolations()
+    {
+        var clock = new FakeTimeProvider(new DateTimeOffset(2025, 3, 20, 10, 0, 0, TimeSpan.Zero));
+        var service = new LiveTelemetryMeshService(clock);
+
+        var topic = "aog/live/season:2025/job:alpha/coverage";
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.PublishAsync(new MeshPublishRequest(
+            "ghost",
+            topic,
+            MeshDataTier.Coverage,
+            ReadOnlyMemory<byte>.Empty)));
+
+        await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
+            "device:alpha",
+            "Combine",
+            shareProfile: new MeshShareProfile(new[]
+            {
+                new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence, new[] { "presence" })
+            })),
+            CancellationToken.None);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.PublishAsync(new MeshPublishRequest(
+            "device:alpha",
+            topic,
+            MeshDataTier.Coverage,
+            ReadOnlyMemory<byte>.Empty)));
+
+        await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
+            "device:beta",
+            "Scout"),
+            CancellationToken.None);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await foreach (var _ in service.SubscribeAsync(new MeshSubscriptionRequest(
+                "device:beta",
+                seasonId: "season:2025",
+                jobId: "job:alpha",
+                tierMask: MeshDataTier.Coverage), CancellationToken.None))
+            {
+            }
+        });
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await foreach (var _ in service.SubscribeAsync(new MeshSubscriptionRequest(
+                "ghost",
+                seasonId: "season:2025",
+                jobId: "job:alpha"), CancellationToken.None))
+            {
+            }
+        });
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdatePresenceAsync(new MeshPresenceUpdate(
+            "device:alpha",
+            new MeshSessionDescriptor("season:2025", "job:alpha"),
+            new MeshPose(45.0, -96.0))));
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.UpdatePresenceAsync(new MeshPresenceUpdate(
+            "ghost",
+            new MeshSessionDescriptor("season:2025", "job:alpha"),
+            new MeshPose(40.0, -90.0))));
+
+        var diagnostics = service.GetDiagnostics();
+
+        diagnostics.CapturedAt.Should().Be(clock.GetUtcNow());
+        diagnostics.RegisteredDeviceCount.Should().Be(2);
+        diagnostics.ActiveSubscriptionCount.Should().Be(0);
+        diagnostics.ActivePresenceCount.Should().Be(0);
+
+        diagnostics.Acl.PublishDenied.Should().Be(1);
+        diagnostics.Acl.PublishDeniedUnknownDevice.Should().Be(1);
+        diagnostics.Acl.SubscribeDenied.Should().Be(1);
+        diagnostics.Acl.SubscribeDeniedUnknownDevice.Should().Be(1);
+        diagnostics.Acl.PresenceDenied.Should().Be(1);
+        diagnostics.Acl.PresenceDeniedUnknownDevice.Should().Be(1);
+
+        diagnostics.Traffic.PublicationsAccepted.Should().Be(0);
+        diagnostics.Traffic.SubscriptionsOpened.Should().Be(0);
+        diagnostics.Traffic.PresenceBroadcasts.Should().Be(0);
+        diagnostics.Traffic.PresenceExpirations.Should().Be(0);
+        diagnostics.Traffic.FanoutDelivered.Should().Be(0);
+        diagnostics.Traffic.FanoutDropped.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task Diagnostics_TracksSuccessfulTraffic()
+    {
+        var start = new DateTimeOffset(2025, 3, 21, 14, 0, 0, TimeSpan.Zero);
+        var clock = new FakeTimeProvider(start);
+        var service = new LiveTelemetryMeshService(clock);
+
+        await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
+            "publisher",
+            "Combine",
+            shareProfile: new MeshShareProfile(new[]
+            {
+                new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence | MeshDataTier.Coverage, new[] { "presence", "coverage" })
+            })),
+            CancellationToken.None);
+
+        await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
+            "subscriber",
+            "Scout",
+            subscribeProfile: new MeshSubscribeProfile(new[]
+            {
+                new MeshSubscribeGrant("season:2025", "job:alpha", MeshDataTier.Coverage, new[] { "coverage" })
+            })),
+            CancellationToken.None);
+
+        await using var watcher = service
+            .SubscribeAsync(new MeshSubscriptionRequest(
+                "subscriber",
+                seasonId: "season:2025",
+                jobId: "job:alpha",
+                tierMask: MeshDataTier.Coverage), CancellationToken.None)
+            .GetAsyncEnumerator();
+
+        var payload = new byte[] { 0x2A };
+        await service.PublishAsync(new MeshPublishRequest(
+            "publisher",
+            "aog/live/season:2025/job:alpha/coverage",
+            MeshDataTier.Coverage,
+            payload));
+
+        Assert.True(await watcher.MoveNextAsync());
+        watcher.Current.Payload.ToArray().Should().Equal(payload);
+
+        await service.UpdatePresenceAsync(new MeshPresenceUpdate(
+            "publisher",
+            new MeshSessionDescriptor("season:2025", "job:alpha"),
+            new MeshPose(44.0, -95.0)));
+
+        service.ListPresence().Should().HaveCount(1);
+
+        clock.Advance(TimeSpan.FromSeconds(6));
+        service.ListPresence().Should().BeEmpty();
+
+        var diagnostics = service.GetDiagnostics();
+
+        diagnostics.CapturedAt.Should().Be(clock.GetUtcNow());
+        diagnostics.RegisteredDeviceCount.Should().Be(2);
+        diagnostics.ActiveSubscriptionCount.Should().Be(1);
+        diagnostics.ActivePresenceCount.Should().Be(0);
+
+        diagnostics.Acl.PublishDenied.Should().Be(0);
+        diagnostics.Acl.PublishDeniedUnknownDevice.Should().Be(0);
+        diagnostics.Acl.SubscribeDenied.Should().Be(0);
+        diagnostics.Acl.SubscribeDeniedUnknownDevice.Should().Be(0);
+        diagnostics.Acl.PresenceDenied.Should().Be(0);
+        diagnostics.Acl.PresenceDeniedUnknownDevice.Should().Be(0);
+
+        diagnostics.Traffic.PublicationsAccepted.Should().Be(1);
+        diagnostics.Traffic.SubscriptionsOpened.Should().Be(1);
+        diagnostics.Traffic.PresenceBroadcasts.Should().Be(1);
+        diagnostics.Traffic.PresenceExpirations.Should().Be(1);
+        diagnostics.Traffic.FanoutDelivered.Should().Be(1);
+        diagnostics.Traffic.FanoutDropped.Should().Be(0);
+    }
 }

@@ -3,6 +3,7 @@ using Aog.Bridge.Host.AogLink;
 using Aog.Bridge.Host.AogLink.Legacy;
 using Aog.Bridge.Host.AogLink.Transports;
 using Aog.Link.V1;
+using Aog.Core.Mesh;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -75,6 +76,8 @@ public static class Program
                 services.AddSingleton<LegacySteerCodec>();
                 services.AddSingleton<LegacyDiscoveryCodec>();
                 services.AddSingleton<LegacyCompatibilityBridge>();
+                services.AddSingleton<ILiveTelemetryMeshService, LiveTelemetryMeshService>();
+                services.AddSingleton<AogLinkMeshBridge>();
                 services.AddSingleton<IAogLinkTransport, UdpAogLinkTransport>();
                 services.AddSingleton<IAogLinkGateway, AogLinkGateway>();
                 services.AddHostedService<BridgeHostedService>();

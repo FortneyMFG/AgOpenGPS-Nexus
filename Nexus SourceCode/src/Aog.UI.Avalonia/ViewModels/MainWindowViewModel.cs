@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Aog.Core.Layers;
 using Aog.Core.Legacy;
 using Aog.Core.Replay;
 using Aog.Core.Simulation;
@@ -80,8 +82,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
         PlanterPanel = new PlanterPanelViewModel();
         ReplayTimeline = new ReplayTimelineViewModel();
 
+        var layerEditJournal = new LayerEditEventJournalService(TimeProvider.System);
+        ZoneEditorToolbar = new ZoneEditorToolbarViewModel(layerEditJournal);
+
         _mapLayers = BuildSampleLayers();
         _guidanceTracks = BuildSampleGuidance();
+        LayerLegend = LayerLegendViewModel.FromLayers(_mapLayers);
+        LayerInspector = BuildSampleInspector(_mapLayers);
 
         ApplySamplePluginState();
         SeedDashboards();
@@ -162,6 +169,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the guidance tracks rendered on the map.</summary>
     public IReadOnlyList<GuidanceTrack> GuidanceTracks => _guidanceTracks;
+
+    /// <summary>Gets the zone editor toolbar view-model powering map editing affordances.</summary>
+    public ZoneEditorToolbarViewModel ZoneEditorToolbar { get; }
+    /// <summary>Gets the legend describing the active map layers.</summary>
+    public LayerLegendViewModel LayerLegend { get; }
+
+    /// <summary>Gets the inspector exposing the pinned layer observation.</summary>
+    public LayerInspectorViewModel LayerInspector { get; }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.
@@ -379,6 +394,70 @@ public class MainWindowViewModel : INotifyPropertyChanged
             new("Current pass", currentPassPoints, Color.FromArgb(230, 255, 215, 0), 3),
             new("Boundary", boundaryPoints, Color.FromArgb(180, 255, 86, 48), 2),
         };
+    }
+
+    private static LayerInspectorViewModel BuildSampleInspector(IReadOnlyList<MapLayer> layers)
+    {
+        if (layers is null || layers.Count == 0)
+        {
+            return new LayerInspectorViewModel("layer:sample", "Sample layer", isPlanned: false);
+        }
+
+        var layer = layers[0];
+        var description = layer.Style.IsPlanned
+            ? "Pinned observation sourced from the prescription metadata."
+            : "Pinned observation using the metadata-driven coverage inspector.";
+        var inspector = new LayerInspectorViewModel(layer.LayerId, layer.DisplayName, layer.Style.IsPlanned, description);
+
+        var cell = layer.Cells.Count > 0
+            ? layer.Cells[Math.Min(3, layer.Cells.Count - 1)]
+            : new MapLayerCell(new Point(0, 0), 1, layer.Style.MinimumValue);
+
+        var valueFormat = string.Equals(layer.Style.Units, "fraction", StringComparison.OrdinalIgnoreCase)
+            ? "{0:P1}"
+            : "{0:0.##}";
+        var units = layer.Style.Units;
+        var targetValue = layer.Style.IsPlanned
+            ? (double?)null
+            : Math.Min(layer.Style.MaximumValue, cell.Value + 0.08);
+        var timestamp = new DateTimeOffset(2024, 4, 11, 14, 32, 0, TimeSpan.Zero);
+        var sourceDisplay = layer.Style.IsPlanned ? "Prescription catalog" : "Section Control (tractor-01)";
+
+        static string FormatForMetadata(double value, string format, string? units)
+        {
+            var formatted = string.Format(CultureInfo.InvariantCulture, format, value);
+            return string.IsNullOrWhiteSpace(units) ? formatted : string.Concat(formatted, " ", units);
+        }
+
+        var transportMetadata = new[]
+        {
+            new KeyValuePair<string, string>("PGN", "0xEF00"),
+            new KeyValuePair<string, string>("CAN ID", "0x1CEBFF02"),
+            new KeyValuePair<string, string>("Rate mode", layer.Style.IsPlanned ? "Preset (open-loop)" : "Closed-loop"),
+        };
+
+        var payloadMetadata = new[]
+        {
+            new KeyValuePair<string, string>("Raw bytes", "2A FF 19 40 00 00 7C 3F"),
+            new KeyValuePair<string, string>("Decoded rate", FormatForMetadata(cell.Value, valueFormat, units)),
+            new KeyValuePair<string, string>("Section mask", "0b0011_1100"),
+        };
+
+        inspector.ApplyObservation(
+            cell.Value,
+            valueFormat,
+            units,
+            targetValue,
+            "Quality 0.97 (Good)",
+            weight: 0.82,
+            isRateUnavailable: false,
+            cell.Center,
+            timestamp,
+            sourceDisplay,
+            transportMetadata,
+            payloadMetadata);
+
+        return inspector;
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

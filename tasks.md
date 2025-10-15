@@ -44,7 +44,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-207 SRS + ADR cross-reference sweep for new layers _(Planned)_ — ADR-027…ADR-053 portfolio alignment
 - [ ] NX-208 Official bundle capability matrix update _(Planned)_ — ADR-031 manifest governance
 - [x] NX-209 CRS normalization matrix publication _(Done)_ — ADR-022 CRS policy
-- [ ] NX-210 Contracts freeze automation for new capabilities _(Planned)_ — ADR-031 governance rollout
+- [x] NX-210 Contracts freeze automation for new capabilities _(Planned)_ — ADR-031 governance rollout
 
 ### Section B — Core (Headless, Sim Graph)
 - [x] NX-010 Core host skeleton
@@ -76,7 +76,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-225 LayerEditEvent journal service _(Planned)_ — ADR-044 zone drawing framework
 - [ ] NX-226 Live telemetry mesh core service _(Planned)_ — ADR-047 live telemetry mesh
 - [ ] NX-227 Mesh diagnostics & ACL enforcement _(Planned)_ — ADR-047 mesh QoS/security
-- [ ] NX-228 RadioBridge transport stack in Core _(Planned)_ — ADR-048 radio bridge
+- [x] NX-228 RadioBridge transport stack in Core _(Done)_ — ADR-048 radio bridge
 - [ ] NX-229 Mesh retention & offline sync workers _(Planned)_ — ADR-047 mesh retention requirements
 - [ ] NX-230 Report builder service backend _(Planned)_ — ADR-051 report builder
 - [ ] NX-231 Performance budget instrumentation _(Planned)_ — ADR-026 performance budgets
@@ -372,7 +372,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-207 | SRS + ADR cross-reference sweep for new layers | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-027…ADR-053 portfolio alignment |
 | NX-208 | Official bundle capability matrix update | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
 | NX-209 | CRS normalization matrix publication | Done |  | — | [ADR-022](docs/ADR/ADR-022-crs-units-precision-policy.md) | Published [reference matrix](docs/reference/crs-normalization-matrix.md) |
-| NX-210 | Contracts freeze automation for new capabilities | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 governance rollout |
+| NX-210 | Contracts freeze automation for new capabilities | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 governance rollout |
 
 ### Section B — Core (Headless, Sim Graph)
 
@@ -406,7 +406,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-225 | LayerEditEvent journal service | Planned |  | — | [ADR-044](docs/ADR/ADR-044_ZoneDrawingFramework.md) | ADR-044 zone drawing framework |
 | NX-226 | Live telemetry mesh core service | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 live telemetry mesh |
 | NX-227 | Mesh diagnostics & ACL enforcement | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 mesh QoS/security |
-| NX-228 | RadioBridge transport stack in Core | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 radio bridge |
+| NX-228 | RadioBridge transport stack in Core | Done | 2025-03-20 | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 radio bridge |
 | NX-229 | Mesh retention & offline sync workers | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 mesh retention requirements |
 | NX-230 | Report builder service backend | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder |
 | NX-231 | Performance budget instrumentation | Planned |  | — | [ADR-026](docs/ADR/ADR-026-performance-budgets.md) | ADR-026 performance budgets |

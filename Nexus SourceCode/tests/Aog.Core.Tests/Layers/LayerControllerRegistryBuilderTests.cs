@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Aog.Core.Eventing;
 using Aog.Core.Layers.Controllers;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,6 +54,8 @@ public class LayerControllerRegistryBuilderTests
     {
         var services = new ServiceCollection();
 
+        services.AddSingleton<IEventBus, InMemoryEventBus>();
+
         services.AddLayerControllerRuntime(builder =>
         {
             builder.Add("controller-1", "layer-1", TimeSpan.FromMilliseconds(200), LayerAggregationStrategy.Average);
@@ -68,5 +71,8 @@ public class LayerControllerRegistryBuilderTests
 
         var bufferPool = provider.GetRequiredService<LayerControllerBufferPool>();
         bufferPool.Should().NotBeNull();
+
+        var poseStream = provider.GetRequiredService<ILayerControllerPoseStream>();
+        poseStream.Should().NotBeNull();
     }
 }

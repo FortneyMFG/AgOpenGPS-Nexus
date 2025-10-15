@@ -16,6 +16,13 @@ Key behaviors:
   entries are pruned lazily whenever the presence list is queried.
 - **Deterministic tests.** A `TimeProvider` dependency allows unit tests to control time
   flow when validating TTL and sequencing logic.
+- **Diagnostics.** `GetDiagnostics()` surfaces ACL denials, fan-out counts, and presence
+  expirations for observability.
+- **ACL enforcement.** Publish, subscribe, and presence operations respect the normalized
+  Share/Subscribe profiles. Access denials are tallied into diagnostics for operator
+  tooling.
 
-Follow-up tasks (NX-227 and beyond) will add diagnostics, ACL enforcement and the
-RadioBridge transport adapters that push these publications out to hardware links.
+NX-228 adds the RadioBridge transport stack which handles framing, acknowledgements,
+compression and retry scheduling for low-bandwidth links. Follow-up tasks (NX-227
+and beyond) will layer additional diagnostics, ACL enforcement and hardware adapters
+that push these publications out to radio devices.

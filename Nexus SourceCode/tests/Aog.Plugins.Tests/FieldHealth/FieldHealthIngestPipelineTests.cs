@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Aog.Plugins.FieldHealth;
@@ -98,6 +99,69 @@ public class FieldHealthIngestPipelineTests
         pipeline.LatestMetadata.Observations.Select(o => o.FeatureId).Should().Equal("feature:new", "feature:old");
     }
 
+    [Fact]
+    public async Task IngestAsync_RecordsHistoryEntriesWhenStatusChanges()
+    {
+        var options = new FieldHealthIngestOptions { Kind = "risk.weeds" };
+        var pipeline = new FieldHealthIngestPipeline(options);
+        var observedAt = new DateTimeOffset(2025, 4, 2, 14, 0, 0, TimeSpan.Zero);
+        var initial = CreateObservation("feature:history", FieldHealthSeverity.Moderate, observedAt);
+
+        await pipeline.IngestAsync(initial);
+        pipeline.LatestMetadata.History.Entries.Should().ContainSingle();
+        pipeline.LatestMetadata.History.Entries[0].Status.Should().Be(FieldHealthObservationStatus.Active);
+
+        var updated = initial with
+        {
+            Status = FieldHealthObservationStatus.Resolved,
+            LastUpdatedAt = observedAt.AddHours(2)
+        };
+
+        await pipeline.IngestAsync(updated);
+
+        pipeline.LatestMetadata.History.Entries.Should().HaveCount(2);
+        pipeline.LatestMetadata.History.Entries[^1].Status.Should().Be(FieldHealthObservationStatus.Resolved);
+        pipeline.LatestMetadata.History.Entries[^1].ChangedAt.Should().Be(updated.LastUpdatedAt);
+    }
+
+    [Fact]
+    public void UpdateHistoryToggles_PersistsState()
+    {
+        var options = new FieldHealthIngestOptions { Kind = "risk.weeds" };
+        var pipeline = new FieldHealthIngestPipeline(options);
+        var toggles = new FieldHealthHistoryToggles(showActive: true, showMonitor: false, showResolved: true);
+
+        var metadata = pipeline.UpdateHistoryToggles(toggles);
+
+        metadata.History.Toggles.Should().Be(toggles);
+        pipeline.LatestMetadata.History.Toggles.Should().Be(toggles);
+    }
+
+    [Fact]
+    public async Task RegisterAnalyticsCallback_NotifiesOnMetadataChanges()
+    {
+        var options = new FieldHealthIngestOptions { Kind = "risk.weeds" };
+        var pipeline = new FieldHealthIngestPipeline(options);
+        var events = new List<(FieldHealthLayerMetadata Current, FieldHealthLayerMetadata? Previous)>();
+
+        using (pipeline.RegisterAnalyticsCallback((current, previous) => events.Add((current, previous)), replayLatest: true))
+        {
+            events.Should().HaveCount(1);
+            events[0].Previous.Should().BeNull();
+
+            var observation = CreateObservation(
+                "feature:callback",
+                FieldHealthSeverity.Low,
+                new DateTimeOffset(2025, 4, 3, 10, 0, 0, TimeSpan.Zero));
+
+            await pipeline.IngestAsync(observation);
+
+            events.Should().HaveCount(2);
+            events[1].Previous.Should().NotBeNull();
+            events[1].Current.Observations.Should().ContainSingle(o => o.FeatureId == "feature:callback");
+        }
+    }
+
     private static FieldHealthObservation CreateObservation(string featureId, FieldHealthSeverity severity, DateTimeOffset observedAt, double? areaHa = null)
     {
         return new FieldHealthObservation
@@ -110,6 +174,7 @@ public class FieldHealthIngestPipelineTests
             AreaHa = areaHa,
             GeometryHash = "abcdef12",
             LastUpdatedAt = observedAt,
+            Status = FieldHealthObservationStatus.Active,
             Attachments = Array.Empty<string>()
         };
     }

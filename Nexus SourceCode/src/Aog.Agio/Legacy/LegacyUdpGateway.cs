@@ -24,6 +24,7 @@ public sealed class LegacyUdpGateway
     private readonly ILegacySteerCommandObserver _steerCommandObserver;
     private readonly ILegacySteerStateObserver _steerStateObserver;
     private readonly ILegacySectionObserver _sectionObserver;
+    private readonly ILegacyMeshPresencePublisher _meshPresencePublisher;
     private readonly TimeProvider _timeProvider;
     private long _sequence;
     private long _steerCommandSequence;
@@ -40,6 +41,7 @@ public sealed class LegacyUdpGateway
         ILegacySteerCommandObserver steerCommandObserver,
         ILegacySteerStateObserver steerStateObserver,
         ILegacySectionObserver sectionObserver,
+        ILegacyMeshPresencePublisher meshPresencePublisher,
         TimeProvider timeProvider)
     {
         _poseCodec = poseCodec ?? throw new ArgumentNullException(nameof(poseCodec));
@@ -51,6 +53,7 @@ public sealed class LegacyUdpGateway
         _steerCommandObserver = steerCommandObserver ?? throw new ArgumentNullException(nameof(steerCommandObserver));
         _steerStateObserver = steerStateObserver ?? throw new ArgumentNullException(nameof(steerStateObserver));
         _sectionObserver = sectionObserver ?? throw new ArgumentNullException(nameof(sectionObserver));
+        _meshPresencePublisher = meshPresencePublisher ?? throw new ArgumentNullException(nameof(meshPresencePublisher));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
@@ -113,6 +116,7 @@ public sealed class LegacyUdpGateway
     {
         if (_discoveryCodec.TryDecode(datagram.Span, out var announcement))
         {
+            await _meshPresencePublisher.OnDiscoveryAsync(announcement, cancellationToken).ConfigureAwait(false);
             await _discoveryObserver.OnDiscoveryAsync(announcement, cancellationToken).ConfigureAwait(false);
             return;
         }
@@ -165,5 +169,6 @@ public sealed class LegacyUdpGateway
         pose.Header.Timestamp = Timestamp.FromDateTimeOffset(_timeProvider.GetUtcNow());
 
         await _poseObserver.OnPoseAsync(pose, metadata, cancellationToken).ConfigureAwait(false);
+        await _meshPresencePublisher.PublishPresenceAsync(pose, metadata, cancellationToken).ConfigureAwait(false);
     }
 }

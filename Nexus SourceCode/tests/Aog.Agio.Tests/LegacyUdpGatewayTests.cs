@@ -33,6 +33,7 @@ public sealed class LegacyUdpGatewayTests
             steerCommandObserver,
             steerStateObserver,
             sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
             new FixedTimeProvider(DateTimeOffset.UtcNow));
 
         var pose = new Pose { LatitudeDeg = 51.2, LongitudeDeg = -114.1 };
@@ -60,6 +61,7 @@ public sealed class LegacyUdpGatewayTests
         var steerCommandObserver = new RecordingSteerCommandObserver();
         var steerStateObserver = new RecordingSteerStateObserver();
         var sectionObserver = new RecordingSectionObserver();
+        var meshPublisher = new RecordingMeshPresencePublisher();
         var gateway = new LegacyUdpGateway(
             poseCodec,
             discoveryCodec,
@@ -70,10 +72,12 @@ public sealed class LegacyUdpGatewayTests
             steerCommandObserver,
             steerStateObserver,
             sectionObserver,
+            meshPublisher,
             new FixedTimeProvider(timestamp));
 
         var pose = new Pose { LatitudeDeg = 51.123, LongitudeDeg = -114.456, HeadingRad = 1.5 };
-        var frame = poseCodec.EncodePose(pose);
+        var metadata = new LegacyPoseMetadata { FixQuality = 5, SatellitesTracked = 12 };
+        var frame = poseCodec.EncodePose(pose, metadata);
 
         await gateway.HandleDatagramAsync(frame);
 
@@ -87,6 +91,57 @@ public sealed class LegacyUdpGatewayTests
         Assert.Equal(pose.LatitudeDeg, observed.LatitudeDeg, 6);
 
         Assert.Single(observer.Metadata);
+        var publishedPose = Assert.Single(meshPublisher.Poses);
+        Assert.Equal(pose.LatitudeDeg, publishedPose.LatitudeDeg, 6);
+        var publishedMetadata = Assert.Single(meshPublisher.Metadata);
+        Assert.Equal(metadata.SatellitesTracked, publishedMetadata.SatellitesTracked);
+    }
+
+    [Fact]
+    public async Task HandleDatagramAsync_ForwardsDiscoveryToMeshPublisher()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
+        var transport = new RecordingTransport();
+        var poseObserver = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var meshPublisher = new RecordingMeshPresencePublisher();
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            poseObserver,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            meshPublisher,
+            new FixedTimeProvider(DateTimeOffset.UtcNow));
+
+        var announcement = new LegacyDiscoveryAnnouncement
+        {
+            VendorId = 0x7C,
+            ProductId = 0x01,
+            VariantId = 0x02,
+            McuId = (byte)LegacyDeviceMcu.Stm32,
+            FirmwareMajor = 2,
+            FirmwareMinor = 5,
+            FirmwarePatch = 9,
+            Capabilities = LegacyDeviceCapabilityFlags.CanBootloader,
+            Health = LegacyDeviceHealthFlags.VoltageLow,
+        };
+
+        var frame = discoveryCodec.Encode(announcement);
+
+        await gateway.HandleDatagramAsync(frame);
+
+        Assert.Single(meshPublisher.Discoveries);
+        Assert.Equal(announcement.FirmwareMajor, meshPublisher.Discoveries[0].FirmwareMajor);
     }
 
     [Fact]
@@ -104,6 +159,7 @@ public sealed class LegacyUdpGatewayTests
             new RecordingSteerCommandObserver(),
             new RecordingSteerStateObserver(),
             new RecordingSectionObserver(),
+            NullLegacyMeshPresencePublisher.Instance,
             new FixedTimeProvider(DateTimeOffset.UtcNow));
         var invalid = new byte[LegacyPoseCodec.MainAntennaFrameLength];
 
@@ -132,6 +188,7 @@ public sealed class LegacyUdpGatewayTests
             steerCommandObserver,
             steerStateObserver,
             sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
             new FixedTimeProvider(DateTimeOffset.UtcNow));
 
         var announcement = new LegacyDiscoveryAnnouncement
@@ -183,6 +240,7 @@ public sealed class LegacyUdpGatewayTests
             steerCommandObserver,
             steerStateObserver,
             sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
             new FixedTimeProvider(DateTimeOffset.UtcNow));
 
         var announcement = new LegacyDiscoveryAnnouncement
@@ -232,6 +290,7 @@ public sealed class LegacyUdpGatewayTests
             steerCommandObserver,
             steerStateObserver,
             sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
             new FixedTimeProvider(DateTimeOffset.UtcNow));
 
         var command = new SteerCmd { TargetWheelAngleDeg = 2.5, Enable = true };
@@ -272,6 +331,7 @@ public sealed class LegacyUdpGatewayTests
             steerCommandObserver,
             steerStateObserver,
             sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
             new FixedTimeProvider(timestamp));
 
         var command = new SteerCmd { TargetWheelAngleDeg = -4.5, Enable = true };
@@ -328,6 +388,7 @@ public sealed class LegacyUdpGatewayTests
             steerCommandObserver,
             steerStateObserver,
             sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
             new FixedTimeProvider(timestamp));
 
         var state = new SteerState { MeasuredWheelAngleDeg = 1.25, AppliedEffort = 0.5, Engaged = true };
@@ -427,6 +488,26 @@ public sealed class LegacyUdpGatewayTests
         public ValueTask OnSectionMaskAsync(SectionMask mask, CancellationToken cancellationToken)
         {
             Masks.Add(mask);
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingMeshPresencePublisher : ILegacyMeshPresencePublisher
+    {
+        public List<Pose> Poses { get; } = new();
+        public List<LegacyPoseMetadata> Metadata { get; } = new();
+        public List<LegacyDiscoveryAnnouncement> Discoveries { get; } = new();
+
+        public ValueTask PublishPresenceAsync(Pose pose, LegacyPoseMetadata metadata, CancellationToken cancellationToken)
+        {
+            Poses.Add(pose);
+            Metadata.Add(metadata);
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask OnDiscoveryAsync(LegacyDiscoveryAnnouncement announcement, CancellationToken cancellationToken)
+        {
+            Discoveries.Add(announcement);
             return ValueTask.CompletedTask;
         }
     }

@@ -9,11 +9,7 @@
     "name",
     "version",
     "requiredApis",
-    "supportedCapabilities",
-    "requiredTransports",
-    "minimumRuntimeVersion",
-    "simProviders",
-    "leases"
+    "simProviders"
   ],
   "additionalProperties": false,
   "properties": {

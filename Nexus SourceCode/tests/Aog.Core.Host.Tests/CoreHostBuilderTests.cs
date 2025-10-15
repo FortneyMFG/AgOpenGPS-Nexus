@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Aog.Core.Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,6 +31,9 @@ public sealed class CoreHostBuilderTests
 
         var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
         Assert.True(lifetime.ApplicationStarted.IsCancellationRequested);
+
+        var orchestrator = host.Services.GetRequiredService<IJobLifecycleOrchestrator>();
+        Assert.NotNull(orchestrator);
 
         using var stopCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         await host.StopAsync(stopCts.Token);

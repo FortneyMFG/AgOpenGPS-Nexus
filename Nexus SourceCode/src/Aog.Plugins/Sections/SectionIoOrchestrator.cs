@@ -86,6 +86,9 @@ public sealed class SectionIoOrchestrator
             mask = 0;
         }
 
+        uint? previousMask = null;
+        var maskUpdated = false;
+
         lock (_gate)
         {
             if (_lastMask.HasValue && _lastMask.Value == mask)
@@ -93,7 +96,9 @@ public sealed class SectionIoOrchestrator
                 return;
             }
 
+            previousMask = _lastMask;
             _lastMask = mask;
+            maskUpdated = true;
         }
 
         var timestamp = _timeProvider.GetUtcNow().UtcDateTime;
@@ -109,7 +114,25 @@ public sealed class SectionIoOrchestrator
             Mask = mask,
         };
 
-        await _eventBus.PublishAsync(message, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await _eventBus.PublishAsync(message, cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            if (maskUpdated)
+            {
+                lock (_gate)
+                {
+                    if (_lastMask == mask)
+                    {
+                        _lastMask = previousMask;
+                    }
+                }
+            }
+
+            throw;
+        }
     }
 
     /// <summary>

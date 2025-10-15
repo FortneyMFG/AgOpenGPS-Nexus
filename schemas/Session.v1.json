@@ -4,7 +4,7 @@
   "title": "Session.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "startedAt", "createdBy", "createdAt", "lastModifiedAt"],
+  "required": ["id", "startedAt"],
   "properties": {
     "schemaVersion": {
       "type": "string",

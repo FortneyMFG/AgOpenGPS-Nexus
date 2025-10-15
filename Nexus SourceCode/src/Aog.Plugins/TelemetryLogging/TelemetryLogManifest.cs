@@ -57,7 +57,7 @@ public sealed class TelemetryLogManifest
     /// Gets the collection of field identifiers associated with the job.
     /// </summary>
     [JsonPropertyName("fieldIds")]
-    public List<string> FieldIds { get; init; } = new();
+    public List<string> FieldIds { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the optional season identifier associated with the job.
@@ -75,7 +75,7 @@ public sealed class TelemetryLogManifest
     /// Gets the tags applied to the job when the session was recorded.
     /// </summary>
     [JsonPropertyName("jobTags")]
-    public List<string> JobTags { get; init; } = new();
+    public List<string> JobTags { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the timestamp when logging began (UTC).

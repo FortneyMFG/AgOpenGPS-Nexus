@@ -58,10 +58,18 @@ internal static class SimulationGraphBuilder
             var deps = new HashSet<SimulationProviderDescriptor>();
             foreach (var input in provider.Inputs)
             {
-                if (topicOwners.TryGetValue(input, out var owner) && !ReferenceEquals(owner, provider))
+                if (topicOwners.TryGetValue(input, out var owner))
                 {
-                    deps.Add(owner);
+                    if (!ReferenceEquals(owner, provider))
+                    {
+                        deps.Add(owner);
+                    }
+
+                    continue;
                 }
+
+                throw new InvalidOperationException(
+                    $"Provider '{provider.ProviderId}' requires input topic '{input}' but no registered provider produces it.");
             }
 
             dependencies[provider] = deps;

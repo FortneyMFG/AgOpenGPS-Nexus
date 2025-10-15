@@ -35,6 +35,39 @@ them to enabled AOG-Link transports. Enable the backend by selecting
 - **UseTls** — Enables TLS negotiation for casters served over HTTPS.
 - **ReconnectBackoff** — Delay applied before reconnecting when the connection is interrupted.
 
+## GNSS correction policy aggregator
+
+Upcoming correction services (local base, radio relays, PPP/NTRIP) share a common failover policy
+implemented by `Aog.Agio.Corrections.CorrectionSourceAggregator`. The aggregator cycles through
+registered `ICorrectionSourceFactory` instances, activates the first available source, and falls
+back when the active provider completes, is cancelled, or faults.
+
+Register the aggregator in DI and bind `CorrectionSourceAggregatorOptions` to control which source
+families participate and how aggressive the retry cadence should be:
+
+```json
+{
+  "AgioHost": {
+    "Corrections": {
+      "EnableNetworkSources": true,
+      "SourceFailureBackoff": "00:00:01",
+      "ExhaustedBackoff": "00:00:05",
+      "PreferredOrder": [
+        "LocalBaseStation",
+        "SerialRadio",
+        "NetworkService",
+        "Replay"
+      ]
+    }
+  }
+}
+```
+
+- **EnableNetworkSources** — Disable to require on-site base/radio providers only.
+- **SourceFailureBackoff** — Delay before the next candidate is tried after a fault.
+- **ExhaustedBackoff** — Delay before the scan repeats when no sources are available.
+- **PreferredOrder** — Optional ordered list of `CorrectionSourceKind` values.
+
 ## Configuration
 
 The `AgioHost:SafetyLogs` section controls retention and output paths:

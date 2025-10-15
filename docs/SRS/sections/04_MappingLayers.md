@@ -73,6 +73,14 @@ Multi-field job envelopes must provide continuous navigation across adjacent fie
 
 Each layer definition includes unit metadata, provenance expectations, and accessibility requirements (color ramps, legends) maintained in plugin manifests and schema files under `/schemas`.
 
+## External ingest flow (NX-113)
+
+1. **Normalization:** Incoming GeoTIFF/COG rasters and GeoJSON/GeoPackage vectors are reprojected to the field’s working CRS (ADR-022) and resampled to registry-defined resolution.
+2. **Validation:** Normalized payloads validate against Layer Registry definitions (ADR-010). Units, planned/actual flags, and provenance fields must match the catalog entry before persistence.
+3. **Provenance capture:** Successful imports append provenance entries to `Layer.v1` noting source file hashes, operator, transform pipeline, and ingestion timestamps.
+4. **Session linking:** When imports occur during an active session, JobsService appends the layer ID to `session.layerRefs[]` and emits `onLayerImported` events so plugins refresh overlays.
+5. **Error handling:** Validation failures emit structured diagnostics referencing the expected schema hash and missing attributes. Operators receive actionable guidance to adjust source data.
+
 ## Open Questions
 
 - What fallback envelope should mapping use if a field polygon is missing or corrupt during mount?

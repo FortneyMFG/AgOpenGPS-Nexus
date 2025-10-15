@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/Device.v1.json",
+  "title": "Device.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "capabilities", "createdAt"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^device:[A-Za-z0-9._:-]+$",
+      "description": "Stable device identifier",
+      "x-nexus-scope": "core"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human readable name",
+      "x-nexus-scope": "core"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Declared capabilities",
+      "x-nexus-scope": "core"
+    },
+    "profileHash": {
+      "type": ["string", "null"],
+      "description": "Hash of active equipment/profile snapshot",
+      "x-nexus-scope": "core"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin owned metadata",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

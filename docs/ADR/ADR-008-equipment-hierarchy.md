@@ -20,6 +20,12 @@ Legacy AOG configurations model implements as flat lists of sections with limite
 - PoseStream consumers can reference stable identifiers for toolbar/section mapping and telemetry.
 - Migration tooling must normalize legacy configs into the new schema, surfacing validation errors when overlaps are invalid.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Equipment, implement, and toolbar profiles now reference session snapshots defined in [ADR-041 — Job Sessions](ADR-041_JobSessions.md). Each session capture stores the applied configuration so replay, profit, and genetics plugins can align telemetry with the hardware state used during that outing.
+- [ADR-017 — Profiles & Kinematics](ADR-017-profiles-kinematics.md) inherits these session pointers to surface profile history in Device Manager and to seed future kinematic planners.
+- The lifecycle bus publishes `onSessionStart`/`onSessionEnd` events with resolved implement IDs so controllers, analytics, and report builders can attach provenance without re-querying the equipment tree.
+
 ## Governance Updates
 - **Migration playbook.** A scripted converter ingests V5/V6 configurations, outputs diff reports (group priority, offsets, dependencies), and highlights operator-visible changes. Upgrades require capturing these reports and attaching them to release notes.
 - **Versioned schemas.** Equipment hierarchy definitions now carry semantic versions, with compatibility gates in the registry that reject edits lacking migration metadata or unit tests covering downgrade paths.

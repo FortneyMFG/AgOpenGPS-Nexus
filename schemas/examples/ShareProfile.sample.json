@@ -1,0 +1,14 @@
+{
+  "id": "share:default",
+  "deviceId": "device:cab-alpha",
+  "name": "Default",
+  "topics": ["presence", "trails"],
+  "acl": {
+    "org:coop": "allow",
+    "device:cab-beta": "allow",
+    "device:unknown": "deny"
+  },
+  "defaultPolicy": "deny",
+  "updatedBy": "user:operator.maya",
+  "updatedAt": "2025-05-01T11:55:00Z"
+}

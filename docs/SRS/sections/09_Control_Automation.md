@@ -23,6 +23,14 @@ Define how Nexus coordinates operator stations, automation plugins, and firmware
 - R-CTRL-006 (MUST, constraint gating): Insert a constraint gate in the control arbiter that prevents autosteer engagement and forces section/rate outputs off when keep-out zones intersect the implement footprint, while trimming guidance terminals at boundaries/headlands.
 - R-CTRL-007 (SHOULD, override policy): Provide configurable operator override policies for work-disabled zones (e.g., hold-to-confirm) with audit logging so product shutoff behavior remains transparent and traceable.
 
+### Remote dashboards & telemetry-only sharing
+- Remote dashboards default to monitor-only capabilities. They may subscribe to pose, coverage, section state, and report metrics but cannot toggle automation unless the operator grants a time-bounded control lease. Offline rigs operate normally without connectivity.
+- Multi-machine share profiles expose telemetry feeds but strip command topics when the connection is flagged untrusted. Operators can promote a remote station to control by issuing an explicit lease inside the cab UI.
+
+### Section control advisory masks
+- Section control reads advisory `noWorkMask` data (e.g., from crop protection or regulatory overlays) and displays warnings when entering these areas. The arbiter never blocks sections solely on advisory masks; only enforced keep-out zones from ADR-027 gate automation.
+- Advisory acknowledgements log `actor`, `timestamp`, and `reason` so compliance reports can reconcile operator decisions with product usage.
+
 ## Options
 - O-MM-0: Status quo — Desktop windows with manual layout tools and helper checks.
 - O-MM-1: Layout profiles synchronized across displays and saved per rig.

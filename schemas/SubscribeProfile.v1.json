@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/SubscribeProfile.v1.json",
+  "title": "SubscribeProfile.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "deviceId", "requestedTopics", "visibilityPreset", "updatedAt"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^subscribe:[A-Za-z0-9._:-]+$",
+      "description": "Subscription profile identifier",
+      "x-nexus-scope": "core"
+    },
+    "deviceId": {
+      "type": "string",
+      "pattern": "^device:[A-Za-z0-9._:-]+$",
+      "description": "Device using this subscription",
+      "x-nexus-scope": "core"
+    },
+    "requestedTopics": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Topics this device wants to receive",
+      "x-nexus-scope": "core"
+    },
+    "allowList": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Allowed device/org IDs",
+      "x-nexus-scope": "core"
+    },
+    "denyList": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Denied device/org IDs",
+      "x-nexus-scope": "core"
+    },
+    "visibilityPreset": {
+      "type": "string",
+      "enum": ["presence", "trails", "coverage", "full"],
+      "description": "UI preset selection",
+      "x-nexus-scope": "core"
+    },
+    "updatedBy": {
+      "type": "string",
+      "description": "Actor modifying the profile",
+      "x-nexus-scope": "core"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin metadata",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

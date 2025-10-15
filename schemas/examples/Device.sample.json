@@ -1,0 +1,7 @@
+{
+  "id": "device:cab-alpha",
+  "name": "Alpha Tractor",
+  "capabilities": ["pose.publish", "coverage.share"],
+  "profileHash": "sha256:abcdef",
+  "createdAt": "2025-03-10T14:00:00Z"
+}

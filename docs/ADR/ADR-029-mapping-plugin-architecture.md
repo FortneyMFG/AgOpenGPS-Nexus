@@ -91,6 +91,12 @@ Services:
 - **Multi-plugin coexistence.** Documentation now requires declaring hard dependencies and incompatibilities, and CI ensures preset bundles do not load conflicting plugins.
 - **Upgrade rehearsals.** Plugin maintainers stage upgrades in sandboxed environments with automated regression reports before promoting releases.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Mapping APIs now expose multi-field job envelopes (ADR-043). Plugins must publish union envelopes, per-field indices, and deterministic merges so rate control, analytics, and report builders can align coverage splits.
+- Integration with the shared Zone Drawing Framework (ADR-044) is mandatory. Mapping plugins relay edit sessions, propagate `LayerEditEvent` journals, and respect edit locks when collaborative mesh updates arrive via ADR-047.
+- External layer ingest (NX-113) plugs into the same import pipeline, reusing CRS normalization, provenance hashing, and registry validation defined in ADR-010/014.
+
 ## Validation
 - **NullMapping readiness:** NullMapping provider start-up on reference hardware must complete in under 350 ms at the 95th percentile and publish a healthy capability state before sections/plugins request pose transforms.
 - **Capability enforcement:** Integration tests must fail within 2 seconds when a plugin advertises incompatible `mapping:*` capabilities, with actionable diagnostics surfaced through the Device Manager contract.

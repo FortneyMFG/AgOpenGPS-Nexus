@@ -25,6 +25,12 @@ Accurate guidance and control require kinematic models that describe tractor, im
 - **Correlation testing.** Simulation outputs are compared against hardware logs for each profile update. Drift beyond tolerance blocks release and spins follow-up tasks.
 - **Lifecycle tracking.** Profiles carry effective dates and deprecation notices so operators can schedule recalibration windows proactively.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Profiles now capture per-session snapshots referenced by [ADR-041](ADR-041_JobSessions.md). When a session starts, Core records the active profile version and calibration bundle ID so replay, profit, and genetics analytics can correlate machine state with agronomic outcomes.
+- Device Manager surfaces session-linked profile history, allowing operators to inspect configuration changes between sessions without trawling raw files.
+- Multi-machine telemetry mesh (ADR-047) distributes profile hashes as part of presence broadcasts so collaborating rigs can confirm they share compatible geometry before exchanging coverage.
+
 ## Validation
 - Kinematic simulations must track hitch articulation within ≤ 2 cm error over 100 m paths compared to motion capture baselines.
 - Multi-steer fusion must converge within five cycles after switching pose sources while avoiding > 1° yaw oscillations.

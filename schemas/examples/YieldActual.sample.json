@@ -1,0 +1,11 @@
+{
+  "layerId": "layer:yield-2025-pass1",
+  "jobId": "job:2025-harvest-corn",
+  "sessionId": "session:1",
+  "fieldId": "field:south-quarter",
+  "units": "bu/ac",
+  "aggregation": "grid",
+  "source": "combine:CNH-1",
+  "createdBy": "system:yield-logger",
+  "createdAt": "2025-10-15T18:45:00Z"
+}

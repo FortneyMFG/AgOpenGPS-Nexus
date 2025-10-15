@@ -33,6 +33,12 @@ Plugins register simulation providers against this fabric and must respect seede
 - **Determinism lint tooling.** A command-line validator rejects builds when topics lack registered schemas or publish payloads exceeding size budgets. Plugin authors receive local tooling to rehearse registration before opening PRs.
 - **Regression fixture cadence.** Quarterly scenario packs replay weather, GNSS drift, and failure injections. New topics must supply at least two chaos scripts (e.g., packet duplication, latency spikes) that Core incorporates into the shared suite.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Replay fixtures now cover multi-field job envelopes (ADR-043) and session timelines (ADR-041). Scenario packs include start/stop session sequences, collaborative zone edits, and layer reuse to verify provenance in headless runs.
+- LayerEditEvent journals emitted from ADR-044 editing sessions must replay deterministically. The fixture catalog adds TODOs for collaborative edit meshes once ADR-047 mesh replication ships.
+- Profit, genetics, and yield plugins consume replay outputs to validate cross-plugin analytics. Sim harnesses capture their layers and compare planned vs. actual aggregates as part of CI.
+
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
 - Simulation lives inside the monolithic `CSim` helper, which synthesizes GNSS/IMU data in-process without a shared bus or external plugin hooks, limiting reuse and determinism across tools.【F:docs/porting/V6-Inventory.md†L45-L49】

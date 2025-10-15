@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/ShareProfile.v1.json",
+  "title": "ShareProfile.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "deviceId", "name", "topics", "acl", "updatedAt"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^share:[A-Za-z0-9._:-]+$",
+      "description": "Share profile identifier",
+      "x-nexus-scope": "core"
+    },
+    "deviceId": {
+      "type": "string",
+      "pattern": "^device:[A-Za-z0-9._:-]+$",
+      "description": "Device owning this profile",
+      "x-nexus-scope": "core"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human readable name",
+      "x-nexus-scope": "core"
+    },
+    "topics": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Topics allowed to leave the cab",
+      "x-nexus-scope": "core"
+    },
+    "acl": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["allow", "deny"]
+      },
+      "description": "Per-device or per-organization overrides",
+      "x-nexus-scope": "core"
+    },
+    "defaultPolicy": {
+      "type": "string",
+      "enum": ["deny", "allow"],
+      "description": "Default policy when ACL has no match",
+      "x-nexus-scope": "core"
+    },
+    "updatedBy": {
+      "type": "string",
+      "description": "Actor modifying the profile",
+      "x-nexus-scope": "core"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp",
+      "x-nexus-scope": "core"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin metadata",
+      "additionalProperties": true,
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

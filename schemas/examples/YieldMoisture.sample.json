@@ -1,0 +1,10 @@
+{
+  "layerId": "layer:yield-moisture-2025",
+  "jobId": "job:2025-harvest-corn",
+  "sessionId": "session:1",
+  "fieldId": "field:south-quarter",
+  "units": "%",
+  "sensorModel": "Maverick-M1",
+  "createdBy": "system:yield-logger",
+  "createdAt": "2025-10-15T18:45:00Z"
+}

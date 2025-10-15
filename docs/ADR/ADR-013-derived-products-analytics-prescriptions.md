@@ -26,6 +26,13 @@ Turning PoseStream-derived datasets (yield, soil, NDVI) into actionable prescrip
 - **Reference datasets.** Public benchmark packs define acceptable variance thresholds per product type. CI enforces these bounds and blocks releases exceeding tolerance.
 - **Change notification.** Recipe adjustments trigger alerts to dependent prescription services and include reproducibility bundles for verification before rollout.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Recipes must ship as manifest-signed YAML/JSON bundles with SHA-256 hashes recorded in the Layer Registry (ADR-010). Hashes accompany layer provenance so Report Builder exports and Profit analytics can verify inputs.
+- The engine now accepts zone masks authored through the LayerEditService (ADR-044) as ROI filters. Recipes reference these masks by ID, and regression fixtures cover zone-enabled derivations to ensure deterministic clipping.
+- QA datasets include season/job/session context pulled from ADR-041. Fixtures replay session metadata, proving that planned vs. actual comparisons and provenance survive reprocessing.
+- ISOXML and external exchange flows (ADR-014, NX-165) embed recipe hashes and layer IDs to guarantee fidelity when exporting to task controllers or re-importing partner prescriptions.
+
 ## Validation
 - Prescription derivations must complete within four minutes for a 160-acre reference field, including smoothing and ROI masking stages.
 - QA report generator must compute coverage, variance, and RMSE metrics with ≤ 0.5% deviation from analytical goldens across the regression suite.

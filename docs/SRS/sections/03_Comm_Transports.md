@@ -39,6 +39,21 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - **ADR-016 Firmware/Transport: Variable-Rate & Layer PGNs** will finalize payload packing, sequencing, and registry-handshake semantics for layer definitions, fulfilling R-COMM-010, R-COMM-011, and R-COMM-021 prior to firmware rollout.【F:docs/ADR/ADR-roadmap.md†L91-L97】
 - **ADR-021 Timebase & clock sync** will establish the canonical clock, drift handling, and latency budgets that anchor R-COMM-020 and R-COMM-040…R-COMM-042 across Core, plugins, and firmware.【F:docs/ADR/ADR-roadmap.md†L131-L137】
 
+## Multi-machine telemetry mesh (ADR-047)
+
+- **Entities:** Devices broadcast `Presence` messages describing identity, capabilities, and profile hashes. Operators curate `ShareProfile` documents defining what data leaves the cab (presence only, trails, coverage, layer edits). `SubscribeProfile` policies declare what remote data a cab ingests.
+- **Pub/Sub topics:** Core defines topics for `presence`, `poseTrail`, `coverage`, `layerEdit`, and `sessionState`. Each topic advertises QoS budgets: presence at 1 Hz, trails at ≤2 Hz, coverage at ≤1 Hz aggregated, layer edits immediately with deduplication, session state on change.
+- **Store-and-forward:** Offline cabs queue shared payloads (coverage tiles, LayerEditEvent journals) up to 20 MB/device. When connectivity returns, queued payloads replay in order with hash validation. Mesh nodes drop stale payloads beyond 30 minutes unless explicitly marked archival.
+- **Privacy & ACL:** Share profiles enforce allow/deny lists keyed by device IDs or organization tags. Sensitive feeds (layer edits, profitability) default to deny; operators opt-in per session.
+- **Failure handling:** Mesh heartbeats include freshness timers. Receivers flag stale data when heartbeats exceed 5 seconds or when coverage deltas pause for >15 seconds, triggering UI warnings.
+
+## RadioBridge abstraction (ADR-048)
+
+- **Transports:** RadioBridge encapsulates ELRS, LoRa, XBee, or other low-bandwidth radios behind a binary framing layer. Frames use CBOR or FlatBuffers encoding with optional compression.
+- **Acknowledgements & replay:** Commands mark `needsAck`; devices retry at exponential backoff up to 5 times. Replay windows allow 60 seconds of history for lossy links; recipients request retransmit by sequence number.
+- **Rate governors:** Links expose configured bitrate ceilings. Core throttles coverage and telemetry streams to respect medium constraints (e.g., LoRa 56 kbps). Higher bandwidth topics fall back to store-and-forward bundles.
+- **Mapping to mesh topics:** RadioBridge integrates with the multi-machine mesh; share profiles declare which topics traverse radio links. Layer edits compress to delta operations; pose trails decimate to 1 Hz for narrowband.
+
 ### AOG-Link MCU datagram protocol
 AOG-Link standardizes MCU-to-host and MCU-to-MCU exchanges on compact protobuf messages compiled with nanopb. Every packet begins with a fixed header of `{version, class, type, seq, src, dst, len}` followed by the protobuf payload; serial links append a CRC-16 after the payload. The fields mirror the IDs exposed through the gRPC contracts so the Bridge can map between the layers without lossy transforms.
 

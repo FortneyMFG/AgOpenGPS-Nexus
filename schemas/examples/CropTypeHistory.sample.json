@@ -1,0 +1,25 @@
+{
+  "fieldId": "field:north80",
+  "entries": [
+    {
+      "year": 2024,
+      "status": "historical",
+      "crop": "Corn",
+      "layerId": "layer:crop-2024",
+      "source": "import",
+      "recordedAt": "2024-11-01T12:00:00Z",
+      "notes": null
+    },
+    {
+      "year": 2025,
+      "status": "planned",
+      "crop": "Soybean",
+      "layerId": "layer:crop-plan-2025",
+      "source": "planner",
+      "recordedAt": "2025-01-05T18:22:00Z",
+      "notes": "Rotation following corn"
+    }
+  ],
+  "createdBy": "user:planner.annika",
+  "createdAt": "2025-01-05T18:22:00Z"
+}

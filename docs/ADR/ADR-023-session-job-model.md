@@ -26,6 +26,12 @@ Nexus must relate jobs, sessions, PoseStreams, and derived artifacts so provenan
 - **Consistency tooling.** Maintenance CLI scans provenance graphs for orphaned edges, offering guided repair actions that operators can run during scheduled downtime.
 - **Operational playbooks.** Fleet administrators receive monthly health reports highlighting drift, reconciliation results, and outstanding repairs.
 
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Terminology normalized to “Session” across Core, UI, telemetry, and documentation. Legacy “Run” hooks trigger transitional warnings and map to session events until plugins migrate fully.
+- Session metadata now records crop type and genetics references, allowing plugins to link crop rotation and seed lot analytics directly to the session context.
+- Multi-field job envelopes (ADR-043) propagate field membership into session records so coverage, yield, and profitability rollups can split per field while maintaining a single session timeline.
+
 ## Validation
 - Session lifecycle tests must demonstrate create/resume/switch flows that maintain referential integrity with zero orphaned references.
 - Snapshot storage must persist implement/equipment state with < 500 ms serialization latency and ≤ 5% storage overhead compared to raw configurations.

@@ -264,6 +264,135 @@ public sealed class PluginCompatibilityEvaluatorTests
         consumerResult.Issues.Should().BeEmpty();
     }
 
+    [Fact]
+    public void Evaluate_FlagsReplacementWhenVersionConstraintNotCovered()
+    {
+        var provider = CreateManifest(
+            "vendor.mapping",
+            "Vendor Mapping",
+            "mapping:vector",
+            requiredApis: new Dictionary<string, string>
+            {
+                ["core.runtime"] = ">=1.0.0",
+                ["mapping.layers"] = ">=1.0.0",
+            },
+            requiredTransports: Array.Empty<string>(),
+            configure: manifest =>
+            {
+                manifest.Requires.Replaces.Add(new PluginRelationshipRequirement
+                {
+                    Id = "org.agopengps.plugins.mapping",
+                    Range = "^1.2.0",
+                    Classification = PluginDependencyClassification.Hard,
+                });
+            });
+
+        var consumer = CreateManifest(
+            "org.agopengps.plugins.variable-mapping",
+            "Variable Mapping",
+            "variable.mapping",
+            requiredApis: new Dictionary<string, string>
+            {
+                ["core.runtime"] = ">=1.0.0",
+                ["plugins.mapping"] = "^3.0.0",
+            },
+            requiredTransports: Array.Empty<string>());
+
+        var report = _evaluator.Evaluate(new[] { provider, consumer }, _environment);
+
+        var consumerResult = report.Plugins.Single(result => result.PluginId == consumer.Id);
+        consumerResult.State.Should().Be(PluginCompatibilityState.Blocked);
+        consumerResult.Issues.Should().Contain(issue =>
+            issue.Kind == PluginDependencyKind.Plugin &&
+            issue.State == PluginCompatibilityState.Blocked &&
+            issue.Identifier == "org.agopengps.plugins.mapping" &&
+            issue.Message.Contains("replacement", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Evaluate_AcceptsReplacementWhenRangeMissingButVersionMatches()
+    {
+        var provider = CreateManifest(
+            "vendor.mapping",
+            "Vendor Mapping",
+            "mapping:vector",
+            requiredApis: new Dictionary<string, string>
+            {
+                ["core.runtime"] = ">=1.0.0",
+            },
+            requiredTransports: Array.Empty<string>(),
+            configure: manifest =>
+            {
+                manifest.Version = "3.2.1";
+                manifest.Requires.Replaces.Add(new PluginRelationshipRequirement
+                {
+                    Id = "org.agopengps.plugins.mapping",
+                    Classification = PluginDependencyClassification.Hard,
+                });
+            });
+
+        var consumer = CreateManifest(
+            "org.agopengps.plugins.variable-mapping",
+            "Variable Mapping",
+            "variable.mapping",
+            requiredApis: new Dictionary<string, string>
+            {
+                ["core.runtime"] = ">=1.0.0",
+                ["plugins.mapping"] = "^3.0.0",
+            },
+            requiredTransports: Array.Empty<string>());
+
+        var report = _evaluator.Evaluate(new[] { provider, consumer }, _environment);
+
+        var consumerResult = report.Plugins.Single(result => result.PluginId == consumer.Id);
+        consumerResult.State.Should().Be(PluginCompatibilityState.Healthy);
+        consumerResult.Issues.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Evaluate_FlagsReplacementWhenRangeMissingAndVersionTooLow()
+    {
+        var provider = CreateManifest(
+            "vendor.mapping",
+            "Vendor Mapping",
+            "mapping:vector",
+            requiredApis: new Dictionary<string, string>
+            {
+                ["core.runtime"] = ">=1.0.0",
+            },
+            requiredTransports: Array.Empty<string>(),
+            configure: manifest =>
+            {
+                manifest.Version = "1.4.0";
+                manifest.Requires.Replaces.Add(new PluginRelationshipRequirement
+                {
+                    Id = "org.agopengps.plugins.mapping",
+                    Classification = PluginDependencyClassification.Hard,
+                });
+            });
+
+        var consumer = CreateManifest(
+            "org.agopengps.plugins.variable-mapping",
+            "Variable Mapping",
+            "variable.mapping",
+            requiredApis: new Dictionary<string, string>
+            {
+                ["core.runtime"] = ">=1.0.0",
+                ["plugins.mapping"] = "^3.0.0",
+            },
+            requiredTransports: Array.Empty<string>());
+
+        var report = _evaluator.Evaluate(new[] { provider, consumer }, _environment);
+
+        var consumerResult = report.Plugins.Single(result => result.PluginId == consumer.Id);
+        consumerResult.State.Should().Be(PluginCompatibilityState.Blocked);
+        consumerResult.Issues.Should().Contain(issue =>
+            issue.Kind == PluginDependencyKind.Plugin &&
+            issue.Identifier == "org.agopengps.plugins.mapping" &&
+            issue.State == PluginCompatibilityState.Blocked &&
+            issue.Message.Contains("replacement", StringComparison.OrdinalIgnoreCase));
+    }
+
     private static PluginManifest CreateManifest(
         string id,
         string name,

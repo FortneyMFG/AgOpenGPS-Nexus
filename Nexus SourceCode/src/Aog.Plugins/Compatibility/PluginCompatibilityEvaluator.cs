@@ -191,6 +191,7 @@ public sealed class PluginCompatibilityEvaluator
         PluginManifest manifest,
         CompatibilityEnvironment environment,
         IReadOnlyDictionary<string, PluginManifest> manifestById,
+        IReadOnlyDictionary<string, IReadOnlyList<ReplacementProvider>> replacementIndex,
         IReadOnlyDictionary<string, IReadOnlyList<PluginManifest>> replacementIndex,
         ICollection<PluginCompatibilityDependencyStatus> issues)
     {
@@ -205,6 +206,31 @@ public sealed class PluginCompatibilityEvaluator
                 {
                     if (replacementIndex.TryGetValue(pluginId, out var replacements) && replacements.Count > 0)
                     {
+                        if (string.IsNullOrWhiteSpace(versionRequirement) ||
+                            IsRequirementCoveredByReplacement(versionRequirement, replacements))
+                        {
+                            continue;
+                        }
+
+                        var replacementMessage = string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Required plugin '{0}' has no replacement that satisfies version constraint '{1}'.",
+                            pluginId,
+                            versionRequirement);
+
+                        issues.Add(new PluginCompatibilityDependencyStatus(
+                            PluginDependencyKind.Plugin,
+                            pluginId,
+                            PluginDependencyClassification.Hard,
+                            PluginCompatibilityState.Blocked,
+                            replacementMessage));
+                        continue;
+                    }
+
+                    var message = string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Required plugin '{0}' is not installed.",
+                        pluginId);
                         continue;
                     }
 
@@ -719,6 +745,9 @@ public sealed class PluginCompatibilityEvaluator
         return index.ToDictionary(pair => pair.Key, pair => (IReadOnlyList<ProfileProvider>)pair.Value, StringComparer.OrdinalIgnoreCase);
     }
 
+    private static IReadOnlyDictionary<string, IReadOnlyList<ReplacementProvider>> BuildReplacementIndex(IEnumerable<PluginManifest> manifests)
+    {
+        var index = new Dictionary<string, List<ReplacementProvider>>(StringComparer.OrdinalIgnoreCase);
     private static IReadOnlyDictionary<string, IReadOnlyList<PluginManifest>> BuildReplacementIndex(IEnumerable<PluginManifest> manifests)
     {
         var index = new Dictionary<string, List<PluginManifest>>(StringComparer.OrdinalIgnoreCase);
@@ -729,6 +758,15 @@ public sealed class PluginCompatibilityEvaluator
             {
                 if (!index.TryGetValue(replacement.Id, out var list))
                 {
+                    list = new List<ReplacementProvider>();
+                    index[replacement.Id] = list;
+                }
+
+                list.Add(new ReplacementProvider(manifest, replacement));
+            }
+        }
+
+        return index.ToDictionary(pair => pair.Key, pair => (IReadOnlyList<ReplacementProvider>)pair.Value, StringComparer.OrdinalIgnoreCase);
                     list = new List<PluginManifest>();
                     index[replacement.Id] = list;
                 }
@@ -827,9 +865,146 @@ public sealed class PluginCompatibilityEvaluator
         return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(words);
     }
 
+    private static bool IsRequirementCoveredByReplacement(
+        string versionRequirement,
+        IReadOnlyList<ReplacementProvider> replacements)
+    {
+        if (string.IsNullOrWhiteSpace(versionRequirement))
+        {
+            return true;
+        }
+
+        if (!TryParseVersionRange(versionRequirement, out var requiredRange))
+        {
+            return false;
+        }
+
+        foreach (var replacement in replacements)
+        {
+            if (string.IsNullOrWhiteSpace(replacement.Relationship.Range))
+            {
+                if (IsVersionSatisfied(replacement.Manifest.Version, versionRequirement, out _))
+                {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (!TryParseVersionRange(replacement.Relationship.Range!, out var replacementRange))
+            {
+                // fall back to checking the replacement plugin's own version when the declared
+                // range is malformed or omitted.
+                if (IsVersionSatisfied(replacement.Manifest.Version, versionRequirement, out _))
+                {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (RangesIntersect(requiredRange, replacementRange))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private sealed record CapabilityProvider(PluginManifest Manifest, PluginCapabilityDescriptor Descriptor);
 
     private sealed record ProfileProvider(PluginManifest Manifest, PluginProfileDescriptor Descriptor);
+
+    private sealed record ReplacementProvider(PluginManifest Manifest, PluginRelationshipRequirement Relationship);
+
+    private static bool TryParseVersionRange(string value, out VersionRange range)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            range = new VersionRange(VersionRangeKind.Any, default);
+            return true;
+        }
+
+        value = value.Trim();
+
+        if (value.StartsWith(">=", StringComparison.Ordinal))
+        {
+            if (!TryParseSemanticVersion(value.Substring(2), out var minimum))
+            {
+                range = default;
+                return false;
+            }
+
+            range = new VersionRange(VersionRangeKind.MinimumInclusive, minimum);
+            return true;
+        }
+
+        if (value.StartsWith("=", StringComparison.Ordinal))
+        {
+            if (!TryParseSemanticVersion(value.Substring(1), out var exact))
+            {
+                range = default;
+                return false;
+            }
+
+            range = new VersionRange(VersionRangeKind.Exact, exact);
+            return true;
+        }
+
+        if (value.StartsWith("^", StringComparison.Ordinal))
+        {
+            if (!TryParseSemanticVersion(value.Substring(1), out var caret))
+            {
+                range = default;
+                return false;
+            }
+
+            range = new VersionRange(VersionRangeKind.Caret, caret);
+            return true;
+        }
+
+        if (!TryParseSemanticVersion(value, out var version))
+        {
+            range = default;
+            return false;
+        }
+
+        range = new VersionRange(VersionRangeKind.MinimumInclusive, version);
+        return true;
+    }
+
+    private static bool RangesIntersect(VersionRange required, VersionRange replacement)
+    {
+        if (required.Kind == VersionRangeKind.Any || replacement.Kind == VersionRangeKind.Any)
+        {
+            return true;
+        }
+
+        if (required.Kind == VersionRangeKind.Exact)
+        {
+            return replacement.Contains(required.Anchor);
+        }
+
+        if (replacement.Kind == VersionRangeKind.Exact)
+        {
+            return required.Contains(replacement.Anchor);
+        }
+
+        var candidate = required.Anchor.CompareTo(replacement.Anchor) >= 0 ? required.Anchor : replacement.Anchor;
+
+        if (required.Kind == VersionRangeKind.Caret && candidate.Major != required.Anchor.Major)
+        {
+            return false;
+        }
+
+        if (replacement.Kind == VersionRangeKind.Caret && candidate.Major != replacement.Anchor.Major)
+        {
+            return false;
+        }
+
+        return required.Contains(candidate) && replacement.Contains(candidate);
+    }
 
     private static bool IsVersionSatisfied(string actualVersion, string requirement, out string? failureReason)
     {
@@ -927,6 +1102,29 @@ public sealed class PluginCompatibilityEvaluator
 
         version = new SemanticVersion(major, minor, patch);
         return true;
+    }
+
+    private enum VersionRangeKind
+    {
+        Any,
+        MinimumInclusive,
+        Exact,
+        Caret,
+    }
+
+    private readonly record struct VersionRange(VersionRangeKind Kind, SemanticVersion Anchor)
+    {
+        public bool Contains(SemanticVersion candidate)
+        {
+            return Kind switch
+            {
+                VersionRangeKind.Any => true,
+                VersionRangeKind.MinimumInclusive => candidate.CompareTo(Anchor) >= 0,
+                VersionRangeKind.Exact => candidate.CompareTo(Anchor) == 0,
+                VersionRangeKind.Caret => candidate.Major == Anchor.Major && candidate.CompareTo(Anchor) >= 0,
+                _ => false,
+            };
+        }
     }
 
     private readonly record struct PluginOptionalDependency(string PluginId, PluginDependencyClassification Classification, string Description);

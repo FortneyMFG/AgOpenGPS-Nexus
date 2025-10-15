@@ -51,14 +51,47 @@
       "additionalProperties": { "$ref": "#/$defs/value" },
       "description": "Optional plugin-level settings surfaced to the host."
     },
+    "supportedCapabilities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/capabilityId" },
+      "description": "Capabilities implemented by the plugin."
+    },
+    "requiredTransports": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9+.-]+://[A-Za-z0-9_.-]+$"
+      },
+      "description": "Transports that must be available for the plugin to operate."
+    },
+    "minimumRuntimeVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[-0-9A-Za-z.]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "description": "Minimum Nexus runtime version required to load the plugin."
+    },
     "simProviders": {
       "type": "array",
       "minItems": 1,
       "items": { "$ref": "#/$defs/simProvider" },
       "description": "Simulation providers bundled with the plugin."
+    },
+    "leases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/lease" },
+      "description": "Capability lease declarations required by the plugin."
     }
   },
   "$defs": {
+    "capabilityId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "description": "Identifier for a capability exposed via Nexus transports."
+    },
     "value": {
       "anyOf": [
         { "type": "string" },
@@ -104,6 +137,28 @@
           "default": {},
           "additionalProperties": { "$ref": "#/$defs/value" },
           "description": "Provider-specific tunables."
+        }
+      }
+    },
+    "lease": {
+      "type": "object",
+      "required": ["capability", "mode", "timeoutSeconds"],
+      "additionalProperties": false,
+      "properties": {
+        "capability": { "$ref": "#/$defs/capabilityId" },
+        "mode": {
+          "type": "string",
+          "enum": ["Exclusive", "Shared"],
+          "description": "Requested lease mode for the capability."
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Duration after which the lease is considered expired."
+        },
+        "recovery": {
+          "type": "string",
+          "description": "Strategy the plugin uses when the lease cannot be acquired."
         }
       }
     }

@@ -39,7 +39,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-202 Yield layer schema refresh _(Planned)_ — ADR-049 yield analytics plugin
 - [ ] NX-203 Cost/profit layer schema _(Planned)_ — ADR-050 cost & profit plugin
 - [ ] NX-204 Field health risk schema _(Planned)_ — ADR-052 field health plugin
-- [ ] NX-205 Weather snapshot schema extensions _(Planned)_ — ADR-053 weather & environment plugin
+- [x] NX-205 Weather snapshot schema extensions _(Done)_ — ADR-053 weather & environment plugin
 - [ ] NX-206 Report template schema + manifest handshake _(Planned)_ — ADR-051 report builder & exports
 - [ ] NX-207 SRS + ADR cross-reference sweep for new layers _(Planned)_ — ADR-027…ADR-053 portfolio alignment
 - [ ] NX-208 Official bundle capability matrix update _(Planned)_ — ADR-031 manifest governance
@@ -366,7 +366,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-202 | Yield layer schema refresh | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 yield analytics plugin |
 | NX-203 | Cost/profit layer schema | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 cost & profit plugin |
 | NX-204 | Field health risk schema | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 field health plugin |
-| NX-205 | Weather snapshot schema extensions | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather & environment plugin |
+| NX-205 | Weather snapshot schema extensions | Done |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather & environment plugin |
 | NX-206 | Report template schema + manifest handshake | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder & exports |
 | NX-207 | SRS + ADR cross-reference sweep for new layers | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-027…ADR-053 portfolio alignment |
 | NX-208 | Official bundle capability matrix update | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |

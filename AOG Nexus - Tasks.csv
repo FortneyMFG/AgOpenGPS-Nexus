@@ -156,7 +156,7 @@ NX-201,FALSE,FALSE,NX-200,,Genetics layer definitions and registries — ADR-046
 NX-202,FALSE,FALSE,NX-199,,Yield layer schema refresh — ADR-049 yield analytics plugin
 NX-203,FALSE,FALSE,NX-202,,Cost/profit layer schema — ADR-050 cost & profit plugin
 NX-204,FALSE,FALSE,NX-199,,Field health risk schema — ADR-052 field health plugin
-NX-205,FALSE,FALSE,NX-196,,Weather snapshot schema extensions — ADR-053 weather & environment plugin
+NX-205,FALSE,TRUE,NX-196,,Weather snapshot schema extensions — ADR-053 weather & environment plugin
 NX-206,FALSE,FALSE,"NX-202, NX-203",,Report template schema + manifest handshake — ADR-051 report builder & exports
 NX-207,FALSE,FALSE,NX-206,,SRS + ADR cross-reference sweep for new layers — ADR-027…ADR-053 portfolio alignment
 NX-208,FALSE,FALSE,NX-195,,Official bundle capability matrix update — ADR-031 manifest governance

@@ -216,6 +216,11 @@
           "minimum": 0,
           "maximum": 360
         },
+        "windGustKph": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Peak wind gust recorded during the sampling interval in kilometers per hour."
+        },
         "pressureKpa": {
           "type": "number",
           "minimum": 0
@@ -224,8 +229,58 @@
           "type": "number",
           "minimum": 0
         },
+        "evapotranspirationMm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Evapotranspiration observed during the sampling interval in millimeters."
+        },
         "soilTempC": {
           "type": "number"
+        },
+        "soilMoisturePct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Volumetric soil moisture percentage at the sampling depth."
+        },
+        "leafWetnessPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Leaf wetness sensor reading expressed as a percentage."
+        },
+        "dewPointC": {
+          "type": "number",
+          "description": "Calculated dew point temperature in Celsius."
+        },
+        "wetBulbC": {
+          "type": "number",
+          "description": "Wet bulb temperature in Celsius."
+        },
+        "deltaTC": {
+          "type": "number",
+          "description": "Spray Delta T (dry bulb - wet bulb) in Celsius."
+        },
+        "solarIrradianceWm2": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Solar irradiance measured in watts per square meter."
+        },
+        "uvIndex": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Ultraviolet index reported for the sampling interval."
+        },
+        "cloudCoverPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Cloud cover estimate as a percentage."
+        },
+        "visibilityKm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Horizontal visibility in kilometers."
         }
       },
       "description": "Snapshot of environmental conditions."

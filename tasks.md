@@ -26,8 +26,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-157 Plugin API lease & manifest enforcement _(Done)_
 
 - [ ] NX-191 Zone proto + JSON schema handshake _(Planned)_ — ADR-027 spatial constraints contract release
-- [ ] NX-192 PoseStream zone mask proto update _(Planned)_ — ADR-027 PoseStream mask contract
-- [ ] NX-193 Layer registry hash handshake draft _(Planned)_ — ADR-032 layer controllers registry requirements
+- [x] NX-192 PoseStream zone mask proto update _(Done)_ — ADR-027 PoseStream mask contract
+- [x] NX-193 Layer registry hash handshake draft _(Done)_ — ADR-032 layer controllers registry requirements
 - [ ] NX-194 Capability registry expansion for mapping/zone capabilities _(Planned)_ — ADR-029 mapping kernel contracts; ADR-031 manifest governance
 - [ ] NX-195 Plugin manifest schema vNext with capability/lease metadata _(Planned)_ — ADR-031 official plugin bundle policy
 - [ ] NX-196 Job/session schema refresh _(Planned)_ — ADR-030 job lifecycle; ADR-041 session metadata
@@ -354,8 +354,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-156 | Roll out ADR-006 AOG-Link transports and bridge translation layers | Done | AI | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Transport rollout guide + validation/support checklist |
 | NX-157 | Implement ADR-018 plugin API leases, manifests, and AgIO migration | Done | AI | — | [ADR-018 Plugin API](docs/ADR/ADR-018-plugin-api.md) | Lease + manifest governance guide for plugin authors |
 | NX-191 | Zone proto + JSON schema handshake | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 spatial constraints contract release |
-| NX-192 | PoseStream zone mask proto update | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 PoseStream mask contract |
-| NX-193 | Layer registry hash handshake draft | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 layer controllers registry requirements |
+| NX-192 | PoseStream zone mask proto update | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | PoseStream now carries `PoseZoneMask` with registry hash + zone IDs |
+| NX-193 | Layer registry hash handshake draft | Done |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | Draft handshake spec published for controller boot validation |
 | NX-194 | Capability registry expansion for mapping/zone capabilities | Planned |  | — | [ADR-029](docs/ADR/ADR-029-mapping-plugin-architecture.md), [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-029 mapping kernel contracts; ADR-031 manifest governance |
 | NX-195 | Plugin manifest schema vNext with capability/lease metadata | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 official plugin bundle policy |
 | NX-196 | Job/session schema refresh | Planned |  | — | [ADR-030](docs/ADR/ADR-030-field-job-sessions.md), [ADR-041](docs/ADR/ADR-041_JobSessions.md) | ADR-030 job lifecycle; ADR-041 session metadata |

@@ -1,0 +1,453 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/job.schema.json",
+  "title": "AgOpenGPS Nexus job metadata (aog.job.v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "jobId",
+    "displayName",
+    "state",
+    "createdAt",
+    "updatedAt",
+    "paths",
+    "context",
+    "spatial",
+    "assets",
+    "sessions"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the job metadata contract implemented by the JobsService."
+    },
+    "jobId": {
+      "$ref": "#/$defs/jobId"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operator friendly job name rendered in UI shells and reports."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{2,}$",
+      "description": "Filesystem friendly slug derived from the display name."
+    },
+    "state": {
+      "$ref": "#/$defs/jobState"
+    },
+    "createdAt": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "updatedAt": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "startedAt": {
+      "$ref": "#/$defs/timestamp",
+      "description": "Timestamp when the first session began."
+    },
+    "endedAt": {
+      "$ref": "#/$defs/timestamp",
+      "description": "Timestamp when the job was completed."
+    },
+    "activeSessionId": {
+      "$ref": "#/$defs/sessionId",
+      "description": "Identifier of the currently mounted session, if any."
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["farmId", "fieldIds"],
+      "properties": {
+        "farmId": {
+          "$ref": "#/$defs/entityId"
+        },
+        "seasonId": {
+          "$ref": "#/$defs/entityId",
+          "description": "Optional season organiser associated with the job."
+        },
+        "fieldIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/entityId"
+          },
+          "description": "Field identifiers mounted by the job."
+        },
+        "workOrderId": {
+          "$ref": "#/$defs/entityId",
+          "description": "Linked TaskService work order when the job originated from orchestration."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Operator supplied context rendered in job drawers and reports."
+        }
+      },
+      "description": "Farm, field, and seasonal context for the job."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "Optional user defined tags used for filtering and analytics."
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jobRoot", "dataDir", "resumeFile"],
+      "properties": {
+        "jobRoot": {
+          "type": "string",
+          "description": "Absolute or job-relative path to the job root directory."
+        },
+        "dataDir": {
+          "type": "string",
+          "description": "Path to the structured data subtree storing layers, sessions, and attachments."
+        },
+        "resumeFile": {
+          "type": "string",
+          "description": "Path to the legacy Resume.txt file maintained for compatibility."
+        },
+        "attachmentsDir": {
+          "type": "string",
+          "description": "Optional directory for operator supplied attachments."
+        }
+      },
+      "description": "Filesystem layout used by the job store."
+    },
+    "spatial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["home", "envelope"],
+      "properties": {
+        "home": {
+          "$ref": "#/$defs/latLon",
+          "description": "Primary reference coordinate used for Drive-In prompts and job sorting."
+        },
+        "envelope": {
+          "$ref": "#/$defs/envelope",
+          "description": "Bounding box encompassing all mounted fields."
+        },
+        "primaryBoundaryId": {
+          "$ref": "#/$defs/entityId",
+          "description": "Identifier of the boundary geometry treated as the canonical job outline."
+        },
+        "boundaryRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entityId"
+          },
+          "uniqueItems": true,
+          "description": "Additional boundary identifiers linked to the job."
+        }
+      },
+      "description": "Spatial hints and geometry references linked to the job."
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "boundaryLayers",
+        "coverageLayers",
+        "guidanceSets",
+        "prescriptions",
+        "attachments"
+      ],
+      "properties": {
+        "boundaryLayers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entityId"
+          },
+          "uniqueItems": true,
+          "description": "Boundary layer identifiers included in the job store."
+        },
+        "coverageLayers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entityId"
+          },
+          "uniqueItems": true,
+          "description": "Coverage layers generated by field work."
+        },
+        "guidanceSets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entityId"
+          },
+          "uniqueItems": true,
+          "description": "Guidance sets available for navigation."
+        },
+        "prescriptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entityId"
+          },
+          "uniqueItems": true,
+          "description": "Prescription layer identifiers attached to the job."
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "path"],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/entityId"
+              },
+              "path": {
+                "type": "string",
+                "description": "Relative path to the attachment asset."
+              },
+              "mediaType": {
+                "type": "string",
+                "description": "Optional MIME type for the attachment."
+              },
+              "sizeBytes": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Size of the attachment on disk."
+              }
+            }
+          },
+          "description": "Attachments linked to the job such as photos or documents."
+        }
+      },
+      "description": "Asset identifiers and references maintained alongside job metadata."
+    },
+    "equipment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vehicleId": {
+          "$ref": "#/$defs/entityId",
+          "description": "Vehicle or power unit assigned when the job was created."
+        },
+        "implementId": {
+          "$ref": "#/$defs/entityId",
+          "description": "Implement or tool attached to the job."
+        },
+        "presetId": {
+          "$ref": "#/$defs/entityId",
+          "description": "Preset configuration referenced during job orchestration."
+        },
+        "layoutId": {
+          "$ref": "#/$defs/entityId",
+          "description": "UI layout snapshot tied to the job."
+        }
+      },
+      "description": "Equipment context captured during job orchestration."
+    },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "totalAreaHa": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total hectares covered across all sessions."
+        },
+        "totalDistanceKm": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Distance travelled while the job was active."
+        },
+        "activeDurationSec": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total active session duration in seconds."
+        },
+        "completedSessionCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of sessions marked as completed."
+        }
+      },
+      "description": "Aggregated statistics derived from session history."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Plugin defined metadata extensions."
+    },
+    "sessions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/sessionSummary"
+      },
+      "description": "Lightweight descriptors for sessions associated with the job."
+    }
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "entityId": {
+      "type": "string",
+      "pattern": "^[a-z]+:[A-Za-z0-9._:-]+$",
+      "description": "Stable identifier using the namespace:type convention (e.g., field:home-quarter)."
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^job:[A-Za-z0-9._:-]+$",
+      "description": "Stable identifier for the job."
+    },
+    "sessionId": {
+      "type": "string",
+      "pattern": "^session:[A-Za-z0-9._:-]+$",
+      "description": "Stable identifier for a job session."
+    },
+    "jobState": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "mounted",
+        "active",
+        "paused",
+        "closed",
+        "completed",
+        "archived"
+      ],
+      "description": "Lifecycle state of the job."
+    },
+    "sessionState": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "completed"
+      ],
+      "description": "Lifecycle state of a session."
+    },
+    "latLon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lat", "lon"],
+      "properties": {
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "elevationM": {
+          "type": "number",
+          "description": "Optional elevation in metres above sea level."
+        }
+      }
+    },
+    "envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minLat",
+        "minLon",
+        "maxLat",
+        "maxLon"
+      ],
+      "properties": {
+        "minLat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "minLon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "maxLat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "maxLon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "crs": {
+          "type": "string",
+          "description": "Coordinate reference system for the envelope when not WGS84."
+        }
+      }
+    },
+    "sessionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "state",
+        "startedAt",
+        "lastModifiedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/sessionId"
+        },
+        "name": {
+          "type": "string",
+          "description": "Operator friendly session name."
+        },
+        "state": {
+          "$ref": "#/$defs/sessionState"
+        },
+        "startedAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "endedAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "lastModifiedAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "activeOperators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entityId"
+          },
+          "description": "Operators assigned to the session."
+        },
+        "stats": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "areaHa": {
+              "type": "number",
+              "minimum": 0
+            },
+            "distanceKm": {
+              "type": "number",
+              "minimum": 0
+            },
+            "durationSec": {
+              "type": "number",
+              "minimum": 0
+            },
+            "coveragePct": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "description": "Summary statistics for the session."
+        },
+        "extensions": {
+          "type": "object",
+          "description": "Plugin supplied summary metadata."
+        }
+      }
+    }
+  }
+}

@@ -82,12 +82,59 @@ public sealed class JobTasksPersistence
 
         var snapshot = JobDocumentFactory.ToSnapshot(document);
         var layout = snapshot.Layout;
+        var targetJobRoot = Path.GetFullPath(jobRoot);
+        var manifestJobRoot = string.IsNullOrWhiteSpace(layout.JobRoot)
+            ? targetJobRoot
+            : Path.GetFullPath(layout.JobRoot);
+
+        string ResolvePath(string? candidatePath, string defaultRelative)
+        {
+            if (string.IsNullOrWhiteSpace(candidatePath))
+            {
+                return Path.Combine(targetJobRoot, defaultRelative);
+            }
+
+            var trimmed = candidatePath.Trim();
+            if (!Path.IsPathRooted(trimmed))
+            {
+                return Path.GetFullPath(trimmed, targetJobRoot);
+            }
+
+            var candidateFullPath = Path.GetFullPath(trimmed);
+            var relativeToManifest = Path.GetRelativePath(manifestJobRoot, candidateFullPath);
+
+            if (string.Equals(relativeToManifest, ".", StringComparison.Ordinal))
+            {
+                return targetJobRoot;
+            }
+
+            if (!Path.IsPathRooted(relativeToManifest) && !relativeToManifest.StartsWith("..", StringComparison.Ordinal))
+            {
+                return Path.GetFullPath(relativeToManifest, targetJobRoot);
+            }
+
+            var fileName = Path.GetFileName(candidateFullPath);
+            return string.IsNullOrEmpty(fileName)
+                ? Path.Combine(targetJobRoot, defaultRelative)
+                : Path.Combine(targetJobRoot, fileName);
+        }
+
+        string? ResolveOptionalPath(string? candidatePath, string defaultRelative)
+        {
+            if (string.IsNullOrWhiteSpace(candidatePath))
+            {
+                return null;
+            }
+
+            return ResolvePath(candidatePath, defaultRelative);
+        }
+
         var resolvedLayout = layout with
         {
-            JobRoot = string.IsNullOrWhiteSpace(layout.JobRoot) ? jobRoot : layout.JobRoot,
-            DataDirectory = string.IsNullOrWhiteSpace(layout.DataDirectory) ? Path.Combine(jobRoot, "data") : layout.DataDirectory,
-            ResumeFile = string.IsNullOrWhiteSpace(layout.ResumeFile) ? Path.Combine(jobRoot, "Resume.txt") : layout.ResumeFile,
-            AttachmentsDirectory = layout.AttachmentsDirectory
+            JobRoot = targetJobRoot,
+            DataDirectory = ResolvePath(layout.DataDirectory, "data"),
+            ResumeFile = ResolvePath(layout.ResumeFile, "Resume.txt"),
+            AttachmentsDirectory = ResolveOptionalPath(layout.AttachmentsDirectory, "attachments")
         };
 
         if (resolvedLayout.AttachmentsDirectory is null)

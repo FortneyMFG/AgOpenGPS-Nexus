@@ -97,20 +97,20 @@ public sealed class WeatherIngestPipeline
             return true;
         }
 
-        if (_options.MinimumPublishInterval > TimeSpan.Zero)
+        if (_options.MinimumPublishInterval <= TimeSpan.Zero)
         {
-            var interval = candidate.CapturedAt - _lastPublishedAt;
-            if (interval < _options.MinimumPublishInterval)
-            {
-                return false;
-            }
-
-            // When the minimum publish interval has elapsed we always emit a snapshot to
-            // provide a heartbeat even if the readings have not materially changed.
-            return true;
+            return !IsEquivalent(candidate, _lastPublished);
         }
 
-        return !IsEquivalent(candidate, _lastPublished);
+        var interval = candidate.CapturedAt - _lastPublishedAt;
+        if (interval < _options.MinimumPublishInterval)
+        {
+            return false;
+        }
+
+        // When the minimum publish interval has elapsed we always emit a snapshot to provide
+        // a heartbeat even if the readings have not materially changed.
+        return true;
     }
 
     private ValueTask<WeatherSnapshot?> PublishAsync(WeatherSnapshot snapshot)

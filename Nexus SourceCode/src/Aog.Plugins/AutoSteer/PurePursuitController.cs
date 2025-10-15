@@ -74,7 +74,7 @@ public sealed class PurePursuitController
             return 0;
         }
 
-        var headingToTarget = Math.Atan2(target.DirectionY, target.DirectionX);
+        var headingToTarget = Math.Atan2(toTargetY, toTargetX);
         var headingError = AutoSteerMath.NormalizeAngle(headingToTarget - state.HeadingRadians);
         var curvature = 2 * Math.Sin(headingError) / Math.Max(distanceToTarget, 1e-6);
         var steering = Math.Atan(curvature * state.WheelbaseMeters);

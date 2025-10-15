@@ -23,6 +23,16 @@ public sealed class CombineYieldOptions
     public string Source { get; set; } = "sim";
 
     /// <summary>
+    /// Gets or sets the transform metadata captured in provenance records.
+    /// </summary>
+    public string Transform { get; set; } = "aggregate:combine-yield";
+
+    /// <summary>
+    /// Gets or sets the actor recorded in provenance entries.
+    /// </summary>
+    public string Actor { get; set; } = "plugin:combine-yield";
+
+    /// <summary>
     /// Gets or sets the coordinate frame identifier for published layers.
     /// </summary>
     public string Frame { get; set; } = "vehicle";
@@ -51,6 +61,16 @@ public sealed class CombineYieldOptions
         if (string.IsNullOrWhiteSpace(Source))
         {
             throw new ArgumentOutOfRangeException(nameof(Source), Source, "Source must be provided.");
+        }
+
+        if (string.IsNullOrWhiteSpace(Transform))
+        {
+            throw new ArgumentOutOfRangeException(nameof(Transform), Transform, "Transform must be provided.");
+        }
+
+        if (string.IsNullOrWhiteSpace(Actor))
+        {
+            throw new ArgumentOutOfRangeException(nameof(Actor), Actor, "Actor must be provided.");
         }
 
         if (string.IsNullOrWhiteSpace(Frame))

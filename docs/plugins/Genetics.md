@@ -22,6 +22,17 @@ The Genetics plugin tracks planned and actual seed varieties, barcode scans, and
 - Support barcode scanning (camera, handheld) that populates lot/treatment data automatically and logs provenance.
 - Surface applied variety summaries per field and per session, highlighting deviations from the plan for operator review and audit exports.
 
+### Picker UI Implementation (NX-303)
+
+- `GeneticsPickerViewModel` coordinates favorites, recents, search results, and barcode scan state so the desktop shell can render
+  ADR-046 workflows even when offline. The design-time sample seeds Pioneer/DEKALB favorites, Asgrow/Corteva recents, and a
+  Specialty catalog entry used in regression screenshots. Search tokens span brand, product, trait stack, lot, treatment, source,
+  notes, and barcode payloads while `ApplyBarcodeScan` resolves wedge/serial scanner input into selections with clear status
+  messaging.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/GeneticsPickerViewModel.cs†L1-L308】
+- `GeneticsVarietyOptionViewModel` exposes display metadata, accent theming, search tokens, and manual selection commands with
+  minimal dependencies so plugin hosts can hydrate the picker from analytics snapshots or on-disk caches without reaching back to
+  the engine.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/GeneticsVarietyOptionViewModel.cs†L1-L168】
+
 ## Exports & Reporting
 
 - Generate CSV and GeoJSON exports listing planned vs. actual varieties, including session timestamps and barcode metadata.

@@ -26,6 +26,15 @@ per-plugin issues that map to ADR-031 governance signals. When running inside th
 view-model loads manifests from `docs/plugins/manifests`; packaged builds fall back to a representative
 sample. UI bindings render capability badges, dependency issues, and a data-source banner so operators
 understand what telemetry is driving the dashboard.
+
+## Radio provisioning UI flows (NX-311)
+
+`RadioProvisioningFlowViewModel` models the RadioBridge provisioning workflow described in
+[ADR-048](../../../docs/ADR/ADR-048_RadioBridge.md) and the
+[`radiobridge-provisioning` how-to](../../../docs/howto/radio/radiobridge-provisioning.md). The card summarises
+prerequisites, CLI usage, device configuration, and validation checkpoints so operators can stage ELRS/LoRa
+bridges without switching back to documentation. The view-model also exposes the provisioning profile schema
+fields to reinforce how generated JSON maps onto adapter options and security practices.
 ## Crop quick-select UI (NX-302)
 
 `CropQuickSelectViewModel` models the crop quick-select card described in [ADR-045](../../../docs/ADR/ADR-045_CropTypePlugin.md).

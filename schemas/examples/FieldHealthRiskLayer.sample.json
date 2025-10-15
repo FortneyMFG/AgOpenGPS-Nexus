@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "layer:risk.flood.2025-04-02",
+  "kind": "risk.flood",
+  "jobId": "job:2025-scouting",
+  "sessionId": "session:scouting-2025-04-02",
+  "units": "severity-index",
+  "createdAt": "2025-04-02T16:05:00Z",
+  "createdBy": "plugin:fieldHealth",
+  "lastModifiedAt": "2025-04-02T16:05:00Z",
+  "provenance": {
+    "source": "plugin:fieldHealth",
+    "transform": "zone-drawing.v1",
+    "hash": "d1b4c8ef",
+    "createdAt": "2025-04-02T16:05:00Z",
+    "actor": "plugin:fieldHealth"
+  },
+  "metadata": {
+    "schemaRef": "https://agopengps.org/schemas/FieldHealthRiskLayer.v1.json",
+    "notes": "Spring scouting after heavy rainfall; prioritise drainage checks before planting.",
+    "tags": ["spring", "priority", "drainage"],
+    "observations": [
+      {
+        "featureId": "feature:risk-zone-01",
+        "zoneId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "label": "South terrace ponding",
+        "severity": "high",
+        "observedAt": "2025-04-02T15:45:00Z",
+        "observer": "user:operator.maya",
+        "notes": "Standing water along terrace; schedule pump truck if no improvement by weekend.",
+        "attachments": ["sessions/scouting-2025-04-02/photos/ponding.jpg"],
+        "sessionId": "session:scouting-2025-04-02",
+        "areaHa": 1.2,
+        "geometryHash": "5f9c2a8e",
+        "lastUpdatedAt": "2025-04-02T16:02:00Z",
+        "status": "active"
+      },
+      {
+        "featureId": "feature:risk-zone-02",
+        "zoneId": "6f9619ff-8b86-d011-b42d-00c04fc964ff",
+        "label": "North access rutting",
+        "severity": "moderate",
+        "observedAt": "2025-04-02T15:55:00Z",
+        "observer": "user:operator.liam",
+        "notes": "Compaction near tender staging; keep heavy traffic out until it dries.",
+        "attachments": ["sessions/scouting-2025-04-02/photos/rutting.jpg"],
+        "sessionId": "session:scouting-2025-04-02",
+        "areaHa": 0.8,
+        "geometryHash": "9a4d3c21",
+        "lastUpdatedAt": "2025-04-02T16:04:00Z",
+        "status": "monitor"
+      }
+    ],
+    "stats": {
+      "totalAreaHa": 2.0,
+      "severityCounts": {
+        "none": 0,
+        "low": 0,
+        "moderate": 1,
+        "high": 1,
+        "critical": 0
+      },
+      "lastSurveyedAt": "2025-04-02T16:00:00Z"
+    }
+  }
+}

@@ -18,6 +18,12 @@ Introduce a Field Health plugin that manages `risk.flood`, `risk.compaction`, `r
 include `severity`, `observedAt`, `observer`, and `notes`. Layers leverage the Zone Drawing Framework for editing and integrate
 with the context bus for analytics.
 
+### Contracts
+
+- Publish `FieldHealthRiskLayer.v1` under `/schemas` to describe risk layer metadata (severity scale, observation provenance,
+  attachments, roll-up statistics). Consumers validate layer payloads against this schema before persisting or rendering
+  overlays.【F:schemas/FieldHealthRiskLayer.v1.json†L1-L140】
+
 ### Workflow
 
 - Operators draw or import risk zones during scouting; severity is color-coded in the UI.

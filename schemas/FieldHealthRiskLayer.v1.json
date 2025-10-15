@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/FieldHealthRiskLayer.v1.json",
+  "title": "FieldHealthRiskLayer.v1",
+  "type": "object",
+  "allOf": [
+    { "$ref": "./Layer.v1.json" }
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "pattern": "^risk\\.(flood|compaction|weeds|other)$",
+      "description": "Field health risk layer classification.",
+      "x-nexus-scope": "core"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observations"],
+      "description": "Field health risk observations captured for this layer.",
+      "x-nexus-scope": "plugin",
+      "properties": {
+        "schemaRef": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional attribute schema reference for client-side validation.",
+          "x-nexus-scope": "core"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "https://agopengps.org/schemas/FieldHealthRiskLayer.v1.json#/$defs/observation"
+          },
+          "description": "Per-zone risk observations recorded during scouting.",
+          "x-nexus-scope": "plugin"
+        },
+        "stats": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Aggregated analytics derived from the risk observations.",
+          "x-nexus-scope": "plugin",
+          "properties": {
+            "totalAreaHa": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Total hectares covered by risk observations.",
+              "x-nexus-scope": "plugin"
+            },
+            "severityCounts": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Count of observations grouped by severity classification.",
+              "x-nexus-scope": "plugin",
+              "properties": {
+                "none": { "type": "integer", "minimum": 0, "x-nexus-scope": "plugin" },
+                "low": { "type": "integer", "minimum": 0, "x-nexus-scope": "plugin" },
+                "moderate": { "type": "integer", "minimum": 0, "x-nexus-scope": "plugin" },
+                "high": { "type": "integer", "minimum": 0, "x-nexus-scope": "plugin" },
+                "critical": { "type": "integer", "minimum": 0, "x-nexus-scope": "plugin" }
+              }
+            },
+            "lastSurveyedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Timestamp of the most recent field health survey contributing to this layer.",
+              "x-nexus-scope": "core"
+            }
+          }
+        },
+        "notes": {
+          "type": "string",
+          "description": "Layer-level notes summarising scouting context or follow-up actions.",
+          "x-nexus-scope": "plugin"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "description": "Free-form tags applied to the layer for filtering or analytics.",
+          "x-nexus-scope": "plugin"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["featureId", "severity", "observedAt", "observer"],
+      "properties": {
+        "featureId": {
+          "type": "string",
+          "pattern": "^feature:[A-Za-z0-9._:-]+$",
+          "description": "Identifier for the editable zone feature.",
+          "x-nexus-scope": "plugin"
+        },
+        "zoneId": {
+          "type": ["string", "null"],
+          "format": "uuid",
+          "description": "Optional reference to the Zone registry entry when persisted separately.",
+          "x-nexus-scope": "core"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-friendly label describing the risk zone.",
+          "x-nexus-scope": "plugin"
+        },
+        "severity": {
+          "$ref": "https://agopengps.org/schemas/FieldHealthRiskLayer.v1.json#/$defs/severity"
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the observation was recorded.",
+          "x-nexus-scope": "core"
+        },
+        "observer": {
+          "type": "string",
+          "pattern": "^(user|system|plugin):[A-Za-z0-9._:-]+$",
+          "description": "Actor responsible for recording the observation.",
+          "x-nexus-scope": "core"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Detailed scouting notes associated with the risk zone.",
+          "x-nexus-scope": "plugin"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "description": "Supporting attachments such as photos or documents.",
+          "x-nexus-scope": "plugin"
+        },
+        "sessionId": {
+          "type": ["string", "null"],
+          "pattern": "^session:[A-Za-z0-9._:-]+$",
+          "description": "Session identifier where the observation was captured.",
+          "x-nexus-scope": "core"
+        },
+        "areaHa": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Approximate area of the risk zone in hectares.",
+          "x-nexus-scope": "plugin"
+        },
+        "geometryHash": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{8,64}$",
+          "description": "Deterministic hash referencing the zone geometry payload.",
+          "x-nexus-scope": "plugin"
+        },
+        "lastUpdatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the observation attributes were last updated.",
+          "x-nexus-scope": "core"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "resolved", "monitor"],
+          "description": "Lifecycle state used by analytics and reporting.",
+          "x-nexus-scope": "plugin"
+        }
+      }
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["none", "low", "moderate", "high", "critical"],
+      "description": "Risk severity classification used for color ramps and analytics.",
+      "x-nexus-scope": "plugin"
+    }
+  }
+}

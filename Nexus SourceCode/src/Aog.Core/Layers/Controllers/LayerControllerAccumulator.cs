@@ -35,6 +35,20 @@ internal sealed class LayerControllerAccumulator
 
     private PlanarPoint? _lastPosition;
 
+    private double? _lastSnapshotNormalized;
+    private double? _lastSnapshotEngineering;
+    private double? _lastSnapshotQuality;
+    private bool? _lastSnapshotRateUnavailable;
+    private double? _lastSnapshotMinimum;
+    private double? _lastSnapshotMaximum;
+    private double? _lastSnapshotArea;
+    private double? _lastSnapshotNumerator;
+    private double? _lastSnapshotDenominator;
+    private int? _lastSnapshotSampleCount;
+    private DateTimeOffset? _lastSnapshotFirstSample;
+    private DateTimeOffset? _lastSnapshotLastSample;
+    private PlanarPoint[]? _lastSnapshotPositions;
+
     public bool HasSamples => _sampleCount > 0 || _areaSum > 0d || _positions.Count > 0;
 
     public bool HasEverReceivedSample => _hasEverReceivedSample;
@@ -107,51 +121,91 @@ internal sealed class LayerControllerAccumulator
         }
 
         var containsFreshData = HasSamples;
-        var area = _areaSum;
+        var area = containsFreshData ? _areaSum : (_lastSnapshotArea ?? 0d);
 
-        var normalized = area > 0d
-            ? _normalizedSum / area
-            : _lastNormalized ?? 0d;
+        var normalized = containsFreshData
+            ? (area > 0d ? _normalizedSum / area : _lastSnapshotNormalized ?? _lastNormalized ?? 0d)
+            : (_lastSnapshotNormalized ?? _lastNormalized ?? 0d);
 
-        var engineering = aggregationStrategy switch
+        double engineering;
+        if (containsFreshData)
         {
-            LayerAggregationStrategy.Sum => _engineeringContributionSum,
-            LayerAggregationStrategy.Hold when _lastEngineering.HasValue => _lastEngineering.Value,
-            LayerAggregationStrategy.Hold => throw new InvalidOperationException("Hold strategy requires at least one observed sample."),
-            _ when area > 0d => _engineeringWeightedSum / area,
-            _ when includeHoldValues && _lastEngineering.HasValue => _lastEngineering.Value,
-            _ => throw new InvalidOperationException("No engineering samples recorded in the current window."),
-        };
+            engineering = aggregationStrategy switch
+            {
+                LayerAggregationStrategy.Sum => _engineeringContributionSum,
+                LayerAggregationStrategy.Hold when _lastEngineering.HasValue => _lastEngineering.Value,
+                LayerAggregationStrategy.Hold => throw new InvalidOperationException("Hold strategy requires at least one observed sample."),
+                _ when area > 0d => _engineeringWeightedSum / area,
+                _ when _lastSnapshotEngineering.HasValue => _lastSnapshotEngineering.Value,
+                _ when includeHoldValues && _lastEngineering.HasValue => _lastEngineering.Value,
+                _ => throw new InvalidOperationException("No engineering samples recorded in the current window."),
+            };
+        }
+        else if (_lastSnapshotEngineering.HasValue)
+        {
+            engineering = _lastSnapshotEngineering.Value;
+        }
+        else if (includeHoldValues && _lastEngineering.HasValue)
+        {
+            engineering = _lastEngineering.Value;
+        }
+        else
+        {
+            throw new InvalidOperationException("No engineering samples recorded in the current window.");
+        }
 
-        var quality = area > 0d
-            ? Math.Clamp(_qualitySum / area, 0d, 1d)
-            : (_lastQuality ?? 0d);
+        var quality = containsFreshData
+            ? (area > 0d
+                ? Math.Clamp(_qualitySum / area, 0d, 1d)
+                : Math.Clamp(_lastSnapshotQuality ?? _lastQuality ?? 0d, 0d, 1d))
+            : Math.Clamp(_lastSnapshotQuality ?? _lastQuality ?? 0d, 0d, 1d);
 
         var rateUnavailable = containsFreshData
             ? _rateUnavailable
-            : (_lastRateUnavailable ?? false);
+            : (_lastSnapshotRateUnavailable ?? _lastRateUnavailable ?? false);
 
         var minimum = containsFreshData
             ? _minimumValue
-            : (_lastEngineering ?? double.NaN);
+            : (_lastSnapshotMinimum ?? _lastEngineering ?? double.NaN);
 
         var maximum = containsFreshData
             ? _maximumValue
-            : (_lastEngineering ?? double.NaN);
+            : (_lastSnapshotMaximum ?? _lastEngineering ?? double.NaN);
 
-        var numerator = containsFreshData || _numeratorSum != 0d
+        var numerator = containsFreshData
             ? _numeratorSum
-            : (_lastNormalized ?? 0d) * area;
+            : (_lastSnapshotNumerator ?? (_lastNormalized ?? 0d) * area);
 
-        var denominator = containsFreshData || _denominatorSum != 0d
+        var denominator = containsFreshData
             ? _denominatorSum
-            : area;
+            : (_lastSnapshotDenominator ?? area);
 
-        var positions = containsFreshData
-            ? (IReadOnlyList<PlanarPoint>)_positions.ToArray()
-            : _lastPosition is { } lastPosition
-                ? new[] { lastPosition }
-                : Array.Empty<PlanarPoint>();
+        PlanarPoint[]? positionsArray = null;
+        IReadOnlyList<PlanarPoint> positions;
+        if (containsFreshData)
+        {
+            positionsArray = _positions.ToArray();
+            positions = positionsArray;
+        }
+        else if (_lastSnapshotPositions is { } snapshotPositions)
+        {
+            positions = snapshotPositions;
+        }
+        else if (_lastPosition is { } lastPosition)
+        {
+            positions = new[] { lastPosition };
+        }
+        else
+        {
+            positions = Array.Empty<PlanarPoint>();
+        }
+
+        var snapshotSampleCount = containsFreshData ? _sampleCount : (_lastSnapshotSampleCount ?? 0);
+        var snapshotFirstSample = containsFreshData ? _windowFirstSample : _lastSnapshotFirstSample;
+        var snapshotLastSample = containsFreshData ? _windowLastSample : _lastSnapshotLastSample;
+
+        var emittedMinimum = containsFreshData ? _minimumValue : minimum;
+        var emittedMaximum = containsFreshData ? _maximumValue : maximum;
 
         var snapshot = new LayerControllerSnapshot(
             controllerId,
@@ -165,12 +219,29 @@ internal sealed class LayerControllerAccumulator
             area,
             numerator,
             denominator,
-            containsFreshData ? _minimumValue : minimum,
-            containsFreshData ? _maximumValue : maximum,
-            containsFreshData ? _sampleCount : 0,
-            containsFreshData ? _windowFirstSample : null,
-            containsFreshData ? _windowLastSample : null,
+            emittedMinimum,
+            emittedMaximum,
+            snapshotSampleCount,
+            snapshotFirstSample,
+            snapshotLastSample,
             positions);
+
+        if (containsFreshData)
+        {
+            _lastSnapshotNormalized = normalized;
+            _lastSnapshotEngineering = engineering;
+            _lastSnapshotQuality = quality;
+            _lastSnapshotRateUnavailable = rateUnavailable;
+            _lastSnapshotArea = area;
+            _lastSnapshotNumerator = numerator;
+            _lastSnapshotDenominator = denominator;
+            _lastSnapshotMinimum = emittedMinimum;
+            _lastSnapshotMaximum = emittedMaximum;
+            _lastSnapshotSampleCount = snapshotSampleCount;
+            _lastSnapshotFirstSample = snapshotFirstSample;
+            _lastSnapshotLastSample = snapshotLastSample;
+            _lastSnapshotPositions = positionsArray;
+        }
 
         if (resetAfterEmission)
         {

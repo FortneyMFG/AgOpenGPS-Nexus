@@ -46,6 +46,30 @@ public sealed class RadioBridgeTransportTests
     }
 
     [Fact]
+    public void EnqueuePublication_WhenFecEnabled_SetsFlagOnFrame()
+    {
+        var clock = new FakeTimeProvider(new DateTimeOffset(2025, 3, 20, 13, 0, 0, TimeSpan.Zero));
+        var transport = new RadioBridgeTransport(
+            new RadioBridgeOptions { DeviceId = "bridge:alpha", EnableForwardErrorCorrection = true },
+            clock);
+
+        var message = new RadioBridgePublicationMessage(
+            "aog/live/season/job/diagnostics",
+            MeshDataTier.Coverage,
+            clock.GetUtcNow(),
+            "device:fec",
+            null,
+            new byte[] { 0x55 });
+
+        transport.EnqueuePublication(message);
+
+        transport.TryGetNextFrame(out var frameBytes).Should().BeTrue();
+        var decoded = RadioBridgeFrameCodec.Decode(frameBytes.Span);
+        decoded.Flags.Should().HaveFlag(RadioBridgeFrameFlags.ForwardErrorCorrection);
+        decoded.Flags.Should().HaveFlag(RadioBridgeFrameFlags.Compressed);
+    }
+
+    [Fact]
     public void ProcessInboundAck_RemovesPendingFrame()
     {
         var clock = new FakeTimeProvider(new DateTimeOffset(2025, 3, 20, 12, 0, 0, TimeSpan.Zero));
@@ -110,6 +134,38 @@ public sealed class RadioBridgeTransportTests
     }
 
     [Fact]
+    public void ProcessInboundFrame_WithFecPayload_DeliversPublication()
+    {
+        var clock = new FakeTimeProvider(new DateTimeOffset(2025, 3, 20, 9, 45, 0, TimeSpan.Zero));
+        var transport = new RadioBridgeTransport(
+            new RadioBridgeOptions { DeviceId = "bridge:alpha", EnableForwardErrorCorrection = true },
+            clock);
+
+        RadioBridgePublicationMessage? received = null;
+        transport.PublicationReceived += m => received = m;
+
+        var inboundMessage = new RadioBridgePublicationMessage(
+            "aog/live/season/job/coverage",
+            MeshDataTier.Coverage,
+            clock.GetUtcNow(),
+            "device:lora",
+            new Dictionary<string, string> { ["origin"] = "radio" },
+            new byte[] { 0x10, 0x20, 0x30 });
+
+        var frameBytes = EncodeDataFrame(inboundMessage, sequence: 12, useForwardErrorCorrection: true);
+        var result = transport.ProcessInboundFrame(frameBytes);
+
+        result.Status.Should().Be(RadioBridgeProcessStatus.PublicationDelivered);
+        result.Sequence.Should().Be(12);
+        received.Should().NotBeNull();
+        received!.Payload.Should().Equal(inboundMessage.Payload);
+
+        transport.TryGetNextFrame(out var ackBytes).Should().BeTrue();
+        var ackFrame = RadioBridgeFrameCodec.Decode(ackBytes.Span);
+        ackFrame.Flags.Should().NotHaveFlag(RadioBridgeFrameFlags.ForwardErrorCorrection);
+    }
+
+    [Fact]
     public void TryGetNextFrame_RetransmitsAfterInterval()
     {
         var clock = new FakeTimeProvider(new DateTimeOffset(2025, 3, 20, 10, 0, 0, TimeSpan.Zero));
@@ -136,6 +192,52 @@ public sealed class RadioBridgeTransportTests
         var retryFrame = RadioBridgeFrameCodec.Decode(retryBytes.Span);
         retryFrame.Sequence.Should().Be(firstFrame.Sequence);
         retryFrame.Flags.Should().HaveFlag(RadioBridgeFrameFlags.Retransmission);
+    }
+
+    [Fact]
+    public void TryGetNextFrame_WhenMaxRetransmissionsExceeded_NotifiesFailure()
+    {
+        var clock = new FakeTimeProvider(new DateTimeOffset(2025, 3, 20, 14, 0, 0, TimeSpan.Zero));
+        var options = new RadioBridgeOptions
+        {
+            DeviceId = "bridge:alpha",
+            BaseRetryInterval = TimeSpan.FromMilliseconds(100),
+            MaxRetryInterval = TimeSpan.FromMilliseconds(100),
+            MaxRetransmissions = 3,
+        };
+
+        var transport = new RadioBridgeTransport(options, clock);
+        RadioBridgeOutboundFailure? failure = null;
+        transport.OutboundDeliveryFailed += f => failure = f;
+
+        var message = new RadioBridgePublicationMessage(
+            "aog/live/season/job/fec",
+            MeshDataTier.Coverage,
+            clock.GetUtcNow(),
+            "device:gamma",
+            null,
+            new byte[] { 0x40 });
+
+        transport.EnqueuePublication(message);
+        transport.TryGetNextFrame(out _).Should().BeTrue();
+
+        for (var attempt = 0; attempt < options.MaxRetransmissions; attempt++)
+        {
+            clock.Advance(options.BaseRetryInterval);
+            var result = transport.TryGetNextFrame(out _);
+            if (attempt < options.MaxRetransmissions - 1)
+            {
+                result.Should().BeTrue();
+            }
+            else
+            {
+                result.Should().BeFalse();
+            }
+        }
+
+        failure.Should().NotBeNull();
+        failure!.Attempts.Should().Be(options.MaxRetransmissions);
+        transport.PendingOutboundCount.Should().Be(0);
     }
 
     [Fact]
@@ -194,7 +296,10 @@ public sealed class RadioBridgeTransportTests
         ackFrame.Ack.Should().Be(21);
     }
 
-    private static byte[] EncodeDataFrame(RadioBridgePublicationMessage message, ushort sequence)
+    private static byte[] EncodeDataFrame(
+        RadioBridgePublicationMessage message,
+        ushort sequence,
+        bool useForwardErrorCorrection = false)
     {
         var envelope = JsonSerializer.SerializeToUtf8Bytes(message, SerializerOptions);
         using var compressedStream = new MemoryStream();
@@ -204,10 +309,17 @@ public sealed class RadioBridgeTransportTests
         }
 
         var payload = compressedStream.ToArray();
+        var flags = RadioBridgeFrameFlags.Compressed;
+        if (useForwardErrorCorrection)
+        {
+            payload = Hamming12_8.Encode(payload);
+            flags |= RadioBridgeFrameFlags.ForwardErrorCorrection;
+        }
+
         var frame = new RadioBridgeFrame(
             Version: 1,
             PayloadType: RadioBridgePayloadType.Data,
-            Flags: RadioBridgeFrameFlags.Compressed,
+            Flags: flags,
             Sequence: sequence,
             Ack: 0,
             TopicHash: RadioBridgeTopicHasher.ComputeHash(message.Topic),

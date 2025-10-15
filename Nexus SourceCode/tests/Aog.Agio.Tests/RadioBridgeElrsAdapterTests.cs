@@ -202,6 +202,6 @@ public sealed class RadioBridgeElrsAdapterTests
             _link = link;
         }
 
-        public IRadioBridgeLink Create(RadioBridgeElrsAdapterOptions options) => _link;
+        public IRadioBridgeLink Create(RadioBridgeAdapterOptions options) => _link;
     }
 }

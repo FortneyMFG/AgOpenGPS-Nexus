@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Aog.Core.Mesh.RadioBridge;
-using System.Runtime.CompilerServices;
 
 namespace Aog.Agio.RadioBridge;
 
@@ -17,7 +16,7 @@ namespace Aog.Agio.RadioBridge;
 public sealed class RadioBridgeLinkFactory : IRadioBridgeLinkFactory
 {
     /// <inheritdoc />
-    public IRadioBridgeLink Create(RadioBridgeElrsAdapterOptions options)
+    public IRadioBridgeLink Create(RadioBridgeAdapterOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
 
@@ -26,15 +25,20 @@ public sealed class RadioBridgeLinkFactory : IRadioBridgeLinkFactory
             return new Simulation.SimulatedRadioBridgeLink(options.Endpoint);
         }
 
+        if (options.Endpoint.StartsWith("lora://", StringComparison.OrdinalIgnoreCase))
+        {
+            return CreateSerialLink(options.Endpoint, scheme: "lora", defaultBaud: 57600);
+        }
+
         if (options.Endpoint.StartsWith("serial://", StringComparison.OrdinalIgnoreCase))
         {
-            return CreateSerialLink(options.Endpoint);
+            return CreateSerialLink(options.Endpoint, scheme: "serial", defaultBaud: 420000);
         }
 
         throw new NotSupportedException($"Unsupported radio bridge endpoint '{options.Endpoint}'.");
     }
 
-    private static IRadioBridgeLink CreateSerialLink(string endpoint)
+    private static IRadioBridgeLink CreateSerialLink(string endpoint, string scheme, int defaultBaud)
     {
         var uri = new Uri(endpoint);
         var portName = uri.Host;
@@ -43,7 +47,7 @@ public sealed class RadioBridgeLinkFactory : IRadioBridgeLinkFactory
             throw new ArgumentException("Serial endpoint must specify a port name.", nameof(endpoint));
         }
 
-        var baudRate = 420000;
+        var baudRate = defaultBaud;
         if (!string.IsNullOrEmpty(uri.Query))
         {
             var pairs = uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries);
@@ -59,7 +63,7 @@ public sealed class RadioBridgeLinkFactory : IRadioBridgeLinkFactory
             }
         }
 
-        return new SerialRadioBridgeLink($"serial://{portName}", portName, baudRate);
+        return new SerialRadioBridgeLink($"{scheme}://{portName}", portName, baudRate);
     }
 
     private sealed class SerialRadioBridgeLink : IRadioBridgeLink

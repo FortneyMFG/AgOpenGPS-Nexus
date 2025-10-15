@@ -87,6 +87,12 @@ public static class Program
                     .ValidateOnStart();
 
                 services
+                    .AddOptions<RadioBridgeLoraAdapterOptions>()
+                    .BindConfiguration("AgioHost:RadioBridge:Lora")
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
+                services
                     .AddOptions<MeshTelemetryAggregatorOptions>()
                     .BindConfiguration("AgioHost:Mesh")
                     .AddOptions<LegacyMeshOptions>()
@@ -103,6 +109,7 @@ public static class Program
                 services.AddSingleton<MeshTelemetryAggregator>();
                 services.AddSingleton<IRadioBridgeLinkFactory, RadioBridgeLinkFactory>();
                 services.AddSingleton<RadioBridgeElrsAdapter>();
+                services.AddSingleton<RadioBridgeLoraAdapter>();
 
                 if (OperatingSystem.IsLinux())
                 {
@@ -131,6 +138,7 @@ public static class Program
 
                 services.AddSingleton<ILegacyPoseObserver>(provider => provider.GetRequiredService<MeshTelemetryAggregator>());
                 services.AddHostedService(provider => provider.GetRequiredService<RadioBridgeElrsAdapter>());
+                services.AddHostedService(provider => provider.GetRequiredService<RadioBridgeLoraAdapter>());
 
                 services.AddSingleton(backend);
                 services.AddSingleton(new AgioBackendRegistration(

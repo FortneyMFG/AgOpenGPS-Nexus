@@ -34,5 +34,8 @@
     <None Include="FileIO\Data\sample-surface.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="CostProfit\Data\ProfitRegressionFixture.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

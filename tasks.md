@@ -43,7 +43,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-206 Report template schema + manifest handshake _(Planned)_ — ADR-051 report builder & exports
 - [ ] NX-207 SRS + ADR cross-reference sweep for new layers _(Planned)_ — ADR-027…ADR-053 portfolio alignment
 - [ ] NX-208 Official bundle capability matrix update _(Planned)_ — ADR-031 manifest governance
-- [ ] NX-209 CRS normalization matrix publication _(Planned)_ — ADR-022 CRS policy
+- [x] NX-209 CRS normalization matrix publication _(Done)_ — ADR-022 CRS policy
 - [ ] NX-210 Contracts freeze automation for new capabilities _(Planned)_ — ADR-031 governance rollout
 
 ### Section B — Core (Headless, Sim Graph)
@@ -370,7 +370,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-206 | Report template schema + manifest handshake | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder & exports |
 | NX-207 | SRS + ADR cross-reference sweep for new layers | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-027…ADR-053 portfolio alignment |
 | NX-208 | Official bundle capability matrix update | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
-| NX-209 | CRS normalization matrix publication | Planned |  | — | [ADR-022](docs/ADR/ADR-022-crs-units-precision-policy.md) | ADR-022 CRS policy |
+| NX-209 | CRS normalization matrix publication | Done |  | — | [ADR-022](docs/ADR/ADR-022-crs-units-precision-policy.md) | Published [reference matrix](docs/reference/crs-normalization-matrix.md) |
 | NX-210 | Contracts freeze automation for new capabilities | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 governance rollout |
 
 ### Section B — Core (Headless, Sim Graph)

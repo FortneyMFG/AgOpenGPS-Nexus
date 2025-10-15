@@ -160,7 +160,7 @@ NX-205,FALSE,FALSE,NX-196,,Weather snapshot schema extensions — ADR-053 weathe
 NX-206,FALSE,FALSE,"NX-202, NX-203",,Report template schema + manifest handshake — ADR-051 report builder & exports
 NX-207,FALSE,FALSE,NX-206,,SRS + ADR cross-reference sweep for new layers — ADR-027…ADR-053 portfolio alignment
 NX-208,FALSE,FALSE,NX-195,,Official bundle capability matrix update — ADR-031 manifest governance
-NX-209,FALSE,FALSE,NX-116,,CRS normalization matrix publication — ADR-022 CRS policy
+NX-209,FALSE,TRUE,NX-116,,CRS normalization matrix publication — ADR-022 CRS policy
 NX-210,FALSE,FALSE,NX-208,,Contracts freeze automation for new capabilities — ADR-031 governance rollout
 NX-211,FALSE,FALSE,"NX-191, NX-209",,ZoneStore persistence service — ADR-027 ZoneService storage and indexing
 NX-212,FALSE,FALSE,NX-211,,ZoneService gRPC host & watcher plumbing — ADR-027 ZoneService implementation

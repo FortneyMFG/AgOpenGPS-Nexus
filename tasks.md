@@ -25,6 +25,27 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-156 AOG-Link transport rollout _(Planned)_
 - [ ] NX-157 Plugin API lease & manifest enforcement _(Proposed)_
 
+- [ ] NX-191 Zone proto + JSON schema handshake _(Planned)_ — ADR-027 spatial constraints contract release
+- [ ] NX-192 PoseStream zone mask proto update _(Planned)_ — ADR-027 PoseStream mask contract
+- [ ] NX-193 Layer registry hash handshake draft _(Planned)_ — ADR-032 layer controllers registry requirements
+- [ ] NX-194 Capability registry expansion for mapping/zone capabilities _(Planned)_ — ADR-029 mapping kernel contracts; ADR-031 manifest governance
+- [ ] NX-195 Plugin manifest schema vNext with capability/lease metadata _(Planned)_ — ADR-031 official plugin bundle policy
+- [ ] NX-196 Job/session schema refresh _(Planned)_ — ADR-030 job lifecycle; ADR-041 session metadata
+- [ ] NX-197 Season organizer schema publication _(Planned)_ — ADR-040 season organizers data model
+- [ ] NX-198 Multi-field job envelope schema updates _(Planned)_ — ADR-043 multi-field job envelopes
+- [ ] NX-199 Layer edit event schema definition _(Planned)_ — ADR-044 zone drawing framework journal
+- [ ] NX-200 Crop layer definitions and registries _(Planned)_ — ADR-045 crop type plugin requirements
+- [ ] NX-201 Genetics layer definitions and registries _(Planned)_ — ADR-046 genetics plugin contracts
+- [ ] NX-202 Yield layer schema refresh _(Planned)_ — ADR-049 yield analytics plugin
+- [ ] NX-203 Cost/profit layer schema _(Planned)_ — ADR-050 cost & profit plugin
+- [ ] NX-204 Field health risk schema _(Planned)_ — ADR-052 field health plugin
+- [ ] NX-205 Weather snapshot schema extensions _(Planned)_ — ADR-053 weather & environment plugin
+- [ ] NX-206 Report template schema + manifest handshake _(Planned)_ — ADR-051 report builder & exports
+- [ ] NX-207 SRS + ADR cross-reference sweep for new layers _(Planned)_ — ADR-027…ADR-053 portfolio alignment
+- [ ] NX-208 Official bundle capability matrix update _(Planned)_ — ADR-031 manifest governance
+- [ ] NX-209 CRS normalization matrix publication _(Planned)_ — ADR-022 CRS policy
+- [ ] NX-210 Contracts freeze automation for new capabilities _(Planned)_ — ADR-031 governance rollout
+
 ### Section B — Core (Headless, Sim Graph)
 - [x] NX-010 Core host skeleton
 - [x] NX-011 Event bus interfaces + tests
@@ -37,6 +58,32 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-018 Source routing map + binder
 - [x] NX-019 Routing change events + duplicate guard
 - [x] NX-028 Core capabilities handshake bridge
+
+- [ ] NX-211 ZoneStore persistence service _(Planned)_ — ADR-027 ZoneService storage and indexing
+- [ ] NX-212 ZoneService gRPC host & watcher plumbing _(Planned)_ — ADR-027 ZoneService implementation
+- [ ] NX-213 PoseStream zone mask propagation _(Planned)_ — ADR-027 constraint mask propagation
+- [ ] NX-214 Constraint gate integration into ControlArbiter _(Planned)_ — ADR-027 constraint gating
+- [ ] NX-215 Layer controller runtime scaffolding _(Planned)_ — ADR-032 layer controllers
+- [ ] NX-216 Layer controller DI registry & buffer pools _(Planned)_ — ADR-032 controller runtime details
+- [ ] NX-217 PoseStream ingestion wiring for controllers _(Planned)_ — ADR-032 ingestion pipeline
+- [ ] NX-218 Controller quality & diagnostic feeds _(Planned)_ — ADR-032 diagnostics surfacing
+- [ ] NX-219 TileStore writer updates for controller outputs _(Planned)_ — ADR-032 TileStore integration
+- [ ] NX-220 Deterministic replay fixtures for controllers _(Planned)_ — ADR-032 replay harness
+- [ ] NX-221 JobsService host & lifecycle orchestration _(Planned)_ — ADR-030 job sessions service
+- [ ] NX-222 Session autosave & journaling pipeline _(Planned)_ — ADR-041 job sessions
+- [ ] NX-223 Season aggregator & sync orchestration _(Planned)_ — ADR-040 season organizers
+- [ ] NX-224 Multi-field envelope aggregation pipeline _(Planned)_ — ADR-043 multi-field jobs
+- [ ] NX-225 LayerEditEvent journal service _(Planned)_ — ADR-044 zone drawing framework
+- [ ] NX-226 Live telemetry mesh core service _(Planned)_ — ADR-047 live telemetry mesh
+- [ ] NX-227 Mesh diagnostics & ACL enforcement _(Planned)_ — ADR-047 mesh QoS/security
+- [ ] NX-228 RadioBridge transport stack in Core _(Planned)_ — ADR-048 radio bridge
+- [ ] NX-229 Mesh retention & offline sync workers _(Planned)_ — ADR-047 mesh retention requirements
+- [ ] NX-230 Report builder service backend _(Planned)_ — ADR-051 report builder
+- [ ] NX-231 Performance budget instrumentation _(Planned)_ — ADR-026 performance budgets
+- [ ] NX-232 Timebase drift monitors for sessions _(Planned)_ — ADR-021 timebase sync
+- [ ] NX-233 Discovery watcher updates for seasons _(Planned)_ — ADR-024 discovery & identity
+- [ ] NX-234 Provenance audit expansion for new layers _(Planned)_ — ADR-019 provenance audit
+- [ ] NX-235 Cross-track replay harness slice _(Planned)_ — ADR-roadmap cross-track slice plan
 
 ### Section C — AGiO & Backends
 - [x] NX-020 AGiO host skeleton + backend loader
@@ -55,6 +102,18 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-120 AOG-Link Ethernet/UDP driver _(Planned)_
 - [ ] NX-121 AOG-Link RS-485/serial driver _(Planned)_
 - [ ] NX-122 AOG-Link CAN/CAN-FD driver _(Planned)_
+
+- [ ] NX-236 AgIO ELRS adapter for RadioBridge _(Planned)_ — ADR-048 radio bridge integration
+- [ ] NX-237 AgIO LoRa adapter for RadioBridge _(Planned)_ — ADR-048 radio bridge integration
+- [ ] NX-238 RadioBridge provisioning & key management CLI _(Planned)_ — ADR-048 provisioning workflow
+- [ ] NX-239 Radio diagnostics feed into mesh telemetry _(Planned)_ — ADR-048 diagnostics + ADR-047 mesh
+- [ ] NX-240 Mesh bridge to AOG-Link gateways _(Planned)_ — ADR-047 mesh integration with legacy
+- [ ] NX-241 RadioBridge firmware stubs & simulators _(Planned)_ — ADR-048 firmware integration
+- [ ] NX-242 RadioBridge conformance & retry/FEC tests _(Planned)_ — ADR-048 reliability validation
+- [ ] NX-243 Mesh integration with AgIO telemetry aggregator _(Planned)_ — ADR-047 mesh presence trails
+- [ ] NX-244 RadioBridge provisioning documentation kit _(Planned)_ — ADR-048 provisioning docs
+- [ ] NX-245 Mesh-aware legacy UDP gateway updates _(Planned)_ — ADR-047 presence integration
+- [ ] NX-246 GNSS correction services bootstrap _(Planned)_ — ADR-066 GNSS correction services
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -84,6 +143,51 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-171 Official Telemetry Logging plugin GA _(Planned)_
 - [ ] NX-172 Official File IO plugin GA _(Planned)_
 
+- [ ] NX-247 Crop plugin layer ingestion pipeline _(Planned)_ — ADR-045 crop type plugin
+- [ ] NX-248 Crop analytics API surface _(Planned)_ — ADR-045 rotation analytics
+- [ ] NX-249 Crop report sections for report builder _(Planned)_ — ADR-045 reporting integration
+- [ ] NX-250 Crop plugin regression fixtures _(Planned)_ — ADR-045 QA hooks
+- [ ] NX-251 Genetics plugin layer ingestion pipeline _(Planned)_ — ADR-046 genetics plugin
+- [ ] NX-252 Genetics barcode & lot tracking integration _(Planned)_ — ADR-046 barcode workflows
+- [ ] NX-253 Genetics export pipelines (CSV/GeoJSON/ISOXML) _(Planned)_ — ADR-046 export formats
+- [ ] NX-254 Genetics analytics callbacks _(Planned)_ — ADR-046 analytics integration
+- [ ] NX-255 Genetics plugin regression fixtures _(Planned)_ — ADR-046 QA hooks
+- [ ] NX-256 Yield sensor normalization module _(Planned)_ — ADR-049 yield plugin
+- [ ] NX-257 Yield smoothing & binning pipeline _(Planned)_ — ADR-049 analytics pipelines
+- [ ] NX-258 Yield import wizard plumbing _(Planned)_ — ADR-049 import workflows
+- [ ] NX-259 Yield analytics API surface _(Planned)_ — ADR-049 analytics integration
+- [ ] NX-260 Yield plugin regression fixtures _(Planned)_ — ADR-049 QA hooks
+- [ ] NX-261 Cost/profit plugin ingestion & ledger _(Planned)_ — ADR-050 cost/profit plugin
+- [ ] NX-262 Cost entry orchestration service _(Planned)_ — ADR-050 cost capture flows
+- [ ] NX-263 Profit analytics rollups _(Planned)_ — ADR-050 analytics integration
+- [ ] NX-264 Profit export pipelines _(Planned)_ — ADR-050 export formats
+- [ ] NX-265 Profit plugin regression fixtures _(Planned)_ — ADR-050 QA hooks
+- [ ] NX-266 Field health plugin ingestion pipeline _(Planned)_ — ADR-052 field health plugin
+- [ ] NX-267 Field health analytics callbacks _(Planned)_ — ADR-052 analytics integration
+- [ ] NX-268 Field health history + toggle persistence _(Planned)_ — ADR-052 historical toggles
+- [ ] NX-269 Field health report sections _(Planned)_ — ADR-052 reporting integration
+- [ ] NX-270 Field health plugin regression fixtures _(Planned)_ — ADR-052 QA hooks
+- [ ] NX-271 Weather ingest pipeline _(Planned)_ — ADR-053 weather plugin
+- [ ] NX-272 Weather sensor adapter integrations _(Planned)_ — ADR-053 sensor integrations
+- [ ] NX-273 Weather overlay data feed _(Planned)_ — ADR-053 visualization pipeline
+- [ ] NX-274 Weather report sections _(Planned)_ — ADR-053 reporting integration
+- [ ] NX-275 Weather plugin regression fixtures _(Planned)_ — ADR-053 QA hooks
+- [ ] NX-276 Autosteer plugin constraint gating updates _(Planned)_ — ADR-027 gating + ADR-033 guidance planner
+- [ ] NX-277 Sections plugin constraint gating updates _(Planned)_ — ADR-027 gating
+- [ ] NX-278 Guidance lane publishing contracts _(Planned)_ — ADR-033 guidance planner
+- [ ] NX-279 Turn planner integration in guidance plugin _(Planned)_ — ADR-033 guidance planner
+- [ ] NX-280 Guidance plugin regression suite _(Planned)_ — ADR-033 QA coverage
+- [ ] NX-281 Mapping plugin zone overlay updates _(Planned)_ — ADR-027 zones + ADR-029 mapping kernel
+- [ ] NX-282 Variable rate plugin zone gating _(Planned)_ — ADR-027 gating semantics
+- [ ] NX-283 Device Manager plugin capability surfacing _(Planned)_ — ADR-031 compatibility dashboard
+- [ ] NX-284 Plugin manifest compliance CI gate _(Planned)_ — ADR-031 manifest governance
+- [ ] NX-285 Telemetry logging plugin season/session updates _(Planned)_ — ADR-040/041 lifecycle data
+- [ ] NX-286 Telemetry logging mesh event capture _(Planned)_ — ADR-047 live telemetry mesh
+- [ ] NX-287 Telemetry export updates for new layers _(Planned)_ — ADR-051 report builder + new layers
+- [ ] NX-288 Job Tasks plugin season/session orchestration _(Planned)_ — ADR-030/040 lifecycle
+- [ ] NX-289 Job Tasks plugin preset/task orchestration _(Planned)_ — ADR-032 presets & layouts
+- [ ] NX-290 Job Tasks plugin regression fixtures _(Planned)_ — ADR-032 orchestration QA
+
 ### Section E — UI (Avalonia) + Sim Bar
 - [x] NX-040 Avalonia app bootstrap
 - [x] NX-041 Connection/settings panel
@@ -98,6 +202,29 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-065 UI theming + layout persistence
 - [ ] NX-112 Layer-aware section map visualization _(Planned)_
 - [ ] NX-130 Presets & layout linking ADR _(Proposed)_
+
+- [ ] NX-291 Zone editor toolbar integration _(Planned)_ — ADR-044 zone drawing framework
+- [ ] NX-292 Zone override toggles & policy UX _(Planned)_ — ADR-027 constraint UX
+- [ ] NX-293 Zone import/export workflows _(Planned)_ — ADR-027 interop contracts
+- [ ] NX-294 Season navigator UI flows _(Planned)_ — ADR-040 season organizers
+- [ ] NX-295 Session start/stop UI refresh _(Planned)_ — ADR-041 job sessions UX
+- [ ] NX-296 Multi-field job selection UX _(Planned)_ — ADR-043 multi-field envelopes
+- [ ] NX-297 Preset switcher with orchestration status _(Planned)_ — ADR-032 presets & layout linking
+- [ ] NX-298 Layout diff viewer & rollback UX _(Planned)_ — ADR-032 presets & layout linking
+- [ ] NX-299 Metadata-driven dashboard refactor _(Planned)_ — ADR-034 metadata dashboards
+- [ ] NX-300 Inspector & legend components _(Planned)_ — ADR-034 inspector surfaces
+- [ ] NX-301 Dashboard automation test harness _(Planned)_ — ADR-034 QA automation
+- [ ] NX-302 Crop quick-select UI _(Planned)_ — ADR-045 crop plugin UX
+- [ ] NX-303 Genetics picker & barcode UI _(Planned)_ — ADR-046 genetics UX
+- [ ] NX-304 Yield overlay UX updates _(Planned)_ — ADR-049 yield visualization
+- [ ] NX-305 Profit heatmap & analytics UI _(Planned)_ — ADR-050 profit visualization
+- [ ] NX-306 Field health severity UX _(Planned)_ — ADR-052 field health visualization
+- [ ] NX-307 Weather timeline & overlay UX _(Planned)_ — ADR-053 weather visualization
+- [ ] NX-308 Report builder preview & share UI _(Planned)_ — ADR-051 report builder UI
+- [ ] NX-309 Device Manager compatibility dashboard _(Planned)_ — ADR-031 manifest governance UI
+- [ ] NX-310 Mesh share/subscribe UI _(Planned)_ — ADR-047 live mesh UX
+- [ ] NX-311 Radio provisioning UI flows _(Planned)_ — ADR-048 provisioning UX
+- [ ] NX-312 Companion metadata-driven parity pass _(Planned)_ — ADR-034 remote parity
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory
@@ -119,6 +246,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-110 Legacy tram line template import _(Planned)_
 - [ ] NX-111 Legacy worked area history import _(Planned)_
 - [ ] NX-113 External agronomic map ingest pipeline _(Planned)_
+
+- [ ] NX-313 Stanley controller parity harness _(Planned)_ — ADR-033 guidance planner porting
+- [ ] NX-314 Pure pursuit control port with fixtures _(Planned)_ — ADR-033 guidance planner porting
+- [ ] NX-315 Turn planner library port _(Planned)_ — ADR-033 guidance planner porting
+- [ ] NX-316 Constraint-aware lookahead tuning _(Planned)_ — ADR-033 lookahead + ADR-027 gating
+- [ ] NX-317 Firmware-in-loop stability validation _(Planned)_ — ADR-033 closed-loop validation
 
 ### Section G — Packaging, DevEx, Docs
 - [x] NX-006 CI matrix (Win x64 + Linux arm64)
@@ -142,6 +275,17 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-124 Spatial constraint zones ADR & SRS sync _(In Progress)_
 - [x] NX-134 Official plugin dependency map & manifests _(Done)_
 
+- [ ] NX-318 Plugin manifest governance documentation _(Planned)_ — ADR-031 manifest governance
+- [ ] NX-319 Zone policy operator guide _(Planned)_ — ADR-027 constraint UX docs
+- [ ] NX-320 Season/session migration playbook _(Planned)_ — ADR-040/041 lifecycle rollout
+- [ ] NX-321 Mesh provisioning runbook _(Planned)_ — ADR-047/048 connectivity rollout
+- [ ] NX-322 Report template catalog documentation _(Planned)_ — ADR-051 report builder
+- [ ] NX-323 Performance budget telemetry dashboards _(Planned)_ — ADR-026 instrumentation rollout
+- [ ] NX-324 Mesh retention & privacy operations guide _(Planned)_ — ADR-047 retention planner
+- [ ] NX-325 Weather compliance export documentation _(Planned)_ — ADR-053 compliance outputs
+- [ ] NX-326 Metadata-driven UI style guide _(Planned)_ — ADR-034 UI refactor
+- [ ] NX-327 Plugin QA handshake update _(Planned)_ — ADR-031 manifest governance QA
+
 ### Section H — Safety & QA
 - [x] NX-070 Heartbeats & failsafe watchdogs
 - [x] NX-071 Arming/state machine
@@ -153,6 +297,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-077 Safety log retention & export tooling
 - [x] NX-078 QA dashboard aggregating safety metrics _(Done)_
 - [x] NX-079 Post-run report generator _(Done)_
+
+- [ ] NX-328 Constraint fault-injection regression suite _(Planned)_ — ADR-027 gating QA
+- [ ] NX-329 Mesh security and penetration tests _(Planned)_ — ADR-047/048 security validation
+- [ ] NX-330 Session crash-recovery regression _(Planned)_ — ADR-041 session durability
+- [ ] NX-331 Report export audit & diff tests _(Planned)_ — ADR-051 report builder QA
+- [ ] NX-332 Autosteer closed-loop bench tests _(Planned)_ — ADR-033 guidance QA
 
 ### Section I — Legacy/Teensy Compatibility
 - [x] NX-080 UDP discovery + capability exchange _(Legacy-maintained)_
@@ -173,6 +323,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-095 Dealer support escalation process
 - [x] NX-096 Community preview program
 - [x] NX-097 1.0 launch readiness review
+
+- [ ] NX-333 Legacy zone importer & converter _(Planned)_ — ADR-027 zone interop
+- [ ] NX-334 Legacy job migration tooling _(Planned)_ — ADR-040/041 season/session migration
+- [ ] NX-335 Legacy multi-field envelope translator _(Planned)_ — ADR-043 multi-field interop
+- [ ] NX-336 Legacy telemetry remap to new layers _(Planned)_ — ADR-049/052 telemetry parity
+- [ ] NX-337 Legacy weather log migration utilities _(Planned)_ — ADR-053 weather parity
 
 ## Detailed Tables by Section
 
@@ -196,6 +352,26 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-155 | Complete ADR-004 composite simulation fabric with regression packs | Planned |  | — | [ADR-004 Composite simulation](docs/ADR/ADR-004-composite-simulation.md) | Finalize SimClock/SimBus topic catalogs and seeded CI scenarios |
 | NX-156 | Roll out ADR-006 AOG-Link transports and bridge translation layers | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Ship Ethernet/RS-485/CAN drivers plus gRPC/PGN translators |
 | NX-157 | Implement ADR-018 plugin API leases, manifests, and AgIO migration | Proposed |  | — | [ADR-018 Plugin API](docs/ADR/ADR-018-plugin-api.md) | Core permission gate, manifest watcher, AgIO pluginization, CI lease tests |
+| NX-191 | Zone proto + JSON schema handshake | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 spatial constraints contract release |
+| NX-192 | PoseStream zone mask proto update | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 PoseStream mask contract |
+| NX-193 | Layer registry hash handshake draft | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 layer controllers registry requirements |
+| NX-194 | Capability registry expansion for mapping/zone capabilities | Planned |  | — | [ADR-029](docs/ADR/ADR-029-mapping-plugin-architecture.md), [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-029 mapping kernel contracts; ADR-031 manifest governance |
+| NX-195 | Plugin manifest schema vNext with capability/lease metadata | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 official plugin bundle policy |
+| NX-196 | Job/session schema refresh | Planned |  | — | [ADR-030](docs/ADR/ADR-030-field-job-sessions.md), [ADR-041](docs/ADR/ADR-041_JobSessions.md) | ADR-030 job lifecycle; ADR-041 session metadata |
+| NX-197 | Season organizer schema publication | Planned |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040 season organizers data model |
+| NX-198 | Multi-field job envelope schema updates | Planned |  | — | [ADR-043](docs/ADR/ADR-043_MultiFieldJobEnvelopes.md) | ADR-043 multi-field job envelopes |
+| NX-199 | Layer edit event schema definition | Planned |  | — | [ADR-044](docs/ADR/ADR-044_ZoneDrawingFramework.md) | ADR-044 zone drawing framework journal |
+| NX-200 | Crop layer definitions and registries | Planned |  | — | [ADR-045](docs/ADR/ADR-045_CropTypePlugin.md) | ADR-045 crop type plugin requirements |
+| NX-201 | Genetics layer definitions and registries | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 genetics plugin contracts |
+| NX-202 | Yield layer schema refresh | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 yield analytics plugin |
+| NX-203 | Cost/profit layer schema | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 cost & profit plugin |
+| NX-204 | Field health risk schema | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 field health plugin |
+| NX-205 | Weather snapshot schema extensions | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather & environment plugin |
+| NX-206 | Report template schema + manifest handshake | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder & exports |
+| NX-207 | SRS + ADR cross-reference sweep for new layers | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-027…ADR-053 portfolio alignment |
+| NX-208 | Official bundle capability matrix update | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
+| NX-209 | CRS normalization matrix publication | Planned |  | — | [ADR-022](docs/ADR/ADR-022-crs-units-precision-policy.md) | ADR-022 CRS policy |
+| NX-210 | Contracts freeze automation for new capabilities | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 governance rollout |
 
 ### Section B — Core (Headless, Sim Graph)
 
@@ -212,6 +388,31 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-018 | Source routing map + options binder | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Applies SourceRoutingOptions snapshots and emits events |
 | NX-019 | Stream route change events + duplicate guard | Done |  | — | [SRS §3.1 Core Services](docs/SRS/NOTES.md#srs-31-core-services) | Publishes StreamRouteChangedEvent and rejects duplicate streams |
 | NX-028 | Core capabilities handshake service | Done |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | gRPC client/service negotiates capabilities |
+| NX-211 | ZoneStore persistence service | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 ZoneService storage and indexing |
+| NX-212 | ZoneService gRPC host & watcher plumbing | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 ZoneService implementation |
+| NX-213 | PoseStream zone mask propagation | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint mask propagation |
+| NX-214 | Constraint gate integration into ControlArbiter | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint gating |
+| NX-215 | Layer controller runtime scaffolding | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 layer controllers |
+| NX-216 | Layer controller DI registry & buffer pools | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 controller runtime details |
+| NX-217 | PoseStream ingestion wiring for controllers | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 ingestion pipeline |
+| NX-218 | Controller quality & diagnostic feeds | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 diagnostics surfacing |
+| NX-219 | TileStore writer updates for controller outputs | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 TileStore integration |
+| NX-220 | Deterministic replay fixtures for controllers | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 replay harness |
+| NX-221 | JobsService host & lifecycle orchestration | Planned |  | — | [ADR-030](docs/ADR/ADR-030-field-job-sessions.md) | ADR-030 job sessions service |
+| NX-222 | Session autosave & journaling pipeline | Planned |  | — | [ADR-041](docs/ADR/ADR-041_JobSessions.md) | ADR-041 job sessions |
+| NX-223 | Season aggregator & sync orchestration | Planned |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040 season organizers |
+| NX-224 | Multi-field envelope aggregation pipeline | Planned |  | — | [ADR-043](docs/ADR/ADR-043_MultiFieldJobEnvelopes.md) | ADR-043 multi-field jobs |
+| NX-225 | LayerEditEvent journal service | Planned |  | — | [ADR-044](docs/ADR/ADR-044_ZoneDrawingFramework.md) | ADR-044 zone drawing framework |
+| NX-226 | Live telemetry mesh core service | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 live telemetry mesh |
+| NX-227 | Mesh diagnostics & ACL enforcement | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 mesh QoS/security |
+| NX-228 | RadioBridge transport stack in Core | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 radio bridge |
+| NX-229 | Mesh retention & offline sync workers | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 mesh retention requirements |
+| NX-230 | Report builder service backend | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder |
+| NX-231 | Performance budget instrumentation | Planned |  | — | [ADR-026](docs/ADR/ADR-026-performance-budgets.md) | ADR-026 performance budgets |
+| NX-232 | Timebase drift monitors for sessions | Planned |  | — | [ADR-021](docs/ADR/ADR-021-timebase-clock-sync.md) | ADR-021 timebase sync |
+| NX-233 | Discovery watcher updates for seasons | Planned |  | — | [ADR-024](docs/ADR/ADR-024-discovery-identity.md) | ADR-024 discovery & identity |
+| NX-234 | Provenance audit expansion for new layers | Planned |  | — | [ADR-019](docs/ADR/ADR-019-provenance-audit-qa.md) | ADR-019 provenance audit |
+| NX-235 | Cross-track replay harness slice | Planned |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | ADR-roadmap cross-track slice plan |
 
 ### Section C — AGiO & Backends
 
@@ -233,6 +434,17 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-120 | AOG-Link Ethernet/UDP driver | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Implement multicast/unicast transport with command retries |
 | NX-121 | AOG-Link RS-485/serial driver | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | COBS framing + CRC-16 with token/slot scheduling |
 | NX-122 | AOG-Link CAN/CAN-FD driver | Planned |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Implement AOG-CAN ID layout + ISO-TP / fragment support |
+| NX-236 | AgIO ELRS adapter for RadioBridge | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 radio bridge integration |
+| NX-237 | AgIO LoRa adapter for RadioBridge | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 radio bridge integration |
+| NX-238 | RadioBridge provisioning & key management CLI | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 provisioning workflow |
+| NX-239 | Radio diagnostics feed into mesh telemetry | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md), [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-048 diagnostics + ADR-047 mesh |
+| NX-240 | Mesh bridge to AOG-Link gateways | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 mesh integration with legacy |
+| NX-241 | RadioBridge firmware stubs & simulators | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 firmware integration |
+| NX-242 | RadioBridge conformance & retry/FEC tests | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 reliability validation |
+| NX-243 | Mesh integration with AgIO telemetry aggregator | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 mesh presence trails |
+| NX-244 | RadioBridge provisioning documentation kit | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 provisioning docs |
+| NX-245 | Mesh-aware legacy UDP gateway updates | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 presence integration |
+| NX-246 | GNSS correction services bootstrap | Planned |  | — | [ADR-066](docs/ADR/ADR-roadmap.md) | ADR-066 GNSS correction services |
 
 ### Section D — Plugins (Logic + Sim Providers)
 
@@ -264,6 +476,50 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-170 | Official Job Tasks plugin GA (save/resume lifecycle) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: Core job services; Soft: file-io, mapping, telemetry per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
 | NX-171 | Official Telemetry Logging plugin GA (replay + export) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: Core telemetry bus; Soft: plugin feeds (mapping, autosteer, device manager) per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
 | NX-172 | Official File IO plugin GA (import/export surfaces) | Planned |  | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Hard deps: Core storage APIs; Soft: mapping, variable-mapping, job-tasks per [dependency map](docs/plugins/nexus-plugin-dependency-map.md) |
+| NX-247 | Crop plugin layer ingestion pipeline | Planned |  | — | [ADR-045](docs/ADR/ADR-045_CropTypePlugin.md) | ADR-045 crop type plugin |
+| NX-248 | Crop analytics API surface | Planned |  | — | [ADR-045](docs/ADR/ADR-045_CropTypePlugin.md) | ADR-045 rotation analytics |
+| NX-249 | Crop report sections for report builder | Planned |  | — | [ADR-045](docs/ADR/ADR-045_CropTypePlugin.md) | ADR-045 reporting integration |
+| NX-250 | Crop plugin regression fixtures | Planned |  | — | [ADR-045](docs/ADR/ADR-045_CropTypePlugin.md) | ADR-045 QA hooks |
+| NX-251 | Genetics plugin layer ingestion pipeline | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 genetics plugin |
+| NX-252 | Genetics barcode & lot tracking integration | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 barcode workflows |
+| NX-253 | Genetics export pipelines (CSV/GeoJSON/ISOXML) | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 export formats |
+| NX-254 | Genetics analytics callbacks | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 analytics integration |
+| NX-255 | Genetics plugin regression fixtures | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 QA hooks |
+| NX-256 | Yield sensor normalization module | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 yield plugin |
+| NX-257 | Yield smoothing & binning pipeline | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 analytics pipelines |
+| NX-258 | Yield import wizard plumbing | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 import workflows |
+| NX-259 | Yield analytics API surface | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 analytics integration |
+| NX-260 | Yield plugin regression fixtures | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 QA hooks |
+| NX-261 | Cost/profit plugin ingestion & ledger | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 cost/profit plugin |
+| NX-262 | Cost entry orchestration service | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 cost capture flows |
+| NX-263 | Profit analytics rollups | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 analytics integration |
+| NX-264 | Profit export pipelines | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 export formats |
+| NX-265 | Profit plugin regression fixtures | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 QA hooks |
+| NX-266 | Field health plugin ingestion pipeline | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 field health plugin |
+| NX-267 | Field health analytics callbacks | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 analytics integration |
+| NX-268 | Field health history + toggle persistence | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 historical toggles |
+| NX-269 | Field health report sections | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 reporting integration |
+| NX-270 | Field health plugin regression fixtures | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 QA hooks |
+| NX-271 | Weather ingest pipeline | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather plugin |
+| NX-272 | Weather sensor adapter integrations | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 sensor integrations |
+| NX-273 | Weather overlay data feed | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 visualization pipeline |
+| NX-274 | Weather report sections | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 reporting integration |
+| NX-275 | Weather plugin regression fixtures | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 QA hooks |
+| NX-276 | Autosteer plugin constraint gating updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-027 gating + ADR-033 guidance planner |
+| NX-277 | Sections plugin constraint gating updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating |
+| NX-278 | Guidance lane publishing contracts | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner |
+| NX-279 | Turn planner integration in guidance plugin | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner |
+| NX-280 | Guidance plugin regression suite | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 QA coverage |
+| NX-281 | Mapping plugin zone overlay updates | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-029](docs/ADR/ADR-029-mapping-plugin-architecture.md) | ADR-027 zones + ADR-029 mapping kernel |
+| NX-282 | Variable rate plugin zone gating | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating semantics |
+| NX-283 | Device Manager plugin capability surfacing | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 compatibility dashboard |
+| NX-284 | Plugin manifest compliance CI gate | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
+| NX-285 | Telemetry logging plugin season/session updates | Planned |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040/041 lifecycle data |
+| NX-286 | Telemetry logging mesh event capture | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 live telemetry mesh |
+| NX-287 | Telemetry export updates for new layers | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder + new layers |
+| NX-288 | Job Tasks plugin season/session orchestration | Planned |  | — | [ADR-030](docs/ADR/ADR-030-field-job-sessions.md) | ADR-030/040 lifecycle |
+| NX-289 | Job Tasks plugin preset/task orchestration | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 presets & layouts |
+| NX-290 | Job Tasks plugin regression fixtures | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 orchestration QA |
 
 ### Section E — UI (Avalonia) + Sim Bar
 
@@ -281,6 +537,28 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-049 | Replay analysis timeline with bookmarks and export options | Done |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Provide bookmark/export tooling |
 | NX-065 | UI theming and layout persistence across sessions | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Save/restore window layout and theme |
 | NX-112 | Layer-aware section map visualization aligned with layer registry | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Replace binary overlay with metadata-driven layers |
+| NX-291 | Zone editor toolbar integration | Planned |  | — | [ADR-044](docs/ADR/ADR-044_ZoneDrawingFramework.md) | ADR-044 zone drawing framework |
+| NX-292 | Zone override toggles & policy UX | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint UX |
+| NX-293 | Zone import/export workflows | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 interop contracts |
+| NX-294 | Season navigator UI flows | Planned |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040 season organizers |
+| NX-295 | Session start/stop UI refresh | Planned |  | — | [ADR-041](docs/ADR/ADR-041_JobSessions.md) | ADR-041 job sessions UX |
+| NX-296 | Multi-field job selection UX | Planned |  | — | [ADR-043](docs/ADR/ADR-043_MultiFieldJobEnvelopes.md) | ADR-043 multi-field envelopes |
+| NX-297 | Preset switcher with orchestration status | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 presets & layout linking |
+| NX-298 | Layout diff viewer & rollback UX | Planned |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 presets & layout linking |
+| NX-299 | Metadata-driven dashboard refactor | Planned |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | ADR-034 metadata dashboards |
+| NX-300 | Inspector & legend components | Planned |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | ADR-034 inspector surfaces |
+| NX-301 | Dashboard automation test harness | Planned |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | ADR-034 QA automation |
+| NX-302 | Crop quick-select UI | Planned |  | — | [ADR-045](docs/ADR/ADR-045_CropTypePlugin.md) | ADR-045 crop plugin UX |
+| NX-303 | Genetics picker & barcode UI | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 genetics UX |
+| NX-304 | Yield overlay UX updates | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 yield visualization |
+| NX-305 | Profit heatmap & analytics UI | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 profit visualization |
+| NX-306 | Field health severity UX | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 field health visualization |
+| NX-307 | Weather timeline & overlay UX | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather visualization |
+| NX-308 | Report builder preview & share UI | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder UI |
+| NX-309 | Device Manager compatibility dashboard | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance UI |
+| NX-310 | Mesh share/subscribe UI | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 live mesh UX |
+| NX-311 | Radio provisioning UI flows | Planned |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 provisioning UX |
+| NX-312 | Companion metadata-driven parity pass | Planned |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | ADR-034 remote parity |
 
 ### Section F — Porting from V6 (Algorithms)
 
@@ -305,6 +583,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-110 | Legacy tram line template import and planner integration | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Translate Tram.txt polygons |
 | NX-111 | Legacy worked area history import for coverage bootstraps | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Bring Sections.txt history into layer registry |
 | NX-113 | External agronomic map ingest pipeline | Planned |  | — | [SRS §5.5 Legacy Data Ingest](docs/SRS/NOTES.md#srs-55-legacy-data-ingest) | Normalize GeoTIFF/ISOXML maps into layers |
+| NX-313 | Stanley controller parity harness | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
+| NX-314 | Pure pursuit control port with fixtures | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
+| NX-315 | Turn planner library port | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner porting |
+| NX-316 | Constraint-aware lookahead tuning | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md), [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-033 lookahead + ADR-027 gating |
+| NX-317 | Firmware-in-loop stability validation | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 closed-loop validation |
 
 ### Section G — Packaging, DevEx, Docs
 
@@ -329,6 +612,16 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-151 | Backlog update for ADR + official plugin tasks | Done | AI | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Extend tasks.md/.csv with ADR coverage and plugin roadmap |
 | NX-124 | Spatial constraint zones ADR & SRS sync | In Progress | AI | — | [SRS §3 Communications](docs/SRS/sections/03_Comm_Transports.md) | Add ZoneService requirements and constraint policies |
 | NX-141 | Companion/mobile stack rollout documentation | In Progress | AI | — | [SRS §5 Frontends](docs/SRS/sections/05_Frontends.md) | Capture CompanionRemote, LocalInProc, and LocalOutOfProc run modes across docs |
+| NX-318 | Plugin manifest governance documentation | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
+| NX-319 | Zone policy operator guide | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint UX docs |
+| NX-320 | Season/session migration playbook | Planned |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040/041 lifecycle rollout |
+| NX-321 | Mesh provisioning runbook | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047/048 connectivity rollout |
+| NX-322 | Report template catalog documentation | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder |
+| NX-323 | Performance budget telemetry dashboards | Planned |  | — | [ADR-026](docs/ADR/ADR-026-performance-budgets.md) | ADR-026 instrumentation rollout |
+| NX-324 | Mesh retention & privacy operations guide | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 retention planner |
+| NX-325 | Weather compliance export documentation | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 compliance outputs |
+| NX-326 | Metadata-driven UI style guide | Planned |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | ADR-034 UI refactor |
+| NX-327 | Plugin QA handshake update | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance QA |
 
 ### Section H — Safety & QA
 
@@ -344,6 +637,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-077 | Safety log retention and export tooling with retention policy | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Archive for audits |
 | NX-078 | QA dashboard aggregating simulation, hardware, and safety metrics | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | Web dashboard + alerts |
 | NX-079 | Post-run report generator summarizing guidance, coverage, and alarms | Done |  | — | [SRS §4.2 Safety & QA](docs/SRS/NOTES.md#srs-42-safety--qa) | PDF/CSV outputs |
+| NX-328 | Constraint fault-injection regression suite | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating QA |
+| NX-329 | Mesh security and penetration tests | Planned |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047/048 security validation |
+| NX-330 | Session crash-recovery regression | Planned |  | — | [ADR-041](docs/ADR/ADR-041_JobSessions.md) | ADR-041 session durability |
+| NX-331 | Report export audit & diff tests | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder QA |
+| NX-332 | Autosteer closed-loop bench tests | Planned |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance QA |
 
 ### Section I — Legacy/Teensy Compatibility
 
@@ -382,3 +680,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - Move tickets to `Done` only after merging to `main`.
 - Record freeze windows, cross-team dependencies, or ADR links in the `Notes` column.
 - Append new NX-IDs within the appropriate section table; maintain the alphabetical section grouping above.
+| NX-333 | Legacy zone importer & converter | Planned |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 zone interop |
+| NX-334 | Legacy job migration tooling | Planned |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040/041 season/session migration |
+| NX-335 | Legacy multi-field envelope translator | Planned |  | — | [ADR-043](docs/ADR/ADR-043_MultiFieldJobEnvelopes.md) | ADR-043 multi-field interop |
+| NX-336 | Legacy telemetry remap to new layers | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049/052 telemetry parity |
+| NX-337 | Legacy weather log migration utilities | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather parity |
+

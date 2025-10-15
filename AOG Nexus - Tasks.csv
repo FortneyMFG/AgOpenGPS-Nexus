@@ -126,19 +126,166 @@ NX-151,FALSE,TRUE,,,Backlog update aligning tasks backlog with ADR and official 
 NX-152,FALSE,FALSE,,,"Enforce ADR-001 .NET 8 runtime baselines across solutions, templates, and CI"
 NX-153,FALSE,FALSE,,,"Operationalize ADR-002 gRPC contract governance, compatibility gates, and bridge validation"
 NX-154,FALSE,FALSE,,,"Deliver ADR-003 Avalonia run modes (CompanionRemote, LocalInProc, LocalOutOfProc) with docs and tests"
-NX-155,FALSE,FALSE,,,"Complete ADR-004 composite simulation fabric with SimClock/SimBus catalogs and seeded regression packs"
+NX-155,FALSE,FALSE,,,Complete ADR-004 composite simulation fabric with SimClock/SimBus catalogs and seeded regression packs
 NX-156,FALSE,FALSE,,,"Roll out ADR-006 AOG-Link transports (Ethernet, RS-485, CAN) plus gRPC/PGN bridge translation"
 NX-157,FALSE,FALSE,,,"Implement ADR-018 plugin API leases, permission gate, manifest watcher, and AgIO migration"
 NX-160,FALSE,FALSE,"NX-161, NX-166, NX-156",,"Official AutoSteer plugin GA covering pose fusion, AB tracking, and actuator transport"
 NX-161,FALSE,FALSE,"NX-157, NX-155",,"Official Mapping plugin GA delivering field state store, AB lines, boundaries, and coverage feeds"
-NX-162,FALSE,FALSE,"NX-161, NX-156",,"Official Sections plugin GA providing coverage-aware IO orchestration"
-NX-163,FALSE,FALSE,"NX-164, NX-156",,"Official Rate Control plugin GA blending variable-rate setpoints and commanding actuators"
-NX-164,FALSE,FALSE,"NX-161, NX-172",,"Official Variable Mapping plugin GA ingesting agronomic grids and serving control setpoints"
-NX-165,FALSE,FALSE,NX-156,,"Official ISOBUS Bridge plugin GA translating TC/UT flows across Core and AgIO"
-NX-166,FALSE,FALSE,"NX-167, NX-156",,"Official GNSS/IMU Fusion plugin GA supplying fused pose to Core consumers"
-NX-167,FALSE,FALSE,NX-156,,"Official NTRIP Client plugin GA delivering RTCM streams to GNSS receivers via AgIO"
+NX-162,FALSE,FALSE,"NX-161, NX-156",,Official Sections plugin GA providing coverage-aware IO orchestration
+NX-163,FALSE,FALSE,"NX-164, NX-156",,Official Rate Control plugin GA blending variable-rate setpoints and commanding actuators
+NX-164,FALSE,FALSE,"NX-161, NX-172",,Official Variable Mapping plugin GA ingesting agronomic grids and serving control setpoints
+NX-165,FALSE,FALSE,NX-156,,Official ISOBUS Bridge plugin GA translating TC/UT flows across Core and AgIO
+NX-166,FALSE,FALSE,"NX-167, NX-156",,Official GNSS/IMU Fusion plugin GA supplying fused pose to Core consumers
+NX-167,FALSE,FALSE,NX-156,,Official NTRIP Client plugin GA delivering RTCM streams to GNSS receivers via AgIO
 NX-168,FALSE,FALSE,"NX-156, NX-157",,"Official Device Manager plugin GA exposing inventory, health, and firmware management"
-NX-169,FALSE,FALSE,"NX-156, NX-157",,"Official Planter Monitor plugin GA streaming row sensors with mapping/telemetry hooks"
+NX-169,FALSE,FALSE,"NX-156, NX-157",,Official Planter Monitor plugin GA streaming row sensors with mapping/telemetry hooks
 NX-170,FALSE,FALSE,NX-157,,"Official Job Tasks plugin GA providing job save/resume, autosave, and session marshal"
-NX-171,FALSE,FALSE,NX-157,,"Official Telemetry Logging plugin GA capturing plugin feeds and replay exports"
+NX-171,FALSE,FALSE,NX-157,,Official Telemetry Logging plugin GA capturing plugin feeds and replay exports
 NX-172,FALSE,FALSE,NX-157,,"Official File IO plugin GA handling imports/exports for layers, jobs, and prescriptions"
+NX-191,FALSE,FALSE,NX-116,,Zone proto + JSON schema handshake — ADR-027 spatial constraints contract release
+NX-192,FALSE,FALSE,NX-191,,PoseStream zone mask proto update — ADR-027 PoseStream mask contract
+NX-193,FALSE,FALSE,NX-191,,Layer registry hash handshake draft — ADR-032 layer controllers registry requirements
+NX-194,FALSE,FALSE,"NX-153, NX-193",,Capability registry expansion for mapping/zone capabilities — ADR-029 mapping kernel contracts; ADR-031 manifest governance
+NX-195,FALSE,FALSE,NX-194,,Plugin manifest schema vNext with capability/lease metadata — ADR-031 official plugin bundle policy
+NX-196,FALSE,FALSE,NX-131,,Job/session schema refresh — ADR-030 job lifecycle; ADR-041 session metadata
+NX-197,FALSE,FALSE,NX-196,,Season organizer schema publication — ADR-040 season organizers data model
+NX-198,FALSE,FALSE,NX-197,,Multi-field job envelope schema updates — ADR-043 multi-field job envelopes
+NX-199,FALSE,FALSE,NX-193,,Layer edit event schema definition — ADR-044 zone drawing framework journal
+NX-200,FALSE,FALSE,NX-199,,Crop layer definitions and registries — ADR-045 crop type plugin requirements
+NX-201,FALSE,FALSE,NX-200,,Genetics layer definitions and registries — ADR-046 genetics plugin contracts
+NX-202,FALSE,FALSE,NX-199,,Yield layer schema refresh — ADR-049 yield analytics plugin
+NX-203,FALSE,FALSE,NX-202,,Cost/profit layer schema — ADR-050 cost & profit plugin
+NX-204,FALSE,FALSE,NX-199,,Field health risk schema — ADR-052 field health plugin
+NX-205,FALSE,FALSE,NX-196,,Weather snapshot schema extensions — ADR-053 weather & environment plugin
+NX-206,FALSE,FALSE,"NX-202, NX-203",,Report template schema + manifest handshake — ADR-051 report builder & exports
+NX-207,FALSE,FALSE,NX-206,,SRS + ADR cross-reference sweep for new layers — ADR-027…ADR-053 portfolio alignment
+NX-208,FALSE,FALSE,NX-195,,Official bundle capability matrix update — ADR-031 manifest governance
+NX-209,FALSE,FALSE,NX-116,,CRS normalization matrix publication — ADR-022 CRS policy
+NX-210,FALSE,FALSE,NX-208,,Contracts freeze automation for new capabilities — ADR-031 governance rollout
+NX-211,FALSE,FALSE,"NX-191, NX-209",,ZoneStore persistence service — ADR-027 ZoneService storage and indexing
+NX-212,FALSE,FALSE,NX-211,,ZoneService gRPC host & watcher plumbing — ADR-027 ZoneService implementation
+NX-213,FALSE,FALSE,NX-212,,PoseStream zone mask propagation — ADR-027 constraint mask propagation
+NX-214,FALSE,FALSE,NX-213,,Constraint gate integration into ControlArbiter — ADR-027 constraint gating
+NX-215,FALSE,FALSE,NX-193,,Layer controller runtime scaffolding — ADR-032 layer controllers
+NX-216,FALSE,FALSE,NX-215,,Layer controller DI registry & buffer pools — ADR-032 controller runtime details
+NX-217,FALSE,FALSE,NX-216,,PoseStream ingestion wiring for controllers — ADR-032 ingestion pipeline
+NX-218,FALSE,FALSE,NX-217,,Controller quality & diagnostic feeds — ADR-032 diagnostics surfacing
+NX-219,FALSE,FALSE,NX-217,,TileStore writer updates for controller outputs — ADR-032 TileStore integration
+NX-220,FALSE,FALSE,"NX-218, NX-219",,Deterministic replay fixtures for controllers — ADR-032 replay harness
+NX-221,FALSE,FALSE,NX-196,,JobsService host & lifecycle orchestration — ADR-030 job sessions service
+NX-222,FALSE,FALSE,NX-221,,Session autosave & journaling pipeline — ADR-041 job sessions
+NX-223,FALSE,FALSE,"NX-197, NX-221",,Season aggregator & sync orchestration — ADR-040 season organizers
+NX-224,FALSE,FALSE,"NX-198, NX-217",,Multi-field envelope aggregation pipeline — ADR-043 multi-field jobs
+NX-225,FALSE,FALSE,"NX-199, NX-217",,LayerEditEvent journal service — ADR-044 zone drawing framework
+NX-226,FALSE,FALSE,"NX-225, NX-217",,Live telemetry mesh core service — ADR-047 live telemetry mesh
+NX-227,FALSE,FALSE,NX-226,,Mesh diagnostics & ACL enforcement — ADR-047 mesh QoS/security
+NX-228,FALSE,FALSE,NX-226,,RadioBridge transport stack in Core — ADR-048 radio bridge
+NX-229,FALSE,FALSE,NX-227,,Mesh retention & offline sync workers — ADR-047 mesh retention requirements
+NX-230,FALSE,FALSE,"NX-206, NX-223",,Report builder service backend — ADR-051 report builder
+NX-231,FALSE,FALSE,NX-215,,Performance budget instrumentation — ADR-026 performance budgets
+NX-232,FALSE,FALSE,NX-221,,Timebase drift monitors for sessions — ADR-021 timebase sync
+NX-233,FALSE,FALSE,NX-223,,Discovery watcher updates for seasons — ADR-024 discovery & identity
+NX-234,FALSE,FALSE,"NX-225, NX-206",,Provenance audit expansion for new layers — ADR-019 provenance audit
+NX-235,FALSE,FALSE,"NX-214, NX-220",,Cross-track replay harness slice — ADR-roadmap cross-track slice plan
+NX-236,FALSE,FALSE,NX-228,,AgIO ELRS adapter for RadioBridge — ADR-048 radio bridge integration
+NX-237,FALSE,FALSE,NX-236,,AgIO LoRa adapter for RadioBridge — ADR-048 radio bridge integration
+NX-238,FALSE,FALSE,NX-228,,RadioBridge provisioning & key management CLI — ADR-048 provisioning workflow
+NX-239,FALSE,FALSE,"NX-227, NX-238",,Radio diagnostics feed into mesh telemetry — ADR-048 diagnostics + ADR-047 mesh
+NX-240,FALSE,FALSE,NX-226,,Mesh bridge to AOG-Link gateways — ADR-047 mesh integration with legacy
+NX-241,FALSE,FALSE,NX-228,,RadioBridge firmware stubs & simulators — ADR-048 firmware integration
+NX-242,FALSE,FALSE,"NX-236, NX-237, NX-241",,RadioBridge conformance & retry/FEC tests — ADR-048 reliability validation
+NX-243,FALSE,FALSE,NX-226,,Mesh integration with AgIO telemetry aggregator — ADR-047 mesh presence trails
+NX-244,FALSE,FALSE,NX-238,,RadioBridge provisioning documentation kit — ADR-048 provisioning docs
+NX-245,FALSE,FALSE,NX-226,,Mesh-aware legacy UDP gateway updates — ADR-047 presence integration
+NX-246,FALSE,FALSE,NX-231,,GNSS correction services bootstrap — ADR-066 GNSS correction services
+NX-247,FALSE,FALSE,"NX-200, NX-225",,Crop plugin layer ingestion pipeline — ADR-045 crop type plugin
+NX-248,FALSE,FALSE,NX-247,,Crop analytics API surface — ADR-045 rotation analytics
+NX-249,FALSE,FALSE,"NX-230, NX-248",,Crop report sections for report builder — ADR-045 reporting integration
+NX-250,FALSE,FALSE,NX-247,,Crop plugin regression fixtures — ADR-045 QA hooks
+NX-251,FALSE,FALSE,"NX-201, NX-225",,Genetics plugin layer ingestion pipeline — ADR-046 genetics plugin
+NX-252,FALSE,FALSE,NX-251,,Genetics barcode & lot tracking integration — ADR-046 barcode workflows
+NX-253,FALSE,FALSE,NX-251,,Genetics export pipelines (CSV/GeoJSON/ISOXML) — ADR-046 export formats
+NX-254,FALSE,FALSE,NX-251,,Genetics analytics callbacks — ADR-046 analytics integration
+NX-255,FALSE,FALSE,"NX-252, NX-253",,Genetics plugin regression fixtures — ADR-046 QA hooks
+NX-256,FALSE,FALSE,"NX-202, NX-217",,Yield sensor normalization module — ADR-049 yield plugin
+NX-257,FALSE,FALSE,NX-256,,Yield smoothing & binning pipeline — ADR-049 analytics pipelines
+NX-258,FALSE,FALSE,NX-256,,Yield import wizard plumbing — ADR-049 import workflows
+NX-259,FALSE,FALSE,"NX-257, NX-258",,Yield analytics API surface — ADR-049 analytics integration
+NX-260,FALSE,FALSE,NX-259,,Yield plugin regression fixtures — ADR-049 QA hooks
+NX-261,FALSE,FALSE,"NX-203, NX-230",,Cost/profit plugin ingestion & ledger — ADR-050 cost/profit plugin
+NX-262,FALSE,FALSE,NX-261,,Cost entry orchestration service — ADR-050 cost capture flows
+NX-263,FALSE,FALSE,NX-261,,Profit analytics rollups — ADR-050 analytics integration
+NX-264,FALSE,FALSE,NX-261,,Profit export pipelines — ADR-050 export formats
+NX-265,FALSE,FALSE,"NX-263, NX-264",,Profit plugin regression fixtures — ADR-050 QA hooks
+NX-266,FALSE,FALSE,"NX-204, NX-225",,Field health plugin ingestion pipeline — ADR-052 field health plugin
+NX-267,FALSE,FALSE,NX-266,,Field health analytics callbacks — ADR-052 analytics integration
+NX-268,FALSE,FALSE,NX-266,,Field health history + toggle persistence — ADR-052 historical toggles
+NX-269,FALSE,FALSE,"NX-230, NX-267, NX-268",,Field health report sections — ADR-052 reporting integration
+NX-270,FALSE,FALSE,NX-269,,Field health plugin regression fixtures — ADR-052 QA hooks
+NX-271,FALSE,FALSE,"NX-205, NX-221",,Weather ingest pipeline — ADR-053 weather plugin
+NX-272,FALSE,FALSE,NX-271,,Weather sensor adapter integrations — ADR-053 sensor integrations
+NX-273,FALSE,FALSE,NX-271,,Weather overlay data feed — ADR-053 visualization pipeline
+NX-274,FALSE,FALSE,"NX-230, NX-273",,Weather report sections — ADR-053 reporting integration
+NX-275,FALSE,FALSE,NX-274,,Weather plugin regression fixtures — ADR-053 QA hooks
+NX-276,FALSE,FALSE,NX-214,,Autosteer plugin constraint gating updates — ADR-027 gating + ADR-033 guidance planner
+NX-277,FALSE,FALSE,NX-214,,Sections plugin constraint gating updates — ADR-027 gating
+NX-278,FALSE,FALSE,"NX-276, NX-215",,Guidance lane publishing contracts — ADR-033 guidance planner
+NX-279,FALSE,FALSE,NX-278,,Turn planner integration in guidance plugin — ADR-033 guidance planner
+NX-280,FALSE,FALSE,NX-279,,Guidance plugin regression suite — ADR-033 QA coverage
+NX-281,FALSE,FALSE,"NX-212, NX-225",,Mapping plugin zone overlay updates — ADR-027 zones + ADR-029 mapping kernel
+NX-282,FALSE,FALSE,NX-214,,Variable rate plugin zone gating — ADR-027 gating semantics
+NX-283,FALSE,FALSE,"NX-208, NX-227",,Device Manager plugin capability surfacing — ADR-031 compatibility dashboard
+NX-284,FALSE,FALSE,NX-208,,Plugin manifest compliance CI gate — ADR-031 manifest governance
+NX-285,FALSE,FALSE,"NX-222, NX-223",,Telemetry logging plugin season/session updates — ADR-040/041 lifecycle data
+NX-286,FALSE,FALSE,NX-226,,Telemetry logging mesh event capture — ADR-047 live telemetry mesh
+NX-287,FALSE,FALSE,"NX-230, NX-269, NX-274",,Telemetry export updates for new layers — ADR-051 report builder + new layers
+NX-288,FALSE,FALSE,"NX-221, NX-223",,Job Tasks plugin season/session orchestration — ADR-030/040 lifecycle
+NX-289,FALSE,FALSE,"NX-206, NX-288",,Job Tasks plugin preset/task orchestration — ADR-032 presets & layouts
+NX-290,FALSE,FALSE,NX-289,,Job Tasks plugin regression fixtures — ADR-032 orchestration QA
+NX-291,FALSE,FALSE,NX-225,,Zone editor toolbar integration — ADR-044 zone drawing framework
+NX-292,FALSE,FALSE,NX-291,,Zone override toggles & policy UX — ADR-027 constraint UX
+NX-293,FALSE,FALSE,NX-291,,Zone import/export workflows — ADR-027 interop contracts
+NX-294,FALSE,FALSE,NX-223,,Season navigator UI flows — ADR-040 season organizers
+NX-295,FALSE,FALSE,NX-222,,Session start/stop UI refresh — ADR-041 job sessions UX
+NX-296,FALSE,FALSE,NX-224,,Multi-field job selection UX — ADR-043 multi-field envelopes
+NX-297,FALSE,FALSE,"NX-206, NX-223",,Preset switcher with orchestration status — ADR-032 presets & layout linking
+NX-298,FALSE,FALSE,NX-297,,Layout diff viewer & rollback UX — ADR-032 presets & layout linking
+NX-299,FALSE,FALSE,"NX-215, NX-219, NX-297",,Metadata-driven dashboard refactor — ADR-034 metadata dashboards
+NX-300,FALSE,FALSE,NX-299,,Inspector & legend components — ADR-034 inspector surfaces
+NX-301,FALSE,FALSE,NX-300,,Dashboard automation test harness — ADR-034 QA automation
+NX-302,FALSE,FALSE,NX-247,,Crop quick-select UI — ADR-045 crop plugin UX
+NX-303,FALSE,FALSE,NX-252,,Genetics picker & barcode UI — ADR-046 genetics UX
+NX-304,FALSE,FALSE,"NX-257, NX-299",,Yield overlay UX updates — ADR-049 yield visualization
+NX-305,FALSE,FALSE,"NX-263, NX-299",,Profit heatmap & analytics UI — ADR-050 profit visualization
+NX-306,FALSE,FALSE,"NX-266, NX-299",,Field health severity UX — ADR-052 field health visualization
+NX-307,FALSE,FALSE,"NX-271, NX-299",,Weather timeline & overlay UX — ADR-053 weather visualization
+NX-308,FALSE,FALSE,NX-230,,Report builder preview & share UI — ADR-051 report builder UI
+NX-309,FALSE,FALSE,NX-208,,Device Manager compatibility dashboard — ADR-031 manifest governance UI
+NX-310,FALSE,FALSE,NX-227,,Mesh share/subscribe UI — ADR-047 live mesh UX
+NX-311,FALSE,FALSE,"NX-238, NX-310",,Radio provisioning UI flows — ADR-048 provisioning UX
+NX-312,FALSE,FALSE,NX-301,,Companion metadata-driven parity pass — ADR-034 remote parity
+NX-313,FALSE,FALSE,NX-276,,Stanley controller parity harness — ADR-033 guidance planner porting
+NX-314,FALSE,FALSE,NX-313,,Pure pursuit control port with fixtures — ADR-033 guidance planner porting
+NX-315,FALSE,FALSE,NX-279,,Turn planner library port — ADR-033 guidance planner porting
+NX-316,FALSE,FALSE,"NX-214, NX-314",,Constraint-aware lookahead tuning — ADR-033 lookahead + ADR-027 gating
+NX-317,FALSE,FALSE,NX-316,,Firmware-in-loop stability validation — ADR-033 closed-loop validation
+NX-318,FALSE,FALSE,NX-208,,Plugin manifest governance documentation — ADR-031 manifest governance
+NX-319,FALSE,FALSE,NX-292,,Zone policy operator guide — ADR-027 constraint UX docs
+NX-320,FALSE,FALSE,"NX-223, NX-295",,Season/session migration playbook — ADR-040/041 lifecycle rollout
+NX-321,FALSE,FALSE,NX-311,,Mesh provisioning runbook — ADR-047/048 connectivity rollout
+NX-322,FALSE,FALSE,NX-308,,Report template catalog documentation — ADR-051 report builder
+NX-323,FALSE,FALSE,NX-231,,Performance budget telemetry dashboards — ADR-026 instrumentation rollout
+NX-324,FALSE,FALSE,NX-229,,Mesh retention & privacy operations guide — ADR-047 retention planner
+NX-325,FALSE,FALSE,NX-274,,Weather compliance export documentation — ADR-053 compliance outputs
+NX-326,FALSE,FALSE,NX-301,,Metadata-driven UI style guide — ADR-034 UI refactor
+NX-327,FALSE,FALSE,NX-284,,Plugin QA handshake update — ADR-031 manifest governance QA
+NX-328,FALSE,FALSE,"NX-214, NX-276, NX-277",,Constraint fault-injection regression suite — ADR-027 gating QA
+NX-329,FALSE,FALSE,"NX-227, NX-238",,Mesh security and penetration tests — ADR-047/048 security validation
+NX-330,FALSE,FALSE,NX-222,,Session crash-recovery regression — ADR-041 session durability
+NX-331,FALSE,FALSE,"NX-230, NX-322",,Report export audit & diff tests — ADR-051 report builder QA
+NX-332,FALSE,FALSE,NX-317,,Autosteer closed-loop bench tests — ADR-033 guidance QA
+NX-333,FALSE,FALSE,NX-292,,Legacy zone importer & converter — ADR-027 zone interop
+NX-334,FALSE,FALSE,NX-320,,Legacy job migration tooling — ADR-040/041 season/session migration
+NX-335,FALSE,FALSE,NX-296,,Legacy multi-field envelope translator — ADR-043 multi-field interop
+NX-336,FALSE,FALSE,"NX-269, NX-304",,Legacy telemetry remap to new layers — ADR-049/052 telemetry parity
+NX-337,FALSE,FALSE,NX-274,,Legacy weather log migration utilities — ADR-053 weather parity

@@ -46,18 +46,37 @@ public sealed class LayerControllerDiagnosticsPublisher
         CancellationToken cancellationToken = default)
     {
         IReadOnlyList<LayerControllerSnapshot> snapshots = _runtime.CollectDueSnapshots(force, emitHoldFrames, timestamp);
+        var snapshotIndex = 0;
 
-        foreach (var snapshot in snapshots)
+        try
         {
-            try
+            for (; snapshotIndex < snapshots.Count; snapshotIndex++)
             {
-                var diagnosticEvent = LayerControllerDiagnosticEvent.FromSnapshot(snapshot);
-                await _eventBus.PublishAsync(diagnosticEvent, cancellationToken).ConfigureAwait(false);
-                await _tileWriter.WriteAsync(snapshot, cancellationToken).ConfigureAwait(false);
+                var snapshot = snapshots[snapshotIndex];
+
+                try
+                {
+                    var diagnosticEvent = LayerControllerDiagnosticEvent.FromSnapshot(snapshot);
+                    await _eventBus.PublishAsync(diagnosticEvent, cancellationToken).ConfigureAwait(false);
+                    await _tileWriter.WriteAsync(snapshot, cancellationToken).ConfigureAwait(false);
+                }
+                finally
+                {
+                    snapshot.Dispose();
+                }
             }
-            finally
+        }
+        catch
+        {
+            DisposeRemainingSnapshots(snapshotIndex + 1);
+            throw;
+        }
+
+        void DisposeRemainingSnapshots(int startIndex)
+        {
+            for (var index = startIndex; index < snapshots.Count; index++)
             {
-                snapshot.Dispose();
+                snapshots[index].Dispose();
             }
         }
     }

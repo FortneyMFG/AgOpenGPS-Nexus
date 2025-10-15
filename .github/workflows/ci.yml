@@ -32,6 +32,15 @@ jobs:
       - name: Display .NET info
         run: dotnet --info
 
+      - name: Restore solution
+        run: dotnet restore "Nexus SourceCode/AgOpenGPS.Nexus.sln"
+
+      - name: Build solution
+        run: dotnet build "Nexus SourceCode/AgOpenGPS.Nexus.sln" --no-restore --configuration Release
+
+      - name: Run unit tests
+        run: dotnet test "Nexus SourceCode/AgOpenGPS.Nexus.sln" --no-build --configuration Release
+
       - name: Lint docs & tasks
         shell: ${{ matrix.shell }}
         run: ./tools/ci/lint.ps1
@@ -43,6 +52,16 @@ jobs:
       - name: Headless sim smoke (placeholder)
         shell: ${{ matrix.shell }}
         run: ./tools/ci/sim-smoke.ps1
+
+      - name: Package Windows artifacts
+        if: matrix.os == 'windows-latest'
+        shell: ${{ matrix.shell }}
+        run: ./tools/ci/package-windows.ps1 -Configuration Release
+
+      - name: Package Linux artifacts
+        if: startsWith(matrix.os, 'ubuntu-')
+        shell: ${{ matrix.shell }}
+        run: ./tools/ci/package-linux.ps1 -Configuration Release -Runtime linux-x64
 
   publish-contracts:
     name: Publish contracts (NuGet)

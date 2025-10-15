@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "1.0.0",
+  "jobId": "job:2025-spring-planting",
+  "sessionId": "session:2",
+  "state": "active",
+  "name": "Evening Push",
+  "startedAt": "2025-03-29T00:15:03Z",
+  "createdAt": "2025-03-29T00:15:03Z",
+  "createdBy": "user:operator.maya",
+  "lastModifiedAt": "2025-03-29T03:15:42Z",
+  "lastModifiedBy": "user:operator.liam",
+  "operators": ["user:operator.maya", "user:operator.liam"],
+  "workOrderId": "work:spring-planter-001",
+  "context": {
+    "seasonId": "season:2025",
+    "farmId": "farm:home",
+    "fieldIds": ["field:north-quarter", "field:east-80"],
+    "presetId": "preset:planter-16r",
+    "layoutId": "layout:planter-dashboard"
+  },
+  "environment": {
+    "at": "2025-03-29T03:15:00Z",
+    "source": "sensor:weather-station-01",
+    "tempC": 12.4,
+    "humidityPct": 58,
+    "windKph": 11.2,
+    "windDeg": 245,
+    "pressureKpa": 98.6
+  },
+  "environmentSamples": [
+    {
+      "at": "2025-03-29T01:00:00Z",
+      "source": "sensor:weather-station-01",
+      "tempC": 14.1,
+      "humidityPct": 52,
+      "windKph": 9.4,
+      "windDeg": 232
+    },
+    {
+      "at": "2025-03-29T02:30:00Z",
+      "source": "sensor:weather-station-01",
+      "tempC": 13.2,
+      "humidityPct": 55,
+      "windKph": 10.8,
+      "windDeg": 238,
+      "rainMm": 0.2
+    }
+  ],
+  "inputs": {
+    "seed": {
+      "name": "ZX-2045 Corn",
+      "productId": "inventory:seed:zx-2045",
+      "lot": "lot-4432A",
+      "rate": 34000,
+      "rateUnits": "seeds/ac",
+      "quantity": 28.5,
+      "quantityUnits": "bag",
+      "notes": "Switch to field prescription at boundary"
+    },
+    "starter": {
+      "name": "Starter Fertilizer",
+      "productId": "inventory:fert:starter-11-52-0",
+      "rate": 5.2,
+      "rateUnits": "gal/ac"
+    }
+  },
+  "notes": [
+    {
+      "at": "2025-03-29T01:12:45Z",
+      "author": "user:operator.maya",
+      "type": "freeform",
+      "text": "Wet patch south edge"
+    },
+    {
+      "at": "2025-03-29T02:45:00Z",
+      "author": "user:taskrunner",
+      "type": "checklist",
+      "payload": {"item": "Refill seed tender", "status": "completed"}
+    }
+  ],
+  "layerRefs": ["layer:coverage:2025-03-28", "layer:boundary:east-80"],
+  "telemetry": {
+    "logId": "telemetry:session-2",
+    "segments": ["segment:telemetry:12345", "segment:telemetry:12346"]
+  },
+  "attachments": [
+    {
+      "id": "attachment:photo:gate",
+      "path": "sessions/session-2/attachments/gate.jpg",
+      "mediaType": "image/jpeg",
+      "sizeBytes": 204812
+    }
+  ],
+  "stats": {
+    "areaHa": 17.5,
+    "distanceKm": 26.7,
+    "durationSec": 10800,
+    "workRateHaPerHr": 5.8
+  },
+  "extensions": {
+    "automation.sectionControl": {"skipped": [], "ackTimeoutMs": 0},
+    "profit.analytics": {"fuelLiters": 42.3, "operatingHours": 3.5}
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0.0",
+  "jobId": "job:2025-spring-planting",
+  "displayName": "Spring Planting 2025",
+  "slug": "spring-planting-2025",
+  "state": "active",
+  "createdAt": "2025-03-28T12:04:00Z",
+  "updatedAt": "2025-03-29T03:15:42Z",
+  "startedAt": "2025-03-28T12:05:15Z",
+  "activeSessionId": "session:1",
+  "context": {
+    "farmId": "farm:home",
+    "seasonId": "season:2025",
+    "fieldIds": ["field:north-quarter", "field:east-80"],
+    "workOrderId": "work:spring-planter-001"
+  },
+  "tags": ["corn", "planter"],
+  "paths": {
+    "jobRoot": "Jobs/Spring Planting 2025",
+    "dataDir": "Jobs/Spring Planting 2025/data",
+    "resumeFile": "Jobs/Spring Planting 2025/Resume.txt",
+    "attachmentsDir": "Jobs/Spring Planting 2025/attachments"
+  },
+  "spatial": {
+    "home": {"lat": 47.5021, "lon": -99.1235, "elevationM": 412.0},
+    "envelope": {"minLat": 47.498, "minLon": -99.130, "maxLat": 47.509, "maxLon": -99.118},
+    "primaryBoundaryId": "layer:boundary:north-quarter",
+    "boundaryRefs": ["layer:boundary:north-quarter", "layer:boundary:east-80"]
+  },
+  "assets": {
+    "boundaryLayers": ["layer:boundary:north-quarter", "layer:boundary:east-80"],
+    "coverageLayers": ["layer:coverage:2025-03-28"],
+    "guidanceSets": ["guidance:ab-lines:2025"],
+    "prescriptions": ["layer:prescription:corn-2025"],
+    "attachments": [
+      {
+        "id": "attachment:soil-sample",
+        "path": "attachments/soil-sample.pdf",
+        "mediaType": "application/pdf",
+        "sizeBytes": 58211
+      }
+    ]
+  },
+  "equipment": {
+    "vehicleId": "equipment:tractor-alpha",
+    "implementId": "equipment:planter-16r",
+    "presetId": "preset:planter-16r",
+    "layoutId": "layout:planter-dashboard"
+  },
+  "stats": {
+    "totalAreaHa": 42.3,
+    "totalDistanceKm": 61.2,
+    "activeDurationSec": 16200,
+    "completedSessionCount": 1
+  },
+  "extensions": {
+    "mapping.status": {"journalMode": "autosave"}
+  },
+  "sessions": [
+    {
+      "id": "session:1",
+      "name": "Morning Warmup",
+      "state": "completed",
+      "startedAt": "2025-03-28T12:05:15Z",
+      "endedAt": "2025-03-28T17:22:19Z",
+      "lastModifiedAt": "2025-03-28T17:22:19Z",
+      "activeOperators": ["user:operator.maya"],
+      "stats": {
+        "areaHa": 24.8,
+        "distanceKm": 34.5,
+        "durationSec": 18724,
+        "coveragePct": 58.2
+      }
+    },
+    {
+      "id": "session:2",
+      "name": "Evening Push",
+      "state": "active",
+      "startedAt": "2025-03-29T00:15:03Z",
+      "lastModifiedAt": "2025-03-29T03:15:42Z",
+      "activeOperators": ["user:operator.maya", "user:operator.liam"],
+      "stats": {
+        "areaHa": 17.5,
+        "distanceKm": 26.7,
+        "durationSec": 10800,
+        "coveragePct": 41.8
+      }
+    }
+  ]
+}

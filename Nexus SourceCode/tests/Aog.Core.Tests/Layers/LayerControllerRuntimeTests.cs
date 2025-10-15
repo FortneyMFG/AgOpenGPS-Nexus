@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Linq;
 using Aog.Core.Layers.Controllers;
 using Aog.Core.Paths;
@@ -191,6 +192,35 @@ public class LayerControllerRuntimeTests
         area.Should().BeApproximately(0.42, 1e-6);
     }
 
+    [Fact]
+    public void RecordSample_ShouldUsePositionBufferPool()
+    {
+        var pool = new TrackingArrayPool<PlanarPoint>();
+        var clock = new FakeTimeProvider();
+        var runtime = new LayerControllerRuntime(
+            new[] { CreateDescriptor("controller-1", "layer-1", LayerAggregationStrategy.Average) },
+            clock,
+            pool);
+
+        for (var index = 0; index < 5; index++)
+        {
+            runtime.RecordSample(
+                "controller-1",
+                CreateSample(
+                    clock.GetUtcNow(),
+                    engineering: 10 + index,
+                    normalized: 0.5,
+                    quality: 0.7,
+                    area: 1,
+                    position: new PlanarPoint(index, index)));
+
+            clock.Advance(TimeSpan.FromMilliseconds(10));
+        }
+
+        pool.RentCount.Should().BeGreaterThan(0);
+        pool.ReturnCount.Should().BeGreaterThan(0);
+    }
+
     private static LayerControllerSample CreateSample(
         DateTimeOffset timestamp,
         double engineering,
@@ -208,5 +238,23 @@ public class LayerControllerRuntimeTests
             quality: quality,
             rateUnavailable: rateUnavailable,
             areaSquareMeters: area);
+    }
+
+    private sealed class TrackingArrayPool<T> : ArrayPool<T>
+    {
+        public int RentCount { get; private set; }
+
+        public int ReturnCount { get; private set; }
+
+        public override T[] Rent(int minimumLength)
+        {
+            RentCount++;
+            return new T[Math.Max(1, minimumLength)];
+        }
+
+        public override void Return(T[] array, bool clearArray = false)
+        {
+            ReturnCount++;
+        }
     }
 }

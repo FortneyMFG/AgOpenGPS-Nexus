@@ -1,6 +1,8 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
+using Aog.Core.Paths;
 
 namespace Aog.Core.Layers.Controllers;
 
@@ -11,13 +13,18 @@ public sealed class LayerControllerRuntime
 {
     private readonly Dictionary<string, ControllerEntry> _controllers;
     private readonly TimeProvider _timeProvider;
+    private readonly ArrayPool<PlanarPoint> _positionBufferPool;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LayerControllerRuntime"/> class.
     /// </summary>
     /// <param name="descriptors">Descriptors describing the controllers managed by the runtime.</param>
     /// <param name="timeProvider">Optional time provider used when scheduling emissions.</param>
-    public LayerControllerRuntime(IEnumerable<LayerControllerDescriptor> descriptors, TimeProvider? timeProvider = null)
+    /// <param name="positionBufferPool">Optional pool for controller position buffers.</param>
+    public LayerControllerRuntime(
+        IEnumerable<LayerControllerDescriptor> descriptors,
+        TimeProvider? timeProvider = null,
+        ArrayPool<PlanarPoint>? positionBufferPool = null)
     {
         if (descriptors is null)
         {
@@ -25,6 +32,7 @@ public sealed class LayerControllerRuntime
         }
 
         _timeProvider = timeProvider ?? TimeProvider.System;
+        _positionBufferPool = positionBufferPool ?? ArrayPool<PlanarPoint>.Shared;
 
         var descriptorList = descriptors.ToList();
         if (descriptorList.Count == 0)
@@ -48,7 +56,7 @@ public sealed class LayerControllerRuntime
             var nextEmission = _timeProvider.GetUtcNow();
             _controllers.Add(
                 descriptor.ControllerId,
-                new ControllerEntry(descriptor, nextEmission));
+                new ControllerEntry(descriptor, nextEmission, _positionBufferPool));
         }
     }
 
@@ -121,10 +129,13 @@ public sealed class LayerControllerRuntime
     {
         private DateTimeOffset _nextEmission;
 
-        public ControllerEntry(LayerControllerDescriptor descriptor, DateTimeOffset initialEmission)
+        public ControllerEntry(
+            LayerControllerDescriptor descriptor,
+            DateTimeOffset initialEmission,
+            ArrayPool<PlanarPoint> positionBufferPool)
         {
             Descriptor = descriptor;
-            Accumulator = new LayerControllerAccumulator();
+            Accumulator = new LayerControllerAccumulator(positionBufferPool);
             _nextEmission = initialEmission;
         }
 

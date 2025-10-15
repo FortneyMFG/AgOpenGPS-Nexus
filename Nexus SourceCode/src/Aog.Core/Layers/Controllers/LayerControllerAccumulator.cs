@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using Aog.Core.Paths;
 
@@ -9,7 +10,9 @@ namespace Aog.Core.Layers.Controllers;
 /// </summary>
 internal sealed class LayerControllerAccumulator
 {
-    private readonly List<PlanarPoint> _positions = new();
+    private readonly ArrayPool<PlanarPoint> _positionsPool;
+
+    private PlanarPoint[] _positions = Array.Empty<PlanarPoint>();
 
     private double _normalizedSum;
     private double _engineeringWeightedSum;
@@ -35,9 +38,16 @@ internal sealed class LayerControllerAccumulator
 
     private PlanarPoint? _lastPosition;
 
-    public bool HasSamples => _sampleCount > 0 || _areaSum > 0d || _positions.Count > 0;
+    private int _positionCount;
+
+    public bool HasSamples => _sampleCount > 0 || _areaSum > 0d || _positionCount > 0;
 
     public bool HasEverReceivedSample => _hasEverReceivedSample;
+
+    public LayerControllerAccumulator(ArrayPool<PlanarPoint>? positionsPool = null)
+    {
+        _positionsPool = positionsPool ?? ArrayPool<PlanarPoint>.Shared;
+    }
 
     public void AddSample(LayerControllerSample sample)
     {
@@ -56,7 +66,8 @@ internal sealed class LayerControllerAccumulator
         _windowLastSample = sample.Timestamp;
         _sampleCount++;
 
-        _positions.Add(sample.Position);
+        EnsurePositionCapacity(_positionCount + 1);
+        _positions[_positionCount++] = sample.Position;
 
         var area = sample.AreaSquareMeters;
         _areaSum += area;
@@ -147,8 +158,8 @@ internal sealed class LayerControllerAccumulator
             ? _denominatorSum
             : area;
 
-        var positions = containsFreshData
-            ? (IReadOnlyList<PlanarPoint>)_positions.ToArray()
+        IReadOnlyList<PlanarPoint> positions = containsFreshData
+            ? CopyPositions()
             : _lastPosition is { } lastPosition
                 ? new[] { lastPosition }
                 : Array.Empty<PlanarPoint>();
@@ -195,6 +206,44 @@ internal sealed class LayerControllerAccumulator
         _rateUnavailable = false;
         _windowFirstSample = null;
         _windowLastSample = null;
-        _positions.Clear();
+        _positionCount = 0;
+    }
+
+    private IReadOnlyList<PlanarPoint> CopyPositions()
+    {
+        if (_positionCount == 0)
+        {
+            return Array.Empty<PlanarPoint>();
+        }
+
+        var copy = new PlanarPoint[_positionCount];
+        Array.Copy(_positions, 0, copy, 0, _positionCount);
+        return copy;
+    }
+
+    private void EnsurePositionCapacity(int required)
+    {
+        if (_positions.Length >= required)
+        {
+            return;
+        }
+
+        var newLength = _positions.Length == 0
+            ? Math.Max(4, required)
+            : Math.Max(required, _positions.Length * 2);
+
+        var newBuffer = _positionsPool.Rent(newLength);
+
+        if (_positionCount > 0)
+        {
+            Array.Copy(_positions, 0, newBuffer, 0, _positionCount);
+        }
+
+        if (_positions.Length > 0)
+        {
+            _positionsPool.Return(_positions, clearArray: false);
+        }
+
+        _positions = newBuffer;
     }
 }

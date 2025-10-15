@@ -46,6 +46,7 @@ public sealed class ReportPreviewViewModelTests
         var geojson = Assert.Single(viewModel.Outputs, output => output.Format == "geojson");
         Assert.True(geojson.IsRequested);
         Assert.True(geojson.IsPartial);
+        Assert.DoesNotContain(viewModel.Outputs, output => string.Equals(output.Format, "count", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]

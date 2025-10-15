@@ -245,7 +245,8 @@ public sealed class ReportPreviewViewModel : INotifyPropertyChanged
             }
 
             var format = pair.Key["requestedOutput.".Length..];
-            if (!string.IsNullOrWhiteSpace(format))
+            if (!string.IsNullOrWhiteSpace(format) &&
+                string.Equals(pair.Value, "true", StringComparison.OrdinalIgnoreCase))
             {
                 formats.Add(format);
             }

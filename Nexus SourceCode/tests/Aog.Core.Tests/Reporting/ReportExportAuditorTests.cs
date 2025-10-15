@@ -89,5 +89,6 @@ public sealed class ReportExportAuditorTests
                        "  requestedOutput.pdf = true";
 
         Assert.Equal(expected, summary);
+        Assert.DoesNotContain("count (requested", summary, StringComparison.OrdinalIgnoreCase);
     }
 }

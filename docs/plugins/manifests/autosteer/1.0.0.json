@@ -18,6 +18,7 @@
     "can:can0",
     "serial:/dev/ttyS1"
   ],
+  "minimumRuntimeVersion": "1.0.0",
   "settings": {
     "defaultMode": {
       "type": "string",

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.plugins.autosteer",
+  "name": "AutoSteer",
+  "version": "1.0.0",
+  "description": "Publishes fused-pose guidance commands, AB line tracking, and actuator transport for production rigs.",
+  "requiredApis": {
+    "core.runtime": ">=1.0.0",
+    "mapping.layers": ">=1.0.0",
+    "pose.stream": ">=1.0.0",
+    "agio.transport": ">=1.0.0"
+  },
+  "supportedCapabilities": [
+    "guidance.control"
+  ],
+  "requiredTransports": [
+    "core://guidance",
+    "can:can0",
+    "serial:/dev/ttyS1"
+  ],
+  "settings": {
+    "defaultMode": {
+      "type": "string",
+      "default": "fused-pure-pursuit",
+      "description": "Default steering controller engaged when the plugin starts."
+    },
+    "poseTimeoutSeconds": {
+      "type": "number",
+      "default": 2.0,
+      "description": "Time without fused pose updates before the controller disengages."
+    },
+    "engageHoldSeconds": {
+      "type": "number",
+      "default": 0.5,
+      "description": "Duration the operator switch must be held before AutoSteer engages."
+    },
+    "maxSteerAngleDegrees": {
+      "type": "number",
+      "default": 28,
+      "description": "Maximum steer command applied to the actuator."
+    }
+  },
+  "simProviders": [
+    {
+      "providerId": "autosteer.fusedPose",
+      "type": "Aog.Plugins.AutoSteer.FusedPoseProvider",
+      "topics": [
+        "pose.fused"
+      ],
+      "description": "Publishes fused GNSS/IMU pose samples with deterministic latency for controller validation.",
+      "settings": {
+        "latencyMs": 35,
+        "noiseStdDev": 0.02
+      }
+    },
+    {
+      "providerId": "autosteer.guidanceController",
+      "type": "Aog.Plugins.AutoSteer.GuidanceControllerProvider",
+      "topics": [
+        "guidance.command"
+      ],
+      "description": "Generates steering commands from AB lines using fused pose input.",
+      "settings": {
+        "lookAheadSeconds": 0.9,
+        "maxRateDegPerSecond": 30
+      }
+    },
+    {
+      "providerId": "autosteer.actuatorTransport",
+      "type": "Aog.Plugins.AutoSteer.ActuatorTransportProvider",
+      "topics": [
+        "guidance.actuator"
+      ],
+      "description": "Exercises CAN/serial actuator transport for bench validation and diagnostics.",
+      "settings": {
+        "commandRateHz": 20,
+        "heartbeatIntervalMs": 250
+      }
+    }
+  ],
+  "leases": [
+    {
+      "capability": "guidance.control",
+      "mode": "Exclusive",
+      "timeoutSeconds": 5,
+      "recovery": "FailSafe"
+    }
+  ]
+}

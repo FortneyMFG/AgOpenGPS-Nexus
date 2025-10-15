@@ -64,7 +64,7 @@ public sealed class BridgeHostBuilderTests
         using var host = Program.CreateHostBuilder(Array.Empty<string>()).Build();
 
         var gateway = host.Services.GetRequiredService<IAogLinkGateway>();
-        Assert.IsType<NullAogLinkGateway>(gateway);
+        Assert.IsType<AogLinkGateway>(gateway);
 
         var hostedServices = host.Services.GetRequiredService<IEnumerable<IHostedService>>();
         Assert.Contains(hostedServices, service => service is BridgeHostedService);

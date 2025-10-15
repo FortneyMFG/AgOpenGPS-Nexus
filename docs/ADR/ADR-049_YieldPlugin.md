@@ -54,6 +54,6 @@ with the Crop Type and Genetics plugins to supply context.
 
 ## SRS Impact
 
-- Updates §08 Data & Storage with yield layer schemas and aggregation requirements.
-- Extends §12 Extensibility with analytics API contracts.
-- Adds UI expectations to §05 Frontends for map overlays and import wizard.
+- Meets yield layer metadata expectations in §08 Data Model & Storage (R-DATA-045).【F:docs/SRS/sections/08_Data_Model_Storage.md†L33-L34】
+- Powers analytics overlays and legends referenced by R-FE-074 in §05 Frontends.【F:docs/SRS/sections/05_Frontends.md†L29-L30】
+- Documents plugin APIs consumed by §12 Extensibility for analytics and export hooks.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L18-L36】

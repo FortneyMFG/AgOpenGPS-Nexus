@@ -50,6 +50,6 @@ builder and analytics.
 
 ## SRS Impact
 
-- Extends §03 Job Lifecycle with weather logging events.
-- Updates §02 Data Model (Session weather snapshot) and §08 Data & Storage (weather overlay schema).
-- Adds UI requirements to §05 Frontends for weather summaries and timeline charts.
+- Fulfills session snapshot and overlay requirements R-DATA-042 and R-DATA-048 in §08 Data Model & Storage.【F:docs/SRS/sections/08_Data_Model_Storage.md†L30-L36】
+- Wires weather logging hooks into §03 Job Lifecycle events (`onSessionWeatherUpdate`).【F:docs/SRS/sections/03_JobLifecycle.md†L31-L35】
+- Powers weather overlays and timelines required by R-FE-074 and R-FE-075 in §05 Frontends.【F:docs/SRS/sections/05_Frontends.md†L29-L31】

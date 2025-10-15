@@ -62,6 +62,6 @@ coverage events to auto-write variety polygons during planting.
 
 ## SRS Impact
 
-- Adds genetics schemas to §04 Mapping Layers and §08 Data Model & Storage.
-- Extends §03 Job Lifecycle with barcode change events and coverage hooks.
-- Updates §12 Extensibility to document plugin registration and event subscriptions.
+- Delivers genetics record schemas required by R-DATA-044 and catalog coverage in §04 Mapping Layers.【F:docs/SRS/sections/08_Data_Model_Storage.md†L32-L34】【F:docs/SRS/sections/04_MappingLayers.md†L62-L67】
+- Threads barcode and variety change events through job lifecycle workflows (R-JOB-040…R-JOB-042).【F:docs/SRS/sections/03_JobLifecycle.md†L27-L75】
+- Documents plugin registration and governance obligations for genetics extensions in §12 Extensibility.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L18-L36】

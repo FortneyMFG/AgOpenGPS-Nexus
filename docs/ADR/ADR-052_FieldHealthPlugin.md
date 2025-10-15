@@ -49,5 +49,5 @@ with the context bus for analytics.
 
 ## SRS Impact
 
-- Adds risk layer requirements to §04 Mapping Layers and §08 Data Model & Storage.
-- Updates §05 Frontends with severity legend and historical toggle expectations.
+- Implements risk overlay storage requirement R-DATA-047 in §08 Data Model & Storage and catalog coverage in §04 Mapping Layers.【F:docs/SRS/sections/08_Data_Model_Storage.md†L35-L36】【F:docs/SRS/sections/04_MappingLayers.md†L62-L67】
+- Powers severity toggles and overlay legends required by R-FE-074 in §05 Frontends.【F:docs/SRS/sections/05_Frontends.md†L29-L30】

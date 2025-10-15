@@ -80,7 +80,7 @@ validation and provenance entries.
 
 ## SRS Impact
 
-- Updates §02 Data Model with layer edit provenance requirements.
-- Expands §03 Job Lifecycle with editing events bound to sessions.
-- Extends §05 Frontends with shared toolbar expectations.
+- Fulfills R-DATA-040 and R-DATA-043 journal/schema expectations in §08 Data Model & Storage.【F:docs/SRS/sections/08_Data_Model_Storage.md†L28-L33】
+- Delivers shared toolbar and attribute panel experiences required by R-FE-070, R-FE-071, and R-FE-093 in §05 Frontends.【F:docs/SRS/sections/05_Frontends.md†L22-L36】
+- Binds editing lifecycle hooks referenced by R-FE-033 and related job lifecycle events in §03 Job Lifecycle.【F:docs/SRS/sections/05_Frontends.md†L48】【F:docs/SRS/sections/03_JobLifecycle.md†L21-L35】
 - Adds `LayerEditEvent.v1` schema under `/schemas` with examples for regression testing.

@@ -51,6 +51,6 @@ Templates define header metadata, required data sources, and widget layout. Plug
 
 ## SRS Impact
 
-- Adds export system requirements to §08 Data & Storage and §12 Extensibility.
-- Updates §05 Frontends with UI expectations (generate button, preview, share).
-- Documents new schemas in §options or appendices for template packaging.
+- Addresses report template governance R-DATA-049 in §08 Data Model & Storage and related packaging guidance.【F:docs/SRS/sections/08_Data_Model_Storage.md†L37-L38】
+- Supplies generate/preview flows defined by R-FE-076 in §05 Frontends.【F:docs/SRS/sections/05_Frontends.md†L31】
+- Requires plugin registration and export packaging policies covered in §12 Extensibility.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L18-L36】

@@ -38,6 +38,11 @@ Example JSON representation:
 }
 ```
 
+## SRS Impact
+
+- Satisfies spatial constraint storage, buffering, and indexing requirements R-DATA-026…R-DATA-028 in §08 Data Model & Storage.【F:docs/SRS/sections/08_Data_Model_Storage.md†L21-L23】
+- Enables zone gating visibility and override workflows described in §05 Frontends (R-FE-041…R-FE-042).【F:docs/SRS/sections/05_Frontends.md†L20-L24】
+
 ## Consequences
 - **Positive impacts**
   - Guidance plugins gain deterministic access to headland and keep-out geometry for intent inference, auto-extend, and recovery logic while remaining bounded by Core policies.【F:docs/SRS/sections/03_Comm_Transports.md†L25-L35】【F:docs/SRS/sections/08_Data_Model_Storage.md†L53-L76】【F:docs/SRS/sections/09_Control_Automation.md†L37-L49】

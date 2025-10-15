@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -127,22 +128,12 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (manifest.SupportedCapabilities is null || manifest.SupportedCapabilities.Count == 0)
-        {
-            throw new InvalidDataException("Manifest must declare supportedCapabilities.");
-        }
-
         foreach (var capability in manifest.SupportedCapabilities)
         {
             if (string.IsNullOrWhiteSpace(capability))
             {
                 throw new InvalidDataException("Supported capability names must be non-empty.");
             }
-        }
-
-        if (manifest.RequiredTransports is null || manifest.RequiredTransports.Count == 0)
-        {
-            throw new InvalidDataException("Manifest must declare required transports.");
         }
 
         foreach (var transport in manifest.RequiredTransports)
@@ -153,7 +144,8 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (string.IsNullOrWhiteSpace(manifest.MinimumRuntimeVersion) || !SemanticVersionPattern.IsMatch(manifest.MinimumRuntimeVersion))
+        if (!string.IsNullOrWhiteSpace(manifest.MinimumRuntimeVersion) &&
+            !SemanticVersionPattern.IsMatch(manifest.MinimumRuntimeVersion))
         {
             throw new InvalidDataException("Manifest minimumRuntimeVersion must be a semantic version (e.g. 1.0.0).");
         }
@@ -205,37 +197,40 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (manifest.CapabilityLeases is null || manifest.CapabilityLeases.Count == 0)
+        if (manifest.CapabilityLeases.Count > 0)
         {
-            throw new InvalidDataException("Manifest must declare capability leases.");
-        }
-
-        var seenLeaseCapabilities = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var lease in manifest.CapabilityLeases)
-        {
-            if (lease is null)
+            if (manifest.SupportedCapabilities.Count == 0)
             {
-                throw new InvalidDataException("Lease entries cannot be null.");
+                throw new InvalidDataException("Manifest must declare supportedCapabilities when capability leases are present.");
             }
 
-            if (string.IsNullOrWhiteSpace(lease.Capability))
+            var seenLeaseCapabilities = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var lease in manifest.CapabilityLeases)
             {
-                throw new InvalidDataException("Lease capability names must be non-empty.");
-            }
+                if (lease is null)
+                {
+                    throw new InvalidDataException("Lease entries cannot be null.");
+                }
 
-            if (!manifest.SupportedCapabilities.Contains(lease.Capability, StringComparer.OrdinalIgnoreCase))
-            {
-                throw new InvalidDataException($"Lease capability '{lease.Capability}' must be listed in supportedCapabilities.");
-            }
+                if (string.IsNullOrWhiteSpace(lease.Capability))
+                {
+                    throw new InvalidDataException("Lease capability names must be non-empty.");
+                }
 
-            if (!seenLeaseCapabilities.Add(lease.Capability))
-            {
-                throw new InvalidDataException($"Duplicate lease declaration for capability '{lease.Capability}'.");
-            }
+                if (!manifest.SupportedCapabilities.Contains(lease.Capability, StringComparer.OrdinalIgnoreCase))
+                {
+                    throw new InvalidDataException($"Lease capability '{lease.Capability}' must be listed in supportedCapabilities.");
+                }
 
-            if (lease.TimeoutSeconds <= 0)
-            {
-                throw new InvalidDataException($"Lease timeout must be positive for capability '{lease.Capability}'.");
+                if (!seenLeaseCapabilities.Add(lease.Capability))
+                {
+                    throw new InvalidDataException($"Duplicate lease declaration for capability '{lease.Capability}'.");
+                }
+
+                if (lease.TimeoutSeconds <= 0)
+                {
+                    throw new InvalidDataException($"Lease timeout must be positive for capability '{lease.Capability}'.");
+                }
             }
         }
     }

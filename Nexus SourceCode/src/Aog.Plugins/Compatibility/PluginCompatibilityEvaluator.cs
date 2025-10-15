@@ -144,6 +144,11 @@ public sealed class PluginCompatibilityEvaluator
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(manifest.MinimumRuntimeVersion))
+        {
+            return;
+        }
+
         if (!TryParseSemanticVersion(manifest.MinimumRuntimeVersion, out var minimumRuntime))
         {
             var message = string.Format(CultureInfo.InvariantCulture, "Manifest minimumRuntimeVersion '{0}' could not be parsed.", manifest.MinimumRuntimeVersion);

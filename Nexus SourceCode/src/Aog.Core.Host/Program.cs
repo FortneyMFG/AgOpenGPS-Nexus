@@ -84,7 +84,7 @@ public static class Program
                 services.AddSingleton(provider =>
                 {
                     var options = provider.GetRequiredService<IOptions<CoreCapabilitiesOptions>>().Value;
-                    IDictionary<string, string>? attributes = null;
+                    IReadOnlyDictionary<string, string>? attributes = null;
 
                     if (options.DefaultCapabilityAttributes.Count > 0)
                     {

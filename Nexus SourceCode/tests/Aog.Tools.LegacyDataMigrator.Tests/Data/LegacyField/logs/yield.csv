@@ -1,0 +1,4 @@
+timestamp_utc,easting_m,northing_m,yield_kg_per_ha,moisture_percent,area_ha
+2024-10-01T15:00:00Z,100,200,8500,18.5,0.01
+2024-10-01T15:00:02Z,110,200,9000,19.0,0.01
+2024-10-01T15:00:04Z,120,200,8700,18.0,0.01

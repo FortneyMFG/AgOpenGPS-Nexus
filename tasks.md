@@ -238,7 +238,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-058 Guidance tuning auto-calculations
 - [x] NX-059 Ported math verification report
 - [x] NX-102 V6 functionality inventory & gap analysis _(Done)_
-- [ ] NX-105 Legacy background imagery import _(Planned)_
+- [x] NX-105 Legacy background imagery import _(Done)_
 - [ ] NX-106 Legacy field overview metadata import _(Planned)_
 - [ ] NX-107 Legacy flag importer & UI surfacing _(Planned)_
 - [ ] NX-108 Legacy contour resume support _(Planned)_

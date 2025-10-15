@@ -239,3 +239,185 @@ message CombineYieldLayer {
   // Averaged cells composing the layer.
   repeated CombineYieldCell cells = 4;
 }
+
+// ZoneType distinguishes the kind of constraint represented by a zone.
+enum ZoneType {
+  // Zone type has not been assigned.
+  ZONE_TYPE_UNSPECIFIED = 0;
+
+  // Field or project boundary.
+  ZONE_TYPE_BOUNDARY = 1;
+
+  // Headland region derived from boundary buffers.
+  ZONE_TYPE_HEADLAND = 2;
+
+  // Hard keep-out / no-go area.
+  ZONE_TYPE_KEEP_OUT = 3;
+
+  // Driveable region where work is disabled (product off, logging only).
+  ZONE_TYPE_WORK_DISABLED = 4;
+}
+
+// ZoneCoordinate represents a longitude/latitude coordinate with optional elevation.
+message ZoneCoordinate {
+  // Longitude in decimal degrees (WGS84).
+  double longitude_deg = 1;
+
+  // Latitude in decimal degrees (WGS84).
+  double latitude_deg = 2;
+
+  // Optional elevation in meters above mean sea level.
+  double elevation_m = 3;
+}
+
+// ZoneLinearRing describes a closed polygon ring where the first and last coordinates
+// are identical.
+message ZoneLinearRing {
+  // Vertices composing the ring (clockwise for exterior, counter-clockwise for holes).
+  repeated ZoneCoordinate vertices = 1;
+}
+
+// ZonePolygon captures the buffered polygon applied to a zone, including any interior holes.
+message ZonePolygon {
+  // Exterior ring of the polygon.
+  ZoneLinearRing exterior = 1;
+
+  // Interior rings that should be excluded from the polygon.
+  repeated ZoneLinearRing holes = 2;
+}
+
+// ZoneBuffers specify drive vs. work clearance margins in meters.
+message ZoneBuffers {
+  // Lateral clearance needed to safely drive near the zone boundary.
+  double drive_m = 1;
+
+  // Clearance required to perform work (product application, tillage, etc.).
+  double work_m = 2;
+}
+
+// ZoneValidWhen expresses optional conditional metadata that scopes zone applicability.
+message ZoneValidWhen {
+  // Crop name (e.g. "corn") for which the zone applies. Empty means all crops.
+  string crop = 1;
+
+  // Season identifier (e.g. "2026"). Empty means all seasons.
+  string season = 2;
+
+  // Additional arbitrary conditions (e.g. weather presets) understood by policy engines.
+  repeated string conditions = 3;
+}
+
+// ZoneProvenance records the source of a zone for auditing and replay.
+message ZoneProvenance {
+  // Source that authored the zone (import type, editor, automation).
+  string source = 1;
+
+  // Timestamp when the zone was created or last updated.
+  google.protobuf.Timestamp timestamp = 2;
+
+  // Optional free-form note about the change rationale.
+  string note = 3;
+}
+
+// Zone represents a buffered polygon with constraint metadata.
+message Zone {
+  // Stable identifier for the zone (UUID string).
+  string zone_id = 1;
+
+  // Classification for the zone.
+  ZoneType type = 2;
+
+  // Human-readable label shown in UIs.
+  string label = 3;
+
+  // Priority ordering when multiple zones overlap (higher wins).
+  uint32 priority = 4;
+
+  // Whether the zone is currently active/enabled.
+  bool enabled = 5;
+
+  // Buffered polygon geometry in the project CRS.
+  ZonePolygon geometry = 6;
+
+  // Drive/work clearance buffers.
+  ZoneBuffers buffers = 7;
+
+  // Optional conditions that gate when the zone applies.
+  ZoneValidWhen valid_when = 8;
+
+  // Provenance metadata for auditing.
+  ZoneProvenance provenance = 9;
+}
+
+// ListZonesRequest queries all known zones optionally including disabled entries.
+message ListZonesRequest {
+  // Include disabled zones in the response when true.
+  bool include_disabled = 1;
+}
+
+// ListZonesResponse returns the zones known to the service at call time.
+message ListZonesResponse {
+  repeated Zone zones = 1;
+}
+
+// WatchZonesRequest subscribes to incremental zone updates.
+message WatchZonesRequest {
+  // Include disabled zones in update streams when true.
+  bool include_disabled = 1;
+}
+
+// ZoneDelta communicates added/updated and deleted zones in a snapshot-consistent order.
+message ZoneDelta {
+  // Snapshot version the delta applies to.
+  uint64 version = 1;
+
+  // Upserted zones (create/update events).
+  repeated Zone upserts = 2;
+
+  // Identifiers for deleted zones.
+  repeated string deleted_zone_ids = 3;
+}
+
+// WatchZonesResponse streams zone deltas after an initial snapshot.
+message WatchZonesResponse {
+  // Full snapshot sent on the first response.
+  repeated Zone snapshot = 1;
+
+  // Incremental deltas after the snapshot is emitted.
+  repeated ZoneDelta deltas = 2;
+}
+
+// GetZonesInBoundsRequest filters zones intersecting a bounding box.
+message GetZonesInBoundsRequest {
+  // Minimum longitude (degrees) of the bounding box.
+  double min_longitude_deg = 1;
+
+  // Minimum latitude (degrees) of the bounding box.
+  double min_latitude_deg = 2;
+
+  // Maximum longitude (degrees) of the bounding box.
+  double max_longitude_deg = 3;
+
+  // Maximum latitude (degrees) of the bounding box.
+  double max_latitude_deg = 4;
+
+  // Include disabled zones when true.
+  bool include_disabled = 5;
+}
+
+// GetZonesInBoundsResponse returns the zones intersecting the requested bounds.
+message GetZonesInBoundsResponse {
+  repeated Zone zones = 1;
+}
+
+// ZoneService exposes spatial constraint zones to automation and UI consumers.
+service ZoneService {
+  // Returns the current list of known zones.
+  rpc ListZones(ListZonesRequest) returns (ListZonesResponse);
+
+  // Streams zone snapshot and incremental updates.
+  rpc WatchZones(WatchZonesRequest) returns (stream WatchZonesResponse);
+
+  // Retrieves zones that intersect the specified bounding box.
+  rpc GetZonesInBounds(GetZonesInBoundsRequest) returns (GetZonesInBoundsResponse);
+}

@@ -87,11 +87,12 @@ domain-specific facts through `extensions` bags that Core stores verbatim.
 
 ### LayerEditEvent.v1 (new)
 - **Identity:** `layerEdit:<uuid>` immutable journal entries emitted by the Zone Drawing Framework.
-- **Core attributes:** `layerId`, `jobId`, `sessionId`, `actor`, `createdAt`, `operations[]` (create/update/delete descriptors),
-  `previousHash`, `nextHash` for undo/redo chains.
+- **Core attributes:** `layerId`, `jobId`, `sessionId`, `context.farmId`, `context.fieldIds[]`, `tool`, `actor`, `createdAt`,
+  `operations[]` (create/update/delete/merge/split descriptors), `tileRefs[]`, `operationGroupId`, `previousHash`, `nextHash`
+  for undo/redo chains.
 - **Relationships:** Linked to layers and sessions; consumed by collaborative mesh replication and analytics plugins.
-- **Schema:** `schemas/LayerEditEvent.v1.json` enumerates operation payloads (geometry diffs, attribute patches) and provenance
-  metadata, marking geometry diffs as Core-owned and attribute payloads as plugin-extendable.
+- **Schema:** `schemas/LayerEditEvent.v1.json` enumerates operation payloads (geometry diffs, vertex edits, JSON Patch attribute
+  updates) and provenance metadata, marking geometry diffs as Core-owned and attribute payloads as plugin-extendable.
 
 ### CropTypeHistoryRecord.v1 (new)
 - **Identity:** Embedded within `Field.cropTypeHistory[]`.

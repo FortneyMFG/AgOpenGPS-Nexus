@@ -1,22 +1,63 @@
 {
-  "id": "layerEdit:12345",
   "schemaVersion": "1.0.0",
+  "id": "layerEdit:2025-05-05T09:15:22Z:polygon-adjust",
   "layerId": "layer:cropType.actual.2025",
   "jobId": "job:2025-plant-soy",
-  "sessionId": "session:1",
+  "sessionId": "session:field-21",
+  "context": {
+    "farmId": "farm:midwest.demo",
+    "fieldIds": ["field:midwest.demo.north-40"],
+    "seasonId": "season:2025"
+  },
+  "tool": "polygon",
   "createdAt": "2025-05-05T09:15:22Z",
   "actor": "user:operator.maya",
-  "hash": "c96f8fd1",
-  "previousHash": "b73c2140",
+  "hash": "c96f8fd1cc09bf12",
+  "previousHash": "b73c2140aa11ef01",
   "nextHash": null,
+  "operationGroupId": "undoGroup:session-42",
+  "tileRefs": [
+    {
+      "tileId": "tile:layer:cropType.actual.2025:5/12/9",
+      "hash": "8aa5f0c1b4d223ff",
+      "purpose": "geometry"
+    }
+  ],
   "operations": [
     {
       "type": "update",
       "featureId": "feature:polygon-12",
       "geometryBefore": { "type": "Polygon", "coordinates": [[[0,0],[1,0],[1,1],[0,1],[0,0]]] },
       "geometryAfter": { "type": "Polygon", "coordinates": [[[0,0],[1.1,0],[1,1.05],[0,1],[0,0]]] },
+      "vertexEdits": [
+        {
+          "index": 2,
+          "before": [1, 1],
+          "after": [1, 1.05]
+        },
+        {
+          "index": 1,
+          "before": [1, 0],
+          "after": [1.1, 0]
+        }
+      ],
       "attributesBefore": { "crop": "corn", "status": "planned" },
-      "attributesAfter": { "crop": "soybean", "status": "actual" }
+      "attributesAfter": { "crop": "soybean", "status": "actual" },
+      "attributePatches": [
+        { "path": "/crop", "action": "replace", "value": "soybean" },
+        { "path": "/status", "action": "replace", "value": "actual" }
+      ],
+      "summary": {
+        "areaDeltaSqMeters": 142.5,
+        "perimeterDeltaMeters": 3.1,
+        "changedAttributes": ["crop", "status"]
+      }
     }
-  ]
+  ],
+  "metadata": {
+    "plugin": "cropType",
+    "notes": "Operator adjusted crop zone after scouting.",
+    "confidence": 0.92
+  },
+  "notes": "Adjusted crop variety polygon using polygon tool to match actual planting boundary."
 }

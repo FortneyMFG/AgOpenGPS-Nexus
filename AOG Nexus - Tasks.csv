@@ -272,7 +272,7 @@ NX-317,FALSE,TRUE,NX-316,,Firmware-in-loop stability validation — ADR-033 clos
 NX-318,FALSE,TRUE,NX-208,,Plugin manifest governance documentation — ADR-031 manifest governance
 NX-319,FALSE,FALSE,NX-292,,Zone policy operator guide — ADR-027 constraint UX docs
 NX-320,FALSE,FALSE,"NX-223, NX-295",,Season/session migration playbook — ADR-040/041 lifecycle rollout
-NX-321,FALSE,FALSE,NX-311,,Mesh provisioning runbook — ADR-047/048 connectivity rollout
+NX-321,FALSE,TRUE,NX-311,,Mesh provisioning runbook — ADR-047/048 connectivity rollout
 NX-322,FALSE,FALSE,NX-308,,Report template catalog documentation — ADR-051 report builder
 NX-323,FALSE,FALSE,NX-231,,Performance budget telemetry dashboards — ADR-026 instrumentation rollout
 NX-324,FALSE,FALSE,NX-229,,Mesh retention & privacy operations guide — ADR-047 retention planner
@@ -280,7 +280,7 @@ NX-325,FALSE,FALSE,NX-274,,Weather compliance export documentation — ADR-053 c
 NX-326,FALSE,TRUE,NX-301,,Metadata-driven UI style guide — ADR-034 UI refactor
 NX-327,FALSE,TRUE,NX-284,,Plugin QA handshake update — ADR-031 manifest governance QA
 NX-328,FALSE,FALSE,"NX-214, NX-276, NX-277",,Constraint fault-injection regression suite — ADR-027 gating QA
-NX-329,FALSE,FALSE,"NX-227, NX-238",,Mesh security and penetration tests — ADR-047/048 security validation
+NX-329,FALSE,TRUE,"NX-227, NX-238",,Mesh security and penetration tests — ADR-047/048 security validation
 NX-330,FALSE,FALSE,NX-222,,Session crash-recovery regression — ADR-041 session durability
 NX-331,FALSE,FALSE,"NX-230, NX-322",,Report export audit & diff tests — ADR-051 report builder QA
 NX-332,FALSE,FALSE,NX-317,,Autosteer closed-loop bench tests — ADR-033 guidance QA

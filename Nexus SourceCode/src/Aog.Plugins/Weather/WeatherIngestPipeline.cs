@@ -108,7 +108,9 @@ public sealed class WeatherIngestPipeline
             return false;
         }
 
-        return !IsEquivalent(candidate, _lastPublished);
+        // When the minimum publish interval has elapsed we always emit a snapshot to
+        // provide a heartbeat even if the readings have not materially changed.
+        return true;
     }
 
     private ValueTask<WeatherSnapshot?> PublishAsync(WeatherSnapshot snapshot)

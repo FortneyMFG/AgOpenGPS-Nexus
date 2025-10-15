@@ -1,3 +1,4 @@
+using Aog.Plugins;
 using Aog.Plugins.Compatibility;
 
 namespace Aog.UI.Avalonia.ViewModels;
@@ -41,6 +42,8 @@ public sealed class DeviceManagerCompatibilityIssueViewModel
         PluginDependencyKind.Transport => "Transport",
         PluginDependencyKind.RuntimeVersion => "Runtime",
         PluginDependencyKind.Capability => "Capability",
+        PluginDependencyKind.Profile => "Profile",
+        PluginDependencyKind.Relationship => "Relationship",
         _ => Kind.ToString()
     };
 }

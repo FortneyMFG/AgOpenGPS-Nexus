@@ -95,6 +95,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         LayerLegend = LayerLegendViewModel.FromLayers(_mapLayers);
         LayerInspector = BuildSampleInspector(_mapLayers);
         MeshSharePanel = MeshSharePanelViewModel.CreateSample();
+        FieldHealthSeverity = FieldHealthSeverityPanelViewModel.CreateSample();
         ProfitAnalytics = ProfitAnalyticsViewModel.CreateSample();
         RadioProvisioningPanel = RadioProvisioningPanelViewModel.CreateSample();
         RadioProvisioning = RadioProvisioningFlowViewModel.CreateSample();
@@ -203,6 +204,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the inspector exposing the pinned layer observation.</summary>
     public LayerInspectorViewModel LayerInspector { get; }
+    /// <summary>Gets the panel surfacing field health severity guidance.</summary>
+    public FieldHealthSeverityPanelViewModel FieldHealthSeverity { get; }
 
     /// <summary>Gets the profitability analytics view-model powering the profit card.</summary>
     public ProfitAnalyticsViewModel ProfitAnalytics { get; }
@@ -246,7 +249,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// </summary>
     public CompanionMetadataSnapshot CreateCompanionMetadataSnapshot()
     {
-        return CompanionMetadataSnapshot.From(LayerLegend, LayerInspector, SteerDashboard, ReplayTimeline);
+        return CompanionMetadataSnapshot.From(
+            LayerLegend,
+            LayerInspector,
+            SteerDashboard,
+            ReplayTimeline,
+            FieldHealthSeverity);
     }
 
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)

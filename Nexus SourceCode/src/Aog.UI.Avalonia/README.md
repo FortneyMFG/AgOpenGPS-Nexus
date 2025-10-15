@@ -65,6 +65,13 @@ background tasks, and orchestration progress through `PresetOptionViewModel` and
 harvest fixtures into `MainWindowViewModel` so UI shells can exercise status messaging without
 service dependencies.
 
+## Field health severity UX (NX-306)
+
+`FieldHealthSeverityPanelViewModel` captures the severity scale required by
+[ADR-052](../../../docs/ADR/ADR-052_FieldHealthPlugin.md), including layer provenance, persisted history
+filters, and the severity colour ramps that align with the `FieldHealthRiskLayer.v1` schema. The sample
+panel used by `MainWindowViewModel` highlights critical, high, moderate, low, and none severities with
+recommended operator actions so future plugins can populate the same structure without bespoke UI code.
 ## Radio provisioning UI flows (NX-311)
 
 `RadioProvisioningPanelViewModel` surfaces the provisioning workflows aligned with

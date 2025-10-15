@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Aog.Core.Simulation.Configuration;
+using Aog.Core.Simulation.Performance;
 using Aog.Plugins;
 using FluentAssertions;
 using Xunit;
@@ -34,7 +35,44 @@ public sealed class SimulationPerformanceHarnessTests
         result.TotalOutputs.Should().BeGreaterThan(0);
         result.TotalMessages.Should().Be(result.Iterations * result.TotalOutputs);
         result.Elapsed.Should().BeLessThan(TimeSpan.FromMilliseconds(400));
+        result.AverageIterationDuration.Should().BeLessThan(TimeSpan.FromMilliseconds(5));
         result.Checksum.Should().NotBe(0d);
+
+        var budget = new SimulationPerformanceBudget(
+            maxTotalDuration: TimeSpan.FromMilliseconds(400),
+            maxAverageIterationDuration: TimeSpan.FromMilliseconds(5),
+            minMessagesPerIteration: result.TotalOutputs,
+            maxMessagesPerIteration: result.TotalOutputs);
+
+        var evaluation = budget.Evaluate(result);
+
+        evaluation.IsWithinBudget.Should().BeTrue();
+        evaluation.Violations.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void BudgetEvaluation_FlagsViolations()
+    {
+        var sample = new SimulationPerformanceSample(
+            "test",
+            Iterations: 100,
+            ProviderCount: 5,
+            TotalMessages: 450,
+            TotalOutputs: 20,
+            Elapsed: TimeSpan.FromMilliseconds(100),
+            Checksum: 42d);
+
+        var budget = new SimulationPerformanceBudget(
+            maxTotalDuration: TimeSpan.FromMilliseconds(50),
+            maxAverageIterationDuration: TimeSpan.FromMilliseconds(0.3),
+            minMessagesPerIteration: 5,
+            maxMessagesPerIteration: 3);
+
+        var evaluation = budget.Evaluate(sample);
+
+        evaluation.IsWithinBudget.Should().BeFalse();
+        evaluation.Violations.Should().HaveCountGreaterThan(0);
+        evaluation.HasViolations.Should().BeTrue();
     }
 
     [Fact]

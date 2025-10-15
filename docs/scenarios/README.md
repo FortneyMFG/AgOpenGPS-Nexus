@@ -29,3 +29,12 @@ realistic environment without building a configuration from scratch.
 
 For headless runs, pass the file to the tooling scripts, e.g. `nexus sim --config
 ./docs/scenarios/library.json --scenario headland-training`.
+
+## Performance Budgets
+
+The `performance-matrix.json` configuration mirrors the presets above but is tailored for
+automation. The new `Aog.Core.Simulation.Performance` harness fans synthetic payloads across
+the provider graph and records a `SimulationPerformanceSample` for each scenario. CI compares
+these samples against a `SimulationPerformanceBudget` to ensure elapsed time and message
+throughput stay within the thresholds defined by ADR-026. Use the matrix when adding new
+providers to guarantee the performance catalog stays up to date.

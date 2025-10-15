@@ -103,9 +103,9 @@ public sealed class WeatherIngestPipeline
         }
 
         var interval = candidate.CapturedAt - _lastPublishedAt;
-        if (interval >= _options.MinimumPublishInterval)
+        if (interval < _options.MinimumPublishInterval)
         {
-            return true;
+            return false;
         }
 
         return !IsEquivalent(candidate, _lastPublished);

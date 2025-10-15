@@ -15,7 +15,7 @@ public sealed class SourceRouter
     private readonly Dictionary<string, TopicState> _topics = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _preferredSources;
     private readonly object _gate = new();
-    private readonly ReentrantAsyncLock _publicationGate = new();
+    private readonly PublicationQueue _publicationQueue = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SourceRouter"/> class.
@@ -180,18 +180,18 @@ public sealed class SourceRouter
         TopicRouteChanged change,
         CancellationToken cancellationToken)
     {
-        return PublishRouteChangeCoreAsync(change, cancellationToken);
+        return _publicationQueue.EnqueueAsync(
+            change,
+            PublishRouteChangeCoreAsync,
+            cancellationToken);
     }
 
     private async ValueTask<TopicRoute?> PublishRouteChangeCoreAsync(
         TopicRouteChanged change,
         CancellationToken cancellationToken)
     {
-        await using (await _publicationGate.EnterAsync(cancellationToken).ConfigureAwait(false))
-        {
-            await _eventBus.PublishAsync(change, cancellationToken).ConfigureAwait(false);
-            return change.Current;
-        }
+        await _eventBus.PublishAsync(change, cancellationToken).ConfigureAwait(false);
+        return change.Current;
     }
 
     private TopicState GetOrCreateState(string topic)
@@ -313,73 +313,78 @@ public sealed class SourceRouter
         public int Priority => ((int)Kind * 1000) + PriorityOffset;
     }
 
-    private sealed class ReentrantAsyncLock
+    private sealed class PublicationQueue
     {
-        private readonly SemaphoreSlim _semaphore = new(1, 1);
-        private readonly AsyncLocal<Entry?> _currentEntry = new();
+        private readonly object _gate = new();
+        private readonly AsyncLocal<int> _scopeDepth = new();
+        private Task _tail = Task.CompletedTask;
 
-        public async ValueTask<Releaser> EnterAsync(CancellationToken cancellationToken)
+        public ValueTask<TResult> EnqueueAsync<TState, TResult>(
+            TState state,
+            Func<TState, CancellationToken, ValueTask<TResult>> action,
+            CancellationToken cancellationToken)
         {
-            var entry = _currentEntry.Value;
-            if (entry is null)
+            ArgumentNullException.ThrowIfNull(action);
+
+            if (_scopeDepth.Value > 0)
             {
-                await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-                entry = new Entry();
-                _currentEntry.Value = entry;
+                return action(state, cancellationToken);
             }
 
-            entry.Depth++;
-            return new Releaser(this);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return ValueTask.FromCanceled<TResult>(cancellationToken);
+            }
+
+            var completion = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+            Task previous;
+
+            lock (_gate)
+            {
+                previous = _tail;
+                _tail = ProcessAsync(previous, state, action, completion, cancellationToken);
+            }
+
+            return new ValueTask<TResult>(completion.Task);
         }
 
-        private void Exit()
+        private async Task ProcessAsync<TState, TResult>(
+            Task previous,
+            TState state,
+            Func<TState, CancellationToken, ValueTask<TResult>> action,
+            TaskCompletionSource<TResult> completion,
+            CancellationToken cancellationToken)
         {
-            var entry = _currentEntry.Value;
-            if (entry is null)
+            try
             {
-                throw new SynchronizationLockException("ReentrantAsyncLock was not acquired on the current context.");
+                await previous.ConfigureAwait(false);
+            }
+            catch
+            {
+                // Ignore failures from prior publications. Their awaiters have already observed them.
             }
 
-            entry.Depth--;
-            if (entry.Depth == 0)
+            try
             {
-                _currentEntry.Value = null;
-                _semaphore.Release();
-            }
-        }
-
-        public readonly struct Releaser : IAsyncDisposable, IDisposable
-        {
-            private readonly ReentrantAsyncLock _owner;
-            private bool _disposed;
-
-            internal Releaser(ReentrantAsyncLock owner)
-            {
-                _owner = owner;
-                _disposed = false;
-            }
-
-            public ValueTask DisposeAsync()
-            {
-                Dispose();
-                return ValueTask.CompletedTask;
-            }
-
-            public void Dispose()
-            {
-                if (_disposed)
+                _scopeDepth.Value++;
+                try
                 {
-                    return;
+                    var result = await action(state, cancellationToken).ConfigureAwait(false);
+                    completion.TrySetResult(result);
                 }
-
-                _disposed = true;
-                _owner.Exit();
+                finally
+                {
+                    _scopeDepth.Value--;
+                }
             }
-        }
-
-        private sealed class Entry
-        {
-            public int Depth;
+            catch (OperationCanceledException oce) when (oce.CancellationToken == cancellationToken)
+            {
+                completion.TrySetCanceled(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                completion.TrySetException(ex);
+            }
         }
     }
 }

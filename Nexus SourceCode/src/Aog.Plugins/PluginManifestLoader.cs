@@ -13,6 +13,10 @@ public sealed class PluginManifestLoader
         "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[-0-9A-Za-z.]+)?(?:\\+[0-9A-Za-z.-]+)?$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    private static readonly Regex ManifestSchemaVersionPattern = new(
+        "^1\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
     private static readonly Regex ManifestIdPattern = new(
         "^[a-z0-9]+(\\.[a-z0-9_-]+)+$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
@@ -78,9 +82,9 @@ public sealed class PluginManifestLoader
             throw new InvalidDataException("Manifest schemaVersion is required.");
         }
 
-        if (!SemanticVersionPattern.IsMatch(manifest.SchemaVersion))
+        if (!ManifestSchemaVersionPattern.IsMatch(manifest.SchemaVersion))
         {
-            throw new InvalidDataException("Manifest schemaVersion must be a semantic version (e.g. 1.0.0).");
+            throw new InvalidDataException("Manifest schemaVersion must be a supported version in the 1.x range (e.g. 1.0.0).");
         }
 
         if (string.IsNullOrWhiteSpace(manifest.Id))

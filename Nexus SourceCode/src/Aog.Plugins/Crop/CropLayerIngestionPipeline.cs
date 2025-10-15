@@ -188,11 +188,17 @@ public sealed class CropLayerIngestionPipeline
     private void ApplyComposite(LayerEditEventEntry entry, LayerEditEventOperation operation)
     {
         var removedSources = new List<KeyValuePair<string, CropZoneFeature>>();
+        var removedSourceIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         try
         {
             foreach (var sourceId in operation.SourceFeatureIds)
             {
+                if (!removedSourceIds.Add(sourceId))
+                {
+                    continue;
+                }
+
                 if (!_features.TryGetValue(sourceId, out var existing))
                 {
                     throw new InvalidOperationException($"Cannot compose crop feature '{operation.FeatureId}' because source feature '{sourceId}' does not exist.");
@@ -200,6 +206,13 @@ public sealed class CropLayerIngestionPipeline
 
                 removedSources.Add(new KeyValuePair<string, CropZoneFeature>(sourceId, existing));
                 _features.Remove(sourceId);
+            }
+
+            if (!removedSourceIds.Contains(operation.FeatureId) &&
+                _features.TryGetValue(operation.FeatureId, out var retained))
+            {
+                removedSources.Add(new KeyValuePair<string, CropZoneFeature>(operation.FeatureId, retained));
+                _features.Remove(operation.FeatureId);
             }
 
             var compositeFeature = BuildFeature(entry, operation);

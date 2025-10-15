@@ -173,6 +173,7 @@ public static class Program
         Console.WriteLine($"  CAN frames: {report.CanCount}");
         Console.WriteLine($"  IO events: {report.SectionCount}");
         Console.WriteLine($"  Plugin events: {report.PluginCount}");
+        Console.WriteLine($"  Weather snapshots: {report.WeatherCount}");
         Console.WriteLine($"  Yield samples: {report.YieldSampleCount}");
         Console.WriteLine($"  Field health observations: {report.FieldHealthObservationCount}");
 

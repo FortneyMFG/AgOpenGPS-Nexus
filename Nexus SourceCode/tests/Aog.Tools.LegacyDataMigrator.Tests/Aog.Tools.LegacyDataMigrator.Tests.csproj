@@ -41,5 +41,8 @@
     <None Include="Data\LegacyField\logs\plugin.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Data\LegacyField\logs\weather.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

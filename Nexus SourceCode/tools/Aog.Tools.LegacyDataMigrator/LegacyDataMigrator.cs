@@ -108,6 +108,16 @@ public sealed class LegacyDataMigrator
             {
                 report = AppendSkipped(report, pluginPath + " (missing)");
             }
+
+            var weatherPath = Path.Combine(logsRoot, "weather.csv");
+            if (File.Exists(weatherPath))
+            {
+                report = report with { WeatherCount = report.WeatherCount + WriteWeather(weatherPath, options.OutputDirectory) };
+            }
+            else
+            {
+                report = AppendSkipped(report, weatherPath + " (missing)");
+            }
         }
         else
         {
@@ -740,6 +750,43 @@ public sealed class LegacyDataMigrator
         return rows.Count;
     }
 
+    private static int WriteWeather(string filePath, string outputDirectory)
+    {
+        var rows = LegacyWeatherCsvParser.Parse(filePath);
+        if (rows.Count == 0)
+        {
+            return 0;
+        }
+
+        using var stream = CreateParquetStream(outputDirectory, "weather.parquet");
+        using var writer = new ParquetWriter(TelemetrySchemas.Weather.Schema, stream);
+        using var rowGroup = writer.CreateRowGroup(rows.Count);
+
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.Sequence, rows.Select(r => r.Sequence).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.Source, rows.Select(r => r.Source).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.TemperatureC, rows.Select(r => r.TemperatureC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.HumidityPct, rows.Select(r => r.HumidityPct).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WindKph, rows.Select(r => r.WindKph).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WindDirectionDeg, rows.Select(r => r.WindDirectionDeg).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WindGustKph, rows.Select(r => r.WindGustKph).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.RainfallMm, rows.Select(r => r.RainfallMm).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.PressureKpa, rows.Select(r => r.PressureKpa).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.DewPointC, rows.Select(r => r.DewPointC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WetBulbC, rows.Select(r => r.WetBulbC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.DeltaTC, rows.Select(r => r.DeltaTC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.EvapotranspirationMm, rows.Select(r => r.EvapotranspirationMm).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.SolarIrradianceWm2, rows.Select(r => r.SolarIrradianceWm2).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.UvIndex, rows.Select(r => r.UvIndex).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.CloudCoverPct, rows.Select(r => r.CloudCoverPct).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.VisibilityKm, rows.Select(r => r.VisibilityKm).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.SoilTempC, rows.Select(r => r.SoilTempC).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.SoilMoisturePct, rows.Select(r => r.SoilMoisturePct).ToArray()));
+        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.LeafWetnessPct, rows.Select(r => r.LeafWetnessPct).ToArray()));
+
+        return rows.Count;
+    }
+
     private static FieldHistoryDocument ParseFieldHistory(string path)
     {
         var lines = File.ReadAllLines(path);
@@ -877,6 +924,7 @@ public sealed record LegacyMigrationReport(
     int CanCount = 0,
     int SectionCount = 0,
     int PluginCount = 0,
+    int WeatherCount = 0,
     int FieldHistoryFields = 0,
     int FieldHistoryEntries = 0,
     int FieldHealthObservationCount = 0,
@@ -1253,6 +1301,105 @@ internal static class LegacyPluginCsvParser
         byte[]? Payload);
 }
 
+internal static class LegacyWeatherCsvParser
+{
+    public static IReadOnlyList<WeatherRow> Parse(string path)
+    {
+        var rows = new List<WeatherRow>();
+        using var reader = new StreamReader(path);
+        reader.ReadLine();
+        while (!reader.EndOfStream)
+        {
+            var line = reader.ReadLine();
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            var parts = line.Split(',', StringSplitOptions.TrimEntries);
+            if (parts.Length < 3)
+            {
+                continue;
+            }
+
+            rows.Add(new WeatherRow(
+                ulong.Parse(parts[0], CultureInfo.InvariantCulture),
+                ParseTimestamp(GetPart(parts, 1)),
+                Normalize(GetPart(parts, 2)),
+                ParseNullableDouble(GetPart(parts, 3)),
+                ParseNullableDouble(GetPart(parts, 4)),
+                ParseNullableDouble(GetPart(parts, 5)),
+                ParseNullableDouble(GetPart(parts, 6)),
+                ParseNullableDouble(GetPart(parts, 7)),
+                ParseNullableDouble(GetPart(parts, 8)),
+                ParseNullableDouble(GetPart(parts, 9)),
+                ParseNullableDouble(GetPart(parts, 10)),
+                ParseNullableDouble(GetPart(parts, 11)),
+                ParseNullableDouble(GetPart(parts, 12)),
+                ParseNullableDouble(GetPart(parts, 13)),
+                ParseNullableDouble(GetPart(parts, 14)),
+                ParseNullableDouble(GetPart(parts, 15)),
+                ParseNullableDouble(GetPart(parts, 16)),
+                ParseNullableDouble(GetPart(parts, 17)),
+                ParseNullableDouble(GetPart(parts, 18)),
+                ParseNullableDouble(GetPart(parts, 19)),
+                ParseNullableDouble(GetPart(parts, 20))));
+        }
+
+        return rows;
+    }
+
+    private static DateTime? ParseTimestamp(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var timestamp = DateTime.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal);
+        return DateTime.SpecifyKind(timestamp, DateTimeKind.Utc);
+    }
+
+    private static double? ParseNullableDouble(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return double.Parse(value, CultureInfo.InvariantCulture);
+    }
+
+    private static string? Normalize(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value;
+
+    private static string? GetPart(string[] parts, int index)
+        => index < parts.Length ? parts[index] : null;
+
+    internal sealed record WeatherRow(
+        ulong Sequence,
+        DateTime? TimestampUtc,
+        string? Source,
+        double? TemperatureC,
+        double? HumidityPct,
+        double? WindKph,
+        double? WindDirectionDeg,
+        double? WindGustKph,
+        double? RainfallMm,
+        double? PressureKpa,
+        double? DewPointC,
+        double? WetBulbC,
+        double? DeltaTC,
+        double? EvapotranspirationMm,
+        double? SolarIrradianceWm2,
+        double? UvIndex,
+        double? CloudCoverPct,
+        double? VisibilityKm,
+        double? SoilTempC,
+        double? SoilMoisturePct,
+        double? LeafWetnessPct);
+}
+
 internal sealed record FieldHistoryDocument(IReadOnlyList<FieldHistoryField> Fields);
 
 internal sealed record FieldHistoryField(string FieldName, IReadOnlyList<FieldHistoryEntry> Entries);
@@ -1461,5 +1608,52 @@ internal static class TelemetrySchemas
             PluginId,
             Topic,
             Payload);
+    }
+
+    internal static class Weather
+    {
+        public static readonly DataField<ulong> Sequence = new("sequence");
+        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+        public static readonly DataField<string?> Source = new("source");
+        public static readonly DataField<double?> TemperatureC = new("temperature_c");
+        public static readonly DataField<double?> HumidityPct = new("humidity_pct");
+        public static readonly DataField<double?> WindKph = new("wind_kph");
+        public static readonly DataField<double?> WindDirectionDeg = new("wind_dir_deg");
+        public static readonly DataField<double?> WindGustKph = new("wind_gust_kph");
+        public static readonly DataField<double?> RainfallMm = new("rainfall_mm");
+        public static readonly DataField<double?> PressureKpa = new("pressure_kpa");
+        public static readonly DataField<double?> DewPointC = new("dew_point_c");
+        public static readonly DataField<double?> WetBulbC = new("wet_bulb_c");
+        public static readonly DataField<double?> DeltaTC = new("delta_t_c");
+        public static readonly DataField<double?> EvapotranspirationMm = new("evapotranspiration_mm");
+        public static readonly DataField<double?> SolarIrradianceWm2 = new("solar_irradiance_wm2");
+        public static readonly DataField<double?> UvIndex = new("uv_index");
+        public static readonly DataField<double?> CloudCoverPct = new("cloud_cover_pct");
+        public static readonly DataField<double?> VisibilityKm = new("visibility_km");
+        public static readonly DataField<double?> SoilTempC = new("soil_temp_c");
+        public static readonly DataField<double?> SoilMoisturePct = new("soil_moisture_pct");
+        public static readonly DataField<double?> LeafWetnessPct = new("leaf_wetness_pct");
+        public static readonly Schema Schema = new(
+            Sequence,
+            Timestamp,
+            Source,
+            TemperatureC,
+            HumidityPct,
+            WindKph,
+            WindDirectionDeg,
+            WindGustKph,
+            RainfallMm,
+            PressureKpa,
+            DewPointC,
+            WetBulbC,
+            DeltaTC,
+            EvapotranspirationMm,
+            SolarIrradianceWm2,
+            UvIndex,
+            CloudCoverPct,
+            VisibilityKm,
+            SoilTempC,
+            SoilMoisturePct,
+            LeafWetnessPct);
     }
 }

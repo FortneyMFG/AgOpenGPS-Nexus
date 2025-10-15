@@ -33,6 +33,7 @@ public sealed class LegacyDataMigratorTests
         report.CanCount.Should().Be(1);
         report.SectionCount.Should().Be(1);
         report.PluginCount.Should().Be(1);
+        report.WeatherCount.Should().Be(2);
         report.FieldHistoryFields.Should().Be(2);
         report.FieldHistoryEntries.Should().Be(3);
         report.FieldHealthObservationCount.Should().Be(3);
@@ -65,6 +66,22 @@ public sealed class LegacyDataMigratorTests
             var payloads = (byte[]?[])rowGroup.ReadColumn(payloadField).Data;
             payloads.Should().HaveCount(1);
             payloads[0].Should().BeEquivalentTo(new byte[] { 0x0A, 0xFF });
+        }
+
+        var weatherPath = Path.Combine(temp.Path, "weather.parquet");
+        File.Exists(weatherPath).Should().BeTrue();
+        using (var reader = ParquetReader.Create(File.OpenRead(weatherPath)))
+        {
+            reader.RowGroupCount.Should().Be(1);
+            var schema = reader.Schema;
+            using var rowGroup = reader.OpenRowGroupReader(0);
+            var temperatureField = (DataField<double?>)schema.DataFields.Single(f => f.Name == "temperature_c");
+            var rainfallField = (DataField<double?>)schema.DataFields.Single(f => f.Name == "rainfall_mm");
+            var temperatures = (double?[])rowGroup.ReadColumn(temperatureField).Data;
+            var rainfall = (double?[])rowGroup.ReadColumn(rainfallField).Data;
+
+            temperatures.Should().Equal(new double?[] { 12.5, 13.1 });
+            rainfall.Should().Equal(new double?[] { 0.3, 0.8 });
         }
 
         var historyPath = Path.Combine(temp.Path, "field-history.json");
@@ -135,8 +152,10 @@ public sealed class LegacyDataMigratorTests
         report.CanCount.Should().Be(0);
         report.SectionCount.Should().Be(0);
         report.PluginCount.Should().Be(0);
+        report.WeatherCount.Should().Be(0);
         report.FieldHistoryEntries.Should().Be(0);
         report.SkippedFiles.Should().Contain(file => file.Contains("pose.csv", StringComparison.OrdinalIgnoreCase));
+        report.SkippedFiles.Should().Contain(file => file.Contains("weather.csv", StringComparison.OrdinalIgnoreCase));
         report.SkippedFiles.Should().Contain(file => file.Contains("field-history.csv", StringComparison.OrdinalIgnoreCase));
     }
 

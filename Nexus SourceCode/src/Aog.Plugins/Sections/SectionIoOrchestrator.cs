@@ -75,8 +75,10 @@ public sealed class SectionIoOrchestrator
 
         lock (_gate)
         {
-            if ((_lastMask.HasValue && _lastMask.Value == mask) ||
-                (_inFlightMask.HasValue && _inFlightMask.Value == mask))
+            var lastMatches = _lastMask.HasValue && _lastMask.Value == mask;
+            var inFlightMatches = _inFlightMask.HasValue && _inFlightMask.Value == mask;
+
+            if (inFlightMatches || (lastMatches && !_inFlightMask.HasValue))
             {
                 return;
             }

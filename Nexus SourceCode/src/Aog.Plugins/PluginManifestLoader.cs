@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -127,12 +128,9 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (manifest.SupportedCapabilities is null)
-        {
-            throw new InvalidDataException("Manifest supportedCapabilities must not be null.");
-        }
+        var supportedCapabilities = manifest.SupportedCapabilities ?? Array.Empty<string>();
 
-        foreach (var capability in manifest.SupportedCapabilities)
+        foreach (var capability in supportedCapabilities)
         {
             if (string.IsNullOrWhiteSpace(capability))
             {
@@ -140,12 +138,9 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (manifest.RequiredTransports is null)
-        {
-            throw new InvalidDataException("Manifest requiredTransports must not be null.");
-        }
+        var requiredTransports = manifest.RequiredTransports ?? Array.Empty<string>();
 
-        foreach (var transport in manifest.RequiredTransports)
+        foreach (var transport in requiredTransports)
         {
             if (string.IsNullOrWhiteSpace(transport))
             {
@@ -153,7 +148,11 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (string.IsNullOrWhiteSpace(manifest.MinimumRuntimeVersion) || !SemanticVersionPattern.IsMatch(manifest.MinimumRuntimeVersion))
+        var minimumRuntimeVersion = string.IsNullOrWhiteSpace(manifest.MinimumRuntimeVersion)
+            ? "1.0.0"
+            : manifest.MinimumRuntimeVersion;
+
+        if (!SemanticVersionPattern.IsMatch(minimumRuntimeVersion))
         {
             throw new InvalidDataException("Manifest minimumRuntimeVersion must be a semantic version (e.g. 1.0.0).");
         }
@@ -205,18 +204,15 @@ public sealed class PluginManifestLoader
             }
         }
 
-        if (manifest.CapabilityLeases is null)
-        {
-            throw new InvalidDataException("Manifest leases must not be null.");
-        }
+        var capabilityLeases = manifest.CapabilityLeases ?? Array.Empty<PluginCapabilityLease>();
 
-        if (manifest.CapabilityLeases.Count == 0)
+        if (!capabilityLeases.Any())
         {
             return;
         }
 
         var seenLeaseCapabilities = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var lease in manifest.CapabilityLeases)
+        foreach (var lease in capabilityLeases)
         {
             if (lease is null)
             {
@@ -228,7 +224,7 @@ public sealed class PluginManifestLoader
                 throw new InvalidDataException("Lease capability names must be non-empty.");
             }
 
-            if (!manifest.SupportedCapabilities.Contains(lease.Capability, StringComparer.OrdinalIgnoreCase))
+            if (!supportedCapabilities.Contains(lease.Capability, StringComparer.OrdinalIgnoreCase))
             {
                 throw new InvalidDataException($"Lease capability '{lease.Capability}' must be listed in supportedCapabilities.");
             }

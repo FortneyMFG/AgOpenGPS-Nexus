@@ -231,7 +231,7 @@ NX-276,FALSE,FALSE,NX-214,,Autosteer plugin constraint gating updates — ADR-02
 NX-277,FALSE,FALSE,NX-214,,Sections plugin constraint gating updates — ADR-027 gating
 NX-278,FALSE,TRUE,"NX-276, NX-215",,Guidance lane publishing contracts — ADR-033 guidance planner
 NX-279,FALSE,FALSE,NX-278,,Turn planner integration in guidance plugin — ADR-033 guidance planner
-NX-280,FALSE,FALSE,NX-279,,Guidance plugin regression suite — ADR-033 QA coverage
+NX-280,FALSE,TRUE,NX-279,,Guidance plugin regression suite — ADR-033 QA coverage
 NX-281,FALSE,FALSE,"NX-212, NX-225",,Mapping plugin zone overlay updates — ADR-027 zones + ADR-029 mapping kernel
 NX-282,FALSE,FALSE,NX-214,,Variable rate plugin zone gating — ADR-027 gating semantics
 NX-283,FALSE,FALSE,"NX-208, NX-227",,Device Manager plugin capability surfacing — ADR-031 compatibility dashboard
@@ -266,7 +266,7 @@ NX-311,FALSE,FALSE,"NX-238, NX-310",,Radio provisioning UI flows — ADR-048 pro
 NX-312,FALSE,TRUE,NX-301,,Companion metadata-driven parity pass — ADR-034 remote parity
 NX-313,FALSE,TRUE,NX-276,,Stanley controller parity harness — ADR-033 guidance planner porting
 NX-314,FALSE,FALSE,NX-313,,Pure pursuit control port with fixtures — ADR-033 guidance planner porting
-NX-315,FALSE,FALSE,NX-279,,Turn planner library port — ADR-033 guidance planner porting
+NX-315,FALSE,TRUE,NX-279,,Turn planner library port — ADR-033 guidance planner porting
 NX-316,FALSE,FALSE,"NX-214, NX-314",,Constraint-aware lookahead tuning — ADR-033 lookahead + ADR-027 gating
 NX-317,FALSE,TRUE,NX-316,,Firmware-in-loop stability validation — ADR-033 closed-loop validation
 NX-318,FALSE,TRUE,NX-208,,Plugin manifest governance documentation — ADR-031 manifest governance

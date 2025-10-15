@@ -25,7 +25,20 @@
     "humidityPct": 58,
     "windKph": 11.2,
     "windDeg": 245,
-    "pressureKpa": 98.6
+    "windGustKph": 18.5,
+    "pressureKpa": 98.6,
+    "rainMm": 0,
+    "evapotranspirationMm": 0.3,
+    "soilTempC": 10.8,
+    "soilMoisturePct": 32,
+    "leafWetnessPct": 12,
+    "dewPointC": 4.2,
+    "wetBulbC": 7.1,
+    "deltaTC": 5.3,
+    "solarIrradianceWm2": 420,
+    "uvIndex": 2.1,
+    "cloudCoverPct": 45,
+    "visibilityKm": 16.4
   },
   "environmentSamples": [
     {
@@ -34,7 +47,12 @@
       "tempC": 14.1,
       "humidityPct": 52,
       "windKph": 9.4,
-      "windDeg": 232
+      "windDeg": 232,
+      "windGustKph": 14.8,
+      "pressureKpa": 99.2,
+      "dewPointC": 4.7,
+      "solarIrradianceWm2": 360,
+      "cloudCoverPct": 35
     },
     {
       "at": "2025-03-29T02:30:00Z",
@@ -43,7 +61,14 @@
       "humidityPct": 55,
       "windKph": 10.8,
       "windDeg": 238,
-      "rainMm": 0.2
+      "windGustKph": 17.1,
+      "rainMm": 0.2,
+      "evapotranspirationMm": 0.1,
+      "wetBulbC": 8.4,
+      "deltaTC": 4.8,
+      "uvIndex": 1.6,
+      "cloudCoverPct": 52,
+      "soilMoisturePct": 34
     }
   ],
   "inputs": {

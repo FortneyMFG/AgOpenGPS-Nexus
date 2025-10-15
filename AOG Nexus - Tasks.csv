@@ -256,8 +256,8 @@ NX-301,FALSE,FALSE,NX-300,,Dashboard automation test harness — ADR-034 QA auto
 NX-302,FALSE,FALSE,NX-247,,Crop quick-select UI — ADR-045 crop plugin UX
 NX-303,FALSE,FALSE,NX-252,,Genetics picker & barcode UI — ADR-046 genetics UX
 NX-304,FALSE,FALSE,"NX-257, NX-299",,Yield overlay UX updates — ADR-049 yield visualization
-NX-305,FALSE,FALSE,"NX-263, NX-299",,Profit heatmap & analytics UI — ADR-050 profit visualization
-NX-306,FALSE,FALSE,"NX-266, NX-299",,Field health severity UX — ADR-052 field health visualization
+NX-305,FALSE,TRUE,"NX-263, NX-299",,Profit heatmap & analytics UI — ADR-050 profit visualization
+NX-306,FALSE,TRUE,"NX-266, NX-299",,Field health severity UX — ADR-052 field health visualization
 NX-307,FALSE,FALSE,"NX-271, NX-299",,Weather timeline & overlay UX — ADR-053 weather visualization
 NX-308,FALSE,FALSE,NX-230,,Report builder preview & share UI — ADR-051 report builder UI
 NX-309,FALSE,FALSE,NX-208,,Device Manager compatibility dashboard — ADR-031 manifest governance UI

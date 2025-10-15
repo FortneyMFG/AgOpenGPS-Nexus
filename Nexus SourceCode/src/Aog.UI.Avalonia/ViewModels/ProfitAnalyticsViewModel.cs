@@ -1,0 +1,147 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+
+namespace Aog.UI.Avalonia.ViewModels;
+
+/// <summary>
+/// Presents aggregated profitability analytics derived from profit layer rollups.
+/// </summary>
+public sealed class ProfitAnalyticsViewModel : ObservableObject
+{
+    private readonly ObservableCollection<ProfitAnalyticsCurrencyViewModel> _currencySummaries = new();
+    private readonly ObservableCollection<ProfitHotspotViewModel> _hotspots = new();
+    private readonly ReadOnlyObservableCollection<ProfitAnalyticsCurrencyViewModel> _currencySummariesView;
+    private readonly ReadOnlyObservableCollection<ProfitHotspotViewModel> _hotspotsView;
+    private string _scopeDisplay = "No profitability scope selected.";
+    private string _generatedAtDisplay = "—";
+    private string _summary = "Profit analytics have not been generated yet.";
+    private string? _lossAlert;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProfitAnalyticsViewModel"/> class.
+    /// </summary>
+    public ProfitAnalyticsViewModel()
+    {
+        _currencySummariesView = new ReadOnlyObservableCollection<ProfitAnalyticsCurrencyViewModel>(_currencySummaries);
+        _hotspotsView = new ReadOnlyObservableCollection<ProfitHotspotViewModel>(_hotspots);
+    }
+
+    /// <summary>Gets the field/season scope the analytics describe.</summary>
+    public string ScopeDisplay
+    {
+        get => _scopeDisplay;
+        private set => SetProperty(ref _scopeDisplay, value);
+    }
+
+    /// <summary>Gets the timestamp describing when the analytics were generated.</summary>
+    public string GeneratedAtDisplay
+    {
+        get => _generatedAtDisplay;
+        private set => SetProperty(ref _generatedAtDisplay, value);
+    }
+
+    /// <summary>Gets the high level summary of profitability conditions.</summary>
+    public string Summary
+    {
+        get => _summary;
+        private set => SetProperty(ref _summary, value);
+    }
+
+    /// <summary>Gets an optional alert describing loss zones that require action.</summary>
+    public string? LossAlert
+    {
+        get => _lossAlert;
+        private set
+        {
+            if (SetProperty(ref _lossAlert, value))
+            {
+                OnPropertyChanged(nameof(HasLossAlert));
+            }
+        }
+    }
+
+    /// <summary>Gets a value indicating whether a loss alert should be rendered.</summary>
+    public bool HasLossAlert => !string.IsNullOrWhiteSpace(LossAlert);
+
+    /// <summary>Gets the per-currency profitability summaries.</summary>
+    public ReadOnlyObservableCollection<ProfitAnalyticsCurrencyViewModel> CurrencySummaries => _currencySummariesView;
+
+    /// <summary>Gets the collection of spatial hotspots surfaced to the operator.</summary>
+    public ReadOnlyObservableCollection<ProfitHotspotViewModel> Hotspots => _hotspotsView;
+
+    /// <summary>
+    /// Applies a snapshot of profitability analytics produced by the plugin.
+    /// </summary>
+    /// <param name="snapshot">Analytics snapshot sourced from the profit pipeline.</param>
+    public void ApplySnapshot(ProfitAnalyticsSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        ScopeDisplay = string.IsNullOrWhiteSpace(snapshot.ScopeDisplay)
+            ? "No profitability scope selected."
+            : snapshot.ScopeDisplay.Trim();
+        GeneratedAtDisplay = snapshot.GeneratedAt.ToString("yyyy-MM-dd HH:mm 'UTC'", CultureInfo.InvariantCulture);
+        Summary = string.IsNullOrWhiteSpace(snapshot.Summary)
+            ? "Profit analytics have not been generated yet."
+            : snapshot.Summary.Trim();
+        LossAlert = string.IsNullOrWhiteSpace(snapshot.LossAlert) ? null : snapshot.LossAlert.Trim();
+
+        ReplaceItems(_currencySummaries, snapshot.Currencies, CreateCurrencyViewModel);
+        ReplaceItems(_hotspots, snapshot.Hotspots, CreateHotspotViewModel);
+    }
+
+    private static ProfitAnalyticsCurrencyViewModel CreateCurrencyViewModel(ProfitCurrencySnapshot snapshot)
+    {
+        return new ProfitAnalyticsCurrencyViewModel(snapshot.Currency, snapshot.Revenue, snapshot.Cost, snapshot.Profit);
+    }
+
+    private static ProfitHotspotViewModel CreateHotspotViewModel(ProfitHotspotSnapshot snapshot)
+    {
+        return new ProfitHotspotViewModel(snapshot.Name, snapshot.Currency, snapshot.ProfitPerHectare, snapshot.AreaHectares, snapshot.Notes);
+    }
+
+    private static void ReplaceItems<TModel, TSnapshot>(ObservableCollection<TModel> collection, IEnumerable<TSnapshot> snapshots, Func<TSnapshot, TModel> factory)
+    {
+        ArgumentNullException.ThrowIfNull(collection);
+        ArgumentNullException.ThrowIfNull(snapshots);
+        ArgumentNullException.ThrowIfNull(factory);
+
+        collection.Clear();
+        foreach (var snapshot in snapshots)
+        {
+            collection.Add(factory(snapshot));
+        }
+    }
+}
+
+/// <summary>Represents a profit analytics snapshot generated by the plugin.</summary>
+/// <param name="ScopeDisplay">Scope label displayed to the operator.</param>
+/// <param name="GeneratedAt">Timestamp when analytics were generated.</param>
+/// <param name="Summary">High level summary of profitability.</param>
+/// <param name="LossAlert">Optional alert describing loss areas.</param>
+/// <param name="Currencies">Per-currency profitability breakdowns.</param>
+/// <param name="Hotspots">Spatial hotspots or loss zones.</param>
+public sealed record ProfitAnalyticsSnapshot(
+    string ScopeDisplay,
+    DateTimeOffset GeneratedAt,
+    string Summary,
+    string? LossAlert,
+    IReadOnlyList<ProfitCurrencySnapshot> Currencies,
+    IReadOnlyList<ProfitHotspotSnapshot> Hotspots);
+
+/// <summary>Represents profitability totals for a specific currency.</summary>
+/// <param name="Currency">ISO currency code.</param>
+/// <param name="Revenue">Total revenue recorded for the scope.</param>
+/// <param name="Cost">Total cost recorded for the scope.</param>
+/// <param name="Profit">Net profit (revenue minus cost).</param>
+public sealed record ProfitCurrencySnapshot(string Currency, decimal Revenue, decimal Cost, decimal Profit);
+
+/// <summary>Represents a spatial profitability hotspot.</summary>
+/// <param name="Name">Human readable hotspot name.</param>
+/// <param name="Currency">Currency used when formatting profit.</param>
+/// <param name="ProfitPerHectare">Profit (or loss) per hectare.</param>
+/// <param name="AreaHectares">Area covered by the hotspot.</param>
+/// <param name="Notes">Optional notes about the hotspot.</param>
+public sealed record ProfitHotspotSnapshot(string Name, string Currency, decimal ProfitPerHectare, double AreaHectares, string Notes);

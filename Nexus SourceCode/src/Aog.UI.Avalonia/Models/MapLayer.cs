@@ -11,7 +11,7 @@ namespace Aog.UI.Avalonia.Models;
 /// </summary>
 public sealed class MapLayer
 {
-    public MapLayer(string layerId, string displayName, LayerVisualizationStyle style, IReadOnlyList<MapLayerCell> cells, bool isVisible = true)
+    public MapLayer(string layerId, string displayName, LayerVisualizationStyle style, IReadOnlyList<MapLayerCell> cells, bool isVisible = true, string? description = null)
     {
         if (string.IsNullOrWhiteSpace(layerId))
         {
@@ -28,6 +28,7 @@ public sealed class MapLayer
         Style = style;
         Cells = new ReadOnlyCollection<MapLayerCell>(cells ?? Array.Empty<MapLayerCell>());
         IsVisible = isVisible;
+        Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
     }
 
     /// <summary>Gets the stable registry identifier for the layer.</summary>
@@ -44,6 +45,9 @@ public sealed class MapLayer
 
     /// <summary>Gets a value indicating whether the layer is currently visible.</summary>
     public bool IsVisible { get; }
+
+    /// <summary>Gets an optional description surfaced in legend entries.</summary>
+    public string? Description { get; }
 }
 
 /// <summary>

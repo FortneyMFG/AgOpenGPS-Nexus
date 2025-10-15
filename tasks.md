@@ -217,8 +217,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-302 Crop quick-select UI _(Planned)_ — ADR-045 crop plugin UX
 - [ ] NX-303 Genetics picker & barcode UI _(Planned)_ — ADR-046 genetics UX
 - [ ] NX-304 Yield overlay UX updates _(Planned)_ — ADR-049 yield visualization
-- [ ] NX-305 Profit heatmap & analytics UI _(Planned)_ — ADR-050 profit visualization
-- [ ] NX-306 Field health severity UX _(Planned)_ — ADR-052 field health visualization
+- [x] NX-305 Profit heatmap & analytics UI _(Done)_ — ADR-050 profit visualization
+- [x] NX-306 Field health severity UX _(Done)_ — ADR-052 field health visualization
 - [ ] NX-307 Weather timeline & overlay UX _(Planned)_ — ADR-053 weather visualization
 - [ ] NX-308 Report builder preview & share UI _(Planned)_ — ADR-051 report builder UI
 - [ ] NX-309 Device Manager compatibility dashboard _(Planned)_ — ADR-031 manifest governance UI
@@ -552,8 +552,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-302 | Crop quick-select UI | Planned |  | — | [ADR-045](docs/ADR/ADR-045_CropTypePlugin.md) | ADR-045 crop plugin UX |
 | NX-303 | Genetics picker & barcode UI | Planned |  | — | [ADR-046](docs/ADR/ADR-046_GeneticsPlugin.md) | ADR-046 genetics UX |
 | NX-304 | Yield overlay UX updates | Planned |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049 yield visualization |
-| NX-305 | Profit heatmap & analytics UI | Planned |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 profit visualization |
-| NX-306 | Field health severity UX | Planned |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 field health visualization |
+| NX-305 | Profit heatmap & analytics UI | Done |  | — | [ADR-050](docs/ADR/ADR-050_CostProfitPlugin.md) | ADR-050 profit visualization |
+| NX-306 | Field health severity UX | Done |  | — | [ADR-052](docs/ADR/ADR-052_FieldHealthPlugin.md) | ADR-052 field health visualization |
 | NX-307 | Weather timeline & overlay UX | Planned |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather visualization |
 | NX-308 | Report builder preview & share UI | Planned |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder UI |
 | NX-309 | Device Manager compatibility dashboard | Planned |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance UI |

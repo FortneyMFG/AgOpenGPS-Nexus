@@ -328,6 +328,219 @@
             </StackPanel>
           </Border>
 
+          <!-- Profit analytics -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding ProfitAnalytics}" x:DataType="vm:ProfitAnalyticsViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Profit heatmap analytics" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding ScopeDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <TextBlock Text="{Binding Summary}" TextWrapping="Wrap"/>
+
+              <StackPanel Spacing="4">
+                <TextBlock Text="Generated at" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding GeneratedAtDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <Border Padding="12" CornerRadius="8"
+                      Background="{DynamicResource ThemeBackgroundBrush}"
+                      BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                      BorderThickness="1"
+                      IsVisible="{Binding HasLossAlert}">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="Loss alert" FontWeight="SemiBold" Foreground="{DynamicResource ThemeForegroundBrush}"/>
+                  <TextBlock Text="{Binding LossAlert}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundBrush}"/>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Spacing="8">
+                <TextBlock Text="Per-currency summary" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding CurrencySummaries}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ProfitAnalyticsCurrencyViewModel">
+                      <Border Padding="12"
+                              Margin="0,4"
+                              CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <StackPanel Spacing="6">
+                          <TextBlock Text="{Binding Currency}" FontWeight="SemiBold"/>
+                          <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
+                            <StackPanel Spacing="2">
+                              <TextBlock Text="Revenue" FontWeight="SemiBold" FontSize="12"/>
+                              <TextBlock Text="{Binding RevenueDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="2">
+                              <TextBlock Text="Cost" FontWeight="SemiBold" FontSize="12"/>
+                              <TextBlock Text="{Binding CostDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="2">
+                              <TextBlock Text="Profit" FontWeight="SemiBold" FontSize="12"/>
+                              <TextBlock Text="{Binding ProfitDisplay}" Foreground="{Binding ProfitBrush}" FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Spacing="2">
+                              <TextBlock Text="Margin" FontWeight="SemiBold" FontSize="12"/>
+                              <TextBlock Text="{Binding MarginDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                            </StackPanel>
+                          </Grid>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="8">
+                <TextBlock Text="Hotspots" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding Hotspots}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ProfitHotspotViewModel">
+                      <Border Padding="12" Margin="0,4"
+                              CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <StackPanel Spacing="6">
+                          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                            <Border Padding="6,2" CornerRadius="6"
+                                    Background="{DynamicResource ThemeBackgroundBrush}"
+                                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                                    BorderThickness="1">
+                              <TextBlock Text="{Binding ProfitDisplay}" Foreground="{Binding ProfitBrush}" FontWeight="SemiBold"/>
+                            </Border>
+                          </StackPanel>
+                          <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="{Binding AreaDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                            <TextBlock Text="{Binding Currency}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          </StackPanel>
+                          <TextBlock Text="{Binding Notes}" TextWrapping="Wrap"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                     IsVisible="{Binding HasNotes}"/>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- Field health severity -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding FieldHealthPanel}" x:DataType="vm:FieldHealthPanelViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Field health severity" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding LayerDisplayName}" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding ScopeDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
+              </StackPanel>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="{Binding TotalAreaDisplay}" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding LastSurveyedDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="4">
+                  <TextBlock Text="Observation summary" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding ObservationsSummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                </StackPanel>
+              </Grid>
+
+              <TextBlock Text="{Binding Notes}" TextWrapping="Wrap" IsVisible="{Binding HasNotes}"/>
+
+              <Border Padding="12" CornerRadius="8"
+                      Background="{DynamicResource ThemeBackgroundBrush}"
+                      BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                      BorderThickness="1"
+                      IsVisible="{Binding HasAlert}">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="Critical alert" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding Alert}" TextWrapping="Wrap"/>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <ToggleSwitch Content="Active" IsChecked="{Binding ShowActive, Mode=TwoWay}"/>
+                <ToggleSwitch Content="Monitor" IsChecked="{Binding ShowMonitor, Mode=TwoWay}"/>
+                <ToggleSwitch Content="Resolved" IsChecked="{Binding ShowResolved, Mode=TwoWay}"/>
+              </StackPanel>
+              <TextBlock Text="{Binding FilterSummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+
+              <StackPanel Spacing="8">
+                <TextBlock Text="Severity buckets" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding SeverityBuckets}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FieldHealthSeverityBucketViewModel">
+                      <Border Padding="12" Margin="0,4" CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <StackPanel Spacing="6">
+                          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Border Width="14" Height="14" CornerRadius="7" Background="{Binding SeverityBrush}"/>
+                            <TextBlock Text="{Binding Severity}" FontWeight="SemiBold"/>
+                            <Border Padding="6,2" CornerRadius="6"
+                                    Background="{DynamicResource ThemeBackgroundBrush}"
+                                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                                    BorderThickness="1">
+                              <TextBlock Text="{Binding CountDisplay}" FontSize="11" FontWeight="SemiBold"/>
+                            </Border>
+                          </StackPanel>
+                          <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="{Binding AreaDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          </StackPanel>
+                          <TextBlock Text="{Binding Description}" TextWrapping="Wrap"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                     IsVisible="{Binding HasDescription}"/>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="8">
+                <TextBlock Text="History" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding HistoryEntries}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FieldHealthHistoryEntryViewModel">
+                      <Border Padding="12" Margin="0,4" CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <StackPanel Spacing="4">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{Binding TimestampDisplay}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Severity}" FontWeight="SemiBold"/>
+                            <Border Padding="6,2" CornerRadius="6"
+                                    Background="{DynamicResource ThemeBackgroundBrush}"
+                                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                                    BorderThickness="1">
+                              <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="SemiBold"/>
+                            </Border>
+                          </StackPanel>
+                          <TextBlock Text="{Binding Notes}" TextWrapping="Wrap"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
+                                     IsVisible="{Binding HasNotes}"/>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
           <!-- Season navigator -->
           <Border Padding="16" CornerRadius="12"
                   Background="{DynamicResource ThemeBackgroundBrush}"

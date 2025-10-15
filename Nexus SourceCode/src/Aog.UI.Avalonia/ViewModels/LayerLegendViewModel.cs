@@ -44,9 +44,9 @@ public sealed class LayerLegendViewModel
                 layer.Style.GradientStart,
                 layer.Style.GradientEnd,
                 layer.Style.IsPlanned,
-                layer.Style.IsPlanned
+                layer.Description ?? (layer.Style.IsPlanned
                     ? "Target metadata sourced from the prescription controller."
-                    : "Live rate samples aggregated from the section controller."))
+                    : "Live rate samples aggregated from the section controller.")))
             .ToArray();
 
         return new LayerLegendViewModel(legendEntries);

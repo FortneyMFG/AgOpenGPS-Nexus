@@ -12,6 +12,7 @@
   "jobId": "job:2025-plant-soy",
   "sessionId": "session:1",
   "layerId": "layer:genetics.variety.2025",
+  "inventoryLotId": "inventory:seed:lot-5521",
   "metadata": {
     "invoice": "INV-5521",
     "supplier": "Rural Coop"

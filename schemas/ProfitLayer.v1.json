@@ -11,6 +11,12 @@
       "type": "object",
       "description": "Profit layer metadata (revenue, cost, profit per area, references).",
       "additionalProperties": false,
+      "required": [
+        "revenuePerArea",
+        "costPerArea",
+        "profitPerArea",
+        "currency"
+      ],
       "x-nexus-scope": "plugin",
       "properties": {
         "revenuePerArea": {
@@ -40,12 +46,23 @@
           "description": "Reference to the yield layer used for revenue calculations.",
           "x-nexus-scope": "plugin"
         },
+        "costLayerIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^layer:[A-Za-z0-9._:-]+$"
+          },
+          "minItems": 1,
+          "description": "Cost layer references used when deriving profitability surfaces.",
+          "x-nexus-scope": "plugin"
+        },
         "costRecordIds": {
           "type": "array",
           "items": {
             "type": "string",
             "pattern": "^cost:[A-Za-z0-9._:-]+$"
           },
+          "minItems": 1,
           "description": "Cost records contributing to this profit layer.",
           "x-nexus-scope": "plugin"
         }

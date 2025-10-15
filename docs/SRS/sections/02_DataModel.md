@@ -110,9 +110,10 @@ domain-specific facts through `extensions` bags that Core stores verbatim.
 
 ### CostRecord.v1 & ProfitLayer.v1 (new)
 - **CostRecord.v1:** Stores granular expenses with scope (`farmId`, `fieldId?`, `jobId?`, `sessionId?`), `category`, `amount`,
-  `currency`, `quantity`, authoring metadata, and optional layer references for attribution.
-- **ProfitLayer.v1:** Extends `Layer.v1` with `revenuePerArea`, `costPerArea`, `profitPerArea`, and links to source yield/cost
-  layers.
+  `currency`, `quantity`, authoring metadata, optional layer references for attribution, and `inventoryLotId` hooks back to
+  the material ledger when deductions affect tracked stock.
+- **ProfitLayer.v1:** Extends `Layer.v1` with `revenuePerArea`, `costPerArea`, `profitPerArea`, and links to contributing
+  sources via `yieldLayerId`, `costLayerIds`, and audited `costRecordIds`.
 - **Schema:** `schemas/CostRecord.v1.json` and `schemas/ProfitLayer.v1.json` mark financial fields as plugin-owned while Core
   enforces ID and provenance integrity.
 

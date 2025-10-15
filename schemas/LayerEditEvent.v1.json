@@ -2,9 +2,21 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agopengps.org/schemas/LayerEditEvent.v1.json",
   "title": "LayerEditEvent.v1",
+  "description": "Immutable journal entry produced by the Zone Drawing Framework whenever geometry or attribute edits commit.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "layerId", "jobId", "createdAt", "actor", "operations", "hash"],
+  "required": [
+    "schemaVersion",
+    "id",
+    "layerId",
+    "jobId",
+    "createdAt",
+    "actor",
+    "hash",
+    "operations",
+    "tool",
+    "context"
+  ],
   "properties": {
     "schemaVersion": {
       "type": "string",
@@ -37,6 +49,43 @@
       "description": "Optional session context.",
       "x-nexus-scope": "core"
     },
+    "context": {
+      "type": "object",
+      "required": ["farmId", "fieldIds"],
+      "additionalProperties": false,
+      "description": "Farm/field envelope and seasonal context for the edit session.",
+      "x-nexus-scope": "core",
+      "properties": {
+        "farmId": {
+          "type": "string",
+          "pattern": "^farm:[A-Za-z0-9._:-]+$",
+          "description": "Farm that owns the edited layer.",
+          "x-nexus-scope": "core"
+        },
+        "fieldIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^field:[A-Za-z0-9._:-]+$"
+          },
+          "description": "Fields impacted by the edit.",
+          "x-nexus-scope": "core"
+        },
+        "seasonId": {
+          "type": ["string", "null"],
+          "pattern": "^season:[A-Za-z0-9._:-]+$",
+          "description": "Season associated with the job when known.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "tool": {
+      "type": "string",
+      "enum": ["polygon", "rectangle", "brush", "eraser", "attribute", "merge", "split"],
+      "description": "Primary editing affordance used to produce the event.",
+      "x-nexus-scope": "core"
+    },
     "createdAt": {
       "type": "string",
       "format": "date-time",
@@ -50,17 +99,55 @@
     },
     "hash": {
       "type": "string",
+      "pattern": "^[A-Fa-f0-9]{16,64}$",
       "description": "Deterministic hash representing the event payload for journal integrity.",
       "x-nexus-scope": "core"
     },
     "previousHash": {
       "type": ["string", "null"],
+      "pattern": "^[A-Fa-f0-9]{16,64}$",
       "description": "Hash of the previous edit in the undo stack.",
       "x-nexus-scope": "core"
     },
     "nextHash": {
       "type": ["string", "null"],
+      "pattern": "^[A-Fa-f0-9]{16,64}$",
       "description": "Hash of the next edit when redo is available.",
+      "x-nexus-scope": "core"
+    },
+    "operationGroupId": {
+      "type": ["string", "null"],
+      "pattern": "^undoGroup:[A-Za-z0-9._:-]+$",
+      "description": "Optional grouping token for chained undo/redo actions.",
+      "x-nexus-scope": "core"
+    },
+    "tileRefs": {
+      "type": "array",
+      "description": "Tile resources touched by this edit for provenance replay.",
+      "items": {
+        "type": "object",
+        "required": ["tileId", "hash"],
+        "additionalProperties": false,
+        "properties": {
+          "tileId": {
+            "type": "string",
+            "pattern": "^tile:[A-Za-z0-9._:/-]+$",
+            "description": "Identifier of the impacted tile.",
+            "x-nexus-scope": "core"
+          },
+          "hash": {
+            "type": "string",
+            "pattern": "^[A-Fa-f0-9]{16,64}$",
+            "description": "Hash of the tile contents after the edit.",
+            "x-nexus-scope": "core"
+          },
+          "purpose": {
+            "type": "string",
+            "description": "Optional reason this tile was updated (geometry, attribute, undo snapshot).",
+            "x-nexus-scope": "core"
+          }
+        }
+      },
       "x-nexus-scope": "core"
     },
     "operations": {
@@ -75,31 +162,163 @@
       "description": "Plugin-owned metadata (e.g., edit tags, automated reasoning).",
       "additionalProperties": true,
       "x-nexus-scope": "plugin"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Human readable summary attached by the editing UI.",
+      "x-nexus-scope": "plugin"
     }
   },
   "$defs": {
-    "operation": {
+    "coordinate": {
+      "type": "array",
+      "description": "Longitude/latitude (and optional elevation) coordinate.",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 3,
+      "x-nexus-scope": "core"
+    },
+    "geojsonGeometry": {
       "type": "object",
       "required": ["type"],
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["create", "update", "delete"],
+          "description": "GeoJSON geometry type.",
+          "x-nexus-scope": "core"
+        }
+      },
+      "additionalProperties": true,
+      "description": "GeoJSON geometry payload; structure validated downstream.",
+      "x-nexus-scope": "core"
+    },
+    "vertexEdit": {
+      "type": "object",
+      "required": ["index", "before", "after"],
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Vertex index within the geometry ring that was updated.",
+          "x-nexus-scope": "core"
+        },
+        "before": {
+          "$ref": "#/$defs/coordinate",
+          "description": "Coordinate prior to the edit.",
+          "x-nexus-scope": "core"
+        },
+        "after": {
+          "$ref": "#/$defs/coordinate",
+          "description": "Coordinate after the edit.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "attributePatch": {
+      "type": "object",
+      "required": ["path", "action"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "JSON Pointer identifying the attribute that changed.",
+          "x-nexus-scope": "plugin"
+        },
+        "action": {
+          "type": "string",
+          "enum": ["add", "replace", "remove"],
+          "description": "Patch action applied to the attribute payload.",
+          "x-nexus-scope": "core"
+        },
+        "value": {
+          "description": "New attribute value for add/replace operations.",
+          "x-nexus-scope": "plugin"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "action": { "const": "remove" } }
+          },
+          "then": {
+            "not": { "required": ["value"] }
+          },
+          "else": {
+            "required": ["value"]
+          }
+        }
+      ]
+    },
+    "operationSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "areaDeltaSqMeters": {
+          "type": "number",
+          "description": "Difference in polygon area introduced by the edit.",
+          "x-nexus-scope": "core"
+        },
+        "perimeterDeltaMeters": {
+          "type": "number",
+          "description": "Difference in polygon perimeter introduced by the edit.",
+          "x-nexus-scope": "core"
+        },
+        "changedAttributes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Attribute keys impacted by the operation.",
+          "x-nexus-scope": "plugin"
+        }
+      }
+    },
+    "operation": {
+      "type": "object",
+      "required": ["type", "featureId"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["create", "update", "delete", "merge", "split"],
           "description": "Operation applied to the layer.",
           "x-nexus-scope": "core"
         },
         "featureId": {
           "type": "string",
+          "pattern": "^feature:[A-Za-z0-9._:-]+$",
           "description": "Identifier of the affected feature.",
           "x-nexus-scope": "core"
         },
+        "sourceFeatureIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^feature:[A-Za-z0-9._:-]+$"
+          },
+          "description": "Features merged into the target during merge operations.",
+          "x-nexus-scope": "core"
+        },
+        "splitStrategy": {
+          "type": "string",
+          "description": "Strategy identifier applied during split operations.",
+          "x-nexus-scope": "core"
+        },
         "geometryBefore": {
-          "type": ["object", "null"],
+          "anyOf": [
+            { "$ref": "#/$defs/geojsonGeometry" },
+            { "type": "null" }
+          ],
           "description": "GeoJSON geometry before the edit (core-owned).",
           "x-nexus-scope": "core"
         },
         "geometryAfter": {
-          "type": ["object", "null"],
+          "anyOf": [
+            { "$ref": "#/$defs/geojsonGeometry" },
+            { "type": "null" }
+          ],
           "description": "GeoJSON geometry after the edit (core-owned).",
           "x-nexus-scope": "core"
         },
@@ -112,9 +331,43 @@
           "type": ["object", "null"],
           "description": "Plugin-owned attributes after the edit.",
           "x-nexus-scope": "plugin"
+        },
+        "vertexEdits": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/vertexEdit" },
+          "description": "Explicit vertex mutations applied during the operation.",
+          "x-nexus-scope": "core"
+        },
+        "attributePatches": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/attributePatch" },
+          "description": "JSON Patch style attribute changes applied during the operation.",
+          "x-nexus-scope": "plugin"
+        },
+        "summary": {
+          "$ref": "#/$defs/operationSummary",
+          "description": "Quantitative summary of the edit for analytics consumers.",
+          "x-nexus-scope": "core"
         }
       },
-      "additionalProperties": false
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "merge" } }
+          },
+          "then": {
+            "required": ["sourceFeatureIds"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "split" } }
+          },
+          "then": {
+            "required": ["splitStrategy"]
+          }
+        }
+      ]
     }
   }
 }

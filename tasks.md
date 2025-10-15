@@ -174,7 +174,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-275 Weather plugin regression fixtures _(Planned)_ — ADR-053 QA hooks
 - [ ] NX-276 Autosteer plugin constraint gating updates _(Planned)_ — ADR-027 gating + ADR-033 guidance planner
 - [ ] NX-277 Sections plugin constraint gating updates _(Planned)_ — ADR-027 gating
-- [ ] NX-278 Guidance lane publishing contracts _(Planned)_ — ADR-033 guidance planner
+- [x] NX-278 Guidance lane publishing contracts _(Done)_ — ADR-033 guidance planner
 - [ ] NX-279 Turn planner integration in guidance plugin _(Planned)_ — ADR-033 guidance planner
 - [ ] NX-280 Guidance plugin regression suite _(Planned)_ — ADR-033 QA coverage
 - [ ] NX-281 Mapping plugin zone overlay updates _(Planned)_ — ADR-027 zones + ADR-029 mapping kernel
@@ -248,11 +248,11 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-113 External agronomic map ingest pipeline _(Done)_
 
 
-- [ ] NX-313 Stanley controller parity harness _(Planned)_ — ADR-033 guidance planner porting
+- [x] NX-313 Stanley controller parity harness _(Done)_ — ADR-033 guidance planner porting
 - [ ] NX-314 Pure pursuit control port with fixtures _(Planned)_ — ADR-033 guidance planner porting
 - [ ] NX-315 Turn planner library port _(Planned)_ — ADR-033 guidance planner porting
 - [x] NX-316 Constraint-aware lookahead tuning _(Done)_ — ADR-033 lookahead + ADR-027 gating
-- [ ] NX-317 Firmware-in-loop stability validation _(Planned)_ — ADR-033 closed-loop validation
+- [x] NX-317 Firmware-in-loop stability validation _(Done)_ — ADR-033 closed-loop validation
 
 ### Section G — Packaging, DevEx, Docs
 - [x] NX-006 CI matrix (Win x64 + Linux arm64)

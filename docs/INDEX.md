@@ -68,7 +68,10 @@
 - [Runtime baseline enforcement](support/dotnet-runtime-baseline.md) — .NET 8 guardrails and review checklist.
 - [Avalonia run modes](howto/avalonia-run-modes.md) — CompanionRemote, LocalInProc, and LocalOutOfProc configuration.
 - [Companion metadata parity](howto/companion-metadata-parity.md) — snapshot contract powering ADR-034 remote clients.
+- [Guidance lane publishing contracts](howto/guidance-lane-contracts.md) — ADR-033 lane geometry and preview payloads.
 - [AOG-Link transport rollout](howto/aog-link-transport-rollout.md) — Ethernet, RS-485, and CAN staging guidance.
+- [Stanley controller parity harness](howto/stanley-controller-parity.md) — deterministic regression checks for the ported controller.
+- [Firmware-in-loop stability validation](howto/firmware-in-loop-stability.md) — dynamic look-ahead and constraint regression slice.
 - [Performance budget telemetry dashboards](howto/performance-budget-telemetry-dashboards.md) — ADR-026 dashboard provisioning and guardrails.
 - [RadioBridge provisioning kit](howto/radio/radiobridge-provisioning.md) — provisioning workflow for ELRS/LoRa bridges (NX-244).
 - [Season/session migration playbook](howto/season-session-migration-playbook.md) — ADR-040/041 rollout playbook.

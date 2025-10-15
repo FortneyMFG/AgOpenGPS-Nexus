@@ -24,18 +24,13 @@ Create a two-part architecture:
 
 Define or extend the following protobuf contracts under `Aog.Abstractions` with versioned messages:
 
-```proto
-message Pose {
-  uint64 frame_id = 1;
-  int64 mono_time_ns = 2;
-  double lat = 3;
-  double lon = 4;
-  double alt_m = 5;
-  double heading_deg = 6;
-  double speed_mps = 7;
-  double accuracy_m = 8;
-}
+- **Pose** – reuse the existing `Pose` message defined in `proto/core.proto`, which already
+  includes the common `Header` metadata plus roll/pitch/yaw-rate fields required by existing
+  consumers. Mapping plugins MUST publish and consume the frozen contract until a
+  versioned successor (for example, `PoseV2`) is proposed through the contracts-freeze
+  process.【F:Nexus SourceCode/proto/core.proto†L1-L120】
 
+```proto
 message LayerQuery {
   double lat = 1;
   double lon = 2;

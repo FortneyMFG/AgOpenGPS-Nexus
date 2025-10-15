@@ -129,6 +129,9 @@ cp -a "${agio_publish}/." "${pkgroot}/opt/nexus/agio/"
 install -m 0644 "${core_appsettings}" "${pkgroot}/etc/nexus/core/appsettings.json"
 install -m 0644 "${agio_appsettings}" "${pkgroot}/etc/nexus/agio/appsettings.json"
 
+ln -sfn "/etc/nexus/core/appsettings.json" "${pkgroot}/opt/nexus/core/appsettings.json"
+ln -sfn "/etc/nexus/agio/appsettings.json" "${pkgroot}/opt/nexus/agio/appsettings.json"
+
 core_env_path="${pkgroot}/etc/nexus/core.env"
 agio_env_path="${pkgroot}/etc/nexus/agio.env"
 cat <<'ENV' > "${core_env_path}"

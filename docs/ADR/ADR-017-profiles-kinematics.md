@@ -1,0 +1,29 @@
+# ADR-017: Equipment profiles and kinematics
+
+## Status
+Drafting (target review window: 2025-12-05 week)
+
+## Context
+Accurate guidance and control require kinematic models that describe tractor, implement, and hitch behavior. Legacy profiles provide limited geometry, leading to inconsistent PoseStream projections and autosteer hand-offs. ADR-017 defines the profile schema, kinematic models, and sensor fusion expectations so ADR-033 guidance and ADR-008 hierarchy share a consistent foundation.
+
+## Decision
+- Establish profile schemas capturing hitch linkages, attachment points, toolbar placement, and sensor locations for multi-steer rigs.
+- Provide kinematic models and simulation utilities that translate PoseStream inputs into steering commands and lookahead points.
+- Define fusion strategies for multiple pose sources (IMU, GNSS, implement sensors) with convergence expectations and oscillation limits.
+- Deliver an operator-facing profile editor with validation logic and deterministic JSON exports for configuration management.
+
+## Consequences
+- Guidance planner (ADR-033) and control systems gain reliable geometry data, improving accuracy and stability.
+- Maintaining detailed profiles increases setup effort but enables richer simulation, diagnostics, and analytics.
+- Sensor fusion introduces complexity that demands regression fixtures and cross-platform validation.
+
+## Validation
+- Kinematic simulations must track hitch articulation within ≤ 2 cm error over 100 m paths compared to motion capture baselines.
+- Multi-steer fusion must converge within five cycles after switching pose sources while avoiding > 1° yaw oscillations.
+- Profile editor must enforce attachment constraints and export deterministic JSON validated via schema conformance tests.
+
+## References
+- [Interprocess API requirements](../SRS/sections/07_Interprocess_API.md)
+- [Control & automation requirements](../SRS/sections/09_Control_Automation.md)
+- [ADR-008: Equipment hierarchy](ADR-008-equipment-hierarchy.md)
+- [ADR-033: Guidance planner and autosteer orchestration](ADR-033-guidance-planner-autosteer.md)

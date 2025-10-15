@@ -1,0 +1,29 @@
+# ADR-011: Mapping and visualization imagery pipeline
+
+## Status
+Drafting (target review window: 2025-11-12 week)
+
+## Context
+Nexus must render PoseStream-derived ribbons, heatmaps, and telemetry overlays with deterministic performance across desktop and companion clients. Current UI code mixes basemap handling, interpolation rules, and attribution requirements across components, making caching and offline workflows fragile. ADR-011 consolidates mapping and imagery decisions so the UI owner can deliver consistent visualization while coordinating with ADR-029 mapping plugins, ADR-010 layer registry metadata, and ADR-034 dashboard refactors.
+
+## Decision
+- Refactor the renderer to support bilinear sampling, near-vehicle supersampling, and shared color-ramp utilities informed by the layer registry.
+- Implement basemap caching (disk LRU plus offline fallbacks) with explicit attribution overlay requirements.
+- Define ribbon, contour, and legend rendering order and interpolation policies to ensure deterministic output across devices.
+- Share metadata contracts with dashboard components so overlays and inspectors consume the same layer-aware APIs.
+
+## Consequences
+- Visualization features gain predictable performance budgets but require coordinated caching and GPU strategy updates.
+- Offline use cases improve through basemap cache and attribution handling but introduce storage management responsibilities.
+- Rendering pipeline refactors may necessitate additional automated screenshot diffs and regression fixtures.
+
+## Validation
+- Basemap cache manager must maintain ≥ 92% hit rate during offline replay while respecting ≤ 3 GB disk footprint.
+- Imagery pipeline must sustain ≥ 55 FPS for ribbon/heatmap workloads on the reference GPU with ≤ 80% GPU utilization.
+- Attribution overlay must pass automated screenshot diffs across five basemap providers to ensure licensing accuracy.
+
+## References
+- [Telemetry & health requirements](../SRS/sections/10_Telemetry_Health.md)
+- [Frontend requirements](../SRS/sections/05_Frontends.md)
+- [ADR-029: Mapping plugin architecture](ADR-029-mapping-plugin-architecture.md)
+- [ADR-034: Metadata-driven dashboards and inspector surfaces](ADR-034-metadata-driven-dashboards.md)

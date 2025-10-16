@@ -94,10 +94,10 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-235 Cross-track replay harness slice _(Done)_ — ADR-roadmap cross-track slice plan
 - [ ] NX-341 GitHub Actions release packaging (Win/Linux zips) _(In Progress)_ — SRS §2.7 Packaging & DevEx
 - [ ] NX-414 Multi-steer configurator export schema GA _(Planned)_ — ADR-067 axle-centric profiles
-- [ ] NX-452 Core ingestion service for axle-centric profiles _(Planned)_ — ADR-067 runtime ingestion
-- [ ] NX-453 Automation integration for axle-centric limits _(Planned)_ — ADR-067 planner/controller wiring
-- [ ] NX-454 Calibration workflows & fixtures _(Planned)_ — ADR-067 calibration suite delivery
-- [ ] NX-455 Documentation & preset libraries for axle-centric rigs _(Planned)_ — ADR-067 rollout playbook
+- [x] NX-452 Core ingestion service for axle-centric profiles _(Complete)_ — ADR-067 runtime ingestion
+- [x] NX-453 Automation integration for axle-centric limits _(Complete)_ — ADR-067 planner/controller wiring
+- [x] NX-454 Calibration workflows & fixtures _(Complete)_ — ADR-067 calibration suite delivery
+- [x] NX-455 Documentation & preset libraries for axle-centric rigs _(Complete)_ — ADR-067 rollout playbook
 - [ ] NX-462 Linux Core service packaging & systemd units _(Planned)_ — SRS option O-BACKEND-6
 - [ ] NX-463 Linux Core operations & observability playbook _(Planned)_ — ADR-068 diagnostics + SRS §10 Telemetry
 - [ ] NX-464 Headless Core + AGiO integration validation _(Planned)_ — ADR-068 replay + O-BACKEND-6 smoke
@@ -457,10 +457,10 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-235 | Cross-track replay harness slice | Done |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | ADR-roadmap cross-track slice plan |
 | NX-341 | GitHub Actions release packaging (Win/Linux zips) | In Progress | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
 | NX-414 | Multi-steer configurator export schema GA | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Finalize JSON schema, validators, and hash tooling |
-| NX-452 | Core ingestion service for axle-centric profiles | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Implement deterministic loader + health telemetry |
-| NX-453 | Automation integration for axle-centric limits | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Wire planners/controllers to curvature/slip limits |
-| NX-454 | Calibration workflows & fixtures | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Deliver Ackermann wizard, hitch zeroing, slip sanity tests |
-| NX-455 | Documentation & preset libraries for axle-centric rigs | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Publish operator guides + preset bundles |
+| NX-452 | Core ingestion service for axle-centric profiles | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Implement deterministic loader + health telemetry |
+| NX-453 | Automation integration for axle-centric limits | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Wire planners/controllers to curvature/slip limits |
+| NX-454 | Calibration workflows & fixtures | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Deliver Ackermann wizard, hitch zeroing, slip sanity tests |
+| NX-455 | Documentation & preset libraries for axle-centric rigs | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Publish operator guides + preset bundles |
 | NX-462 | Linux Core service packaging & systemd units | Planned | Core Owner | — | [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | Create deb/rpm installers, systemd units, and upgrade path |
 | NX-463 | Linux Core operations & observability playbook | Planned | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [SRS §10](docs/SRS/sections/10_Telemetry_Health.md) | Document logging, metrics, alerting, and recovery drills |
 | NX-464 | Headless Core + AGiO integration validation | Planned | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | End-to-end smoke with AGiO backends on Linux headless |

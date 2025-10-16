@@ -108,6 +108,9 @@ $hostProject = Join-Path $RepoRoot 'Nexus SourceCode/src/Nexus.Cli.Host/Nexus.Cl
 if (Test-Path $hostProject) {
     Write-Host 'Validating restore against packaged abstractions' -ForegroundColor Cyan
     dotnet restore $hostProject /p:UseLocalNexusCliAbstractions=false
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet restore failed with exit code $LASTEXITCODE."
+    }
 }
 else {
     Write-Warning 'Nexus CLI host project not found; skipping restore validation.'
@@ -129,10 +132,16 @@ if (-not $apiKey) {
 foreach ($pkg in $packages) {
     Write-Host "Pushing $($pkg.Name) to $sourceUrl" -ForegroundColor Cyan
     dotnet nuget push $pkg.FullName --source $sourceUrl --api-key $apiKey --skip-duplicate
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet nuget push failed for $($pkg.Name) with exit code $LASTEXITCODE."
+    }
 }
 
 $symbolPackages = Get-ChildItem -Path $artifactsDir -Filter 'AgOpenGPS.Nexus.Plugin.Cli.Abstractions*.snupkg'
 foreach ($sym in $symbolPackages) {
     Write-Host "Pushing symbol package $($sym.Name)" -ForegroundColor Cyan
     dotnet nuget push $sym.FullName --source $sourceUrl --api-key $apiKey --skip-duplicate
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet nuget push failed for symbol package $($sym.Name) with exit code $LASTEXITCODE."
+    }
 }

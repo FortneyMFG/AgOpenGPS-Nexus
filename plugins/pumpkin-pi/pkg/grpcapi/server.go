@@ -129,7 +129,13 @@ func (s *Server) StreamSteerStatus(_ *emptypb.Empty, stream pumpkinpipb.PumpkinP
 		select {
 		case <-stream.Context().Done():
 			return stream.Context().Err()
-		case msg := <-ch:
+		case msg, ok := <-ch:
+			if !ok {
+				return nil
+			}
+			if msg == nil {
+				continue
+			}
 			if err := stream.Send(msg); err != nil {
 				return err
 			}
@@ -231,6 +237,33 @@ func (s *Server) ensureAuthorityFresh() {
 	if s.mqtt != nil {
 		_ = s.mqtt.PublishAuthority(s.authorityTopic, s.authorityOwner, time.Now().Add(s.authorityHold))
 	}
+}
+
+// StartAuthorityMonitor launches a background loop that resets authority ownership when stale.
+func (s *Server) StartAuthorityMonitor(ctx context.Context) {
+	interval := s.authorityHold / 2
+	if interval <= 0 {
+		interval = s.authorityHold
+	}
+	if interval <= 0 {
+		interval = 150 * time.Millisecond
+	}
+	if interval > time.Second {
+		interval = time.Second
+	}
+	ticker := time.NewTicker(interval)
+	s.ensureAuthorityFresh()
+	go func() {
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				s.ensureAuthorityFresh()
+			}
+		}
+	}()
 }
 
 // ErrNotReady is returned when dependencies are missing.

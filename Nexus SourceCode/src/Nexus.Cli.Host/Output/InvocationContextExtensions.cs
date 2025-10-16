@@ -9,4 +9,10 @@ public static class InvocationContextExtensions
         ArgumentNullException.ThrowIfNull(context);
         return context.ParseResult.GetValueForOption(OutputOptions.ModeOption);
     }
+
+    public static CancellationToken GetCancellationTokenSafe(this InvocationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        return System.CommandLine.InvocationExtensions.GetCancellationToken(context);
+    }
 }

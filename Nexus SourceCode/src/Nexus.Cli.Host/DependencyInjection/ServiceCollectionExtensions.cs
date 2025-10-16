@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Nexus.Cli.Host.Core.Endpoints;
+using Nexus.Cli.Host.Core.Status;
 using Nexus.Cli.Host.Host;
 using Nexus.Cli.Host.Modules;
 using Nexus.Cli.Host.Output;
@@ -16,10 +18,15 @@ public static class ServiceCollectionExtensions
 
         services.TryAddSingleton<IAnsiConsole>(_ => AnsiConsole.Create(new AnsiConsoleSettings()));
         services.TryAddSingleton<INexusEnvironment, NexusEnvironment>();
+        services.TryAddSingleton(TimeProvider.System);
+        services.TryAddSingleton<ICoreEndpointResolver, CoreEndpointResolver>();
+        services.TryAddSingleton<ICoreStatusProbe, CoreStatusProbe>();
+        services.TryAddSingleton<CoreStatusPresenter>();
         services.TryAddSingleton<IHostInfoProvider, HostInfoProvider>();
         services.TryAddSingleton<HostInfoPresenter>();
 
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandModule, HostInfoCommandModule>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandModule, CoreCommandModule>());
 
         services.AddSingleton<RootCommandFactory>();
         services.AddSingleton(provider => provider.GetRequiredService<RootCommandFactory>().Create());

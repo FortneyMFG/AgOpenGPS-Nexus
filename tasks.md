@@ -25,12 +25,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-156 AOG-Link transport rollout _(Done)_
 - [x] NX-157 Plugin API lease & manifest enforcement _(Done)_
 
-- [ ] NX-610 Governance telemetry automation _(Planned)_ — ADR roadmap program board, dependency digests, and review minutes publishing
+- [x] NX-610 Governance telemetry automation _(Done)_ — ADR roadmap program board, dependency digests, and review minutes publishing
 - [x] NX-611 PoseStream and SectionState roadmap delivery _(Done)_ — ADR-007 services, schemas, and replay fixtures
-- [ ] NX-612 TileStore durability and compaction rollout _(Planned)_ — ADR-009 crash-safety, maintenance workers, and audit tooling
-- [ ] NX-613 Layer registry and visualization expansion _(Planned)_ — ADR-010…ADR-013 registry automation, renderer cache, fusion provenance, and QA suite
-- [ ] NX-614 Prescription interop and control semantics _(Planned)_ — ADR-014…ADR-016 import/export suite, control engine updates, and CAN transport guardrails
-- [ ] NX-615 Kinematics, plugin platform, and identity governance _(Planned)_ — ADR-017…ADR-024 kinematics editor, plugin permission gate, provenance DAG, and identity UX
+- [x] NX-612 TileStore durability and compaction rollout _(Done)_ — ADR-009 crash-safety, maintenance workers, and audit tooling
+- [x] NX-613 Layer registry and visualization expansion _(Done)_ — ADR-010…ADR-013 registry automation, renderer cache, fusion provenance, and QA suite
+- [x] NX-614 Prescription interop and control semantics _(Done)_ — ADR-014…ADR-016 import/export suite, control engine updates, and CAN transport guardrails
+- [x] NX-615 Kinematics, plugin platform, and identity governance _(Done)_ — ADR-017…ADR-024 kinematics editor, plugin permission gate, provenance DAG, and identity UX
 - [x] NX-616 Global retention, performance, and acceptance guardrails _(Done)_ — ADR-025…ADR-026 retention planners plus global CI hooks for replay, CPU, interop, and crash recovery
 
 - [x] NX-191 Zone proto + JSON schema handshake _(Done)_ — ADR-027 spatial constraints contract release
@@ -92,15 +92,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-233 Discovery watcher updates for seasons _(Done)_ — ADR-024 discovery & identity
 - [x] NX-234 Provenance audit expansion for new layers _(Done)_ — ADR-019 provenance audit
 - [x] NX-235 Cross-track replay harness slice _(Done)_ — ADR-roadmap cross-track slice plan
-- [ ] NX-341 GitHub Actions release packaging (Win/Linux zips) _(In Progress)_ — SRS §2.7 Packaging & DevEx
-- [ ] NX-414 Multi-steer configurator export schema GA _(Planned)_ — ADR-067 axle-centric profiles
+- [x] NX-341 GitHub Actions release packaging (Win/Linux zips) _(Done)_ — SRS §2.7 Packaging & DevEx
+- [x] NX-414 Multi-steer configurator export schema GA _(Done)_ — ADR-067 axle-centric profiles
 - [x] NX-452 Core ingestion service for axle-centric profiles _(Complete)_ — ADR-067 runtime ingestion
 - [x] NX-453 Automation integration for axle-centric limits _(Complete)_ — ADR-067 planner/controller wiring
 - [x] NX-454 Calibration workflows & fixtures _(Complete)_ — ADR-067 calibration suite delivery
 - [x] NX-455 Documentation & preset libraries for axle-centric rigs _(Complete)_ — ADR-067 rollout playbook
-- [ ] NX-462 Linux Core service packaging & systemd units _(Planned)_ — SRS option O-BACKEND-6
-- [ ] NX-463 Linux Core operations & observability playbook _(Planned)_ — ADR-068 diagnostics + SRS §10 Telemetry
-- [ ] NX-464 Headless Core + AGiO integration validation _(Planned)_ — ADR-068 replay + O-BACKEND-6 smoke
+- [x] NX-462 Linux Core service packaging & systemd units _(Done)_ — SRS option O-BACKEND-6
+- [x] NX-463 Linux Core operations & observability playbook _(Done)_ — ADR-068 diagnostics + SRS §10 Telemetry
+- [x] NX-464 Headless Core + AGiO integration validation _(Done)_ — ADR-068 replay + O-BACKEND-6 smoke
 
 ### Section C — AGiO & Backends
 - [x] NX-020 AGiO host skeleton + backend loader
@@ -243,15 +243,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-310 Mesh share/subscribe UI _(Done)_ — ADR-047 live mesh UX
 - [x] NX-311 Radio provisioning UI flows _(Done)_ — ADR-048 provisioning UX
 - [x] NX-312 Companion metadata-driven parity pass _(Done)_ — ADR-034 remote parity
-- [ ] NX-410 Legacy UI asset migration workbook _(Planned)_ — See docs/plans/ui-shell-and-plugin-integration.md
-- [ ] NX-411 Shell & navigation port from V6/AgValonia _(Planned)_ — Aligns with artifacts/ui-core-spec.md
-- [ ] NX-412 Map canvas & field operations UI port _(Planned)_ — Aligns with artifacts/ui-inventory.json
-- [ ] NX-413 Job & field lifecycle dialogs port _(Planned)_ — Aligns with artifacts/ui-backlog.json
-- [ ] NX-414 Settings, hotkeys, and appearance consolidation _(Planned)_ — Aligns with artifacts/ui-theme-tokens.json
-- [ ] NX-415 Plugin UI surfaces (guidance, device, analytics, video) _(Planned)_ — Aligns with artifacts/ui-to-plugin.yaml
-- [ ] NX-416 Diagnostics & AgIO workspace port _(Planned)_ — Aligns with artifacts/ui-core-spec.md
-- [ ] NX-417 Simulation shell + companion parity automation _(Planned)_ — Aligns with docs/reference/metadata-driven-ui-style-guide.md
-- [ ] NX-418 Documentation, QA, and release readiness _(Planned)_ — Aligns with artifacts/ui-screenshots/README.md
+- [x] NX-410 Legacy UI asset migration workbook _(Done)_ — See docs/plans/ui-shell-and-plugin-integration.md
+- [x] NX-411 Shell & navigation port from V6/AgValonia _(Done)_ — Aligns with artifacts/ui-core-spec.md
+- [x] NX-412 Map canvas & field operations UI port _(Done)_ — Aligns with artifacts/ui-inventory.json
+- [x] NX-413 Job & field lifecycle dialogs port _(Done)_ — Aligns with artifacts/ui-backlog.json
+- [x] NX-414 Settings, hotkeys, and appearance consolidation _(Done)_ — Aligns with artifacts/ui-theme-tokens.json
+- [x] NX-415 Plugin UI surfaces (guidance, device, analytics, video) _(Done)_ — Aligns with artifacts/ui-to-plugin.yaml
+- [x] NX-416 Diagnostics & AgIO workspace port _(Done)_ — Aligns with artifacts/ui-core-spec.md
+- [x] NX-417 Simulation shell + companion parity automation _(Done)_ — Aligns with docs/reference/metadata-driven-ui-style-guide.md
+- [x] NX-418 Documentation, QA, and release readiness _(Done)_ — Aligns with artifacts/ui-screenshots/README.md
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory
@@ -315,19 +315,19 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-326 Metadata-driven UI style guide _(Done)_ — ADR-034 UI refactor
 - [x] NX-327 Plugin QA handshake update _(Done)_ — ADR-031 manifest governance QA
 - [x] NX-514 Nexus CLI SRS & ADR alignment _(Done)_ — SRS §18 Command Line Interface
-- [ ] NX-341 GitHub Actions release packaging (Win/Linux zips) _(In Progress)_ — SRS §2.7 Packaging & DevEx
+- [x] NX-341 GitHub Actions release packaging (Win/Linux zips) _(Done)_ — SRS §2.7 Packaging & DevEx
 - [x] NX-342 Developer setup quick start _(Done)_ — SRS §2.8 Documentation
 - [ ] NX-512 README Nexus guide expansion _(In Progress)_ — docs/README.md narrative refresh
 - [x] NX-600 NX CLI Plugin backlog update _(Done)_ — Seed implementation tasks for unified `nx` host
 - [x] NX-601 NX CLI Plugin host scaffold _(Done)_ — SRS §18 CLI host with System.CommandLine + Spectre.Console
-- [ ] NX-602 NX CLI Plugin endpoint resolver & core status _(Planned)_ — SRS §18 transport negotiation + Core health probe
-- [ ] NX-603 NX CLI Plugin output modes & completions _(Planned)_ — SRS §18 structured output + shell completion
-- [ ] NX-604 NX CLI Plugin discovery & adapter loader _(Planned)_ — SRS §18 plugin adapters and manifest scanning
-- [ ] NX-605 Publish Nexus.Plugin.Cli.Abstractions _(Planned)_ — SRS §18 plugin SDK packaging
-- [ ] NX-606 NX CLI Plugin sample verbs _(Planned)_ — SRS §18 sample plugin exposing calibrate/sniff commands
-- [ ] NX-607 NX CLI Plugin gRPC reflection client _(Planned)_ — SRS §18 dynamic verb reflection support
-- [ ] NX-608 NX CLI Plugin packaging pipeline _(Planned)_ — SRS §18 dotnet tool + RID single-file builds
-- [ ] NX-609 NX CLI Plugin docs & completions kit _(Planned)_ — SRS §18 CLI docs and shell integration guidance
+- [x] NX-602 NX CLI Plugin endpoint resolver & core status _(Done)_ — SRS §18 transport negotiation + Core health probe
+- [x] NX-603 NX CLI Plugin output modes & completions _(Done)_ — SRS §18 structured output + shell completion
+- [x] NX-604 NX CLI Plugin discovery & adapter loader _(Done)_ — SRS §18 plugin adapters and manifest scanning
+- [x] NX-605 Publish Nexus.Plugin.Cli.Abstractions _(Done)_ — SRS §18 plugin SDK packaging
+- [x] NX-606 NX CLI Plugin sample verbs _(Done)_ — SRS §18 sample plugin exposing calibrate/sniff commands
+- [x] NX-607 NX CLI Plugin gRPC reflection client _(Done)_ — SRS §18 dynamic verb reflection support
+- [x] NX-608 NX CLI Plugin packaging pipeline _(Done)_ — SRS §18 dotnet tool + RID single-file builds
+- [x] NX-609 NX CLI Plugin docs & completions kit _(Done)_ — SRS §18 CLI docs and shell integration guidance
 
 ### Section H — Safety & QA
 - [x] NX-070 Heartbeats & failsafe watchdogs
@@ -389,7 +389,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-115 | AOG-Link protocol specification and reference flows | Done |  | — | [SRS §3 Communications & Transports](docs/SRS/sections/03_Comm_Transports.md) | ADR-006 + SRS updates complete |
 | NX-116 | Shared `aog-link.proto` schemas with nanopb options | Done |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Publish contracts aligned with `Aog.Abstractions` |
 | NX-152 | Enforce ADR-001 .NET 8 runtime baselines across solutions and CI | Done | AI | — | [ADR-001 .NET 8 runtime](docs/ADR/ADR-001-dotnet8-runtime.md) | Runtime baseline playbook + SDK pinning in `global.json` |
-| NX-190 | Comprehensive ADR portfolio review | Planned |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Apply 2025 governance updates across accepted and draft ADRs |
+| NX-190 | Comprehensive ADR portfolio review | Done |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Apply 2025 governance updates across accepted and draft ADRs |
 | NX-153 | Operationalize ADR-002 gRPC contract governance and compatibility gates | Done | AI | — | [ADR-002 gRPC contracts](docs/ADR/ADR-002-grpc-contracts.md) | Checklist for clinics, golden fixtures, and release gating |
 | NX-154 | Deliver ADR-003 Avalonia shell run modes (CompanionRemote/Local) | Done | AI | — | [ADR-003 Avalonia UI](docs/ADR/ADR-003-avalonia-ui.md) | Run-mode configuration + smoke test guide published |
 | NX-155 | Complete ADR-004 composite simulation fabric with regression packs | Done | AI | — | [ADR-004 Composite simulation](docs/ADR/ADR-004-composite-simulation.md) | GA validation checklist covering topics, seeds, replay |
@@ -456,15 +456,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-233 | Discovery watcher updates for seasons | Done |  | — | [ADR-024](docs/ADR/ADR-024-discovery-identity.md) | ADR-024 discovery & identity |
 | NX-234 | Provenance audit expansion for new layers | Done |  | — | [ADR-019](docs/ADR/ADR-019-provenance-audit-qa.md) | ADR-019 provenance audit |
 | NX-235 | Cross-track replay harness slice | Done |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | ADR-roadmap cross-track slice plan |
-| NX-341 | GitHub Actions release packaging (Win/Linux zips) | In Progress | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
-| NX-414 | Multi-steer configurator export schema GA | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Finalize JSON schema, validators, and hash tooling |
+| NX-341 | GitHub Actions release packaging (Win/Linux zips) | Done | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
+| NX-414 | Multi-steer configurator export schema GA | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Finalize JSON schema, validators, and hash tooling |
 | NX-452 | Core ingestion service for axle-centric profiles | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Implement deterministic loader + health telemetry |
 | NX-453 | Automation integration for axle-centric limits | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Wire planners/controllers to curvature/slip limits |
 | NX-454 | Calibration workflows & fixtures | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Deliver Ackermann wizard, hitch zeroing, slip sanity tests |
 | NX-455 | Documentation & preset libraries for axle-centric rigs | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Publish operator guides + preset bundles |
-| NX-462 | Linux Core service packaging & systemd units | Planned | Core Owner | — | [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | Create deb/rpm installers, systemd units, and upgrade path |
-| NX-463 | Linux Core operations & observability playbook | Planned | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [SRS §10](docs/SRS/sections/10_Telemetry_Health.md) | Document logging, metrics, alerting, and recovery drills |
-| NX-464 | Headless Core + AGiO integration validation | Planned | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | End-to-end smoke with AGiO backends on Linux headless |
+| NX-462 | Linux Core service packaging & systemd units | Done | Core Owner | — | [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | Create deb/rpm installers, systemd units, and upgrade path |
+| NX-463 | Linux Core operations & observability playbook | Done | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [SRS §10](docs/SRS/sections/10_Telemetry_Health.md) | Document logging, metrics, alerting, and recovery drills |
+| NX-464 | Headless Core + AGiO integration validation | Done | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | End-to-end smoke with AGiO backends on Linux headless |
 
 ### Section C — AGiO & Backends
 
@@ -612,15 +612,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-310 | Mesh share/subscribe UI | Done |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 live mesh UX |
 | NX-311 | Radio provisioning UI flows | Done |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 provisioning UX |
 | NX-312 | Companion metadata-driven parity pass | Done |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | Snapshot export keeps CompanionRemote dashboards, legends, and inspector metadata aligned. |
-| NX-410 | Legacy UI asset migration workbook | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Inventory V6/Dev/AgValonia components per docs/plans/ui-shell-and-plugin-integration.md |
-| NX-411 | Shell & navigation port from V6/AgValonia | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port menus/toolbars per artifacts/ui-core-spec.md |
-| NX-412 | Map canvas & field operations UI port | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Integrate map canvas + boundary/flag dialogs per plan |
-| NX-413 | Job & field lifecycle dialogs port | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Rebuild job/field dialogs aligned with artifacts/ui-backlog.json |
-| NX-414 | Settings, hotkeys, and appearance consolidation | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port settings dialogs with theme tokens |
-| NX-415 | Plugin UI surfaces (sections, autosteer, video) | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Implement plugin injection per artifacts/ui-to-plugin.yaml |
-| NX-416 | Diagnostics & AgIO workspace port | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port diagnostics dialogs aligning with UI core spec |
-| NX-417 | Simulation shell + companion parity automation | Planned |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Wire simulator dialog + metadata snapshot harness |
-| NX-418 | Documentation, QA, and release readiness | Planned |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Update docs/tests per plan |
+| NX-410 | Legacy UI asset migration workbook | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Inventory V6/Dev/AgValonia components per docs/plans/ui-shell-and-plugin-integration.md |
+| NX-411 | Shell & navigation port from V6/AgValonia | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port menus/toolbars per artifacts/ui-core-spec.md |
+| NX-412 | Map canvas & field operations UI port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Integrate map canvas + boundary/flag dialogs per plan |
+| NX-413 | Job & field lifecycle dialogs port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Rebuild job/field dialogs aligned with artifacts/ui-backlog.json |
+| NX-414 | Settings, hotkeys, and appearance consolidation | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port settings dialogs with theme tokens |
+| NX-415 | Plugin UI surfaces (sections, autosteer, video) | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Implement plugin injection per artifacts/ui-to-plugin.yaml |
+| NX-416 | Diagnostics & AgIO workspace port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port diagnostics dialogs aligning with UI core spec |
+| NX-417 | Simulation shell + companion parity automation | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Wire simulator dialog + metadata snapshot harness |
+| NX-418 | Documentation, QA, and release readiness | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Update docs/tests per plan |
 
 ### Section F — Porting from V6 (Algorithms)
 
@@ -685,7 +685,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-326 | Metadata-driven UI style guide | Done |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | Style tokens cover dashboards, inspectors, and legends across desktop + companion shells. |
 | NX-327 | Plugin QA handshake update | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance QA |
 | NX-514 | Nexus CLI SRS & ADR alignment | Done | AI | — | [SRS §18 Command Line Interface](docs/SRS/sections/18_Command_Line_Interface.md) | Capture CLI requirements and ADR-054 design brief |
-| NX-341 | GitHub Actions release packaging (Win/Linux zips) | In Progress | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
+| NX-341 | GitHub Actions release packaging (Win/Linux zips) | Done | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
 | NX-342 | Developer setup quick start doc | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/howto/developer-setup.md |
 | NX-343 | UI modernization AI prompt bundle | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/templates/ui-modernization-ai-prompts.md |
 
@@ -761,24 +761,24 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-PP-002 ADR-00XX documenting SHM fastpath + HAL decision
 
 #### Plugin Scaffold
-- [ ] NX-PP-003 Create repo structure under `plugins/pumpkin-pi/`
-- [ ] NX-PP-004 Implement SHM ring (`/dev/shm/aoglink_steer`) + eventfd
-- [ ] NX-PP-005 HAL backends (GPIO via libgpiod, PWM char dev, SocketCAN)
-- [ ] NX-PP-006 gRPC handlers: consume `SetSteerTarget`, publish `SteerStatus`
-- [ ] NX-PP-007 MQTT loopback publishers for status/health
+- [x] NX-PP-003 Create repo structure under `plugins/pumpkin-pi/`
+- [x] NX-PP-004 Implement SHM ring (`/dev/shm/aoglink_steer`) + eventfd
+- [x] NX-PP-005 HAL backends (GPIO via libgpiod, PWM char dev, SocketCAN)
+- [x] NX-PP-006 gRPC handlers: consume `SetSteerTarget`, publish `SteerStatus`
+- [x] NX-PP-007 MQTT loopback publishers for status/health
 
 #### Docs & Diagrams
-- [ ] NX-PP-008 Update plugin catalog & architecture diagrams (Mermaid)
-- [ ] NX-PP-011 Add CM5 getting-started guidance (systemd, mlockall, priorities)
-- [ ] NX-PP-012 Document authority token workflows (`aog/v1/ctrl/authority/steer`)
+- [x] NX-PP-008 Update plugin catalog & architecture diagrams (Mermaid)
+- [x] NX-PP-011 Add CM5 getting-started guidance (systemd, mlockall, priorities)
+- [x] NX-PP-012 Document authority token workflows (`aog/v1/ctrl/authority/steer`)
 
 #### Config & Ops
-- [ ] NX-PP-010 Provide `pumpkin.yaml.example`
-- [ ] NX-PP-013 Provide `pumpkin-pi.service` systemd unit
-- [ ] NX-PP-014 Provide minimal AgIO bridge config with external adapters enabled
+- [x] NX-PP-010 Provide `pumpkin.yaml.example`
+- [x] NX-PP-013 Provide `pumpkin-pi.service` systemd unit
+- [x] NX-PP-014 Provide minimal AgIO bridge config with external adapters enabled
 
 #### Testing
-- [ ] NX-PP-015 Bench test NAV → SHM → PWM apply ≤ 2 ms p50
-- [ ] NX-PP-016 Failure test: setpoint TTL expiry drives safe neutral
-- [ ] NX-PP-017 Broker restart resilience (SHM unaffected, MQTT mirrors restore)
-- [ ] NX-PP-018 External MCU join without SHM latency regression
+- [x] NX-PP-015 Bench test NAV → SHM → PWM apply ≤ 2 ms p50
+- [x] NX-PP-016 Failure test: setpoint TTL expiry drives safe neutral
+- [x] NX-PP-017 Broker restart resilience (SHM unaffected, MQTT mirrors restore)
+- [x] NX-PP-018 External MCU join without SHM latency regression

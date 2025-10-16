@@ -37,6 +37,20 @@ Draft authors should reference the listed requirements and tasks before opening 
 - **Exit criteria:** End-to-end replay that drives the guidance preview using the shared timebase, emits dependency warnings when mapping/plugins are missing, and records a job session journal entry for the run.
 - **NX task alignment:** NX-124, NX-126, NX-131, NX-157.
 
+### ADR-067 — Equipment configuration and axle-centric kinematics runtime
+- **Owner:** Core Owner — Control & Automation pod
+- **Stage:** Drafting (target review window: 2025-05-16 week)
+- **Dependencies:** ADR-017 (profiles and kinematics); O-HW-7 (multi-steer configurator blueprint)
+- **Scope:** Formalize the axle-centric export graph, ingestion service, telemetry, and validation gates that bridge the multi-steer configurator to ADR-017’s runtime solver, ensuring articulated, tracked, and steer-cart rigs ship with uniform contracts.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L1-L74】【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L1-L202】
+- **Key decisions:** Schema versioning and compatibility guards, graph validation rules, telemetry surface definitions, mode profile toggles with interlocks, and acceptance criteria for slip-aware accuracy and mode switching latency.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L24-L74】【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L447-L533】
+- **SRS alignment:** Control & automation (§09), Hardware I/O (§06), Telemetry & health (§10), plus O-HW-7 option coverage for sensor roles, calibration, and planner hints.【F:docs/SRS/sections/09_Control_Automation.md†L12-L60】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L38】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L203-L446】
+- **Primary requirements:** R-CTRL-000…R-CTRL-007, R-HW-000…R-HW-014, R-TEL-000…R-TEL-015, plus NX-414 for configurator delivery and NX-452…NX-455 for runtime ingestion, automation integration, and calibration tooling.【F:docs/SRS/sections/09_Control_Automation.md†L12-L60】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L38】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L75-L114】
+- **Tasks:** Finalize export schema tooling, implement Core ingestion validators, wire planners to curvature/drive-direction limits, deliver calibration fixtures (Ackermann wizard, slip sanity, transport locks), and publish preset documentation with hardware hints.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L75-L114】
+- **Acceptance hooks:**
+  - Automated fixtures demonstrate ≤5 cm RMS toolpoint cross-track error on flat terrain and ≤10 cm on 8 % sidehills without crab steering across ≥3 km mixed-maneuver datasets.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L116-L123】
+  - Mode profile transitions road↔field↔fail_safe complete in <150 ms with <1° transient on dependent joints across articulated and steer-cart rigs.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L116-L123】
+  - Profile import/export round-trips preserve content hashes (modulo calibration stamps) and reject graphs with cycles or missing sensors for enabled modules, including Ackermann CSV loopbacks (<0.2° RMS), sidehill slip sanity (0.08–0.16 m/s with κ_max derate ≥15 %), and road→field mode flips (<150 ms, <1°).【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L116-L123】
+
 ### ADR-027 — Spatial constraints & zone policies
 - **Owner:** Core Owner — PoseStream & Control pod
 - **Stage:** Proposed (target review window: 2025-10-27 week)

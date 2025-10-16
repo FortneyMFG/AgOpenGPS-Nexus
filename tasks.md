@@ -84,6 +84,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-233 Discovery watcher updates for seasons _(Planned)_ — ADR-024 discovery & identity
 - [ ] NX-234 Provenance audit expansion for new layers _(Planned)_ — ADR-019 provenance audit
 - [ ] NX-235 Cross-track replay harness slice _(Planned)_ — ADR-roadmap cross-track slice plan
+- [x] NX-414 Multi-steer equipment configurator blueprint _(Done)_ — ADR-017 profile configuration scaffolding
 
 ### Section C — AGiO & Backends
 - [x] NX-020 AGiO host skeleton + backend loader

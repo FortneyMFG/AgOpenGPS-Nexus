@@ -55,21 +55,26 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - **Mapping to mesh topics:** RadioBridge integrates with the multi-machine mesh; share profiles declare which topics traverse radio links. Layer edits compress to delta operations; pose trails decimate to 1 Hz for narrowband.
 
 ### AOG-Link MCU datagram protocol
-AOG-Link standardizes MCU-to-host and MCU-to-MCU exchanges on compact protobuf messages compiled with nanopb. Every packet begins with a fixed header of `{version, class, type, seq, src, dst, len}` followed by the protobuf payload; serial links append a CRC-16 after the payload. The fields mirror the IDs exposed through the gRPC contracts so the Bridge can map between the layers without lossy transforms.
+AOG-Link standardizes MCU-to-host and MCU-to-MCU exchanges on compact protobuf
+messages compiled with nanopb. Section 3A captures the full wire specification,
+including the frame layout, discovery handshakes, transport bindings, and
+latency targets.[^aoglink-srs]
 
-**Transports:**
+Key expectations carried into this section:
 
-- **UDP (Ethernet/Wi-Fi):** Telemetry, discovery, and MCU-to-MCU data publish on multicast `239.10.6.1:16666`, while command/ack flows use unicast with retry/timeout handling. Payloads stay ≤600 B to avoid fragmentation, and the same packet framing is shared with the serial variant for firmware simplicity.
-- **RS-485/serial:** Packets reuse the common header/payload, wrapped in COBS with a CRC-16 trailer. Deployments target 115200–1Mbaud multi-drop links with a simple token or host-directed slot every ~5 ms to prevent collisions.
-- **CAN / CAN-FD:** Extended 29-bit identifiers follow `priority (3) | class (2) | type (10) | dest (8) | src (8)`, enabling silicon filtering by message type. CAN-FD single frames encode `[ver][seq][len][flags][protobuf…]`; larger messages either segment through ISO-TP (works on CAN 2.0 and FD) or a lightweight fragment header `[ver][seq][frag_idx][frag_cnt][payload…]` when `flags.fragmented` is set.
+- A single 8-byte header (`0xA5` prefix, version, flags, `msg_id`, length,
+  service, method) precedes all `aoglink.v1` protobuf payloads; serial and CAN
+  transports append CRC16-CCITT and use COBS framing where required.
+- Commands set `FLAGS.ACK_REQUIRED` and retry until an `Ack{msg_id}` arrives;
+  telemetry is fire-and-forget but embeds sequence numbers and monotonic
+  microsecond clocks for loss detection.
+- UDP, USB-CDC serial, and CAN(FD) share the same logical model while MQTT can
+  mirror payloads for pub/sub fan-out without the binary header.
+- A v0 bridge preserves legacy PGN interoperability during migration so the
+  Bridge can translate between gRPC contracts, AOG-Link v1 frames, and existing
+  UDP-only devices.
 
-**Reliability and arbitration:** Commands mark `flags.needs_ack` and expect an acknowledgement echoing the original `type` and `seq`. Telemetry remains fire-and-forget, but listeners drop stale sources once sequence gaps exceed 300 ms and declare failover at 500 ms. Heartbeat messages advertise `{role, priority, capabilities}` at 1 Hz so multiple MCUs can self-elect producers or consumers per data class.
-
-**MCU-to-MCU data sharing:** Speed, rate, section-state, and override information reuse the same message types used between the host and MCUs. Arbitration favors the highest-priority publisher for each class while still exposing lower-priority data for diagnostics. Suggested cadences: speed 10–20 Hz, section-state 2–5 Hz plus on change, rate 5 Hz, heartbeat 1 Hz.
-
-**Firmware guidance:** Nanopb options should prefer fixed-width numeric fields and compact enums to keep payloads ≤48 B where possible, ensuring single-frame delivery on CAN-FD and minimal ISO-TP fragmentation on classical CAN. Modules log `{device_id, seq, stale_ms}` per data class for diagnostics and fall back to fail-safe outputs if inputs remain stale beyond 500–1000 ms.
-
-Discovery, heartbeat, and time-sync flows originate from the Bridge, which also exposes conversion shims for legacy PGN UDP devices to remain operational during migration. MCU firmware reuses the shared `.proto` schemas from `Aog.Abstractions`, enabling the Bridge to translate losslessly between gRPC topics and AOG-Link datagrams while keeping PGN expansion frozen to maintenance-only fixes.
+[^aoglink-srs]: See [Section 3A — AOG-Link v1 Wire Protocol Specification](03A_AOG_Link_v1.md).
 
 ## Options
 - O-COMM-0: Status quo — AgIO-managed UDP + serial PGN transports with optional NTRIP.

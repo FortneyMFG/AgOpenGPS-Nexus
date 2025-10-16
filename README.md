@@ -6,11 +6,11 @@ Nexus is an experiment in how far a community guided by AI co-pilots can take Ag
 
 - **AI-assisted evolution.** Nexus treats every artifact—code, docs, packaging, and automation—as something an AI helper can draft while humans review and steer.
 - **CM5-first hardware plan.** A Raspberry Pi Compute Module 5 (or Pi 5) is positioned to replace both the Teensy on an All-In-One (AIO) board and the traditional Windows tablet by hosting the entire AOG stack with one or more HDMI/DSI touch displays.
-- **Runs where you are.** The same stack operates on Linux or Windows laptops and desktops, and it remains compatible with existing AIO hardware through USB, Ethernet, or CAN links.
+- **Runs how you want.** The same stack operates on Linux or Windows tablets, laptops and desktops, and it remains compatible with existing AIO hardware through USB, Ethernet, or CAN links.
 - **AOG-Link V1 bridge.** Nexus modernizes the legacy UDP PGN link (AOG-Link V0) with nanopb messaging and optional MQTT/MQTT-SN transport while keeping the V0 protocol available for drop-in compatibility.
 - **Composable everything.** Every service is a replaceable block that communicates through efficient gRPC contracts, letting operators enable, disable, or swap plugins without rewriting the core.
 
-## Modular Architecture
+## Modular Architecture (Slightly Simplified)
 
 ```mermaid
 flowchart TD
@@ -23,9 +23,14 @@ flowchart TD
     Bridge[AgIO Bridge]
     AgIO[AgIO Service]
     MCUs[MCUs & Field Hardware]
+    ELRS[ELRS Mesh Plugin]
+    ELRSR[ELRS Radio]
+    EAOG[To other AOG Enabled Equipement]
+    ISOBUSP[Isobus Plugin]
+    ISOBUS[To Isobus Equipement]
+    
 
     Core --> UI
-    Plugins <--> Core
     Telemetry <--> Core
     Mapping <--> Core
     Guidance <--> Core
@@ -33,10 +38,11 @@ flowchart TD
     Core <--> AgIO
     AgIO <--> Bridge
     Bridge <--> MCUs
+    Core <--> ELRS
     
 ```
 
-Core coordinates the data model, job/session orchestration, and routing while UI shells focus on visualization. Plugins plug into the gRPC event bus for guidance, mapping, telemetry, analytics, and hardware integrations. AgIO (and its bridge) surface those decisions to MCU modules or legacy AIO boards through AOG-Link V1 or the existing UDP PGN stack.
+Core coordinates the data model, kinematics, job/session orchestration, and routing while UI shells focus on visualization. Plugins plug into the gRPC event bus for guidance, mapping, telemetry, analytics, and hardware integrations. AgIO (and its bridge) surface those decisions to MCU modules or legacy AIO boards through AOG-Link V1 or the existing UDP PGN stack.
 
 ## Hardware & Deployment Vision
 
@@ -44,7 +50,7 @@ Core coordinates the data model, job/session orchestration, and routing while UI
 | --- | --- |
 | **CM5 / Pi 5 all-in-one** | CM5 mounted on an AIO carrier board powers display(s), GNSS, steering, sections, and sensors while running the complete Nexus stack locally. |
 | **Laptop or desktop** | Windows and Linux builds run the same binaries; connect to existing Teensy-based AIOs over USB, Ethernet, or CAN without replacing hardware. |
-| **Hybrid rigs** | Mix-and-match CM5 host control with remote MCU modules (rate control, section control, ISOBUS, etc.) connected by Ethernet, Wi-Fi, ELRS, LoRa, or CAN. |
+| **Hybrid rigs** | Mix-and-match host control with remote MCU modules (rate control, section control, ISOBUS, etc.) connected by Ethernet, Wi-Fi, ELRS, LoRa, or CAN. |
 
 ## AOG-Link Evolution
 

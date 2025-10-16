@@ -317,6 +317,8 @@ public sealed class BoundaryPolygonViewModel : ObservableObject
     private readonly int _originalVertexCount;
     private bool _isLocked;
     private bool _isVisible = true;
+    private double _areaHectares;
+    private double _coverageShare;
     private double _perimeterMeters;
     private int _vertexCount;
     private Point _centroid;
@@ -351,13 +353,13 @@ public sealed class BoundaryPolygonViewModel : ObservableObject
 
         DisplayName = displayName;
         IsInclusion = isInclusion;
-        AreaHectares = areaHectares;
+        _areaHectares = areaHectares;
         _perimeterMeters = perimeterMeters;
         _originalPerimeter = perimeterMeters;
         _vertexCount = vertexCount;
         _originalVertexCount = vertexCount;
         _centroid = centroid;
-        CoverageShare = Math.Clamp(coverageShare, 0, 1);
+        _coverageShare = Math.Clamp(coverageShare, 0, 1);
     }
 
     /// <summary>Gets the polygon display name.</summary>
@@ -373,7 +375,11 @@ public sealed class BoundaryPolygonViewModel : ObservableObject
     public string ModeDisplay => IsInclusion ? "Inclusion boundary" : "Exclusion zone";
 
     /// <summary>Gets the polygon area in hectares.</summary>
-    public double AreaHectares { get; }
+    public double AreaHectares
+    {
+        get => _areaHectares;
+        private set => SetProperty(ref _areaHectares, value);
+    }
 
     /// <summary>Gets or sets a value indicating whether the polygon is locked.</summary>
     public bool IsLocked
@@ -420,7 +426,11 @@ public sealed class BoundaryPolygonViewModel : ObservableObject
     public string CentroidDisplay => string.Format(CultureInfo.InvariantCulture, "{0:F1}, {1:F1}", Centroid.X, Centroid.Y);
 
     /// <summary>Gets the share of coverage samples that touched the polygon.</summary>
-    public double CoverageShare { get; }
+    public double CoverageShare
+    {
+        get => _coverageShare;
+        private set => SetProperty(ref _coverageShare, Math.Clamp(value, 0, 1));
+    }
 
     /// <summary>Gets a value indicating whether the polygon can be simplified.</summary>
     public bool CanSimplify => VertexCount > _originalVertexCount * 0.35;
@@ -452,13 +462,20 @@ public sealed class BoundaryPolygonViewModel : ObservableObject
             throw new InvalidOperationException("Polygons must be the same type to merge.");
         }
 
-        var combinedArea = AreaHectares + partner.AreaHectares;
+        var currentArea = AreaHectares;
+        var partnerArea = partner.AreaHectares;
+        var combinedArea = currentArea + partnerArea;
         var combinedPerimeter = Math.Max(PerimeterMeters, partner.PerimeterMeters) + Math.Min(PerimeterMeters, partner.PerimeterMeters) * 0.25;
         var combinedVertices = VertexCount + partner.VertexCount;
 
-        var areaRatio = combinedArea <= 0 ? 1 : AreaHectares / combinedArea;
+        var areaRatio = combinedArea <= 0 ? 1 : currentArea / combinedArea;
         var centroidX = (Centroid.X * areaRatio) + (partner.Centroid.X * (1 - areaRatio));
         var centroidY = (Centroid.Y * areaRatio) + (partner.Centroid.Y * (1 - areaRatio));
+
+        AreaHectares = Math.Max(combinedArea, double.Epsilon);
+        CoverageShare = combinedArea <= 0
+            ? CoverageShare
+            : ((currentArea * CoverageShare) + (partnerArea * partner.CoverageShare)) / combinedArea;
 
         PerimeterMeters = combinedPerimeter;
         VertexCount = Math.Max(12, combinedVertices - 32);

@@ -14,6 +14,7 @@ Multiple controllers, plugins, and firmware nodes must discover each other, exch
 - Implement discovery watchers and capability handshakes that complete quickly across transports while honoring permission models.
 - Enforce security controls (e.g., mTLS) for remote nodes with actionable telemetry when authentication fails.
 - Provide operator-facing UI for managing identities (rename, retire) with audit logging tied to provenance pipelines.
+- Introduce an `IdentityRegistryViewModel` in the desktop shell to surface discovered nodes, enforce rename/retire workflows, and emit audit entries that feed provenance DAGs.
 
 ## Consequences
 - Operators gain clarity when managing multi-node rigs, improving troubleshooting and governance.

@@ -144,6 +144,20 @@ public sealed class PluginManifestLoader
             }
         }
 
+        var permissionSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var permission in manifest.RequiredPermissions)
+        {
+            if (string.IsNullOrWhiteSpace(permission))
+            {
+                throw new InvalidDataException("Required permission names must be non-empty.");
+            }
+
+            if (!permissionSet.Add(permission))
+            {
+                throw new InvalidDataException($"Manifest declares duplicate required permission '{permission}'.");
+            }
+        }
+
         ValidateProvides(manifest);
         ValidateRequirements(manifest);
 

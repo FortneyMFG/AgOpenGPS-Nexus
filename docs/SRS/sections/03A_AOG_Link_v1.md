@@ -119,36 +119,36 @@ telemetry, and the v0 bridge remains the sole producer of legacy PGNs.
 
 ```mermaid
 flowchart TD
-    subgraph CoreStack["AgIO Bridge & Core Runtime"]
+    %% Core/UI/Plugins live above the AgIO bridge zone
+    CORECLIENTS["Core / UI / Plugins"]
+
+    subgraph AgIO["AgIO Bridge & Core Runtime"]
         direction TB
 
-        subgraph Internal["Internal Message Bus"]
-            GRPC["gRPC Bus\n⇄ Core / UI / Plugins"]
+        GRPC["gRPC Bus"]
+        CORE["AgIO Core"]
+        GRPC -- "publish / subscribe" --> CORE
+
+        LINKV1["AOG-Link v1 Layer\n(shared encoding / ACKs)"]
+        CORE -- "AOG-Link v1 frames" --> LINKV1
+
+        subgraph Adapters["Transport Adapters (AgIO Bridge)"]
+            direction LR
+            UDP["UDP Adapter\n29292/udp\n(Ethernet / Wi-Fi)"]
+            MQTT["MQTT Adapter\nBroker API\n(Ethernet / Wi-Fi)"]
+            SERIAL["Serial Adapter\nUSB-CDC / UART"]
+            CAN["CAN Adapter\nSocketCAN / CAN-FD"]
+            V0["v0 Bridge\nLegacy AOG-Link v0 PGNs"]
         end
 
-        subgraph Link["AOG-Link v1 Layer"]
-            LINKV1["AOG-Link v1\nprotobuf payloads + frame header"]
-        end
-
-        GRPC -- "publish / subscribe" --> LINKV1
+        LINKV1 --> UDP
+        LINKV1 --> MQTT
+        LINKV1 --> SERIAL
+        LINKV1 --> CAN
+        LINKV1 --> V0
     end
 
-    %% --- Transport adapters ---
-    subgraph Adapters["Physical & Network Adapters"]
-        direction LR
-        UDP["UDP Adapter\n29292/udp\n(Ethernet / Wi-Fi)"]
-        MQTT["MQTT Adapter\nBroker API\n(Ethernet / Wi-Fi)"]
-        SERIAL["Serial Adapter\nUSB-CDC / UART"]
-        CAN["CAN Adapter\nSocketCAN / CAN-FD"]
-        V0["v0 Bridge\nLegacy AOG-Link v0 PGNs"]
-    end
-
-    %% --- Flows ---
-    LINKV1 --> UDP
-    LINKV1 --> MQTT
-    LINKV1 --> SERIAL
-    LINKV1 --> CAN
-    LINKV1 --> V0
+    CORECLIENTS -- "gRPC calls" --> GRPC
 
     %% --- External environment ---
     subgraph External["MCUs / Devices / Networks"]

@@ -8,4 +8,8 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.47.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Aog.Plugins\Aog.Plugins.csproj" />
+    <ProjectReference Include="..\Nexus.Plugin.Cli.Abstractions\Nexus.Plugin.Cli.Abstractions.csproj" />
+  </ItemGroup>
 </Project>

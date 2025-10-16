@@ -3,6 +3,7 @@ using System.CommandLine.Invocation;
 using Microsoft.Extensions.DependencyInjection;
 using Nexus.Cli.Host.Host;
 using Nexus.Cli.Host.Output;
+using Nexus.Plugin.Cli.Abstractions;
 using Spectre.Console;
 
 namespace Nexus.Cli.Host.Modules;

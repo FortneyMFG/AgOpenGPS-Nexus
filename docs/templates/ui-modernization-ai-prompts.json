@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NX-343 UI Modernization Prompt Bundle",
+  "description": "Task generator prompts to drive the UI inventory, mapping, component library, backlog, and compliance deliverables for Nexus.",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "task_id": { "const": "NX-343" },
+        "owner": { "type": "string", "description": "Team or AI using the prompts." },
+        "source_repos": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Repositories the automation must read when generating artifacts."
+        },
+        "notes": { "type": "string" }
+      },
+      "required": ["task_id", "source_repos"]
+    },
+    "prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "goal": { "type": "string" },
+          "instructions": { "type": "string" },
+          "inputs": {
+            "type": "object",
+            "properties": {
+              "repo_paths": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "output_paths": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "expected_outputs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "complexity": { "type": "string", "enum": ["Low", "Medium", "High"] }
+        },
+        "required": ["id", "title", "goal", "instructions", "expected_outputs", "acceptance_criteria", "complexity"]
+      }
+    }
+  },
+  "required": ["metadata", "prompts"],
+  "examples": [
+    {
+      "metadata": {
+        "task_id": "NX-343",
+        "owner": "ui-modernization",
+        "source_repos": [
+          "../Legacy SourceCode -V6",
+          "../Legacy SourceCode -Dev",
+          "../Legacy SourceCode -AgValoniaGPS"
+        ],
+        "notes": "Run prompts sequentially; reuse intermediate outputs when possible."
+      },
+      "prompts": [
+        {
+          "id": "inventory-json",
+          "title": "Generate canonical UI inventory JSON",
+          "goal": "Produce a complete list of UI surfaces across legacy repositories to guide migration planning.",
+          "instructions": "Crawl and statically analyze the AgOpenGPS V6 repo, the AgOpenGPS-dev repo, and the Avalonia port. For each top-level screen or dialog, output an object with: unique id, screen name, description, repo path(s) to primary source file(s), menu hierarchy, toolbar buttons, dialogs triggered, settings panels, and whether the element is presentation-only or bound to domain logic (steering, section control, mapping, etc.). Capture screenshot file names if available and include text descriptions when screenshots cannot be produced. Return a JSON array sorted by screen name.",
+          "inputs": {
+            "repo_paths": [
+              "../Legacy SourceCode -V6",
+              "../Legacy SourceCode -Dev",
+              "../Legacy SourceCode -AgValoniaGPS"
+            ],
+            "output_paths": ["artifacts/ui-inventory.json", "artifacts/ui-screenshots/"]
+          },
+          "expected_outputs": [
+            "artifacts/ui-inventory.json",
+            "artifacts/ui-screenshots/README.md"
+          ],
+          "acceptance_criteria": [
+            "Every screen listed includes menu/toolbar context and file paths.",
+            "Each entry flags whether domain logic is involved.",
+            "Screenshots or text descriptions exist for all entries.",
+            "JSON validates against the schema defined in schemas/ui-inventory.schema.json if available."
+          ],
+          "complexity": "High"
+        },
+        {
+          "id": "inventory-csv",
+          "title": "Export UI inventory CSV",
+          "goal": "Provide a spreadsheet-friendly summary of the UI inventory entries.",
+          "instructions": "Convert ui-inventory.json into CSV format. Columns: id, screen, element_type (menu|dialog|panel|toolbar|widget), primary_action, secondary_actions, dependencies (library/plugin/proc), likely_plugin_owner. Where multiple values exist, separate with semicolons. Persist to artifacts/ui-inventory.csv.",
+          "inputs": {
+            "repo_paths": [],
+            "output_paths": ["artifacts/ui-inventory.csv"]
+          },
+          "expected_outputs": ["artifacts/ui-inventory.csv"],
+          "acceptance_criteria": [
+            "CSV rows align one-to-one with ui-inventory.json entries.",
+            "Dependencies column references concrete package or plugin names.",
+            "File encoded in UTF-8 with headers on first row."
+          ],
+          "complexity": "Low"
+        },
+        {
+          "id": "mapping-yaml",
+          "title": "Assign UI elements to core or plugin hosts",
+          "goal": "Define the ownership of each UI element so plugins can inject their surfaces.",
+          "instructions": "Using ui-inventory.json, create ui-to-plugin.yaml mapping each screen/element to either `core` or a plugin slug (e.g., plugin:section-control). Include inject_point (menu slot, settings region, toolbar zone) and a proposed capability contract id (e.g., section_control.v1). Flag uncertain assignments with `review: true`.",
+          "inputs": {
+            "repo_paths": ["artifacts/ui-inventory.json"],
+            "output_paths": ["artifacts/ui-to-plugin.yaml"]
+          },
+          "expected_outputs": ["artifacts/ui-to-plugin.yaml"],
+          "acceptance_criteria": [
+            "Every ui-inventory id appears exactly once.",
+            "Inject points reference core shell regions (menu, toolbar, settings.plugins, leftNav, map.overlay).",
+            "Capability contract ids follow kebab or dot notation and match planned gRPC/JSON contracts.",
+            "YAML parses cleanly with standard tooling."
+          ],
+          "complexity": "Medium"
+        },
+        {
+          "id": "design-system-spec",
+          "title": "Author Avalonia design system specification",
+          "goal": "Describe reusable components and theme tokens required for the Nexus UI shell.",
+          "instructions": "From the inventory and mapping files, synthesize a component specification for the @nexus/ui-core library. For each component (AppShell, LeftNav, TopToolbar, SettingsLayout, MapCanvas controls, form inputs, dialogs, icons), document props/parameters, state management expectations, plugin injection hooks, and references back to ui-inventory entries. Output Markdown plus a machine-readable JSON theme token file capturing typography, spacing, radius, and color scales for light/dark modes.",
+          "inputs": {
+            "repo_paths": ["artifacts/ui-inventory.json", "artifacts/ui-to-plugin.yaml"],
+            "output_paths": ["artifacts/ui-core-spec.md", "artifacts/ui-theme-tokens.json"]
+          },
+          "expected_outputs": [
+            "artifacts/ui-core-spec.md",
+            "artifacts/ui-theme-tokens.json"
+          ],
+          "acceptance_criteria": [
+            "Spec lists component complexity (Low/Medium/High).",
+            "Each component references relevant inventory ids.",
+            "Theme tokens cover typography, color (surface/primary/accent/state), spacing, radii, stroke widths.",
+            "Markdown includes example XAML snippets or pseudo-code."
+          ],
+          "complexity": "High"
+        },
+        {
+          "id": "backlog-json",
+          "title": "Generate GitHub-ready backlog",
+          "goal": "Create granular implementation tasks derived from the UI mapping and component spec.",
+          "instructions": "Produce a JSON array compatible with the GitHub Issues import API. For each task: include title, body (summary, context, acceptance criteria), labels (ui, avalonia, plus plugin:<name> where applicable), estimated complexity, and suggested file paths. Group tasks into epics (shell-and-navigation, settings-and-plugins, mapping-and-canvas, section-control, autosteer, dialogs-and-wizards). Reference ui-inventory ids and component names explicitly.",
+          "inputs": {
+            "repo_paths": [
+              "artifacts/ui-inventory.json",
+              "artifacts/ui-to-plugin.yaml",
+              "artifacts/ui-core-spec.md"
+            ],
+            "output_paths": ["artifacts/ui-backlog.json"]
+          },
+          "expected_outputs": ["artifacts/ui-backlog.json"],
+          "acceptance_criteria": [
+            "At least 100 tasks generated across epics.",
+            "Each task contains acceptance criteria in checklist format.",
+            "Tasks cite required contracts or plugin manifests when relevant.",
+            "JSON validates against GitHub issues import schema.",
+            "Include sample PR description templates for major epics."
+          ],
+          "complexity": "High"
+        },
+        {
+          "id": "license-checklist",
+          "title": "Produce license compliance checklist",
+          "goal": "Ensure reuse of legacy assets respects licensing constraints.",
+          "instructions": "Scan the LICENSE files from each legacy repository and summarize obligations. Output a Markdown checklist covering attribution requirements, incompatible assets, steps to recreate icons/art, and verification steps before merging plugin UI ports. Include boilerplate attribution text for MIT, GPL, or custom licenses discovered.",
+          "inputs": {
+            "repo_paths": [
+              "../Legacy SourceCode -V6/LICENSE",
+              "../Legacy SourceCode -Dev/LICENSE",
+              "../Legacy SourceCode -AgValoniaGPS/LICENSE"
+            ],
+            "output_paths": ["artifacts/ui-license-checklist.md"]
+          },
+          "expected_outputs": ["artifacts/ui-license-checklist.md"],
+          "acceptance_criteria": [
+            "Checklist enumerates each repo with license type.",
+            "Explicitly lists assets that must be recreated.",
+            "Provides attribution boilerplate and instructions for THIRD_PARTY_NOTICES updates.",
+            "Includes diff checklist to confirm no proprietary code is imported."
+          ],
+          "complexity": "Medium"
+        }
+      ]
+    }
+  ]
+}

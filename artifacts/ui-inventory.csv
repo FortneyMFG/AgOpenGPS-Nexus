@@ -1,0 +1,32 @@
+id,screen,element_type,primary_action,secondary_actions,dependencies,likely_plugin_owner
+app_shell,Main Field View,panel,"Operate guidance session, monitor map layers, and control automation.","Open guidance dialogs (AB lines, headland, flags); Toggle autosteer and section control states; Access settings, help, and profile management",OpenTK; ApplicationCore; System.Windows.Forms,core.shell
+map_canvas,OpenGL Map Canvas,panel,Render geospatial layers and accept pan/zoom interactions.,Display section states and AB guidance; Support flag context menu,OpenTK; WorldGrid,core.map
+top_toolbar,Top Command Toolbar,toolbar,Provide single-click access to automation states and frequently used commands.,Launch steering configuration dialogs; Toggle manual section overrides; Arm YouTurn guidance,System.Windows.Forms; HotkeyService,core.shell
+file_menu,File Menu,menu,Manage profiles and global session state.,Toggle simulator; Reset configuration; Open About,System.Windows.Forms,core.shell
+tools_menu,Tools Menu,menu,Provide access to diagnostics and setup utilities.,Launch steer wizard; Open steering charts; Access log viewer,System.Windows.Forms,core.shell
+field_menu,Field Menu,menu,Manage field geometry assets for the current job.,Open boundary editor; Launch headland builder; Clear applied coverage,System.Windows.Forms,core.map
+job_manager_dialog,Job Manager Dialog,dialog,Create or resume field jobs with correct directories and file templates.,Import ISOXML fields; Open job history,System.IO; RegistrySettings,core.jobs
+field_directory_dialog,Create Field Dialog,dialog,Capture new field name and initialize directory structure.,Append date/time; Cancel without creating,RegistrySettings; FormGPS,core.jobs
+field_existing_dialog,Open Existing Field Dialog,dialog,Allow operator to select and open existing field directories.,Delete field; Preview boundary,System.IO; FieldPreview,core.jobs
+field_map_dialog,Field Map Preview,dialog,Confirm selected field geometry prior to activation.,Adjust zoom; Inspect coverage layers,OpenTK,core.map
+field_save_dialog,Save Field Confirmation,dialog,Prevent accidental data loss when closing field sessions.,Discard changes; Cancel,FileManagement,core.jobs
+boundary_tool_dialog,Boundary Tool,dialog,Let operators define and edit field boundaries using recorded data.,Merge segments; Simplify geometry; Export shapefile,BoundaryBuilder; WorldGrid,core.map
+flag_manager_dialog,Flag Manager,dialog,"Create, edit, and delete field flags with context metadata.",Filter by category; Jump map to flag,FlagService,core.map
+section_control_widget,Section Control Widget,widget,Allow operator to monitor and override section application states.,Toggle master; Run test cycle,SectionControlService,plugin.section-control
+section_config_dialog,Section Configuration,dialog,Persist section geometry and IO mapping for implement control.,Calibrate delays; Assign controller outputs,ImplementModel; SectionControlService,plugin.section-control
+steer_settings_dialog,Steer Settings,dialog,Tune autosteer controller parameters for the active vehicle.,Test motor outputs; Review steer charts,SteerModule; VehicleModel,plugin.autosteer
+steer_wizard_dialog,Steer Wizard,dialog,Provide step-by-step configuration with live validation.,Run wheel angle tests; Set default tuning,SteerModule; WizardFramework,plugin.autosteer
+steer_chart_dialog,Steer Performance Chart,dialog,Visualize steering performance metrics over time.,Export CSV; Adjust sample rate,System.Windows.Forms.DataVisualization,plugin.autosteer
+color_settings_dialog,Display Color Settings,dialog,Persist user-chosen colors for key UI elements.,Restore defaults; Preview live,ThemeManager,core.shell
+hotkey_dialog,Hotkey Manager,dialog,Let operator customize global hotkeys.,Restore defaults; Export mapping,HotkeyService,core.shell
+gps_data_dialog,GPS Data Monitor,dialog,Diagnose GPS feed and confirm fix quality.,Pause stream; Copy data,GPSProvider,core.telemetry
+udp_status_dialog,UDP Status,dialog,Verify UDP networking state between modules.,Restart sockets; Send test packet,UdpComm,core.telemetry
+event_viewer_dialog,Event Viewer,dialog,Review diagnostic logs within the application.,Filter by severity; Export logs,AgLibrary.Logging,core.telemetry
+help_dialog,Help Dialog,dialog,Provide quick reference without leaving the app.,Open external documentation,Localization,core.docs
+about_dialog,About Dialog,dialog,Provide attribution and build metadata.,Copy version; Open website,AssemblyInfo,core.docs
+webcam_dialog,Webcam Viewer,dialog,Show live video and snapshot controls.,Capture image; Select camera,AForge.Video,plugin.video-monitor
+shift_position_dialog,Shift Position,dialog,Offset vehicle pose in the map to align with reality.,Nudge north/east; Reset offset,GeoTransforms,core.map
+ag_io_loop_dialog,AgIO Loop Monitor,dialog,Monitor hardware IO loop running outside the main UI.,Restart loop; Open advanced settings,AgIO,core.agio
+ag_io_serial_dialog,AgIO Serial Configuration,dialog,Assign serial ports and connection parameters for hardware modules.,Test connection; Auto-detect,System.IO.Ports,core.agio
+ag_io_advanced_settings_dialog,AgIO Advanced Settings,dialog,Tune AgIO performance and diagnostics options.,Enable verbose logging; Reset defaults,AgIO,core.agio
+simulator_main_dialog,ModSim Main Window,dialog,Run headless simulations for hardware testing.,Start/stop simulation; Adjust noise profiles,SimulationEngine,core.simulation

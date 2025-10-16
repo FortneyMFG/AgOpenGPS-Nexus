@@ -1,0 +1,1358 @@
+[
+  {
+    "title": "[shell-and-navigation] Implement Main Field View UI",
+    "body": "## Summary\n- Build the ui for `app_shell` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `app_shell`\n- Contract: `core.app_shell.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `shell.main`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AppShellUI.cs\n- src/Aog.UI.Avalonia/Views/AppShellUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "app_shell"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Main Field View ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `app_shell` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `app_shell`\n- Contract: `core.app_shell.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `shell.main`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AppShellViewModel.cs\n- src/Aog.UI.Avalonia/Views/AppShellViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "app_shell"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Main Field View Tests",
+    "body": "## Summary\n- Build the tests for `app_shell` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `app_shell`\n- Contract: `core.app_shell.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `shell.main`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AppShellTests.cs\n- src/Aog.UI.Avalonia/Views/AppShellTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "app_shell"
+  },
+  {
+    "title": "[shell-and-navigation] Implement OpenGL Map Canvas UI",
+    "body": "## Summary\n- Build the ui for `map_canvas` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `map_canvas`\n- Contract: `core.map_canvas.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `shell.map`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/MapCanvasUI.cs\n- src/Aog.UI.Avalonia/Views/MapCanvasUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "map_canvas"
+  },
+  {
+    "title": "[shell-and-navigation] Implement OpenGL Map Canvas ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `map_canvas` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `map_canvas`\n- Contract: `core.map_canvas.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `shell.map`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/MapCanvasViewModel.cs\n- src/Aog.UI.Avalonia/Views/MapCanvasViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "map_canvas"
+  },
+  {
+    "title": "[shell-and-navigation] Implement OpenGL Map Canvas Tests",
+    "body": "## Summary\n- Build the tests for `map_canvas` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `map_canvas`\n- Contract: `core.map_canvas.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `shell.map`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/MapCanvasTests.cs\n- src/Aog.UI.Avalonia/Views/MapCanvasTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "map_canvas"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Top Command Toolbar UI",
+    "body": "## Summary\n- Build the ui for `top_toolbar` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `top_toolbar`\n- Contract: `core.top_toolbar.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `toolbar.top`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/TopToolbarUI.cs\n- src/Aog.UI.Avalonia/Views/TopToolbarUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "top_toolbar"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Top Command Toolbar ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `top_toolbar` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `top_toolbar`\n- Contract: `core.top_toolbar.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `toolbar.top`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/TopToolbarViewModel.cs\n- src/Aog.UI.Avalonia/Views/TopToolbarViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "top_toolbar"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Top Command Toolbar Tests",
+    "body": "## Summary\n- Build the tests for `top_toolbar` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `top_toolbar`\n- Contract: `core.top_toolbar.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `toolbar.top`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/TopToolbarTests.cs\n- src/Aog.UI.Avalonia/Views/TopToolbarTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "top_toolbar"
+  },
+  {
+    "title": "[shell-and-navigation] Implement File Menu UI",
+    "body": "## Summary\n- Build the ui for `file_menu` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `file_menu`\n- Contract: `core.file_menu.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `menu.file`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FileMenuUI.cs\n- src/Aog.UI.Avalonia/Views/FileMenuUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "file_menu"
+  },
+  {
+    "title": "[shell-and-navigation] Implement File Menu ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `file_menu` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `file_menu`\n- Contract: `core.file_menu.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `menu.file`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FileMenuViewModel.cs\n- src/Aog.UI.Avalonia/Views/FileMenuViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "file_menu"
+  },
+  {
+    "title": "[shell-and-navigation] Implement File Menu Tests",
+    "body": "## Summary\n- Build the tests for `file_menu` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `file_menu`\n- Contract: `core.file_menu.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `menu.file`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FileMenuTests.cs\n- src/Aog.UI.Avalonia/Views/FileMenuTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "file_menu"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Tools Menu UI",
+    "body": "## Summary\n- Build the ui for `tools_menu` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `tools_menu`\n- Contract: `core.tools_menu.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `menu.tools`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/ToolsMenuUI.cs\n- src/Aog.UI.Avalonia/Views/ToolsMenuUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "tools_menu"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Tools Menu ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `tools_menu` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `tools_menu`\n- Contract: `core.tools_menu.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `menu.tools`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/ToolsMenuViewModel.cs\n- src/Aog.UI.Avalonia/Views/ToolsMenuViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "tools_menu"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Tools Menu Tests",
+    "body": "## Summary\n- Build the tests for `tools_menu` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `tools_menu`\n- Contract: `core.tools_menu.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `menu.tools`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/ToolsMenuTests.cs\n- src/Aog.UI.Avalonia/Views/ToolsMenuTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "tools_menu"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Field Menu UI",
+    "body": "## Summary\n- Build the ui for `field_menu` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_menu`\n- Contract: `core.field_menu.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `menu.field`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldMenuUI.cs\n- src/Aog.UI.Avalonia/Views/FieldMenuUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_menu"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Field Menu ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `field_menu` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_menu`\n- Contract: `core.field_menu.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `menu.field`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldMenuViewModel.cs\n- src/Aog.UI.Avalonia/Views/FieldMenuViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_menu"
+  },
+  {
+    "title": "[shell-and-navigation] Implement Field Menu Tests",
+    "body": "## Summary\n- Build the tests for `field_menu` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_menu`\n- Contract: `core.field_menu.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `menu.field`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldMenuTests.cs\n- src/Aog.UI.Avalonia/Views/FieldMenuTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_menu"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Section Configuration UI",
+    "body": "## Summary\n- Build the ui for `section_config_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `section_config_dialog`\n- Contract: `section_control.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SectionConfigDialogUI.cs\n- src/Aog.UI.Avalonia/Views/SectionConfigDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins",
+      "plugin:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "section_config_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Section Configuration ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `section_config_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `section_config_dialog`\n- Contract: `section_control.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SectionConfigDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/SectionConfigDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins",
+      "plugin:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "section_config_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Section Configuration Tests",
+    "body": "## Summary\n- Build the tests for `section_config_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `section_config_dialog`\n- Contract: `section_control.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SectionConfigDialogTests.cs\n- src/Aog.UI.Avalonia/Views/SectionConfigDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins",
+      "plugin:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "section_config_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Steer Settings UI",
+    "body": "## Summary\n- Build the ui for `steer_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_settings_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerSettingsDialogUI.cs\n- src/Aog.UI.Avalonia/Views/SteerSettingsDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_settings_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Steer Settings ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `steer_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_settings_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerSettingsDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/SteerSettingsDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_settings_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Steer Settings Tests",
+    "body": "## Summary\n- Build the tests for `steer_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_settings_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerSettingsDialogTests.cs\n- src/Aog.UI.Avalonia/Views/SteerSettingsDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_settings_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Display Color Settings UI",
+    "body": "## Summary\n- Build the ui for `color_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `color_settings_dialog`\n- Contract: `core.color_settings_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.display`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/ColorSettingsDialogUI.cs\n- src/Aog.UI.Avalonia/Views/ColorSettingsDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "color_settings_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Display Color Settings ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `color_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `color_settings_dialog`\n- Contract: `core.color_settings_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.display`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/ColorSettingsDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/ColorSettingsDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "color_settings_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Display Color Settings Tests",
+    "body": "## Summary\n- Build the tests for `color_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `color_settings_dialog`\n- Contract: `core.color_settings_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.display`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/ColorSettingsDialogTests.cs\n- src/Aog.UI.Avalonia/Views/ColorSettingsDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "color_settings_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Hotkey Manager UI",
+    "body": "## Summary\n- Build the ui for `hotkey_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `hotkey_dialog`\n- Contract: `core.hotkey_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.input`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/HotkeyDialogUI.cs\n- src/Aog.UI.Avalonia/Views/HotkeyDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "hotkey_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Hotkey Manager ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `hotkey_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `hotkey_dialog`\n- Contract: `core.hotkey_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.input`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/HotkeyDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/HotkeyDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "hotkey_dialog"
+  },
+  {
+    "title": "[settings-and-plugins] Implement Hotkey Manager Tests",
+    "body": "## Summary\n- Build the tests for `hotkey_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `hotkey_dialog`\n- Contract: `core.hotkey_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.input`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/HotkeyDialogTests.cs\n- src/Aog.UI.Avalonia/Views/HotkeyDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:settings-and-plugins"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "hotkey_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Boundary Tool UI",
+    "body": "## Summary\n- Build the ui for `boundary_tool_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `boundary_tool_dialog`\n- Contract: `core.boundary_tool_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.boundary`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/BoundaryToolDialogUI.cs\n- src/Aog.UI.Avalonia/Views/BoundaryToolDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "boundary_tool_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Boundary Tool ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `boundary_tool_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `boundary_tool_dialog`\n- Contract: `core.boundary_tool_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.boundary`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/BoundaryToolDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/BoundaryToolDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "boundary_tool_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Boundary Tool Tests",
+    "body": "## Summary\n- Build the tests for `boundary_tool_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `boundary_tool_dialog`\n- Contract: `core.boundary_tool_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.boundary`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/BoundaryToolDialogTests.cs\n- src/Aog.UI.Avalonia/Views/BoundaryToolDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "boundary_tool_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Flag Manager UI",
+    "body": "## Summary\n- Build the ui for `flag_manager_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `flag_manager_dialog`\n- Contract: `core.flag_manager_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.flags`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FlagManagerDialogUI.cs\n- src/Aog.UI.Avalonia/Views/FlagManagerDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "flag_manager_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Flag Manager ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `flag_manager_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `flag_manager_dialog`\n- Contract: `core.flag_manager_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.flags`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FlagManagerDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/FlagManagerDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "flag_manager_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Flag Manager Tests",
+    "body": "## Summary\n- Build the tests for `flag_manager_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `flag_manager_dialog`\n- Contract: `core.flag_manager_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.flags`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FlagManagerDialogTests.cs\n- src/Aog.UI.Avalonia/Views/FlagManagerDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "flag_manager_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Field Map Preview UI",
+    "body": "## Summary\n- Build the ui for `field_map_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_map_dialog`\n- Contract: `core.field_map_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldMapDialogUI.cs\n- src/Aog.UI.Avalonia/Views/FieldMapDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_map_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Field Map Preview ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `field_map_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_map_dialog`\n- Contract: `core.field_map_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldMapDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/FieldMapDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_map_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Field Map Preview Tests",
+    "body": "## Summary\n- Build the tests for `field_map_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_map_dialog`\n- Contract: `core.field_map_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldMapDialogTests.cs\n- src/Aog.UI.Avalonia/Views/FieldMapDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_map_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Shift Position UI",
+    "body": "## Summary\n- Build the ui for `shift_position_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `shift_position_dialog`\n- Contract: `core.shift_position_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `tools.offset`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/ShiftPositionDialogUI.cs\n- src/Aog.UI.Avalonia/Views/ShiftPositionDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "shift_position_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Shift Position ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `shift_position_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `shift_position_dialog`\n- Contract: `core.shift_position_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `tools.offset`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/ShiftPositionDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/ShiftPositionDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "shift_position_dialog"
+  },
+  {
+    "title": "[mapping-and-canvas] Implement Shift Position Tests",
+    "body": "## Summary\n- Build the tests for `shift_position_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `shift_position_dialog`\n- Contract: `core.shift_position_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `tools.offset`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/ShiftPositionDialogTests.cs\n- src/Aog.UI.Avalonia/Views/ShiftPositionDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "shift_position_dialog"
+  },
+  {
+    "title": "[section-control] Implement Section Control Widget UI",
+    "body": "## Summary\n- Build the ui for `section_control_widget` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `section_control_widget`\n- Contract: `section_control.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `toolbar.section`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SectionControlWidgetUI.cs\n- src/Aog.UI.Avalonia/Views/SectionControlWidgetUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:section-control",
+      "plugin:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "section_control_widget"
+  },
+  {
+    "title": "[section-control] Implement Section Control Widget ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `section_control_widget` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `section_control_widget`\n- Contract: `section_control.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `toolbar.section`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SectionControlWidgetViewModel.cs\n- src/Aog.UI.Avalonia/Views/SectionControlWidgetViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:section-control",
+      "plugin:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "section_control_widget"
+  },
+  {
+    "title": "[section-control] Implement Section Control Widget Tests",
+    "body": "## Summary\n- Build the tests for `section_control_widget` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `section_control_widget`\n- Contract: `section_control.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `toolbar.section`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SectionControlWidgetTests.cs\n- src/Aog.UI.Avalonia/Views/SectionControlWidgetTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:section-control",
+      "plugin:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "section_control_widget"
+  },
+  {
+    "title": "[section-control] Implement Section Configuration UI",
+    "body": "## Summary\n- Build the ui for `section_config_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `section_config_dialog`\n- Contract: `section_control.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SectionConfigDialogUI.cs\n- src/Aog.UI.Avalonia/Views/SectionConfigDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:section-control",
+      "plugin:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "section_config_dialog"
+  },
+  {
+    "title": "[section-control] Implement Section Configuration ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `section_config_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `section_config_dialog`\n- Contract: `section_control.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SectionConfigDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/SectionConfigDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:section-control",
+      "plugin:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "section_config_dialog"
+  },
+  {
+    "title": "[section-control] Implement Section Configuration Tests",
+    "body": "## Summary\n- Build the tests for `section_config_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `section_config_dialog`\n- Contract: `section_control.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SectionConfigDialogTests.cs\n- src/Aog.UI.Avalonia/Views/SectionConfigDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:section-control",
+      "plugin:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "section_config_dialog"
+  },
+  {
+    "title": "[autosteer] Implement Steer Settings UI",
+    "body": "## Summary\n- Build the ui for `steer_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_settings_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerSettingsDialogUI.cs\n- src/Aog.UI.Avalonia/Views/SteerSettingsDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:autosteer",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_settings_dialog"
+  },
+  {
+    "title": "[autosteer] Implement Steer Settings ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `steer_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_settings_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerSettingsDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/SteerSettingsDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:autosteer",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_settings_dialog"
+  },
+  {
+    "title": "[autosteer] Implement Steer Settings Tests",
+    "body": "## Summary\n- Build the tests for `steer_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_settings_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `settings.plugins`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerSettingsDialogTests.cs\n- src/Aog.UI.Avalonia/Views/SteerSettingsDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:autosteer",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_settings_dialog"
+  },
+  {
+    "title": "[autosteer] Implement Steer Wizard UI",
+    "body": "## Summary\n- Build the ui for `steer_wizard_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_wizard_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `wizard.autosteer`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerWizardDialogUI.cs\n- src/Aog.UI.Avalonia/Views/SteerWizardDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:autosteer",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_wizard_dialog"
+  },
+  {
+    "title": "[autosteer] Implement Steer Wizard ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `steer_wizard_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_wizard_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `wizard.autosteer`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerWizardDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/SteerWizardDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:autosteer",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_wizard_dialog"
+  },
+  {
+    "title": "[autosteer] Implement Steer Wizard Tests",
+    "body": "## Summary\n- Build the tests for `steer_wizard_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_wizard_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `wizard.autosteer`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerWizardDialogTests.cs\n- src/Aog.UI.Avalonia/Views/SteerWizardDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:autosteer",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_wizard_dialog"
+  },
+  {
+    "title": "[autosteer] Implement Steer Performance Chart UI",
+    "body": "## Summary\n- Build the ui for `steer_chart_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_chart_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.autosteer`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerChartDialogUI.cs\n- src/Aog.UI.Avalonia/Views/SteerChartDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:autosteer",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_chart_dialog"
+  },
+  {
+    "title": "[autosteer] Implement Steer Performance Chart ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `steer_chart_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_chart_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.autosteer`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerChartDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/SteerChartDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:autosteer",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_chart_dialog"
+  },
+  {
+    "title": "[autosteer] Implement Steer Performance Chart Tests",
+    "body": "## Summary\n- Build the tests for `steer_chart_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `steer_chart_dialog`\n- Contract: `autosteer.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.autosteer`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SteerChartDialogTests.cs\n- src/Aog.UI.Avalonia/Views/SteerChartDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:autosteer",
+      "plugin:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "steer_chart_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Job Manager Dialog UI",
+    "body": "## Summary\n- Build the ui for `job_manager_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `job_manager_dialog`\n- Contract: `core.job_manager_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/JobManagerDialogUI.cs\n- src/Aog.UI.Avalonia/Views/JobManagerDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "job_manager_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Job Manager Dialog ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `job_manager_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `job_manager_dialog`\n- Contract: `core.job_manager_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/JobManagerDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/JobManagerDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "job_manager_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Job Manager Dialog Tests",
+    "body": "## Summary\n- Build the tests for `job_manager_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `job_manager_dialog`\n- Contract: `core.job_manager_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/JobManagerDialogTests.cs\n- src/Aog.UI.Avalonia/Views/JobManagerDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "job_manager_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Create Field Dialog UI",
+    "body": "## Summary\n- Build the ui for `field_directory_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_directory_dialog`\n- Contract: `core.field_directory_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldDirectoryDialogUI.cs\n- src/Aog.UI.Avalonia/Views/FieldDirectoryDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_directory_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Create Field Dialog ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `field_directory_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_directory_dialog`\n- Contract: `core.field_directory_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldDirectoryDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/FieldDirectoryDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_directory_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Create Field Dialog Tests",
+    "body": "## Summary\n- Build the tests for `field_directory_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_directory_dialog`\n- Contract: `core.field_directory_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldDirectoryDialogTests.cs\n- src/Aog.UI.Avalonia/Views/FieldDirectoryDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_directory_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Open Existing Field Dialog UI",
+    "body": "## Summary\n- Build the ui for `field_existing_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_existing_dialog`\n- Contract: `core.field_existing_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldExistingDialogUI.cs\n- src/Aog.UI.Avalonia/Views/FieldExistingDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_existing_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Open Existing Field Dialog ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `field_existing_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_existing_dialog`\n- Contract: `core.field_existing_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldExistingDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/FieldExistingDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_existing_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Open Existing Field Dialog Tests",
+    "body": "## Summary\n- Build the tests for `field_existing_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `field_existing_dialog`\n- Contract: `core.field_existing_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `dialog.jobs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/FieldExistingDialogTests.cs\n- src/Aog.UI.Avalonia/Views/FieldExistingDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "field_existing_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement GPS Data Monitor UI",
+    "body": "## Summary\n- Build the ui for `gps_data_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `gps_data_dialog`\n- Contract: `core.gps_data_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.telemetry`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/GpsDataDialogUI.cs\n- src/Aog.UI.Avalonia/Views/GpsDataDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "gps_data_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement GPS Data Monitor ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `gps_data_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `gps_data_dialog`\n- Contract: `core.gps_data_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.telemetry`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/GpsDataDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/GpsDataDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "gps_data_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement GPS Data Monitor Tests",
+    "body": "## Summary\n- Build the tests for `gps_data_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `gps_data_dialog`\n- Contract: `core.gps_data_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.telemetry`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/GpsDataDialogTests.cs\n- src/Aog.UI.Avalonia/Views/GpsDataDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "gps_data_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Event Viewer UI",
+    "body": "## Summary\n- Build the ui for `event_viewer_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `event_viewer_dialog`\n- Contract: `core.event_viewer_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.logs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/EventViewerDialogUI.cs\n- src/Aog.UI.Avalonia/Views/EventViewerDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "event_viewer_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Event Viewer ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `event_viewer_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `event_viewer_dialog`\n- Contract: `core.event_viewer_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.logs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/EventViewerDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/EventViewerDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "event_viewer_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Event Viewer Tests",
+    "body": "## Summary\n- Build the tests for `event_viewer_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `event_viewer_dialog`\n- Contract: `core.event_viewer_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.logs`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/EventViewerDialogTests.cs\n- src/Aog.UI.Avalonia/Views/EventViewerDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "event_viewer_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Webcam Viewer UI",
+    "body": "## Summary\n- Build the ui for `webcam_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `webcam_dialog`\n- Contract: `video_monitor.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.video`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/WebcamDialogUI.cs\n- src/Aog.UI.Avalonia/Views/WebcamDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards",
+      "plugin:video-monitor"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "webcam_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Webcam Viewer ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `webcam_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `webcam_dialog`\n- Contract: `video_monitor.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.video`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/WebcamDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/WebcamDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards",
+      "plugin:video-monitor"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "webcam_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Webcam Viewer Tests",
+    "body": "## Summary\n- Build the tests for `webcam_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `webcam_dialog`\n- Contract: `video_monitor.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.video`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/WebcamDialogTests.cs\n- src/Aog.UI.Avalonia/Views/WebcamDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards",
+      "plugin:video-monitor"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "webcam_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Help Dialog UI",
+    "body": "## Summary\n- Build the ui for `help_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `help_dialog`\n- Contract: `core.help_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `help.modal`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/HelpDialogUI.cs\n- src/Aog.UI.Avalonia/Views/HelpDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "help_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Help Dialog ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `help_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `help_dialog`\n- Contract: `core.help_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `help.modal`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/HelpDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/HelpDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "help_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement Help Dialog Tests",
+    "body": "## Summary\n- Build the tests for `help_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `help_dialog`\n- Contract: `core.help_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `help.modal`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/HelpDialogTests.cs\n- src/Aog.UI.Avalonia/Views/HelpDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "help_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement About Dialog UI",
+    "body": "## Summary\n- Build the ui for `about_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `about_dialog`\n- Contract: `core.about_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `help.modal`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AboutDialogUI.cs\n- src/Aog.UI.Avalonia/Views/AboutDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "about_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement About Dialog ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `about_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `about_dialog`\n- Contract: `core.about_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `help.modal`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AboutDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/AboutDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "about_dialog"
+  },
+  {
+    "title": "[dialogs-and-wizards] Implement About Dialog Tests",
+    "body": "## Summary\n- Build the tests for `about_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `about_dialog`\n- Contract: `core.about_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `help.modal`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AboutDialogTests.cs\n- src/Aog.UI.Avalonia/Views/AboutDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": "about_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement AgIO Loop Monitor UI",
+    "body": "## Summary\n- Build the ui for `ag_io_loop_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `ag_io_loop_dialog`\n- Contract: `core.ag_io_loop_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.agio`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AgIoLoopDialogUI.cs\n- src/Aog.UI.Avalonia/Views/AgIoLoopDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "ag_io_loop_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement AgIO Loop Monitor ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `ag_io_loop_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `ag_io_loop_dialog`\n- Contract: `core.ag_io_loop_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.agio`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AgIoLoopDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/AgIoLoopDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "ag_io_loop_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement AgIO Loop Monitor Tests",
+    "body": "## Summary\n- Build the tests for `ag_io_loop_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `ag_io_loop_dialog`\n- Contract: `core.ag_io_loop_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.agio`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AgIoLoopDialogTests.cs\n- src/Aog.UI.Avalonia/Views/AgIoLoopDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "ag_io_loop_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement AgIO Serial Configuration UI",
+    "body": "## Summary\n- Build the ui for `ag_io_serial_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `ag_io_serial_dialog`\n- Contract: `core.ag_io_serial_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.agio`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AgIoSerialDialogUI.cs\n- src/Aog.UI.Avalonia/Views/AgIoSerialDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "ag_io_serial_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement AgIO Serial Configuration ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `ag_io_serial_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `ag_io_serial_dialog`\n- Contract: `core.ag_io_serial_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.agio`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AgIoSerialDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/AgIoSerialDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "ag_io_serial_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement AgIO Serial Configuration Tests",
+    "body": "## Summary\n- Build the tests for `ag_io_serial_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `ag_io_serial_dialog`\n- Contract: `core.ag_io_serial_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.agio`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AgIoSerialDialogTests.cs\n- src/Aog.UI.Avalonia/Views/AgIoSerialDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "ag_io_serial_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement AgIO Advanced Settings UI",
+    "body": "## Summary\n- Build the ui for `ag_io_advanced_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `ag_io_advanced_settings_dialog`\n- Contract: `core.ag_io_advanced_settings_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.agio`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AgIoAdvancedSettingsDialogUI.cs\n- src/Aog.UI.Avalonia/Views/AgIoAdvancedSettingsDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "ag_io_advanced_settings_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement AgIO Advanced Settings ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `ag_io_advanced_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `ag_io_advanced_settings_dialog`\n- Contract: `core.ag_io_advanced_settings_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.agio`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AgIoAdvancedSettingsDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/AgIoAdvancedSettingsDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "ag_io_advanced_settings_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement AgIO Advanced Settings Tests",
+    "body": "## Summary\n- Build the tests for `ag_io_advanced_settings_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `ag_io_advanced_settings_dialog`\n- Contract: `core.ag_io_advanced_settings_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `plugin.agio`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/AgIoAdvancedSettingsDialogTests.cs\n- src/Aog.UI.Avalonia/Views/AgIoAdvancedSettingsDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "ag_io_advanced_settings_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement ModSim Main Window UI",
+    "body": "## Summary\n- Build the ui for `simulator_main_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `simulator_main_dialog`\n- Contract: `core.simulator_main_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `simulation.shell`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SimulatorMainDialogUI.cs\n- src/Aog.UI.Avalonia/Views/SimulatorMainDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "simulator_main_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement ModSim Main Window ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `simulator_main_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `simulator_main_dialog`\n- Contract: `core.simulator_main_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `simulation.shell`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SimulatorMainDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/SimulatorMainDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "simulator_main_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement ModSim Main Window Tests",
+    "body": "## Summary\n- Build the tests for `simulator_main_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `simulator_main_dialog`\n- Contract: `core.simulator_main_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `simulation.shell`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/SimulatorMainDialogTests.cs\n- src/Aog.UI.Avalonia/Views/SimulatorMainDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "High",
+    "inventory_id": "simulator_main_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement UDP Status UI",
+    "body": "## Summary\n- Build the ui for `udp_status_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `udp_status_dialog`\n- Contract: `core.udp_status_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.telemetry`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/UdpStatusDialogUI.cs\n- src/Aog.UI.Avalonia/Views/UdpStatusDialogUI.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "udp_status_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement UDP Status ViewModel",
+    "body": "## Summary\n- Build the viewmodel for `udp_status_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `udp_status_dialog`\n- Contract: `core.udp_status_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.telemetry`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/UdpStatusDialogViewModel.cs\n- src/Aog.UI.Avalonia/Views/UdpStatusDialogViewModel.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "udp_status_dialog"
+  },
+  {
+    "title": "[hardware-and-sim] Implement UDP Status Tests",
+    "body": "## Summary\n- Build the tests for `udp_status_dialog` derived from ui-inventory.json.\n\n## Context\n- Inventory reference: `udp_status_dialog`\n- Contract: `core.udp_status_dialog.v1`\n\n## Acceptance Criteria\n- [ ] Matches legacy behavior documented in ui-inventory.json.\n- [ ] Hooks into plugin host via `diagnostics.telemetry`.\n- [ ] Includes unit tests for primary interactions.\n- [ ] Provides Storybook-style example in @nexus/ui-core samples.\n\n## Suggested Files\n- src/Aog.UI.Avalonia/UdpStatusDialogTests.cs\n- src/Aog.UI.Avalonia/Views/UdpStatusDialogTests.axaml",
+    "labels": [
+      "ui",
+      "avalonia",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Medium",
+    "inventory_id": "udp_status_dialog"
+  },
+  {
+    "title": "PR Template: shell-and-navigation",
+    "body": "## Summary\n- Describe changes for `shell-and-navigation` epic.\n\n## Testing\n- [ ] `dotnet build`\n- [ ] `dotnet test`\n- [ ] `nexus sim smoke`",
+    "labels": [
+      "meta",
+      "epic:shell-and-navigation"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": null
+  },
+  {
+    "title": "PR Template: settings-and-plugins",
+    "body": "## Summary\n- Describe changes for `settings-and-plugins` epic.\n\n## Testing\n- [ ] `dotnet build`\n- [ ] `dotnet test`\n- [ ] `nexus sim smoke`",
+    "labels": [
+      "meta",
+      "epic:settings-and-plugins"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": null
+  },
+  {
+    "title": "PR Template: mapping-and-canvas",
+    "body": "## Summary\n- Describe changes for `mapping-and-canvas` epic.\n\n## Testing\n- [ ] `dotnet build`\n- [ ] `dotnet test`\n- [ ] `nexus sim smoke`",
+    "labels": [
+      "meta",
+      "epic:mapping-and-canvas"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": null
+  },
+  {
+    "title": "PR Template: section-control",
+    "body": "## Summary\n- Describe changes for `section-control` epic.\n\n## Testing\n- [ ] `dotnet build`\n- [ ] `dotnet test`\n- [ ] `nexus sim smoke`",
+    "labels": [
+      "meta",
+      "epic:section-control"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": null
+  },
+  {
+    "title": "PR Template: autosteer",
+    "body": "## Summary\n- Describe changes for `autosteer` epic.\n\n## Testing\n- [ ] `dotnet build`\n- [ ] `dotnet test`\n- [ ] `nexus sim smoke`",
+    "labels": [
+      "meta",
+      "epic:autosteer"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": null
+  },
+  {
+    "title": "PR Template: dialogs-and-wizards",
+    "body": "## Summary\n- Describe changes for `dialogs-and-wizards` epic.\n\n## Testing\n- [ ] `dotnet build`\n- [ ] `dotnet test`\n- [ ] `nexus sim smoke`",
+    "labels": [
+      "meta",
+      "epic:dialogs-and-wizards"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": null
+  },
+  {
+    "title": "PR Template: hardware-and-sim",
+    "body": "## Summary\n- Describe changes for `hardware-and-sim` epic.\n\n## Testing\n- [ ] `dotnet build`\n- [ ] `dotnet test`\n- [ ] `nexus sim smoke`",
+    "labels": [
+      "meta",
+      "epic:hardware-and-sim"
+    ],
+    "assignees": [],
+    "milestone": null,
+    "complexity": "Low",
+    "inventory_id": null
+  }
+]

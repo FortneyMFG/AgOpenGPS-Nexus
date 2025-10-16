@@ -34,14 +34,35 @@ jobs:
         id: paths
         shell: bash
         run: |
-          case "${{ inputs.component }}" in
-            core) echo "proj=src/Core/Nexus.Core.csproj" >> $GITHUB_OUTPUT ;;
-            agio) echo "proj=src/AgIO/Nexus.AgIO.csproj" >> $GITHUB_OUTPUT ;;
-            ui)   echo "proj=src/UI/Nexus.UI.csproj" >> $GITHUB_OUTPUT ;;
+          comp="${{ inputs.component }}"
+          case "$comp" in
+            core)
+              echo "proj=Nexus SourceCode/src/Aog.Core/Aog.Core.csproj" >> "$GITHUB_OUTPUT"
+              echo "dir=core" >> "$GITHUB_OUTPUT"
+              echo "archive=core" >> "$GITHUB_OUTPUT"
+              ;;
+            agio)
+              echo "proj=Nexus SourceCode/src/Aog.Agio/Aog.Agio.csproj" >> "$GITHUB_OUTPUT"
+              echo "dir=agio" >> "$GITHUB_OUTPUT"
+              echo "archive=agio" >> "$GITHUB_OUTPUT"
+              ;;
+            ui)
+              echo "proj=Nexus SourceCode/src/Aog.UI.Avalonia/Aog.UI.Avalonia.csproj" >> "$GITHUB_OUTPUT"
+              echo "dir=ui" >> "$GITHUB_OUTPUT"
+              echo "archive=ui" >> "$GITHUB_OUTPUT"
+              ;;
             plugin:*)
-              plug="${{ inputs.component#plugin: }}"
-              echo "proj=plugins/$plug/$plug.csproj" >> $GITHUB_OUTPUT ;;
-            *) echo "Unknown component"; exit 1 ;;
+              plug="${comp#plugin:}"
+              if [[ -z "$plug" ]]; then echo "Plugin name missing" >&2; exit 1; fi
+              echo "proj=Nexus SourceCode/src/Aog.Plugins/Aog.Plugins.csproj" >> "$GITHUB_OUTPUT"
+              echo "dir=Plugin-$plug" >> "$GITHUB_OUTPUT"
+              echo "archive=Plugin-$plug" >> "$GITHUB_OUTPUT"
+              echo "plugin=$plug" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Unknown component: $comp" >&2
+              exit 1
+              ;;
           esac
 
       - name: Publish self-contained
@@ -49,30 +70,30 @@ jobs:
           dotnet publish "${{ steps.paths.outputs.proj }}" \
             -c $CFG -r $RUNTIME --self-contained true \
             /p:PublishSingleFile=true /p:PublishTrimmed=false \
-            -o "out/${{ inputs.component }}/${RUNTIME}"
+            -o "out/${{ steps.paths.outputs.dir }}/${RUNTIME}"
 
       - name: Package docs & extras
         run: |
-          mkdir -p "out/${{ inputs.component }}/${RUNTIME}/docs"
-          cp -R packaging/common/. "out/${{ inputs.component }}/${RUNTIME}/" || true
-          cp docs/COMPONENT-README.md "out/${{ inputs.component }}/${RUNTIME}/README-${{ inputs.component }}.md" || true
+          mkdir -p "out/${{ steps.paths.outputs.dir }}/${RUNTIME}/docs"
+          cp -R packaging/common/. "out/${{ steps.paths.outputs.dir }}/${RUNTIME}/" || true
+          cp docs/COMPONENT-README.md "out/${{ steps.paths.outputs.dir }}/${RUNTIME}/README-${{ steps.paths.outputs.archive }}.md" || true
 
       - name: Archive
         id: arc
         shell: bash
         run: |
-          cd out/${{ inputs.component }}
-          name="${{ inputs.component }}_v${VERSION}_${RUNTIME}"
+          cd "out/${{ steps.paths.outputs.dir }}"
+          name="${{ steps.paths.outputs.archive }}_v${VERSION}_${RUNTIME}"
           if [[ "$RUNTIME" == win-* ]]; then
             7z a -r "${name}.zip" "${RUNTIME}/*"
-            echo "archive=${{ github.workspace }}/out/${{ inputs.component }}/${name}.zip" >> $GITHUB_OUTPUT
+            echo "archive=${{ github.workspace }}/out/${{ steps.paths.outputs.dir }}/${name}.zip" >> $GITHUB_OUTPUT
           else
             tar -czf "${name}.tar.gz" "${RUNTIME}"
-            echo "archive=${{ github.workspace }}/out/${{ inputs.component }}/${name}.tar.gz" >> $GITHUB_OUTPUT
+            echo "archive=${{ github.workspace }}/out/${{ steps.paths.outputs.dir }}/${name}.tar.gz" >> $GITHUB_OUTPUT
           fi
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.component }}_${{ inputs.runtime }}
+          name: ${{ steps.paths.outputs.archive }}_${{ inputs.runtime }}
           path: ${{ steps.arc.outputs.archive }}

@@ -1,7 +1,11 @@
 # ADR-029: Mapping as a plugin with a minimal geospatial kernel in Core
 
 ## Status
-Proposed
+Accepted
+
+The architecture review board signed off during NX-126, promoting this split as the
+authoritative baseline for Core and plugin pods. Future mapping work must uphold the
+capability and determinism guarantees codified below.
 
 **Relevant Plugin(s):** Mapping, Variable Mapping, Rate Control, Section Control, Telemetry Logging
 
@@ -61,6 +65,17 @@ Services:
 - **Version agility:** Mapping plugins declare capabilities (e.g., `mapping:raster@v1`, `mapping:vector@v2`). Core validates compatibility before activation and surfaces feature gaps to presets.
 - **Deterministic replay:** Core mirrors Pose/Layer traffic into replay logs; plugins must honor frame IDs/mono time and supply deterministic outputs under replay.
 - **Debugging:** Core exposes replay/tap endpoints so developers can feed recorded Pose logs into mapping plugins for regression tests.
+
+### Accepted scope & invariants
+- Capability registration for `mapping:raster@v1`, `mapping:vector@v2`, and future
+  revisions is now normative; Core and presets enforce these entries using the
+  dependency rules published in the manifest governance program.【F:docs/ADR/ADR-031-official-plugin-bundle.md†L17-L70】
+- CRS normalization, tiling utilities, and replay taps shipped in Core must continue
+  to satisfy the precision budgets in the communications and data model SRS chapters
+  so controller pods can rely on deterministic pose/layer alignment.【F:docs/SRS/sections/03_Comm_Transports.md†L6-L28】【F:docs/SRS/sections/08_Data_Model_Storage.md†L10-L33】
+- Mapping plugins that participate in spatial constraint enforcement remain bound to
+  ADR-027 zone policies; capability gaps trigger degraded-mode messaging per the
+  operator UX guidance in Section 5 of the SRS.【F:docs/ADR/ADR-027-spatial-constraints.md†L11-L64】【F:docs/SRS/sections/05_Frontends.md†L44-L80】
 
 ### Degraded operation & operator messaging
 - **NullMapping UX:** When NullMapping is active, Core publishes a `mapping:offline` state with explicit operator-facing messaging in the Device Manager and Preset Switcher. Sections and rate controllers continue to run using headland-only constraints, and UI overlays display a "No map data" banner rather than empty tiles.

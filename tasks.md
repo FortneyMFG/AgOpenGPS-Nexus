@@ -318,7 +318,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-342 Developer setup quick start _(Done)_ — SRS §2.8 Documentation
 - [ ] NX-512 README Nexus guide expansion _(In Progress)_ — docs/README.md narrative refresh
 - [x] NX-600 NX CLI Plugin backlog update _(Done)_ — Seed implementation tasks for unified `nx` host
-- [ ] NX-601 NX CLI Plugin host scaffold _(Planned)_ — SRS §18 CLI host with System.CommandLine + Spectre.Console
+- [x] NX-601 NX CLI Plugin host scaffold _(Done)_ — SRS §18 CLI host with System.CommandLine + Spectre.Console
 - [ ] NX-602 NX CLI Plugin endpoint resolver & core status _(Planned)_ — SRS §18 transport negotiation + Core health probe
 - [ ] NX-603 NX CLI Plugin output modes & completions _(Planned)_ — SRS §18 structured output + shell completion
 - [ ] NX-604 NX CLI Plugin discovery & adapter loader _(Planned)_ — SRS §18 plugin adapters and manifest scanning

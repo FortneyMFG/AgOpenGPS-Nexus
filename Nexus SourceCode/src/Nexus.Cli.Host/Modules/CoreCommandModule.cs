@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Nexus.Cli.Host.Core.Endpoints;
 using Nexus.Cli.Host.Core.Status;
 using Nexus.Cli.Host.Output;
+using Nexus.Plugin.Cli.Abstractions;
 using Spectre.Console;
 
 namespace Nexus.Cli.Host.Modules;

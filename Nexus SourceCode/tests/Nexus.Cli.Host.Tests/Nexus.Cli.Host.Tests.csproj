@@ -16,6 +16,9 @@
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="Spectre.Console.Testing" Version="0.47.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="coverlet.collector" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -24,5 +27,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Nexus.Cli.Host\Nexus.Cli.Host.csproj" />
+    <ProjectReference Include="..\..\src\Nexus.Plugin.Cli.Abstractions\Nexus.Plugin.Cli.Abstractions.csproj" />
   </ItemGroup>
 </Project>

@@ -149,7 +149,7 @@ NX-169,FALSE,TRUE,"NX-156, NX-157",,Official Planter Monitor plugin GA streaming
 NX-170,FALSE,TRUE,NX-157,,"Official Job Tasks plugin GA providing job save/resume, autosave, and session marshal"
 NX-171,FALSE,TRUE,NX-157,,Official Telemetry Logging plugin GA capturing plugin feeds and replay exports
 NX-172,FALSE,TRUE,NX-157,,"Official File IO plugin GA handling imports/exports for layers, jobs, and prescriptions"
-NX-190,FALSE,FALSE,"NX-150, NX-153, NX-154, NX-155, NX-156, NX-157",Ready,Apply 2025 governance updates across accepted and draft ADRs
+NX-190,FALSE,TRUE,"NX-150, NX-153, NX-154, NX-155, NX-156, NX-157",Ready,Apply 2025 governance updates across accepted and draft ADRs
 NX-191,FALSE,TRUE,NX-116,,Zone proto + JSON schema handshake — ADR-027 spatial constraints contract release
 NX-192,FALSE,TRUE,NX-191,,PoseStream zone mask proto update — ADR-027 PoseStream mask contract
 NX-193,FALSE,TRUE,NX-191,,Layer registry hash handshake draft — ADR-068 layer controllers registry requirements
@@ -345,3 +345,10 @@ NX-606,FALSE,FALSE,NX-605,,NX CLI Plugin sample verbs
 NX-607,FALSE,FALSE,NX-605,,NX CLI Plugin gRPC reflection client
 NX-608,FALSE,FALSE,"NX-606, NX-607",,NX CLI Plugin packaging pipeline
 NX-609,FALSE,FALSE,NX-608,,NX CLI Plugin docs & completions kit
+NX-610,FALSE,FALSE,NX-190,,"ADR governance automation for program board telemetry, dependency digests, and review minutes"
+NX-611,FALSE,FALSE,NX-190,,"PoseStreamService and SectionState roadmap delivery for ADR-007 services, schemas, and replay fixtures"
+NX-612,FALSE,FALSE,NX-190,,"TileStore durability, compaction, and crash-safety rollout per ADR-009"
+NX-613,FALSE,FALSE,NX-190,,"Layer registry, imagery renderer cache, and fusion QA expansion from ADR-010 through ADR-013"
+NX-614,FALSE,FALSE,NX-190,,"Prescription import/export suite, control semantics updates, and CAN guardrails from ADR-014 through ADR-016"
+NX-615,FALSE,FALSE,NX-190,,"Kinematics editor, plugin permission gate, provenance DAG, and identity UX per ADR-017 through ADR-024"
+NX-616,FALSE,FALSE,NX-190,,"Retention planners, performance dashboards, and CI acceptance hooks from ADR-025 and ADR-026"

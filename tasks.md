@@ -31,7 +31,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-613 Layer registry and visualization expansion _(Planned)_ — ADR-010…ADR-013 registry automation, renderer cache, fusion provenance, and QA suite
 - [ ] NX-614 Prescription interop and control semantics _(Planned)_ — ADR-014…ADR-016 import/export suite, control engine updates, and CAN transport guardrails
 - [ ] NX-615 Kinematics, plugin platform, and identity governance _(Planned)_ — ADR-017…ADR-024 kinematics editor, plugin permission gate, provenance DAG, and identity UX
-- [ ] NX-616 Global retention, performance, and acceptance guardrails _(Planned)_ — ADR-025…ADR-026 retention planners plus global CI hooks for replay, CPU, interop, and crash recovery
+- [x] NX-616 Global retention, performance, and acceptance guardrails _(Done)_ — ADR-025…ADR-026 retention planners plus global CI hooks for replay, CPU, interop, and crash recovery
 
 - [x] NX-191 Zone proto + JSON schema handshake _(Done)_ — ADR-027 spatial constraints contract release
 - [x] NX-192 PoseStream zone mask proto update _(Done)_ — ADR-027 PoseStream mask contract

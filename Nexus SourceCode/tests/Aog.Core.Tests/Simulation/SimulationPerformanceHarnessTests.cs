@@ -22,6 +22,7 @@ public sealed class SimulationPerformanceHarnessTests
 
     [Theory]
     [MemberData(nameof(ScenarioIds))]
+    [Trait("Category", "Guardrail")]
     public async Task Scenario_CompletesWithinBudgetAsync(string scenarioId)
     {
         var (configuration, harness) = HarnessState.Value;

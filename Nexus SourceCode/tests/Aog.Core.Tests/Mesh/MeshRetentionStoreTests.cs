@@ -11,6 +11,7 @@ namespace Aog.Core.Tests.Mesh;
 public sealed class MeshRetentionStoreTests
 {
     [Fact]
+    [Trait("Category", "Guardrail")]
     public void Record_PrunesByRetentionWindowAndLimit()
     {
         var clock = new FakeTimeProvider(new DateTimeOffset(2025, 3, 21, 12, 0, 0, TimeSpan.Zero));
@@ -46,6 +47,54 @@ public sealed class MeshRetentionStoreTests
         retained.Select(p => p.PublishedAt)
             .Should().BeInAscendingOrder()
             .And.Subject.Should().OnlyContain(p => p >= clock.GetUtcNow().AddMinutes(-10));
+    }
+
+    [Theory]
+    [InlineData(30)]
+    [InlineData(90)]
+    [InlineData(365)]
+    [Trait("Category", "Guardrail")]
+    public void Record_RespectsRetentionWindows(int retentionDays)
+    {
+        var start = new DateTimeOffset(2025, 3, 24, 7, 0, 0, TimeSpan.Zero);
+        var clock = new FakeTimeProvider(start);
+        var options = new MeshRetentionOptions
+        {
+            RetentionWindow = TimeSpan.FromDays(retentionDays),
+            MaxEntriesPerTopic = 8,
+        };
+
+        var store = new MeshRetentionStore(options, clock);
+        var topic = "aog/live/season:alpha/job:bravo/coverage";
+        var baseTime = clock.GetUtcNow();
+
+        var expiredTimestamp = baseTime - TimeSpan.FromDays(retentionDays) - TimeSpan.FromMinutes(1);
+        clock.SetUtcNow(expiredTimestamp);
+        store.Record(CreatePublication(
+            "combine",
+            topic,
+            "season:alpha",
+            "job:bravo",
+            "coverage",
+            MeshDataTier.Coverage,
+            expiredTimestamp));
+
+        var retainedTimestamp = baseTime - TimeSpan.FromDays(retentionDays) + TimeSpan.FromMinutes(1);
+        clock.SetUtcNow(retainedTimestamp);
+        store.Record(CreatePublication(
+            "combine",
+            topic,
+            "season:alpha",
+            "job:bravo",
+            "coverage",
+            MeshDataTier.Coverage,
+            retainedTimestamp));
+
+        clock.SetUtcNow(baseTime);
+        var retained = store.Query();
+
+        retained.Should().ContainSingle();
+        retained[0].PublishedAt.Should().Be(retainedTimestamp);
     }
 
     [Fact]

@@ -351,4 +351,4 @@ NX-612,FALSE,FALSE,NX-190,,"TileStore durability, compaction, and crash-safety r
 NX-613,FALSE,FALSE,NX-190,,"Layer registry, imagery renderer cache, and fusion QA expansion from ADR-010 through ADR-013"
 NX-614,FALSE,FALSE,NX-190,,"Prescription import/export suite, control semantics updates, and CAN guardrails from ADR-014 through ADR-016"
 NX-615,FALSE,FALSE,NX-190,,"Kinematics editor, plugin permission gate, provenance DAG, and identity UX per ADR-017 through ADR-024"
-NX-616,FALSE,FALSE,NX-190,,"Retention planners, performance dashboards, and CI acceptance hooks from ADR-025 and ADR-026"
+NX-616,FALSE,TRUE,NX-190,,"Retention planners, performance dashboards, and CI acceptance hooks from ADR-025 and ADR-026"

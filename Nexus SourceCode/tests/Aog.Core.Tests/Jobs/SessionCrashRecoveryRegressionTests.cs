@@ -11,6 +11,7 @@ namespace Aog.Core.Jobs.Tests;
 public sealed class SessionCrashRecoveryRegressionTests
 {
     [Fact]
+    [Trait("Category", "Guardrail")]
     public async Task CrashRecovery_ReplaysLostJournalEntryAndPersistsResumeAsync()
     {
         var start = new DateTimeOffset(2025, 5, 5, 7, 0, 0, TimeSpan.Zero);

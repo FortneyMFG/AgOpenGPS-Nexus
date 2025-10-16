@@ -117,6 +117,7 @@ Reference `bundles/base.bundle.json` and `bundles/headless.bundle.json` for the 
 ## Continuous Integration & Release Automation
 
 - **Nexus CI** (`.github/workflows/ci.yml`) restores, builds, and tests the .NET solution on Ubuntu using .NET 8. Test results are always uploaded as artifacts for debugging.
+- **Guardrail bundle** (`nexus guardrails`) runs retention, performance, replay, and crash-recovery regressions tagged with the guardrail trait so ADR-025/026 acceptance stays green before merges.【F:tools/scripts/nexus.sh†L12-L64】【F:Nexus SourceCode/tests/Aog.Core.Tests/Simulation/SimulationPerformanceHarnessTests.cs†L19-L70】
 - **Reusable component builds** (`.github/workflows/build-components-reusable.yml`) package Core, AgIO, UI, and plugins across Windows and Linux runtimes with consistent naming.
 - **Release Packaging** (`.github/workflows/release.yml`) publishes component archives immediately, assembles manifest-driven bundles only when every dependency is present, and updates the same GitHub Release on retries. SHA256 checksums, optional SBOMs, and Cosign signatures are attached alongside bundles.
 

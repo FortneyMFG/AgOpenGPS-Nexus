@@ -39,6 +39,9 @@ Define how Nexus coordinates operator stations, automation plugins, and firmware
 - O-MM-4: Remote-only thin client (tablet) controlling a headless backend.
 - O-MM-5: Linux Core kiosk/headless deployment with remote frontends.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L44】【F:docs/SRS/options/O-FRONT-6_RemoteClients.md†L1-L34】
 
+### Equipment configuration primitives
+- O-HW-7: Multi-steer equipment configurator primitives describe the module catalog, hitch rules, sensor attachments, mode profiles, calibration flows, telemetry surfaces, definition-of-done gates, and the axle-centric runtime graph that [ADR-017](../ADR/ADR-017-profiles-kinematics.md) consumes for articulated, tracked, or multi-axle rigs.【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L1-L420】
+
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
 |---|---|---|---|---|

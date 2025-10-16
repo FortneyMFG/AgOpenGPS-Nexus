@@ -25,8 +25,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-156 AOG-Link transport rollout _(Done)_
 - [x] NX-157 Plugin API lease & manifest enforcement _(Done)_
 
-- [x] NX-610 Governance telemetry automation _(Done)_ — ADR roadmap program board, dependency digests, and review minutes publishing
-- [ ] NX-611 PoseStream and SectionState roadmap delivery _(Planned)_ — ADR-007 services, schemas, and replay fixtures
+- [ ] NX-610 Governance telemetry automation _(Planned)_ — ADR roadmap program board, dependency digests, and review minutes publishing
+- [x] NX-611 PoseStream and SectionState roadmap delivery _(Done)_ — ADR-007 services, schemas, and replay fixtures
 - [ ] NX-612 TileStore durability and compaction rollout _(Planned)_ — ADR-009 crash-safety, maintenance workers, and audit tooling
 - [ ] NX-613 Layer registry and visualization expansion _(Planned)_ — ADR-010…ADR-013 registry automation, renderer cache, fusion provenance, and QA suite
 - [ ] NX-614 Prescription interop and control semantics _(Planned)_ — ADR-014…ADR-016 import/export suite, control engine updates, and CAN transport guardrails

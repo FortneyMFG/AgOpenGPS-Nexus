@@ -4,6 +4,7 @@ package aog.core.v1;
 
 option csharp_namespace = "Aog.Core.V1";
 
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
 // Header captures metadata about a published message such as ordering and
@@ -68,6 +69,261 @@ message Pose {
 
   // Zone mask describing constraint state for the implement footprint at this sample.
   PoseZoneMask zone_mask = 10;
+}
+
+// PoseStreamEntityType identifies the role a pose sample represents within the
+// unified PoseStream timeline.
+enum PoseStreamEntityType {
+  // Unspecified entity type. Treated as informational only.
+  POSE_STREAM_ENTITY_TYPE_UNSPECIFIED = 0;
+
+  // Primary vehicle pose (tractor or power unit).
+  POSE_STREAM_ENTITY_TYPE_VEHICLE = 1;
+
+  // Implement pose attached to the vehicle (planter, toolbar, sprayer boom).
+  POSE_STREAM_ENTITY_TYPE_IMPLEMENT = 2;
+
+  // Toolbar pose that aggregates a set of sections.
+  POSE_STREAM_ENTITY_TYPE_TOOLBAR = 3;
+
+  // Individual section pose when spatial offsets are tracked per nozzle/row.
+  POSE_STREAM_ENTITY_TYPE_SECTION = 4;
+}
+
+// PoseStreamEntityPose associates a pose sample with a stable entity identifier
+// and optional parent for hierarchy reconstruction during replay.
+message PoseStreamEntityPose {
+  // Stable identifier for the entity (e.g. "vehicle:tractor-alpha").
+  string entity_id = 1;
+
+  // Optional identifier for the entity that owns this pose (implement→vehicle,
+  // toolbar→implement, section→toolbar).
+  string parent_entity_id = 2;
+
+  // Role of the entity within the pose hierarchy.
+  PoseStreamEntityType type = 3;
+
+  // Pose sample for the entity.
+  Pose pose = 4;
+}
+
+// SectionCommandState expresses the operator or automation requested state for
+// a section output.
+enum SectionCommandState {
+  // No command has been issued yet.
+  SECTION_COMMAND_STATE_UNSPECIFIED = 0;
+
+  // Section is commanded off.
+  SECTION_COMMAND_STATE_OFF = 1;
+
+  // Section is armed/auto but not yet actively applying product.
+  SECTION_COMMAND_STATE_ARMED = 2;
+
+  // Section is commanded on and expected to apply product.
+  SECTION_COMMAND_STATE_ON = 3;
+}
+
+// SectionCommandSource identifies who or what initiated the latest section
+// state.
+enum SectionCommandSource {
+  // Command origin is unknown or not applicable.
+  SECTION_COMMAND_SOURCE_UNSPECIFIED = 0;
+
+  // Operator issued the command directly.
+  SECTION_COMMAND_SOURCE_OPERATOR = 1;
+
+  // Automation or rate controller initiated the command.
+  SECTION_COMMAND_SOURCE_AUTOMATION = 2;
+
+  // Safety or constraint gating forced the state change.
+  SECTION_COMMAND_SOURCE_SAFETY = 3;
+
+  // Replay or simulation pipelines applied the command.
+  SECTION_COMMAND_SOURCE_REPLAY = 4;
+}
+
+// SectionStateAnnotation communicates supplemental metadata about a section
+// state transition (e.g., zone gate clearances, overrides).
+message SectionStateAnnotation {
+  // Machine-readable code describing the annotation (e.g. "zone.keepOutCleared").
+  string code = 1;
+
+  // Human-readable message offering additional context.
+  string message = 2;
+
+  // Actor associated with the annotation (user:*, system:*).
+  string actor = 3;
+}
+
+// SectionStateTally accumulates opportunity/event metrics per section for
+// deterministic replay comparisons.
+message SectionStateTally {
+  // Total duration the section had a work opportunity (seconds).
+  google.protobuf.Duration opportunity_duration = 1;
+
+  // Total duration the section actively applied product (seconds).
+  google.protobuf.Duration active_duration = 2;
+
+  // Number of commanded state transitions observed for the section.
+  uint64 command_count = 3;
+
+  // Number of work events emitted (e.g. nozzle fired, seed drop).
+  uint64 event_count = 4;
+
+  // Total applied area tracked for the section (square meters).
+  double applied_area_sq_meters = 5;
+
+  // Total missed opportunity area (work opportunity without application).
+  double missed_area_sq_meters = 6;
+}
+
+// SectionStateChange communicates the latest state for a section with optional
+// diff-friendly fields.
+message SectionStateChange {
+  // Identifier of the toolbar that owns the section.
+  string toolbar_id = 1;
+
+  // Stable identifier of the section (e.g. "section:planter-24r:01").
+  string section_id = 2;
+
+  // Commanded state for the section.
+  SectionCommandState commanded_state = 3;
+
+  // Measured/actual state reported by hardware.
+  SectionCommandState measured_state = 4;
+
+  // Origin of the most recent command.
+  SectionCommandSource source = 5;
+
+  // True when an operator override is active.
+  optional bool manual_override = 6;
+
+  // True when conditions indicate the section should be applying product.
+  optional bool work_opportunity = 7;
+
+  // True when a product application event occurred in this frame.
+  optional bool work_event = 8;
+
+  // Requested rate for the section (units defined by layer definition).
+  optional double target_rate = 9;
+
+  // Measured rate for the section.
+  optional double actual_rate = 10;
+
+  // Opportunity area represented by this change (square meters).
+  optional double opportunity_area_sq_meters = 11;
+
+  // Applied area represented by this change (square meters).
+  optional double applied_area_sq_meters = 12;
+
+  // Running tallies derived from the section timeline.
+  SectionStateTally tallies = 13;
+
+  // Supplemental annotations describing gating or overrides.
+  repeated SectionStateAnnotation annotations = 14;
+}
+
+// SectionStateDelta batches section changes on the unified PoseStream timeline.
+message SectionStateDelta {
+  // Header aligned with the PoseStream frame that produced the delta.
+  Header header = 1;
+
+  // Ordered set of section changes that occurred at this point in time.
+  repeated SectionStateChange changes = 2;
+}
+
+// SectionStateSnapshot returns the latest known state for sections that match
+// a query.
+message SectionStateSnapshot {
+  // Header describing when the snapshot was captured.
+  Header header = 1;
+
+  // Current state for each section included in the snapshot.
+  repeated SectionStateChange sections = 2;
+}
+
+// PoseStreamFrame represents a single entry on the authoritative pose timeline.
+message PoseStreamFrame {
+  // Header for the frame (sequence/timestamp).
+  Header header = 1;
+
+  // Entity poses included in this frame ordered by hierarchy.
+  repeated PoseStreamEntityPose entities = 2;
+
+  // Optional SectionState delta emitted for this frame.
+  SectionStateDelta section_state = 3;
+
+  // Diagnostics describing frame quality.
+  PoseStreamFrameDiagnostics diagnostics = 4;
+}
+
+// PoseStreamFrameDiagnostics captures best-effort telemetry about frame
+// sequencing and latency for monitoring.
+message PoseStreamFrameDiagnostics {
+  // Number of frames dropped since the previous frame.
+  uint32 dropped_frames = 1;
+
+  // Observed max end-to-end latency for this frame in milliseconds.
+  double max_latency_ms = 2;
+
+  // Free-form warnings attached to the frame.
+  repeated string warnings = 3;
+}
+
+// WatchPoseStreamRequest filters PoseStream frames streamed to subscribers.
+message WatchPoseStreamRequest {
+  // Restrict results to specific entity identifiers when provided.
+  repeated string entity_ids = 1;
+
+  // Restrict results to specific entity types when provided.
+  repeated PoseStreamEntityType entity_types = 2;
+
+  // Include SectionState deltas alongside pose frames when true.
+  bool include_section_state = 3;
+}
+
+// WatchSectionStateRequest streams SectionState deltas matching the provided
+// toolbar/section filters.
+message WatchSectionStateRequest {
+  // Restrict results to specific toolbar identifiers when provided.
+  repeated string toolbar_ids = 1;
+
+  // Restrict results to specific section identifiers when provided.
+  repeated string section_ids = 2;
+
+  // Include running tallies with each delta when true.
+  bool include_tallies = 3;
+}
+
+// GetSectionStateSnapshotRequest retrieves the current SectionState view.
+message GetSectionStateSnapshotRequest {
+  // Restrict the snapshot to specific toolbars when provided.
+  repeated string toolbar_ids = 1;
+
+  // Restrict the snapshot to specific sections when provided.
+  repeated string section_ids = 2;
+
+  // Include running tallies with each entry when true.
+  bool include_tallies = 3;
+}
+
+// GetSectionStateSnapshotResponse contains the resulting snapshot for a query.
+message GetSectionStateSnapshotResponse {
+  // Snapshot of the latest SectionState values.
+  SectionStateSnapshot snapshot = 1;
+}
+
+// PoseStreamService exposes the unified pose timeline and SectionState deltas
+// described in ADR-007 for consumers that require deterministic sequencing.
+service PoseStreamService {
+  // Streams PoseStream frames optionally filtered by entity identifiers or types.
+  rpc WatchPoseStream(WatchPoseStreamRequest) returns (stream PoseStreamFrame);
+
+  // Streams SectionState deltas for the requested toolbars/sections.
+  rpc WatchSectionState(WatchSectionStateRequest) returns (stream SectionStateDelta);
+
+  // Retrieves a snapshot of the latest SectionState for requested toolbars/sections.
+  rpc GetSectionStateSnapshot(GetSectionStateSnapshotRequest) returns (GetSectionStateSnapshotResponse);
 }
 
 // PoseZoneMask summarises the spatial constraint context intersecting the implement

@@ -33,7 +33,6 @@ flowchart TD
     Core <--> AgIO
     AgIO <--> Bridge
     Bridge <--> MCUs
-    MCUs <--> MCUs
     
 ```
 

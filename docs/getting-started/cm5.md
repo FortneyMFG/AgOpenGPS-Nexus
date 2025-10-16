@@ -14,21 +14,28 @@ This guide prepares a CM5 that runs NAV, steer-ctrl, Pumpkin Pi, and the AgIO Br
    sudo cp plugins/pumpkin-pi/config/pumpkin.yaml.example /etc/aog/pumpkin.yaml
    sudo editor /etc/aog/pumpkin.yaml
    ```
-2. Deploy the systemd unit:
+2. Keep the AgIO Bridge enabled for external adapters:
+   ```bash
+   sudo cp plugins/pumpkin-pi/config/bridge.yaml.example /etc/aog/bridge.yaml
+   sudo systemctl enable --now agio-bridge
+   ```
+3. Deploy the systemd unit:
    ```bash
    sudo cp plugins/pumpkin-pi/systemd/pumpkin-pi.service /etc/systemd/system/
    sudo systemctl daemon-reload
    sudo systemctl enable --now pumpkin-pi
    ```
-3. Grant real-time scheduling:
+4. Grant real-time scheduling and memory lock:
    ```bash
    sudo setcap cap_sys_nice=+ep /usr/local/bin/pumpkin-pi
+    sudo systemctl set-property pumpkin-pi.service MemoryMax=infinity
    ```
 
 ## Verify Fastpath
 - Confirm `/dev/shm/aoglink_steer` exists and updates when NAV runs.
 - Check `journalctl -u pumpkin-pi` for HAL initialization logs.
 - Subscribe to `aog/v1/bus/nav/steer_target` on localhost MQTT and confirm retained updates.
+- Call `grpcurl -unix /run/pumpkin-pi.sock pumpkinpi.v1.PumpkinPiService/StreamSteerStatus` to watch status streaming.
 
 ## Keep AgIO Bridge Enabled
 - Ensure `AgOpenGPS.AgIOBridge` service remains active for UDP/serial/CAN adapters.

@@ -1,12 +1,21 @@
 [Unit]
 Description=Pumpkin Pi (CM5 HAL + SHM fastpath)
 After=network.target mosquitto.service
+Requires=mosquitto.service
 
 [Service]
+Type=simple
 ExecStart=/usr/local/bin/pumpkin-pi --config /etc/aog/pumpkin.yaml
 Restart=always
+RestartSec=2
+Environment=GOMAXPROCS=1
 CPUSchedulingPolicy=fifo
 CPUSchedulingPriority=80
+LimitMEMLOCK=infinity
+NoNewPrivileges=yes
+AmbientCapabilities=CAP_SYS_NICE
+RuntimeDirectory=pumpkin-pi
+RuntimeDirectoryMode=0750
 
 [Install]
 WantedBy=multi-user.target

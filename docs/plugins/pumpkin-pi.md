@@ -4,26 +4,41 @@ Pumpkin Pi lets a CM5 run NAV and steer-ctrl loops without leaving the box. The 
 
 ## Capabilities
 - SHM fastpath (`/dev/shm/aoglink_steer`) between NAV producer and steer-ctrl consumer with eventfd notification.
-- HAL drivers for GPIO, PWM, SocketCAN, I²C, and SPI via libgpiod and Linux character devices.
-- MQTT loopback mirrors for `SteerTarget`, `SteerStatus`, and health topics (QoS1 retained).
+- gRPC service `pumpkinpi.v1.PumpkinPiService` exposing `SetSteerTarget`, `StreamSteerStatus`, and `ClaimAuthority`.
+- HAL drivers for GPIO (libgpiod), PWM character devices, and SocketCAN actuators.
+- MQTT loopback mirrors for `SteerTarget`, `SteerStatus`, health heartbeats, and authority tokens (QoS1 retained).
 - Authority topic `aog/v1/ctrl/authority/steer` for takeover or external controller nomination.
 
 ## Configuration
 ```yaml
+node_id: cm5
+roles: [CTRL, SENSOR, ACTUATOR]
 fastpath:
   shm_name: "/aoglink_steer"
+  eventfd_name: "/pumpkin-pi-steer"
   setpoint_ttl_ms: 250
 hal:
-  backend: pwm          # pwm | gpio | can | i2c | spi
-  pwm: { chip: 0, channel: 0, period_ns: 2000000 }
+  backend: pwm          # pwm | gpio | can
+  pwm:
+    chip: 0
+    channel: 0
+    period_ns: 2000000
+grpc:
+  listen: "unix:///run/pumpkin-pi.sock"
 mqtt:
   broker: "localhost:1883"
+  client_id: pumpkin-pi
   publish_status: true
+authority:
+  topic: "aog/v1/ctrl/authority/steer"
+  default_owner: cm5
+  hold_interval: 150ms
 ```
 
 - `fastpath.setpoint_ttl_ms` defines the maximum age NAV/steer-ctrl should honor before forcing neutral outputs.
 - `hal.backend` selects which hardware driver to load; each backend injects additional configuration blocks.
 - `mqtt.publish_status` controls whether Pumpkin Pi mirrors telemetry to loopback (recommended `true`).
+- `authority.hold_interval` defines how long a takeover lasts before Pumpkin Pi automatically reclaims control.
 
 ## Interaction with AgIO Bridge
 Pumpkin Pi bypasses AgIO for CM5-internal traffic but keeps the bridge online for UDP, serial, CAN-FD, and MQTT-SN transports. The bridge still reports authority state, mirrored steer targets, and health so UI shells and external modules can monitor activity.
@@ -45,7 +60,8 @@ flowchart TD
       V0[v0 Bridge]
       LINK --> UDP & SERIAL & CAN & MQTT & V0
     end
-    Core --> SHM
+    Core -->|SetSteerTarget (gRPC)| Pumpkin
+    Pumpkin --> SHM
     STEER -->|HAL| Hardware
     Pumpkin <--> MQTT
   end

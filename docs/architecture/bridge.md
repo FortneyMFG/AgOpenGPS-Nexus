@@ -19,7 +19,8 @@ flowchart TD
       V0[v0 Bridge]
       LINK --> UDP & SERIAL & CAN & MQTT & V0
     end
-    Core --> SHM
+    Core -->|SetSteerTarget (gRPC)| Pumpkin
+    Pumpkin --> SHM
     STEER -->|HAL| Hardware
     Pumpkin <--> MQTT
   end

@@ -109,7 +109,10 @@ Yield plugin responsibilities and analytics surfaces defined in ADR-049 drive th
 | `cost.chem` | Chemical cost allocation. | USD/acre | Drafting (ADR-050) |
 | `cost.fert` | Fertilizer cost allocation. | USD/acre | Drafting (ADR-050) |
 
-Economic analytics and ProfitLayer schema requirements live in ADR-050.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L11-L46】
+Economic analytics and ProfitLayer schema requirements live in ADR-050. The
+`ProfitLayer.v1` schema now advertises `x-nexus-layerId="profit.net"` and marks the
+layer as actual so registry automation can link analytics and provenance without
+manual catalog entries.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L11-L46】【F:schemas/ProfitLayer.v1.json†L1-L36】
 
 ### Weather & Environment
 
@@ -119,8 +122,12 @@ Economic analytics and ProfitLayer schema requirements live in ADR-050.【F:docs
 | `weather.wind` | Wind speed/direction overlay. | m/s + ° | Drafting (ADR-053) |
 | `weather.rain` | Rainfall accumulation. | mm | Drafting (ADR-053) |
 | `weather.humidity` | Relative humidity. | % | Drafting (ADR-053) |
+| `weather.pressure` | Barometric pressure overlay. | hPa | Drafting (ADR-053) |
 
-Weather logging and overlay requirements defined in ADR-053 also populate session weather snapshots via SessionService.【F:docs/ADR/ADR-053_WeatherPlugin.md†L1-L49】【F:schemas/Session.v1.json†L29-L84】
+Weather logging and overlay requirements defined in ADR-053 also populate
+session weather snapshots via SessionService. `WeatherOverlay.v1` publishes the
+canonical layer identifiers via `x-nexus-layerIds` so renderer caches and QA
+harnesses can reason about every weather overlay consistently.【F:docs/ADR/ADR-053_WeatherPlugin.md†L1-L49】【F:schemas/Session.v1.json†L29-L84】【F:schemas/WeatherOverlay.v1.json†L1-L36】
 
 ### Soil & Lab Data (Reserved)
 
@@ -155,7 +162,11 @@ Mapping and visualization ADR-011 governs imagery ingestion, color ramps, and pe
 | `risk.compaction` | Compaction risk zones. | severity index | Drafting (ADR-052) |
 | `risk.weeds` | Weed pressure zones. | severity index | Drafting (ADR-052) |
 
-Risk overlays and severity handling defined in ADR-052 align with zone drawing workflows and analytics hooks.【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L1-L43】
+Risk overlays and severity handling defined in ADR-052 align with zone drawing
+workflows and analytics hooks. The shared `FieldHealthRiskLayer.v1` schema
+exposes all governed risk layer identifiers via `x-nexus-layerIds`, enabling the
+registry handshake and renderer caches to keep multiple severity overlays in
+sync.【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L1-L43】【F:schemas/FieldHealthRiskLayer.v1.json†L1-L36】
 
 ### Guidance & Geometry
 

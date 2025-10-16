@@ -62,7 +62,7 @@ aid diagnosis when loops misbehave.
 
 ## 4. Frame format
 
-Every frame starts with a fixed 8-byte header followed by the protobuf payload
+Every frame starts with a fixed 9-byte header followed by the protobuf payload
 and (when required) a CRC-16-CCITT trailer.
 
 ```

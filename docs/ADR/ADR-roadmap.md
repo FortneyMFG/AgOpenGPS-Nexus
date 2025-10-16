@@ -8,6 +8,7 @@ This tracker consolidates current and planned Architecture Decision Records so t
   [`tasks.md`](../../tasks.md) so execution plans stay aligned.
 - **Dependency telemetry.** Automated scripts highlight ADRs blocked on missing registries or tooling, prompting owners to file NX follow-ups before deadlines slip.
 - **Communication cadence.** Monthly review meetings publish minutes and action items linked from this roadmap, keeping community contributors informed about sequencing changes.
+- **Telemetry artefacts.** `tools/scripts/generate-governance-telemetry.py` aggregates the program board, dependency digests, and published minutes into machine-readable telemetry under `artifacts/governance/`.
 
 ## Adopted decisions (foundation)
 

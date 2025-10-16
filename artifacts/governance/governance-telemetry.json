@@ -1,0 +1,834 @@
+{
+  "task": "NX-610",
+  "generated_at": "2025-10-16T21:27:11.851330+00:00",
+  "program_board": {
+    "section": "Section A \u2014 Foundations & Contracts",
+    "total": 44,
+    "done": 38,
+    "in_progress": 0,
+    "planned": 6,
+    "blocked": 0,
+    "tickets": [
+      {
+        "ticket": "NX-001",
+        "title": "Repo skeleton + solutions",
+        "notes": "",
+        "stage": null,
+        "state": "done"
+      },
+      {
+        "ticket": "NX-002",
+        "title": "ADRs for runtime, gRPC, Avalonia, and simulation model",
+        "notes": "",
+        "stage": null,
+        "state": "done"
+      },
+      {
+        "ticket": "NX-003",
+        "title": "Protobuf v1 contracts",
+        "notes": "",
+        "stage": null,
+        "state": "done"
+      },
+      {
+        "ticket": "NX-004",
+        "title": "JSON schema suite",
+        "notes": "",
+        "stage": null,
+        "state": "done"
+      },
+      {
+        "ticket": "NX-005",
+        "title": "Capabilities handshake service",
+        "notes": "",
+        "stage": null,
+        "state": "done"
+      },
+      {
+        "ticket": "NX-104",
+        "title": "Metadata-driven variable-rate layer mapping ADR",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-115",
+        "title": "AOG-Link protocol specification",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-116",
+        "title": "Shared aog-link.proto schemas",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-126",
+        "title": "Mapping plugin architecture ADR",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-131",
+        "title": "Field job session lifecycle ADR",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-152",
+        "title": ".NET 8 runtime enforcement per ADR-001",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-190",
+        "title": "Comprehensive ADR portfolio review",
+        "notes": "Backlog gaps captured in NX-610\u2026NX-616",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-153",
+        "title": "gRPC contract governance rollout",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-154",
+        "title": "Avalonia companion run-mode delivery",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-155",
+        "title": "Composite simulation fabric GA",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-156",
+        "title": "AOG-Link transport rollout",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-157",
+        "title": "Plugin API lease & manifest enforcement",
+        "notes": "",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-610",
+        "title": "Governance telemetry automation",
+        "notes": "ADR roadmap program board, dependency digests, and review minutes publishing",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-611",
+        "title": "PoseStream and SectionState roadmap delivery",
+        "notes": "ADR-007 services, schemas, and replay fixtures",
+        "stage": "Planned",
+        "state": "planned"
+      },
+      {
+        "ticket": "NX-612",
+        "title": "TileStore durability and compaction rollout",
+        "notes": "ADR-009 crash-safety, maintenance workers, and audit tooling",
+        "stage": "Planned",
+        "state": "planned"
+      },
+      {
+        "ticket": "NX-613",
+        "title": "Layer registry and visualization expansion",
+        "notes": "ADR-010\u2026ADR-013 registry automation, renderer cache, fusion provenance, and QA suite",
+        "stage": "Planned",
+        "state": "planned"
+      },
+      {
+        "ticket": "NX-614",
+        "title": "Prescription interop and control semantics",
+        "notes": "ADR-014\u2026ADR-016 import/export suite, control engine updates, and CAN transport guardrails",
+        "stage": "Planned",
+        "state": "planned"
+      },
+      {
+        "ticket": "NX-615",
+        "title": "Kinematics, plugin platform, and identity governance",
+        "notes": "ADR-017\u2026ADR-024 kinematics editor, plugin permission gate, provenance DAG, and identity UX",
+        "stage": "Planned",
+        "state": "planned"
+      },
+      {
+        "ticket": "NX-616",
+        "title": "Global retention, performance, and acceptance guardrails",
+        "notes": "ADR-025\u2026ADR-026 retention planners plus global CI hooks for replay, CPU, interop, and crash recovery",
+        "stage": "Planned",
+        "state": "planned"
+      },
+      {
+        "ticket": "NX-191",
+        "title": "Zone proto + JSON schema handshake",
+        "notes": "ADR-027 spatial constraints contract release",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-192",
+        "title": "PoseStream zone mask proto update",
+        "notes": "ADR-027 PoseStream mask contract",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-193",
+        "title": "Layer registry hash handshake draft",
+        "notes": "ADR-068 layer controller registry requirements",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-194",
+        "title": "Capability registry expansion for mapping/zone capabilities",
+        "notes": "ADR-029 mapping kernel contracts; ADR-031 manifest governance",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-195",
+        "title": "Plugin manifest schema vNext with capability/lease metadata",
+        "notes": "ADR-031 official plugin bundle policy",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-196",
+        "title": "Job/session schema refresh",
+        "notes": "ADR-030 job lifecycle; ADR-041 session metadata",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-197",
+        "title": "Season organizer schema publication",
+        "notes": "ADR-040 season organizers data model",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-198",
+        "title": "Multi-field job envelope schema updates",
+        "notes": "ADR-043 multi-field job envelopes",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-199",
+        "title": "Layer edit event schema definition",
+        "notes": "ADR-044 zone drawing framework journal",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-200",
+        "title": "Crop layer definitions and registries",
+        "notes": "ADR-045 crop type plugin requirements",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-201",
+        "title": "Genetics layer definitions and registries",
+        "notes": "ADR-046 genetics plugin contracts",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-202",
+        "title": "Yield layer schema refresh",
+        "notes": "ADR-049 yield analytics plugin",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-203",
+        "title": "Cost/profit layer schema",
+        "notes": "ADR-050 cost & profit plugin",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-204",
+        "title": "Field health risk schema",
+        "notes": "ADR-052 field health plugin",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-205",
+        "title": "Weather snapshot schema extensions",
+        "notes": "ADR-053 weather & environment plugin",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-206",
+        "title": "Report template schema + manifest handshake",
+        "notes": "ADR-051 report builder & exports",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-207",
+        "title": "SRS + ADR cross-reference sweep for new layers",
+        "notes": "ADR-027\u2026ADR-053 portfolio alignment",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-208",
+        "title": "Official bundle capability matrix update",
+        "notes": "ADR-031 manifest governance",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-209",
+        "title": "CRS normalization matrix publication",
+        "notes": "ADR-022 CRS policy",
+        "stage": "Done",
+        "state": "done"
+      },
+      {
+        "ticket": "NX-210",
+        "title": "Contracts freeze automation for new capabilities",
+        "notes": "ADR-031 governance rollout",
+        "stage": "Done",
+        "state": "done"
+      }
+    ]
+  },
+  "dependency_digest": {
+    "plugin_count": 12,
+    "api_frequency": [
+      {
+        "api": "core",
+        "count": 8
+      },
+      {
+        "api": "sim",
+        "count": 4
+      },
+      {
+        "api": "core.runtime",
+        "count": 3
+      },
+      {
+        "api": "agio.transport",
+        "count": 2
+      },
+      {
+        "api": "agio",
+        "count": 1
+      },
+      {
+        "api": "agio.sensors",
+        "count": 1
+      },
+      {
+        "api": "aog.core.capabilities",
+        "count": 1
+      },
+      {
+        "api": "aog.core.telemetry",
+        "count": 1
+      },
+      {
+        "api": "aog.job.lifecycle",
+        "count": 1
+      },
+      {
+        "api": "mapping.layers",
+        "count": 1
+      },
+      {
+        "api": "plugins.ntrip-client",
+        "count": 1
+      },
+      {
+        "api": "pose.stream",
+        "count": 1
+      },
+      {
+        "api": "storage",
+        "count": 1
+      }
+    ],
+    "capability_frequency": [
+      {
+        "capability": "guidance.control",
+        "count": 2
+      },
+      {
+        "capability": "bridge.udp-mirror",
+        "count": 1
+      },
+      {
+        "capability": "devices.firmware",
+        "count": 1
+      },
+      {
+        "capability": "devices.health",
+        "count": 1
+      },
+      {
+        "capability": "devices.inventory",
+        "count": 1
+      },
+      {
+        "capability": "fileio.export",
+        "count": 1
+      },
+      {
+        "capability": "fileio.import",
+        "count": 1
+      },
+      {
+        "capability": "gnss.corrections",
+        "count": 1
+      },
+      {
+        "capability": "guidance.telemetry",
+        "count": 1
+      },
+      {
+        "capability": "isobus.task-controller",
+        "count": 1
+      },
+      {
+        "capability": "isobus.universal-terminal",
+        "count": 1
+      },
+      {
+        "capability": "navigation.imu",
+        "count": 1
+      },
+      {
+        "capability": "navigation.pose",
+        "count": 1
+      },
+      {
+        "capability": "navigation.pose.quality",
+        "count": 1
+      },
+      {
+        "capability": "planter.monitor.analytics",
+        "count": 1
+      },
+      {
+        "capability": "planter.monitor.telemetry",
+        "count": 1
+      },
+      {
+        "capability": "replay.guidance",
+        "count": 1
+      },
+      {
+        "capability": "replay.pose",
+        "count": 1
+      },
+      {
+        "capability": "sections.control",
+        "count": 1
+      },
+      {
+        "capability": "sections.telemetry",
+        "count": 1
+      },
+      {
+        "capability": "telemetry.corrections",
+        "count": 1
+      },
+      {
+        "capability": "telemetry.logging",
+        "count": 1
+      }
+    ],
+    "plugins": [
+      {
+        "id": "org.agopengps.plugins.autosteer",
+        "name": "AutoSteer",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "agio.transport",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "core.runtime",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "mapping.layers",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "pose.stream",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "can:can0",
+          "core://guidance",
+          "serial:/dev/ttyS1"
+        ],
+        "supported_capabilities": [
+          "guidance.control"
+        ],
+        "minimum_runtime": "1.0.0"
+      },
+      {
+        "id": "org.agopengps.plugins.autosteer-lite",
+        "name": "AutoSteer Lite",
+        "version": "1.2.0",
+        "required_apis": [
+          {
+            "name": "core",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "sim",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "AOG-Link",
+          "core://guidance"
+        ],
+        "supported_capabilities": [
+          "guidance.control",
+          "guidance.telemetry"
+        ],
+        "minimum_runtime": "1.0.0"
+      },
+      {
+        "id": "org.agopengps.plugins.device-manager",
+        "name": "Device Manager",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "agio",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "core",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "agio://inventory",
+          "core://devices"
+        ],
+        "supported_capabilities": [
+          "devices.firmware",
+          "devices.health",
+          "devices.inventory"
+        ],
+        "minimum_runtime": "1.0.0"
+      },
+      {
+        "id": "org.agopengps.plugins.file-io",
+        "name": "File IO",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "core",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "storage",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "core://storage",
+          "storage://local"
+        ],
+        "supported_capabilities": [
+          "fileio.export",
+          "fileio.import"
+        ],
+        "minimum_runtime": "1.0.0"
+      },
+      {
+        "id": "org.agopengps.plugins.gnss-imu-fusion",
+        "name": "GNSS + IMU Fusion",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "agio.sensors",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "core.runtime",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "plugins.ntrip-client",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "can://can0",
+          "core://imu",
+          "core://pose",
+          "serial://serial1"
+        ],
+        "supported_capabilities": [
+          "navigation.imu",
+          "navigation.pose",
+          "navigation.pose.quality"
+        ],
+        "minimum_runtime": "1.0.0"
+      },
+      {
+        "id": "org.agopengps.plugins.isobus-bridge",
+        "name": "ISOBUS Communications Bridge",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "aog.core.capabilities",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "aog.core.telemetry",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "aog.job.lifecycle",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "can:can0",
+          "udp:239.255.76.67:8888"
+        ],
+        "supported_capabilities": [
+          "bridge.udp-mirror",
+          "isobus.task-controller",
+          "isobus.universal-terminal"
+        ],
+        "minimum_runtime": "1.0.0"
+      },
+      {
+        "id": "org.agopengps.plugins.job-tasks",
+        "name": "Job Tasks",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "core",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [],
+        "supported_capabilities": [],
+        "minimum_runtime": null
+      },
+      {
+        "id": "org.agopengps.plugins.ntrip-client",
+        "name": "NTRIP Client",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "agio.transport",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "core.runtime",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "core://ntrip",
+          "udp://localhost:2101"
+        ],
+        "supported_capabilities": [
+          "gnss.corrections",
+          "telemetry.corrections"
+        ],
+        "minimum_runtime": null
+      },
+      {
+        "id": "org.agopengps.plugins.planter-monitor",
+        "name": "Planter Monitor",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "core",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "sim",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "AOG-Link",
+          "SimBus"
+        ],
+        "supported_capabilities": [
+          "planter.monitor.analytics",
+          "planter.monitor.telemetry"
+        ],
+        "minimum_runtime": "1.0.0"
+      },
+      {
+        "id": "org.agopengps.plugins.replay",
+        "name": "Replay Toolkit",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "core",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "sim",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "core://replay",
+          "storage://logs"
+        ],
+        "supported_capabilities": [
+          "replay.guidance",
+          "replay.pose"
+        ],
+        "minimum_runtime": "1.0.0"
+      },
+      {
+        "id": "org.agopengps.plugins.sections",
+        "name": "Sections Control",
+        "version": "1.1.0",
+        "required_apis": [
+          {
+            "name": "core",
+            "version": ">=1.0.0"
+          },
+          {
+            "name": "sim",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "AOG-Link",
+          "core://sections"
+        ],
+        "supported_capabilities": [
+          "sections.control",
+          "sections.telemetry"
+        ],
+        "minimum_runtime": "1.0.0"
+      },
+      {
+        "id": "org.agopengps.plugins.telemetry-logging",
+        "name": "Telemetry Logging",
+        "version": "1.0.0",
+        "required_apis": [
+          {
+            "name": "core",
+            "version": ">=1.0.0"
+          }
+        ],
+        "required_transports": [
+          "core://telemetry"
+        ],
+        "supported_capabilities": [
+          "telemetry.logging"
+        ],
+        "minimum_runtime": null
+      }
+    ]
+  },
+  "review_minutes": {
+    "meetings": [
+      {
+        "meeting_date": "2025-02-17",
+        "meeting_type": "Architecture Governance Review",
+        "summary": "Monthly sync covering the ADR roadmap, plugin manifest dependencies, and telemetry publishing cadence.",
+        "attendees": [
+          "Core Owner",
+          "Plugins Owner",
+          "QA Steward",
+          "UI Owner"
+        ],
+        "decisions": [
+          {
+            "id": "ADR-031",
+            "title": "Manifest governance automation",
+            "status": "ratified",
+            "notes": "Signed digests move to a weekly cadence and must surface resolver deltas in telemetry exports."
+          },
+          {
+            "id": "ADR-roadmap",
+            "title": "Roadmap sync telemetry",
+            "status": "acknowledged",
+            "notes": "Program board automation feeds NX backlog dashboards starting with NX-610."
+          }
+        ],
+        "action_items": [
+          {
+            "id": "NX-610-1",
+            "owner": "Plugins Owner",
+            "description": "Backfill dependency digests for controller plugins into the governance artifact store.",
+            "status": "open",
+            "due_date": "2025-03-03",
+            "completed_date": null
+          },
+          {
+            "id": "NX-610-2",
+            "owner": "QA Steward",
+            "description": "Attach governance telemetry JSON to the March review minutes for regression tracking.",
+            "status": "in_progress",
+            "due_date": "2025-03-07",
+            "completed_date": null
+          },
+          {
+            "id": "NX-208-followup",
+            "owner": "Core Owner",
+            "description": "Confirm the UI compatibility dashboard ingests the manifest digest summaries without regression.",
+            "status": "done",
+            "due_date": null,
+            "completed_date": "2025-02-20"
+          }
+        ],
+        "links": [
+          {
+            "label": "Roadmap",
+            "url": "docs/ADR/ADR-roadmap.md"
+          },
+          {
+            "label": "Dependency Map",
+            "url": "docs/plugins/nexus-plugin-dependency-map.md"
+          }
+        ]
+      }
+    ],
+    "stats": {
+      "meetings_recorded": 1,
+      "action_items_open": 2,
+      "action_items_done": 1
+    }
+  }
+}

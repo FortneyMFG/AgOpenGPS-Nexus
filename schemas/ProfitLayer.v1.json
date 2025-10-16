@@ -3,6 +3,8 @@
   "$id": "https://agopengps.org/schemas/ProfitLayer.v1.json",
   "title": "ProfitLayer.v1",
   "type": "object",
+  "x-nexus-layerId": "profit.net",
+  "x-nexus-actual": true,
   "allOf": [
     { "$ref": "./Layer.v1.json" }
   ],

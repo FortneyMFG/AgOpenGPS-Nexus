@@ -82,6 +82,9 @@ case "${format}" in
     needs_deb=true
     needs_rpm=true
     ;;
+  deb)
+    needs_deb=true
+    ;;
   *)
     >&2 printf 'error: unknown format "%s". Use deb, rpm, or all.\n' "${format}"
     exit 1

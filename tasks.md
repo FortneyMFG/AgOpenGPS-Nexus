@@ -307,6 +307,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-327 Plugin QA handshake update _(Done)_ — ADR-031 manifest governance QA
 - [ ] NX-341 GitHub Actions release packaging (Win/Linux zips) _(In Progress)_ — SRS §2.7 Packaging & DevEx
 - [x] NX-342 Developer setup quick start _(Done)_ — SRS §2.8 Documentation
+- [ ] NX-512 README Nexus guide expansion _(In Progress)_ — docs/README.md narrative refresh
 
 ### Section H — Safety & QA
 - [x] NX-070 Heartbeats & failsafe watchdogs

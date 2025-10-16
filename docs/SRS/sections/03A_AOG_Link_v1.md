@@ -113,9 +113,14 @@ Serial links additionally wrap frames in COBS with a `0x00` delimiter.
 ## 6. Transport bindings
 
 Figure 1 illustrates how the internal gRPC bus feeds the shared AOG-Link v1
-layer, which is then fanned out by transport-specific adapters. UDP, Serial,
-and CAN carry the low-latency control paths, MQTT handles high-fan-out
+layer, which is then fanned out by transport-specific adapters. Within the
+bridge, **AgIO Core** is the orchestration service that maps gRPC intents into
+wire frames, manages adapter lifecycles, tracks discovery/authority state, and
+enforces reliability policies (ACK retries, segmentation, rate guards). UDP,
+Serial, and CAN carry the low-latency control paths, MQTT handles high-fan-out
 telemetry, and the v0 bridge remains the sole producer of legacy PGNs.
+Multiple MCU nodes can also exchange telemetry or commands with each other via
+the shared MQTT broker, as depicted by the fan-out between MCU nodes A and B.
 
 ```mermaid
 flowchart TD
@@ -153,18 +158,31 @@ flowchart TD
     %% --- External environment ---
     subgraph External["MCUs / Devices / Networks"]
         direction LR
-        MCU1["MCU Node\n(UDP or MQTT-SN)"]
-        MCU2["MCU Node\n(Serial)"]
-        MCU3["MCU Node\n(CAN-FD)"]
+        MCUUDP["MCU Node\n(UDP)"]
+
+        subgraph MQTTMesh["MQTT Fan-out"]
+            direction TB
+            BROKER["MQTT Broker\n(+ MQTT-SN Gateway)"]
+            MCUA["MCU Node A\n(MQTT / MQTT-SN)"]
+            MCUB["MCU Node B\n(MQTT / MQTT-SN)"]
+            BROKER -- "pub/sub topics" --> MCUA
+            BROKER -- "pub/sub topics" --> MCUB
+        end
+
+        MCUSERIAL["MCU Node\n(Serial)"]
+        MCUCAN["MCU Node\n(CAN-FD)"]
         Legacy["Legacy v0 Node\n(UDP PGNs)"]
     end
 
     %% --- External links ---
-    UDP <--> MCU1
-    MQTT <--> MCU1
-    SERIAL <--> MCU2
-    CAN <--> MCU3
+    UDP <--> MCUUDP
+    MQTT <--> BROKER
+    SERIAL <--> MCUSERIAL
+    CAN <--> MCUCAN
     V0 <--> Legacy
+
+    %% MCU-to-MCU visualization via broker fan-out
+    MCUA -. "fan-out via broker" .-> MCUB
 
     %% color key
     classDef control fill:#ffd7d7,stroke:#aa0000,stroke-width:1px;
@@ -173,6 +191,7 @@ flowchart TD
     class SERIAL control;
     class CAN control;
     class MQTT telemetry;
+    class BROKER telemetry;
 ```
 
 ### 6.1 UDP (Ethernet/Wi-Fi)

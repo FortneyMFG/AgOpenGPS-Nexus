@@ -20,6 +20,17 @@ full normative specification.
 4. **Legacy bridge.** A dedicated adapter still emits/consumes AOG-Link v0 UDP
    PGNs so older MCUs remain operable until retirement.
 
+### What “AgIO Core” actually does
+
+* **Message translation.** Subscribes to the gRPC bus, maps intents/telemetry
+  into the canonical protobuf payloads, and assigns message IDs for ACK flows.
+* **Adapter orchestration.** Starts/stops transport adapters, keeps their state
+  machines fed with frames, and surfaces health counters back onto the bus.
+* **Discovery and authority.** Tracks `Hello`/`HelloAck`, role masks, authority
+  tokens, and TTL windows so only the current controller drives actuators.
+* **Reliability guardrails.** Enforces retry policies, fragmentation, rate
+  shaping, and drop counters so every transport inherits the same behavior.
+
 ```mermaid
 flowchart TD
     %% Core/UI/Plugins feed the bridge via the gRPC bus
@@ -55,17 +66,29 @@ flowchart TD
 
     subgraph External["MCUs / Devices / Networks"]
         direction LR
-        MCU1["MCU Node\n(UDP or MQTT-SN)"]
-        MCU2["MCU Node\n(Serial)"]
-        MCU3["MCU Node\n(CAN-FD)"]
+        MCUUDP["MCU Node\n(UDP)"]
+
+        subgraph MQTTMesh["MQTT Fan-out"]
+            direction TB
+            BROKER["MQTT Broker\n(+ MQTT-SN Gateway)"]
+            MCUA["MCU Node A\n(MQTT / MQTT-SN)"]
+            MCUB["MCU Node B\n(MQTT / MQTT-SN)"]
+            BROKER -- "pub/sub topics" --> MCUA
+            BROKER -- "pub/sub topics" --> MCUB
+        end
+
+        MCUSERIAL["MCU Node\n(Serial)"]
+        MCUCAN["MCU Node\n(CAN-FD)"]
         Legacy["Legacy v0 Node\n(UDP PGNs)"]
     end
 
-    UDP <--> MCU1
-    MQTT <--> MCU1
-    SERIAL <--> MCU2
-    CAN <--> MCU3
+    UDP <--> MCUUDP
+    MQTT <--> BROKER
+    SERIAL <--> MCUSERIAL
+    CAN <--> MCUCAN
     V0 <--> Legacy
+
+    MCUA -. "fan-out via broker" .-> MCUB
 
     classDef control fill:#ffd7d7,stroke:#aa0000,stroke-width:1px;
     classDef telemetry fill:#d7f9ff,stroke:#0077aa,stroke-width:1px;
@@ -73,10 +96,14 @@ flowchart TD
     class SERIAL control;
     class CAN control;
     class MQTT telemetry;
+    class BROKER telemetry;
 ```
 
 ## 2. Why the split matters
 
+- The MQTT fan-out cluster illustrates that multiple MCU nodes can publish and
+  subscribe through the same broker, effectively enabling MCU-to-MCU exchanges
+  without direct wiring when they share topics.
 - **Shared logic once.** Encoding, decoding, ACK handling, and rate limiting are
   written once in the AOG-Link v1 layer. A bug fix benefits every transport.
 - **Transport specialization.** Each adapter focuses on its medium (socket

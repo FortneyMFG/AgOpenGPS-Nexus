@@ -9,12 +9,18 @@ import (
 	"github.com/AgOpenGPS/AgOpenGPS-Nexus/plugins/pumpkin-pi/pkg/config"
 	pumpkinpipb "github.com/AgOpenGPS/AgOpenGPS-Nexus/plugins/pumpkin-pi/pkg/grpcapi/pb"
 	"github.com/AgOpenGPS/AgOpenGPS-Nexus/plugins/pumpkin-pi/pkg/hal"
-	"github.com/AgOpenGPS/AgOpenGPS-Nexus/plugins/pumpkin-pi/pkg/mqtt"
 	"github.com/AgOpenGPS/AgOpenGPS-Nexus/plugins/pumpkin-pi/pkg/shm"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+type publisher interface {
+	PublishSteerTarget(shm.Target) error
+	PublishSteerStatus(hal.Status) error
+	PublishHealth(string) error
+	PublishAuthority(string, string, time.Time) error
+}
 
 // Server exposes the Pumpkin Pi gRPC API and bridges fast-path events to HAL + MQTT.
 type Server struct {
@@ -22,7 +28,7 @@ type Server struct {
 
 	ring *shm.Ring
 	hal  hal.HAL
-	mqtt *mqtt.Publisher
+	mqtt publisher
 	ttl  time.Duration
 
 	mu               sync.Mutex
@@ -37,7 +43,7 @@ type Server struct {
 }
 
 // NewServer builds a Server using the supplied dependencies.
-func NewServer(r *shm.Ring, h hal.HAL, pub *mqtt.Publisher, fastpath config.FastpathConfig, authority config.AuthorityConfig) *Server {
+func NewServer(r *shm.Ring, h hal.HAL, pub publisher, fastpath config.FastpathConfig, authority config.AuthorityConfig) *Server {
 	s := &Server{
 		ring:             r,
 		hal:              h,

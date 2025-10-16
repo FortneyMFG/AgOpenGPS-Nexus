@@ -1,7 +1,7 @@
 # Layer Registry Hash Handshake (Draft)
 
 ## Status
-Draft — aligns with NX-193 and ADR-032 requirements.
+Draft — aligns with NX-193 and ADR-068 requirements.
 
 ## Purpose
 Layer controllers, UI overlays, and transport bridges must only emit telemetry after
@@ -18,7 +18,7 @@ and firmware PGN mapping as part of ADR-016.
 - **Core Registry Authority** — owns the authoritative LayerDefinition store and
   publishes registry snapshots (ADR-010).
 - **Layer Controller Host** — aggregation pipelines that emit section telemetry and
-  derive overlays (ADR-032).
+  derive overlays (ADR-068).
 - **Observers** — UI shells, replay harnesses, or AGiO bridges that validate handshake
   outcomes for diagnostics.
 
@@ -76,5 +76,5 @@ and firmware PGN mapping as part of ADR-016.
 ## References
 - [ADR-010: Layer registry and variable-rate framework](../ADR/ADR-010-layer-registry-variable-rate.md)
 - [ADR-027: Spatial constraints & zone policies](../ADR/ADR-027-spatial-constraints.md)
-- [ADR-032: Presets and layout linking for equipment workflows](../ADR/ADR-032-presets-and-layout-linking.md)
+- [ADR-068: Layer controllers & aggregation runtime](../ADR/ADR-068-layer-controllers-runtime.md)
 - [SRS §03 — Communications & transports](../SRS/sections/03_Comm_Transports.md)

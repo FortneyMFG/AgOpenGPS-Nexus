@@ -1,4 +1,4 @@
-# 03 — Job Lifecycle & Session Management (Status: Drafting)
+# 03 — Job Lifecycle & Session Management (Status: Aligned with ADR-040/041/043)
 
 ## Overview
 

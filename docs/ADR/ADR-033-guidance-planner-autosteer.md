@@ -7,7 +7,7 @@ Drafting (target review window: 2025-11-21 week)
 
 
 ## Context
-The Nexus guidance stack must reconcile legacy planners (AB, curve, turn) and controllers (Stanley, pure pursuit) with PoseStream, zone gating, and plugin extensibility. Existing implementations rely on legacy assumptions that do not honor ADR-027 zone policies or ADR-032 layer metadata. ADR-033 defines the canonical lane model, lookahead scheduling, and constraint handling to align autosteer firmware, UI, and plugins.
+The Nexus guidance stack must reconcile legacy planners (AB, curve, turn) and controllers (Stanley, pure pursuit) with PoseStream, zone gating, and plugin extensibility. Existing implementations rely on legacy assumptions that do not honor ADR-027 zone policies or ADR-068 layer metadata. ADR-033 defines the canonical lane model, lookahead scheduling, and constraint handling to align autosteer firmware, UI, and plugins.
 
 ## Decision
 - Standardize lane and turn templates (straight, curve, adaptive) with preview publishing and lookahead scheduling tied to PoseStream cadence.
@@ -35,5 +35,5 @@ The Nexus guidance stack must reconcile legacy planners (AB, curve, turn) and co
 - [Interprocess API requirements](../SRS/sections/07_Interprocess_API.md)
 - [Extensibility & plugin requirements](../SRS/sections/12_Extensibility_Plugins.md)
 - [ADR-027: Spatial constraints and zone policies](ADR-027-spatial-constraints.md)
-- [ADR-032: Layer controllers and aggregation runtime](ADR-032-presets-and-layout-linking.md)
+- [ADR-068: Layer controllers and aggregation runtime](ADR-068-layer-controllers-runtime.md)
 - [ADR-017: Equipment profiles and kinematics](ADR-017-profiles-kinematics.md)

@@ -1,4 +1,4 @@
-# Backend Services (Status: collecting proposals)
+# Backend Services (Status: Aligned with ADR-068 layer runtime)
 
 ## Problem statement
 Map the guidance, mapping, field data, and rules services that power the application and how they scale to future architectures.

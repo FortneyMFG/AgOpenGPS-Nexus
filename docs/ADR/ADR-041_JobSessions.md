@@ -1,6 +1,6 @@
 # ADR-041 — Job Sessions Lifecycle
 
-- **Status:** Proposed
+- **Status:** Accepted — 2025-05-17 lifecycle working group
 - **Date:** 2025-03-18
 - **Author(s):** Nexus architecture guild
 - **NX Task:** NX-131 Field job session lifecycle ADR
@@ -108,6 +108,12 @@ explicitly orchestrated by Core, UI, and plugins.
 - When the job store detects read-only media or low disk space, Core falls back to append-only session journals and warns before
   pausing/completing a session. Operators can export the job bundle to removable storage and resume once space is available.
 
+## SRS Impact
+
+- Aligns the operational hierarchy and session payload requirements in §02 Data Model, ensuring Season → Job → Session orchestration has a canonical schema and journaling policy.【F:docs/SRS/sections/02_DataModel.md†L1-L160】
+- Implements the lifecycle states, events, and autosave expectations defined in §03 Job Lifecycle, replacing the implicit run model with deterministic session hooks.【F:docs/SRS/sections/03_JobLifecycle.md†L1-L120】
+- Provides backend services with the deterministic checkpoints and health metrics called out in §04 Backend Services for layer controllers, journaling, and automation coordination.【F:docs/SRS/sections/04_Backend_Services.md†L6-L40】
+
 ## Consequences
 
 - **Positive:**
@@ -175,7 +181,7 @@ explicitly orchestrated by Core, UI, and plugins.
 
 - [Job lifecycle architecture](../ADR/ADR-030-field-job-sessions.md)
 - [Season organisers & context bus](../ADR/ADR-040_SeasonOrganizers.md)
-- [Job session schema requirements](../SRS/sections/03_Job_Lifecycle.md)
+- [Job session schema requirements](../SRS/sections/03_JobLifecycle.md)
 - [Deterministic replay policy](../ADR/ADR-020-determinism-replay-ci.md)
 - [Spatial constraints & Drive-In](../ADR/ADR-027-spatial-constraints.md)
 - [Plugin lifecycle contracts](../ADR/ADR-018-plugin-api.md)

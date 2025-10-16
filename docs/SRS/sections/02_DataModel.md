@@ -1,4 +1,4 @@
-# 02 — Data Model: Farm → Field and Season → Job → Session Hierarchies (Status: Drafting)
+# 02 — Data Model: Farm → Field and Season → Job → Session Hierarchies (Status: Aligned with ADR-040/041/043)
 
 ## Overview
 

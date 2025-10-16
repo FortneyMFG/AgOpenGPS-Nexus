@@ -1,7 +1,7 @@
 # ADR-067: Equipment configuration and axle-centric kinematics runtime
 
 ## Status
-Drafting (target review window: 2025-05-16 week)
+Accepted — 2025-05-17 multi-pod joint review
 
 **Relevant Plugin(s):** Autosteer, Guidance Planner, Section Control, Mapping, Calibration Toolkit
 
@@ -16,6 +16,12 @@ Operators need to configure articulated, multi-steer, and tracked machines witho
 - Lock export determinism: `contentHash = SHA256(canonicalJson(profile \ calibrationBundle))` must remain stable across import/export cycles; any kinematic or sensor change requires bumping `schemaVersion` or `profileId` before ingestion will accept the profile.【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L29-L35】【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L236-L244】
 - Core computes per-axle capacity from per-wheel slip and publishes `κ_max` each cycle; planners must honor the advertised curvature limit when generating headland or crab trajectories.【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L410-L432】
 - Establish Definition of Done gates for profile-driven rigs that align with NX-414: configuration round-trips must be lossless, mode switches must meet latency/overshoot budgets, and slip/accuracy metrics must hold across representative fixtures before declaring a rig supported.【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L479-L533】
+
+## SRS Impact
+
+- Fulfils the multi-steer configurator blueprint captured in §06 Hardware I/O and option O-HW-7, establishing schema, calibration, and redundancy requirements for articulated rigs.【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L19-L446】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L38】
+- Extends §09 Control & Automation by publishing curvature limits, drive-direction policies, and slip feedback the planners must honour across autosteer modes.【F:docs/SRS/sections/09_Control_Automation.md†L12-L60】
+- Provides telemetry and health contracts referenced in §10 Telemetry & Health for monitoring controller authority, calibration state, and fallback behaviour.【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】
 
 ## Consequences
 - Guidance, section, and automation planners can rely on a uniform axle-centric model with explicit limits, reducing bespoke rig integrations and enabling deterministic simulation across articulated tractors, tracked drives, and steerable implements.

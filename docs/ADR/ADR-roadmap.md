@@ -19,6 +19,12 @@ This tracker consolidates current and planned Architecture Decision Records so t
 | [ADR-004](ADR-004-composite-simulation.md) | Establish the composite simulation fabric (SimClock + SimBus) | Accepted | SRS §04 Backend Services, §12 Extensibility & Plugins | R-BE-000…R-BE-014, R-EXT-030…R-EXT-103【F:docs/ADR/ADR-004-composite-simulation.md†L1-L20】【F:docs/SRS/sections/04_Backend_Services.md†L1-L120】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L51-L74】 |
 | [ADR-006](ADR-006-aog-link-mcu-communications.md) | MCU communications over AOG-Link (nanopb) | Accepted | SRS §03 Communications & Transports, §06 Hardware I/O | R-COMM-000…R-COMM-013, R-HW-000…R-HW-014【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L1-L55】【F:docs/SRS/sections/03_Comm_Transports.md†L1-L45】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L38】 |
 | [ADR-028](ADR-028-stack-boundaries.md) | Nexus stack responsibilities & handoff boundaries | Accepted | SRS §03 Communications & Transports, §06 Hardware I/O, §12 Extensibility & Plugins | R-COMM-000…R-COMM-032, R-HW-000…R-HW-027, R-EXT-000…R-EXT-134【F:docs/ADR/ADR-028-stack-boundaries.md†L1-L118】【F:docs/SRS/sections/03_Comm_Transports.md†L1-L45】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L54】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L1-L80】 |
+| [ADR-027](ADR-027-spatial-constraints.md) | Spatial constraints & zone policies | Accepted | SRS §03 Communications, §08 Data Model, §09 Control, §10 Telemetry | R-COMM-020…R-COMM-023, R-DATA-026…R-DATA-028, R-CTRL-000…R-CTRL-007【F:docs/ADR/ADR-027-spatial-constraints.md†L11-L64】【F:docs/SRS/sections/08_Data_Model_Storage.md†L21-L27】【F:docs/SRS/sections/09_Control_Automation.md†L37-L60】 |
+| [ADR-040](ADR-040_SeasonOrganizers.md) | Season organizers & context publication | Accepted | SRS §02 Data Model, §03 Job Lifecycle, §04 Backend Services | Season catalog & context publish requirements【F:docs/ADR/ADR-040_SeasonOrganizers.md†L9-L74】【F:docs/SRS/sections/02_DataModel.md†L1-L140】【F:docs/SRS/sections/03_JobLifecycle.md†L1-L64】【F:docs/SRS/sections/04_Backend_Services.md†L6-L27】 |
+| [ADR-041](ADR-041_JobSessions.md) | Job session lifecycle orchestration | Accepted | SRS §02 Data Model, §03 Job Lifecycle, §04 Backend Services | Session schema, autosave, and lifecycle hooks【F:docs/ADR/ADR-041_JobSessions.md†L9-L148】【F:docs/SRS/sections/03_JobLifecycle.md†L1-L120】【F:docs/SRS/sections/04_Backend_Services.md†L6-L40】 |
+| [ADR-043](ADR-043_MultiFieldJobEnvelopes.md) | Multi-field job envelopes | Accepted | SRS §02 Data Model, §03 Job Lifecycle, §04 Mapping & Layers | Multi-field mount & analytics requirements【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L75】【F:docs/SRS/sections/02_DataModel.md†L22-L140】【F:docs/SRS/sections/03_JobLifecycle.md†L59-L112】【F:docs/SRS/sections/04_MappingLayers.md†L1-L44】 |
+| [ADR-067](ADR-067-equipment-configuration-kinematics.md) | Axle-centric equipment configuration runtime | Accepted | SRS §06 Hardware I/O, §09 Control & Automation, §10 Telemetry | Multi-steer configurator export & ingestion requirements【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L9-L123】【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L19-L533】【F:docs/SRS/sections/09_Control_Automation.md†L12-L60】 |
+| [ADR-068](ADR-068-layer-controllers-runtime.md) | Layer controllers & aggregation runtime | Accepted | SRS §04 Backend Services, §08 Data Model, §10 Telemetry | Layer aggregation, diagnostics, and replay requirements【F:docs/ADR/ADR-068-layer-controllers-runtime.md†L9-L118】【F:docs/SRS/sections/04_Backend_Services.md†L6-L35】【F:docs/SRS/sections/08_Data_Model_Storage.md†L10-L33】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】 |
 
 ## Active proposals & in-flight drafts
 
@@ -38,35 +44,6 @@ Draft authors should reference the listed requirements and tasks before opening 
 - **Validation harness:** Extend `nexus sim replay --slice cross-track` to drive the slice in headless CI, capturing PoseStream, controller outputs, dependency warnings, and job journal events for regression comparison.
 - **Exit criteria:** End-to-end replay that drives the guidance preview using the shared timebase, emits dependency warnings when mapping/plugins are missing, and records a job session journal entry for the run.
 - **NX task alignment:** NX-124, NX-126, NX-131, NX-157.
-
-### ADR-067 — Equipment configuration and axle-centric kinematics runtime
-- **Owner:** Core Owner — Control & Automation pod
-- **Stage:** Drafting (target review window: 2025-05-16 week)
-- **Dependencies:** ADR-017 (profiles and kinematics); O-HW-7 (multi-steer configurator blueprint)
-- **Scope:** Formalize the axle-centric export graph, ingestion service, telemetry, and validation gates that bridge the multi-steer configurator to ADR-017’s runtime solver, ensuring articulated, tracked, and steer-cart rigs ship with uniform contracts.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L1-L74】【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L1-L202】
-- **Key decisions:** Schema versioning and compatibility guards, graph validation rules, telemetry surface definitions, mode profile toggles with interlocks, and acceptance criteria for slip-aware accuracy and mode switching latency.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L24-L74】【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L447-L533】
-- **SRS alignment:** Control & automation (§09), Hardware I/O (§06), Telemetry & health (§10), plus O-HW-7 option coverage for sensor roles, calibration, and planner hints.【F:docs/SRS/sections/09_Control_Automation.md†L12-L60】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L38】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L203-L446】
-- **Primary requirements:** R-CTRL-000…R-CTRL-007, R-HW-000…R-HW-014, R-TEL-000…R-TEL-015, plus NX-414 for configurator delivery and NX-452…NX-455 for runtime ingestion, automation integration, and calibration tooling.【F:docs/SRS/sections/09_Control_Automation.md†L12-L60】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L38】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L75-L114】
-- **Tasks:** Finalize export schema tooling, implement Core ingestion validators, wire planners to curvature/drive-direction limits, deliver calibration fixtures (Ackermann wizard, slip sanity, transport locks), and publish preset documentation with hardware hints.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L75-L114】
-- **Acceptance hooks:**
-  - Automated fixtures demonstrate ≤5 cm RMS toolpoint cross-track error on flat terrain and ≤10 cm on 8 % sidehills without crab steering across ≥3 km mixed-maneuver datasets.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L116-L123】
-  - Mode profile transitions road↔field↔fail_safe complete in <150 ms with <1° transient on dependent joints across articulated and steer-cart rigs.【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L116-L123】
-  - Profile import/export round-trips preserve content hashes (modulo calibration stamps) and reject graphs with cycles or missing sensors for enabled modules, including Ackermann CSV loopbacks (<0.2° RMS), sidehill slip sanity (0.08–0.16 m/s with κ_max derate ≥15 %), and road→field mode flips (<150 ms, <1°).【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L116-L123】
-
-### ADR-027 — Spatial constraints & zone policies
-- **Owner:** Core Owner — PoseStream & Control pod
-- **Stage:** Proposed (target review window: 2025-10-27 week)
-- **Dependencies:** ADR-028 (stack boundaries, accepted); ADR-010 (layer registry draft); ADR-031 (plugin manifest governance)
-- **Scope:** Stand up a ZoneService with first-class boundary, headland, keep-out, and work-disabled polygons so guidance, section control, and visualization share deterministic constraint context across live runs and replays.【F:docs/ADR/ADR-027-spatial-constraints.md†L7-L55】
-- **Key decisions:** Canonical zone types and buffered footprints, storage/indexing strategy, PoseStream zone bitmask semantics, control arbiter gates, and shared UX contracts for overrides and provenance.【F:docs/ADR/ADR-027-spatial-constraints.md†L11-L64】
-- **SRS alignment:** Communications (§03 zone streaming), Data Model (§08 zone persistence), Control (§09 constraint gating), Telemetry (§10 override logging).【F:docs/SRS/sections/03_Comm_Transports.md†L16-L45】【F:docs/SRS/sections/08_Data_Model_Storage.md†L21-L27】【F:docs/SRS/sections/09_Control_Automation.md†L16-L60】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】
-- **Primary requirements:** R-COMM-020…R-COMM-023; R-DATA-015…R-DATA-028; R-CTRL-000…R-CTRL-007.【F:docs/SRS/sections/03_Comm_Transports.md†L20-L45】【F:docs/SRS/sections/08_Data_Model_Storage.md†L17-L27】【F:docs/SRS/sections/09_Control_Automation.md†L12-L60】
-- **Tasks:** ZoneService/storage implementation, guidance/section plugin integration, UI editor/importers, replay fixtures.【F:docs/ADR/ADR-027-spatial-constraints.md†L64-L108】
-- **Acceptance hooks:**
-  - 95th percentile zone-mask propagation latency ≤ 120 ms from ingest to section arbiter under 20 Hz PoseStream load (measured on reference sim fixture).
-  - Constraint gate fault-injection: forced keep-out toggles must block section enable within two PoseStream frames and emit override telemetry with actor, reason, and expiry fields populated.
-  - Override audit log retention verified across crash-recovery scenario with ≤ 1 lost entry for a 30-minute replay.
-- **NX task alignment:** NX-124, NX-157.
 
 ### ADR-029 — Mapping plugin architecture & geospatial kernel split
 - **Owner:** Core Owner — Mapping & Replay pod
@@ -141,68 +118,6 @@ Draft authors should reference the listed requirements and tasks before opening 
   - Controller pipeline must sustain 25 Hz ingest for 48-row rigs with ≤ 22% CPU on aggregation workers and ≤ 500 MB total working-set at steady state.
   - Schema registration handshake must reject mismatched layer hashes with actionable diagnostics and emit `LayerRegistryMismatch` telemetry verified across three replay fixtures.
   - Golden replay outputs from controllers must match analytical baselines within 0.5% per-channel variance over a 60-minute run (yield, rate, downforce).
-
-### ADR-040 — Season organizers
-- **Owner:** Core Owner — Lifecycle & Reporting pod
-- **Stage:** Drafting (target review window: 2025-03-28 week)
-- **Dependencies:** ADR-030 (job lifecycle services, proposed); ADR-029 (mapping plugin architecture) for shared storage layout
-- **Scope:** Introduce the `Season` entity as an optional organizer above jobs so planning tools and analytics can group work across farms while preserving historical date windows and optimizer state.【F:docs/ADR/ADR-040_SeasonOrganizers.md†L9-L52】
-- **Key decisions:** Season identity, job membership rules, optimizer state storage, navigation UX updates, and synchronization behavior across devices.【F:docs/ADR/ADR-040_SeasonOrganizers.md†L15-L52】
-- **SRS alignment:** Data model (§02 Season hierarchy), Job lifecycle (§03 Season-first navigation), Mapping & layers (§04 provenance scopes).【F:docs/SRS/sections/02_DataModel.md†L15-L92】【F:docs/SRS/sections/03_JobLifecycle.md†L12-L59】【F:docs/SRS/sections/04_MappingLayers.md†L10-L83】
-- **Primary requirements:** R-DATA-029…R-DATA-033 (job metadata + provenance), R-UX-010…R-UX-018 (navigator flows), R-ANL-010 (seasonal analytics).【F:docs/SRS/sections/02_DataModel.md†L95-L152】【F:docs/SRS/sections/03_JobLifecycle.md†L21-L74】
-- **Tasks:** Publish Season schema, add navigator Season step, update reporting filters, extend sync tooling, author migration scripts for existing jobs.【F:docs/ADR/ADR-040_SeasonOrganizers.md†L55-L73】
-- **Acceptance hooks:**
-  - Season-first navigator demo groups ≥3 jobs across ≥2 farms with correct filtering and breadcrumb updates.
-  - Analytics/export plugins accept a `seasonId` filter and produce scoped summaries in regression fixtures.
-  - Synchronization diff tests verify deduplicated `jobIds` and stable season metadata across round-trips.
-
-### ADR-041 — Job sessions
-- **Owner:** Core Owner — Lifecycle & UI pod
-- **Stage:** Drafting (target review window: 2025-04-04 week)
-- **Dependencies:** ADR-030 (job lifecycle services); ADR-032 (layer controllers) for session-scoped provenance
-- **Scope:** Replace legacy “runs” with structured sessions capturing environment, input, notes, and layer references with deterministic plugin hooks for start/stop flows.【F:docs/ADR/ADR-041_JobSessions.md†L9-L52】
-- **Key decisions:** Session storage layout (embedded vs. folder), metadata fields, autosave policy, journaling triggers, plugin hook shapes, and backwards-compatibility for jobs lacking session metadata.【F:docs/ADR/ADR-041_JobSessions.md†L15-L66】
-- **SRS alignment:** Data model (§02 Session entity), Job lifecycle (§03 session lifecycle & resume), Mapping & layers (§04 layer provenance + reuse).【F:docs/SRS/sections/02_DataModel.md†L40-L152】【F:docs/SRS/sections/03_JobLifecycle.md†L33-L92】【F:docs/SRS/sections/04_MappingLayers.md†L32-L132】
-- **Primary requirements:** R-DATA-029…R-DATA-031 (job metadata/journaling), R-DATA-017…R-DATA-018 (provenance), R-UX-015 (Start Session UX).【F:docs/SRS/sections/02_DataModel.md†L95-L152】【F:docs/SRS/sections/03_JobLifecycle.md†L33-L92】
-- **Tasks:** Implement session autosave, expose Start/End Session UI actions, publish plugin session hooks, migrate documentation and telemetry labels from Run to Session.【F:docs/ADR/ADR-041_JobSessions.md†L55-L73】
-- **Acceptance hooks:**
-  - Headless regression fixture demonstrates session start/end with autosave and journal checkpoints surviving crash recovery.
-  - Plugins under test receive `onSessionStart`/`onSessionEnd` events with correct `jobId`, `sessionId`, and `fieldIds` payloads.
-  - UI copy review confirms “Session” terminology replaces “Run” across lifecycle panels and reports.
-
-### ADR-043 — Multi-field job envelopes
-- **Owner:** Core Owner — Mapping & Lifecycle pod
-- **Stage:** Drafting (target review window: 2025-04-11 week)
-- **Dependencies:** ADR-029 (mapping plugin architecture), ADR-027 (spatial constraints) for shared geometry indexing
-- **Scope:** Permit jobs to mount multiple fields simultaneously, define the union envelope contract, and require per-field analytics rollups alongside aggregated coverage.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L63】
-- **Key decisions:** Storage of `fieldIds`, envelope union rules, per-field stats layout, plugin API expectations, and UI flows for multi-field selection and visualization.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L15-L75】
-- **SRS alignment:** Data model (§02 Farm→Field hierarchy), Job lifecycle (§03 mount/unmount events), Mapping & layers (§04 multi-field envelopes & stats).【F:docs/SRS/sections/02_DataModel.md†L15-L92】【F:docs/SRS/sections/03_JobLifecycle.md†L59-L112】【F:docs/SRS/sections/04_MappingLayers.md†L10-L132】
-- **Primary requirements:** R-DATA-026…R-DATA-031 (geometry + job metadata), R-MAP-015…R-MAP-028 (multi-field mapping), R-UX-020 (multi-field selection UX).【F:docs/SRS/sections/02_DataModel.md†L95-L152】【F:docs/SRS/sections/03_JobLifecycle.md†L59-L112】【F:docs/SRS/sections/04_MappingLayers.md†L83-L132】
-- **Tasks:** Update job schema, extend mapping plugin API for `mountFields`, build per-field stat aggregation, update analytics exports, and deliver multi-field navigator UX flows.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L47-L75】
-- **Acceptance hooks:**
-  - Mapping plugin regression renders continuous coverage across two adjacent fields without reopening the job and reports per-field stats.
-  - Analytics/export plugins emit season/job/session scoped outputs that honor per-field aggregates.
-  - Performance harness shows union envelope queries staying within ≤ 25 ms p95 under 10-field mounts.
-
-## Emerging plugin & automation proposals
-
-The following ADRs are drafting to capture upcoming plugin initiatives referenced in the 2025 roadmap refresh. Owners should anchor requirement coverage in the SRS before promoting proposals for review.
-
-| ADR | Title | Stage | Highlights |
-| --- | --- | --- | --- |
-| ADR-054 (drafting) | Task & Work Order Orchestration | Defines TaskService work orders, checklist journaling, and preset/session bindings building on ADR-032/ADR-041 for NX-170 deployment. |
-| ADR-055 (drafting) | Inventory & Material Ledger | Establishes `InventoryLot.v1`, stock reconciliation, and Profit plugin integration for lot-aware costing and compliance. |
-| ADR-056 (drafting) | Equipment Health & Maintenance | Leverages telemetry hours/cycle counters to drive maintenance schedules, predictive alerts, and fleet health dashboards sourced from Device Manager and Sessions provenance. |
-| ADR-057 (drafting) | Soil & Lab Data Manager | Normalizes soil sampling imports (CSV/shapefile/grid) into `soil.*` layers, ties recommendations into ADR-013 derivations, and archives lab provenance. |
-| ADR-058 (drafting) | Map Composer & Print Studio | Formalizes Print View templates, legends, and Report Builder integration for landlord/regulator-ready PDF exports. |
-| ADR-059 (drafting) | Terrain & Drainage Planner | Specifies elevation ingest, slope/aspect computation, drain tile sketching, and export hooks for erosion mitigation planning. |
-| ADR-060 (drafting) | AI Agronomic Advisor | Governs ML model packaging, data access, and recommendation layer outputs within the ADR-013 derivation framework and replay determinism constraints. |
-| ADR-061 (drafting) | Sync Dashboard & Web Companion | Documents read-only remote dashboards that mirror `/Seasons/` folders via cloud sync (Drive, Syncthing) without control privileges. |
-| ADR-062 (drafting) | Marketplace & Plugin Catalog UI | Covers signed catalog manifests, install/update/rollback UX, and health telemetry integration for plugin governance. |
-| ADR-063 (drafting) | Telemetry Replay & Training Simulator | Extends replay UX with record/replay capture, benchmarking hooks, and CI integration for deterministic training scenarios. |
-| ADR-064 (drafting) | Regulatory & Traceability Exports | Produces pesticide/compliance PDFs, signed JSON exports, and optional hash-chain audit features leveraging ADR-019 provenance. |
-| ADR-065 (drafting) | Rules & Automation Engine | Introduces declarative when/then automation rules executed inside the Core sandbox with safety gating and plugin extension points. |
-| ADR-066 (drafting) | GNSS Correction Services | Manages NTRIP/PPP/base station connections, credential storage, and correction log retention for post-processing accuracy. |
 
 ### ADR-044 — Zone drawing framework
 - **Owner:** Core Owner — Mapping & Lifecycle pod
@@ -347,7 +262,7 @@ The following ADRs are drafting to capture upcoming plugin initiatives reference
 ### ADR-033 — Guidance planner & autosteer orchestration
 - **Owner:** Core Owner — Guidance & Autonomy pod
 - **Stage:** Drafting (target review window: 2025-11-21 week)
-- **Dependencies:** ADR-027 (zone policies); ADR-032 (layer controllers for lookahead metadata); ADR-015 (section control semantics)
+- **Dependencies:** ADR-027 (zone policies); ADR-068 (layer controllers for lookahead metadata); ADR-015 (section control semantics)
 - **Scope:** Reconcile the legacy guidance math (AB/curve/turn planners, Stanley controller) with Nexus PoseStream and zone gating so guidance plugins, autosteer firmware, and UI share deterministic lane, turn, and lookahead policies.【F:docs/porting/V6-Inventory.md†L5-L44】【F:docs/SRS/sections/09_Control_Automation.md†L16-L24】
 - **Key decisions:** Canonical lane model (straight, curve, adaptive), turn template selection and preview publishing, lookahead scheduling tied to PoseStream cadence, error damping/anti-windup expectations, and how constraint/zone masks bias path outputs prior to control arbitration.【F:docs/porting/V6-Inventory.md†L7-L19】【F:docs/ADR/ADR-027-spatial-constraints.md†L7-L44】【F:docs/SRS/sections/09_Control_Automation.md†L16-L24】
 - **SRS alignment:** Control & Automation (§09 control graph, automation lifecycle), Interprocess API (§07 geometry metadata), Extensibility (§12 plugin contracts).【F:docs/SRS/sections/09_Control_Automation.md†L16-L24】【F:docs/SRS/sections/07_Interprocess_API.md†L16-L24】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L28】
@@ -361,7 +276,7 @@ The following ADRs are drafting to capture upcoming plugin initiatives reference
 ### ADR-034 — Metadata-driven dashboards & inspector surfaces
 - **Owner:** UI Owner — Telemetry & Visualization pod
 - **Stage:** Drafting (target review window: 2025-11-28 week)
-- **Dependencies:** ADR-010 (layer registry); ADR-032 (layer controllers); ADR-029 (mapping plugin APIs)
+- **Dependencies:** ADR-010 (layer registry); ADR-068 (layer controllers); ADR-029 (mapping plugin APIs)
 - **Scope:** Deliver the layer-aware dashboard/inspector refactor so overlays, charts, and presets consume the layer registry and controller metadata without hard-coded IDs, enabling declarative visualization across desktop and companion clients.【F:docs/SRS/sections/05_Frontends.md†L10-L27】【F:docs/SRS/options/O-UI-5_MetadataDrivenDashboards.md†L1-L28】
 - **Key decisions:** Binding strategy between layer definitions and UI widgets, preset catalog and layout persistence, inspector/tooltip data contracts, performance budgets for rich overlays, and how remote/headless modes reuse the same metadata-driven components.【F:docs/SRS/options/O-UI-5_MetadataDrivenDashboards.md†L6-L28】【F:docs/SRS/sections/05_Frontends.md†L19-L27】【F:docs/SRS/options/O-UI-5_MetadataDrivenDashboards.md†L25-L36】
 - **SRS alignment:** Frontends (§05 metadata-driven UI, spatial overlays, remote readiness), Telemetry (§10 diagnostics surfacing), Extensibility (§12 plugin UI contributions).【F:docs/SRS/sections/05_Frontends.md†L10-L33】【F:docs/SRS/sections/10_Telemetry_Health.md†L12-L18】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L30-L34】

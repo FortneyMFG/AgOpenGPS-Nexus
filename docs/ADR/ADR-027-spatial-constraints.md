@@ -1,7 +1,7 @@
 # ADR-027: Spatial Constraints & Zone Policies
 
 ## Status
-Proposed
+Accepted — 2025-05-17 architecture guild review
 
 **Relevant Plugin(s):** Mapping, Autosteer, Section Control, Rate Control, Variable Mapping, UI Shell
 

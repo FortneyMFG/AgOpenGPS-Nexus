@@ -45,5 +45,5 @@ L — Touches ingestion, mapping, rendering, and configuration code paths with n
 ## Related ADRs
 - [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)
 - [ADR-020 — Determinism & Replay CI](../../ADR/ADR-020-determinism-replay-ci.md)
-- [ADR-032 — Presets and Layout Linking](../../ADR/ADR-032-presets-and-layout-linking.md)
+- [ADR-068 — Layer controllers & aggregation runtime](../../ADR/ADR-068-layer-controllers-runtime.md)
 

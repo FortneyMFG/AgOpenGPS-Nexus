@@ -80,6 +80,7 @@
 - [Season/session migration playbook](howto/season-session-migration-playbook.md) — ADR-040/041 rollout playbook.
 - [Mesh provisioning runbook](howto/mesh-provisioning-runbook.md) — ADR-047/048 connectivity rollout.
 - [Mesh retention & privacy operations guide](howto/mesh-retention-privacy-operations-guide.md) — ADR-047 retention planner playbook.
+- [Linux Core operations & observability](howto/linux-core-operations-playbook.md) — NX-462/463 systemd packaging, health signals, and replay validation.
 - [Composite simulation fabric GA](scenarios/composite-simulation-fabric.md) — SimClock/SimBus validation steps.
 - [gRPC contract governance](qa/grpc-contract-governance.md) — protobuf review and release gating.
 - [Plugin lease & manifest governance](plugins/plugin-lease-manifest-governance.md) — ADR-018 compliance checklist.

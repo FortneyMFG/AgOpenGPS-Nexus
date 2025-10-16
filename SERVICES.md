@@ -46,6 +46,11 @@ sudo systemctl enable --now nexus.service
 
 For environments that prefer individual processes, create separate units that call `core/Nexus.Core`, `agio/Nexus.AgIO`, and `ui/Nexus.UI` with appropriate dependencies.
 
+> **NX-462 packaging update:** `tools/packaging/linux/build-packages.sh` now
+> installs hardened `aog-core.service` and `aog-agio.service` units plus wrapper
+> launchers, so production rigs can enable the services directly after installing
+> the `.deb` or `.rpm` bundle.【F:tools/packaging/linux/build-packages.sh†L1-L353】【F:tools/packaging/linux/systemd/aog-core.service†L1-L27】
+
 ## Windows (Scheduled Task or Service Wrapper)
 
 - Extract the bundle to `C:\Nexus\v0.3.0`.

@@ -1,0 +1,30 @@
+[Unit]
+Description=AOG Core service
+After=network-online.target aog-agio.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aogsvc
+Group=aogsvc
+WorkingDirectory=/usr/lib/aog/core
+EnvironmentFile=-/etc/aog/core.env
+ExecStart=/usr/bin/aog-core
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=5
+StateDirectory=aog
+LogsDirectory=aog
+# Allow graceful shutdown before systemd declares the service dead
+TimeoutStopSec=20
+# Hardened defaults for network services
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target

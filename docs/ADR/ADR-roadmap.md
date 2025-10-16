@@ -19,12 +19,14 @@ This tracker consolidates current and planned Architecture Decision Records so t
 | [ADR-004](ADR-004-composite-simulation.md) | Establish the composite simulation fabric (SimClock + SimBus) | Accepted | SRS §04 Backend Services, §12 Extensibility & Plugins | R-BE-000…R-BE-014, R-EXT-030…R-EXT-103【F:docs/ADR/ADR-004-composite-simulation.md†L1-L20】【F:docs/SRS/sections/04_Backend_Services.md†L1-L120】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L51-L74】 |
 | [ADR-006](ADR-006-aog-link-mcu-communications.md) | MCU communications over AOG-Link (nanopb) | Accepted | SRS §03 Communications & Transports, §06 Hardware I/O | R-COMM-000…R-COMM-013, R-HW-000…R-HW-014【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L1-L55】【F:docs/SRS/sections/03_Comm_Transports.md†L1-L45】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L38】 |
 | [ADR-028](ADR-028-stack-boundaries.md) | Nexus stack responsibilities & handoff boundaries | Accepted | SRS §03 Communications & Transports, §06 Hardware I/O, §12 Extensibility & Plugins | R-COMM-000…R-COMM-032, R-HW-000…R-HW-027, R-EXT-000…R-EXT-134【F:docs/ADR/ADR-028-stack-boundaries.md†L1-L118】【F:docs/SRS/sections/03_Comm_Transports.md†L1-L45】【F:docs/SRS/sections/06_Hardware_IO.md†L1-L54】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L1-L80】 |
+| [ADR-029](ADR-029-mapping-plugin-architecture.md) | Mapping plugin architecture & geospatial kernel split | Accepted | SRS §03 Communications, §04 Backend Services, §08 Data Model, §12 Extensibility | R-COMM-020…R-COMM-042, R-BE-000…R-BE-014, R-DATA-010…R-DATA-025, R-EXT-010…R-EXT-134【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L14-L93】【F:docs/SRS/sections/03_Comm_Transports.md†L6-L28】【F:docs/SRS/sections/04_Backend_Services.md†L6-L20】【F:docs/SRS/sections/08_Data_Model_Storage.md†L10-L33】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L80】 |
 | [ADR-027](ADR-027-spatial-constraints.md) | Spatial constraints & zone policies | Accepted | SRS §03 Communications, §08 Data Model, §09 Control, §10 Telemetry | R-COMM-020…R-COMM-023, R-DATA-026…R-DATA-028, R-CTRL-000…R-CTRL-007【F:docs/ADR/ADR-027-spatial-constraints.md†L11-L64】【F:docs/SRS/sections/08_Data_Model_Storage.md†L21-L27】【F:docs/SRS/sections/09_Control_Automation.md†L37-L60】 |
 | [ADR-040](ADR-040_SeasonOrganizers.md) | Season organizers & context publication | Accepted | SRS §02 Data Model, §03 Job Lifecycle, §04 Backend Services | Season catalog & context publish requirements【F:docs/ADR/ADR-040_SeasonOrganizers.md†L9-L74】【F:docs/SRS/sections/02_DataModel.md†L1-L140】【F:docs/SRS/sections/03_JobLifecycle.md†L1-L64】【F:docs/SRS/sections/04_Backend_Services.md†L6-L27】 |
 | [ADR-041](ADR-041_JobSessions.md) | Job session lifecycle orchestration | Accepted | SRS §02 Data Model, §03 Job Lifecycle, §04 Backend Services | Session schema, autosave, and lifecycle hooks【F:docs/ADR/ADR-041_JobSessions.md†L9-L148】【F:docs/SRS/sections/03_JobLifecycle.md†L1-L120】【F:docs/SRS/sections/04_Backend_Services.md†L6-L40】 |
 | [ADR-043](ADR-043_MultiFieldJobEnvelopes.md) | Multi-field job envelopes | Accepted | SRS §02 Data Model, §03 Job Lifecycle, §04 Mapping & Layers | Multi-field mount & analytics requirements【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L75】【F:docs/SRS/sections/02_DataModel.md†L22-L140】【F:docs/SRS/sections/03_JobLifecycle.md†L59-L112】【F:docs/SRS/sections/04_MappingLayers.md†L1-L44】 |
 | [ADR-067](ADR-067-equipment-configuration-kinematics.md) | Axle-centric equipment configuration runtime | Accepted | SRS §06 Hardware I/O, §09 Control & Automation, §10 Telemetry | Multi-steer configurator export & ingestion requirements【F:docs/ADR/ADR-067-equipment-configuration-kinematics.md†L9-L123】【F:docs/SRS/options/O-HW-7_MultiSteerConfigurator.md†L19-L533】【F:docs/SRS/sections/09_Control_Automation.md†L12-L60】 |
 | [ADR-068](ADR-068-layer-controllers-runtime.md) | Layer controllers & aggregation runtime | Accepted | SRS §04 Backend Services, §08 Data Model, §10 Telemetry | Layer aggregation, diagnostics, and replay requirements【F:docs/ADR/ADR-068-layer-controllers-runtime.md†L9-L118】【F:docs/SRS/sections/04_Backend_Services.md†L6-L35】【F:docs/SRS/sections/08_Data_Model_Storage.md†L10-L33】【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】 |
+| [ADR-032](ADR-032-presets-and-layout-linking.md) | Presets and layout linking for equipment workflows | Accepted | SRS §02 Documentation, §03 Job Lifecycle, §05 Frontends | Preset orchestration, layout versioning, and task telemetry requirements【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L14-L108】【F:docs/ADR/ADR-030-field-job-sessions.md†L20-L96】【F:docs/SRS/sections/05_Frontends.md†L22-L88】 |
 
 ## Active proposals & in-flight drafts
 
@@ -45,20 +47,6 @@ Draft authors should reference the listed requirements and tasks before opening 
 - **Exit criteria:** End-to-end replay that drives the guidance preview using the shared timebase, emits dependency warnings when mapping/plugins are missing, and records a job session journal entry for the run.
 - **NX task alignment:** NX-124, NX-126, NX-131, NX-157.
 
-### ADR-029 — Mapping plugin architecture & geospatial kernel split
-- **Owner:** Core Owner — Mapping & Replay pod
-- **Stage:** Proposed (target sign-off window: 2025-11-03 week)
-- **Dependencies:** ADR-028 (stack boundaries); ADR-031 (plugin bundle governance); ADR-022 (CRS policy, pending draft)
-- **Scope:** Move mapping engines into plugins while Core keeps a minimal geospatial kernel (CRS transforms, tiling helpers, monotonic timebase, deterministic replay scaffolding, null providers). Ensure headless rigs and alternate pose sources can run without mapping while variable-rate and sections consume a stable Mapping API.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L7-L84】
-- **Key decisions:** Mapping contracts in `Aog.Abstractions`, capability registry entries (`mapping:raster@v1`, `mapping:vector@v2`), event bus fan-out, replay taps, and plugin lifecycle/health semantics.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L19-L84】
-- **SRS alignment:** Communications (§03 timebase/event bus), Backend Services (§04 replay/registry), Data Model (§08 layers), Extensibility (§12 plugin lifecycle).【F:docs/SRS/sections/03_Comm_Transports.md†L6-L28】【F:docs/SRS/sections/04_Backend_Services.md†L6-L20】【F:docs/SRS/sections/08_Data_Model_Storage.md†L6-L31】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L6-L80】
-- **Primary requirements:** R-COMM-020…R-COMM-042; R-BE-000…R-BE-014; R-DATA-010…R-DATA-025; R-EXT-010…R-EXT-134.【F:docs/SRS/sections/03_Comm_Transports.md†L11-L28】【F:docs/SRS/sections/04_Backend_Services.md†L6-L20】【F:docs/SRS/sections/08_Data_Model_Storage.md†L11-L31】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L11-L80】
-- **Tasks:** Draft Mapping proto/service updates, implement NullMapping/NullPose, prototype grid mapping plugin with replay fixtures, extend plugin loader for capability-gated presets.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L86-L93】
-- **Acceptance hooks:**
-  - NullMapping provider start-up must complete < 350 ms (p95) on reference hardware and publish healthy status before section plugins request pose transforms.
-  - Capability registry integration tests must fail-fast (< 2 s) when a plugin declares incompatible `mapping:*` capabilities, with actionable error messaging surfaced in Device Manager.
-  - Replay tap verification: 60-minute PoseStream replay must render identical raster tiles (checksum parity) when run against headless Core with and without mapping plugins loaded, proving deterministic tap semantics.
-- **NX task alignment:** NX-126, NX-161.
 
 ### ADR-030 — Field job sessions & lifecycle services
 - **Owner:** Core Owner — Lifecycle & UI pod
@@ -105,7 +93,7 @@ Draft authors should reference the listed requirements and tasks before opening 
   - UI compatibility dashboard must present bundle health with pass/warn/fail states and include remediation links for at least the top 10 first-party plugins.
 - **NX task alignment:** NX-134, NX-157, NX-168.
 
-### ADR-032 — Layer controllers & aggregation runtime
+### ADR-068 — Layer controllers & aggregation runtime
 - **Owner:** Core Owner — Layer Controllers pod
 - **Stage:** Drafting (target review window: 2025-11-14 week)
 - **Dependencies:** ADR-029 (mapping kernel split); ADR-010 (layer registry); ADR-027 (zone policies for gating)

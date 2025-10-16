@@ -98,10 +98,27 @@ The Nexus roadmap upgrades the legacy UDP PGN interface to **AOG-Link V1**, a na
 4. Keep documentation, schema, and test updates alongside code changes; deterministic storage and replay are core principles.
 5. When you are ready to run the stack, follow the [developer setup quick start](docs/howto/developer-setup.md) for packaging downloads or local builds.
 
+## Installing from Release
+
+- Releases are produced by `.github/workflows/release.yml`. Each tagged build first publishes individual component and plugin archives, then attempts bundle assembly once every required artifact is present.
+- Bundles are never partial. If a dependency is missing, the Release stays in **components-only** mode so you can pick the pieces you need without waiting for a retry.
+- Download the archive that matches your runtime. Windows builds use `.zip` while Linux builds use `.tar.gz`.
+- Verify the attached `SHA256SUMS.txt` (and optional Cosign signatures) before deploying to production rigs.
+- Bundle layouts are documented in `SERVICES.md` and `PLUGINS.md`; upgrade steps are captured in `UPGRADING.md`.
+
+| Artifact Type | Naming Pattern |
+| --- | --- |
+| Component archives | `<Component>_v<VER>_<RUNTIME>.zip\|.tar.gz` |
+| Plugin archives | `Plugin-<Name>_v<VER>_<RUNTIME>.zip\|.tar.gz` |
+| Bundles | `Nexus-Base_v<VER>_<RUNTIME>.<ext>`, `Nexus-Headless_v<VER>_<RUNTIME>.tar.gz`, `Nexus-UI_v<VER>_<RUNTIME>.<ext>` |
+
+Reference `bundles/base.bundle.json` and `bundles/headless.bundle.json` for the exact component and plugin manifest enforced by CI.
+
 ## Continuous Integration & Release Automation
 
-- **Nexus CI** (`.github/workflows/ci.yml`) restores, builds, and tests the .NET solution on Windows and Linux, then runs linting, contract governance, deterministic simulation smoke tests, and packaging probes.
-- **Release Packaging** (`.github/workflows/release.yml`) rebuilds tagged releases, generates single-file bundles via `tools/ci/package-windows.ps1` and `tools/ci/package-linux.ps1`, and publishes zip archives for operators.
+- **Nexus CI** (`.github/workflows/ci.yml`) restores, builds, and tests the .NET solution on Ubuntu using .NET 8. Test results are always uploaded as artifacts for debugging.
+- **Reusable component builds** (`.github/workflows/build-components-reusable.yml`) package Core, AgIO, UI, and plugins across Windows and Linux runtimes with consistent naming.
+- **Release Packaging** (`.github/workflows/release.yml`) publishes component archives immediately, assembles manifest-driven bundles only when every dependency is present, and updates the same GitHub Release on retries. SHA256 checksums, optional SBOMs, and Cosign signatures are attached alongside bundles.
 
 ## Safety, Access, and Roadmap
 

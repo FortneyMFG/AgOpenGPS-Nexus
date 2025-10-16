@@ -1,0 +1,19 @@
+{
+  "name": "Nexus Base",
+  "components": {
+    "core": { "runtime": ["win-x64","linux-x64"] },
+    "agio": { "runtime": ["win-x64","linux-x64"] },
+    "ui":   { "runtime": ["win-x64","linux-x64"] }
+  },
+  "plugins": [
+    { "id": "Autosteer" },
+    { "id": "Mapping" },
+    { "id": "Guidance" },
+    { "id": "SectionControl" },
+    { "id": "FileIO" },
+    { "id": "Sim" },
+    { "id": "Telemetry" }
+  ],
+  "docs": ["LICENSE", "README.md", "UPGRADING.md", "SERVICES.md", "PLUGINS.md"],
+  "rootFiles": ["release.json", "nexus-launcher.sh", "nexus-launcher.cmd"]
+}

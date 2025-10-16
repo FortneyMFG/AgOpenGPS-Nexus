@@ -1,0 +1,12 @@
+{
+  "name": "Nexus Headless",
+  "components": {
+    "core": { "runtime": ["linux-arm64"] },
+    "agio": { "runtime": ["linux-arm64"] }
+  },
+  "plugins": [
+    { "id": "Sim" }
+  ],
+  "docs": ["LICENSE", "README.md", "SERVICES.md", "PLUGINS.md"],
+  "rootFiles": ["release.json", "nexus-launcher.sh"]
+}

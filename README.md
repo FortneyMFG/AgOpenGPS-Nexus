@@ -38,8 +38,8 @@ flowchart TD
     Guidance <--> Core
     Sections <--> Core
     Core <--> AgIO
-    AgIO <--> Bridge
-    Bridge <--> MCUs
+    AgIO <-- AOG-Link --> Bridge
+    Bridge <-- AOG-Link Adapted --> MCUs
     Core <--> ISOBUSP
     ISOBUSP <--> ISOBUS
     Core <--> ELRS

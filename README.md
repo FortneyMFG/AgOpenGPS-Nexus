@@ -6,7 +6,7 @@ Nexus is an experiment in how far a community guided by AI co-pilots can take Ag
 
 - **Full backward compatibility.**  
   Nexus is built to run natively with existing **AgOpenGPS Windows tablet + AIO** setups—no hardware changes or wiring rewrites required. Every configuration, connection, and control scheme supported today continues to work out of the box.
-- **CM5-first future option.**  
+- **CM5-first option.**  
   For new installations, a **Raspberry Pi Compute Module 5 (or Pi 5)** can host the entire Nexus stack—replacing both the tablet and the Teensy in an AIO—with identical functionality, reduced complexity, and a **steep cost savings**. One or more HDMI/DSI touch displays can be connected directly.
 - **AI-assisted evolution.**  
   Nexus treats every artifact—code, docs, packaging, and automation—as something an AI helper can draft while humans review and steer.

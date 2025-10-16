@@ -18,12 +18,20 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-126 Mapping plugin architecture ADR _(Done)_
 - [x] NX-131 Field job session lifecycle ADR _(Done)_
 - [x] NX-152 .NET 8 runtime enforcement per ADR-001 _(Done)_
-- [ ] NX-190 Comprehensive ADR portfolio review _(Planned)_
+- [x] NX-190 Comprehensive ADR portfolio review _(Done)_ — Backlog gaps captured in NX-610…NX-616
 - [x] NX-153 gRPC contract governance rollout _(Done)_
 - [x] NX-154 Avalonia companion run-mode delivery _(Done)_
 - [x] NX-155 Composite simulation fabric GA _(Done)_
 - [x] NX-156 AOG-Link transport rollout _(Done)_
 - [x] NX-157 Plugin API lease & manifest enforcement _(Done)_
+
+- [ ] NX-610 Governance telemetry automation _(Planned)_ — ADR roadmap program board, dependency digests, and review minutes publishing
+- [ ] NX-611 PoseStream and SectionState roadmap delivery _(Planned)_ — ADR-007 services, schemas, and replay fixtures
+- [ ] NX-612 TileStore durability and compaction rollout _(Planned)_ — ADR-009 crash-safety, maintenance workers, and audit tooling
+- [ ] NX-613 Layer registry and visualization expansion _(Planned)_ — ADR-010…ADR-013 registry automation, renderer cache, fusion provenance, and QA suite
+- [ ] NX-614 Prescription interop and control semantics _(Planned)_ — ADR-014…ADR-016 import/export suite, control engine updates, and CAN transport guardrails
+- [ ] NX-615 Kinematics, plugin platform, and identity governance _(Planned)_ — ADR-017…ADR-024 kinematics editor, plugin permission gate, provenance DAG, and identity UX
+- [ ] NX-616 Global retention, performance, and acceptance guardrails _(Planned)_ — ADR-025…ADR-026 retention planners plus global CI hooks for replay, CPU, interop, and crash recovery
 
 - [x] NX-191 Zone proto + JSON schema handshake _(Done)_ — ADR-027 spatial constraints contract release
 - [x] NX-192 PoseStream zone mask proto update _(Done)_ — ADR-027 PoseStream mask contract

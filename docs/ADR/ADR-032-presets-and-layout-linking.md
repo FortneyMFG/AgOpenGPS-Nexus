@@ -1,7 +1,11 @@
 # ADR-032: Presets and Layout Linking for Equipment Workflows
 
 ## Status
-Proposed
+Accepted
+
+NX-130 advanced this ADR through review, locking the preset/layout model as the
+authoritative workflow for equipment orchestration across desktop and companion
+clients.
 
 **Relevant Plugin(s):** UI Shell (Presets), Device Manager, Mapping, Autosteer, Section Control, Rate Control, Job Tasks, Variable Mapping
 
@@ -47,6 +51,17 @@ Adopt a Preset model that binds Equipment, Implement, and Layout selections into
   - Seed catalog fixtures (e.g., "Planting – 12R", "Sprayer – 120ft") to validate multi-screen behavior and linked/snapshot flows.
 - Provide migration tooling for layout JSON schemas (`migrate(LayoutJson, fromVersion)`), and regression tests covering inheritance, linking, and task execution.
 - Coordinate with the layer registry hash handshake draft to ensure controller boot flows validate registry hashes before activating presets ([reference](../reference/layer-registry-handshake.md)).
+
+## Accepted scope & invariants
+- Preset bundles must persist dependency graphs that align with the manifest
+  governance matrix so Device Manager and PresetsService present identical health
+  states during orchestration.【F:docs/ADR/ADR-031-official-plugin-bundle.md†L15-L62】
+- Layout inheritance and live-link semantics are now normative for UI pods; updates
+  must respect the deterministic overlay rules and provenance requirements captured
+  in the frontend SRS section.【F:docs/SRS/sections/05_Frontends.md†L22-L88】
+- Task orchestration for preset application is officially bound to the JobsService
+  lifecycle contracts, ensuring preset provenance is journaled alongside job/session
+  metadata for auditing.【F:docs/ADR/ADR-030-field-job-sessions.md†L20-L96】
 
 ## Legacy Implementation Notes
 ### AgOpenGPS v6

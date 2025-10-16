@@ -15,7 +15,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-104 Metadata-driven variable-rate layer mapping ADR _(Done)_
 - [x] NX-115 AOG-Link protocol specification _(Done)_
 - [x] NX-116 Shared aog-link.proto schemas _(Done)_
-- [ ] NX-126 Mapping plugin architecture ADR _(Planned)_
+- [x] NX-126 Mapping plugin architecture ADR _(Done)_
 - [x] NX-131 Field job session lifecycle ADR _(Done)_
 - [x] NX-152 .NET 8 runtime enforcement per ADR-001 _(Done)_
 - [ ] NX-190 Comprehensive ADR portfolio review _(Planned)_
@@ -211,7 +211,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-049 Replay analysis timeline
 - [x] NX-065 UI theming + layout persistence
 - [x] NX-112 Layer-aware section map visualization _(Done)_
-- [ ] NX-130 Presets & layout linking ADR _(Planned)_
+- [x] NX-130 Presets & layout linking ADR _(Done)_
 
 - [x] NX-291 Zone editor toolbar integration _(Done)_ — ADR-044 zone drawing framework
 - [x] NX-292 Zone override toggles & policy UX _(Done)_ — ADR-027 constraint UX
@@ -292,7 +292,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-125 Stack responsibility reference ADR _(Done)_
 - [x] NX-151 Backlog update for ADR + official plugin tasks _(Done)_
 - [x] NX-116 README experiment narrative refresh _(Done)_
-- [ ] NX-124 Spatial constraint zones ADR & SRS sync _(In Progress)_
+- [x] NX-124 Spatial constraint zones ADR & SRS sync _(Done)_
 - [x] NX-134 Official plugin dependency map & manifests _(Done)_
 
 - [x] NX-318 Plugin manifest governance documentation _(Done)_ — ADR-031 manifest governance
@@ -364,7 +364,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-004 | JSON schemas (Core, AGiO, UI, Simulation) | Done |  | — | [SRS §2.1 Foundations & Contracts](docs/SRS/NOTES.md#srs-21-foundations--contracts) | Coordinate with Schema Owner |
 | NX-005 | Capabilities handshake proto/service | Done |  | — | [SRS §3.2 Capabilities Exchange](docs/SRS/NOTES.md#srs-32-capabilities-exchange) | Smoke test between Core & AGiO |
 | NX-104 | ADR: Metadata-driven variable-rate layer mapping & imports | Done |  | — | [SRS §8 Data Model & Storage](docs/SRS/sections/08_Data_Model_Storage.md) | Superseded by ADR-010 roadmap planning; see ADR tracker for replacement scope |
-| NX-150 | ADR roadmap: PoseStream, layers, and control revamp | In Progress |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Track upcoming ADR-007…ADR-020 deliverables and linked SRS requirements |
+| NX-150 | ADR roadmap: PoseStream, layers, and control revamp | Done |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | Track upcoming ADR-007…ADR-020 deliverables and linked SRS requirements |
 | NX-115 | AOG-Link protocol specification and reference flows | Done |  | — | [SRS §3 Communications & Transports](docs/SRS/sections/03_Comm_Transports.md) | ADR-006 + SRS updates complete |
 | NX-116 | Shared `aog-link.proto` schemas with nanopb options | Done |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Publish contracts aligned with `Aog.Abstractions` |
 | NX-152 | Enforce ADR-001 .NET 8 runtime baselines across solutions and CI | Done | AI | — | [ADR-001 .NET 8 runtime](docs/ADR/ADR-001-dotnet8-runtime.md) | Runtime baseline playbook + SDK pinning in `global.json` |
@@ -568,6 +568,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-049 | Replay analysis timeline with bookmarks and export options | Done |  | — | [SRS §3.9 Replay Services](docs/SRS/NOTES.md#srs-39-replay-services) | Provide bookmark/export tooling |
 | NX-065 | UI theming and layout persistence across sessions | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Save/restore window layout and theme |
 | NX-112 | Layer-aware section map visualization aligned with layer registry | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Map view renders registry-backed layers |
+| NX-130 | Presets & layout linking ADR | Done |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 accepted in NX-130 |
 | NX-291 | Zone editor toolbar integration | Done |  | — | [ADR-044](docs/ADR/ADR-044_ZoneDrawingFramework.md) | ADR-044 zone drawing framework |
 | NX-292 | Zone override toggles & policy UX | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint UX |
 | NX-293 | Zone import/export workflows | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 interop contracts |
@@ -650,8 +651,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-103 | Sync tasks.md with tasks.csv progress tracker | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Align statuses and backlog entries |
 | NX-125 | Stack responsibility reference ADR | Done |  | — | [ADR-028](docs/ADR/ADR-028-stack-boundaries.md) | Document layer boundaries for AgIO, Core, and plugins |
 | NX-151 | Backlog update for ADR + official plugin tasks | Done | AI | — | [ADR-031 Official plugin bundle](docs/ADR/ADR-031-official-plugin-bundle.md) | Extend tasks.md/.csv with ADR coverage and plugin roadmap |
-| NX-124 | Spatial constraint zones ADR & SRS sync | In Progress | AI | — | [SRS §3 Communications](docs/SRS/sections/03_Comm_Transports.md) | Add ZoneService requirements and constraint policies |
-| NX-141 | Companion/mobile stack rollout documentation | In Progress | AI | — | [SRS §5 Frontends](docs/SRS/sections/05_Frontends.md) | Capture CompanionRemote, LocalInProc, and LocalOutOfProc run modes across docs |
+| NX-124 | Spatial constraint zones ADR & SRS sync | Done | AI | — | [SRS §3 Communications](docs/SRS/sections/03_Comm_Transports.md) | Add ZoneService requirements and constraint policies |
+| NX-141 | Companion/mobile stack rollout documentation | Done | AI | — | [SRS §5 Frontends](docs/SRS/sections/05_Frontends.md) | Capture CompanionRemote, LocalInProc, and LocalOutOfProc run modes across docs |
 | NX-318 | Plugin manifest governance documentation | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
 | NX-319 | Zone policy operator guide | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint UX docs |
 | NX-320 | Season/session migration playbook | Done |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040/041 lifecycle rollout |

@@ -66,6 +66,27 @@ validation and provenance entries.
 - Plugin teams focus on attribute semantics instead of geometry math, accelerating new overlay development.
 - Core must own tile-store concurrency, undo stack persistence, and eventual conflict resolution when offline edits merge.
 
+## Governance Updates
+
+- **Layer registry alignment.** Editable layer declarations must reference the canonical registry entries introduced with the
+  multi-field envelope update so Crop, Genetics, Yield, Profit, Field Health, and Weather plugins remain provenance-compatible
+  when sessions span multiple fields.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】【F:schemas/Layer.v1.json†L1-L120】
+- **Undo/redo determinism gate.** `LayerEditEvent.v1` fixtures now ship alongside each plugin bundle. CI compares journal hashes
+  during replay to block releases that diverge from the reference set, ensuring collaborative edits remain deterministic across
+  mesh participants.【F:schemas/LayerEditEvent.v1.json†L1-L140】
+- **Collaborative audit trail.** Mesh share profiles must declare which edit events they replicate. ZoneService rejects
+  publications that omit provenance hashes or exceed the per-event payload budget defined in the manifest governance
+  program.【F:schemas/ShareProfile.v1.json†L1-L120】【F:docs/ADR/ADR-031-official-plugin-bundle.md†L17-L70】
+
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Editing sessions record the mounted `fieldIds[]` and union envelopes published by JobsService so replay, profit, and weather
+  analytics can reconcile edits with the active job context without bespoke geometry joins.【F:docs/ADR/ADR-030-field-job-sessions.md†L13-L96】
+- `LayerEditService` broadcasts session lifecycle hooks (`onSessionStart`, `onSessionEnd`) and mesh presence metadata, allowing
+  Profit, Yield, and Weather plugins to coalesce analytics windows with the exact edit ranges captured in journals.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L9-L70】【F:schemas/Session.v1.json†L1-L120】
+- Collaborative edits over the Live Telemetry Mesh carry deterministic replay seeds so remote devices rebuild identical undo
+  stacks even when RadioBridge transports introduce retries or resequencing during constrained connectivity.【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+
 ## Alternatives Considered
 
 1. **Plugin-owned editors.** Rejected due to inconsistent UX, conflicting shortcuts, and divergent provenance stories.

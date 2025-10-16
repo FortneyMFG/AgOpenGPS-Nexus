@@ -280,6 +280,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-315 Turn planner library port _(Done)_ — ADR-033 guidance planner porting
 - [x] NX-316 Constraint-aware lookahead tuning _(Done)_ — ADR-033 lookahead + ADR-027 gating
 - [x] NX-317 Firmware-in-loop stability validation _(Done)_ — ADR-033 closed-loop validation
+- [x] NX-620 V6 guidance row/edge-case study docs _(Done)_ — v6 guidance extraction notes (sections 90/95/99)
 
 ### Section G — Packaging, DevEx, Docs
 - [x] NX-006 CI matrix (Win x64 + Linux arm64)

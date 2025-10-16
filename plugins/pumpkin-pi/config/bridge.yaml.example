@@ -1,0 +1,21 @@
+# Minimal AgIO Bridge configuration for Pumpkin Pi deployments.
+bridge:
+  node_id: cm5-bridge
+  advertise:
+    udp: true
+    serial: true
+    can: true
+    mqtt_sn: true
+  udp:
+    listen: "0.0.0.0:8888"
+  serial:
+    device: "/dev/ttyUSB0"
+    baud: 460800
+  can:
+    interface: can0
+  mqtt_sn:
+    broker: "udp://127.0.0.1:1884"
+mqtt:
+  broker: "localhost:1883"
+  client_id: bridge-loopback
+  publish_health: true

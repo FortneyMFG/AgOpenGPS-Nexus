@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package pumpkinpi.v1;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/AgOpenGPS/AgOpenGPS-Nexus/plugins/pumpkin-pi/pkg/grpcapi/pb;pumpkinpipb";
+
+message SetSteerTargetRequest {
+  uint32 sequence = 1;
+  double target_wheel_angle_deg = 2;
+  double controller_output = 3;
+  double feed_forward = 4;
+  bool enable = 5;
+  uint64 monotonic_time_us = 6;
+}
+
+message SteerStatus {
+  uint32 sequence = 1;
+  double measured_wheel_angle_deg = 2;
+  double applied_effort = 3;
+  bool engaged = 4;
+  uint64 monotonic_time_us = 5;
+}
+
+message AuthorityClaim {
+  string owner = 1;
+  uint64 monotonic_time_us = 2;
+}
+
+service PumpkinPiService {
+  rpc SetSteerTarget(SetSteerTargetRequest) returns (google.protobuf.Empty);
+  rpc StreamSteerStatus(google.protobuf.Empty) returns (stream SteerStatus);
+  rpc ClaimAuthority(AuthorityClaim) returns (google.protobuf.Empty);
+}

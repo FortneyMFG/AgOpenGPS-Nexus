@@ -1,0 +1,125 @@
+screens:
+  - id: app_shell
+    host: core
+    inject_point: shell.main
+    contract: core.app_shell.v1
+  - id: map_canvas
+    host: core
+    inject_point: shell.map
+    contract: core.map_canvas.v1
+  - id: top_toolbar
+    host: core
+    inject_point: toolbar.top
+    contract: core.top_toolbar.v1
+  - id: file_menu
+    host: core
+    inject_point: menu.file
+    contract: core.file_menu.v1
+  - id: tools_menu
+    host: core
+    inject_point: menu.tools
+    contract: core.tools_menu.v1
+  - id: field_menu
+    host: core
+    inject_point: menu.field
+    contract: core.field_menu.v1
+  - id: job_manager_dialog
+    host: core
+    inject_point: dialog.jobs
+    contract: core.job_manager_dialog.v1
+  - id: field_directory_dialog
+    host: core
+    inject_point: dialog.jobs
+    contract: core.field_directory_dialog.v1
+  - id: field_existing_dialog
+    host: core
+    inject_point: dialog.jobs
+    contract: core.field_existing_dialog.v1
+  - id: field_map_dialog
+    host: core
+    inject_point: dialog.jobs
+    contract: core.field_map_dialog.v1
+  - id: field_save_dialog
+    host: core
+    inject_point: dialog.general
+    contract: core.field_save_dialog.v1
+  - id: boundary_tool_dialog
+    host: core
+    inject_point: dialog.boundary
+    contract: core.boundary_tool_dialog.v1
+  - id: flag_manager_dialog
+    host: core
+    inject_point: dialog.flags
+    contract: core.flag_manager_dialog.v1
+  - id: section_control_widget
+    host: plugin:section-control
+    inject_point: toolbar.section
+    contract: section_control.v1
+  - id: section_config_dialog
+    host: plugin:section-control
+    inject_point: settings.plugins
+    contract: section_control.v1
+  - id: steer_settings_dialog
+    host: plugin:autosteer
+    inject_point: settings.plugins
+    contract: autosteer.v1
+  - id: steer_wizard_dialog
+    host: plugin:autosteer
+    inject_point: wizard.autosteer
+    contract: autosteer.v1
+  - id: steer_chart_dialog
+    host: plugin:autosteer
+    inject_point: diagnostics.autosteer
+    contract: autosteer.v1
+  - id: color_settings_dialog
+    host: core
+    inject_point: settings.display
+    contract: core.color_settings_dialog.v1
+  - id: hotkey_dialog
+    host: core
+    inject_point: settings.input
+    contract: core.hotkey_dialog.v1
+  - id: gps_data_dialog
+    host: core
+    inject_point: diagnostics.telemetry
+    contract: core.gps_data_dialog.v1
+  - id: udp_status_dialog
+    host: core
+    inject_point: diagnostics.telemetry
+    contract: core.udp_status_dialog.v1
+  - id: event_viewer_dialog
+    host: core
+    inject_point: diagnostics.logs
+    contract: core.event_viewer_dialog.v1
+  - id: help_dialog
+    host: core
+    inject_point: help.modal
+    contract: core.help_dialog.v1
+  - id: about_dialog
+    host: core
+    inject_point: help.modal
+    contract: core.about_dialog.v1
+  - id: webcam_dialog
+    host: plugin:video-monitor
+    inject_point: plugin.video
+    contract: video_monitor.v1
+  - id: shift_position_dialog
+    host: core
+    inject_point: tools.offset
+    contract: core.shift_position_dialog.v1
+  - id: ag_io_loop_dialog
+    host: core
+    inject_point: plugin.agio
+    contract: core.ag_io_loop_dialog.v1
+  - id: ag_io_serial_dialog
+    host: core
+    inject_point: plugin.agio
+    contract: core.ag_io_serial_dialog.v1
+  - id: ag_io_advanced_settings_dialog
+    host: core
+    inject_point: plugin.agio
+    contract: core.ag_io_advanced_settings_dialog.v1
+  - id: simulator_main_dialog
+    host: core
+    inject_point: simulation.shell
+    contract: core.simulator_main_dialog.v1

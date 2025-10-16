@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "version": 1,
+    "generated_at": "2025-10-16T01:39:14.814357Z"
+  },
+  "font": {
+    "family": "Segoe UI",
+    "sizes": {
+      "xs": 10,
+      "sm": 12,
+      "md": 14,
+      "lg": 18,
+      "xl": 24
+    }
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24
+  },
+  "radius": {
+    "sm": 4,
+    "md": 8,
+    "lg": 12
+  },
+  "color": {
+    "light": {
+      "surface": "#FFFFFF",
+      "surface-alt": "#F3F6FB",
+      "text": "#1F2933",
+      "accent": "#1D9BF0",
+      "accent-muted": "#7CC4FF",
+      "success": "#2DCB74",
+      "warning": "#F7B529",
+      "danger": "#E5484D"
+    },
+    "dark": {
+      "surface": "#131722",
+      "surface-alt": "#1F2534",
+      "text": "#F8FAFC",
+      "accent": "#5AB9FF",
+      "accent-muted": "#94D2FF",
+      "success": "#4ADE80",
+      "warning": "#FACC15",
+      "danger": "#F87171"
+    }
+  },
+  "stroke": {
+    "thin": 1,
+    "medium": 2,
+    "thick": 3
+  }
+}

@@ -68,6 +68,18 @@ artifacts/*
 !artifacts/nuget/
 artifacts/nuget/*
 !artifacts/nuget/.gitkeep
+!artifacts/ui-*.json
+!artifacts/ui-*.csv
+!artifacts/ui-*.md
+!artifacts/ui-*.yaml
+!artifacts/ui-screenshots/
+artifacts/ui-screenshots/*
+!artifacts/ui-screenshots/README.md
+
+# Legacy repositories cloned locally for analysis
+Legacy SourceCode -V6/
+Legacy SourceCode -Dev/
+Legacy SourceCode -AgValoniaGPS/
 
 # Tye
 .tye/

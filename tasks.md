@@ -628,6 +628,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-327 | Plugin QA handshake update | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance QA |
 | NX-341 | GitHub Actions release packaging (Win/Linux zips) | In Progress | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
 | NX-342 | Developer setup quick start doc | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/howto/developer-setup.md |
+| NX-343 | UI modernization AI prompt bundle | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/templates/ui-modernization-ai-prompts.md |
 
 ### Section H — Safety & QA
 

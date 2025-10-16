@@ -37,6 +37,24 @@ builder and analytics.
 - Requires caching and rate limiting for external API calls.
 - Introduces additional sensor integration points.
 
+## Governance Updates
+
+- **Snapshot retention.** Weather snapshots adopt the session archival cadence defined in JobsService; operators must retain raw
+  imports and API provenance so audits can rehydrate the data underpinning regulatory reports.【F:docs/ADR/ADR-030-field-job-sessions.md†L13-L96】【F:schemas/WeatherOverlay.v1.json†L1-L140】
+- **Source verification.** External API connectors log request/response hashes and rate limit decisions, and regression packs
+  replay them through the composite simulation harness to verify deterministic caching.【F:docs/ADR/ADR-004-composite-simulation.md†L9-L43】
+- **Alert scope compliance.** Weather-derived notifications respect share/subscribe ACLs and RadioBridge throttles, keeping
+  sensitive agronomic data scoped to authorized collaborators.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L70】【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Session snapshots capture weather deltas alongside crop, genetics, and profit references so analytics can correlate outcomes
+  without bespoke joins.【F:schemas/Session.v1.json†L1-L120】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L9-L96】
+- Multi-field envelope membership informs weather overlays, enabling per-field rainfall and wind reporting that aligns with
+  regulatory compliance and profitability splits.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+- Weather overlays seed LayerEditEvent journals when operators draw manual impact zones, ensuring collaborative edits replay
+  consistently across mesh-connected devices.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L9-L74】
+
 ## Alternatives Considered
 
 1. **Leave weather to external apps.** Rejected because compliance and analytics rely on aligned timestamps and contexts.

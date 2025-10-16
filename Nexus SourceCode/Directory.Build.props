@@ -11,5 +11,7 @@
     <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ContractsArtifactsDir)</RestoreAdditionalProjectSources>
     <AogAbstractionsBaseVersion>0.1.0</AogAbstractionsBaseVersion>
     <AogAbstractionsPackageVersion>0.1.*</AogAbstractionsPackageVersion>
+    <NexusCliAbstractionsBaseVersion>0.1.0</NexusCliAbstractionsBaseVersion>
+    <NexusCliAbstractionsPackageVersion>0.1.*</NexusCliAbstractionsPackageVersion>
   </PropertyGroup>
 </Project>

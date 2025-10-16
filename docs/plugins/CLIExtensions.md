@@ -4,6 +4,20 @@ Plugins can now publish CLI verbs that run under the shared `nx` host described
 in ADR-054 and SRS Section 18. This guide highlights how plugin teams surface
 commands without duplicating transport or manifest plumbing.
 
+## Install the CLI adapter SDK
+
+Reference the published abstractions so your project builds against the same
+contracts as the `nx` host. The package is available from the local repository
+feed (`./artifacts/nuget`) or GitHub Packages.
+
+```bash
+dotnet add package AgOpenGPS.Nexus.Plugin.Cli.Abstractions --version 0.1.*
+```
+
+The package ships XML documentation and nullable-enabled APIs for
+`System.CommandLine` integration. See the README inside the package for local
+packaging instructions.
+
 ## Adapter vs. reflection contributions
 - **Adapter assemblies (`*.Cli.dll`)** implement `Nexus.Plugin.Cli.Abstractions`.
   Drop the assembly beside your plugin package and export one or more

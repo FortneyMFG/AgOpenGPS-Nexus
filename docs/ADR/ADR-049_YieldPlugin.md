@@ -40,6 +40,24 @@ with the Crop Type and Genetics plugins to supply context.
 - Requires robust calibration handling and sensor quality checks to avoid misleading analytics.
 - Introduces additional storage and compute load for smoothing/aggregation pipelines.
 
+## Governance Updates
+
+- **Calibration bundles.** Yield ingest must attach calibration artifacts (header, sensor offsets, reference passes) that replay
+  in the composite simulation harness before analytics updates can ship.【F:docs/ADR/ADR-004-composite-simulation.md†L9-L43】
+- **Schema enforcement.** `YieldActual.v1`, `YieldMoisture.v1`, and `YieldTestWeight.v1` revisions trigger compatibility scans
+  across Profit, Field Health, and Report Builder templates, ensuring downstream consumers stay in lockstep.【F:schemas/YieldActual.v1.json†L1-L140】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L9-L70】【F:docs/ADR/ADR-051_ReportBuilder.md†L9-L70】
+- **Fixture parity.** Regression packs now include collaborative harvest scenarios over mesh links to confirm streamed yield
+  deltas stay within latency and determinism budgets when RadioBridge retransmits packets.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L70】【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Yield analytics consume the session-linked crop and genetics references so profitability overlays and rotation reporting
+  derive accurate per-variety metrics without manual reconciliation.【F:schemas/Session.v1.json†L1-L120】【F:docs/ADR/ADR-045_CropTypePlugin.md†L9-L96】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L9-L87】
+- Multi-field jobs emit per-field yield aggregates alongside the union envelope, unlocking report templates and alerts that
+  differentiate parcels even during continuous harvest passes.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+- Weather and Field Health overlays can subscribe to live yield deltas to correlate stress indicators during harvest, creating
+  richer scouting feedback loops.【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L9-L66】【F:docs/ADR/ADR-053_WeatherPlugin.md†L9-L66】
+
 ## Alternatives Considered
 
 1. **Keep yield in general analytics plugin.** Rejected because harvest-specific calibration and smoothing require dedicated

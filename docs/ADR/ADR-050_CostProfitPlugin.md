@@ -45,6 +45,24 @@ deducts quantities, updates weighted cost bases, and feeds replenishment forecas
 - Requires strong data validation and unit normalization to prevent misinterpretation.
 - Relies on timely availability of yield and cost inputs; plugins must handle missing data gracefully.
 
+## Governance Updates
+
+- **Ledger attestation.** `CostRecord.v1` entries require dual attestation (operator + reviewer) for high-impact categories; CI
+  validates that rollups reconcile with inventory ledger balances before releases exit staging.【F:schemas/CostRecord.v1.json†L1-L160】
+- **Profit layer certification.** `ProfitLayer.v1` exports carry summary stats and hash manifests so Report Builder and analytics
+  consumers confirm the layer matches recorded sessions before generating financial statements.【F:schemas/ProfitLayer.v1.json†L1-L140】【F:docs/ADR/ADR-051_ReportBuilder.md†L9-L70】
+- **Cross-plugin gating.** Profit analytics may only publish rollups when Crop, Genetics, Yield, Field Health, and Weather
+  plugins expose session-aligned context, preventing partially informed financial summaries.【F:docs/ADR/ADR-045_CropTypePlugin.md†L9-L96】【F:docs/ADR/ADR-049_YieldPlugin.md†L9-L96】【F:docs/ADR/ADR-053_WeatherPlugin.md†L9-L70】
+
+## Amendment — 2025 architecture refresh (NX-190)
+
+- Multi-field envelope splits allocate costs and revenue per field automatically, keeping cross-field jobs auditable without
+  manual spreadsheets.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+- Profit rollups include session hashes, crop IDs, genetics lots, and weather snapshots so downstream analytics can trace every
+  metric back to the exact operating context.【F:schemas/Session.v1.json†L1-L120】【F:docs/ADR/ADR-053_WeatherPlugin.md†L9-L66】
+- Mesh presence events trigger incremental profit exports, letting collaborating machines compare live profitability while
+  radio bandwidth stays bounded via RadioBridge throttling policies.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L70】【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+
 ## Alternatives Considered
 
 1. **Keep profit calculations external.** Rejected because it breaks provenance and prevents layering with other analytics.

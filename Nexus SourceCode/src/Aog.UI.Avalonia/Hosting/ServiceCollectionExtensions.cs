@@ -28,6 +28,8 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IUiPreferencesService, UiPreferencesService>();
         services.TryAddSingleton<IThemeManager, ThemeManager>();
         services.TryAddSingleton<ICrashTelemetryService, CrashTelemetryService>();
+        services.TryAddSingleton<IShellCommandDispatcher, ShellCommandDispatcher>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, LoggingShellCommandHandler>());
         services.TryAddSingleton<ConnectionSettingsViewModel>();
         services.TryAddSingleton<TelemetryPrivacyViewModel>();
         services.TryAddSingleton<IReplayController, NullReplayController>();

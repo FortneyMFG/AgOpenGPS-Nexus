@@ -26,4 +26,8 @@ public interface IUiPreferencesService
     /// <summary>Updates the persisted run mode preference.</summary>
     /// <param name="mode">The run mode to record.</param>
     void UpdateRunMode(AvaloniaRunMode mode);
+
+    /// <summary>Updates the persisted shell layout preferences.</summary>
+    /// <param name="layout">The layout preferences to store.</param>
+    void UpdateShellLayout(ShellLayoutPreferences layout);
 }

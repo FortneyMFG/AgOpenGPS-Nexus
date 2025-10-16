@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
+             x:Class="Aog.UI.Avalonia.Views.Shell.StatusStripView"
+             x:DataType="vm:StatusStripViewModel">
+  <ItemsControl Items="{Binding Indicators}">
+    <ItemsControl.ItemsPanel>
+      <ItemsPanelTemplate>
+        <StackPanel Orientation="Horizontal" Spacing="16"/>
+      </ItemsPanelTemplate>
+    </ItemsControl.ItemsPanel>
+    <ItemsControl.ItemTemplate>
+      <DataTemplate x:DataType="vm:ShellStatusIndicatorViewModel">
+        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+          <TextBlock Text="{Binding Value}">
+            <TextBlock.Styles>
+              <Style Selector="TextBlock">
+                <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+                <DataTrigger Binding="{Binding Level}" Value="Warning">
+                  <Setter Property="Foreground" Value="#F7B529"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Level}" Value="Critical">
+                  <Setter Property="Foreground" Value="#E5484D"/>
+                </DataTrigger>
+              </Style>
+            </TextBlock.Styles>
+            <TextBlock.ToolTip>
+              <ToolTip Content="{Binding Description}"/>
+            </TextBlock.ToolTip>
+          </TextBlock>
+        </StackPanel>
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</UserControl>

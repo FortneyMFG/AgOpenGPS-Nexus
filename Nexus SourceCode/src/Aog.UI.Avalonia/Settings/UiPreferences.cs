@@ -21,6 +21,9 @@ public sealed class UiPreferences
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AvaloniaRunMode RunMode { get; set; } = AvaloniaRunMode.CompanionRemote;
 
+    /// <summary>Gets or sets the persisted shell layout preferences.</summary>
+    public ShellLayoutPreferences ShellLayout { get; set; } = new();
+
     /// <summary>Creates a deep copy of the preferences.</summary>
     public UiPreferences Clone() => new()
     {
@@ -28,5 +31,6 @@ public sealed class UiPreferences
         TelemetryOptIn = TelemetryOptIn,
         Window = Window.Clone(),
         RunMode = RunMode,
+        ShellLayout = ShellLayout.Clone(),
     };
 }

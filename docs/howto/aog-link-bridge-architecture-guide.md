@@ -20,8 +20,57 @@ full normative specification.
 4. **Legacy bridge.** A dedicated adapter still emits/consumes AOG-Link v0 UDP
    PGNs so older MCUs remain operable until retirement.
 
-```
-Core / Plugins (gRPC) → Bridge (AOG-Link v1) → {UDP | Serial | CAN | MQTT | v0 PGNs}
+```mermaid
+flowchart TD
+    subgraph CoreStack["AgIO Bridge & Core Runtime"]
+        direction TB
+
+        subgraph Internal["Internal Message Bus"]
+            GRPC["gRPC Bus\n⇄ Core / UI / Plugins"]
+        end
+
+        subgraph Link["AOG-Link v1 Layer"]
+            LINKV1["AOG-Link v1\nprotobuf payloads + frame header"]
+        end
+
+        GRPC -- "publish / subscribe" --> LINKV1
+    end
+
+    subgraph Adapters["Physical & Network Adapters"]
+        direction LR
+        UDP["UDP Adapter\n29292/udp\n(Ethernet / Wi-Fi)"]
+        MQTT["MQTT Adapter\nBroker API\n(Ethernet / Wi-Fi)"]
+        SERIAL["Serial Adapter\nUSB-CDC / UART"]
+        CAN["CAN Adapter\nSocketCAN / CAN-FD"]
+        V0["v0 Bridge\nLegacy AOG-Link v0 PGNs"]
+    end
+
+    LINKV1 --> UDP
+    LINKV1 --> MQTT
+    LINKV1 --> SERIAL
+    LINKV1 --> CAN
+    LINKV1 --> V0
+
+    subgraph External["MCUs / Devices / Networks"]
+        direction LR
+        MCU1["MCU Node\n(UDP or MQTT-SN)"]
+        MCU2["MCU Node\n(Serial)"]
+        MCU3["MCU Node\n(CAN-FD)"]
+        Legacy["Legacy v0 Node\n(UDP PGNs)"]
+    end
+
+    UDP <--> MCU1
+    MQTT <--> MCU1
+    SERIAL <--> MCU2
+    CAN <--> MCU3
+    V0 <--> Legacy
+
+    classDef control fill=#ffd7d7,stroke=#aa0000,stroke-width=1px;
+    classDef telemetry fill=#d7f9ff,stroke=#0077aa,stroke-width=1px;
+    class UDP control;
+    class SERIAL control;
+    class CAN control;
+    class MQTT telemetry;
 ```
 
 ## 2. Why the split matters
@@ -35,15 +84,15 @@ Core / Plugins (gRPC) → Bridge (AOG-Link v1) → {UDP | Serial | CAN | MQTT | 
 
 ## 3. Control vs telemetry paths
 
-| Path type        | Preferred transports                                   | Notes |
-|------------------|---------------------------------------------------------|-------|
-| Low-latency CTRL | Shared memory (same host) → Serial/CAN → UDP            | `ACK_REQUIRED` commands, steer and section loops. |
-| Fan-out telemetry| MQTT QoS0 → UDP multicast (optional)                    | GPS, IMU, status, health metrics. |
-| Legacy support   | v0 Bridge                                               | Emits AOG-Link v0 PGNs for classic controllers. |
+| Path type         | Preferred transports                        | Notes                                                   |
+|-------------------|---------------------------------------------|---------------------------------------------------------|
+| Low-latency CTRL  | Shared memory (same host) → Serial/CAN → UDP | `ACK_REQUIRED` commands, steer and section loops.        |
+| Fan-out telemetry | MQTT QoS0 → UDP multicast (optional)         | GPS, IMU, status, health metrics.                       |
+| Legacy support    | v0 Bridge                                    | Emits AOG-Link v0 PGNs for classic controllers.         |
 
-The Mermaid flowchart in the SRS (Section 3A §6) marks control-focused adapters
-in red and telemetry-first adapters in blue. Use that diagram as the visual aid
-when explaining the data paths to stakeholders.
+The Mermaid flowchart above (mirrored in the SRS, Section 3A §6) marks
+control-focused adapters in red and telemetry-first adapters in blue. Use it as
+the visual aid when explaining the data paths to stakeholders.
 
 ## 4. Operational checklist
 

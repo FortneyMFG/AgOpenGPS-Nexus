@@ -123,24 +123,24 @@ flowchart TD
         direction TB
 
         subgraph Internal["Internal Message Bus"]
-            GRPC[gRPC Bus<br/>⇄ Core / UI / Plugins]
+            GRPC["gRPC Bus\n⇄ Core / UI / Plugins"]
         end
 
         subgraph Link["AOG-Link v1 Layer"]
-            LINKV1[AOG-Link v1<br/>protobuf payloads + frame header]
+            LINKV1["AOG-Link v1\nprotobuf payloads + frame header"]
         end
 
-        GRPC -- publish / subscribe --> LINKV1
+        GRPC -- "publish / subscribe" --> LINKV1
     end
 
     %% --- Transport adapters ---
     subgraph Adapters["Physical & Network Adapters"]
         direction LR
-        UDP[UDP Adapter<br/>29292/udp<br/><b>Ethernet / Wi-Fi</b>]
-        MQTT[MQTT Adapter<br/>Broker API<br/><b>Ethernet / Wi-Fi</b>]
-        SERIAL[Serial Adapter<br/>USB-CDC / UART]
-        CAN[CAN Adapter<br/>SocketCAN / CAN-FD]
-        V0[v0 Bridge<br/>Legacy AOG-Link v0 PGNs]
+        UDP["UDP Adapter\n29292/udp\n(Ethernet / Wi-Fi)"]
+        MQTT["MQTT Adapter\nBroker API\n(Ethernet / Wi-Fi)"]
+        SERIAL["Serial Adapter\nUSB-CDC / UART"]
+        CAN["CAN Adapter\nSocketCAN / CAN-FD"]
+        V0["v0 Bridge\nLegacy AOG-Link v0 PGNs"]
     end
 
     %% --- Flows ---
@@ -153,10 +153,10 @@ flowchart TD
     %% --- External environment ---
     subgraph External["MCUs / Devices / Networks"]
         direction LR
-        MCU1[MCU Node (UDP or MQTT-SN)]
-        MCU2[MCU Node (Serial)]
-        MCU3[MCU Node (CAN-FD)]
-        Legacy[Legacy v0 Node (UDP PGNs)]
+        MCU1["MCU Node\n(UDP or MQTT-SN)"]
+        MCU2["MCU Node\n(Serial)"]
+        MCU3["MCU Node\n(CAN-FD)"]
+        Legacy["Legacy v0 Node\n(UDP PGNs)"]
     end
 
     %% --- External links ---

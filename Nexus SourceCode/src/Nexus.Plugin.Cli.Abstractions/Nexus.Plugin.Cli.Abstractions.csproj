@@ -3,9 +3,29 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsPackable>true</IsPackable>
+    <PackageId>AgOpenGPS.Nexus.Plugin.Cli.Abstractions</PackageId>
+    <Authors>AgOpenGPS</Authors>
+    <Product>AgOpenGPS Nexus CLI Plugin SDK</Product>
+    <Description>Abstractions and hosting primitives for Nexus CLI plugin adapters.</Description>
+    <PackageProjectUrl>https://github.com/AgOpenGPS/AgOpenGPS-Nexus</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AgOpenGPS/AgOpenGPS-Nexus</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>agopengps;nexus;cli;plugins</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageOutputPath>$(ContractsArtifactsDir)</PackageOutputPath>
+    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">false</ContinuousIntegrationBuild>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 </Project>

@@ -4,12 +4,20 @@
     <RootNamespace>Nexus.Cli.Host</RootNamespace>
     <AssemblyName>Nexus.Cli.Host</AssemblyName>
   </PropertyGroup>
+  <PropertyGroup>
+    <UseLocalNexusCliAbstractions Condition="'$(UseLocalNexusCliAbstractions)' == '' and Exists('..\Nexus.Plugin.Cli.Abstractions\Nexus.Plugin.Cli.Abstractions.csproj')">true</UseLocalNexusCliAbstractions>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.47.0" />
   </ItemGroup>
+  <ItemGroup Condition="'$(UseLocalNexusCliAbstractions)' == 'true'">
+    <ProjectReference Include="..\Nexus.Plugin.Cli.Abstractions\Nexus.Plugin.Cli.Abstractions.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseLocalNexusCliAbstractions)' != 'true'">
+    <PackageReference Include="AgOpenGPS.Nexus.Plugin.Cli.Abstractions" Version="$(NexusCliAbstractionsPackageVersion)" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Aog.Plugins\Aog.Plugins.csproj" />
-    <ProjectReference Include="..\Nexus.Plugin.Cli.Abstractions\Nexus.Plugin.Cli.Abstractions.csproj" />
   </ItemGroup>
 </Project>

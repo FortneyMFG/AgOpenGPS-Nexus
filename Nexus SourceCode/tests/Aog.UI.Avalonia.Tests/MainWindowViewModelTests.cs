@@ -303,6 +303,7 @@ public sealed class MainWindowViewModelTests
             {
                 CurrentTheme = theme;
                 ThemeChanged?.Invoke(this, theme);
+            }
         }
     }
 
@@ -316,7 +317,6 @@ public sealed class MainWindowViewModelTests
             return ValueTask.FromResult(true);
         }
     }
-}
 
     private sealed class TestCrashTelemetryService : ICrashTelemetryService
     {

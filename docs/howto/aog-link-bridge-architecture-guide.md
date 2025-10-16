@@ -65,8 +65,8 @@ flowchart TD
     CAN <--> MCU3
     V0 <--> Legacy
 
-    classDef control fill=#ffd7d7,stroke=#aa0000,stroke-width=1px;
-    classDef telemetry fill=#d7f9ff,stroke=#0077aa,stroke-width=1px;
+    classDef control fill:#ffd7d7,stroke:#aa0000,stroke-width:1px;
+    classDef telemetry fill:#d7f9ff,stroke:#0077aa,stroke-width:1px;
     class UDP control;
     class SERIAL control;
     class CAN control;

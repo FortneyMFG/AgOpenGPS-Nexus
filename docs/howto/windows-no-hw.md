@@ -35,7 +35,8 @@ Choose whichever path matches how you received Nexus:
 - **From a release ZIP:** download the latest `Nexus-Windows-x64.zip`, extract it to
   `C:\AgOpenGPS\Nexus`, and continue to Step 2.
 - **From source:** clone this repository, open Windows Terminal, `cd` into the repo,
-  and run `pwsh ./tools/scripts/nexus.ps1 run ui` once to restore dependencies.
+  and run `pwsh ./tools/scripts/nexus.ps1 run ui` once to restore dependencies. The helper
+  script lives at [`tools/scripts/nexus.ps1`](../../tools/scripts/nexus.ps1).
   Subsequent runs start instantly because the script shells out to `dotnet run` with
   cached packages.【F:tools/scripts/nexus.ps1†L11-L117】【F:Nexus SourceCode/README.md†L69-L83】
 
@@ -89,7 +90,7 @@ You now have:
 - Saved connection settings for the future hardware handshake.
 
 From here you can experiment with editing the simulation JSON in
-`Nexus SourceCode/src/Aog.UI.Avalonia/Resources/SimulationSample.json` to practice
+[`SimulationSample.json`](../../Nexus%20SourceCode/src/Aog.UI.Avalonia/Resources/SimulationSample.json) to practice
 longer routes or multi-sensor setups before you step into the cab.【F:Nexus SourceCode/src/Aog.UI.Avalonia/Resources/SimulationSample.json†L1-L33】
 
 ## Troubleshooting
@@ -103,7 +104,7 @@ longer routes or multi-sensor setups before you step into the cab.【F:Nexus Sou
 
 ## Next steps
 
-- Read the Pi/CM5 quick start (NX-064) to rehearse the headless flow before you
+- Read the [Pi/CM5 quick start](pi-sim.md) (NX-064) to rehearse the headless flow before you
   stage a tractor install.
 - Pair this guide with the upcoming packaging tasks (NX-061/NX-062) so operators
   can download a ready-to-run bundle instead of cloning the repository.

@@ -34,3 +34,13 @@ Expands hardware IO expectations so CAN/UDP modules (e.g., SK21 AOG_RC and futur
 ## Rough effort
 M — Firmware, configuration UI, and discovery protocol changes but largely additive to existing module infrastructure.
 
+## References
+- [Section 06 — Hardware I/O](../sections/06_Hardware_IO.md)
+- [Section 09 — Control Automation](../sections/09_Control_Automation.md)
+- [Gauge ID Registry](../appendices/GaugeId_Registry.md)
+
+## Related ADRs
+- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
+- [ADR-018 — Plugin API](../../ADR/ADR-018-plugin-api.md)
+

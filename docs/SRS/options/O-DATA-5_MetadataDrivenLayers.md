@@ -35,3 +35,13 @@ Establishes a layer catalogue and storage model that preserves today’s binary 
 ## Rough effort
 L — Introduces new schema definitions, persistence changes, configuration tooling, and export/replay utilities in addition to the runtime controllers.
 
+## References
+- [Section 02 — Data Model](../sections/02_DataModel.md)
+- [Section 04 — Mapping Layers](../sections/04_MappingLayers.md)
+- [Section 08 — Data Model Storage](../sections/08_Data_Model_Storage.md)
+
+## Related ADRs
+- [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)
+- [ADR-020 — Determinism & Replay CI](../../ADR/ADR-020-determinism-replay-ci.md)
+- [ADR-034 — Metadata-Driven Dashboards](../../ADR/ADR-034-metadata-driven-dashboards.md)
+

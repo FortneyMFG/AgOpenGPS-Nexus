@@ -29,3 +29,9 @@ patterns so future integrations (e.g., PR 607) can reuse documented DDI semantic
 - What timeout/window should AgOpenGPS enforce before treating feedback as stale when a condensed work state PGN is missed?
 - Can the microcontroller toolchain efficiently parse the command/element/DDI tuple without blowing RAM/flash budgets?
 - Should the AgIO CRC be retained even though UDP already carries a checksum, to preserve serial compatibility?
+
+## Related ADRs
+
+- [ADR-006 — AgIO Link MCU Communications](../../ADR/ADR-006-aog-link-mcu-communications.md)
+- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
+- [ADR-048 — RadioBridge](../../ADR/ADR-048_RadioBridge.md)

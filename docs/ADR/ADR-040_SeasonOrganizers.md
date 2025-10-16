@@ -76,3 +76,10 @@ cached analytics and register interest in seasonal overlays before sessions begi
 - Importers should create a default season only when operators opt in; Core must not auto-create seasons during migration.
 - UI and API flows may hide the Season step when no seasons are defined to preserve today’s farm-first workflow.
 - Synchronization tooling must merge seasons by `id` and keep `jobIds` deduplicated.
+
+## References
+
+- [Section 02 — Data Model](../SRS/sections/02_DataModel.md)
+- [Section 03 — Job Lifecycle](../SRS/sections/03_JobLifecycle.md)
+- [Section 04 — Backend Services](../SRS/sections/04_Backend_Services.md)
+- [ADR-023 — Session & Job Model](ADR-023-session-job-model.md)

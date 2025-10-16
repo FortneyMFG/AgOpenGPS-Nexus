@@ -33,3 +33,13 @@ Adds observability tooling that tracks packet rates, bad samples, and legend par
 ## Rough effort
 M — Requires coordinated updates to diagnostics overlays, logging, and documentation plus shared libraries for decoding.
 
+## References
+- [Section 10 — Telemetry & Health](../sections/10_Telemetry_Health.md)
+- [Section 15 — Engine & Machine Gauges](../sections/15_Engine_Machine_Gauges.md)
+- [AgIO PGN baseline](../references/AgIO_PGN_Baseline.md)
+
+## Related ADRs
+- [ADR-019 — Provenance, Audit, & QA](../../ADR/ADR-019-provenance-audit-qa.md)
+- [ADR-047 — Live Telemetry Mesh](../../ADR/ADR-047_LiveTelemetryMesh.md)
+- [ADR-052 — Field Health Plugin](../../ADR/ADR-052_FieldHealthPlugin.md)
+

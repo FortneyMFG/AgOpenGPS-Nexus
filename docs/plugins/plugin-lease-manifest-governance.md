@@ -24,7 +24,8 @@ ADR-018 introduces lease-based access control and manifest enforcement for plugi
   capability/lease matrix consumed by Device Manager and CI dashboards.
 - **Lease simulation.** Plugin regression suite runs simulated Core lease arbitration scenarios to ensure plugins back off/resume correctly.
 - **Bridge compatibility.** For plugins migrating from AgIO, CI runs dual-stack tests where both legacy and Nexus transports operate simultaneously.
-- **Human QA.** Record hardware validation (who/when) in `tasks.md` before promoting the plugin bundle.
+- **Human QA.** Record hardware validation (who/when) in
+  [`tasks.md`](../../tasks.md) before promoting the plugin bundle.
 
 ## Reviewer Checklist
 

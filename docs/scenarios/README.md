@@ -2,7 +2,9 @@
 
 The scenario library bundles curated presets that match the default simulation providers
 shipped with Nexus. Each scenario targets a common workflow so operators can load a
-realistic environment without building a configuration from scratch.
+realistic environment without building a configuration from scratch. Use it alongside the
+[composite simulation fabric checklist](composite-simulation-fabric.md) to keep presets,
+seed fixtures, and topic coverage aligned with ADR-004.
 
 ## Files
 - `library.json` — full simulation configuration that declares the shared providers,
@@ -21,6 +23,8 @@ realistic environment without building a configuration from scratch.
 ### `replay-overlay`
 - Uses a recorded guidance stream while the vehicle dynamics continue to run live.
 - Ideal for debriefs where telemetry is available but sensor fusion still runs in real time.
+- Pair with the [cross-track replay harness slice](../howto/cross-track-replay-harness.md) to
+  validate replay parity before loading field captures.
 
 ## Loading the Library
 1. Launch the UI and open **Simulation → Edit scenarios...**.
@@ -36,4 +40,6 @@ The `performance-matrix.json` catalog is exercised by the
 simulation bus with the `InstrumentedSimBus` and aggregates publish timings via
 `SimulationPerformanceBudgetRecorder`. The resulting budget snapshot enforces
 CPU-oriented thresholds (messages per second, max publish duration) so ADR-026
-performance budgets stay measurable in CI.
+performance budgets stay measurable in CI. Update both the scenario presets and the
+[performance budget dashboards](../howto/performance-budget-telemetry-dashboards.md) when
+topic coverage or provider mixes change.

@@ -30,14 +30,14 @@
 ## Hands-on lab (65–140 min)
 
 - Assign roles (driver, scribe, spotter) for each group of attendees.
-- Walk through the `hands-on-checklist.md`, pausing after each major milestone
-  (translation, soak validation, import) to answer questions.
+- Walk through the [`hands-on-checklist.md`](hands-on-checklist.md), pausing after each
+  major milestone (translation, soak validation, import) to answer questions.
 - Encourage teams to repeat steps with their own legacy data if time allows.
 - Capture screenshots of successful imports and soak reports for the final wrap-
   up.
 
 ## Wrap-up (140–150 min)
 
-- Distribute the `knowledge-check.md` quiz and collect responses.
+- Distribute the [`knowledge-check.md`](knowledge-check.md) quiz and collect responses.
 - Review next steps: schedule on-farm migrations, share local support contacts,
   and remind attendees to upload their artifacts to the deployment tracker.

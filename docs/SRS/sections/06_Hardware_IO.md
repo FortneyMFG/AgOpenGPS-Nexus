@@ -58,3 +58,10 @@ Field reliability, ease of install, compatibility with existing rigs, firmware u
 - What handshake (if any) should new modules implement to advertise capabilities?
 - How quickly should AgOpenGPS mark ISOBUS-style condensed work state feedback as stale when PGNs are missed, and should UDP keep
   the legacy CRC for serial parity?【F:docs/SRS/references/ISOBUS_Section_Control.md†L35-L40】
+
+## Related ADRs
+
+- [ADR-006 — AgIO Link MCU Communications](../../ADR/ADR-006-aog-link-mcu-communications.md)
+- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
+- [ADR-048 — RadioBridge](../../ADR/ADR-048_RadioBridge.md)

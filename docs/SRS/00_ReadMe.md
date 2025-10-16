@@ -9,10 +9,14 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 
 ## How this SRS is organized
 - **Vision & Non-goals** capture what the next release aspires to solve and what is intentionally out-of-scope.
-- **System slices** map every focus area (OS, UI, comms, storage, etc.) to an individual section document under `sections/`.
+- **System slices** map every focus area (OS, UI, comms, storage, etc.) to an individual
+  section document under [`sections/`](sections/).
 - **Sections** collect requirements and enumerate options. They are intentionally decision-neutral—decisions live in Architecture Decision Records (ADRs).
-- **Options** can be expanded in dedicated files using the `/docs/templates/OPTION.md` template when deeper analysis is needed.
-- **Decision matrices** use `/docs/templates/DECISION_MATRIX.md` to score mutually exclusive option families once requirements are stable.
+- **Options** can be expanded in dedicated files using the
+  [`docs/templates/OPTION.md`](../templates/OPTION.md) template when deeper analysis is
+  needed.
+- **Decision matrices** use [`docs/templates/DECISION_MATRIX.md`](../templates/DECISION_MATRIX.md)
+  to score mutually exclusive option families once requirements are stable.
 - **References** house canonical specs (e.g., PGN catalogs) that new options must remain compatible with unless an ADR says otherwise.
 - **ADRs** document finalized decisions. Each ADR references the section(s) and options involved so we preserve traceability.
 

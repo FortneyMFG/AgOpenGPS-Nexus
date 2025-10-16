@@ -5,3 +5,6 @@
 [submodule "Legacy SourceCode -Dev"]
 	path = Legacy SourceCode -Dev
 	url = https://github.com/double07killor/AOG_Dev.git
+[submodule "Legacy SourceCode -AgValoniaGPS"]
+	path = Legacy SourceCode -AgValoniaGPS
+	url = https://github.com/chriskinal/AgValoniaGPS

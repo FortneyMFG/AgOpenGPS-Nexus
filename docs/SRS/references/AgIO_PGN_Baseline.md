@@ -131,3 +131,10 @@ undocumented bytes. All counts are little endian unless noted.
 * Legacy PGN consumers expect the framing, IDs, and CRC described above.
 * Any new transport (gRPC, WebSocket, CAN) must either reproduce this catalog or provide a translator.
 * Capability negotiation must not break existing “Hello” and subnet messages without an opt-in upgrade path.
+
+## Related ADRs
+
+- [ADR-006 — AgIO Link MCU Communications](../../ADR/ADR-006-aog-link-mcu-communications.md)
+- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
+- [ADR-047 — Live Telemetry Mesh](../../ADR/ADR-047_LiveTelemetryMesh.md)

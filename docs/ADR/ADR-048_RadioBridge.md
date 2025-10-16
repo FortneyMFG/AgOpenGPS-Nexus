@@ -52,3 +52,9 @@ semantics.
 - Adds radio framing requirements to §03 Communications & Transports.
 - Extends §10 Telemetry diagnostics with radio health counters.
 - Updates plugin documentation to describe provisioning steps and ACL configuration.
+
+## References
+
+- [Section 03 — Communications & Transports](../SRS/sections/03_Comm_Transports.md)
+- [Section 10 — Telemetry & Health](../SRS/sections/10_Telemetry_Health.md)
+- [Section 12 — Extensibility & Plugins](../SRS/sections/12_Extensibility_Plugins.md)

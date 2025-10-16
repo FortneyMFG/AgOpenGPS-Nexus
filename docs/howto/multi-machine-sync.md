@@ -8,7 +8,9 @@
 Nexus is distributed under a permissive open-source license. There is no activation or
 seat enforcement layer to worry about; the "fleet manifest" files described below exist
 only to keep operator notes, machine IDs, and configuration metadata in sync across a
-fleet. Treat them like configuration rather than DRM.
+fleet. Treat them like configuration rather than DRM. Pair this workflow with the
+[offline update channel guide](installer-update-channels.md) so staged media and nightly
+sync archives stay aligned with the channel assignments you deploy.
 
 ## Workflow roles and artifacts
 
@@ -21,11 +23,15 @@ fleet. Treat them like configuration rather than DRM.
 The dealer toolkit from NX-087 already creates the staging folder that travels with the
 installer.【F:docs/howto/dealer-deployment-toolkit.md†L1-L54】 Extend that bundle with a
 `fleet/` directory that holds one machine manifest per cab and a `sync/` directory
-containing the initial field profiles you want preloaded.
+containing the initial field profiles you want preloaded. The
+[season/session migration playbook](season-session-migration-playbook.md) offers scripts
+for translating legacy machine profiles before you drop them into the sync seed.
 
 ## Pre-flight checklist
 
-Complete these items before leaving the staging bench:
+Complete these items before leaving the staging bench. Doing so keeps the
+[legacy migration guide](legacy-migration-guide.md) workflow aligned with the synced
+machine identities when you upgrade existing fleets:
 
 1. Generate the machine manifest files from the toolkit helper (`dealer-toolkit fleet export`).
    Name them `machine-<serial>.json` so they line up with the stickers on each cab
@@ -35,7 +41,9 @@ Complete these items before leaving the staging bench:
    `fleet/manifest.json`, which simply lists every machine ID and which one should start as
    the anchor.
 3. Export translated machine profiles (`legacy-tool translate`) and any baseline guidance
-   lines into `sync/seed/` so every machine starts with identical data.【F:docs/howto/dealer-deployment-toolkit.md†L38-L54】
+   lines into `sync/seed/` so every machine starts with identical data.【F:docs/howto/dealer-deployment-toolkit.md†L38-L54】 Use
+   the [Pi simulation helper](pi-sim.md) when you need to verify legacy AB lines before
+   travelling.
 4. Print the delivery checklist from the toolkit bundle and annotate which manifest goes
    with which physical machine to avoid swapping identities in the field.【F:docs/howto/dealer-deployment-toolkit.md†L30-L54】
 
@@ -50,7 +58,9 @@ Complete these items before leaving the staging bench:
 3. Launch Nexus Core. During startup it reads every `fleet/machine-*.json` file, validates
    that the anchor ID matches `fleet/manifest.json`, and writes
    `fleet/manifest.cache.json` summarising the configured fleet. Confirm the log shows the
-   anchor machine as `FleetAnchorConfirmed` before proceeding.
+   anchor machine as `FleetAnchorConfirmed` before proceeding. Capture a snapshot for the
+   [dealer escalation playbook](../support/dealer-escalation-process.md) so support teams can
+   quickly audit fleet assignments if issues arise.
 4. Seed the sync area by copying the contents of `sync/seed/` into
    `%PROGRAMDATA%/AgOpenGPS/Nexus/sync/inbox/`. The Core service will ingest the inbox and
    mirror it into `sync/outbox/anchor-<date>.zip` so satellites can pull the same baseline
@@ -61,7 +71,9 @@ Complete these items before leaving the staging bench:
 1. On each remaining machine, copy **only** its assigned `machine-<serial>.json` file into
    `%PROGRAMDATA%/AgOpenGPS/Nexus/fleet/`. Leave the anchor's manifest untouched.
 2. Start Nexus Core and watch for the `FleetMachineRegistered` entry. The log also records
-   the serial so you can double-check the right file landed on the right machine.
+   the serial so you can double-check the right file landed on the right machine. Record the
+   timestamp alongside your [field feedback telemetry snapshot](../support/field-feedback-telemetry.md)
+   so weekly rollups show which rigs received fresh identities.
 3. Delete the copied manifest file from the portable media after registration to avoid
    accidentally reusing it on another fleet.
 
@@ -78,9 +90,14 @@ stick) between machines.
    into `sync/inbox/` so Core ingests new AB lines, coverage logs, and machine notes the
    next time it starts.
 3. **Return path:** When the satellite finishes work, the import script also packages its
-   local changes into `sync/outbox/<machine-id>-<timestamp>.zip`. Drop the drive back at the
-   anchor and run `sync-collect` so the anchor manifest pulls in the updates and merges them
-   into the next nightly snapshot.
+ local changes into `sync/outbox/<machine-id>-<timestamp>.zip`. Drop the drive back at the
+  anchor and run `sync-collect` so the anchor manifest pulls in the updates and merges them
+  into the next nightly snapshot.
+
+Preview fleets participating in the
+[community preview program](../support/community-preview-program.md) should attach the
+sync drop timestamps to their weekly survey so telemetry comparisons account for when rigs
+received updated guidance or coverage archives.
 
 ## Step 4 — Auditing and recovery
 

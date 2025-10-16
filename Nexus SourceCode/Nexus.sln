@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Core.Host", "src\Aog.Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Plugins", "src\Aog.Plugins\Aog.Plugins.csproj", "{220AEF07-9CAB-4628-AA45-4E522A271CAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nexus.Cli.Host", "src\\Nexus.Cli.Host\\Nexus.Cli.Host.csproj", "{C2ECC375-3BB0-4237-80CD-6A12D2B0B14C}"
+EndProject
 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Abstractions.Tests", "tests\Aog.Abstractions.Tests\Aog.Abstractions.Tests.csproj", "{6EE00360-D881-45E7-8878-3BB805F70DE7}"
 EndProject
@@ -77,6 +79,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Tools.RadioBridge", "tools\Aog.Tools.RadioBridge\Aog.Tools.RadioBridge.csproj", "{D53DE9C1-46B4-4B90-B9C2-5DF25CAEB894}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aog.Tools.RadioBridge.Tests", "tests\Aog.Tools.RadioBridge.Tests\Aog.Tools.RadioBridge.Tests.csproj", "{439901F3-159B-48B5-8A4B-206DDFB04128}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nexus.Cli.Host.Tests", "tests\\Nexus.Cli.Host.Tests\\Nexus.Cli.Host.Tests.csproj", "{BEAC2494-A044-4FD7-844C-237CA8120F57}"
 EndProject
 
 Global
@@ -250,6 +254,16 @@ Global
     {2397C5C4-817F-4E83-BBF5-65EBB79A8B5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {2397C5C4-817F-4E83-BBF5-65EBB79A8B5C}.Release|Any CPU.Build.0   = Release|Any CPU
 
+    {C2ECC375-3BB0-4237-80CD-6A12D2B0B14C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {C2ECC375-3BB0-4237-80CD-6A12D2B0B14C}.Debug|Any CPU.Build.0   = Debug|Any CPU
+    {C2ECC375-3BB0-4237-80CD-6A12D2B0B14C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {C2ECC375-3BB0-4237-80CD-6A12D2B0B14C}.Release|Any CPU.Build.0   = Release|Any CPU
+
+    {BEAC2494-A044-4FD7-844C-237CA8120F57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {BEAC2494-A044-4FD7-844C-237CA8120F57}.Debug|Any CPU.Build.0   = Debug|Any CPU
+    {BEAC2494-A044-4FD7-844C-237CA8120F57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {BEAC2494-A044-4FD7-844C-237CA8120F57}.Release|Any CPU.Build.0   = Release|Any CPU
+
   EndGlobalSection
 
   GlobalSection(SolutionProperties) = preSolution
@@ -289,6 +303,9 @@ Global
     {FEE887B7-6070-42B8-B8D3-0093DA67B553} = {303ABDBD-7499-4F4B-9551-F64B319BC50D}
     {2397C5C4-817F-4E83-BBF5-65EBB79A8B5C} = {303ABDBD-7499-4F4B-9551-F64B319BC50D}
     {439901F3-159B-48B5-8A4B-206DDFB04128} = {303ABDBD-7499-4F4B-9551-F64B319BC50D}
+    {C2ECC375-3BB0-4237-80CD-6A12D2B0B14C} = {14609AB0-53CA-4B9A-B21F-527D1F98F821}
+    {BEAC2494-A044-4FD7-844C-237CA8120F57} = {303ABDBD-7499-4F4B-9551-F64B319BC50D}
+
   EndGlobalSection
 
   GlobalSection(ExtensibilityGlobals) = postSolution

@@ -184,8 +184,7 @@ public sealed class DiagnosticsWorkspaceViewModel
     {
         ArgumentNullException.ThrowIfNull(connection);
 
-        // Mirror production defaults so the shell renders a realistic opt-in state.
-        telemetry.IsTelemetryOptedIn = true;
+        // Respect the caller's telemetry state so opting out is preserved in design data.
 
         var gps = new GpsDiagnosticsViewModel(
             fixQuality: "RTK Fixed",

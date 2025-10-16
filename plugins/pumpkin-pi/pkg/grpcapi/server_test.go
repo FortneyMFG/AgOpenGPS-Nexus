@@ -101,3 +101,41 @@ func TestServerAuthorityClaim(t *testing.T) {
 		t.Fatalf("owner not reset: %s", owner)
 	}
 }
+
+func TestServerAuthorityMonitor(t *testing.T) {
+	ring, err := shm.Open("/srv_ring_auth_monitor", "/srv_evt_auth_monitor")
+	if err != nil {
+		t.Fatalf("open ring: %v", err)
+	}
+	defer ring.Close()
+	halBackend, err := hal.New(config.HALConfig{Backend: "pwm", PWM: config.PWMConfig{PeriodNS: 1_000_000, Simulate: true}})
+	if err != nil {
+		t.Fatalf("hal.New: %v", err)
+	}
+	defer halBackend.Close()
+	pub, err := mqtt.NewPublisher(config.MQTTConfig{Broker: "localhost:1883", PublishStatus: false})
+	if err != nil {
+		t.Fatalf("mqtt: %v", err)
+	}
+	defer pub.Close()
+	server := NewServer(ring, halBackend, pub, config.FastpathConfig{SetpointTTLMs: 250}, config.AuthorityConfig{Topic: "aog/v1/ctrl/authority/steer", DefaultOwner: "cm5", HoldInterval: 20 * time.Millisecond})
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	server.StartAuthorityMonitor(ctx)
+
+	if _, err := server.ClaimAuthority(context.Background(), &pumpkinpipb.AuthorityClaim{Owner: "external"}); err != nil {
+		t.Fatalf("ClaimAuthority: %v", err)
+	}
+
+	deadline := time.Now().Add(250 * time.Millisecond)
+	for time.Now().Before(deadline) {
+		server.mu.Lock()
+		owner := server.authorityOwner
+		server.mu.Unlock()
+		if owner == "cm5" {
+			return
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	t.Fatalf("authority did not revert; owner=%s", server.authorityOwner)
+}

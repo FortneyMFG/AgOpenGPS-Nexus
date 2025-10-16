@@ -73,6 +73,8 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	server.StartAuthorityMonitor(ctx)
+
 	go func() {
 		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()

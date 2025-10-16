@@ -31,7 +31,8 @@ public sealed class DiagnosticsWorkspaceViewModelTests
         workspace.Loops.Should().NotBeEmpty();
         workspace.Events.Should().NotBeEmpty();
         workspace.ConnectionSummary.Should().Contain(connection.AgioEndpoint);
-        workspace.TelemetrySummary.Should().Contain("No crash reports");
+        workspace.TelemetrySummary.Should().Contain("Telemetry uploads are disabled");
+        telemetry.IsTelemetryOptedIn.Should().BeFalse();
         workspace.DeviceHealthSummary.Should().Contain(deviceManager.SummaryTitle);
         workspace.LastUpdatedUtc.Kind.Should().Be(DateTimeKind.Utc);
     }

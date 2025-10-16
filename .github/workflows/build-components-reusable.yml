@@ -1,0 +1,78 @@
+name: build-components-reusable
+on:
+  workflow_call:
+    inputs:
+      component:
+        required: true
+        type: string
+      runtime:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build ${{ inputs.component }} for ${{ inputs.runtime }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      RUNTIME: ${{ inputs.runtime }}
+      VERSION: ${{ inputs.version }}
+      CFG: Release
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Resolve project
+        id: paths
+        shell: bash
+        run: |
+          case "${{ inputs.component }}" in
+            core) echo "proj=src/Core/Nexus.Core.csproj" >> $GITHUB_OUTPUT ;;
+            agio) echo "proj=src/AgIO/Nexus.AgIO.csproj" >> $GITHUB_OUTPUT ;;
+            ui)   echo "proj=src/UI/Nexus.UI.csproj" >> $GITHUB_OUTPUT ;;
+            plugin:*)
+              plug="${{ inputs.component#plugin: }}"
+              echo "proj=plugins/$plug/$plug.csproj" >> $GITHUB_OUTPUT ;;
+            *) echo "Unknown component"; exit 1 ;;
+          esac
+
+      - name: Publish self-contained
+        run: |
+          dotnet publish "${{ steps.paths.outputs.proj }}" \
+            -c $CFG -r $RUNTIME --self-contained true \
+            /p:PublishSingleFile=true /p:PublishTrimmed=false \
+            -o "out/${{ inputs.component }}/${RUNTIME}"
+
+      - name: Package docs & extras
+        run: |
+          mkdir -p "out/${{ inputs.component }}/${RUNTIME}/docs"
+          cp -R packaging/common/. "out/${{ inputs.component }}/${RUNTIME}/" || true
+          cp docs/COMPONENT-README.md "out/${{ inputs.component }}/${RUNTIME}/README-${{ inputs.component }}.md" || true
+
+      - name: Archive
+        id: arc
+        shell: bash
+        run: |
+          cd out/${{ inputs.component }}
+          name="${{ inputs.component }}_v${VERSION}_${RUNTIME}"
+          if [[ "$RUNTIME" == win-* ]]; then
+            7z a -r "${name}.zip" "${RUNTIME}/*"
+            echo "archive=${{ github.workspace }}/out/${{ inputs.component }}/${name}.zip" >> $GITHUB_OUTPUT
+          else
+            tar -czf "${name}.tar.gz" "${RUNTIME}"
+            echo "archive=${{ github.workspace }}/out/${{ inputs.component }}/${name}.tar.gz" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.component }}_${{ inputs.runtime }}
+          path: ${{ steps.arc.outputs.archive }}

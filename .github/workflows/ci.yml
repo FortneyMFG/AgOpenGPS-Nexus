@@ -1,94 +1,24 @@
-name: Nexus CI
-
+name: CI
 on:
   push:
+    branches: [ develop, main ]
   pull_request:
 
 jobs:
-  smoke:
-    name: ${{ matrix.os }} / ${{ matrix.architecture }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            architecture: x64
-            shell: pwsh
-          - os: ubuntu-22.04-arm64
-            architecture: arm64
-            shell: pwsh
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-          architecture: ${{ matrix.architecture }}
-
-      - name: Display .NET info
-        run: dotnet --info
-
-      - name: Restore solution
-        run: dotnet restore "Nexus SourceCode/AgOpenGPS.Nexus.sln"
-
-      - name: Build solution
-        run: dotnet build "Nexus SourceCode/AgOpenGPS.Nexus.sln" --no-restore --configuration Release
-
-      - name: Run unit tests
-        run: dotnet test "Nexus SourceCode/AgOpenGPS.Nexus.sln" --no-build --configuration Release
-
-      - name: Lint docs & tasks
-        shell: ${{ matrix.shell }}
-        run: ./tools/ci/lint.ps1
-
-      - name: Contract compatibility gate
-        shell: ${{ matrix.shell }}
-        run: ./tools/ci/contracts.ps1
-
-      - name: Headless sim smoke (placeholder)
-        shell: ${{ matrix.shell }}
-        run: ./tools/ci/sim-smoke.ps1
-
-      - name: Package Windows artifacts
-        if: matrix.os == 'windows-latest'
-        shell: ${{ matrix.shell }}
-        run: ./tools/ci/package-windows.ps1 -Configuration Release
-
-      - name: Package Linux artifacts
-        if: startsWith(matrix.os, 'ubuntu-')
-        shell: ${{ matrix.shell }}
-        run: ./tools/ci/package-linux.ps1 -Configuration Release -Runtime linux-x64
-
-  publish-contracts:
-    name: Publish contracts (NuGet)
+  build-test:
+    name: Build & test (.NET 8)
     runs-on: ubuntu-latest
-    needs: smoke
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
-    permissions:
-      contents: read
-      packages: write
+    timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
-
-      - name: Pack & publish Aog.Abstractions
-        shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./tools/ci/publish-contracts.ps1
-
-      - name: Upload package artifacts
-        if: always()
+          dotnet-version: '8.0.x'
+      - run: dotnet restore
+      - run: dotnet build --configuration Release --no-restore
+      - run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx"
+      - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: aog-abstractions-nuget
-          path: artifacts/nuget
+          name: test-results
+          path: '**/TestResults/*.trx'

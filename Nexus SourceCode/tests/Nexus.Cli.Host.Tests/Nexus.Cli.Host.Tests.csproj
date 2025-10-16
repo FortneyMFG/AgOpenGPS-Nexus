@@ -28,5 +28,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Nexus.Cli.Host\Nexus.Cli.Host.csproj" />
     <ProjectReference Include="..\..\src\Nexus.Plugin.Cli.Abstractions\Nexus.Plugin.Cli.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Nexus.SamplePlugin.Cli\Nexus.SamplePlugin.Cli.csproj" />
   </ItemGroup>
 </Project>

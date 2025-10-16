@@ -10,6 +10,8 @@
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.47.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.59.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.25.3" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseLocalNexusCliAbstractions)' == 'true'">
     <ProjectReference Include="..\Nexus.Plugin.Cli.Abstractions\Nexus.Plugin.Cli.Abstractions.csproj" />

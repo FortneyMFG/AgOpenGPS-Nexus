@@ -8,6 +8,7 @@ using Nexus.Cli.Host.Modules;
 using Nexus.Cli.Host.Output;
 using Nexus.Cli.Host.Plugins;
 using Nexus.Cli.Host.Runtime;
+using Nexus.Cli.Host.Plugins.Reflection;
 using Nexus.Plugin.Cli.Abstractions;
 using Spectre.Console;
 
@@ -29,9 +30,11 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<HostInfoPresenter>();
         services.TryAddSingleton<PluginManifestLoader>();
         services.TryAddSingleton<IPluginCommandModuleLoader, PluginCommandModuleLoader>();
+        services.TryAddSingleton<IPluginReflectionClient, PluginReflectionClient>();
 
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandModule, HostInfoCommandModule>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandModule, CoreCommandModule>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandModule, PluginReflectionCommandModule>());
 
         services.AddSingleton<RootCommandFactory>();
         services.AddSingleton(provider => provider.GetRequiredService<RootCommandFactory>().Create());

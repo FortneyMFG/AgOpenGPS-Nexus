@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2024-03-01T12:45:00Z",
+  "jobId": "job:planter-alpha",
+  "sessionId": "session:morning-pass",
+  "farmId": "farm:demo",
+  "fieldIds": ["field:north-40"],
+  "zoneRegistryHash": "d8b0a6ad0f4e3f10",
+  "sections": [
+    {
+      "toolbarId": "toolbar:planter-24r:main",
+      "sectionId": "section:planter-24r:01",
+      "commandedState": "on",
+      "measuredState": "on",
+      "manualOverride": false,
+      "opportunityDurationSeconds": 142.5,
+      "activeDurationSeconds": 138.0,
+      "commandCount": 12,
+      "eventCount": 48,
+      "appliedAreaSqMeters": 512.6,
+      "missedAreaSqMeters": 18.4
+    },
+    {
+      "toolbarId": "toolbar:planter-24r:main",
+      "sectionId": "section:planter-24r:02",
+      "commandedState": "armed",
+      "measuredState": "armed",
+      "manualOverride": true,
+      "opportunityDurationSeconds": 137.1,
+      "activeDurationSeconds": 95.4,
+      "commandCount": 15,
+      "eventCount": 42,
+      "appliedAreaSqMeters": 445.8,
+      "missedAreaSqMeters": 52.7
+    }
+  ]
+}
+

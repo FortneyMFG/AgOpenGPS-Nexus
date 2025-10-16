@@ -20,6 +20,11 @@ Nexus requires a single authoritative timeline that carries tractor, implement, 
 - Replay tooling must ingest PoseStream outputs and preserve ordering to remain within determinism budgets.
 - Legacy components will require shims to adapt multi-stream pose logs into the new combined format.
 
+## Implementation Artifacts (NX-611)
+- `proto/core.proto` now defines `PoseStreamService`, `PoseStreamFrame`, and `SectionState*` contracts for gRPC consumers.
+- JSON schemas (`schemas/PoseStreamFrame.v1.json`, `schemas/SectionStateTally.v1.json`) describe vector log payloads and opportunity/event tallies consumed by replay tooling.
+- Deterministic fixtures in `docs/plugins/fixtures/pose-section-fixture.jsonl` exercise PoseStream + SectionState ingestion alongside the aggregated tally sample.
+
 ## Governance Updates
 - **Schema evolution rules.** PoseStream payloads accept additive-only field changes with reserved IDs tracked in a central registry. Dual-write shims cover consumers for at least one minor release before removals and require downgrade verification in replay CI.
 - **Chaos validation.** Integration suites now include packet duplication, reorder, and ±75 ms clock skew bursts. Contributors must publish deterministic expectations for each case and prove downstream tallies stay within tolerance.

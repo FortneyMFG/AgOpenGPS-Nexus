@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.0.0",
+  "sequence": 4201,
+  "timestamp": "2024-03-01T12:00:05.050Z",
+  "frameIntervalMs": 50.0,
+  "entities": [
+    {
+      "entityId": "vehicle:tractor-alpha",
+      "parentEntityId": null,
+      "kind": "vehicle",
+      "pose": {
+        "latitudeDeg": 41.923451,
+        "longitudeDeg": -93.105217,
+        "altitudeM": 302.4,
+        "headingRad": 1.5708,
+        "rollRad": 0.002,
+        "pitchRad": -0.004,
+        "speedMps": 5.2,
+        "yawRateRadps": 0.015,
+        "zoneMask": {
+          "insideBoundary": true,
+          "insideHeadland": false,
+          "insideKeepOut": false,
+          "insideWorkDisabled": false,
+          "activeZoneIds": ["zone:boundary:north-40"],
+          "zoneRegistryHash": "d8b0a6ad0f4e3f10"
+        }
+      }
+    },
+    {
+      "entityId": "implement:planter-24r",
+      "parentEntityId": "vehicle:tractor-alpha",
+      "kind": "implement",
+      "pose": {
+        "latitudeDeg": 41.923401,
+        "longitudeDeg": -93.105119,
+        "altitudeM": 301.8,
+        "headingRad": 1.5712,
+        "rollRad": 0.004,
+        "pitchRad": -0.006,
+        "speedMps": 5.1,
+        "yawRateRadps": 0.015,
+        "zoneMask": {
+          "insideBoundary": true,
+          "insideHeadland": false,
+          "insideKeepOut": false,
+          "insideWorkDisabled": false,
+          "activeZoneIds": ["zone:boundary:north-40"],
+          "zoneRegistryHash": "d8b0a6ad0f4e3f10"
+        }
+      }
+    },
+    {
+      "entityId": "toolbar:planter-24r:main",
+      "parentEntityId": "implement:planter-24r",
+      "kind": "toolbar",
+      "pose": {
+        "latitudeDeg": 41.923362,
+        "longitudeDeg": -93.105045,
+        "altitudeM": 301.7,
+        "headingRad": 1.5715,
+        "rollRad": 0.005,
+        "pitchRad": -0.006,
+        "speedMps": 5.1,
+        "yawRateRadps": 0.015,
+        "zoneMask": {
+          "insideBoundary": true,
+          "insideHeadland": false,
+          "insideKeepOut": false,
+          "insideWorkDisabled": false,
+          "activeZoneIds": ["zone:boundary:north-40"],
+          "zoneRegistryHash": "d8b0a6ad0f4e3f10"
+        }
+      }
+    },
+    {
+      "entityId": "section:planter-24r:01",
+      "parentEntityId": "toolbar:planter-24r:main",
+      "kind": "section",
+      "pose": {
+        "latitudeDeg": 41.923350,
+        "longitudeDeg": -93.105030,
+        "altitudeM": 301.7,
+        "headingRad": 1.5716,
+        "rollRad": 0.005,
+        "pitchRad": -0.006,
+        "speedMps": 5.1,
+        "yawRateRadps": 0.015,
+        "zoneMask": {
+          "insideBoundary": true,
+          "insideHeadland": false,
+          "insideKeepOut": false,
+          "insideWorkDisabled": false,
+          "activeZoneIds": ["zone:boundary:north-40"],
+          "zoneRegistryHash": "d8b0a6ad0f4e3f10"
+        }
+      }
+    }
+  ],
+  "sectionState": {
+    "sequence": 188,
+    "changes": [
+      {
+        "toolbarId": "toolbar:planter-24r:main",
+        "sectionId": "section:planter-24r:01",
+        "commandedState": "on",
+        "measuredState": "on",
+        "source": "automation",
+        "manualOverride": false,
+        "workOpportunity": true,
+        "workEvent": true,
+        "targetRate": 34.5,
+        "actualRate": 34.1,
+        "opportunityAreaSqMeters": 11.8,
+        "appliedAreaSqMeters": 11.2,
+        "tallies": {
+          "opportunityDurationSeconds": 58.6,
+          "activeDurationSeconds": 55.2,
+          "commandCount": 6,
+          "eventCount": 4,
+          "appliedAreaSqMeters": 245.3,
+          "missedAreaSqMeters": 12.8
+        },
+        "annotations": [
+          {
+            "code": "zone.keepOutCleared",
+            "message": "Keep-out cleared by operator acknowledgement.",
+            "actor": "user:operator-1"
+          }
+        ]
+      }
+    ]
+  },
+  "diagnostics": {
+    "droppedFrames": 0,
+    "maxLatencyMs": 12.4,
+    "warnings": []
+  }
+}
+

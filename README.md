@@ -29,7 +29,7 @@ flowchart TD
     ISOBUSP[Isobus Plugin]
     ISOBUS[To Isobus Equipement]
     PPP[Pumkin Pi Plugin]
-    PPH[Hardware (Steer, Section, Rate etc) connected straight to Pi interfaces]
+    PPH[Hardware - Steer, Section, Rate - connected straight to Pi interfaces]
     
 
     Core --> UI

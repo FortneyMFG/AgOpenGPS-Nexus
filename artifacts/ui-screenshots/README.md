@@ -92,5 +92,11 @@ Environment captured textual descriptions because automation cannot capture WinF
 ## AgIO Advanced Settings (ag_io_advanced_settings_dialog)
 *Placeholder:* Tab strip with advanced toggles and log level selectors.
 
+## Diagnostics Workspace (diagnostics_workspace)
+*Placeholder:* Sidebar panel summarising GPS fix, AGiO loops, network channels, serial profiles, and recent diagnostics events.
+
 ## ModSim Main Window (simulator_main_dialog)
 *Placeholder:* Simulator dashboard with telemetry readouts and start/stop buttons.
+
+## Simulation Control Bar (simulation_bar)
+*Placeholder:* Playback controls with scenario summary, routed streams, and playback rate toggles.

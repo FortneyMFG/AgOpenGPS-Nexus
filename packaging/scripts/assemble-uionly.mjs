@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import child from 'child_process';
 
-const [,, artifactsDir, outDir, version] = process.argv;
+const [,, artifactsDir, outDir, version, ...runtimeArgs] = process.argv;
 fs.mkdirSync(outDir, { recursive: true });
 
 function extract(src, dest) {
@@ -17,8 +17,14 @@ const tryFind = (pattern) => {
   catch { return null; }
 };
 
-// prefer linux-x64 content
-let found = tryFind(`ui_v${version}_linux-x64.tar.gz`) || tryFind(`ui_v${version}_win-x64.zip`);
+const order = runtimeArgs.filter(Boolean);
+const runtimeOrder = order.length ? order : ['linux-x64', 'win-x64'];
+let found = null;
+for (const rt of runtimeOrder) {
+  const ext = rt.startsWith('win-') ? 'zip' : 'tar.gz';
+  found = tryFind(`ui_v${version}_${rt}.${ext}`);
+  if (found) break;
+}
 if (!found) throw new Error('UI artifact not found for UI-only bundle.');
 extract(found, outDir);
 

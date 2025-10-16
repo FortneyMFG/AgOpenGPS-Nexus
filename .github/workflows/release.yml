@@ -2,8 +2,8 @@ name: Release
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9+]'
-      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+      - 'v*.*.*'
+      - 'v*.*.*-*'
 
 jobs:
   prepare:
@@ -22,6 +22,7 @@ jobs:
 
   build-components:
     name: Build components
+    needs: prepare
     continue-on-error: true
     strategy:
       fail-fast: false
@@ -39,6 +40,7 @@ jobs:
 
   build-plugins:
     name: Build plugins
+    needs: prepare
     continue-on-error: true
     strategy:
       fail-fast: false
@@ -96,15 +98,23 @@ jobs:
       - name: Build bundles
         run: |
           mkdir -p bundle
-          node packaging/scripts/assemble-base.mjs     "artifacts" "bundle/Nexus-Base"     "bundles/base.bundle.json"     "${{ needs.prepare.outputs.version }}"
-          node packaging/scripts/assemble-headless.mjs "artifacts" "bundle/Nexus-Headless" "bundles/headless.bundle.json" "${{ needs.prepare.outputs.version }}"
-          node packaging/scripts/assemble-uionly.mjs   "artifacts" "bundle/Nexus-UI"       "${{ needs.prepare.outputs.version }}"
+          node packaging/scripts/assemble-base.mjs     "artifacts" "bundle/Nexus-Base-win-x64"    "bundles/base.bundle.json"     "${{ needs.prepare.outputs.version }}" win-x64
+          node packaging/scripts/assemble-base.mjs     "artifacts" "bundle/Nexus-Base-linux-x64"  "bundles/base.bundle.json"     "${{ needs.prepare.outputs.version }}" linux-x64
+          node packaging/scripts/assemble-headless.mjs "artifacts" "bundle/Nexus-Headless"        "bundles/headless.bundle.json" "${{ needs.prepare.outputs.version }}"
+          node packaging/scripts/assemble-uionly.mjs   "artifacts" "bundle/Nexus-UI-win-x64"      "${{ needs.prepare.outputs.version }}" win-x64
+          node packaging/scripts/assemble-uionly.mjs   "artifacts" "bundle/Nexus-UI-linux-x64"    "${{ needs.prepare.outputs.version }}" linux-x64
           cd bundle
-          zip -r "Nexus-Base_v${{ needs.prepare.outputs.version }}_win-x64.zip" Nexus-Base
-          tar -czf "Nexus-Base_v${{ needs.prepare.outputs.version }}_linux-x64.tar.gz" Nexus-Base
-          tar -czf "Nexus-Headless_v${{ needs.prepare.outputs.version }}_linux-arm64.tar.gz" Nexus-Headless
-          zip -r "Nexus-UI_v${{ needs.prepare.outputs.version }}_win-x64.zip" Nexus-UI
-          tar -czf "Nexus-UI_v${{ needs.prepare.outputs.version }}_linux-x64.tar.gz" Nexus-UI
+          (
+            cd Nexus-Base-win-x64
+            zip -r "../Nexus-Base_v${{ needs.prepare.outputs.version }}_win-x64.zip" .
+          )
+          tar -czf "Nexus-Base_v${{ needs.prepare.outputs.version }}_linux-x64.tar.gz" -C Nexus-Base-linux-x64 .
+          tar -czf "Nexus-Headless_v${{ needs.prepare.outputs.version }}_linux-arm64.tar.gz" -C Nexus-Headless .
+          (
+            cd Nexus-UI-win-x64
+            zip -r "../Nexus-UI_v${{ needs.prepare.outputs.version }}_win-x64.zip" .
+          )
+          tar -czf "Nexus-UI_v${{ needs.prepare.outputs.version }}_linux-x64.tar.gz" -C Nexus-UI-linux-x64 .
 
       - name: Checksums
         working-directory: bundle

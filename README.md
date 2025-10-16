@@ -44,7 +44,7 @@ flowchart TD
     Core <--> ELRS
     ELRS <-- Direct Serial --> ELRSR
     ELRS <--> AGiO
-    ELRSR <--> MCU
+    ELRSR <--> MCUs
     ELRSR <--> EAOG
     
 ```

@@ -16,7 +16,6 @@ Nexus is an experiment in how far a community guided by AI co-pilots can take Ag
 flowchart TD
     Core[Core Orchestrator]
     UI[User Interface Shells]
-    Plugins[Plugins & Feature Modules]
     Telemetry[Telemetry & Analytics]
     Mapping[Mapping & Layers]
     Guidance[Guidance & AutoSteer]
@@ -31,13 +30,11 @@ flowchart TD
     Mapping <--> Core
     Guidance <--> Core
     Sections <--> Core
-    Plugins <--> Telemetry
-    Plugins <--> Mapping
-    Plugins <--> Guidance
-    Plugins <--> Sections
-    Core --> Bridge
-    Bridge --> AgIO
-    AgIO --> MCUs
+    Core <--> AgIO
+    AgIO <--> Bridge
+    Bridge <--> MCUs
+    MCUs <--> MCUs
+    
 ```
 
 Core coordinates the data model, job/session orchestration, and routing while UI shells focus on visualization. Plugins plug into the gRPC event bus for guidance, mapping, telemetry, analytics, and hardware integrations. AgIO (and its bridge) surface those decisions to MCU modules or legacy AIO boards through AOG-Link V1 or the existing UDP PGN stack.

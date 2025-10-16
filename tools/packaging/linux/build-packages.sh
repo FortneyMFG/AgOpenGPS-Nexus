@@ -68,23 +68,29 @@ require_tool() {
 }
 
 require_tool dotnet
-require_tool dpkg-deb
 
+needs_deb=false
 needs_rpm=false
 case "${format}" in
   rpm)
     needs_rpm=true
     ;;
   all)
+    needs_deb=true
     needs_rpm=true
     ;;
   deb)
+    needs_deb=true
     ;;
   *)
     >&2 printf 'error: unknown format "%s". Use deb, rpm, or all.\n' "${format}"
     exit 1
     ;;
 esac
+
+if ${needs_deb}; then
+  require_tool dpkg-deb
+fi
 
 if ${needs_rpm}; then
   require_tool rpmbuild

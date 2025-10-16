@@ -72,6 +72,7 @@
 - [Companion metadata parity](howto/companion-metadata-parity.md) — snapshot contract powering ADR-034 remote clients.
 - [Guidance lane publishing contracts](howto/guidance-lane-contracts.md) — ADR-033 lane geometry and preview payloads.
 - [AOG-Link transport rollout](howto/aog-link-transport-rollout.md) — Ethernet, RS-485, and CAN staging guidance.
+- [AOG-Link bridge architecture](howto/aog-link-bridge-architecture-guide.md) — visual layer breakdown and operator-facing explainer.
 - [Stanley controller parity harness](howto/stanley-controller-parity.md) — deterministic regression checks for the ported controller.
 - [Firmware-in-loop stability validation](howto/firmware-in-loop-stability.md) — dynamic look-ahead and constraint regression slice.
 - [Performance budget telemetry dashboards](howto/performance-budget-telemetry-dashboards.md) — ADR-026 dashboard provisioning and guardrails.

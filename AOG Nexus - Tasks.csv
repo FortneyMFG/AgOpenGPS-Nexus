@@ -300,3 +300,12 @@ NX-337,FALSE,TRUE,NX-274,,Legacy weather log migration utilities — ADR-053 wea
 NX-341,TRUE,FALSE,,,Produce zipped release artifacts for Windows and Linux builds
 NX-342,FALSE,TRUE,,,docs/howto/developer-setup.md
 NX-401,FALSE,TRUE,,,Simulation catalog atomic provider registration
+NX-410,FALSE,FALSE,,,Legacy UI asset migration workbook per docs/plans/ui-shell-and-plugin-integration.md
+NX-411,FALSE,FALSE,,,Shell and navigation port from V6 and AgValonia per artifacts/ui-core-spec.md
+NX-412,FALSE,FALSE,,,Map canvas and field operations UI port aligned with artifacts/ui-inventory.json
+NX-413,FALSE,FALSE,,,Job and field lifecycle dialogs port aligned with artifacts/ui-backlog.json
+NX-414,FALSE,FALSE,,,Settings hotkeys and appearance consolidation aligned with artifacts/ui-theme-tokens.json
+NX-415,FALSE,FALSE,,,Plugin UI surfaces for guidance device analytics and video plugins aligned with artifacts/ui-to-plugin.yaml
+NX-416,FALSE,FALSE,,,Diagnostics and AgIO workspace port aligned with artifacts/ui-core-spec.md
+NX-417,FALSE,FALSE,,,Simulation shell and companion parity automation aligned with metadata-driven style guide
+NX-418,FALSE,FALSE,,,Documentation QA and release readiness aligned with artifacts/ui-screenshots/README.md

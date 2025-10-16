@@ -18,3 +18,13 @@ NX-PP-015,Bench fastpath latency,@qa,P1,Open,2025-11-07,Measure NAV→HAL latenc
 NX-PP-016,TTL expiry safe-neutral test,@qa,P1,Open,2025-11-07,Verify stale setpoints drop to neutral within 250 ms
 NX-PP-017,Broker restart resilience test,@qa,P2,Open,2025-11-14,Ensure MQTT mirrors recover without SHM disruption
 NX-PP-018,External MCU coexistence test,@qa,P2,Open,2025-11-14,Validate UDP/Serial modules unaffected by fastpath
+NX-600,NX CLI Plugin backlog update,@ai,P1,Done,2024-10-15,Seed implementation tasks for unified nx host
+NX-601,NX CLI Plugin host scaffold,@cli-team,P1,Open,2024-11-04,System.CommandLine + Spectre.Console host skeleton
+NX-602,NX CLI Plugin endpoint resolver & core status,@cli-team,P1,Open,2024-11-11,Named pipe/UDS/TCP resolver + Core/Health check
+NX-603,NX CLI Plugin output modes & completions,@cli-team,P1,Open,2024-11-18,--json/--ndjson output surfaces + completion generator
+NX-604,NX CLI Plugin discovery & adapter loader,@cli-team,P1,Open,2024-11-25,Manifest scan + adapter activation pipeline
+NX-605,Publish Nexus.Plugin.Cli.Abstractions,@cli-team,P1,Open,2024-12-02,Package ICommandModule SDK for plugin verbs
+NX-606,NX CLI Plugin sample verbs,@cli-team,P2,Open,2024-12-02,Ship sample plugin exposing calibrate/sniff verbs
+NX-607,NX CLI Plugin gRPC reflection client,@cli-team,P2,Open,2024-12-09,Implement CliReflection proto support in host
+NX-608,NX CLI Plugin packaging pipeline,@cli-team,P1,Open,2024-12-09,Dotnet tool + RID single-file builds in CI
+NX-609,NX CLI Plugin docs & completions kit,@techwriter,P1,Open,2024-12-09,Author docs/cli overview and shell integration guidance

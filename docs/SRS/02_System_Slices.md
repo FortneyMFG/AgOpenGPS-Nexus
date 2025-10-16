@@ -21,6 +21,7 @@ This index lists every active section in the SRS with quick links. Each section 
 | 15 | [Engine & Machine Gauges](sections/15_Engine_Machine_Gauges.md) | Read-only engine telemetry, gauge PGNs, JSON definitions, and shared UI behaviors. | Builds on 03 transport contracts and 05 frontend layouts; feeds 04 service controllers and 10 telemetry dashboards.
 | 16 | [Plugin Packaging, Updates, and Catalog](sections/16_Plugin_Packaging_Updates.md) | Plugin archive layout, manifest schema, permissions, catalog governance, and side-loading policies. | Relies on 12 extensibility scaffolding and 14 update distribution; sets trust inputs for 17 firmware updates.
 | 17 | [Device Firmware Updates](sections/17_Device_Firmware_Updates.md) | Device identity discovery, cataloged firmware releases, orchestrated flashing flows, and offline bundles. | Depends on 03 transports, 14 offline strategies, and 16 packaging policies; informs hardware readiness in 06.
+| 18 | [Command Line Interface](sections/18_Command_Line_Interface.md) | Unified `nx` host, transport negotiation, plugin verb discovery, and packaging strategy for automation workflows. | Builds on 03 transports, 07 interprocess APIs, 12 plugin governance, and 16 packaging policies; feeds docs in Section G tasks.
 
 ## Upcoming ADR program
 

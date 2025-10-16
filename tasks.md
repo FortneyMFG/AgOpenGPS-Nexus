@@ -305,9 +305,20 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-325 Weather compliance export documentation _(Done)_ — ADR-053 compliance outputs
 - [x] NX-326 Metadata-driven UI style guide _(Done)_ — ADR-034 UI refactor
 - [x] NX-327 Plugin QA handshake update _(Done)_ — ADR-031 manifest governance QA
+- [x] NX-514 Nexus CLI SRS & ADR alignment _(Done)_ — SRS §18 Command Line Interface
 - [ ] NX-341 GitHub Actions release packaging (Win/Linux zips) _(In Progress)_ — SRS §2.7 Packaging & DevEx
 - [x] NX-342 Developer setup quick start _(Done)_ — SRS §2.8 Documentation
 - [ ] NX-512 README Nexus guide expansion _(In Progress)_ — docs/README.md narrative refresh
+- [x] NX-600 NX CLI Plugin backlog update _(Done)_ — Seed implementation tasks for unified `nx` host
+- [ ] NX-601 NX CLI Plugin host scaffold _(Planned)_ — SRS §18 CLI host with System.CommandLine + Spectre.Console
+- [ ] NX-602 NX CLI Plugin endpoint resolver & core status _(Planned)_ — SRS §18 transport negotiation + Core health probe
+- [ ] NX-603 NX CLI Plugin output modes & completions _(Planned)_ — SRS §18 structured output + shell completion
+- [ ] NX-604 NX CLI Plugin discovery & adapter loader _(Planned)_ — SRS §18 plugin adapters and manifest scanning
+- [ ] NX-605 Publish Nexus.Plugin.Cli.Abstractions _(Planned)_ — SRS §18 plugin SDK packaging
+- [ ] NX-606 NX CLI Plugin sample verbs _(Planned)_ — SRS §18 sample plugin exposing calibrate/sniff commands
+- [ ] NX-607 NX CLI Plugin gRPC reflection client _(Planned)_ — SRS §18 dynamic verb reflection support
+- [ ] NX-608 NX CLI Plugin packaging pipeline _(Planned)_ — SRS §18 dotnet tool + RID single-file builds
+- [ ] NX-609 NX CLI Plugin docs & completions kit _(Planned)_ — SRS §18 CLI docs and shell integration guidance
 
 ### Section H — Safety & QA
 - [x] NX-070 Heartbeats & failsafe watchdogs
@@ -664,6 +675,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-325 | Weather compliance export documentation | Done |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 compliance outputs |
 | NX-326 | Metadata-driven UI style guide | Done |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | Style tokens cover dashboards, inspectors, and legends across desktop + companion shells. |
 | NX-327 | Plugin QA handshake update | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance QA |
+| NX-514 | Nexus CLI SRS & ADR alignment | Done | AI | — | [SRS §18 Command Line Interface](docs/SRS/sections/18_Command_Line_Interface.md) | Capture CLI requirements and ADR-054 design brief |
 | NX-341 | GitHub Actions release packaging (Win/Linux zips) | In Progress | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
 | NX-342 | Developer setup quick start doc | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/howto/developer-setup.md |
 | NX-343 | UI modernization AI prompt bundle | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/templates/ui-modernization-ai-prompts.md |

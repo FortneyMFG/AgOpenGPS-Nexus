@@ -39,6 +39,20 @@ Draft authors should reference the listed requirements and tasks before opening 
   spatial math and deterministic replay.
 - **ADR-031 Manifest governance (CI stub)** — Land the manifest validator CLI plus CI gate to let plugin teams iterate against a concrete toolchain while the broader governance ADR proceeds through review.
 
+### ADR-054 — Nexus CLI host & plugin verbs
+- **Owner:** Packaging & DevEx pod
+- **Stage:** Drafting (target review window: 2025-03-14 week)
+- **Dependencies:** ADR-001 (.NET 8 runtime), ADR-028 (stack boundaries), ADR-031 (manifest governance), SRS §18 CLI requirements
+- **Scope:** Deliver the unified `nx` CLI host with offline filesystem workflows, Core transport negotiation (pipes/UDS/TLS), plugin adapter loading, and structured outputs so operators and automation scripts share one toolchain.【F:docs/ADR/ADR-054_NexusCliHost.md†L16-L56】【F:docs/SRS/sections/18_Command_Line_Interface.md†L1-L66】
+- **Key decisions:** Endpoint resolver ordering and overrides, adapter vs. reflection loading contract, packaging targets (dotnet tool + single-file), JSON/NDJSON schema governance, auth token handling, and compatibility checks between CLI, Core, and plugin verbs.【F:docs/ADR/ADR-054_NexusCliHost.md†L20-L56】【F:docs/SRS/sections/18_Command_Line_Interface.md†L19-L48】
+- **SRS alignment:** CLI Section (§18) plus dependencies on Communications (§03 transports), Interprocess API (§07 versioning), and Plugin Packaging (§16 manifests).【F:docs/SRS/sections/18_Command_Line_Interface.md†L1-L83】【F:docs/SRS/sections/03_Comm_Transports.md†L1-L45】【F:docs/SRS/sections/07_Interprocess_API.md†L1-L40】【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L1-L60】
+- **Primary requirements:** R-CLI-000…R-CLI-010 covering host unification, offline/live modes, plugin discovery, UX, versioning, and packaging.【F:docs/SRS/sections/18_Command_Line_Interface.md†L19-L66】
+- **Tasks:** NX-514 (SRS/ADR alignment), NX-CLI-001 (host scaffold), NX-CLI-002 (endpoint resolver), NX-CLI-004 (plugin manifest loader), NX-CLI-008 (tool packaging).【F:tasks.md†L276-L324】【F:docs/SRS/sections/18_Command_Line_Interface.md†L67-L83】
+- **Acceptance hooks:**
+  - `nx core status` auto-discovers a running Core via named pipe/UDS within ≤ 500 ms on supported OS targets.
+  - `nx plugin list --json` returns manifest-derived metadata and flags compatibility mismatches when plugin semver ranges are violated.
+  - `nx diag dump` produces a timestamped archive containing logs, manifests, and version info usable in support workflows.
+
 ### Cross-track integration slice — PoseStream → Controller → Guidance preview
 - **Vertical scope:** PoseStream ingest, LayerController stub, Section Arbiter happy-path, and Guidance preview widget stitched together with the NullMapping provider.
 - **Objective:** Exercise ADR-027, ADR-029, and ADR-030 interfaces in concert before full drafts complete, smoke out capability registry assumptions, and validate degraded-mode messaging when optional plugins are absent.

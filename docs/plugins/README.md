@@ -16,4 +16,7 @@ This index complements the detailed plugin briefs in this directory. Each entry 
 - [Telemetry Logging](TelemetryLogging.md)
 - [Replay](Replay.md)
 
+## Tooling & Automation
+- [CLI Extensions](CLIExtensions.md)
+
 Refer to `docs/INDEX.md` for additional guides, ADRs, and rollout plans.

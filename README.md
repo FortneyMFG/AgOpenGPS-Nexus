@@ -4,11 +4,18 @@ Nexus is an experiment in how far a community guided by AI co-pilots can take Ag
 
 ## Vision at a Glance
 
-- **AI-assisted evolution.** Nexus treats every artifact—code, docs, packaging, and automation—as something an AI helper can draft while humans review and steer.
-- **CM5-first hardware plan.** A Raspberry Pi Compute Module 5 (or Pi 5) is positioned to replace both the Teensy on an All-In-One (AIO) board and the traditional Windows tablet by hosting the entire AOG stack with one or more HDMI/DSI touch displays.
-- **Runs how you want.** The same stack operates on Linux or Windows tablets, laptops and desktops, and it remains compatible with existing AIO hardware through USB, Ethernet, or CAN links.
-- **AOG-Link V1 bridge.** Nexus modernizes the legacy UDP PGN link (AOG-Link V0) with nanopb messaging and optional MQTT/MQTT-SN transport while keeping the V0 protocol available for drop-in compatibility.
-- **Composable everything.** Every service is a replaceable block that communicates through efficient gRPC contracts, letting operators enable, disable, or swap plugins without rewriting the core.
+- **Full backward compatibility.**  
+  Nexus is built to run natively with existing **AgOpenGPS Windows tablet + AIO** setups—no hardware changes or wiring rewrites required. Every configuration, connection, and control scheme supported today continues to work out of the box.
+- **CM5-first future option.**  
+  For new installations, a **Raspberry Pi Compute Module 5 (or Pi 5)** can host the entire Nexus stack—replacing both the tablet and the Teensy in an AIO—with identical functionality, reduced complexity, and a **steep cost savings**. One or more HDMI/DSI touch displays can be connected directly.
+- **AI-assisted evolution.**  
+  Nexus treats every artifact—code, docs, packaging, and automation—as something an AI helper can draft while humans review and steer.
+- **Runs how you want.**  
+  The same stack operates on Linux or Windows tablets, laptops, and desktops, and it remains compatible with existing AIO hardware through USB, Ethernet, or CAN links.
+- **AOG-Link V1 bridge.**  
+  Nexus modernizes the legacy UDP PGN link (V0) with nanopb messaging and optional MQTT/MQTT-SN transport while keeping the V0 protocol available for drop-in compatibility.
+- **Composable everything.**  
+  Every service is a replaceable block that communicates through efficient gRPC contracts, letting operators enable, disable, or swap plugins without rewriting the core.
 
 ## Modular Architecture (Slightly Simplified)
 

@@ -194,7 +194,48 @@ public sealed class MainWindowViewModelTests
         });
     }
 
-    private static MainWindowViewModel CreateViewModel()
+    [Fact]
+    public void ShellMenuBar_DispatchesCommands()
+    {
+        var viewModel = CreateViewModel(out var dispatcher);
+
+        var profileItem = viewModel.ShellMenuBar.FileMenu.Items.First();
+        profileItem.Command.Should().NotBeNull();
+        profileItem.Command!.Execute(null);
+
+        dispatcher.Invocations.Should().ContainSingle(invocation =>
+            invocation.InjectionPoint == "menu.file" && invocation.CommandId == "core.profile.manage");
+        profileItem.LastInvocationHandled.Should().BeTrue();
+        profileItem.LastInvocationTimestamp.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void TopToolbar_TogglesUpdateState()
+    {
+        var viewModel = CreateViewModel(out var dispatcher);
+
+        var autoSteer = viewModel.TopToolbar.Items.First(item => item.Id == "toolbar.autosteer");
+        autoSteer.IsChecked.Should().BeTrue();
+
+        autoSteer.Command.Execute(null);
+
+        autoSteer.IsChecked.Should().BeFalse();
+        dispatcher.Invocations.Should().Contain(invocation => invocation.CommandId == "core.toolbar.autoSteer");
+    }
+
+    [Fact]
+    public void StatusStrip_ExposesIndicators()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.StatusStrip.Indicators.Should().NotBeEmpty();
+        viewModel.StatusStrip.Indicators.Select(indicator => indicator.Label)
+            .Should().Contain("GPS");
+    }
+
+    private static MainWindowViewModel CreateViewModel() => CreateViewModel(out _);
+
+    private static MainWindowViewModel CreateViewModel(out RecordingShellCommandDispatcher dispatcher)
     {
         var connectionStore = new InMemoryConnectionSettingsStore();
         var runModeService = new TestRunModeService();
@@ -204,7 +245,8 @@ public sealed class MainWindowViewModelTests
         var themeManager = new TestThemeManager();
         var telemetryService = new TestCrashTelemetryService();
         var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
-        return new MainWindowViewModel(connection, null, preferencesService, themeManager, telemetryViewModel);
+        dispatcher = new RecordingShellCommandDispatcher();
+        return new MainWindowViewModel(connection, null, preferencesService, themeManager, dispatcher, telemetryViewModel);
     }
 
     private sealed class InMemoryConnectionSettingsStore : IConnectionSettingsStore
@@ -261,9 +303,20 @@ public sealed class MainWindowViewModelTests
             {
                 CurrentTheme = theme;
                 ThemeChanged?.Invoke(this, theme);
-            }
         }
     }
+
+    private sealed class RecordingShellCommandDispatcher : IShellCommandDispatcher
+    {
+        public List<(string InjectionPoint, string CommandId)> Invocations { get; } = new();
+
+        public ValueTask<bool> DispatchAsync(string injectionPoint, string commandId, CancellationToken cancellationToken = default)
+        {
+            Invocations.Add((injectionPoint, commandId));
+            return ValueTask.FromResult(true);
+        }
+    }
+}
 
     private sealed class TestCrashTelemetryService : ICrashTelemetryService
     {

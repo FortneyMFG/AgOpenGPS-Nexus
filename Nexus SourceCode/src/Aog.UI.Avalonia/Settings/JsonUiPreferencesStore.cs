@@ -54,6 +54,7 @@ public sealed class JsonUiPreferencesStore : IUiPreferencesStore
             }
 
             loaded.Window ??= new WindowPlacement();
+            loaded.ShellLayout ??= new ShellLayoutPreferences();
             return loaded;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)

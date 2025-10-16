@@ -89,6 +89,18 @@ public sealed class UiPreferencesService : IUiPreferencesService
         }
     }
 
+    /// <inheritdoc />
+    public void UpdateShellLayout(ShellLayoutPreferences layout)
+    {
+        ArgumentNullException.ThrowIfNull(layout);
+
+        lock (_gate)
+        {
+            _current.ShellLayout = layout.Clone();
+            Persist();
+        }
+    }
+
     private void Persist()
     {
         _store.Save(_current);

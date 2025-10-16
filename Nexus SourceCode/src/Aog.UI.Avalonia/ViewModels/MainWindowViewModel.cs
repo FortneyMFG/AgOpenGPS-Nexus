@@ -12,10 +12,12 @@ using Aog.Core.Replay;
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
 using Aog.Core.V1;
+using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Models;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Theming;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media;
 
 namespace Aog.UI.Avalonia.ViewModels;
@@ -32,11 +34,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
     private readonly SimulationConfiguration? _simulationConfiguration;
     private readonly IUiPreferencesService _preferencesService;
     private readonly IThemeManager _themeManager;
+    private readonly ShellLayoutPreferences _shellLayout;
 
     private UiTheme _selectedTheme;
 
     private readonly IReadOnlyList<MapLayer> _mapLayers;
     private readonly IReadOnlyList<GuidanceTrack> _guidanceTracks;
+    private bool _isTopToolbarVisible;
+    private bool _isRightSidebarVisible;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MainWindowViewModel"/> class.
@@ -51,11 +56,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
         IReplayController? replayController,
         IUiPreferencesService preferencesService,
         IThemeManager themeManager,
+        IShellCommandDispatcher commandDispatcher,
         TelemetryPrivacyViewModel telemetryPrivacy)
     {
         ArgumentNullException.ThrowIfNull(connectionSettings);
         ArgumentNullException.ThrowIfNull(preferencesService);
         ArgumentNullException.ThrowIfNull(themeManager);
+        ArgumentNullException.ThrowIfNull(commandDispatcher);
         ArgumentNullException.ThrowIfNull(telemetryPrivacy);
 
         _connectionSettings = connectionSettings;
@@ -113,8 +120,15 @@ public class MainWindowViewModel : INotifyPropertyChanged
         // Theme bootstrapping
         AvailableThemes = Enum.GetValues<UiTheme>();
         var preferences = _preferencesService.GetPreferences();
+        _shellLayout = preferences.ShellLayout.Clone();
+        _isTopToolbarVisible = _shellLayout.IsTopToolbarVisible;
+        _isRightSidebarVisible = _shellLayout.IsRightSidebarVisible;
         _selectedTheme = preferences.Theme;
         _themeManager.ApplyTheme(_selectedTheme);
+
+        ShellMenuBar = new ShellMenuBarViewModel(commandDispatcher);
+        TopToolbar = new TopToolbarViewModel(commandDispatcher);
+        StatusStrip = BuildStatusStrip();
     }
 
     /// <summary>Raised when a property value changes.</summary>
@@ -126,11 +140,66 @@ public class MainWindowViewModel : INotifyPropertyChanged
     /// <summary>Gets a description of the runtime platform.</summary>
     public string PlatformDescription { get; }
 
+    /// <summary>Gets the view-model describing the shell menu bar.</summary>
+    public ShellMenuBarViewModel ShellMenuBar { get; }
+
+    /// <summary>Gets the view-model backing the top toolbar.</summary>
+    public TopToolbarViewModel TopToolbar { get; }
+
+    /// <summary>Gets the status strip view-model providing runtime indicators.</summary>
+    public StatusStripViewModel StatusStrip { get; }
+
     /// <summary>Gets a sample vehicle pose used to seed the map view.</summary>
     public VehiclePose VehiclePose { get; } = new(10, 15, 45);
 
     /// <summary>Gets the connection settings view-model.</summary>
     public ConnectionSettingsViewModel Connection => _connectionSettings;
+
+    /// <summary>Gets or sets whether the top toolbar is visible.</summary>
+    public bool IsTopToolbarVisible
+    {
+        get => _isTopToolbarVisible;
+        set
+        {
+            if (_isTopToolbarVisible == value)
+            {
+                return;
+            }
+
+            _isTopToolbarVisible = value;
+            OnPropertyChanged();
+            _shellLayout.IsTopToolbarVisible = value;
+            PersistShellLayout();
+        }
+    }
+
+    /// <summary>Gets or sets whether the right sidebar panels are visible.</summary>
+    public bool IsRightSidebarVisible
+    {
+        get => _isRightSidebarVisible;
+        set
+        {
+            if (_isRightSidebarVisible == value)
+            {
+                return;
+            }
+
+            _isRightSidebarVisible = value;
+            OnPropertyChanged();
+            _shellLayout.IsRightSidebarVisible = value;
+            PersistShellLayout();
+            OnPropertyChanged(nameof(MainWorkspaceColumnWidth));
+            OnPropertyChanged(nameof(RightSidebarColumnWidth));
+        }
+    }
+
+    /// <summary>Gets the grid length applied to the main workspace column.</summary>
+    public GridLength MainWorkspaceColumnWidth =>
+        IsRightSidebarVisible ? new GridLength(3, GridUnitType.Star) : new GridLength(1, GridUnitType.Star);
+
+    /// <summary>Gets the grid length applied to the right sidebar column.</summary>
+    public GridLength RightSidebarColumnWidth =>
+        IsRightSidebarVisible ? new GridLength(2, GridUnitType.Star) : new GridLength(0);
 
     /// <summary>Gets a summary of the embedded simulation configuration.</summary>
     public string SimulationGraphSummary { get; }
@@ -257,6 +326,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
             FieldHealthSeverity);
     }
 
+    private void PersistShellLayout()
+    {
+        _preferencesService.UpdateShellLayout(_shellLayout);
+    }
+
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)
     {
         var assembly = typeof(MainWindowViewModel).Assembly;
@@ -349,6 +423,35 @@ public class MainWindowViewModel : INotifyPropertyChanged
             },
         };
         PlanterPanel.ApplyRowStatuses(planterSamples);
+    }
+
+    private StatusStripViewModel BuildStatusStrip()
+    {
+        var indicators = new[]
+        {
+            new ShellStatusIndicatorViewModel(
+                "GPS",
+                "RTK FIX",
+                StatusIndicatorLevel.Normal,
+                "GNSS corrections locked with centimeter accuracy."),
+            new ShellStatusIndicatorViewModel(
+                "Speed",
+                "6.2 mph",
+                StatusIndicatorLevel.Normal,
+                "Ground speed reported by vehicle bus."),
+            new ShellStatusIndicatorViewModel(
+                "Sections",
+                "6 / 8",
+                StatusIndicatorLevel.Warning,
+                "Two sections masked due to obstacle avoidance."),
+            new ShellStatusIndicatorViewModel(
+                "Radio",
+                "Mesh linked",
+                StatusIndicatorLevel.Normal,
+                "RadioBridge mesh network connected."),
+        };
+
+        return new StatusStripViewModel(indicators);
     }
 
     private void SeedDashboards()

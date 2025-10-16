@@ -44,5 +44,5 @@ M — Requires schema design, serialization tooling, validation, and contributor
 ## Related ADRs
 - [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)
 - [ADR-019 — Provenance, Audit, & QA](../../ADR/ADR-019-provenance-audit-qa.md)
-- [ADR-032 — Presets and Layout Linking](../../ADR/ADR-032-presets-and-layout-linking.md)
+- [ADR-068 — Layer controllers & aggregation runtime](../../ADR/ADR-068-layer-controllers-runtime.md)
 

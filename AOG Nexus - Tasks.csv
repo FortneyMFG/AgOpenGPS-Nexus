@@ -152,7 +152,7 @@ NX-172,FALSE,TRUE,NX-157,,"Official File IO plugin GA handling imports/exports f
 NX-190,FALSE,FALSE,,,Apply 2025 governance updates across accepted and draft ADRs
 NX-191,FALSE,TRUE,NX-116,,Zone proto + JSON schema handshake — ADR-027 spatial constraints contract release
 NX-192,FALSE,TRUE,NX-191,,PoseStream zone mask proto update — ADR-027 PoseStream mask contract
-NX-193,FALSE,TRUE,NX-191,,Layer registry hash handshake draft — ADR-032 layer controllers registry requirements
+NX-193,FALSE,TRUE,NX-191,,Layer registry hash handshake draft — ADR-068 layer controllers registry requirements
 NX-194,FALSE,TRUE,"NX-153, NX-193",,Capability registry expansion for mapping/zone capabilities — ADR-029 mapping kernel contracts; ADR-031 manifest governance
 NX-195,FALSE,TRUE,NX-194,,Plugin manifest schema vNext with capability/lease metadata — ADR-031 official plugin bundle policy
 NX-196,FALSE,TRUE,NX-131,,Job/session schema refresh — ADR-030 job lifecycle; ADR-041 session metadata
@@ -174,12 +174,12 @@ NX-211,FALSE,TRUE,"NX-191, NX-209",,ZoneStore persistence service — ADR-027 Zo
 NX-212,FALSE,TRUE,NX-211,,ZoneService gRPC host & watcher plumbing — ADR-027 ZoneService implementation
 NX-213,FALSE,TRUE,NX-212,,PoseStream zone mask propagation — ADR-027 constraint mask propagation
 NX-214,FALSE,TRUE,NX-213,,Constraint gate integration into ControlArbiter — ADR-027 constraint gating
-NX-215,FALSE,TRUE,NX-193,,Layer controller runtime scaffolding — ADR-032 layer controllers
-NX-216,FALSE,TRUE,NX-215,,Layer controller DI registry & buffer pools — ADR-032 controller runtime details
-NX-217,FALSE,TRUE,NX-216,,PoseStream ingestion wiring for controllers — ADR-032 ingestion pipeline
-NX-218,FALSE,TRUE,NX-217,,Controller quality & diagnostic feeds — ADR-032 diagnostics surfacing
-NX-219,FALSE,TRUE,NX-217,,TileStore writer updates for controller outputs — ADR-032 TileStore integration
-NX-220,FALSE,TRUE,"NX-218, NX-219",,Deterministic replay fixtures for controllers — ADR-032 replay harness
+NX-215,FALSE,TRUE,NX-193,,Layer controller runtime scaffolding — ADR-068 layer controllers
+NX-216,FALSE,TRUE,NX-215,,Layer controller DI registry & buffer pools — ADR-068 controller runtime details
+NX-217,FALSE,TRUE,NX-216,,PoseStream ingestion wiring for controllers — ADR-068 ingestion pipeline
+NX-218,FALSE,TRUE,NX-217,,Controller quality & diagnostic feeds — ADR-068 diagnostics surfacing
+NX-219,FALSE,TRUE,NX-217,,TileStore writer updates for controller outputs — ADR-068 TileStore integration
+NX-220,FALSE,TRUE,"NX-218, NX-219",,Deterministic replay fixtures for controllers — ADR-068 replay harness
 NX-221,FALSE,TRUE,NX-196,,JobsService host & lifecycle orchestration — ADR-030 job sessions service
 NX-222,FALSE,TRUE,NX-221,,Session autosave & journaling pipeline — ADR-041 job sessions
 NX-223,FALSE,TRUE,"NX-197, NX-221",,Season aggregator & sync orchestration — ADR-040 season organizers
@@ -304,8 +304,16 @@ NX-410,FALSE,FALSE,,,Legacy UI asset migration workbook per docs/plans/ui-shell-
 NX-411,FALSE,FALSE,,,Shell and navigation port from V6 and AgValonia per artifacts/ui-core-spec.md
 NX-412,FALSE,FALSE,,,Map canvas and field operations UI port aligned with artifacts/ui-inventory.json
 NX-413,FALSE,FALSE,,,Job and field lifecycle dialogs port aligned with artifacts/ui-backlog.json
-NX-414,FALSE,FALSE,,,Settings hotkeys and appearance consolidation aligned with artifacts/ui-theme-tokens.json
+NX-414,FALSE,FALSE,,,Multi-steer configurator export schema GA — ADR-067 axle-centric profiles
 NX-415,FALSE,FALSE,,,Plugin UI surfaces for guidance device analytics and video plugins aligned with artifacts/ui-to-plugin.yaml
 NX-416,FALSE,FALSE,,,Diagnostics and AgIO workspace port aligned with artifacts/ui-core-spec.md
 NX-417,FALSE,FALSE,,,Simulation shell and companion parity automation aligned with metadata-driven style guide
 NX-418,FALSE,FALSE,,,Documentation QA and release readiness aligned with artifacts/ui-screenshots/README.md
+NX-452,FALSE,FALSE,,,Core ingestion service for axle-centric profiles — ADR-067 runtime ingestion
+NX-453,FALSE,FALSE,,,Automation integration for axle-centric limits — ADR-067 planner/controller wiring
+NX-454,FALSE,FALSE,,,Calibration workflows & fixtures — ADR-067 calibration suite delivery
+NX-455,FALSE,FALSE,,,Documentation & preset libraries for axle-centric rigs — ADR-067 rollout playbook
+NX-462,FALSE,FALSE,,,Linux Core service packaging & systemd units — O-BACKEND-6 packaging
+NX-463,FALSE,FALSE,,,Linux Core operations & observability playbook — ADR-068 diagnostics + SRS §10
+NX-464,FALSE,FALSE,,,Headless Core + AGiO integration validation — ADR-068 replay + O-BACKEND-6 smoke
+

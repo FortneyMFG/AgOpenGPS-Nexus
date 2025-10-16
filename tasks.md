@@ -27,7 +27,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 - [x] NX-191 Zone proto + JSON schema handshake _(Done)_ — ADR-027 spatial constraints contract release
 - [x] NX-192 PoseStream zone mask proto update _(Done)_ — ADR-027 PoseStream mask contract
-- [x] NX-193 Layer registry hash handshake draft _(Done)_ — ADR-032 layer controllers registry requirements
+- [x] NX-193 Layer registry hash handshake draft _(Done)_ — ADR-068 layer controller registry requirements
 - [x] NX-194 Capability registry expansion for mapping/zone capabilities _(Done)_ — ADR-029 mapping kernel contracts; ADR-031 manifest governance
 - [x] NX-195 Plugin manifest schema vNext with capability/lease metadata _(Done)_ — ADR-031 official plugin bundle policy
 - [x] NX-196 Job/session schema refresh _(Done)_ — ADR-030 job lifecycle; ADR-041 session metadata
@@ -63,12 +63,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-212 ZoneService gRPC host & watcher plumbing _(Done)_ — ADR-027 ZoneService implementation
 - [x] NX-213 PoseStream zone mask propagation _(Done)_ — ADR-027 constraint mask propagation
 - [x] NX-214 Constraint gate integration into ControlArbiter _(Done)_ — ADR-027 constraint gating
-- [x] NX-215 Layer controller runtime scaffolding _(Done)_ — ADR-032 layer controllers
-- [x] NX-216 Layer controller DI registry & buffer pools _(Done)_ — ADR-032 controller runtime details
-- [x] NX-217 PoseStream ingestion wiring for controllers _(Done)_ — ADR-032 ingestion pipeline
-- [x] NX-218 Controller quality & diagnostic feeds _(Done)_ — ADR-032 diagnostics surfacing
-- [x] NX-219 TileStore writer updates for controller outputs _(Done)_ — ADR-032 TileStore integration
-- [x] NX-220 Deterministic replay fixtures for controllers _(Done)_ — ADR-032 replay harness
+- [x] NX-215 Layer controller runtime scaffolding _(Done)_ — ADR-068 layer controllers
+- [x] NX-216 Layer controller DI registry & buffer pools _(Done)_ — ADR-068 controller runtime details
+- [x] NX-217 PoseStream ingestion wiring for controllers _(Done)_ — ADR-068 ingestion pipeline
+- [x] NX-218 Controller quality & diagnostic feeds _(Done)_ — ADR-068 diagnostics surfacing
+- [x] NX-219 TileStore writer updates for controller outputs _(Done)_ — ADR-068 TileStore integration
+- [x] NX-220 Deterministic replay fixtures for controllers _(Done)_ — ADR-068 replay harness
 - [x] NX-221 JobsService host & lifecycle orchestration _(Done)_ — ADR-030 job sessions service
 - [x] NX-222 Session autosave & journaling pipeline _(Done)_ — ADR-041 job sessions
 - [x] NX-223 Season aggregator & sync orchestration _(Done)_ — ADR-040 season organizers
@@ -84,6 +84,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-233 Discovery watcher updates for seasons _(Done)_ — ADR-024 discovery & identity
 - [x] NX-234 Provenance audit expansion for new layers _(Done)_ — ADR-019 provenance audit
 - [x] NX-235 Cross-track replay harness slice _(Done)_ — ADR-roadmap cross-track slice plan
+- [ ] NX-341 GitHub Actions release packaging (Win/Linux zips) _(In Progress)_ — SRS §2.7 Packaging & DevEx
+- [ ] NX-414 Multi-steer configurator export schema GA _(Planned)_ — ADR-067 axle-centric profiles
+- [ ] NX-452 Core ingestion service for axle-centric profiles _(Planned)_ — ADR-067 runtime ingestion
+- [ ] NX-453 Automation integration for axle-centric limits _(Planned)_ — ADR-067 planner/controller wiring
+- [ ] NX-454 Calibration workflows & fixtures _(Planned)_ — ADR-067 calibration suite delivery
+- [ ] NX-455 Documentation & preset libraries for axle-centric rigs _(Planned)_ — ADR-067 rollout playbook
+- [ ] NX-462 Linux Core service packaging & systemd units _(Planned)_ — SRS option O-BACKEND-6
+- [ ] NX-463 Linux Core operations & observability playbook _(Planned)_ — ADR-068 diagnostics + SRS §10 Telemetry
+- [ ] NX-464 Headless Core + AGiO integration validation _(Planned)_ — ADR-068 replay + O-BACKEND-6 smoke
 
 ### Section C — AGiO & Backends
 - [x] NX-020 AGiO host skeleton + backend loader
@@ -367,7 +376,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-157 | Implement ADR-018 plugin API leases, manifests, and AgIO migration | Done | AI | — | [ADR-018 Plugin API](docs/ADR/ADR-018-plugin-api.md) | Lease + manifest governance guide for plugin authors |
 | NX-191 | Zone proto + JSON schema handshake | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 spatial constraints contract release |
 | NX-192 | PoseStream zone mask proto update | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | PoseStream now carries `PoseZoneMask` with registry hash + zone IDs |
-| NX-193 | Layer registry hash handshake draft | Done |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | Draft handshake spec published for controller boot validation |
+| NX-193 | Layer registry hash handshake draft | Done |  | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md) | Draft handshake spec published for controller boot validation |
 | NX-194 | Capability registry expansion for mapping/zone capabilities | Done |  | — | [ADR-029](docs/ADR/ADR-029-mapping-plugin-architecture.md), [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-029 mapping kernel contracts; ADR-031 manifest governance |
 | NX-195 | Plugin manifest schema vNext with capability/lease metadata | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 official plugin bundle policy |
 | NX-196 | Job/session schema refresh | Done |  | — | [ADR-030](docs/ADR/ADR-030-field-job-sessions.md), [ADR-041](docs/ADR/ADR-041_JobSessions.md) | ADR-030 job lifecycle; ADR-041 session metadata |
@@ -405,12 +414,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-212 | ZoneService gRPC host & watcher plumbing | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 ZoneService implementation |
 | NX-213 | PoseStream zone mask propagation | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 constraint mask propagation |
 | NX-214 | Constraint gate integration into ControlArbiter | Done | AI | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | Constraint gate enforces keep-out/work-disabled policies |
-| NX-215 | Layer controller runtime scaffolding | Done |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 layer controllers |
-| NX-216 | Layer controller DI registry & buffer pools | Done |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 controller runtime details |
-| NX-217 | PoseStream ingestion wiring for controllers | Done |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 ingestion pipeline |
-| NX-218 | Controller quality & diagnostic feeds | Done |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 diagnostics surfacing |
-| NX-219 | TileStore writer updates for controller outputs | Done |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 TileStore integration |
-| NX-220 | Deterministic replay fixtures for controllers | Done |  | — | [ADR-032](docs/ADR/ADR-032-presets-and-layout-linking.md) | ADR-032 replay harness |
+| NX-215 | Layer controller runtime scaffolding | Done |  | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md) | ADR-068 layer controllers |
+| NX-216 | Layer controller DI registry & buffer pools | Done |  | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md) | ADR-068 controller runtime details |
+| NX-217 | PoseStream ingestion wiring for controllers | Done |  | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md) | ADR-068 ingestion pipeline |
+| NX-218 | Controller quality & diagnostic feeds | Done |  | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md) | ADR-068 diagnostics surfacing |
+| NX-219 | TileStore writer updates for controller outputs | Done |  | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md) | ADR-068 TileStore integration |
+| NX-220 | Deterministic replay fixtures for controllers | Done |  | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md) | ADR-068 replay harness |
 | NX-221 | JobsService host & lifecycle orchestration | Done |  | — | [ADR-030](docs/ADR/ADR-030-field-job-sessions.md) | ADR-030 job sessions service |
 | NX-222 | Session autosave & journaling pipeline | Done |  | — | [ADR-041](docs/ADR/ADR-041_JobSessions.md) | ADR-041 job sessions |
 | NX-223 | Season aggregator & sync orchestration | Done |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040 season organizers |
@@ -426,6 +435,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-233 | Discovery watcher updates for seasons | Done |  | — | [ADR-024](docs/ADR/ADR-024-discovery-identity.md) | ADR-024 discovery & identity |
 | NX-234 | Provenance audit expansion for new layers | Done |  | — | [ADR-019](docs/ADR/ADR-019-provenance-audit-qa.md) | ADR-019 provenance audit |
 | NX-235 | Cross-track replay harness slice | Done |  | — | [ADR roadmap](docs/ADR/ADR-roadmap.md) | ADR-roadmap cross-track slice plan |
+| NX-341 | GitHub Actions release packaging (Win/Linux zips) | In Progress | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
+| NX-414 | Multi-steer configurator export schema GA | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Finalize JSON schema, validators, and hash tooling |
+| NX-452 | Core ingestion service for axle-centric profiles | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Implement deterministic loader + health telemetry |
+| NX-453 | Automation integration for axle-centric limits | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Wire planners/controllers to curvature/slip limits |
+| NX-454 | Calibration workflows & fixtures | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Deliver Ackermann wizard, hitch zeroing, slip sanity tests |
+| NX-455 | Documentation & preset libraries for axle-centric rigs | Planned | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Publish operator guides + preset bundles |
+| NX-462 | Linux Core service packaging & systemd units | Planned | Core Owner | — | [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | Create deb/rpm installers, systemd units, and upgrade path |
+| NX-463 | Linux Core operations & observability playbook | Planned | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [SRS §10](docs/SRS/sections/10_Telemetry_Health.md) | Document logging, metrics, alerting, and recovery drills |
+| NX-464 | Headless Core + AGiO integration validation | Planned | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | End-to-end smoke with AGiO backends on Linux headless |
 
 ### Section C — AGiO & Backends
 

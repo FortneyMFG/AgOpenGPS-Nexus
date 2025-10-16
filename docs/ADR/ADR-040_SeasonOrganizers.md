@@ -1,6 +1,6 @@
 # ADR-040 — Season Organizers
 
-- **Status:** Drafting
+- **Status:** Accepted — 2025-05-17 architecture guild review
 - **Date:** 2025-03-18
 - **Author(s):** Nexus architecture guild
 - **NX Task:** NX-131 Field job session lifecycle ADR
@@ -53,6 +53,12 @@ cached analytics and register interest in seasonal overlays before sessions begi
   recalculate aggregates. Season optimizer payloads may be interpreted by specialized plugins (e.g., Profit, Report Builder) but
   Core treats the payload as opaque binary or JSON blobs.
 
+## SRS Impact
+
+- Satisfies the season catalog hierarchy, payload, and synchronization notes captured in §02 Data Model for Season → Job → Session orchestration.【F:docs/SRS/sections/02_DataModel.md†L1-L140】
+- Enables season-scoped navigation, analytics, and work planning flows described in §03 Job Lifecycle lifecycle state and event tables.【F:docs/SRS/sections/03_JobLifecycle.md†L1-L64】
+- Provides the context handle relied on by backend services to hydrate caches before sessions, addressing §04 Backend Services orchestration requirements.【F:docs/SRS/sections/04_Backend_Services.md†L6-L27】
+
 ## Consequences
 
 - Navigation flows may start with season selection, letting operators drill into participating farms and jobs without scanning
@@ -76,6 +82,12 @@ cached analytics and register interest in seasonal overlays before sessions begi
 - Importers should create a default season only when operators opt in; Core must not auto-create seasons during migration.
 - UI and API flows may hide the Season step when no seasons are defined to preserve today’s farm-first workflow.
 - Synchronization tooling must merge seasons by `id` and keep `jobIds` deduplicated.
+
+## Validation
+
+- Regression fixtures must demonstrate season selection driving `onSeasonLoaded` within 200 ms of `onFarmLoaded` on the headless host while keeping cache hydration idempotent across repeats.
+- Job/session analytics exports scoped to a season must include all participating jobs with consistent acreage totals and provenance hashes.
+- Offline merge tests confirm concurrent season edits reconcile deterministically using last-write-wins on Core-owned fields and plugin-defined merge rules inside `extensions`.
 
 ## References
 

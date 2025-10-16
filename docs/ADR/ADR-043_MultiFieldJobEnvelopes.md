@@ -1,6 +1,6 @@
 # ADR-043 — Multi-Field Job Envelopes
 
-- **Status:** Drafting
+- **Status:** Accepted — 2025-05-17 lifecycle & mapping review
 - **Date:** 2025-03-18
 - **Author(s):** Nexus architecture guild
 - **NX Task:** NX-131 Field job session lifecycle ADR
@@ -61,6 +61,12 @@ overlays deterministically.
   }
 }
 ```
+
+## SRS Impact
+
+- Fulfils the multi-field hierarchy and envelope schema expectations in §02 Data Model, which document Season → Job → Session relationships and field membership constraints.【F:docs/SRS/sections/02_DataModel.md†L22-L140】
+- Extends the mount/unmount lifecycle defined in §03 Job Lifecycle with deterministic `mountFields` events and per-field stat rollups.【F:docs/SRS/sections/03_JobLifecycle.md†L59-L112】
+- Aligns with §04 Mapping, Layer Governance & Multi-Field Envelopes by enforcing union envelope generation, R-tree maintenance, and per-field analytics exports for mounted fields.【F:docs/SRS/sections/04_MappingLayers.md†L1-L44】
 
 ## Consequences
 

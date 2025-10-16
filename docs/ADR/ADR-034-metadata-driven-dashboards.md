@@ -8,7 +8,7 @@ Drafting (target review window: 2025-11-28 week)
 
 
 ## Context
-UI overlays, dashboards, and inspectors need to consume layer metadata without hard-coded IDs so Nexus can adapt to new layers and plugins. Current implementations tightly couple widgets to specific datasets, impeding reuse across desktop and companion clients. ADR-034 describes the metadata-driven UI model that leverages ADR-010 layer registry and ADR-032 layer controllers to deliver declarative visualization.
+UI overlays, dashboards, and inspectors need to consume layer metadata without hard-coded IDs so Nexus can adapt to new layers and plugins. Current implementations tightly couple widgets to specific datasets, impeding reuse across desktop and companion clients. ADR-034 describes the metadata-driven UI model that leverages ADR-010 layer registry and ADR-068 layer controllers to deliver declarative visualization.
 
 ## Decision
 - Bind UI widgets to layer definitions and controller metadata rather than fixed identifiers, enabling declarative dashboard composition.
@@ -36,4 +36,4 @@ UI overlays, dashboards, and inspectors need to consume layer metadata without h
 - [Telemetry & health requirements](../SRS/sections/10_Telemetry_Health.md)
 - [Extensibility & plugin requirements](../SRS/sections/12_Extensibility_Plugins.md)
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
-- [ADR-032: Layer controllers and aggregation runtime](ADR-032-presets-and-layout-linking.md)
+- [ADR-068: Layer controllers and aggregation runtime](ADR-068-layer-controllers-runtime.md)

@@ -46,5 +46,5 @@ M — Significant investment in replay assets, CI scripting, and documentation b
 ## Related ADRs
 - [ADR-004 — Composite Simulation](../../ADR/ADR-004-composite-simulation.md)
 - [ADR-020 — Determinism & Replay CI](../../ADR/ADR-020-determinism-replay-ci.md)
-- [ADR-032 — Presets and Layout Linking](../../ADR/ADR-032-presets-and-layout-linking.md)
+- [ADR-068 — Layer controllers & aggregation runtime](../../ADR/ADR-068-layer-controllers-runtime.md)
 

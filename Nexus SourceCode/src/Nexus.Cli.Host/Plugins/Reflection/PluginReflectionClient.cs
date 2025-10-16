@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Net.Http;
 using Grpc.Net.Client;
 using Nexus.Cli.Reflection.V1;
 
@@ -37,13 +38,29 @@ public sealed class PluginReflectionClient : IPluginReflectionClient
 
     private GrpcChannel CreateChannel(Uri endpoint)
     {
-        if (_httpClientFactory is not null)
+        var options = new GrpcChannelOptions();
+
+        switch (endpoint.Scheme)
         {
-            var httpClient = _httpClientFactory.CreateClient("nx-cli-reflection");
-            return GrpcChannel.ForAddress(endpoint, new GrpcChannelOptions { HttpClient = httpClient });
+            case "http":
+                options.HttpHandler = new SocketsHttpHandler
+                {
+                    Http2UnencryptedSupport = true,
+                };
+                options.Credentials = Grpc.Core.ChannelCredentials.Insecure;
+                break;
+            case "https":
+                if (_httpClientFactory is not null)
+                {
+                    options.HttpClient = _httpClientFactory.CreateClient("nx-cli-reflection");
+                }
+
+                break;
+            default:
+                throw new NotSupportedException($"Unsupported URI scheme '{endpoint.Scheme}'.");
         }
 
-        return GrpcChannel.ForAddress(endpoint);
+        return GrpcChannel.ForAddress(endpoint, options);
     }
 
     private static PluginVerb? ToVerb(VerbDescriptor descriptor)

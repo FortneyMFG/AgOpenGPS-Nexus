@@ -28,6 +28,8 @@ flowchart TD
     EAOG[To other AOG Enabled Equipment]
     ISOBUSP[Isobus Plugin]
     ISOBUS[To Isobus Equipement]
+    PPP[Pumkin Pi Plugin]
+    PPH[Hardware (Steer, Section, Rate etc) connected straight to Pi interfaces]
     
 
     Core --> UI
@@ -45,6 +47,8 @@ flowchart TD
     ELRS <--> AgIO
     ELRSR <-- Serial through MCU --> MCUs
     ELRSR <--> EAOG
+    Core <--> PPP
+    PPP <--> PPH
     
 ```
 

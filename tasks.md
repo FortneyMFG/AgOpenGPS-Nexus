@@ -748,7 +748,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-PP-000 Ingest Pumpkin Pi codex brief _(Done)_
 
 #### SRS & ADR
-- [ ] NX-PP-001 Add §8A CM5 Integrated Controller (AgIO-bypass) to SRS
+- [x] NX-PP-001 Add §8A CM5 Integrated Controller (AgIO-bypass) to SRS
 - [ ] NX-PP-002 ADR-00XX documenting SHM fastpath + HAL decision
 
 #### Plugin Scaffold

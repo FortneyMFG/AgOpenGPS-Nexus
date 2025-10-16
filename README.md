@@ -25,7 +25,7 @@ flowchart TD
     MCUs[MCUs & Field Hardware]
     ELRS[ELRS Mesh Plugin]
     ELRSR[ELRS Radio]
-    EAOG[To other AOG Enabled Equipement]
+    EAOG[To other AOG Enabled Equipment]
     ISOBUSP[Isobus Plugin]
     ISOBUS[To Isobus Equipement]
     
@@ -43,7 +43,7 @@ flowchart TD
     Core <--> ELRS
     ELRS <-- Direct Serial (no MCU) --> ELRSR
     ELRS <--> AGiO
-    ELRSR <- Serial through MCU --> MCUs
+    ELRSR <-- Serial through MCU --> MCUs
     ELRSR <--> EAOG
     
 ```

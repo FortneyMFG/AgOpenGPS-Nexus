@@ -19,6 +19,9 @@ public sealed class LoggingShellCommandHandler : IShellCommandHandler
         "toolbar.top",
         "shell.main",
         "shell.map",
+        "dialog.boundary",
+        "dialog.flags",
+        "tools.offset",
     };
 
     private readonly ILogger<LoggingShellCommandHandler> _logger;

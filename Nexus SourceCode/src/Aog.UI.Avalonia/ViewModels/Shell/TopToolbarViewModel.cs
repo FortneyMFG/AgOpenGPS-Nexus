@@ -75,6 +75,15 @@ public sealed class TopToolbarViewModel
                 isToggle: false,
                 initialState: false,
                 description: "Open section control configuration."),
+            new TopToolbarItemViewModel(
+                id: "toolbar.offsetFix",
+                displayName: "Offset Fix",
+                injectionPoint: "tools.offset",
+                commandId: "core.shift_position_dialog.open",
+                dispatcher: dispatcher,
+                isToggle: false,
+                initialState: false,
+                description: "Open the shift position dialog."),
         });
 
         _items = new ReadOnlyObservableCollection<TopToolbarItemViewModel>(collection);

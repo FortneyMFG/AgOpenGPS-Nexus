@@ -268,6 +268,13 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | DFU-004 | Workstream TBD | [Update orchestration](../sections/17_Device_Firmware_Updates.md) | ADR-DFU-002 (TBD) |
 | DFU-008 | Workstream TBD | [Offline bundles](../sections/17_Device_Firmware_Updates.md) | ADR-DFU-003 (TBD) |
 
+### Section 18 – Command Line Interface
+| Requirement | Options / Workstreams | References & tooling | ADR placeholder |
+|-------------|----------------------|----------------------|-----------------|
+| R-CLI-000…R-CLI-003 | O-CLI-0 | [Unified host requirements](sections/18_Command_Line_Interface.md) | ADR-054 (TBD) |
+| R-CLI-004…R-CLI-007 | O-CLI-0 | [CLI UX & config discovery notes](sections/18_Command_Line_Interface.md) | ADR-054 (TBD) |
+| R-CLI-008…R-CLI-010 | O-CLI-0 | [Versioning & packaging requirements](sections/18_Command_Line_Interface.md) | ADR-054 (TBD) |
+
 ## Glossary
 - **AgIO**: Companion I/O service that provides network, CAN, and serial connectivity for AgOpenGPS.
 - **ADR**: Architecture Decision Record capturing the context, choice, and consequences of an agreed solution.

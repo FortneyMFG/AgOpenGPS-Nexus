@@ -95,28 +95,94 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
             yield break;
         }
 
-        var unique = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var seenManifests = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var pluginDirectory in SafeEnumerateDirectories(pluginRoot))
         {
-            if (TryGetManifestPath(pluginDirectory, out var directManifest) && unique.Add(directManifest))
+            if (TryGetManifestPath(pluginDirectory, out var directManifest)
+                && TryTrackManifest(directManifest, seenManifests))
             {
                 yield return directManifest;
             }
 
             var currentPath = Path.Combine(pluginDirectory, "current");
-            if (TryGetManifestPath(currentPath, out var currentManifest) && unique.Add(currentManifest))
+            if (TryGetManifestPath(currentPath, out var currentManifest)
+                && TryTrackManifest(currentManifest, seenManifests))
             {
                 yield return currentManifest;
             }
 
             foreach (var versionDirectory in SafeEnumerateDirectories(pluginDirectory))
             {
-                if (TryGetManifestPath(versionDirectory, out var manifestPath) && unique.Add(manifestPath))
+                if (TryGetManifestPath(versionDirectory, out var manifestPath)
+                    && TryTrackManifest(manifestPath, seenManifests))
                 {
                     yield return manifestPath;
                 }
             }
+        }
+    }
+
+    private static bool TryTrackManifest(string manifestPath, HashSet<string> seen)
+    {
+        var canonicalPath = GetCanonicalManifestPath(manifestPath);
+        return seen.Add(canonicalPath);
+    }
+
+    private static string GetCanonicalManifestPath(string manifestPath)
+    {
+        if (string.IsNullOrWhiteSpace(manifestPath))
+        {
+            return manifestPath;
+        }
+
+        try
+        {
+            var fileInfo = new FileInfo(manifestPath);
+            if (!fileInfo.Exists)
+            {
+                return fileInfo.FullName;
+            }
+
+            var directory = fileInfo.Directory;
+            if (directory is null)
+            {
+                return fileInfo.FullName;
+            }
+
+            var resolvedDirectory = ResolveDirectoryLinkTarget(directory);
+            var canonicalDirectory = resolvedDirectory?.FullName ?? directory.FullName;
+
+            return Path.Combine(canonicalDirectory, fileInfo.Name);
+        }
+        catch
+        {
+            return Path.GetFullPath(manifestPath);
+        }
+    }
+
+    private static DirectoryInfo? ResolveDirectoryLinkTarget(DirectoryInfo directory)
+    {
+        try
+        {
+            if (!directory.Attributes.HasFlag(FileAttributes.ReparsePoint))
+            {
+                return null;
+            }
+
+            return directory.ResolveLinkTarget(true) as DirectoryInfo;
+        }
+        catch (IOException)
+        {
+            return null;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return null;
+        }
+        catch (NotSupportedException)
+        {
+            return null;
         }
     }
 

@@ -1,14 +1,66 @@
 # Nexus (AgOpenGPS Next Generation)
 
-Nexus is the next-generation AgOpenGPS stack that blends community experience with ambitious 2025 planning. It keeps rigs productive offline, codifies farm → field and season → job → session hierarchies, and opens the door for a governed plugin ecosystem.
+Nexus is an experiment in how far a community guided by AI co-pilots can take AgOpenGPS when human time is no longer the limiting factor. The goal is to produce the best, most connected version of AOG possible while staying transparent, documented, and collaborative for the broader farming community.
 
-## Why Nexus?
+## Vision at a Glance
 
-- **Offline-first, cloud-optional.** Jobs, sessions, telemetry, and plugins run locally with deterministic folder layouts. Cloud sync is additive and reconciles when devices land back on a network—never a requirement for field work.【F:docs/ADR/ADR-030-field-job-sessions.md†L33-L86】
-- **Canonical hierarchies.** Farm → Field geometry and Season → Job → Session operational flows align Core, plugins, and analytics around shared identifiers.【F:docs/SRS/sections/02_DataModel.md†L1-L132】
-- **Plugin ecosystem.** Core lifecycle events, the Layer Registry, and manifest governance let crop type, genetics, yield, profit, and telemetry plugins ship independently while sharing provenance and QA policies.【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】
-- **Safety posture.** Remote dashboards default to monitor-only. Telemetry sharing runs through explicit share/subscribe profiles and never grants control without an in-cab lease.【F:docs/SRS/sections/09_Control_Automation.md†L33-L60】【F:docs/plugins/MultiMachine.md†L1-L80】
-- **Interop built-in.** ISOXML bridges, external layer ingest, and report builders share the same registry hashes so TaskData, GeoTIFF, and GeoJSON round-trip without drift.【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】【F:docs/SRS/sections/04_MappingLayers.md†L84-L106】
+- **AI-assisted evolution.** Nexus treats every artifact—code, docs, packaging, and automation—as something an AI helper can draft while humans review and steer.
+- **CM5-first hardware plan.** A Raspberry Pi Compute Module 5 (or Pi 5) is positioned to replace both the Teensy on an All-In-One (AIO) board and the traditional Windows tablet by hosting the entire AOG stack with one or more HDMI/DSI touch displays.
+- **Runs where you are.** The same stack operates on Linux or Windows laptops and desktops, and it remains compatible with existing AIO hardware through USB, Ethernet, or CAN links.
+- **AOG-Link V1 bridge.** Nexus modernizes the legacy UDP PGN link (AOG-Link V0) with nanopb messaging and optional MQTT/MQTT-SN transport while keeping the V0 protocol available for drop-in compatibility.
+- **Composable everything.** Every service is a replaceable block that communicates through efficient gRPC contracts, letting operators enable, disable, or swap plugins without rewriting the core.
+
+## Modular Architecture
+
+```mermaid
+flowchart TD
+    Core[Core Orchestrator]
+    UI[User Interface Shells]
+    Plugins[Plugins & Feature Modules]
+    Telemetry[Telemetry & Analytics]
+    Mapping[Mapping & Layers]
+    Guidance[Guidance & AutoSteer]
+    Sections[Sections & Rate Control]
+    Bridge[AgIO Bridge]
+    AgIO[AgIO Service]
+    MCUs[MCUs & Field Hardware]
+
+    Core --> UI
+    Plugins <--> Core
+    Telemetry <--> Core
+    Mapping <--> Core
+    Guidance <--> Core
+    Sections <--> Core
+    Plugins <--> Telemetry
+    Plugins <--> Mapping
+    Plugins <--> Guidance
+    Plugins <--> Sections
+    Core --> Bridge
+    Bridge --> AgIO
+    AgIO --> MCUs
+```
+
+Core coordinates the data model, job/session orchestration, and routing while UI shells focus on visualization. Plugins plug into the gRPC event bus for guidance, mapping, telemetry, analytics, and hardware integrations. AgIO (and its bridge) surface those decisions to MCU modules or legacy AIO boards through AOG-Link V1 or the existing UDP PGN stack.
+
+## Hardware & Deployment Vision
+
+| Scenario | What It Looks Like |
+| --- | --- |
+| **CM5 / Pi 5 all-in-one** | CM5 mounted on an AIO carrier board powers display(s), GNSS, steering, sections, and sensors while running the complete Nexus stack locally. |
+| **Laptop or desktop** | Windows and Linux builds run the same binaries; connect to existing Teensy-based AIOs over USB, Ethernet, or CAN without replacing hardware. |
+| **Hybrid rigs** | Mix-and-match CM5 host control with remote MCU modules (rate control, section control, ISOBUS, etc.) connected by Ethernet, Wi-Fi, ELRS, LoRa, or CAN. |
+
+## AOG-Link Evolution
+
+The Nexus roadmap upgrades the legacy UDP PGN interface to **AOG-Link V1**, a nanopb-based contract with optional MQTT/MQTT-SN transport. The bridge maintains full compatibility with **AOG-Link V0**, allowing existing rigs and logging workflows to continue operating unchanged while unlocking richer diagnostics, higher throughput, and device identity.
+
+## Plugin & Component Highlights
+
+- **AutoSteer & Guidance.** Closed-loop steering, lookahead tuning, and constraint gating run as plugins connected to Core routing. Refer to [docs/plugins/AutoSteer.md](docs/plugins/AutoSteer.md) and [docs/ADR/ADR-033-guidance-planner-autosteer.md](docs/ADR/ADR-033-guidance-planner-autosteer.md) for control theory and safety notes.
+- **Sections & Rate Control.** Section management, variable rate, and product control share the Layer Registry and telemetry feeds, with nanopb contracts ready for MCU modules. See [docs/plugins/Sections.md](docs/plugins/Sections.md) and [docs/plugins/RateControl.md](docs/plugins/RateControl.md).
+- **Mapping & Analytics.** Layer editing, replay, and telemetry logging use the TileStore, Layer Registry, and report builder services. Explore [docs/plugins/Mapping.md](docs/plugins/Mapping.md), [docs/plugins/Replay.md](docs/plugins/Replay.md), and [docs/plugins/TelemetryLogging.md](docs/plugins/TelemetryLogging.md).
+- **ISOBUS & External Devices.** The ISOBUS bridge, GNSS/IMU fusion, and device manager plugins coordinate identities and capabilities across the mesh; details are under [docs/plugins/ISOBUS.md](docs/plugins/ISOBUS.md) and [docs/plugins/DeviceManager.md](docs/plugins/DeviceManager.md).
+- **Simulation & Testing.** Deterministic simulation scenarios, Parquet telemetry logs, and replay fixtures keep regression coverage aligned with the SRS. Start with [docs/howto/simulation-scenarios.md](docs/howto/simulation-scenarios.md) and [docs/plugins/Replay.md](docs/plugins/Replay.md).
 
 ## Repository Tour
 
@@ -28,32 +80,30 @@ Nexus is the next-generation AgOpenGPS stack that blends community experience wi
 
 ## Getting Started
 
-1. Review `docs/INDEX.md` for entry points into the SRS, ADR roadmap, and plugin docs.
-2. Pick an NX ticket from `tasks.md`, confirm the owning ADR/SRS sections, and align on scope.
-3. Follow `AGENTS.md` for branch naming, ownership bands, and PR expectations. Every change ties to one NX ticket.
-4. Run documentation, schema, and test updates together; deterministic storage and replay are core principles.
-5. When you're ready to exercise the code, follow the [developer setup quick start](docs/howto/developer-setup.md) to either download the packaged release bundles or build/run the solution locally.
+1. Read `docs/INDEX.md` to see how the ADR roadmap, SRS sections, and how-to guides connect.
+2. Choose an NX ticket from `tasks.md`, confirm the referenced ADR/SRS material, and align scope in `#nexus-dev`.
+3. Follow `AGENTS.md` for branch naming, ownership bands, and PR expectations—every change ties to one NX ticket.
+4. Keep documentation, schema, and test updates alongside code changes; deterministic storage and replay are core principles.
+5. When you are ready to run the stack, follow the [developer setup quick start](docs/howto/developer-setup.md) for packaging downloads or local builds.
 
 ## Continuous Integration & Release Automation
 
-- The **Nexus CI** workflow (`.github/workflows/ci.yml`) runs on every push and pull request. It restores, builds, and tests the .NET 8 solution on Windows and Linux runners before executing repository linting, contract governance checks, the simulation smoke harness, and packaging smoke tests for each platform.
-- The **Nexus Release Packaging** workflow (`.github/workflows/release.yml`) triggers for tags that match `v*` (or manually via workflow dispatch). It rebuilds and tests the solution on dedicated Windows and Linux jobs, packages self-contained single-file binaries using `tools/ci/package-windows.ps1` and `tools/ci/package-linux.ps1`, and publishes zip bundles directly to the GitHub release so operators can download ready-to-run archives for each platform.
+- **Nexus CI** (`.github/workflows/ci.yml`) restores, builds, and tests the .NET solution on Windows and Linux, then runs linting, contract governance, deterministic simulation smoke tests, and packaging probes.
+- **Release Packaging** (`.github/workflows/release.yml`) rebuilds tagged releases, generates single-file bundles via `tools/ci/package-windows.ps1` and `tools/ci/package-linux.ps1`, and publishes zip archives for operators.
 
-## Continuous Integration & Release Automation
+## Safety, Access, and Roadmap
 
-- The **Nexus CI** workflow (`.github/workflows/ci.yml`) runs on every push and pull request. It restores, builds, and tests the .NET 8 solution on Windows and Linux runners before executing repository linting, contract governance checks, the simulation smoke harness, and packaging smoke tests for each platform.
-- The **Nexus Release Packaging** workflow (`.github/workflows/release.yml`) triggers for tags that match `v*` (or manually via workflow dispatch). It rebuilds and tests the solution on dedicated Windows and Linux jobs, packages self-contained single-file binaries using `tools/ci/package-windows.ps1` and `tools/ci/package-linux.ps1`, and publishes zip bundles directly to the GitHub release so operators can download ready-to-run archives for each platform.
-
-## Safety & Remote Access
-
-- Remote dashboards subscribe to telemetry but cannot issue commands unless an operator grants an explicit control lease. Mesh profiles limit what leaves the cab, with profitability and layer edits denied by default.【F:docs/plugins/MultiMachine.md†L1-L80】【F:docs/SRS/sections/09_Control_Automation.md†L33-L60】
-- Section control treats advisory `noWorkMask` overlays as guidance only; constraint gates remain in Core and never depend on remote inputs.【F:docs/SRS/sections/09_Control_Automation.md†L61-L71】
+- Remote dashboards stay monitor-only unless an operator grants an explicit control lease; mesh profiles restrict which telemetry leaves the cab by default.
+- Constraint gates and safety checks stay in Core; plugins receive advisory overlays without gaining direct actuator control.
+- Nexus remains experimental. The Architecture Decision Records (ADR) catalog and System Requirements Specification (SRS) outline the proposed path forward so the community can iterate together even when AI authors the first draft.
 
 ## Additional Resources
 
 - [docs/INDEX.md](docs/INDEX.md) — curated links into ADRs, SRS sections, and plugin guides.
+- [docs/SRS/NOTES.md](docs/SRS/NOTES.md) — narrative summary of the SRS with quick links into requirement sections.
+- [docs/ADR/](docs/ADR) — Architecture Decision Records, including [ADR roadmap highlights](docs/ADR/INDEX.md) for upcoming work.
 - [docs/howto/developer-setup.md](docs/howto/developer-setup.md) — step-by-step instructions for downloading release builds or running from source.
-- [docs/CONTRIBUTING-PLUGINS.md](docs/CONTRIBUTING-PLUGINS.md) — packaging, manifest, and signing requirements for plugin authors.
-- [docs/plugins](docs/plugins) — feature-specific requirements (Mapping, Rate Control, Genetics, Yield, Profit, Multi-Machine, ISOBUS Bridge, Telemetry Logging, Replay, File I/O, and planned Soil/Lab, Map Composer, 3D Terrain).
+- [docs/howto/simulation-scenarios.md](docs/howto/simulation-scenarios.md) — deterministic sim walkthroughs for validation and QA.
+- [docs/templates/ui-modernization-ai-prompts.md](docs/templates/ui-modernization-ai-prompts.md) — examples of AI prompt bundles used in Nexus development.
 
-Nexus continues to evolve in public. Contributions that respect the offline-first, session-aware architecture keep rigs productive today while enabling the ambitious 2025 roadmap.
+Nexus continues to evolve in public. The ADR and SRS trail markers are meant to keep the community aligned, even when the AI prototypes the next chapter.

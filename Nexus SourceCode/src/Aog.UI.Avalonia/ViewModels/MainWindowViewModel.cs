@@ -314,6 +314,21 @@ public class MainWindowViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Creates a boundary tool view-model populated with sample geometry.
+    /// </summary>
+    public BoundaryToolViewModel CreateBoundaryToolViewModel() => BoundaryToolViewModel.CreateSample();
+
+    /// <summary>
+    /// Creates a flag manager view-model populated with sample flags.
+    /// </summary>
+    public FlagManagerDialogViewModel CreateFlagManagerDialogViewModel() => FlagManagerDialogViewModel.CreateSample();
+
+    /// <summary>
+    /// Creates a shift position dialog view-model populated with sample offsets.
+    /// </summary>
+    public ShiftPositionDialogViewModel CreateShiftPositionDialogViewModel() => ShiftPositionDialogViewModel.CreateSample();
+
+    /// <summary>
     /// Creates a metadata snapshot that companion clients can consume to mirror the desktop layout.
     /// </summary>
     public CompanionMetadataSnapshot CreateCompanionMetadataSnapshot()

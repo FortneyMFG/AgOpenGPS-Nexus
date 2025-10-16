@@ -217,6 +217,24 @@
                          Foreground="{DynamicResource ThemeForegroundBrush}"/>
             </StackPanel>
           </Border>
+
+          <Border HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Margin="16"
+                  Padding="14"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  CornerRadius="10">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Field tools" FontSize="16" FontWeight="SemiBold"/>
+              <TextBlock Text="Launch dialogs for boundary editing, flag management, and pose adjustments." TextWrapping="Wrap"
+                         Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              <Button Content="Boundary tool" Click="OnOpenBoundaryTool" MinWidth="160"/>
+              <Button Content="Flag manager" Click="OnOpenFlagManager" MinWidth="160"/>
+              <Button Content="Shift position" Click="OnOpenShiftPosition" MinWidth="160"/>
+            </StackPanel>
+          </Border>
         </Grid>
       </Border>
 

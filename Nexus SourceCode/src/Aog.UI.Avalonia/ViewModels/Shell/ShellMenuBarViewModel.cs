@@ -46,9 +46,9 @@ public sealed class ShellMenuBarViewModel
             new[]
             {
                 ShellMenuItemViewModel.CreateCommand(
-                    "Boundary",
-                    "menu.field",
-                    "core.field.boundary",
+                    "Boundary tool…",
+                    "dialog.boundary",
+                    "core.boundary_tool_dialog.open",
                     dispatcher,
                     description: "Launch the boundary editor for the active field."),
                 ShellMenuItemViewModel.CreateCommand(
@@ -85,12 +85,28 @@ public sealed class ShellMenuBarViewModel
                         "core.tools.steerChart",
                         dispatcher,
                         description: "Open live steering telemetry charts.")),
+                ShellMenuItemViewModel.CreateContainer(
+                    "Flags",
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Flag Manager",
+                        "dialog.flags",
+                        "core.flag_manager_dialog.open",
+                        dispatcher,
+                        description: "Review and manage field flags.")),
                 ShellMenuItemViewModel.CreateCommand(
                     "Log Viewer",
                     "menu.tools",
                     "core.tools.logViewer",
                     dispatcher,
                     description: "Review recent log entries and event history."),
+                ShellMenuItemViewModel.CreateContainer(
+                    "Offset",
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Shift Position",
+                        "tools.offset",
+                        "core.shift_position_dialog.open",
+                        dispatcher,
+                        description: "Adjust the current vehicle position offsets.")),
             });
     }
 

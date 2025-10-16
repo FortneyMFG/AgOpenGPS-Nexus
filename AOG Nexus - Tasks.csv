@@ -345,7 +345,7 @@ NX-606,FALSE,FALSE,NX-605,,NX CLI Plugin sample verbs
 NX-607,FALSE,FALSE,NX-605,,NX CLI Plugin gRPC reflection client
 NX-608,FALSE,FALSE,"NX-606, NX-607",,NX CLI Plugin packaging pipeline
 NX-609,FALSE,FALSE,NX-608,,NX CLI Plugin docs & completions kit
-NX-610,FALSE,FALSE,NX-190,,"ADR governance automation for program board telemetry, dependency digests, and review minutes"
+NX-610,FALSE,TRUE,NX-190,,"ADR governance automation for program board telemetry, dependency digests, and review minutes"
 NX-611,FALSE,FALSE,NX-190,,"PoseStreamService and SectionState roadmap delivery for ADR-007 services, schemas, and replay fixtures"
 NX-612,FALSE,FALSE,NX-190,,"TileStore durability, compaction, and crash-safety rollout per ADR-009"
 NX-613,FALSE,FALSE,NX-190,,"Layer registry, imagery renderer cache, and fusion QA expansion from ADR-010 through ADR-013"

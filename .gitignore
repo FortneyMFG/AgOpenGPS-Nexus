@@ -72,6 +72,9 @@ artifacts/nuget/*
 !artifacts/ui-*.csv
 !artifacts/ui-*.md
 !artifacts/ui-*.yaml
+!artifacts/governance/
+!artifacts/governance/*.json
+!artifacts/governance/*.md
 !artifacts/ui-screenshots/
 artifacts/ui-screenshots/*
 !artifacts/ui-screenshots/README.md

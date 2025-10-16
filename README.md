@@ -42,7 +42,7 @@ flowchart TD
     ISOBUSP <--> ISOBUS
     Core <--> ELRS
     ELRS <-- Direct Serial (no MCU) --> ELRSR
-    ELRS <--> AGiO
+    ELRS <--> AgIO
     ELRSR <-- Serial through MCU --> MCUs
     ELRSR <--> EAOG
     

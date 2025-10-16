@@ -39,6 +39,13 @@ flowchart TD
     AgIO <--> Bridge
     Bridge <--> MCUs
     Core <--> ELRS
+    Core <--> ISOBUSP
+    ISOBUSP <--> ISOBUS
+    Core <--> ELRS
+    ELRS <-| Direct Serial|-> ELRSR
+    ELRS <--> AGiO
+    ELRSR <--> MCU
+    ELRSR <--> EAOG
     
 ```
 

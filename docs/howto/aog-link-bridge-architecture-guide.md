@@ -39,9 +39,8 @@ flowchart TD
     subgraph AgIO["AgIO Bridge & Core Runtime"]
         direction TB
 
-        GRPC["gRPC Bus"]
         CORE["AgIO Core"]
-        GRPC -- "publish / subscribe" --> CORE
+
 
         LINKV1["AOG-Link v1 Layer\n(shared encoding / ACKs)"]
         CORE -- "AOG-Link v1 frames" --> LINKV1
@@ -62,7 +61,7 @@ flowchart TD
         LINKV1 --> V0
     end
 
-    CORECLIENTS -- "gRPC calls" --> GRPC
+    CORECLIENTS -- "gRPC calls" --> CORE
 
     subgraph External["MCUs / Devices / Networks"]
         direction LR

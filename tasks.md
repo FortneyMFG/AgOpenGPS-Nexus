@@ -731,3 +731,33 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-336 | Legacy telemetry remap to new layers | Done |  | — | [ADR-049](docs/ADR/ADR-049_YieldPlugin.md) | ADR-049/052 telemetry parity |
 | NX-337 | Legacy weather log migration utilities | Done |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 weather parity |
 
+
+### Section E — Pumpkin Pi Fastpath
+- [x] NX-PP-000 Ingest Pumpkin Pi codex brief _(Done)_
+
+#### SRS & ADR
+- [ ] NX-PP-001 Add §8A CM5 Integrated Controller (AgIO-bypass) to SRS
+- [ ] NX-PP-002 ADR-00XX documenting SHM fastpath + HAL decision
+
+#### Plugin Scaffold
+- [ ] NX-PP-003 Create repo structure under `plugins/pumpkin-pi/`
+- [ ] NX-PP-004 Implement SHM ring (`/dev/shm/aoglink_steer`) + eventfd
+- [ ] NX-PP-005 HAL backends (GPIO via libgpiod, PWM char dev, SocketCAN)
+- [ ] NX-PP-006 gRPC handlers: consume `SetSteerTarget`, publish `SteerStatus`
+- [ ] NX-PP-007 MQTT loopback publishers for status/health
+
+#### Docs & Diagrams
+- [ ] NX-PP-008 Update plugin catalog & architecture diagrams (Mermaid)
+- [ ] NX-PP-011 Add CM5 getting-started guidance (systemd, mlockall, priorities)
+- [ ] NX-PP-012 Document authority token workflows (`aog/v1/ctrl/authority/steer`)
+
+#### Config & Ops
+- [ ] NX-PP-010 Provide `pumpkin.yaml.example`
+- [ ] NX-PP-013 Provide `pumpkin-pi.service` systemd unit
+- [ ] NX-PP-014 Provide minimal AgIO bridge config with external adapters enabled
+
+#### Testing
+- [ ] NX-PP-015 Bench test NAV → SHM → PWM apply ≤ 2 ms p50
+- [ ] NX-PP-016 Failure test: setpoint TTL expiry drives safe neutral
+- [ ] NX-PP-017 Broker restart resilience (SHM unaffected, MQTT mirrors restore)
+- [ ] NX-PP-018 External MCU join without SHM latency regression

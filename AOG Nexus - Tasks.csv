@@ -316,3 +316,22 @@ NX-455,FALSE,FALSE,NX-454,,Documentation & preset libraries for axle-centric rig
 NX-462,FALSE,FALSE,,,Linux Core service packaging & systemd units — O-BACKEND-6 packaging
 NX-463,FALSE,FALSE,NX-462,,Linux Core operations & observability playbook — ADR-068 diagnostics + SRS §10
 NX-464,FALSE,FALSE,"NX-462, NX-463",,Headless Core + AGiO integration validation — ADR-068 replay + O-BACKEND-6 smoke
+NX-PP-000,FALSE,TRUE,,,Ingest Pumpkin Pi codex brief — owner @you — document SRS/ADR stubs and plugin scaffold
+NX-PP-001,FALSE,FALSE,,,Write SRS §8A CM5 Integrated (AgIO-bypass) — owner @you — insert section and performance targets by 2025-10-20
+NX-PP-002,FALSE,FALSE,,,Add ADR for SHM fastpath + HAL — owner @you — author ADR-00XX by 2025-10-20
+NX-PP-003,FALSE,FALSE,,,Create Pumpkin Pi plugin scaffold — owner @dev1 — establish cmd/pkg structure and systemd unit by 2025-10-27
+NX-PP-004,FALSE,FALSE,,,Implement SHM ring plus eventfd — owner @dev1 — deliver /dev/shm aoglink_steer with versioned ABI by 2025-10-27
+NX-PP-005,FALSE,FALSE,,,Implement HAL backends for pwm gpio can — owner @dev2 — wire libgpiod pwm char dev and SocketCAN by 2025-11-03
+NX-PP-006,FALSE,FALSE,,,Wire gRPC handlers to SHM and HAL — owner @dev2 — consume SetSteerTarget and publish SteerStatus by 2025-11-03
+NX-PP-007,FALSE,FALSE,,,Add MQTT loopback publishers — owner @dev3 — provide GPS IMU Health SteerStatus topics by 2025-11-03
+NX-PP-008,FALSE,FALSE,,,Update plugin docs and architecture diagrams — owner @techwriter — refresh plugins README and bridge.md by 2025-10-28
+NX-PP-009,FALSE,FALSE,,,Bridge integration tests for bypass integrity — owner @qa — measure latency p50 and p95 plus authority handoff by 2025-11-07
+NX-PP-010,FALSE,FALSE,,,Add CM5 integrated sample configs — owner @dev3 — supply /etc/aog yaml examples and systemd templates by 2025-10-28
+NX-PP-011,FALSE,FALSE,,,Add CM5 getting started guidance — owner @techwriter — extend docs/getting-started/cm5.md for RT priority and ops by 2025-10-28
+NX-PP-012,FALSE,FALSE,,,Document authority token workflows — owner @techwriter — cover MQTT retained token guidance in plugin docs by 2025-10-28
+NX-PP-013,FALSE,FALSE,,,Ship pumpkin-pi systemd unit — owner @devops — include realtime scheduling hints and mlockall guidance by 2025-10-20
+NX-PP-014,FALSE,FALSE,,,Publish AgIO bridge minimal config — owner @devops — ensure external adapters stay enabled alongside fastpath by 2025-10-28
+NX-PP-015,FALSE,FALSE,,,Bench fastpath latency — owner @qa — measure NAV to HAL latency targets on CM5 hardware by 2025-11-07
+NX-PP-016,FALSE,FALSE,,,TTL expiry safe neutral test — owner @qa — verify stale setpoints drop to neutral within 250 ms by 2025-11-07
+NX-PP-017,FALSE,FALSE,,,Broker restart resilience test — owner @qa — ensure MQTT mirrors recover without SHM disruption by 2025-11-14
+NX-PP-018,FALSE,FALSE,,,External MCU coexistence test — owner @qa — validate UDP and Serial modules unaffected by fastpath by 2025-11-14

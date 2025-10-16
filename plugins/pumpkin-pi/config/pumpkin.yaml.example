@@ -1,0 +1,11 @@
+node_id: cm5
+roles: [CTRL, SENSOR, ACTUATOR]
+fastpath:
+  shm_name: "/aoglink_steer"
+  setpoint_ttl_ms: 250
+hal:
+  backend: pwm          # pwm | gpio | can | i2c | spi
+  pwm: { chip: 0, channel: 0, period_ns: 2000000 }
+mqtt:
+  broker: "localhost:1883"
+  publish_status: true

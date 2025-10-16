@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+package pumpkinpi.proto;
+
+// TODO: Reuse shared aog_link.proto definitions once wiring is in place.

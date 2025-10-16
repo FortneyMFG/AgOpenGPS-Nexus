@@ -13,7 +13,9 @@ public sealed record CompanionMetadataSnapshot(
     CompanionInspectorSnapshot Inspector,
     CompanionDashboardSnapshot Dashboard,
     CompanionReplayTimelineSnapshot ReplayTimeline,
-    CompanionFieldHealthSnapshot FieldHealth)
+    CompanionFieldHealthSnapshot FieldHealth,
+    CompanionSimulationSnapshot Simulation,
+    CompanionDiagnosticsSnapshot Diagnostics)
 {
     /// <summary>
     /// Creates a snapshot from the supplied metadata-driven view-models.
@@ -28,13 +30,17 @@ public sealed record CompanionMetadataSnapshot(
         LayerInspectorViewModel inspector,
         SteerDashboardViewModel dashboard,
         ReplayTimelineViewModel timeline,
-        FieldHealthSeverityPanelViewModel fieldHealth)
+        FieldHealthSeverityPanelViewModel fieldHealth,
+        SimulationBarViewModel simulation,
+        DiagnosticsWorkspaceViewModel diagnostics)
     {
         ArgumentNullException.ThrowIfNull(legend);
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(dashboard);
         ArgumentNullException.ThrowIfNull(timeline);
         ArgumentNullException.ThrowIfNull(fieldHealth);
+        ArgumentNullException.ThrowIfNull(simulation);
+        ArgumentNullException.ThrowIfNull(diagnostics);
 
         var legendEntries = legend.Entries
             .Select(entry => new CompanionLegendEntry(
@@ -98,6 +104,96 @@ public sealed record CompanionMetadataSnapshot(
                 entry.Color.ToString()))
             .ToArray();
 
+        var simulationRoutes = simulation.Routes
+            .Select(route => new CompanionSimulationRoute(
+                route.Stream,
+                route.SelectedSource,
+                route.SelectedMode))
+            .ToArray();
+
+        var simulationSnapshot = new CompanionSimulationSnapshot(
+            simulation.StatusText,
+            simulation.PlayPauseLabel,
+            simulation.SelectedPlaybackRate,
+            simulation.Position.TotalSeconds,
+            simulation.Duration.TotalSeconds,
+            simulation.ActiveScenarioTitle,
+            simulation.ActiveScenarioDescription,
+            simulation.ActiveScenarioOptions,
+            simulationRoutes);
+
+        var diagnosticsChannels = diagnostics.NetworkChannels
+            .Select(channel => new CompanionDiagnosticsChannel(
+                channel.Name,
+                channel.Transport,
+                channel.Endpoint,
+                channel.PacketsPerSecond,
+                channel.PacketLossPercent,
+                channel.StatusDisplay,
+                channel.Health.ToString()))
+            .ToArray();
+
+        var diagnosticsLoops = diagnostics.Loops
+            .Select(loop => new CompanionDiagnosticsLoop(
+                loop.LoopId,
+                loop.Description,
+                loop.FrequencyHz,
+                loop.TargetFrequencyHz,
+                loop.UtilisationPercent,
+                loop.AverageLatencyMilliseconds,
+                loop.Health.ToString(),
+                loop.HasBacklog,
+                loop.StatusDisplay))
+            .ToArray();
+
+        var diagnosticsSerialProfiles = diagnostics.SerialProfiles
+            .Select(profile => new CompanionDiagnosticsSerialProfile(
+                profile.Port,
+                profile.DeviceLabel,
+                profile.BaudRate,
+                profile.DataBits,
+                profile.Parity,
+                profile.StopBits,
+                profile.IsActive,
+                profile.Handshake,
+                profile.Notes,
+                profile.ConfigurationDisplay))
+            .ToArray();
+
+        var diagnosticsEvents = diagnostics.Events
+            .Select(evt => new CompanionDiagnosticsEvent(
+                evt.TimestampDisplay,
+                evt.SeverityDisplay,
+                evt.Source,
+                evt.Message,
+                evt.Remediation))
+            .ToArray();
+
+        var diagnosticsSnapshot = new CompanionDiagnosticsSnapshot(
+            diagnostics.ConnectionSummary,
+            diagnostics.GpsSummary,
+            new CompanionGpsSnapshot(
+                diagnostics.Gps.FixQuality,
+                diagnostics.Gps.SatelliteCount,
+                diagnostics.Gps.Hdop,
+                diagnostics.Gps.Vdop,
+                diagnostics.Gps.PositionDisplay,
+                diagnostics.Gps.AltitudeDisplay,
+                diagnostics.Gps.SpeedDisplay,
+                diagnostics.Gps.HeadingDisplay,
+                diagnostics.Gps.CorrectionSummary,
+                diagnostics.Gps.LastUpdateDisplay),
+            diagnostics.TelemetrySummary,
+            diagnostics.DeviceHealthSummary,
+            diagnosticsChannels,
+            diagnosticsLoops,
+            diagnosticsSerialProfiles,
+            diagnosticsEvents,
+            diagnostics.LastUpdatedDisplay,
+            diagnostics.LogSummary,
+            diagnostics.HasAlerts,
+            diagnostics.OverallSummary);
+
         return new CompanionMetadataSnapshot(
             new CompanionLegendSnapshot(legendEntries),
             new CompanionInspectorSnapshot(
@@ -132,7 +228,9 @@ public sealed record CompanionMetadataSnapshot(
                 fieldHealth.LastSurveyedDisplay,
                 fieldHealth.ObserverDisplay,
                 fieldHealth.FilterSummary,
-                fieldHealthEntries));
+                fieldHealthEntries),
+            simulationSnapshot,
+            diagnosticsSnapshot);
     }
 
     private static string? ExtractColor(IBrush? brush)
@@ -309,3 +407,159 @@ public sealed record CompanionReplayBookmark(
     string Notes,
     double TimestampSeconds,
     string TimestampDisplay);
+
+/// <summary>Simulation control metadata for the companion parity harness.</summary>
+/// <param name="Status">Playback status text.</param>
+/// <param name="PlayPauseLabel">Label for the play/pause affordance.</param>
+/// <param name="PlaybackRate">Current playback rate multiplier.</param>
+/// <param name="PositionSeconds">Current playback position in seconds.</param>
+/// <param name="DurationSeconds">Total duration in seconds.</param>
+/// <param name="ScenarioTitle">Title describing the active scenario.</param>
+/// <param name="ScenarioDescription">Long-form scenario description.</param>
+/// <param name="ScenarioOptions">Formatted scenario options.</param>
+/// <param name="Routes">Route selections for each simulation stream.</param>
+public sealed record CompanionSimulationSnapshot(
+    string Status,
+    string PlayPauseLabel,
+    double PlaybackRate,
+    double PositionSeconds,
+    double DurationSeconds,
+    string ScenarioTitle,
+    string ScenarioDescription,
+    string ScenarioOptions,
+    IReadOnlyList<CompanionSimulationRoute> Routes);
+
+/// <summary>Represents a single simulation route selection.</summary>
+/// <param name="Stream">Stream identifier.</param>
+/// <param name="SelectedSource">Selected provider for the stream.</param>
+/// <param name="SelectedMode">Routing mode.</param>
+public sealed record CompanionSimulationRoute(
+    string Stream,
+    string SelectedSource,
+    string SelectedMode);
+
+/// <summary>Diagnostics workspace metadata exposed to companion clients.</summary>
+/// <param name="ConnectionSummary">Summary of the active AGiO connection.</param>
+/// <param name="GpsSummary">Short GPS fix summary.</param>
+/// <param name="Gps">Detailed GPS metadata.</param>
+/// <param name="TelemetrySummary">Telemetry opt-in summary.</param>
+/// <param name="DeviceHealthSummary">Device Manager health summary.</param>
+/// <param name="NetworkChannels">Diagnostics for network transports.</param>
+/// <param name="Loops">Diagnostics for AGiO loops.</param>
+/// <param name="SerialProfiles">Diagnostics for serial profiles.</param>
+/// <param name="Events">Recent diagnostics events.</param>
+/// <param name="LastUpdated">Timestamp of the diagnostics sample.</param>
+/// <param name="LogSummary">Summary describing event provenance.</param>
+/// <param name="HasAlerts">Indicates whether alerts are present.</param>
+/// <param name="OverallSummary">Roll-up summary string.</param>
+public sealed record CompanionDiagnosticsSnapshot(
+    string ConnectionSummary,
+    string GpsSummary,
+    CompanionGpsSnapshot Gps,
+    string TelemetrySummary,
+    string DeviceHealthSummary,
+    IReadOnlyList<CompanionDiagnosticsChannel> NetworkChannels,
+    IReadOnlyList<CompanionDiagnosticsLoop> Loops,
+    IReadOnlyList<CompanionDiagnosticsSerialProfile> SerialProfiles,
+    IReadOnlyList<CompanionDiagnosticsEvent> Events,
+    string LastUpdated,
+    string LogSummary,
+    bool HasAlerts,
+    string OverallSummary);
+
+/// <summary>Represents the GPS metadata mirrored to companion clients.</summary>
+/// <param name="FixQuality">Fix quality string.</param>
+/// <param name="SatelliteCount">Number of satellites tracked.</param>
+/// <param name="Hdop">Horizontal dilution of precision.</param>
+/// <param name="Vdop">Vertical dilution of precision.</param>
+/// <param name="Position">Formatted coordinate string.</param>
+/// <param name="Altitude">Formatted altitude string.</param>
+/// <param name="Speed">Formatted speed string.</param>
+/// <param name="Heading">Formatted heading string.</param>
+/// <param name="CorrectionSummary">Summary of correction source and age.</param>
+/// <param name="LastUpdate">Timestamp describing the last update.</param>
+public sealed record CompanionGpsSnapshot(
+    string FixQuality,
+    int SatelliteCount,
+    double Hdop,
+    double Vdop,
+    string Position,
+    string Altitude,
+    string Speed,
+    string Heading,
+    string CorrectionSummary,
+    string LastUpdate);
+
+/// <summary>Represents diagnostics for a single network channel.</summary>
+/// <param name="Name">Channel name.</param>
+/// <param name="Transport">Transport type.</param>
+/// <param name="Endpoint">Endpoint address.</param>
+/// <param name="PacketsPerSecond">Observed packets per second.</param>
+/// <param name="PacketLossPercent">Observed packet loss percentage.</param>
+/// <param name="Status">Formatted status string.</param>
+/// <param name="Health">Health classification.</param>
+public sealed record CompanionDiagnosticsChannel(
+    string Name,
+    string Transport,
+    string Endpoint,
+    double PacketsPerSecond,
+    double PacketLossPercent,
+    string Status,
+    string Health);
+
+/// <summary>Represents diagnostics for a single AGiO loop.</summary>
+/// <param name="LoopId">Loop identifier.</param>
+/// <param name="Description">Loop description.</param>
+/// <param name="FrequencyHz">Measured frequency.</param>
+/// <param name="TargetFrequencyHz">Target frequency.</param>
+/// <param name="UtilisationPercent">Utilisation percentage.</param>
+/// <param name="AverageLatencyMilliseconds">Average latency in milliseconds.</param>
+/// <param name="Health">Health classification.</param>
+/// <param name="HasBacklog">Indicates backlog state.</param>
+/// <param name="StatusDisplay">Formatted status string.</param>
+public sealed record CompanionDiagnosticsLoop(
+    string LoopId,
+    string Description,
+    double FrequencyHz,
+    double TargetFrequencyHz,
+    double UtilisationPercent,
+    double AverageLatencyMilliseconds,
+    string Health,
+    bool HasBacklog,
+    string StatusDisplay);
+
+/// <summary>Represents diagnostics metadata for a serial profile.</summary>
+/// <param name="Port">Serial port path.</param>
+/// <param name="DeviceLabel">Friendly device label.</param>
+/// <param name="BaudRate">Configured baud rate.</param>
+/// <param name="DataBits">Configured data bits.</param>
+/// <param name="Parity">Configured parity.</param>
+/// <param name="StopBits">Configured stop bits.</param>
+/// <param name="IsActive">Indicates whether the port is streaming.</param>
+/// <param name="Handshake">Transport handshake summary.</param>
+/// <param name="Notes">Additional notes.</param>
+/// <param name="ConfigurationDisplay">Formatted configuration summary.</param>
+public sealed record CompanionDiagnosticsSerialProfile(
+    string Port,
+    string DeviceLabel,
+    int BaudRate,
+    int DataBits,
+    string Parity,
+    int StopBits,
+    bool IsActive,
+    string Handshake,
+    string Notes,
+    string ConfigurationDisplay);
+
+/// <summary>Represents a single diagnostics event for companion parity.</summary>
+/// <param name="Timestamp">Timestamp display string.</param>
+/// <param name="Severity">Severity classification.</param>
+/// <param name="Source">Source subsystem.</param>
+/// <param name="Message">Event message.</param>
+/// <param name="Remediation">Optional remediation guidance.</param>
+public sealed record CompanionDiagnosticsEvent(
+    string Timestamp,
+    string Severity,
+    string Source,
+    string Message,
+    string? Remediation);

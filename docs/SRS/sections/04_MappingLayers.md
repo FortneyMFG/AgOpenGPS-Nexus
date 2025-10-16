@@ -46,6 +46,8 @@ Multi-field job envelopes must provide continuous navigation across adjacent fie
   (relocate provenance), or reuse from a prior job via a selection modal.
 - Multi-field selection UI presents combined envelope outlines and per-field coverage completion percentages updated in real time.
 - Session metadata panel surfaces linked layers with provenance badges showing source plugin, createdAt, and reuse indicators.
+- Provenance DAG builder in Core exposes a validation API that rejects cycles/disconnected components before layers commit,
+  aligning with ADR-019 audit requirements and emitting actionable diagnostics for UI surfaces.
 
 ## Plugin API Summary
 

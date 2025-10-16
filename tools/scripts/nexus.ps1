@@ -16,6 +16,7 @@ Commands:
   run <target> [-- <args>...]   Run a Nexus host (core, agio, ui) via dotnet run.
   sim [-- <args>...]            Launch the composite simulation host.
   plugin <cmd> [options]        Plugin manifest tooling (lint, capabilities).
+  guardrails [-- <args>...]     Run guardrail regression tests (retention, replay, crash).
 
 Environment overrides:
   NEXUS_CORE_PROJECT  Relative path to the Core host .csproj.
@@ -112,6 +113,23 @@ function Run-PluginTool {
     exit $LASTEXITCODE
 }
 
+function Run-Guardrails {
+    param([string[]]$Args)
+    $dotnetCmd = Ensure-Dotnet
+    $solutionPath = Join-Path $repoRoot 'Nexus SourceCode/Nexus.sln'
+    if (-not (Test-Path -Path $solutionPath -PathType Leaf)) {
+        throw "Expected solution at $solutionPath."
+    }
+
+    $arguments = @('test', $solutionPath, '--filter', 'Category=Guardrail')
+    if ($Args -and $Args.Count -gt 0) {
+        $arguments += $Args
+    }
+
+    & $dotnetCmd @arguments
+    exit $LASTEXITCODE
+}
+
 switch ($Command.ToLowerInvariant()) {
     'run' {
         if (-not $Target) {
@@ -134,6 +152,9 @@ switch ($Command.ToLowerInvariant()) {
     }
     'plugin' {
         Run-PluginTool -Args $RemainingArgs
+    }
+    'guardrails' {
+        Run-Guardrails -Args $RemainingArgs
     }
     'help' { Show-Usage }
     default {

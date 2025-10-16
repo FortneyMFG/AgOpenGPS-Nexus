@@ -21,7 +21,7 @@ exact same layout without bespoke wiring.
 `CompanionMetadataSnapshot` lives in
 `Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels` and is populated by the
 `MainWindowViewModel.CreateCompanionMetadataSnapshot()` helper. The snapshot
-contains four sections:
+contains six sections:
 
 | Section | Contents | Notes |
 | --- | --- | --- |
@@ -29,6 +29,13 @@ contains four sections:
 | `Inspector` | Pinned observation text, rate availability, transport/payload metadata | Derived from `LayerInspectorViewModel` including formatted strings. |
 | `Dashboard` | Steering history series, PID gains, tuning parameter definitions | Captures sparkline samples and slider bounds from `SteerDashboardViewModel`. |
 | `ReplayTimeline` | Speed/heading samples, export status, bookmarks | Reuses `ReplayTimelineViewModel` data for quick remote analysis. |
+| `Simulation` | Playback status, scenario summary, routed streams | Sourced from `SimulationBarViewModel`. |
+| `Diagnostics` | GPS fix, network channels, loops, serial profiles, events | Produced by `DiagnosticsWorkspaceViewModel` using NX-416 sample data. |
+
+The simulation section keeps CompanionRemote shells in parity with the desktop control bar, exporting
+playback state, scenario metadata, and routed stream selections. The diagnostics section serialises the
+sidebar workspace so GPS, transport channels, AGiO loops, serial profiles, and diagnostics events stay in
+sync across desktop and mobile clients.
 
 Colour values are emitted as `#AARRGGBB` strings so Xamarin/MAUI, Uno, or
 web companions can recreate the gradients without Avalonia dependencies.

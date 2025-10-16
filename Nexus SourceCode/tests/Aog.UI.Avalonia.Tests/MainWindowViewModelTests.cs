@@ -163,6 +163,15 @@ public sealed class MainWindowViewModelTests
         var sourceSeverity = viewModel.FieldHealthSeverity.Entries.First();
         var snapshotSeverity = snapshot.FieldHealth.Entries.First(entry => entry.Severity == sourceSeverity.Severity);
         snapshotSeverity.Color.Should().Be(sourceSeverity.Color.ToString());
+        snapshot.Simulation.Status.Should().Be(viewModel.SimulationBar.StatusText);
+        snapshot.Simulation.PlaybackRate.Should().Be(viewModel.SimulationBar.SelectedPlaybackRate);
+        snapshot.Simulation.Routes.Should().HaveCount(viewModel.SimulationBar.Routes.Count);
+        snapshot.Diagnostics.ConnectionSummary.Should().Be(viewModel.DiagnosticsWorkspace.ConnectionSummary);
+        snapshot.Diagnostics.NetworkChannels.Should().HaveCount(viewModel.DiagnosticsWorkspace.NetworkChannels.Count);
+        snapshot.Diagnostics.Loops.Should().HaveCount(viewModel.DiagnosticsWorkspace.Loops.Count);
+        snapshot.Diagnostics.Events.Should().HaveCount(viewModel.DiagnosticsWorkspace.Events.Count);
+        snapshot.Diagnostics.Gps.FixQuality.Should().Be(viewModel.DiagnosticsWorkspace.Gps.FixQuality);
+        snapshot.Diagnostics.HasAlerts.Should().Be(viewModel.DiagnosticsWorkspace.HasAlerts);
     }
 
     [Fact]
@@ -192,6 +201,19 @@ public sealed class MainWindowViewModelTests
         {
             device.Steps.Should().NotBeEmpty();
         });
+    }
+
+    [Fact]
+    public void DiagnosticsWorkspace_SurfacesSampleData()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.DiagnosticsWorkspace.Should().NotBeNull();
+        viewModel.DiagnosticsWorkspace.Gps.FixQuality.Should().Be("RTK Fixed");
+        viewModel.DiagnosticsWorkspace.NetworkChannels.Should().NotBeEmpty();
+        viewModel.DiagnosticsWorkspace.Loops.Should().NotBeEmpty();
+        viewModel.DiagnosticsWorkspace.Events.Should().NotBeEmpty();
+        viewModel.DiagnosticsWorkspace.TelemetrySummary.Should().Contain("No crash reports");
     }
 
     [Fact]

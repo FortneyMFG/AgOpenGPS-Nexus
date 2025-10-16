@@ -75,6 +75,9 @@ case "${format}" in
   rpm)
     needs_rpm=true
     ;;
+  deb)
+    needs_deb=true
+    ;;
   all)
     needs_deb=true
     needs_rpm=true

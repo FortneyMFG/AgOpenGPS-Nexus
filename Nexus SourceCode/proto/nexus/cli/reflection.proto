@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package nexus.cli.v1;
+
+option csharp_namespace = "Nexus.Cli.Reflection.V1";
+
+// Declares a minimal contract plugins can implement to expose CLI verbs to the
+// unified nx host without shipping a local adapter assembly.
+service PluginReflection {
+  // Lists verbs contributed by the plugin along with option metadata used by
+  // the nx host to construct commands dynamically.
+  rpc ListVerbs(ListVerbsRequest) returns (ListVerbsResponse);
+}
+
+message ListVerbsRequest {}
+
+message ListVerbsResponse {
+  repeated VerbDescriptor verbs = 1;
+}
+
+message VerbDescriptor {
+  string name = 1;
+  string description = 2;
+  repeated OptionDescriptor options = 3;
+}
+
+message OptionDescriptor {
+  string name = 1;
+  string description = 2;
+  bool required = 3;
+  OptionValueKind value_kind = 4;
+  string default_value = 5;
+}
+
+enum OptionValueKind {
+  OPTION_VALUE_KIND_UNSPECIFIED = 0;
+  OPTION_VALUE_KIND_STRING = 1;
+  OPTION_VALUE_KIND_INT32 = 2;
+  OPTION_VALUE_KIND_DOUBLE = 3;
+  OPTION_VALUE_KIND_BOOL = 4;
+}

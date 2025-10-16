@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.nx.sample",
+  "name": "Sample Calibration Plugin",
+  "version": "0.1.0",
+  "description": "Demonstrates calibrate/sniff CLI verbs for Nexus plugin authors.",
+  "requiredApis": {
+    "core": ">=1.0.0"
+  },
+  "supportedCapabilities": [],
+  "provides": {
+    "capabilities": [],
+    "profiles": []
+  },
+  "requires": {
+    "capabilities": [],
+    "profiles": [],
+    "peerOf": [],
+    "conflictsWith": [],
+    "replaces": [],
+    "extends": []
+  },
+  "requiredTransports": [],
+  "minimumRuntimeVersion": "0.1.0",
+  "simProviders": [],
+  "leases": []
+}

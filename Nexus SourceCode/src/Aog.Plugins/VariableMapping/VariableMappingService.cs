@@ -21,6 +21,7 @@ public sealed class VariableMappingService
     private const string Source = "plugin:variable-mapping";
 
     private readonly ExternalAgronomicMapIngestor _ingestor;
+    private readonly PrescriptionExportPipeline _exportPipeline;
     private readonly Dictionary<string, AgronomicLayerDocument> _plannedLayers = new(StringComparer.Ordinal);
     private readonly object _sync = new();
 
@@ -28,9 +29,12 @@ public sealed class VariableMappingService
     /// Initializes a new instance of the <see cref="VariableMappingService"/> class.
     /// </summary>
     /// <param name="ingestor">Agronomic map ingestor used when importing grid files.</param>
-    public VariableMappingService(ExternalAgronomicMapIngestor ingestor)
+    public VariableMappingService(
+        ExternalAgronomicMapIngestor ingestor,
+        PrescriptionExportPipeline? exportPipeline = null)
     {
         _ingestor = ingestor ?? throw new ArgumentNullException(nameof(ingestor));
+        _exportPipeline = exportPipeline ?? new PrescriptionExportPipeline();
     }
 
     /// <summary>
@@ -131,7 +135,9 @@ public sealed class VariableMappingService
     public IReadOnlyList<double> ComputeSetpoints(
         string layerId,
         VariableRateController controller,
-        IReadOnlyList<SectionPlacement> sections)
+        IReadOnlyList<SectionPlacement> sections,
+        VariableRateTransportGuard? transportGuard = null,
+        DateTimeOffset? timestampUtc = null)
     {
         if (controller is null)
         {
@@ -148,7 +154,35 @@ public sealed class VariableMappingService
             throw new InvalidOperationException($"Layer '{layerId}' has not been imported.");
         }
 
-        return controller.ComputeRates(sections, layer);
+        return controller.ComputeRates(sections, layer, transportGuard: transportGuard, timestampUtc: timestampUtc);
+    }
+
+    /// <summary>
+    /// Exports a previously imported prescription to ISOXML and manifest artifacts.
+    /// </summary>
+    /// <param name="layerId">Identifier of the planned layer to export.</param>
+    /// <param name="jobId">Job identifier recorded in the manifest.</param>
+    /// <param name="sessionId">Session identifier recorded in the manifest.</param>
+    /// <param name="recipeId">Prescription recipe identifier recorded in the manifest.</param>
+    /// <param name="operatorId">Optional operator identifier recorded in the manifest.</param>
+    public PrescriptionExportArtifacts ExportPrescription(
+        string layerId,
+        string jobId,
+        string sessionId,
+        string recipeId,
+        string? operatorId = null)
+    {
+        if (string.IsNullOrWhiteSpace(layerId))
+        {
+            throw new ArgumentException("Layer identifier is required.", nameof(layerId));
+        }
+
+        if (!TryGetPlannedLayer(layerId, out var layer))
+        {
+            throw new InvalidOperationException($"Layer '{layerId}' has not been imported.");
+        }
+
+        return _exportPipeline.Export(layer, jobId, sessionId, recipeId, operatorId);
     }
 
     private static string BuildTransform(string recipeId, string? regionLayerId)

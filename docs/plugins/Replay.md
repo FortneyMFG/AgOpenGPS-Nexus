@@ -12,6 +12,14 @@ Replay plugins consume telemetry logs and deterministic fixtures to reproduce se
 - Provide hooks for automation plugins to subscribe to replayed events, enabling regression packs that compare outputs to golden datasets.
 - Expose a "Training Simulator" mode that records operator inputs, plays back telemetry, and scores guidance/rate algorithms against reference baselines for onboarding and GA training.
 
+### Deterministic fixture packs
+
+- Consume the curated PoseStream + SectionState fixture at `docs/plugins/fixtures/pose-section-fixture.jsonl`
+  to validate ingest pipelines against [PoseStreamFrame.v1](../../schemas/PoseStreamFrame.v1.json) and
+  [`SectionStateTally.v1`](../../schemas/SectionStateTally.v1.json) outputs.
+- Replay harnesses MUST verify frame ordering, opportunity/event tallies, and pose hierarchy integrity to
+  satisfy ADR-007 acceptance gates before shipping new transports or persistence changes.
+
 ## UX Requirements
 
 - Offer controls for play/pause/seek/speed tied to the shared SimClock. Display progress, session metadata, and asset availability (layers, logs, reports).

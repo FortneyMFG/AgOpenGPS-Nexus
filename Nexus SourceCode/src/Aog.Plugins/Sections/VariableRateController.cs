@@ -61,7 +61,9 @@ public sealed class VariableRateController
     public IReadOnlyList<double> ComputeRates(
         IReadOnlyList<SectionPlacement> sections,
         AgronomicLayerDocument layer,
-        ConstraintGateSnapshot? constraintGate = null)
+        ConstraintGateSnapshot? constraintGate = null,
+        VariableRateTransportGuard? transportGuard = null,
+        DateTimeOffset? timestampUtc = null)
     {
         if (sections is null)
         {
@@ -73,9 +75,11 @@ public sealed class VariableRateController
             throw new ArgumentNullException(nameof(layer));
         }
 
-        if (constraintGate is not null && !constraintGate.SectionsAllowed)
+        if (transportGuard is not null)
         {
-            return new ReadOnlyCollection<double>(new double[_sectionCount]);
+            var reference = timestampUtc ?? DateTimeOffset.UtcNow;
+            transportGuard.EnsureHeartbeatFresh(reference);
+            timestampUtc = reference;
         }
 
         if (sections.Count != _sectionCount)
@@ -83,21 +87,36 @@ public sealed class VariableRateController
             throw new ArgumentException($"Exactly {_sectionCount} sections are required.", nameof(sections));
         }
 
-        if (layer.Cells.Count == 0)
+        ReadOnlyCollection<double> result;
+
+        if (constraintGate is not null && !constraintGate.SectionsAllowed)
         {
-            return Enumerable.Repeat(_defaultRate, _sectionCount).ToArray();
+            result = new ReadOnlyCollection<double>(new double[_sectionCount]);
+        }
+        else if (layer.Cells.Count == 0)
+        {
+            result = new ReadOnlyCollection<double>(Enumerable.Repeat(_defaultRate, _sectionCount).ToArray());
+        }
+        else
+        {
+            var rates = new double[_sectionCount];
+            for (var index = 0; index < sections.Count; index++)
+            {
+                var section = sections[index];
+                var cell = FindCell(section.Center, layer.Cells);
+                var value = cell?.Value ?? _defaultRate;
+                rates[index] = Math.Clamp(value, _minimumRate, _maximumRate);
+            }
+
+            result = new ReadOnlyCollection<double>(rates);
         }
 
-        var rates = new double[_sectionCount];
-        for (var index = 0; index < sections.Count; index++)
+        if (transportGuard is not null)
         {
-            var section = sections[index];
-            var cell = FindCell(section.Center, layer.Cells);
-            var value = cell?.Value ?? _defaultRate;
-            rates[index] = Math.Clamp(value, _minimumRate, _maximumRate);
+            transportGuard.RecordHeartbeat(layer.LayerId, layer.Provenance.Hash, timestampUtc);
         }
 
-        return new ReadOnlyCollection<double>(rates);
+        return result;
     }
 
     private static AgronomicLayerCell? FindCell(PlanarPoint position, IReadOnlyList<AgronomicLayerCell> cells)

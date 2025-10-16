@@ -111,6 +111,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         SeedDashboards();
 
         DeviceManagerCompatibility = DeviceManagerCompatibilityViewModel.CreateSample();
+        DiagnosticsWorkspace = DiagnosticsWorkspaceViewModel.CreateSample(TelemetryPrivacy, DeviceManagerCompatibility, connectionSettings);
 
         if (configuration?.Scenarios is not null)
         {
@@ -287,6 +288,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public RadioProvisioningPanelViewModel RadioProvisioningPanel { get; }
     /// <summary>Gets the RadioBridge provisioning workflow view-model.</summary>
     public RadioProvisioningFlowViewModel RadioProvisioning { get; }
+    /// <summary>Gets the diagnostics workspace view-model surfaced in the sidebar.</summary>
+    public DiagnosticsWorkspaceViewModel DiagnosticsWorkspace { get; }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.
@@ -338,7 +341,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
             LayerInspector,
             SteerDashboard,
             ReplayTimeline,
-            FieldHealthSeverity);
+            FieldHealthSeverity,
+            SimulationBar,
+            DiagnosticsWorkspace);
     }
 
     private void PersistShellLayout()

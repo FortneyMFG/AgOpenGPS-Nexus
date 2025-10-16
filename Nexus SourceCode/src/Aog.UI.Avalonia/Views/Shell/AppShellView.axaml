@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
              xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
              xmlns:views="clr-namespace:Aog.UI.Avalonia.Views.Shell"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
              x:DataType="vm:MainWindowViewModel"
              mc:Ignorable="d"
@@ -386,6 +387,251 @@
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <!-- Diagnostics workspace -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
+                  DataContext="{Binding DiagnosticsWorkspace}"
+                  x:DataType="vm:DiagnosticsWorkspaceViewModel">
+            <StackPanel Spacing="12">
+              <StackPanel Spacing="4">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <TextBlock Text="Diagnostics workspace" FontSize="20" FontWeight="SemiBold"/>
+                  <Border Padding="8,2"
+                          CornerRadius="6"
+                          Background="{DynamicResource ThemeBackgroundBrush}"
+                          BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                          BorderThickness="1">
+                    <TextBlock Text="{Binding LastUpdatedDisplay}" FontSize="11"/>
+                  </Border>
+                </StackPanel>
+                <TextBlock Text="{Binding OverallSummary}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding ConnectionSummary}"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+              </StackPanel>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="GPS" FontWeight="SemiBold"/>
+                  <StackPanel Spacing="2" DataContext="{Binding Gps}" x:DataType="vm:GpsDiagnosticsViewModel">
+                    <TextBlock Text="{Binding FixQuality}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding PositionDisplay}"
+                               FontFamily="Consolas, Courier New, monospace"/>
+                    <TextBlock Text="{Binding AltitudeDisplay}"
+                               Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                    <TextBlock Text="{Binding SpeedDisplay}"
+                               Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                    <TextBlock Text="{Binding HeadingDisplay}"
+                               Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                    <TextBlock Text="{Binding CorrectionSummary}"
+                               Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                  </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="6">
+                  <TextBlock Text="Telemetry &amp; device health" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding TelemetrySummary}" TextWrapping="Wrap"/>
+                  <TextBlock Text="{Binding DeviceHealthSummary}" TextWrapping="Wrap"/>
+                </StackPanel>
+              </Grid>
+
+              <StackPanel Spacing="6">
+                <TextBlock Text="Network channels" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding NetworkChannelCollection}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DiagnosticsChannelViewModel">
+                      <Border Padding="10"
+                              Margin="0,4"
+                              CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <Border.Styles>
+                          <Style Selector="Border">
+                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsChannelHealth.Degraded}">
+                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsChannelHealth.Offline}">
+                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+                            </DataTrigger>
+                          </Style>
+                        </Border.Styles>
+                        <StackPanel Spacing="4">
+                          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Transport}"
+                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                            <TextBlock Text="{Binding Endpoint}"
+                                       FontFamily="Consolas, Courier New, monospace"
+                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          </StackPanel>
+                          <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="{Binding StatusDisplay}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding PacketLossPercent, StringFormat=Loss {0:0.0}%}"
+                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          </StackPanel>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="6">
+                <TextBlock Text="AGiO loops" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding LoopCollection}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:AgioLoopViewModel">
+                      <Border Padding="10"
+                              Margin="0,4"
+                              CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <Border.Styles>
+                          <Style Selector="Border">
+                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsLoopHealth.Warning}">
+                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsLoopHealth.Degraded}">
+                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+                            </DataTrigger>
+                          </Style>
+                        </Border.Styles>
+                        <StackPanel Spacing="4">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{Binding LoopId}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Description}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          </StackPanel>
+                          <TextBlock Text="{Binding StatusDisplay}"
+                                     FontFamily="Consolas, Courier New, monospace"/>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="6">
+                <TextBlock Text="Serial profiles" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding SerialProfileCollection}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:AgioSerialProfileViewModel">
+                      <Border Padding="10"
+                              Margin="0,4"
+                              CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <Border.Styles>
+                          <Style Selector="Border">
+                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+                            </DataTrigger>
+                          </Style>
+                        </Border.Styles>
+                        <StackPanel Spacing="4">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{Binding DeviceLabel}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Port}"
+                                       FontFamily="Consolas, Courier New, monospace"/>
+                          </StackPanel>
+                          <TextBlock Text="{Binding ConfigurationDisplay}"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          <TextBlock Text="{Binding Handshake}"
+                                     TextWrapping="Wrap"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                          <TextBlock Text="{Binding Notes}"
+                                     TextWrapping="Wrap"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <StackPanel Spacing="6">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <TextBlock Text="Recent events" FontWeight="SemiBold"/>
+                  <Border Padding="6,2"
+                          CornerRadius="6"
+                          Background="{DynamicResource ThemeBackgroundBrush}"
+                          BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                          BorderThickness="1">
+                    <TextBlock Text="{Binding LogSummary}"
+                               FontSize="11"
+                               TextWrapping="Wrap"/>
+                  </Border>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding EventCollection}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DiagnosticsEventViewModel">
+                      <Border Padding="10"
+                              Margin="0,4"
+                              CornerRadius="8"
+                              Background="{DynamicResource ThemeBackgroundBrush}"
+                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                              BorderThickness="1">
+                        <Border.Styles>
+                          <Style Selector="Border">
+                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Warning}">
+                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Error}">
+                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Critical}">
+                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+                            </DataTrigger>
+                          </Style>
+                        </Border.Styles>
+                        <StackPanel Spacing="4">
+                          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding TimestampDisplay}"
+                                       FontFamily="Consolas, Courier New, monospace"
+                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
+                            <Border Padding="6,2"
+                                    CornerRadius="6"
+                                    Background="{DynamicResource ThemeBackgroundBrush}"
+                                    BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                                    BorderThickness="1">
+                              <TextBlock Text="{Binding SeverityDisplay}" FontSize="11" FontWeight="SemiBold"/>
+                            </Border>
+                            <TextBlock Text="{Binding Source}" FontWeight="SemiBold"/>
+                          </StackPanel>
+                          <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
+                          <TextBlock Text="{Binding Remediation}"
+                                     TextWrapping="Wrap"
+                                     Foreground="{DynamicResource ThemeForegroundLowBrush}">
+                            <TextBlock.Styles>
+                              <Style Selector="TextBlock">
+                                <Setter Property="IsVisible" Value="True"/>
+                                <DataTrigger Binding="{Binding Remediation}" Value="">
+                                  <Setter Property="IsVisible" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Remediation}" Value="{x:Null}">
+                                  <Setter Property="IsVisible" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Remediation}" Value="{x:Static sys:String.Empty}">
+                                  <Setter Property="IsVisible" Value="False"/>
+                                </DataTrigger>
+                              </Style>
+                            </TextBlock.Styles>
+                          </TextBlock>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
             </StackPanel>
           </Border>
 

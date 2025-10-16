@@ -1,0 +1,409 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agopengps.org/schemas/PoseStreamFrame.v1.json",
+  "title": "PoseStreamFrame.v1",
+  "description": "Unified PoseStream frame carrying entity poses and SectionState deltas per ADR-007.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "sequence",
+    "timestamp",
+    "entities"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.0\\.0$",
+      "default": "1.0.0",
+      "description": "Semantic version for PoseStream frames.",
+      "x-nexus-scope": "core"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonic sequence aligned with PoseStreamService headers.",
+      "x-nexus-scope": "core"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when the frame was captured.",
+      "x-nexus-scope": "core"
+    },
+    "frameIntervalMs": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Elapsed time since the previous PoseStream frame in milliseconds.",
+      "x-nexus-scope": "core"
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Entity poses included in the frame ordered by pose hierarchy.",
+      "items": {
+        "$ref": "#/$defs/entityPose"
+      },
+      "x-nexus-scope": "core"
+    },
+    "sectionState": {
+      "anyOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/sectionStateDelta"}
+      ],
+      "description": "Optional SectionState delta emitted alongside the frame.",
+      "x-nexus-scope": "core"
+    },
+    "diagnostics": {
+      "anyOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/diagnostics"}
+      ],
+      "description": "Optional diagnostics describing sequencing quality.",
+      "x-nexus-scope": "core"
+    }
+  },
+  "$defs": {
+    "entityPose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entityId",
+        "kind",
+        "pose"
+      ],
+      "properties": {
+        "entityId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._:-]+:[A-Za-z0-9._:-]+$",
+          "description": "Stable identifier for the entity (vehicle:*, implement:*, section:*).",
+          "x-nexus-scope": "core"
+        },
+        "parentEntityId": {
+          "type": ["string", "null"],
+          "pattern": "^[A-Za-z0-9._:-]+:[A-Za-z0-9._:-]+$",
+          "description": "Optional parent entity for hierarchy reconstruction.",
+          "x-nexus-scope": "core"
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["vehicle", "implement", "toolbar", "section"],
+          "description": "Role of the entity within the PoseStream hierarchy.",
+          "x-nexus-scope": "core"
+        },
+        "pose": {
+          "$ref": "#/$defs/pose",
+          "description": "Pose sample for the entity.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "pose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "latitudeDeg",
+        "longitudeDeg"
+      ],
+      "properties": {
+        "latitudeDeg": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "Latitude in decimal degrees (WGS84).",
+          "x-nexus-scope": "core"
+        },
+        "longitudeDeg": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "Longitude in decimal degrees (WGS84).",
+          "x-nexus-scope": "core"
+        },
+        "altitudeM": {
+          "type": "number",
+          "description": "Altitude above mean sea level in meters.",
+          "x-nexus-scope": "core"
+        },
+        "headingRad": {
+          "type": "number",
+          "description": "Heading in radians measured clockwise from true north.",
+          "x-nexus-scope": "core"
+        },
+        "rollRad": {
+          "type": "number",
+          "description": "Vehicle roll in radians (positive when right side lower).",
+          "x-nexus-scope": "core"
+        },
+        "pitchRad": {
+          "type": "number",
+          "description": "Vehicle pitch in radians (positive when nose up).",
+          "x-nexus-scope": "core"
+        },
+        "speedMps": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Forward speed in meters per second.",
+          "x-nexus-scope": "core"
+        },
+        "yawRateRadps": {
+          "type": "number",
+          "description": "Angular velocity around the vertical axis in radians per second.",
+          "x-nexus-scope": "core"
+        },
+        "zoneMask": {
+          "anyOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/zoneMask"}
+          ],
+          "description": "Spatial constraint mask active for the pose sample.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "zoneMask": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "insideBoundary": {
+          "type": "boolean",
+          "description": "True when within the configured boundary polygon.",
+          "x-nexus-scope": "core"
+        },
+        "insideHeadland": {
+          "type": "boolean",
+          "description": "True when within the headland buffer.",
+          "x-nexus-scope": "core"
+        },
+        "insideKeepOut": {
+          "type": "boolean",
+          "description": "True when intersecting a keep-out zone.",
+          "x-nexus-scope": "core"
+        },
+        "insideWorkDisabled": {
+          "type": "boolean",
+          "description": "True when intersecting a work-disabled zone.",
+          "x-nexus-scope": "core"
+        },
+        "activeZoneIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Ordered identifiers for intersecting zones.",
+          "x-nexus-scope": "core"
+        },
+        "zoneRegistryHash": {
+          "type": ["string", "null"],
+          "description": "Registry hash that produced the mask.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "sectionStateDelta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "changes"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Monotonic sequence for SectionState deltas.",
+          "x-nexus-scope": "core"
+        },
+        "changes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/sectionStateChange"},
+          "description": "Ordered SectionState changes aligned with the frame.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "sectionStateChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "toolbarId",
+        "sectionId",
+        "commandedState",
+        "measuredState",
+        "source"
+      ],
+      "properties": {
+        "toolbarId": {
+          "type": "string",
+          "pattern": "^toolbar:[A-Za-z0-9._:-]+$",
+          "description": "Identifier for the toolbar owning the section.",
+          "x-nexus-scope": "core"
+        },
+        "sectionId": {
+          "type": "string",
+          "pattern": "^section:[A-Za-z0-9._:-]+$",
+          "description": "Identifier for the section.",
+          "x-nexus-scope": "core"
+        },
+        "commandedState": {
+          "type": "string",
+          "enum": ["unspecified", "off", "armed", "on"],
+          "description": "Commanded state for the section.",
+          "x-nexus-scope": "core"
+        },
+        "measuredState": {
+          "type": "string",
+          "enum": ["unspecified", "off", "armed", "on"],
+          "description": "Measured state reported by hardware.",
+          "x-nexus-scope": "core"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["unspecified", "operator", "automation", "safety", "replay"],
+          "description": "Origin of the most recent command.",
+          "x-nexus-scope": "core"
+        },
+        "manualOverride": {
+          "type": ["boolean", "null"],
+          "description": "True when operator override is active.",
+          "x-nexus-scope": "core"
+        },
+        "workOpportunity": {
+          "type": ["boolean", "null"],
+          "description": "True when the section should be applying product.",
+          "x-nexus-scope": "core"
+        },
+        "workEvent": {
+          "type": ["boolean", "null"],
+          "description": "True when a work event occurred for the section.",
+          "x-nexus-scope": "core"
+        },
+        "targetRate": {
+          "type": ["number", "null"],
+          "description": "Requested rate for the section.",
+          "x-nexus-scope": "core"
+        },
+        "actualRate": {
+          "type": ["number", "null"],
+          "description": "Measured rate for the section.",
+          "x-nexus-scope": "core"
+        },
+        "opportunityAreaSqMeters": {
+          "type": ["number", "null"],
+          "description": "Opportunity area represented by the change.",
+          "x-nexus-scope": "core"
+        },
+        "appliedAreaSqMeters": {
+          "type": ["number", "null"],
+          "description": "Applied area represented by the change.",
+          "x-nexus-scope": "core"
+        },
+        "tallies": {
+          "anyOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/sectionStateTally"}
+          ],
+          "description": "Running tallies for the section.",
+          "x-nexus-scope": "core"
+        },
+        "annotations": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/annotation"},
+          "description": "Supplemental annotations for the change.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "sectionStateTally": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "opportunityDurationSeconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Cumulative opportunity duration in seconds.",
+          "x-nexus-scope": "core"
+        },
+        "activeDurationSeconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Cumulative active duration in seconds.",
+          "x-nexus-scope": "core"
+        },
+        "commandCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of commanded state transitions.",
+          "x-nexus-scope": "core"
+        },
+        "eventCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of work events emitted.",
+          "x-nexus-scope": "core"
+        },
+        "appliedAreaSqMeters": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Aggregated applied area in square meters.",
+          "x-nexus-scope": "core"
+        },
+        "missedAreaSqMeters": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Aggregated missed opportunity area in square meters.",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Machine-readable annotation code.",
+          "x-nexus-scope": "core"
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable annotation message.",
+          "x-nexus-scope": "core"
+        },
+        "actor": {
+          "type": "string",
+          "description": "Actor associated with the annotation (user:*, system:*).",
+          "x-nexus-scope": "core"
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "droppedFrames": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of frames dropped since the previous frame.",
+          "x-nexus-scope": "core"
+        },
+        "maxLatencyMs": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Observed maximum end-to-end latency in milliseconds.",
+          "x-nexus-scope": "core"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Warnings emitted for the frame.",
+          "x-nexus-scope": "core"
+        }
+      }
+    }
+  }
+}
+

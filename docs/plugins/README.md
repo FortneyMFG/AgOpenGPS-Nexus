@@ -18,5 +18,6 @@ This index complements the detailed plugin briefs in this directory. Each entry 
 
 ## Tooling & Automation
 - [CLI Extensions](CLIExtensions.md)
+- [Nexus CLI Completions Kit](../howto/nx-cli-completions.md)
 
 Refer to `docs/INDEX.md` for additional guides, ADRs, and rollout plans.

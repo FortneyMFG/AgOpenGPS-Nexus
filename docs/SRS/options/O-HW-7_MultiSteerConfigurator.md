@@ -111,6 +111,9 @@ editing JSON by hand.
 - Exported profile serializes nodes with their transforms, joint types, steering
   modules, and couplers so [ADR-017](../../ADR/ADR-017-profiles-kinematics.md) ingestion
   builds the same graph.
+- Desktop shell now ships the `KinematicsProfileEditorViewModel`, allowing operators to
+  assemble axle nodes, joints, and mode policies inline while streaming
+  ingestion diagnostics and canonical JSON/hashes back to the configurator.
 - Dependency annotations capture multi-point steering chains (e.g., tractor → hitch
   → steer cart → toolbar axle) so planners understand command precedence.
 

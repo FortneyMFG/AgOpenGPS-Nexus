@@ -3,6 +3,12 @@
   "$id": "https://agopengps.org/schemas/FieldHealthRiskLayer.v1.json",
   "title": "FieldHealthRiskLayer.v1",
   "type": "object",
+  "x-nexus-layerIds": [
+    "risk.flood",
+    "risk.compaction",
+    "risk.weeds"
+  ],
+  "x-nexus-actual": true,
   "allOf": [
     { "$ref": "./Layer.v1.json" }
   ],

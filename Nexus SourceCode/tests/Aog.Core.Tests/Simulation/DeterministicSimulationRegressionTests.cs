@@ -20,6 +20,7 @@ public sealed class DeterministicSimulationRegressionTests
     }
 
     [Fact]
+    [Trait("Category", "Guardrail")]
     public async Task TenSecondRun_MatchesGoldenCsvAsync()
     {
         var generator = new TenSecondDeterministicScenario();

@@ -73,6 +73,12 @@ public sealed class PluginManifest
     public PluginManifestRequirements Requires { get; init; } = new();
 
     /// <summary>
+    /// Gets the permission scopes that must be granted before the plugin can load.
+    /// </summary>
+    [JsonPropertyName("requiredPermissions")]
+    public List<string> RequiredPermissions { get; init; } = new();
+
+    /// <summary>
     /// Gets the transports required for the plugin to function.
     /// </summary>
     [JsonPropertyName("requiredTransports")]

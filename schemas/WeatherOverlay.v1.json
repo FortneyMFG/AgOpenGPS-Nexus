@@ -3,6 +3,14 @@
   "$id": "https://agopengps.org/schemas/WeatherOverlay.v1.json",
   "title": "WeatherOverlay.v1",
   "type": "object",
+  "x-nexus-layerIds": [
+    "weather.temp",
+    "weather.wind",
+    "weather.rain",
+    "weather.humidity",
+    "weather.pressure"
+  ],
+  "x-nexus-actual": true,
   "allOf": [
     { "$ref": "./Layer.v1.json" }
   ],

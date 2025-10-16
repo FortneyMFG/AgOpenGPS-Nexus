@@ -9,6 +9,7 @@ Commands:
   run <target> [-- <args>...]   Run a Nexus host (core, agio, ui) via dotnet run.
   sim [-- <args>...]            Launch the composite simulation host.
   plugin <cmd> [options]        Plugin manifest tooling (lint, capabilities).
+  guardrails [-- <args>...]     Run guardrail regression tests (retention, replay, crash).
   help                          Show this help text.
 
 Environment overrides:
@@ -83,6 +84,23 @@ run_target() {
   fi
 }
 
+run_guardrails() {
+  ensure_dotnet
+  local dotnet_cmd="${DOTNET:-dotnet}"
+  local solution_path="${repo_root}/Nexus SourceCode/Nexus.sln"
+  if [[ ! -f "${solution_path}" ]]; then
+    >&2 printf 'error: expected solution at %s\n' "${solution_path}"
+    exit 1
+  fi
+
+  local args=("test" "${solution_path}" "--filter" "Category=Guardrail")
+  if [[ $# -gt 0 ]]; then
+    args+=("$@")
+  fi
+
+  "${dotnet_cmd}" "${args[@]}"
+}
+
 if [[ $# -lt 1 ]]; then
   usage
   exit 1
@@ -129,6 +147,9 @@ case "${command}" in
       "${dotnet_cmd}" run --project "${project_path}" -- help
     fi
     ;;
+  guardrails)
+    run_guardrails "$@"
+    ;;
   help|-h|--help)
     usage
     ;;
@@ -137,4 +158,4 @@ case "${command}" in
     usage
     exit 1
     ;;
- esac
+esac

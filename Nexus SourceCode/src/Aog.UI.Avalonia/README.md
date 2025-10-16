@@ -81,3 +81,24 @@ reliability steps for each bridge, while `RadioProvisioningProfileViewModel` and
 `RadioProvisioningAuditEntryViewModel` expose generated keysets and operator-facing audit history. The
 sample card in `MainWindow` binds to `RadioProvisioningPanelViewModel.CreateSample()` so designers can
 exercise queue, diagnostics, and follow-up messaging without mesh hardware.
+
+## Diagnostics workspace (NX-416)
+
+`DiagnosticsWorkspaceViewModel` aggregates GPS, loop, network, and serial telemetry so the sidebar can
+mirror AGiO health. The workspace feeds off `TelemetryPrivacyViewModel` and
+`DeviceManagerCompatibilityViewModel` to summarise opt-in status, plugin health, UDP throughput, loop
+frequency, and recent diagnostics events. Sample data mirrors NX-309/NX-311 fixtures, providing realistic
+metadata for designers while keeping the panel free from code-behind glue.
+
+## Simulation and companion parity automation (NX-417)
+
+`CompanionMetadataSnapshot` now serialises simulation bar state (playback rate, routed streams, scenario
+metadata) plus diagnostics payloads from the workspace so CompanionRemote builds render identical
+controls. The parity tests in `MainWindowViewModelTests` assert route counts, playback settings, and
+diagnostics lists all match the Avalonia view-models.
+
+## Documentation and QA updates (NX-418)
+
+`DiagnosticsWorkspaceViewModelTests` exercises the new workspace sample data, while
+`CompanionMetadataSnapshot` coverage verifies simulation and diagnostics parity. Supporting docs describe
+the new snapshot sections so release checklists include diagnostics and simulation parity captures.

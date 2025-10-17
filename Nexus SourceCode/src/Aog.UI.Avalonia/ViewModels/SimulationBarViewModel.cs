@@ -317,17 +317,18 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
             OnPlaybackRateSelected(option.Rate);
         }
 
-        foreach (var optionDefinition in new (double Rate, string Label)[]
+        foreach (var rate in new[] { 0.5, 1.0, 2.0 })
         {
-            (0.5, "50%"),
-            (1.0, "100%"),
-            (2.0, "200%"),
-        })
-        {
-            options.Add(new SimulationPlaybackRateOptionViewModel(optionDefinition.Rate, SelectOption, optionDefinition.Label));
+            var label = FormatPlaybackRateLabel(rate);
+            options.Add(new SimulationPlaybackRateOptionViewModel(rate, SelectOption, label));
         }
 
         return new ReadOnlyCollection<SimulationPlaybackRateOptionViewModel>(options);
+    }
+
+    private static string FormatPlaybackRateLabel(double rate)
+    {
+        return $"{rate:0.#}×";
     }
 
     private void EnsureReplayControllerSubscription()

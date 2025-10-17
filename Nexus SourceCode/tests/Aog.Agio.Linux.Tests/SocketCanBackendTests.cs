@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Agio.Linux.SocketCan;
@@ -10,6 +11,7 @@ using Aog.Core.V1;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using SocketCANSharp;
@@ -111,112 +113,206 @@ public sealed class SocketCanBackendTests
     }
 
     [Fact]
-[Fact]
-public async Task BackgroundService_PublishesFrameImmediatelyAfterTimeout()
-{
-    var client = new FakeSocketCanClient("vcan0", Array.Empty<SocketCANSharp.CanFrame>());
-    var factory = new FakeSocketCanClientFactory(client);
-    var channel = new SocketCanFrameChannel();
-
-    var initialOptions = new SocketCanOptions
+    public async Task BackgroundService_ClampsZeroReconnectDelay()
     {
-        InterfaceName = "vcan0",
-        ReceiveTimeout = TimeSpan.FromMilliseconds(200),
-        ReconnectDelay = TimeSpan.FromMilliseconds(10),
-        SourcePrefix = "test/socketcan",
-    };
-    var monitor = new TestOptionsMonitor(initialOptions);
-
-    var service = new SocketCanBackgroundService(
-        factory,
-        channel,
-        monitor,
-        TimeProvider.System,
-        NullLogger<SocketCanBackgroundService>.Instance);
-
-    await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
-
-    using var readCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-    await using var enumerator = channel.ReadAllAsync(readCts.Token).GetAsyncEnumerator();
-    var moveNextTask = enumerator.MoveNextAsync().AsTask();
-
-    // Ensure at least one receive timeout has occurred so the pump is in "publish immediately" mode.
-    await WaitForAsync(() => client.TimeoutCount > 0, TimeSpan.FromSeconds(1));
-
-    var frame = new SocketCANSharp.CanFrame(
-        SocketCanUtils.CreateCanIdWithFlags(0x456, isEff: false, isRtr: false, isErr: false),
-        new byte[] { 0x0A, 0x0B });
-
-    var stopwatch = Stopwatch.StartNew();
-    client.EnqueueFrame(frame);
-
-    Assert.True(await moveNextTask.ConfigureAwait(false));
-    stopwatch.Stop();
-
-    Assert.True(
-        stopwatch.Elapsed < TimeSpan.FromMilliseconds(100),
-        $"Frame was delayed by {stopwatch.Elapsed.TotalMilliseconds}ms");
-
-    var published = enumerator.Current;
-    Assert.Equal(0x456u, published.ArbitrationId);
-    Assert.Equal(new byte[] { 0x0A, 0x0B }, published.Payload.ToByteArray());
-}
-
-[Fact]
-public async Task BackgroundService_ReconfiguresWhenOptionsChange()
-{
-    var channel = new SocketCanFrameChannel();
-    var firstClient = new PassiveSocketCanClient("vcan0");
-    var secondClient = new PassiveSocketCanClient("vcan1");
-    var factory = new TrackingSocketCanClientFactory(options =>
-    {
-        return options.InterfaceName switch
+        var factory = new MissingInterfaceSocketCanClientFactory();
+        var channel = new SocketCanFrameChannel();
+        var options = new SocketCanOptions
         {
-            "vcan0" => firstClient,
-            "vcan1" => secondClient,
-            _ => throw new InvalidOperationException($"Unexpected interface '{options.InterfaceName}'."),
+            InterfaceName = "vcan-missing",
+            ReconnectDelay = TimeSpan.Zero,
         };
-    });
+        var monitor = new TestOptionsMonitor(options);
 
-    var initialOptions = new SocketCanOptions
+        Assert.Equal(SocketCanOptions.DefaultReconnectDelay, options.ReconnectDelay);
+
+        var service = new SocketCanBackgroundService(
+            factory,
+            channel,
+            monitor,
+            TimeProvider.System,
+            NullLogger<SocketCanBackgroundService>.Instance);
+
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        try
+        {
+            await WaitForAsync(() => factory.AttemptCount >= 1, TimeSpan.FromSeconds(1));
+
+            var attemptsBefore = factory.AttemptCount;
+            await Task.Delay(TimeSpan.FromMilliseconds(200)).ConfigureAwait(false);
+
+            Assert.Equal(SocketCanOptions.DefaultReconnectDelay, monitor.CurrentValue.ReconnectDelay);
+            Assert.Equal(attemptsBefore, factory.AttemptCount);
+        }
+        finally
+        {
+            await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+        }
+    }
+
+    [Fact]
+    public async Task BackgroundService_PublishesFrameImmediatelyAfterTimeout()
     {
-        InterfaceName = "vcan0",
-        ReceiveTimeout = TimeSpan.FromMilliseconds(10),
-        ReconnectDelay = TimeSpan.FromMilliseconds(10),
-        SourcePrefix = "test/socketcan",
-    };
-    var monitor = new TestOptionsMonitor(initialOptions);
+        var client = new FakeSocketCanClient("vcan0", Array.Empty<SocketCANSharp.CanFrame>());
+        var factory = new FakeSocketCanClientFactory(client);
+        var channel = new SocketCanFrameChannel();
 
-    var service = new SocketCanBackgroundService(
-        factory,
-        channel,
-        monitor,
-        TimeProvider.System,
-        NullLogger<SocketCanBackgroundService>.Instance);
+        var initialOptions = new SocketCanOptions
+        {
+            InterfaceName = "vcan0",
+            ReceiveTimeout = TimeSpan.FromMilliseconds(200),
+            ReconnectDelay = TimeSpan.FromMilliseconds(10),
+            SourcePrefix = "test/socketcan",
+        };
+        var monitor = new TestOptionsMonitor(initialOptions);
 
-    await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+        var service = new SocketCanBackgroundService(
+            factory,
+            channel,
+            monitor,
+            TimeProvider.System,
+            NullLogger<SocketCanBackgroundService>.Instance);
 
-    await WaitForAsync(() => factory.CreatedInterfaces.Count >= 1, TimeSpan.FromSeconds(1));
-    Assert.Equal("vcan0", factory.CreatedInterfaces[0]);
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
 
-    monitor.Update(new SocketCanOptions
+        using var readCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        await using var enumerator = channel.ReadAllAsync(readCts.Token).GetAsyncEnumerator();
+        var moveNextTask = enumerator.MoveNextAsync().AsTask();
+
+        // Ensure at least one receive timeout has occurred so the pump is in "publish immediately" mode.
+        await WaitForAsync(() => client.TimeoutCount > 0, TimeSpan.FromSeconds(1));
+
+        var frame = new SocketCANSharp.CanFrame(
+            SocketCanUtils.CreateCanIdWithFlags(0x456, isEff: false, isRtr: false, isErr: false),
+            new byte[] { 0x0A, 0x0B });
+
+        var stopwatch = Stopwatch.StartNew();
+        client.EnqueueFrame(frame);
+
+        Assert.True(await moveNextTask.ConfigureAwait(false));
+        stopwatch.Stop();
+
+        Assert.True(
+            stopwatch.Elapsed < TimeSpan.FromMilliseconds(100),
+            $"Frame was delayed by {stopwatch.Elapsed.TotalMilliseconds}ms");
+
+        var published = enumerator.Current;
+        Assert.Equal(0x456u, published.ArbitrationId);
+        Assert.Equal(new byte[] { 0x0A, 0x0B }, published.Payload.ToByteArray());
+    }
+
+    [Fact]
+    public async Task BackgroundService_ReconfiguresWhenOptionsChange()
     {
-        InterfaceName = "vcan1",
-        ReceiveTimeout = initialOptions.ReceiveTimeout,
-        ReconnectDelay = initialOptions.ReconnectDelay,
-        SourcePrefix = initialOptions.SourcePrefix,
-        IncludeVirtualInterfaces = initialOptions.IncludeVirtualInterfaces,
-        ReceiveOwnMessages = initialOptions.ReceiveOwnMessages,
-    });
+        var channel = new SocketCanFrameChannel();
+        var firstClient = new PassiveSocketCanClient("vcan0");
+        var secondClient = new PassiveSocketCanClient("vcan1");
+        var factory = new TrackingSocketCanClientFactory(options =>
+        {
+            return options.InterfaceName switch
+            {
+                "vcan0" => firstClient,
+                "vcan1" => secondClient,
+                _ => throw new InvalidOperationException($"Unexpected interface '{options.InterfaceName}'."),
+            };
+        });
 
-    await WaitForAsync(() => factory.CreatedInterfaces.Count >= 2, TimeSpan.FromSeconds(1));
-    Assert.Equal("vcan1", factory.CreatedInterfaces[1]);
+        var initialOptions = new SocketCanOptions
+        {
+            InterfaceName = "vcan0",
+            ReceiveTimeout = TimeSpan.FromMilliseconds(10),
+            ReconnectDelay = TimeSpan.FromMilliseconds(10),
+            SourcePrefix = "test/socketcan",
+        };
+        var monitor = new TestOptionsMonitor(initialOptions);
 
-    await WaitForAsync(() => firstClient.DisposeCount > 0, TimeSpan.FromSeconds(1));
-    Assert.Equal(1, firstClient.DisposeCount);
-}
+        var service = new SocketCanBackgroundService(
+            factory,
+            channel,
+            monitor,
+            TimeProvider.System,
+            NullLogger<SocketCanBackgroundService>.Instance);
 
-        await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        try
+        {
+            await WaitForAsync(() => factory.CreatedInterfaces.Count >= 1, TimeSpan.FromSeconds(1));
+            Assert.Equal("vcan0", factory.CreatedInterfaces[0]);
+
+            monitor.Update(new SocketCanOptions
+            {
+                InterfaceName = "vcan1",
+                ReceiveTimeout = initialOptions.ReceiveTimeout,
+                ReconnectDelay = initialOptions.ReconnectDelay,
+                SourcePrefix = initialOptions.SourcePrefix,
+                IncludeVirtualInterfaces = initialOptions.IncludeVirtualInterfaces,
+                ReceiveOwnMessages = initialOptions.ReceiveOwnMessages,
+            });
+
+            await WaitForAsync(() => factory.CreatedInterfaces.Count >= 2, TimeSpan.FromSeconds(1));
+            Assert.Equal("vcan1", factory.CreatedInterfaces[1]);
+
+            await WaitForAsync(() => firstClient.DisposeCount > 0, TimeSpan.FromSeconds(1));
+            Assert.Equal(1, firstClient.DisposeCount);
+        }
+        finally
+        {
+            await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+        }
+    }
+
+    [Fact]
+    public async Task BackgroundService_WarnsAndContinuesWhenSourcePrefixUpdateEmpty()
+    {
+        var channel = new SocketCanFrameChannel();
+        var client = new PassiveSocketCanClient("vcan0");
+        var factory = new TrackingSocketCanClientFactory(_ => client);
+        var initialOptions = new SocketCanOptions
+        {
+            InterfaceName = "vcan0",
+            ReceiveTimeout = TimeSpan.FromMilliseconds(10),
+            ReconnectDelay = TimeSpan.FromMilliseconds(10),
+            SourcePrefix = "test/socketcan",
+            IncludeVirtualInterfaces = true,
+            ReceiveOwnMessages = true,
+        };
+        var monitor = new TestOptionsMonitor(initialOptions);
+        var logger = new TestLogger<SocketCanBackgroundService>();
+
+        var service = new SocketCanBackgroundService(
+            factory,
+            channel,
+            monitor,
+            TimeProvider.System,
+            logger);
+
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        try
+        {
+            await WaitForAsync(() => factory.CreatedInterfaces.Count >= 1, TimeSpan.FromSeconds(1));
+
+            var invalid = CloneWithSourcePrefix(initialOptions, string.Empty);
+            monitor.Update(invalid);
+
+            var defaultPrefix = new SocketCanOptions().SourcePrefix;
+            Assert.Contains(
+                logger.Entries,
+                entry => entry.Level == LogLevel.Warning
+                    && entry.Message.Contains("SourcePrefix update was empty", StringComparison.Ordinal)
+                    && entry.Message.Contains(defaultPrefix, StringComparison.Ordinal));
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100)).ConfigureAwait(false);
+
+            Assert.Single(factory.CreatedInterfaces);
+            Assert.Equal(0, client.DisposeCount);
+        }
+        finally
+        {
+            await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+        }
     }
 
     [Fact]
@@ -241,122 +337,284 @@ public async Task BackgroundService_ReconfiguresWhenOptionsChange()
     }
 
     [Fact]
-[Fact]
-public async Task SocketCanBusService_DropsSlowSubscribers()
-{
-    // Service-level: verifies a slow gRPC writer triggers drop,
-    // and a later fast subscriber still receives fresh frames.
-    var channel = new SocketCanFrameChannel(subscriberCapacity: 4, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
-    var service = new SocketCanBusService(channel, NullLogger<SocketCanBusService>.Instance);
-
-    // Slow subscriber simulates backpressure on the server stream.
-    var slowWriter = new SlowServerStreamWriter<CanFrame>(TimeSpan.FromMilliseconds(200));
-    using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-    var slowContext = new TestServerCallContext(slowCts.Token);
-    var slowCallTask = service.SubscribeFrames(new Empty(), slowWriter, slowContext);
-
-    // Fast subscriber should continue receiving frames while the slow peer is evicted.
-    var fastWriter = new TestServerStreamWriter<CanFrame>();
-    using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-    var fastContext = new TestServerCallContext(fastCts.Token);
-    var fastCallTask = service.SubscribeFrames(new Empty(), fastWriter, fastContext);
-
-    // Publish a burst that should overflow the slow subscriber buffer and trigger eviction.
-    for (var i = 0; i < 64; i++)
+    public async Task SocketCanBusService_DropsSlowSubscribers()
     {
-        await channel.PublishAsync(new CanFrame
+        // Service-level: verifies a slow gRPC writer triggers drop,
+        // and a later fast subscriber still receives fresh frames.
+        var channel = new SocketCanFrameChannel(subscriberCapacity: 4, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
+        var service = new SocketCanBusService(channel, NullLogger<SocketCanBusService>.Instance);
+
+        // Slow subscriber simulates backpressure on the server stream.
+        var slowWriter = new SlowServerStreamWriter<CanFrame>(TimeSpan.FromMilliseconds(200));
+        using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var slowContext = new TestServerCallContext(slowCts.Token);
+        var slowCallTask = service.SubscribeFrames(new Empty(), slowWriter, slowContext);
+
+        // Fast subscriber should continue receiving frames while the slow peer is evicted.
+        var fastWriter = new TestServerStreamWriter<CanFrame>();
+        using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var fastContext = new TestServerCallContext(fastCts.Token);
+        var fastCallTask = service.SubscribeFrames(new Empty(), fastWriter, fastContext);
+
+        // Publish a burst that should overflow the slow subscriber buffer and trigger eviction.
+        for (var i = 0; i < 64; i++)
         {
-            Header = new Header(),
-            ArbitrationId = (uint)i,
-        }, CancellationToken.None).ConfigureAwait(false);
+            await channel.PublishAsync(new CanFrame
+            {
+                Header = new Header(),
+                ArbitrationId = (uint)i,
+            }, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        await WaitForAsync(() => fastWriter.Messages.Count >= 10, TimeSpan.FromSeconds(2));
+        await WaitForAsync(() => slowCallTask.IsCompleted, TimeSpan.FromSeconds(5));
+        await slowCallTask.ConfigureAwait(false);
+
+        // If the slow subscriber had kept up, it would have the full burst.
+        Assert.True(slowWriter.Messages.Count < 64);
+
+        // Publish another frame to ensure the fast subscriber continues to receive updates.
+        var finalFrame = new CanFrame { Header = new Header(), ArbitrationId = 0xABC };
+        await channel.PublishAsync(finalFrame, CancellationToken.None).ConfigureAwait(false);
+
+        await WaitForAsync(
+            () => fastWriter.Messages.Exists(frame => frame.ArbitrationId == 0xABCu),
+            TimeSpan.FromSeconds(2));
+
+        fastCts.Cancel();
+        await fastCallTask.ConfigureAwait(false);
     }
 
-    await WaitForAsync(() => fastWriter.Messages.Count >= 10, TimeSpan.FromSeconds(2));
-    await WaitForAsync(() => slowCallTask.IsCompleted, TimeSpan.FromSeconds(5));
-    await slowCallTask.ConfigureAwait(false);
-
-    // If the slow subscriber had kept up, it would have the full burst.
-    Assert.True(slowWriter.Messages.Count < 64);
-
-    // Publish another frame to ensure the fast subscriber continues to receive updates.
-    var finalFrame = new CanFrame { Header = new Header(), ArbitrationId = 0xABC };
-    await channel.PublishAsync(finalFrame, CancellationToken.None).ConfigureAwait(false);
-
-    await WaitForAsync(
-        () => fastWriter.Messages.Exists(frame => frame.ArbitrationId == 0xABCu),
-        TimeSpan.FromSeconds(2));
-
-    fastCts.Cancel();
-    await fastCallTask.ConfigureAwait(false);
-}
-
-[Fact]
-public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
-{
-    // Channel-level: verifies bounded per-subscriber queue and backpressure timeout.
-    var channel = new SocketCanFrameChannel(subscriberCapacity: 4, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
-    using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-    using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-
-    var fastFrames = new ConcurrentQueue<CanFrame>();
-
-    var fastTask = Task.Run(async () =>
+    [Fact]
+    public async Task SocketCanBusService_RepeatedSubscribeCyclesDoNotLeakCancellationSources()
     {
-        try
+        var channel = new SocketCanFrameChannel();
+        var service = new SocketCanBusService(channel, NullLogger<SocketCanBusService>.Instance);
+
+        ForceGarbageCollection();
+        var baseline = GetLinkedTokenSourceCount();
+
+        for (var i = 0; i < 5; i++)
         {
-            await foreach (var frame in channel.ReadAllAsync(fastCts.Token))
+            using var callCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+            var context = new TestServerCallContext(callCts.Token);
+            var writer = new TestServerStreamWriter<CanFrame>();
+
+            var callTask = service.SubscribeFrames(new Empty(), writer, context);
+
+            await Task.Delay(10).ConfigureAwait(false);
+            callCts.Cancel();
+
+            await callTask.ConfigureAwait(false);
+
+            ForceGarbageCollection();
+
+            var current = GetLinkedTokenSourceCount();
+            Assert.Equal(baseline, current);
+        }
+    }
+
+    [Fact]
+    public async Task FrameChannel_DeliversBurstToRecoveringSubscriber()
+    {
+        var channel = new SocketCanFrameChannel(
+            subscriberCapacity: 4,
+            maxSubscriberBackpressure: TimeSpan.FromMilliseconds(250));
+
+        using var cts = new CancellationTokenSource();
+        var receivedFrames = new ConcurrentQueue<CanFrame>();
+        var subscriptionReady = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var subscriberTask = Task.Run(async () =>
+        {
+            await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator();
+            subscriptionReady.TrySetResult();
+
+            // Pause briefly before reading to allow the bounded buffer to fill up.
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cts.Token);
+
+            try
             {
-                fastFrames.Enqueue(frame);
+                while (await enumerator.MoveNextAsync())
+                {
+                    receivedFrames.Enqueue(enumerator.Current);
+                    // Simulate light processing work after the initial pause.
+                    await Task.Delay(TimeSpan.FromMilliseconds(5), cts.Token);
+                }
             }
-        }
-        catch (OperationCanceledException) when (fastCts.IsCancellationRequested) { }
-    });
-
-    var slowCompletion = new TaskCompletionSource<Exception?>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-    var slowTask = Task.Run(async () =>
-    {
-        await using var enumerator = channel.ReadAllAsync(slowCts.Token).GetAsyncEnumerator();
-        try
-        {
-            while (await enumerator.MoveNextAsync())
+            catch (OperationCanceledException) when (cts.IsCancellationRequested)
             {
-                // Artificial slowness to trip backpressure handling
-                await Task.Delay(200, slowCts.Token);
             }
+        });
 
-            slowCompletion.TrySetResult(null);
-        }
-        catch (Exception ex)
+        await subscriptionReady.Task.ConfigureAwait(false);
+
+        const int frameCount = 16;
+        for (var i = 0; i < frameCount; i++)
         {
-            slowCompletion.TrySetResult(ex);
-        }
-    });
+            var frame = new CanFrame
+            {
+                Header = new Header { Sequence = (ulong)(i + 1) },
+                ArbitrationId = (uint)i,
+            };
 
-    for (var i = 0; i < 100; i++)
+            await channel.PublishAsync(frame, CancellationToken.None);
+        }
+
+        await WaitForAsync(() => receivedFrames.Count == frameCount, TimeSpan.FromSeconds(2));
+
+        var received = receivedFrames.ToArray();
+        Assert.Equal(frameCount, received.Length);
+        Assert.Equal(
+            Enumerable.Range(0, frameCount).Select(value => (uint)value),
+            received.Select(frame => frame.ArbitrationId));
+
+        cts.Cancel();
+        await subscriberTask.ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
     {
-        var frame = new CanFrame
+        // Channel-level: verifies bounded per-subscriber queue and backpressure timeout.
+        var channel = new SocketCanFrameChannel(subscriberCapacity: 4, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
+        using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+        var fastFrames = new ConcurrentQueue<CanFrame>();
+
+        var fastTask = Task.Run(async () =>
         {
-            Header = new Header { Sequence = (ulong)(i + 1) },
-            ArbitrationId = (uint)i,
+            try
+            {
+                await foreach (var frame in channel.ReadAllAsync(fastCts.Token))
+                {
+                    fastFrames.Enqueue(frame);
+                }
+            }
+            catch (OperationCanceledException) when (fastCts.IsCancellationRequested) { }
+        });
+
+        var slowCompletion = new TaskCompletionSource<Exception?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var slowTask = Task.Run(async () =>
+        {
+            await using var enumerator = channel.ReadAllAsync(slowCts.Token).GetAsyncEnumerator();
+            try
+            {
+                while (await enumerator.MoveNextAsync())
+                {
+                    // Artificial slowness to trip backpressure handling
+                    await Task.Delay(200, slowCts.Token);
+                }
+
+                slowCompletion.TrySetResult(null);
+            }
+            catch (Exception ex)
+            {
+                slowCompletion.TrySetResult(ex);
+            }
+        });
+
+        for (var i = 0; i < 100; i++)
+        {
+            var frame = new CanFrame
+            {
+                Header = new Header { Sequence = (ulong)(i + 1) },
+                ArbitrationId = (uint)i,
+            };
+
+            await channel.PublishAsync(frame, CancellationToken.None);
+        }
+
+        await WaitForAsync(() => fastFrames.Count >= 100, TimeSpan.FromSeconds(2));
+        await WaitForAsync(() => slowCompletion.Task.IsCompleted, TimeSpan.FromSeconds(2));
+
+        var slowResult = await slowCompletion.Task.ConfigureAwait(false);
+        Assert.IsType<OperationCanceledException>(slowResult);
+        Assert.Contains(fastFrames, frame => frame.ArbitrationId == 99);
+
+        fastCts.Cancel();
+        slowCts.Cancel();
+
+        await Task.WhenAll(fastTask, slowTask);
+    }
+
+    [Fact]
+    public async Task FrameChannel_AllowsResubscriptionAfterEviction()
+    {
+        var channel = new SocketCanFrameChannel(subscriberCapacity: 2, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
+        using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+        var slowCompletion = new TaskCompletionSource<Exception?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var slowTask = Task.Run(async () =>
+        {
+            await using var enumerator = channel.ReadAllAsync(slowCts.Token).GetAsyncEnumerator();
+            try
+            {
+                while (await enumerator.MoveNextAsync())
+                {
+                    // Introduce slowness so this subscriber is evicted for backpressure.
+                    await Task.Delay(200, slowCts.Token);
+                }
+
+                slowCompletion.TrySetResult(null);
+            }
+            catch (Exception ex)
+            {
+                slowCompletion.TrySetResult(ex);
+            }
+        });
+
+        for (var i = 0; i < 32; i++)
+        {
+            await channel.PublishAsync(new CanFrame
+            {
+                Header = new Header(),
+                ArbitrationId = (uint)i,
+            }, CancellationToken.None);
+        }
+
+        await WaitForAsync(() => slowCompletion.Task.IsCompleted, TimeSpan.FromSeconds(2));
+
+        var slowResult = await slowCompletion.Task.ConfigureAwait(false);
+        Assert.IsType<OperationCanceledException>(slowResult);
+
+        using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        await using var fastEnumerator = channel.ReadAllAsync(fastCts.Token).GetAsyncEnumerator();
+
+        var firstFrame = new CanFrame { Header = new Header(), ArbitrationId = 0xA1u };
+        await channel.PublishAsync(firstFrame, CancellationToken.None);
+        Assert.True(await fastEnumerator.MoveNextAsync().ConfigureAwait(false));
+        Assert.Equal(firstFrame.ArbitrationId, fastEnumerator.Current.ArbitrationId);
+
+        var secondFrame = new CanFrame { Header = new Header(), ArbitrationId = 0xA2u };
+        await channel.PublishAsync(secondFrame, CancellationToken.None);
+        Assert.True(await fastEnumerator.MoveNextAsync().ConfigureAwait(false));
+        Assert.Equal(secondFrame.ArbitrationId, fastEnumerator.Current.ArbitrationId);
+
+        fastCts.Cancel();
+
+        slowCts.Cancel();
+        await slowTask.ConfigureAwait(false);
+    }
+
+    private static SocketCanOptions CloneWithSourcePrefix(SocketCanOptions template, string? sourcePrefix)
+    {
+        var clone = new SocketCanOptions
+        {
+            InterfaceName = template.InterfaceName,
+            IncludeVirtualInterfaces = template.IncludeVirtualInterfaces,
+            ReceiveOwnMessages = template.ReceiveOwnMessages,
+            ReceiveTimeout = template.ReceiveTimeout,
+            ReconnectDelay = template.ReconnectDelay,
         };
 
-        await channel.PublishAsync(frame, CancellationToken.None);
-    }
+        var field = typeof(SocketCanOptions).GetField("_sourcePrefix", BindingFlags.Instance | BindingFlags.NonPublic);
+        field?.SetValue(clone, sourcePrefix);
 
-    await WaitForAsync(() => fastFrames.Count >= 100, TimeSpan.FromSeconds(2));
-    await WaitForAsync(() => slowCompletion.Task.IsCompleted, TimeSpan.FromSeconds(2));
-
-    var slowResult = await slowCompletion.Task.ConfigureAwait(false);
-    Assert.IsType<OperationCanceledException>(slowResult);
-    Assert.Contains(fastFrames, frame => frame.ArbitrationId == 99);
-
-    fastCts.Cancel();
-    slowCts.Cancel();
-
-    await Task.WhenAll(fastTask, slowTask);
-}
-
+        return clone;
     }
 
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)
@@ -371,6 +629,25 @@ public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
 
             await Task.Delay(10);
         }
+    }
+
+    private static int GetLinkedTokenSourceCount()
+    {
+        var linkedType = typeof(CancellationTokenSource).GetNestedType("LinkedTokenSource", BindingFlags.NonPublic);
+        Assert.NotNull(linkedType);
+
+        var countField = linkedType!.GetField("s_linkedTokenSourceCount", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(countField);
+
+        var value = countField!.GetValue(null);
+        return Assert.IsType<int>(value);
+    }
+
+    private static void ForceGarbageCollection()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
     }
 
     private sealed class FakeSocketCanClientFactory : ISocketCanClientFactory
@@ -492,6 +769,36 @@ public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
         public FixedTimeProvider(DateTimeOffset now) => _now = now;
 
         public override DateTimeOffset GetUtcNow() => _now;
+    }
+
+    private sealed class TestLogger<T> : ILogger<T>
+    {
+        private sealed class NullScope : IDisposable
+        {
+            public static readonly NullScope Instance = new();
+
+            public void Dispose()
+            {
+            }
+        }
+
+        public List<(LogLevel Level, string Message)> Entries { get; } = new();
+
+        public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            if (formatter is null)
+            {
+                throw new ArgumentNullException(nameof(formatter));
+            }
+
+            var message = formatter(state, exception);
+            Entries.Add((logLevel, message));
+        }
     }
 
     private sealed class TestOptionsMonitor : IOptionsMonitor<SocketCanOptions>

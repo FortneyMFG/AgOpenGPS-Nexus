@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.CommandLine.Parsing;
 using System.Linq;
 using System.Text.Json;
 using Nexus.Plugin.Cli.Abstractions;
@@ -72,18 +73,18 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
                     WriteIndented = outputMode == "json",
                 });
 
-                invocationContext.Console.Out.WriteLine(json);
+                invocationContext.Console.WriteLine(json);
             }
             else
             {
-                invocationContext.Console.Out.WriteLine($"Applying calibration: offset={offset:F3} kg/s, gain={gain:F3}.");
+                invocationContext.Console.WriteLine($"Applying calibration: offset={offset:F3} kg/s, gain={gain:F3}.");
                 if (dryRun)
                 {
-                    invocationContext.Console.Out.WriteLine("Dry-run enabled, coefficients were not persisted.");
+                    invocationContext.Console.WriteLine("Dry-run enabled, coefficients were not persisted.");
                 }
                 else
                 {
-                    invocationContext.Console.Out.WriteLine("Calibration persisted to the plugin state cache.");
+                    invocationContext.Console.WriteLine("Calibration persisted to the plugin state cache.");
                 }
             }
         });
@@ -112,9 +113,9 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
             var duration = invocationContext.ParseResult.GetValueForOption(durationOption);
             var file = invocationContext.ParseResult.GetValueForOption(outputOption);
 
-            invocationContext.Console.Out.WriteLine(
+            invocationContext.Console.WriteLine(
                 $"Sniffing raw samples for {duration} second(s). Output will be appended to '{file}'.");
-            invocationContext.Console.Out.WriteLine("Use the bundled Jupyter notebook to visualize captured flow curves.");
+            invocationContext.Console.WriteLine("Use the bundled Jupyter notebook to visualize captured flow curves.");
         });
 
         return command;

@@ -68,7 +68,20 @@ public sealed class SocketCanBackgroundService : BackgroundService
             using var reconfigureCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             using var changeRegistration = _options.OnChange((updated, _) =>
             {
-                if (!stoppingToken.IsCancellationRequested && RequiresRestart(options, updated))
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                var sanitized = SnapshotOptions(updated);
+                if (updated is not null && string.IsNullOrWhiteSpace(updated.SourcePrefix))
+                {
+                    _logger.LogWarning(
+                        "SocketCAN SourcePrefix update was empty. Defaulting to {SourcePrefix}.",
+                        sanitized.SourcePrefix);
+                }
+
+                if (RequiresRestart(options, sanitized))
                 {
                     reconfigured = true;
                     reconfigureCts.Cancel();
@@ -153,15 +166,21 @@ public sealed class SocketCanBackgroundService : BackgroundService
             return new SocketCanOptions();
         }
 
-        return new SocketCanOptions
+        var snapshot = new SocketCanOptions
         {
             InterfaceName = source.InterfaceName,
             IncludeVirtualInterfaces = source.IncludeVirtualInterfaces,
             ReceiveOwnMessages = source.ReceiveOwnMessages,
             ReceiveTimeout = source.ReceiveTimeout,
             ReconnectDelay = source.ReconnectDelay,
-            SourcePrefix = source.SourcePrefix,
         };
+
+        if (!string.IsNullOrWhiteSpace(source.SourcePrefix))
+        {
+            snapshot.SourcePrefix = source.SourcePrefix;
+        }
+
+        return snapshot;
     }
 
     private static bool RequiresRestart(SocketCanOptions? current, SocketCanOptions? updated)

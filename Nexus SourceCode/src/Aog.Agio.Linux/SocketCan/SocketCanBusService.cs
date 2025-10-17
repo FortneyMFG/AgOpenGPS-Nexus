@@ -44,28 +44,36 @@ public sealed class SocketCanBusService : CanBusService.CanBusServiceBase
             throw new ArgumentNullException(nameof(context));
         }
 
-        using var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
-        var queue = Channel.CreateBounded<CanFrame>(new BoundedChannelOptions(SubscriberQueueCapacity)
-        {
-            AllowSynchronousContinuations = false,
-            FullMode = BoundedChannelFullMode.Wait,
-            SingleReader = true,
-            SingleWriter = true,
-        });
-
-        var pumpTask = PumpFramesAsync(queue, cancellationSource, context);
-        var writeTask = WriteFramesAsync(queue, responseStream, cancellationSource);
+        var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
 
         try
         {
-            await Task.WhenAll(pumpTask, writeTask).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException) when (cancellationSource.IsCancellationRequested)
-        {
+            var queue = Channel.CreateBounded<CanFrame>(new BoundedChannelOptions(SubscriberQueueCapacity)
+            {
+                AllowSynchronousContinuations = false,
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = true,
+                SingleWriter = true,
+            });
+
+            var pumpTask = PumpFramesAsync(queue, cancellationSource, context);
+            var writeTask = WriteFramesAsync(queue, responseStream, cancellationSource);
+
+            try
+            {
+                await Task.WhenAll(pumpTask, writeTask).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationSource.IsCancellationRequested)
+            {
+            }
+            finally
+            {
+                queue.Writer.TryComplete();
+            }
         }
         finally
         {
-            queue.Writer.TryComplete();
+            cancellationSource.Dispose();
         }
     }
 

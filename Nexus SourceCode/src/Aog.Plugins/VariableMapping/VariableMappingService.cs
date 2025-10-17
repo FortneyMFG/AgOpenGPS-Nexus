@@ -29,6 +29,7 @@ public sealed class VariableMappingService
     /// Initializes a new instance of the <see cref="VariableMappingService"/> class.
     /// </summary>
     /// <param name="ingestor">Agronomic map ingestor used when importing grid files.</param>
+    /// <param name="exportPipeline">Optional export pipeline used when generating ISOXML manifests.</param>
     public VariableMappingService(
         ExternalAgronomicMapIngestor ingestor,
         PrescriptionExportPipeline? exportPipeline = null)
@@ -132,6 +133,8 @@ public sealed class VariableMappingService
     /// <param name="layerId">Layer identifier that contains planned rates.</param>
     /// <param name="controller">Controller used to translate layer values into setpoints.</param>
     /// <param name="sections">Section placements consuming the layer.</param>
+    /// <param name="transportGuard">Optional transport guard to update heartbeat metadata.</param>
+    /// <param name="timestampUtc">Optional timestamp associated with the generated setpoints.</param>
     public IReadOnlyList<double> ComputeSetpoints(
         string layerId,
         VariableRateController controller,

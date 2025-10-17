@@ -58,6 +58,9 @@ public sealed class VariableRateController
     /// </summary>
     /// <param name="sections">Section placements in planar coordinates.</param>
     /// <param name="layer">Agronomic layer containing target rates.</param>
+    /// <param name="constraintGate">Optional constraint gate used to disable output when sections are disallowed.</param>
+    /// <param name="transportGuard">Optional transport guard that enforces heartbeat freshness.</param>
+    /// <param name="timestampUtc">Optional timestamp associated with the computed rates.</param>
     public IReadOnlyList<double> ComputeRates(
         IReadOnlyList<SectionPlacement> sections,
         AgronomicLayerDocument layer,

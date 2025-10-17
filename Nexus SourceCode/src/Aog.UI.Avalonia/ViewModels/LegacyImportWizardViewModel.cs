@@ -33,6 +33,16 @@ public sealed class LegacyImportWizardViewModel : ObservableObject
         _applyCallback = applyCallback;
     }
 
+    /// <summary>
+    /// Performs asynchronous initialization for the wizard.
+    /// </summary>
+    /// <returns>A completed task once initialization is done.</returns>
+    public Task InitializeAsync()
+    {
+        ResetImportState();
+        return Task.CompletedTask;
+    }
+
     /// <summary>Gets or sets the friendly field name.</summary>
     public string? FieldName
     {
@@ -178,8 +188,12 @@ public sealed class LegacyImportWizardViewModel : ObservableObject
             HasError = false;
             StatusMessage = "Importing legacy guidance…";
 
-            using var csvStream = File.OpenRead(AbLineCsvPath!);
-            var result = _importService.Import(FieldName!, csvStream, BoundaryShapePath!);
+            var result = await Task.Run(() =>
+            {
+                using var csvStream = File.OpenRead(AbLineCsvPath!);
+                return _importService.Import(FieldName!, csvStream, BoundaryShapePath!);
+            }).ConfigureAwait(true);
+
             _result = result;
 
             _abLines.Clear();

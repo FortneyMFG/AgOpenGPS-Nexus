@@ -46,6 +46,24 @@ public sealed class NmeaSentenceParserTests
     }
 
     [Fact]
+    public void TryParse_GgaSentenceWithBlankNumericFields_AllowsNulls()
+    {
+        const string sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,,,M,,M,,*5B";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var gga = Assert.IsType<NmeaGgaSentence>(parsed);
+        Assert.Equal("GP", gga.TalkerId);
+        Assert.Equal(NmeaFixQuality.Gps, gga.FixQuality);
+        Assert.Equal(8, gga.SatelliteCount);
+        Assert.Null(gga.HorizontalDilution);
+        Assert.Null(gga.AltitudeMeters);
+        Assert.Null(gga.GeoidSeparationMeters);
+    }
+
+    [Fact]
     public void TryParse_VtgSentence_ReturnsExpectedValues()
     {
         const string sentence = "$GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*48";

@@ -78,8 +78,10 @@ public sealed class LegacySteerCodec
             TramControl = tramControl,
         };
 
+        const byte EngagedBit = 0x01;
+
         command.TargetWheelAngleDeg = steerHundredths / 100.0;
-        command.Enable = rawGuidanceStatus != 0;
+        command.Enable = (rawGuidanceStatus & EngagedBit) != 0;
         command.FeedForward = 0;
         command.ControllerOutput = 0;
 

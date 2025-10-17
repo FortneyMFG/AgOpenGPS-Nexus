@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Threading;
 using Aog.Agio.Nmea;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,14 +10,15 @@ namespace Aog.Agio.Serial;
 /// <summary>
 /// Scans serial devices for NMEA streams and returns the first port that emits GGA, RMC, and VTG sentences.
 /// </summary>
-public sealed class NmeaAutoScanner
+public sealed class NmeaAutoScanner : IDisposable
 {
     private readonly ISerialPortEnumerator _enumerator;
     private readonly ISerialPortSessionFactory _sessionFactory;
     private readonly NmeaSentenceParser _parser;
     private readonly ILogger<NmeaAutoScanner> _logger;
     private readonly TimeProvider _timeProvider;
-    private readonly NmeaSerialPortScanOptions _options;
+    private readonly IDisposable _optionsReloadToken;
+    private NmeaSerialPortScanOptions _options;
 
     public NmeaAutoScanner(
         ISerialPortEnumerator enumerator,
@@ -23,14 +26,20 @@ public sealed class NmeaAutoScanner
         NmeaSentenceParser parser,
         ILogger<NmeaAutoScanner> logger,
         TimeProvider timeProvider,
-        IOptions<NmeaSerialPortScanOptions> options)
+        IOptionsMonitor<NmeaSerialPortScanOptions> options)
     {
         _enumerator = enumerator ?? throw new ArgumentNullException(nameof(enumerator));
         _sessionFactory = sessionFactory ?? throw new ArgumentNullException(nameof(sessionFactory));
         _parser = parser ?? throw new ArgumentNullException(nameof(parser));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
-        _options = (options ?? throw new ArgumentNullException(nameof(options))).Value ?? throw new ArgumentException("Options are required.", nameof(options));
+        if (options is null)
+        {
+            throw new ArgumentNullException(nameof(options));
+        }
+
+        _options = options.CurrentValue ?? throw new ArgumentException("Options are required.", nameof(options));
+        _optionsReloadToken = options.OnChange(OnOptionsChanged);
     }
 
     /// <summary>
@@ -50,15 +59,17 @@ public sealed class NmeaAutoScanner
         bool logOnSuccess,
         bool logWhenNoneDetected)
     {
+        var options = GetOptions();
+
         foreach (var portName in _enumerator.GetPortNames())
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            foreach (var baudRate in _options.BaudRates)
+            foreach (var baudRate in options.BaudRates)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                using var session = CreateSession(portName, baudRate);
+                using var session = CreateSession(portName, baudRate, options);
                 if (session is null)
                 {
                     continue;
@@ -74,8 +85,8 @@ public sealed class NmeaAutoScanner
                     continue;
                 }
 
-                var probeDeadline = _timeProvider.GetUtcNow() + _options.ProbeDuration;
-                var maxAttempts = Math.Max(1, _options.MaxReadAttemptsPerPort);
+                var probeDeadline = _timeProvider.GetUtcNow() + options.ProbeDuration;
+                var maxAttempts = Math.Max(1, options.MaxReadAttemptsPerPort);
 
                 NmeaGgaSentence? lastGga = null;
                 NmeaRmcSentence? lastRmc = null;
@@ -149,16 +160,34 @@ public sealed class NmeaAutoScanner
         return null;
     }
 
-    private ISerialPortSession? CreateSession(string portName, int baudRate)
+    private ISerialPortSession? CreateSession(string portName, int baudRate, NmeaSerialPortScanOptions options)
     {
         try
         {
-            return _sessionFactory.Create(portName, baudRate, _options.ReadTimeout);
+            return _sessionFactory.Create(portName, baudRate, options.ReadTimeout);
         }
         catch (Exception ex)
         {
             _logger.LogDebug(ex, "Failed to create serial session for {PortName} at {BaudRate} baud.", portName, baudRate);
             return null;
         }
+    }
+
+    private NmeaSerialPortScanOptions GetOptions()
+        => Volatile.Read(ref _options) ?? new NmeaSerialPortScanOptions();
+
+    private void OnOptionsChanged(NmeaSerialPortScanOptions options, string? name)
+    {
+        if (options is null)
+        {
+            return;
+        }
+
+        Volatile.Write(ref _options, options);
+    }
+
+    public void Dispose()
+    {
+        _optionsReloadToken.Dispose();
     }
 }

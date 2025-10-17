@@ -1,10 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Aog.Agio.Linux;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Globalization; // if you use any CultureInfo formatting helpers
 
 namespace Aog.Agio.Linux.Serial;
 
@@ -18,11 +19,22 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
 
     private readonly NmeaAutoScanner _scanner;
     private readonly ILogger<LinuxNmeaBackgroundService> _logger;
+    private readonly IDisposable _optionsReloadToken;
 
-    public LinuxNmeaBackgroundService(NmeaAutoScanner scanner, ILogger<LinuxNmeaBackgroundService> logger)
+    private NmeaSerialPortScanOptions _options;
+    private CancellationTokenSource? _reloadTokenSource = new();
+
+    public LinuxNmeaBackgroundService(
+        NmeaAutoScanner scanner,
+        ILogger<LinuxNmeaBackgroundService> logger,
+        IOptionsMonitor<NmeaSerialPortScanOptions> options)
     {
         _scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        if (options is null) throw new ArgumentNullException(nameof(options));
+
+        _options = options.CurrentValue ?? throw new ArgumentException("Options are required.", nameof(options));
+        _optionsReloadToken = options.OnChange(OnOptionsChanged);
     }
 
     /// <inheritdoc />
@@ -32,13 +44,36 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            using var iterationCancellation =
+                CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, GetReloadToken());
+            var iterationToken = iterationCancellation.Token;
+
             try
             {
-                var result = await _scanner.ScanAsync(stoppingToken).ConfigureAwait(false);
+                await RunScanLoopAsync(iterationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (iterationToken.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
+            {
+                // Configuration changed; loop restarts with updated options.
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                break;
+            }
+        }
+    }
+
+    private async Task RunScanLoopAsync(CancellationToken iterationToken)
+    {
+        while (!iterationToken.IsCancellationRequested)
+        {
+            try
+            {
+                var result = await _scanner.ScanAsync(iterationToken).ConfigureAwait(false);
                 if (result is null)
                 {
                     _logger.LogWarning("No NMEA-capable serial devices detected. Retrying in {Delay}.", RetryDelay);
-                    await Task.Delay(RetryDelay, stoppingToken).ConfigureAwait(false);
+                    await Task.Delay(RetryDelay, iterationToken).ConfigureAwait(false);
                     continue;
                 }
 
@@ -52,39 +87,39 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
                     FormatHelpers.FormatDouble(result.Vtg.SpeedKilometersPerHour, "F2"),
                     FormatHelpers.FormatDouble(result.Vtg.TrueCourseDegrees, "F1"));
 
-                await MonitorActiveStreamAsync(result, stoppingToken).ConfigureAwait(false);
+                await MonitorActiveStreamAsync(result, iterationToken).ConfigureAwait(false);
             }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (iterationToken.IsCancellationRequested)
             {
-                break;
+                throw;
             }
             catch (OperationCanceledException ex)
             {
                 _logger.LogWarning(ex, "Linux NMEA serial scan canceled unexpectedly. Retrying in {Delay}.", RetryDelay);
-                await Task.Delay(RetryDelay, stoppingToken).ConfigureAwait(false);
+                await Task.Delay(RetryDelay, iterationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during Linux NMEA serial scan. Retrying in {Delay}.", RetryDelay);
-                await Task.Delay(RetryDelay, stoppingToken).ConfigureAwait(false);
+                await Task.Delay(RetryDelay, iterationToken).ConfigureAwait(false);
             }
         }
     }
 
-    private async Task MonitorActiveStreamAsync(NmeaPortScanResult activePort, CancellationToken stoppingToken)
+    private async Task MonitorActiveStreamAsync(NmeaPortScanResult activePort, CancellationToken iterationToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        while (!iterationToken.IsCancellationRequested)
         {
-            await Task.Delay(StreamVerificationInterval, stoppingToken).ConfigureAwait(false);
+            await Task.Delay(StreamVerificationInterval, iterationToken).ConfigureAwait(false);
 
             NmeaPortScanResult? verificationResult;
             try
             {
                 verificationResult = await _scanner
-                    .ScanAsync(stoppingToken, logOnSuccess: false, logWhenNoneDetected: false)
+                    .ScanAsync(iterationToken, logOnSuccess: false, logWhenNoneDetected: false)
                     .ConfigureAwait(false);
             }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (iterationToken.IsCancellationRequested)
             {
                 throw;
             }
@@ -108,4 +143,68 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
         }
     }
 
+    // ----- Options change + reload wiring -----
+
+    private void OnOptionsChanged(NmeaSerialPortScanOptions options, string? name)
+    {
+        if (options is null)
+        {
+            return;
+        }
+
+        Volatile.Write(ref _options, options);
+
+        _logger.LogInformation(
+            "NMEA serial scan configuration changed: ProbeDuration={ProbeDuration}, ReadTimeout={ReadTimeout}, MaxAttempts={MaxAttempts}, BaudRates={BaudRates}.",
+            options.ProbeDuration,
+            options.ReadTimeout,
+            options.MaxReadAttemptsPerPort,
+            string.Join(", ", options.BaudRates ?? Array.Empty<int>()));
+
+        SignalReload();
+    }
+
+    private CancellationToken GetReloadToken()
+        => Volatile.Read(ref _reloadTokenSource)?.Token ?? CancellationToken.None;
+
+    private void SignalReload()
+    {
+        var newSource = new CancellationTokenSource();
+        var previous = Interlocked.Exchange(ref _reloadTokenSource, newSource);
+
+        if (previous is not null)
+        {
+            try
+            {
+                previous.Cancel();
+            }
+            finally
+            {
+                previous.Dispose();
+            }
+        }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _optionsReloadToken.Dispose();
+
+            var previous = Interlocked.Exchange(ref _reloadTokenSource, null);
+            if (previous is not null)
+            {
+                try
+                {
+                    previous.Cancel();
+                }
+                finally
+                {
+                    previous.Dispose();
+                }
+            }
+        }
+
+        base.Dispose(disposing);
+    }
 }

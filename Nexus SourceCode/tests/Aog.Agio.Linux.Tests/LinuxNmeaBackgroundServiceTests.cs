@@ -11,7 +11,6 @@ using Aog.Agio.Nmea;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Aog.Agio.Linux.Tests;
@@ -42,7 +41,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
 
         var sessionFactory = new ScriptedSerialPortSessionFactory(sessionScripts, () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
 
-        var options = Options.Create(new NmeaSerialPortScanOptions
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
         {
             ProbeDuration = TimeSpan.FromSeconds(1),
             ReadTimeout = TimeSpan.FromMilliseconds(50),
@@ -59,7 +58,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
             options);
 
         var logger = new TestLogger<LinuxNmeaBackgroundService>();
-        var service = new LinuxNmeaBackgroundService(scanner, logger);
+        var service = new LinuxNmeaBackgroundService(scanner, logger, options);
 
         await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
 
@@ -82,6 +81,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
         finally
         {
             await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+            scanner.Dispose();
         }
     }
 
@@ -166,7 +166,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
             new[] { streamWithMissingVtgData },
             () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
 
-        var options = Options.Create(new NmeaSerialPortScanOptions
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
         {
             ProbeDuration = TimeSpan.FromSeconds(1),
             ReadTimeout = TimeSpan.FromMilliseconds(50),
@@ -183,7 +183,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
             options);
 
         var logger = new TestLogger<LinuxNmeaBackgroundService>();
-        var service = new LinuxNmeaBackgroundService(scanner, logger);
+        var service = new LinuxNmeaBackgroundService(scanner, logger, options);
 
         await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
 
@@ -202,6 +202,84 @@ public sealed class LinuxNmeaBackgroundServiceTests
         finally
         {
             await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+            scanner.Dispose();
+        }
+    }
+
+    [Fact]
+    public async Task BackgroundService_RescansWhenOptionsUpdate()
+    {
+        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero));
+        var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB2");
+        var parser = new NmeaSentenceParser();
+
+        var activeStream = new[]
+        {
+            "$GPGGA,123519,4807.038,N,01131.000,E,1,10,0.8,545.4,M,46.9,M,,*48",
+            "$GPRMC,123520,A,4807.100,N,01131.200,E,022.4,084.4,230394,003.1,W*66",
+            "$GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*48",
+        };
+
+        var sessionScripts = new[]
+        {
+            activeStream,
+            activeStream,
+            activeStream,
+        };
+
+        var sessionFactory = new ScriptedSerialPortSessionFactory(
+            sessionScripts,
+            () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
+
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
+        {
+            ProbeDuration = TimeSpan.FromSeconds(1),
+            ReadTimeout = TimeSpan.FromMilliseconds(50),
+            BaudRates = new[] { 9600 },
+            MaxReadAttemptsPerPort = 4,
+        });
+
+        var scanner = new NmeaAutoScanner(
+            enumerator,
+            sessionFactory,
+            parser,
+            NullLogger<NmeaAutoScanner>.Instance,
+            timeProvider,
+            options);
+
+        var logger = new TestLogger<LinuxNmeaBackgroundService>();
+        var service = new LinuxNmeaBackgroundService(scanner, logger, options);
+
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        try
+        {
+            await WaitForConditionAsync(() => sessionFactory.CreateCount >= 1, TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+            var initialCreateCount = sessionFactory.CreateCount;
+
+            options.Update(new NmeaSerialPortScanOptions
+            {
+                ProbeDuration = TimeSpan.FromSeconds(2),
+                ReadTimeout = TimeSpan.FromMilliseconds(150),
+                BaudRates = new[] { 19200, 38400 },
+                MaxReadAttemptsPerPort = 6,
+            });
+
+            await WaitForConditionAsync(
+                () => sessionFactory.CreateCount > initialCreateCount
+                    && sessionFactory.ObservedBaudRates.Contains(19200),
+                TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+
+            await WaitForConditionAsync(
+                () => logger.Count(LogLevel.Information, static message => message.Contains("configuration changed", StringComparison.OrdinalIgnoreCase)) >= 1,
+                TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+
+            Assert.Equal(TimeSpan.FromMilliseconds(150), sessionFactory.LastRequestedReadTimeout);
+        }
+        finally
+        {
+            await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+            scanner.Dispose();
         }
     }
 
@@ -289,6 +367,8 @@ public sealed class LinuxNmeaBackgroundServiceTests
         private readonly Queue<IReadOnlyList<string?>> _scripts;
         private readonly IReadOnlyList<string?> _fallbackScript;
         private readonly Action _onReadAttempt;
+        private readonly ConcurrentDictionary<int, byte> _observedBaudRates = new();
+        private long _lastReadTimeoutTicks;
 
         public ScriptedSerialPortSessionFactory(IEnumerable<IReadOnlyList<string?>> scripts, Action onReadAttempt)
         {
@@ -305,11 +385,20 @@ public sealed class LinuxNmeaBackgroundServiceTests
 
         public int CreateCount { get; private set; }
 
+        // From codex branch: expose observed baud rates + last requested read timeout
+        public ICollection<int> ObservedBaudRates => _observedBaudRates.Keys;
+
+        public TimeSpan LastRequestedReadTimeout => TimeSpan.FromTicks(Volatile.Read(ref _lastReadTimeoutTicks));
+
+        // From develop branch: ability to inject a read failure
         public bool ThrowOnNextRead { get; set; }
 
         public ISerialPortSession Create(string portName, int baudRate, TimeSpan readTimeout)
         {
             CreateCount++;
+            _observedBaudRates.TryAdd(baudRate, 0);
+            Volatile.Write(ref _lastReadTimeoutTicks, readTimeout.Ticks);
+
             var script = _scripts.Count > 0 ? _scripts.Dequeue() : _fallbackScript;
             return new ScriptedSerialPortSession(portName, baudRate, new Queue<string?>(script), _onReadAttempt, this);
         }

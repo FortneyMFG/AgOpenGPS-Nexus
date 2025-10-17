@@ -38,33 +38,48 @@ public sealed class LegacySteerCodecTests
         Assert.Equal(metadata.SpeedKph, decodedMetadata.SpeedKph, 6);
         Assert.Equal(metadata.TramControl, decodedMetadata.TramControl);
         Assert.Equal((uint)(sections.Mask & 0xFFF), decodedSections.Mask);
-        Assert.Equal(16u, decodedSections.SectionCount);
+        Assert.Equal(16u, decodedSections.SectionCount); // legacy PGN capacity
     }
 
     [Fact]
-    public void DecodeSteerCommand_InfersEnableFromEngagedBitOnly()
+    public void TryDecodeSteerCommand_RemoteOrTramBitsAloneDoNotEngage()
     {
         var codec = new LegacySteerCodec();
         var command = new SteerCmd
         {
+            TargetWheelAngleDeg = 5.0,
             Enable = false,
-            TargetWheelAngleDeg = 15,
         };
         var metadata = new LegacySteerCommandMetadata
         {
-            GuidanceStatus = 0b0000_0110, // remote + gps + engaged cleared
+            // remote + tram (or gps) bits set, BUT engaged bit (0x01) is NOT set
+            GuidanceStatus = 0b0000_0110,
         };
 
         var frame = codec.EncodeSteerCommand(command, metadata: metadata);
 
-        // Force another status bit to remain while the engaged bit is cleared
-        frame[7] = 0b0000_0010;
-
         Assert.True(codec.TryDecodeSteerCommand(frame, out var decodedCommand, out _, out _));
         Assert.False(decodedCommand.Enable);
+    }
 
-        frame[7] |= 0b0000_0001;
-        Assert.True(codec.TryDecodeSteerCommand(frame, out decodedCommand, out _, out _));
+    [Fact]
+    public void TryDecodeSteerCommand_EngagedBitOverridesMetadata()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd
+        {
+            TargetWheelAngleDeg = -3.25,
+            Enable = true,
+        };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            // keep other bits; encoder should set engaged (0x01) because Enable=true
+            GuidanceStatus = 0b0000_0110,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        Assert.True(codec.TryDecodeSteerCommand(frame, out var decodedCommand, out _, out _));
         Assert.True(decodedCommand.Enable);
     }
 

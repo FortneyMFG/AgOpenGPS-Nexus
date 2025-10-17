@@ -147,6 +147,8 @@ public sealed class LegacyGuidanceImportService : ILegacyGuidanceImportService
         // Bounding boxes + Z/M range are not required for import.
         stream.Seek(100, SeekOrigin.Begin);
 
+        var combinedBoundary = new List<GeographicCoordinate>();
+
         while (stream.Position < stream.Length)
         {
             if (stream.Length - stream.Position < 8)
@@ -240,8 +242,15 @@ public sealed class LegacyGuidanceImportService : ILegacyGuidanceImportService
 
             if (exterior.Count > 0)
             {
-                return exterior;
+                combinedBoundary.AddRange(exterior);
             }
+
+            stream.Seek(recordStart + contentBytes, SeekOrigin.Begin);
+        }
+
+        if (combinedBoundary.Count > 0)
+        {
+            return combinedBoundary;
         }
 
         throw new InvalidDataException("No polygon records were found in the shapefile.");

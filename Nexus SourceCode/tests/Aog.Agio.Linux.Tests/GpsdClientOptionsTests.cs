@@ -36,20 +36,33 @@ public sealed class GpsdClientOptionsTests
     }
 
     [Fact]
-    public void SocketPath_Whitespace_Throws()
-    {
-        var options = new GpsdClientOptions();
-
-        var exception = Assert.Throws<ArgumentException>(() => options.SocketPath = " \t\n");
-        Assert.Equal("value", exception.ParamName);
-    }
-
-    [Fact]
     public void SocketPath_ValidPath_Updates()
     {
         var options = new GpsdClientOptions
         {
             SocketPath = "/tmp/gpsd.sock",
+        };
+
+        Assert.Equal("/tmp/gpsd.sock", options.SocketPath);
+    }
+
+    [Fact]
+    public void SocketPath_Whitespace_DisablesWorker()
+    {
+        var options = new GpsdClientOptions
+        {
+            SocketPath = "  \t\n  ",
+        };
+
+        Assert.Null(options.SocketPath);
+    }
+
+    [Fact]
+    public void SocketPath_TrimmedValue_Persists()
+    {
+        var options = new GpsdClientOptions
+        {
+            SocketPath = "  /tmp/gpsd.sock  ",
         };
 
         Assert.Equal("/tmp/gpsd.sock", options.SocketPath);

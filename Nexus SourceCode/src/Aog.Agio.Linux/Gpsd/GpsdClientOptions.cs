@@ -17,20 +17,21 @@ public sealed class GpsdClientOptions
         get => _socketPath;
         set
         {
-            if (value is null || value.Length == 0)
+            if (value is null)
             {
                 _socketPath = null;
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(value))
+            var normalized = value.Trim();
+
+            if (normalized.Length == 0)
             {
-                throw new ArgumentException(
-                    "Socket path cannot contain only whitespace. Assign null or empty to disable gpsd.",
-                    nameof(value));
+                _socketPath = null;
+                return;
             }
 
-            _socketPath = value;
+            _socketPath = normalized;
         }
     }
 

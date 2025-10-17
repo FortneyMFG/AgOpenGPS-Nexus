@@ -136,6 +136,38 @@ public sealed class LegacyPoseCodecTests
         Assert.Equal(0d, decodedPose.HeadingRad);
     }
 
+    [Theory]
+    [MemberData(nameof(TryDecodePose_SanitizesLatLonData))]
+    public void TryDecodePose_SanitizesLatLon(double encodedLatitude, double encodedLongitude, double expectedLatitude, double expectedLongitude)
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = 1d,
+            LongitudeDeg = 1d,
+        };
+
+        var frame = codec.EncodePose(pose);
+        var payload = frame.AsSpan(5, LegacyPoseCodec.MainAntennaPayloadLength);
+
+        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(0, 8), encodedLongitude);
+        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(8, 8), encodedLatitude);
+
+        frame[^1] = ComputeChecksum(frame);
+
+        Assert.True(codec.TryDecodePose(frame, out var decodedPose, out _));
+        Assert.Equal(expectedLatitude, decodedPose.LatitudeDeg, 6);
+        Assert.Equal(expectedLongitude, decodedPose.LongitudeDeg, 6);
+    }
+
+    public static TheoryData<double, double, double, double> TryDecodePose_SanitizesLatLonData => new()
+    {
+        { double.NaN,               12.5d,  0d,    12.5d },
+        { 44.1d,    double.PositiveInfinity, 44.1d, 0d   },
+        { 95d,                 -181d,       90d,  -180d },
+        { -120d,                540d,      -90d,   180d },
+    };
+
     [Fact]
     public void TryDecodePose_ReturnsFalseForInvalidChecksum()
     {

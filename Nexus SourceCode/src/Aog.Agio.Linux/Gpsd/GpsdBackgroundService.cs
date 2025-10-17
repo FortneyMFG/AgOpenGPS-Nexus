@@ -30,6 +30,12 @@ public sealed class GpsdBackgroundService : BackgroundService
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        if (string.IsNullOrEmpty(_options.SocketPath))
+        {
+            _logger.LogInformation("gpsd monitor disabled. No socket path configured.");
+            return;
+        }
+
         _logger.LogInformation("Starting gpsd monitor for socket {SocketPath}.", _options.SocketPath);
 
         while (!stoppingToken.IsCancellationRequested)

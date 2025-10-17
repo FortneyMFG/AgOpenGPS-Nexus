@@ -230,6 +230,11 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
             ? "No description provided."
             : scenario.Description!;
         ActiveScenarioOptions = FormatScenarioOptions(scenario.Options);
+
+        if (scenario.Options?.TimeScale is double timeScale)
+        {
+            OnPlaybackRateSelected(timeScale);
+        }
     }
 
     /// <summary>

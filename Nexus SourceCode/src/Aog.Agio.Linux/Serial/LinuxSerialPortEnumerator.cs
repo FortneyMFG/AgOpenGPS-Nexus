@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,13 +21,14 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         IOptions<LinuxSerialPortEnumeratorOptions> options)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = (options ?? throw new ArgumentNullException(nameof(options))).Value ?? throw new ArgumentException("Options are required.", nameof(options));
+        _options = (options ?? throw new ArgumentNullException(nameof(options))).Value
+                   ?? throw new ArgumentException("Options are required.", nameof(options));
     }
 
     /// <inheritdoc />
     public IEnumerable<string> GetPortNames()
     {
-        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var seen = new HashSet<string>(StringComparer.Ordinal); // canonical-path de-dupe
         var results = new List<string>();
 
         var prefixes = _options.DevicePrefixes ?? Array.Empty<string>();
@@ -121,15 +124,52 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         {
             fullPath = Path.GetFullPath(path);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its full path could not be resolved.", path);
             return;
         }
 
+        // Resolve canonical path (follows symlinks when possible) to de-dupe entries
         var canonicalPath = ResolveCanonicalPath(fullPath);
+
+        // Skip directories (and reparse points that target directories). Legit serials are device files.
+        try
+        {
+            var attrs = File.GetAttributes(canonicalPath);
+            if ((attrs & FileAttributes.Directory) != 0)
+            {
+                _logger.LogDebug("Skipping serial device candidate {Path} because it points to a directory.", canonicalPath);
+                return;
+            }
+
+            if ((attrs & FileAttributes.ReparsePoint) != 0)
+            {
+                // If the reparse/ link ultimately lands on a directory, skip it.
+                try
+                {
+                    if (Directory.Exists(canonicalPath))
+                    {
+                        _logger.LogDebug("Skipping serial device candidate {Path} because it targets a directory reparse point.", canonicalPath);
+                        return;
+                    }
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its reparse target could not be inspected.", canonicalPath);
+                    return;
+                }
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its attributes could not be read.", canonicalPath);
+            return;
+        }
 
         if (seen.Add(canonicalPath))
         {
+            // Keep the discovered (possibly non-canonical) path for operator familiarity, but de-dupe on canonical.
             results.Add(fullPath);
         }
         else
@@ -159,24 +199,24 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
             }
             catch (IOException)
             {
-                // Ignore failures resolving the link target; fall back to the original path.
+                // Ignore and fall back.
             }
             catch (UnauthorizedAccessException)
             {
-                // Ignore failures resolving the link target; fall back to the original path.
+                // Ignore and fall back.
             }
             catch (PlatformNotSupportedException)
             {
-                // Ignore failures resolving the link target; fall back to the original path.
+                // Ignore and fall back.
             }
             catch (NotSupportedException)
             {
-                // Ignore failures resolving the link target; fall back to the original path.
+                // Ignore and fall back.
             }
 
             return info.FullName;
         }
-        catch (Exception)
+        catch
         {
             return fullPath;
         }

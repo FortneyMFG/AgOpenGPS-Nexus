@@ -220,6 +220,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
         var targetRate = scenario.Options?.TimeScale ?? _configuration?.Options?.TimeScale ?? 1.0;
         SelectPlaybackRate(targetRate, updateController: true);
+        NotifyPlaybackRateProperties();
     }
 
     /// <summary>
@@ -246,6 +247,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
         var targetRate = _configuration?.Options?.TimeScale ?? 1.0;
         SelectPlaybackRate(targetRate, updateController: true);
+        NotifyPlaybackRateProperties();
     }
 
     /// <inheritdoc />
@@ -347,18 +349,36 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         _playbackRates.Sort((left, right) => left.Rate.CompareTo(right.Rate));
     }
 
-    private void UpdateSelectedPlaybackRateOption(SimulationPlaybackRateOptionViewModel option)
-    {
-        if (_selectedPlaybackRateOption == option)
-        {
-            option.SetSelected(true, suppressCallback: true);
-            return;
-        }
+// Call this when a playback rate option is chosen (e.g., from the UI).
+private void UpdateSelectedPlaybackRateOption(SimulationPlaybackRateOptionViewModel option)
+{
+    if (option is null)
+        return;
 
-        _selectedPlaybackRateOption?.SetSelected(false, suppressCallback: true);
+    if (_selectedPlaybackRateOption == option)
+    {
+        // Ensure visual state is correct without re-firing callbacks.
         option.SetSelected(true, suppressCallback: true);
-        _selectedPlaybackRateOption = option;
+        // Still notify in case dependent bindings read through properties.
+        NotifyPlaybackRateProperties();
+        return;
     }
+
+    _selectedPlaybackRateOption?.SetSelected(false, suppressCallback: true);
+    option.SetSelected(true, suppressCallback: true);
+    _selectedPlaybackRateOption = option;
+
+    NotifyPlaybackRateProperties();
+}
+
+// Centralized place to notify anything bound to the selected rate/label/option.
+private void NotifyPlaybackRateProperties()
+{
+    RaisePropertyChanged(nameof(SelectedPlaybackRate));
+    RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
+    RaisePropertyChanged(nameof(SelectedPlaybackRateOption));
+}
+
 
     private void UpdateSeekFraction(double value, bool triggerSeek)
     {

@@ -39,6 +39,7 @@ public sealed class LegacySteerCodecTests
         Assert.Equal(expectedSpeedKph, decodedMetadata.SpeedKph, 6);
         Assert.Equal(metadata.CurrentSpeedMps, decodedMetadata.CurrentSpeedMps, 6);
         Assert.Equal(metadata.TramControl, decodedMetadata.TramControl);
+        Assert.Equal(0x7F, decodedMetadata.SourceAddress);
         Assert.Equal((uint)(sections.Mask & 0xFFF), decodedSections.Mask);
         Assert.Equal(16u, decodedSections.SectionCount); // legacy PGN capacity
     }
@@ -109,7 +110,7 @@ public sealed class LegacySteerCodecTests
         var frame = codec.EncodeSteerCommand(command, metadata: metadata);
 
         var rawSpeed = BinaryPrimitives.ReadUInt16LittleEndian(frame.AsSpan(5, 2));
-        Assert.Equal((ushort)1980, rawSpeed); // 5.5 m/s = 19.8 km/h -> 198 hundredths
+        Assert.Equal((ushort)1980, rawSpeed); // 5.5 m/s = 19.8 km/h -> 1980 hundredths
     }
 
     [Fact]
@@ -181,6 +182,21 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
+    public void EncodeSteerCommand_UsesMetadataSourceAddressWhenValid()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { Enable = true };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            SourceAddress = 0x42,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        Assert.Equal(0x42, frame[2]);
+    }
+
+    [Fact]
     public void EncodeSteerCommand_PreservesSteerMetadataFlagsWhenEnabled()
     {
         var codec = new LegacySteerCodec();
@@ -197,6 +213,7 @@ public sealed class LegacySteerCodecTests
 
         var frame = codec.EncodeSteerCommand(command, metadata: metadata, steerMetadata: steerMetadata);
 
+        // Expect engaged bit set + steerMetadata flags merged
         Assert.Equal(0b0000_0111, frame[7]);
         Assert.Equal(metadata.TramControl, frame[10]);
     }
@@ -234,16 +251,17 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
-    public void EncodeSteerCommand_ThrowsWhenSectionCountExceedsSixteen()
+    public void EncodeSteerCommand_ThrowsWhenSectionCountExceedsThirtyTwo()
     {
         var codec = new LegacySteerCodec();
         var sections = new SectionMask
         {
-            SectionCount = 17,
-            Mask = 0x1FFFF,
+            SectionCount = 33,
+            Mask = 0xFFFFFFFF,
         };
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => codec.EncodeSteerCommand(new SteerCmd { Enable = true }, sections));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            codec.EncodeSteerCommand(new SteerCmd { Enable = true }, sections));
     }
 
     [Fact]

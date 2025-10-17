@@ -18,6 +18,7 @@ public sealed class LegacyUdpGateway
     private const string LegacySteerCommandSource = "legacy/udp/steer_cmd";
     private const string LegacySteerStateSource = "legacy/udp/steer_state";
     private const string LegacySectionSource = "legacy/udp/sections";
+
     private readonly LegacyPoseCodec _poseCodec;
     private readonly LegacyDiscoveryCodec _discoveryCodec;
     private readonly LegacySteerCodec _steerCodec;
@@ -31,11 +32,14 @@ public sealed class LegacyUdpGateway
     private readonly TimeProvider _timeProvider;
     private readonly IActuatorFailsafeService _actuatorFailsafe;
     private readonly ILogger<LegacyUdpGateway> _logger;
+
     private long _sequence;
     private long _steerCommandSequence;
     private long _steerStateSequence;
     private long _sectionSequence;
+
     private SteerCmd? _steerSnapshot;
+    private LegacySteerCommandMetadata? _lastSteerMetadata;
 
     public LegacyUdpGateway(
         LegacyPoseCodec poseCodec,
@@ -65,19 +69,15 @@ public sealed class LegacyUdpGateway
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _actuatorFailsafe = actuatorFailsafe ?? NullActuatorFailsafeService.Instance;
         _logger = logger ?? NullLogger<LegacyUdpGateway>.Instance;
+
         _steerSnapshot = null;
+        _lastSteerMetadata = null;
     }
 
-    /// <summary>
-    /// Encodes a typed pose into its legacy PGN representation and transmits it.
-    /// </summary>
+    /// <summary>Encodes a typed pose into its legacy PGN representation and transmits it.</summary>
     public async ValueTask PublishPoseAsync(Pose pose, LegacyPoseMetadata? metadata = null, CancellationToken cancellationToken = default)
     {
-        if (pose is null)
-        {
-            throw new ArgumentNullException(nameof(pose));
-        }
-
+        if (pose is null) throw new ArgumentNullException(nameof(pose));
         var frame = _poseCodec.EncodePose(pose, metadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
@@ -85,110 +85,96 @@ public sealed class LegacyUdpGateway
     /// <summary>
     /// Encodes a typed steering command (optionally including section state) and transmits it.
     /// </summary>
-    /// <param name="command">Steering command to encode.</param>
-    /// <param name="sections">Optional section mask to include in the PGN.</param>
-    /// <param name="metadata">Optional legacy metadata overrides.</param>
-    /// <param name="cancellationToken">Cancellation token for the send operation.</param>
     public async ValueTask PublishSteerCommandAsync(
         SteerCmd command,
         SectionMask? sections = null,
         LegacySteerCommandMetadata? metadata = null,
         CancellationToken cancellationToken = default)
     {
-        if (command is null)
-        {
-            throw new ArgumentNullException(nameof(command));
-        }
+        if (command is null) throw new ArgumentNullException(nameof(command));
 
         _actuatorFailsafe.ReportHeartbeat();
 
+        // Filter & snapshot
         var filteredCommand = _actuatorFailsafe.FilterSteerCommand(command);
         var filteredSnapshot = filteredCommand.Clone();
         Volatile.Write(ref _steerSnapshot, filteredSnapshot);
-        SectionMask? filteredSections = null;
 
+        SectionMask? filteredSections = null;
         if (sections is not null)
         {
             filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
         }
 
-        LegacySteerMetadata? steerMetadata = null;
+        // Snapshot metadata (preserve for section-only updates)
+        var metadataSnapshot = metadata?.Clone() ?? new LegacySteerCommandMetadata();
+        Volatile.Write(ref _lastSteerMetadata, metadataSnapshot);
 
-        if (metadata is not null)
+        // Build supplemental steer metadata (raw flags + optional source override)
+        LegacySteerMetadata steerMetadata = new()
         {
-            steerMetadata = new LegacySteerMetadata
-            {
-                GuidanceStatus = metadata.GuidanceStatus,
-            };
-        }
+            GuidanceStatus = metadataSnapshot.GuidanceStatus,
+            SourceAddress = metadataSnapshot.SourceAddress,
+        };
 
-        var frame = _steerCodec.EncodeSteerCommand(filteredSnapshot, filteredSections, metadata, steerMetadata);
+        var frame = _steerCodec.EncodeSteerCommand(filteredSnapshot, filteredSections, metadataSnapshot, steerMetadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Encodes the last filtered steering command with a new section mask and transmits it.
+    /// Re-encodes the last filtered steering command snapshot with a new section mask and transmits it.
     /// </summary>
-    /// <param name="sections">Section mask to encode with the last steering command snapshot.</param>
-    /// <param name="metadata">Optional legacy metadata overrides.</param>
-    /// <param name="cancellationToken">Cancellation token for the send operation.</param>
     public async ValueTask PublishSectionMaskAsync(
         SectionMask sections,
         LegacySteerCommandMetadata? metadata = null,
         CancellationToken cancellationToken = default)
     {
-        if (sections is null)
-        {
-            throw new ArgumentNullException(nameof(sections));
-        }
+        if (sections is null) throw new ArgumentNullException(nameof(sections));
 
         var filteredCommand = Volatile.Read(ref _steerSnapshot);
-
         if (filteredCommand is null)
         {
-            _logger.LogInformation(
-                "Ignoring section mask update because no steer command snapshot has been published yet.");
+            _logger.LogInformation("Ignoring section mask update because no steer command snapshot has been published yet.");
             return;
         }
 
         var filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
 
+        // Refresh command through failsafe again (keeps rate/limits consistent)
         var refreshedCommand = _actuatorFailsafe.FilterSteerCommand(filteredCommand);
         var refreshedSnapshot = refreshedCommand.Clone();
         Volatile.Write(ref _steerSnapshot, refreshedSnapshot);
 
-        LegacySteerMetadata? steerMetadata = null;
-
-        if (metadata is not null)
+        // Choose metadata source: prefer provided; else last snapshot; if neither, fail
+        var effectiveMetadata = metadata?.Clone() ?? Volatile.Read(ref _lastSteerMetadata);
+        if (effectiveMetadata is null)
         {
-            steerMetadata = new LegacySteerMetadata
-            {
-                GuidanceStatus = metadata.GuidanceStatus,
-            };
+            throw new InvalidOperationException("A steering command must be published before section updates.");
         }
+        Volatile.Write(ref _lastSteerMetadata, effectiveMetadata);
 
-        var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, filteredSections, metadata, steerMetadata);
+        LegacySteerMetadata steerMetadata = new()
+        {
+            GuidanceStatus = effectiveMetadata.GuidanceStatus,
+            SourceAddress = effectiveMetadata.SourceAddress,
+        };
+
+        var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, filteredSections, effectiveMetadata, steerMetadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Publishes a discovery announcement over the UDP transport.
     /// </summary>
-    /// <param name="announcement">Discovery announcement to broadcast.</param>
-    /// <param name="cancellationToken">Cancellation token for the broadcast operation.</param>
     public async ValueTask PublishDiscoveryAsync(LegacyDiscoveryAnnouncement announcement, CancellationToken cancellationToken = default)
     {
-        if (announcement is null)
-        {
-            throw new ArgumentNullException(nameof(announcement));
-        }
-
+        if (announcement is null) throw new ArgumentNullException(nameof(announcement));
         var frame = _discoveryCodec.Encode(announcement);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Attempts to decode a legacy datagram and forwards the resulting pose to observers.
+    /// Attempts to decode a legacy datagram and forwards to the appropriate observers.
     /// </summary>
     public async ValueTask HandleDatagramAsync(ReadOnlyMemory<byte> datagram, CancellationToken cancellationToken = default)
     {
@@ -235,7 +221,7 @@ public sealed class LegacyUdpGateway
             return;
         }
 
-        if (!_poseCodec.TryDecodePose(datagram.Span, out var pose, out var metadata))
+        if (!_poseCodec.TryDecodePose(datagram.Span, out var pose, out var poseMeta))
         {
             return;
         }
@@ -246,8 +232,8 @@ public sealed class LegacyUdpGateway
         pose.Header.Sequence = (ulong)Interlocked.Increment(ref _sequence);
         pose.Header.Timestamp = Timestamp.FromDateTimeOffset(_timeProvider.GetUtcNow());
 
-        await _poseObserver.OnPoseAsync(pose, metadata, cancellationToken).ConfigureAwait(false);
-        await _meshPresencePublisher.PublishPresenceAsync(pose, metadata, cancellationToken).ConfigureAwait(false);
+        await _poseObserver.OnPoseAsync(pose, poseMeta, cancellationToken).ConfigureAwait(false);
+        await _meshPresencePublisher.PublishPresenceAsync(pose, poseMeta, cancellationToken).ConfigureAwait(false);
     }
 
     private sealed class NullActuatorFailsafeService : IActuatorFailsafeService
@@ -255,18 +241,11 @@ public sealed class LegacyUdpGateway
         public static NullActuatorFailsafeService Instance { get; } = new();
 
         public bool HasActiveHeartbeat => false;
-
         public DateTimeOffset? LastHeartbeatUtc => null;
-
         public TimeSpan HeartbeatTimeout => TimeSpan.Zero;
 
-        public void ReportHeartbeat()
-        {
-        }
-
-        public void ClearHeartbeat()
-        {
-        }
+        public void ReportHeartbeat() { }
+        public void ClearHeartbeat() { }
 
         public SteerCmd FilterSteerCommand(SteerCmd command)
         {

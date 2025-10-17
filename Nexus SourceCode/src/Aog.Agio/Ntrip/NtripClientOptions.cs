@@ -1,4 +1,3 @@
-using System;
 namespace Aog.Agio.Ntrip;
 
 /// <summary>

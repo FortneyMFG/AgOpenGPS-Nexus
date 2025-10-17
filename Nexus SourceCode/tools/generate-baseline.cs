@@ -1,7 +1,4 @@
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 
 var repositoryRoot = LocateRepositoryRoot();
 var projectPath = Path.Combine(repositoryRoot, "Nexus SourceCode", "tools", "generate-baseline", "generate-baseline.csproj");

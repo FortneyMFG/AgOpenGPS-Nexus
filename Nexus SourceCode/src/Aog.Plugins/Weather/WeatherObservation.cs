@@ -8,6 +8,11 @@ namespace Aog.Plugins.Weather;
 /// </summary>
 public sealed class WeatherObservation
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WeatherObservation"/> class.
+    /// </summary>
+    /// <param name="snapshot">Snapshot produced by the ingest pipeline.</param>
+    /// <param name="location">Optional location associated with the sensor.</param>
     public WeatherObservation(WeatherSnapshot snapshot, PlanarPoint? location)
     {
         Snapshot = snapshot ?? throw new ArgumentNullException(nameof(snapshot));

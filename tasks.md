@@ -286,6 +286,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
 - [x] NX-941 Simulation bar playback rate reset _(Done)_ — Reset configuration default when reverting routes
 - [x] NX-988 Simulation bar cancellation logging suppression _(Done)_ — Ignore replay controller cancellations in transport bar
+- [x] NX-989 Simulation bar design-time data parity _(Done)_ — Align design-time view model with runtime dependencies for the Avalonia designer
 - [x] NX-989 Simulation bar auto-resume guard _(Done)_ — Skip toggling when no replay session is active
 - [x] NX-991 Simulation bar cancellation logging suppression _(Done)_ — Ignore replay controller cancellations in transport bar
 

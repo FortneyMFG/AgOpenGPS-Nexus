@@ -44,7 +44,6 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
     private string _playPauseLabel = "Play";
     private string _positionDisplay = FormatPosition(TimeSpan.Zero, DefaultDuration);
     private double _selectedPlaybackRateMultiplier = 1.0;
-    private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRate;
     private string _selectedPlaybackRateLabel = FormatPlaybackRateLabel(1.0);
     private string _activeScenarioTitle = "Scenario: configuration defaults";
     private string _activeScenarioDescription = "Routes sourced from configuration.";
@@ -153,6 +152,9 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
 
     /// <summary>Gets the available playback rates.</summary>
     public ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> PlaybackRates => _playbackRateView;
+
+    /// <summary>Gets the currently selected playback rate option when available.</summary>
+    public SimulationPlaybackRateOptionViewModel? SelectedPlaybackRateOption => _selectedPlaybackRateOption;
 
     /// <summary>
     /// Gets the currently selected playback rate multiplier. Values are clamped between

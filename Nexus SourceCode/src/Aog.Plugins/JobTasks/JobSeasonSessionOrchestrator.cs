@@ -392,7 +392,7 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
                 null,
 
                 sanitized.WorkOrderId,
-                sanitized.ActiveOperators,
+                sanitized.ActiveOperators ?? Array.Empty<string>(),
                 sanitized.Notes);
 
             state.Sessions.Add(session);

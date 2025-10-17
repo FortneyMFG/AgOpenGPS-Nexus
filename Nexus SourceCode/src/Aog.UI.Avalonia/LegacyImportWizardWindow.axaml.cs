@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 using Aog.UI.Avalonia.ViewModels;
 
 namespace Aog.UI.Avalonia;
@@ -27,20 +28,24 @@ public partial class LegacyImportWizardWindow : Window
             return;
         }
 
-        var dialog = new OpenFileDialog
+        if (StorageProvider is not { } storageProvider)
+        {
+            return;
+        }
+
+        var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             AllowMultiple = false,
-            Filters =
+            FileTypeFilter = new[]
             {
-                new FileDialogFilter { Name = "CSV files", Extensions = { "csv" } },
-                new FileDialogFilter { Name = "All files", Extensions = { "*" } },
+                new FilePickerFileType("CSV files") { Patterns = new[] { "*.csv" } },
+                new FilePickerFileType("All files") { Patterns = new[] { "*.*" } },
             },
-        };
+        }).ConfigureAwait(true);
 
-        var result = await dialog.ShowAsync(this);
-        if (result is { Length: > 0 })
+        if (files is { Count: > 0 } && files[0].Path?.LocalPath is { } path && !string.IsNullOrWhiteSpace(path))
         {
-            viewModel.SetAbLineCsvPath(result[0]);
+            viewModel.SetAbLineCsvPath(path);
         }
     }
 
@@ -51,20 +56,24 @@ public partial class LegacyImportWizardWindow : Window
             return;
         }
 
-        var dialog = new OpenFileDialog
+        if (StorageProvider is not { } storageProvider)
+        {
+            return;
+        }
+
+        var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             AllowMultiple = false,
-            Filters =
+            FileTypeFilter = new[]
             {
-                new FileDialogFilter { Name = "Shapefiles", Extensions = { "shp" } },
-                new FileDialogFilter { Name = "All files", Extensions = { "*" } },
+                new FilePickerFileType("Shapefiles") { Patterns = new[] { "*.shp" } },
+                new FilePickerFileType("All files") { Patterns = new[] { "*.*" } },
             },
-        };
+        }).ConfigureAwait(true);
 
-        var result = await dialog.ShowAsync(this);
-        if (result is { Length: > 0 })
+        if (files is { Count: > 0 } && files[0].Path?.LocalPath is { } path && !string.IsNullOrWhiteSpace(path))
         {
-            viewModel.SetBoundaryShapePath(result[0]);
+            viewModel.SetBoundaryShapePath(path);
         }
     }
 

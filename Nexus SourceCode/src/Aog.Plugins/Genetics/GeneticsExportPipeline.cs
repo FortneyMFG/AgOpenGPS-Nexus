@@ -367,12 +367,16 @@ public sealed class GeneticsExportPipeline
             new XAttribute("id", feature.FeatureId),
             new XAttribute("zoneId", feature.ZoneId),
             new XAttribute("layerId", feature.LayerId),
-            new XAttribute("jobId", feature.JobId),
             new XAttribute("sessionId", feature.SessionId),
             new XAttribute("brand", feature.Brand),
             new XAttribute("product", feature.Product),
             new XAttribute("appliedAt", feature.AppliedAt.ToString("O", CultureInfo.InvariantCulture)),
             new XAttribute("areaSquareMeters", feature.Geometry.AreaSquareMeters.ToString("0.###", CultureInfo.InvariantCulture)));
+
+        if (!string.IsNullOrEmpty(feature.JobId))
+        {
+            element.Add(new XAttribute("jobId", feature.JobId));
+        }
 
         if (!string.IsNullOrEmpty(feature.TraitStack))
         {

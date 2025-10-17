@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Media;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -313,6 +314,9 @@ public sealed class BoundaryToolViewModel : ObservableObject
 /// </summary>
 public sealed class BoundaryPolygonViewModel : ObservableObject
 {
+    private static readonly IBrush InclusionBrush = new SolidColorBrush(Color.FromUInt32(0xFF4CC2FF));
+    private static readonly IBrush ExclusionBrush = new SolidColorBrush(Color.FromUInt32(0xFFFFAA5C));
+
     private readonly double _originalPerimeter;
     private readonly int _originalVertexCount;
     private bool _isLocked;
@@ -373,6 +377,9 @@ public sealed class BoundaryPolygonViewModel : ObservableObject
 
     /// <summary>Gets a display string describing how the polygon is used.</summary>
     public string ModeDisplay => IsInclusion ? "Inclusion boundary" : "Exclusion zone";
+
+    /// <summary>Gets the brush used to render the polygon indicator.</summary>
+    public IBrush FillBrush => IsInclusion ? InclusionBrush : ExclusionBrush;
 
     /// <summary>Gets the polygon area in hectares.</summary>
     public double AreaHectares

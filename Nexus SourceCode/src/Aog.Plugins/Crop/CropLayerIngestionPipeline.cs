@@ -235,7 +235,8 @@ public sealed class CropLayerIngestionPipeline
             throw new InvalidOperationException($"Feature '{featureId}' already exists in layer '{_layerId}'.");
         }
 
-        var geometry = CloneGeometry(operation.GeometryAfter, featureId, required: true);
+        var geometry = CloneGeometry(operation.GeometryAfter, featureId, required: true)
+            ?? throw new InvalidOperationException($"Feature '{featureId}' must include geometry.");
         var attributes = ExtractAttributes(operation.AttributesAfter, null, requireAll: true);
         var area = ComputeArea(operation.Summary, null);
 

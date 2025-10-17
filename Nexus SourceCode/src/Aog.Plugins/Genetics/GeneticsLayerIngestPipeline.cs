@@ -697,7 +697,8 @@ public sealed class GeneticsLayerIngestPipeline
             .ToList();
 
         var varietySummaries = _varieties.Values
-            .GroupBy(variety => new VarietyKey(variety.JobId, variety.Brand, variety.Product, variety.TraitStack, variety.Lot, variety.Treatment, variety.Barcode), VarietyKey.Comparer)
+            .Where(variety => !string.IsNullOrWhiteSpace(variety.JobId))
+            .GroupBy(variety => new VarietyKey(variety.JobId!, variety.Brand, variety.Product, variety.TraitStack, variety.Lot, variety.Treatment, variety.Barcode), VarietyKey.Comparer)
             .Select(group => new GeneticsVarietyAnalytics(
                 group.Key.JobId,
                 group.Key.Brand,

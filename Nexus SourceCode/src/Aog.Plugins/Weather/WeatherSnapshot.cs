@@ -216,6 +216,11 @@ public sealed record WeatherSnapshot
         };
     }
 
+    /// <summary>
+    /// Clamps a nullable percentage to the range [0, 100] when a value is present.
+    /// </summary>
+    /// <param name="value">The percentage value to normalize.</param>
+    /// <returns>The clamped percentage, or <see langword="null"/> when no value was provided.</returns>
     private static double? ClampPercent(double? value)
     {
         if (!value.HasValue)
@@ -226,6 +231,11 @@ public sealed record WeatherSnapshot
         return Math.Clamp(value.Value, 0d, 100d);
     }
 
+    /// <summary>
+    /// Ensures nullable scalar quantities are non-negative by substituting zero for negative inputs.
+    /// </summary>
+    /// <param name="value">The quantity to evaluate.</param>
+    /// <returns>The original value when positive, zero when negative, or <see langword="null"/> when absent.</returns>
     private static double? ClampNonNegative(double? value)
     {
         if (!value.HasValue)
@@ -236,6 +246,11 @@ public sealed record WeatherSnapshot
         return value.Value < 0 ? 0 : value;
     }
 
+    /// <summary>
+    /// Normalizes a nullable direction in degrees to the [0, 360) interval.
+    /// </summary>
+    /// <param name="value">The direction in degrees to normalize.</param>
+    /// <returns>The normalized direction, or <see langword="null"/> when no value was supplied.</returns>
     private static double? NormalizeDirection(double? value)
     {
         if (!value.HasValue)

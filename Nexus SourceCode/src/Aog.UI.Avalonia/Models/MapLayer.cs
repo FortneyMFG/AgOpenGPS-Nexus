@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Avalonia;
 using Avalonia.Media;
 
@@ -26,7 +27,7 @@ public sealed class MapLayer
         LayerId = layerId;
         DisplayName = string.IsNullOrWhiteSpace(displayName) ? layerId : displayName.Trim();
         Style = style;
-        Cells = new ReadOnlyCollection<MapLayerCell>(cells ?? Array.Empty<MapLayerCell>());
+        Cells = new ReadOnlyCollection<MapLayerCell>((cells ?? Array.Empty<MapLayerCell>()).ToList());
         IsVisible = isVisible;
     }
 

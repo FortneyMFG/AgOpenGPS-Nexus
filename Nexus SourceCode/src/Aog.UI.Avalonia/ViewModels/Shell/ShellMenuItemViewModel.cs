@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows.Input;
@@ -50,6 +51,31 @@ public sealed class ShellMenuItemViewModel : ObservableObject
     /// <summary>Gets a tooltip or descriptive text for the command.</summary>
     public string? Description { get; init; }
 
+    /// <summary>Gets the tooltip text including last invocation metadata when available.</summary>
+    public string Tooltip
+    {
+        get
+        {
+            var baseDescription = string.IsNullOrWhiteSpace(Description) ? string.Empty : Description.Trim();
+
+            if (LastInvocationTimestamp is not { } timestamp)
+            {
+                return baseDescription;
+            }
+
+            var localTimestamp = timestamp.ToLocalTime();
+            var formattedTimestamp = localTimestamp.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture);
+            var status = LastInvocationHandled ? "handled" : "failed";
+
+            if (baseDescription.Length == 0)
+            {
+                return FormattableString.Invariant($"Last invoked {formattedTimestamp} ({status}).");
+            }
+
+            return FormattableString.Invariant($"{baseDescription}\nLast invoked {formattedTimestamp} ({status}).");
+        }
+    }
+
     /// <summary>Gets a shortcut text to display next to the command.</summary>
     public string? GestureText { get; init; }
 
@@ -69,14 +95,26 @@ public sealed class ShellMenuItemViewModel : ObservableObject
     public bool LastInvocationHandled
     {
         get => _lastInvocationHandled;
-        private set => SetProperty(ref _lastInvocationHandled, value);
+        private set
+        {
+            if (SetProperty(ref _lastInvocationHandled, value))
+            {
+                OnPropertyChanged(nameof(Tooltip));
+            }
+        }
     }
 
     /// <summary>Gets the timestamp of the last invocation if any.</summary>
     public DateTimeOffset? LastInvocationTimestamp
     {
         get => _lastInvocationTimestamp;
-        private set => SetProperty(ref _lastInvocationTimestamp, value);
+        private set
+        {
+            if (SetProperty(ref _lastInvocationTimestamp, value))
+            {
+                OnPropertyChanged(nameof(Tooltip));
+            }
+        }
     }
 
     /// <summary>

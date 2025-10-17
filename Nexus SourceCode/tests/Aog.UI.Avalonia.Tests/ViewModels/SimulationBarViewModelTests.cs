@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -9,6 +10,7 @@ using Aog.Core.Paths;
 using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
 using Aog.UI.Avalonia.ViewModels;
+using Avalonia.Threading;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -85,7 +87,7 @@ public sealed class SimulationBarViewModelTests
 
         var configuration = SimulationConfigurationLoader.Load(json);
 
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
 
         viewModel.SelectedPlaybackRate.Should().Be(0.75);
         viewModel.SelectedPlaybackRateLabel.Should().Be("0.75×");
@@ -102,7 +104,7 @@ public sealed class SimulationBarViewModelTests
     public void ApplyScenario_UpdatesMetadataAndRoutes()
     {
         var configuration = CreateConfigurationWithScenario();
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
         var scenario = new SimulationScenarioConfiguration(
             "test",
             "Scenario for testing",
@@ -131,7 +133,7 @@ public sealed class SimulationBarViewModelTests
     public void ApplyScenario_WithCustomPlaybackRate_AddsPlaybackRateOption()
     {
         var configuration = CreateConfigurationWithScenario();
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
         var scenario = new SimulationScenarioConfiguration(
             "custom-rate",
             "Scenario requesting three-quarter speed",
@@ -154,7 +156,7 @@ public sealed class SimulationBarViewModelTests
     public void ResetToConfigurationRoutes_WhenConfigurationOmitsTimeScale_RevertsToNormalRate()
     {
         var configuration = CreateConfigurationWithoutTimeScaleOption();
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
         var scenario = new SimulationScenarioConfiguration(
             "half-speed",
             "Scenario that halves playback speed",
@@ -178,7 +180,7 @@ public sealed class SimulationBarViewModelTests
     public void ApplyLegacyImport_WithTimeScale_AdjustsPlaybackRate()
     {
         var configuration = CreateConfigurationWithScenario();
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
 
         var scenario = new SimulationScenarioConfiguration(
             "legacy-import",
@@ -222,7 +224,7 @@ public sealed class SimulationBarViewModelTests
     public void ResetToConfigurationRoutes_RestoresConfigurationPlaybackRate()
     {
         var configuration = CreateConfigurationWithTimeScale(1.2);
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
 
         var doubleRate = viewModel.PlaybackRates.Single(rate => Math.Abs(rate.Rate - 2.0) < 1e-6);
         doubleRate.SelectCommand.Execute(null);
@@ -240,7 +242,7 @@ public sealed class SimulationBarViewModelTests
         var configuration = CreateConfigurationWithScenario();
         var replayController = new ReplayControllerStub();
 
-        var first = new SimulationBarViewModel(configuration, replayController);
+        var first = CreateViewModel(configuration, replayController);
         var firstStatusNotifications = 0;
         first.PropertyChanged += (_, e) =>
         {
@@ -255,7 +257,7 @@ public sealed class SimulationBarViewModelTests
         first.Dispose();
         replayController.SubscriptionCount.Should().Be(0);
 
-        var second = new SimulationBarViewModel(configuration, replayController);
+        var second = CreateViewModel(configuration, replayController);
         var secondStatusNotifications = 0;
         second.PropertyChanged += (_, e) =>
         {
@@ -290,7 +292,7 @@ public sealed class SimulationBarViewModelTests
         {
             replayController.SubscriptionCount.Should().Be(0);
 
-            using (var viewModel = new SimulationBarViewModel(configuration, replayController))
+            using (var viewModel = CreateViewModel(configuration, replayController))
             {
                 replayController.SubscriptionCount.Should().Be(1);
                 viewModel.StatusText.Should().Be("Paused");
@@ -308,7 +310,7 @@ public sealed class SimulationBarViewModelTests
         var replayController = new ReplayControllerStub(
             playAsync: () => ValueTask.FromException(new InvalidOperationException("play failed")));
 
-        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+        using var viewModel = CreateViewModel(configuration, replayController, logger);
 
         viewModel.TogglePlaybackCommand.Execute(null);
 
@@ -326,7 +328,7 @@ public sealed class SimulationBarViewModelTests
         var replayController = new ReplayControllerStub(
             playAsync: () => ValueTask.FromException(new OperationCanceledException()));
 
-        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+        using var viewModel = CreateViewModel(configuration, replayController, logger);
 
         viewModel.TogglePlaybackCommand.Execute(null);
 
@@ -343,7 +345,7 @@ public sealed class SimulationBarViewModelTests
         var replayController = new ReplayControllerStub(
             seekAsync: _ => new ValueTask(Task.Run(() => throw new InvalidOperationException("seek failed"))));
 
-        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+        using var viewModel = CreateViewModel(configuration, replayController, logger);
 
         viewModel.SeekFraction = 0.5;
 
@@ -351,6 +353,43 @@ public sealed class SimulationBarViewModelTests
 
         logger.Entries.Should().Contain(
             entry => entry.Level == LogLevel.Error && entry.Message.Contains("seek to", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void ApplyScenario_FromBackgroundThread_UpdatesPlaybackRatesOnDispatcherThread()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        using var dispatcher = new RecordingDispatcher();
+        using var viewModel = CreateViewModel(configuration, dispatcher: dispatcher);
+
+        var scenario = new SimulationScenarioConfiguration(
+            "background-thread",
+            "Scenario applied from a worker thread",
+            new[]
+            {
+                new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+            },
+            new SimulationOptionsConfiguration(null, 1.5));
+
+        var backgroundThreadId = -1;
+
+        Task.Run(
+                () =>
+                {
+                    backgroundThreadId = Thread.CurrentThread.ManagedThreadId;
+                    viewModel.ApplyScenario(scenario);
+                })
+            .GetAwaiter()
+            .GetResult();
+
+        viewModel.SelectedPlaybackRate.Should().Be(1.5);
+        viewModel.PlaybackRates.Select(option => option.Rate)
+            .Should()
+            .Contain(1.5);
+
+        dispatcher.ExecutedThreadIds.Should().NotBeEmpty();
+        dispatcher.ExecutedThreadIds.Should().OnlyContain(id => id == dispatcher.DispatcherThreadId);
+        dispatcher.DispatcherThreadId.Should().NotBe(backgroundThreadId);
     }
 
     private static SimulationBarViewModel CreateViewModel()
@@ -373,7 +412,16 @@ public sealed class SimulationBarViewModelTests
 """;
 
         var configuration = SimulationConfigurationLoader.Load(json);
-        return new SimulationBarViewModel(configuration);
+        return CreateViewModel(configuration);
+    }
+
+    private static SimulationBarViewModel CreateViewModel(
+        SimulationConfiguration configuration,
+        IReplayController? replayController = null,
+        ILogger<SimulationBarViewModel>? logger = null,
+        IDispatcher? dispatcher = null)
+    {
+        return new SimulationBarViewModel(configuration, replayController, logger, dispatcher ?? new InlineDispatcher());
     }
 
     private static SimulationConfiguration CreateConfigurationWithTimeScale(double timeScale)
@@ -443,6 +491,113 @@ public sealed class SimulationBarViewModelTests
 """;
 
         return SimulationConfigurationLoader.Load(json);
+    }
+
+    private sealed class InlineDispatcher : IDispatcher
+    {
+        public bool CheckAccess() => true;
+
+        public void VerifyAccess()
+        {
+        }
+
+        public void Post(Action action, DispatcherPriority priority = default)
+        {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            action();
+        }
+    }
+
+    private sealed class RecordingDispatcher : IDispatcher, IDisposable
+    {
+        private readonly BlockingCollection<(Action action, DispatcherPriority priority)> _queue = new();
+        private readonly List<int> _executedThreadIds = new();
+        private readonly ManualResetEventSlim _started = new();
+        private readonly Thread _thread;
+        private readonly object _gate = new();
+        private bool _disposed;
+
+        public RecordingDispatcher()
+        {
+            _thread = new Thread(ProcessQueue)
+            {
+                IsBackground = true,
+                Name = "RecordingDispatcher"
+            };
+
+            _thread.Start();
+            _started.Wait();
+        }
+
+        public int DispatcherThreadId { get; private set; }
+
+        public IReadOnlyList<int> ExecutedThreadIds
+        {
+            get
+            {
+                lock (_gate)
+                {
+                    return _executedThreadIds.ToArray();
+                }
+            }
+        }
+
+        public bool CheckAccess() => Thread.CurrentThread.ManagedThreadId == DispatcherThreadId;
+
+        public void VerifyAccess()
+        {
+            if (!CheckAccess())
+            {
+                throw new InvalidOperationException("Access from non-dispatcher thread.");
+            }
+        }
+
+        public void Post(Action action, DispatcherPriority priority = default)
+        {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(RecordingDispatcher));
+            }
+
+            _queue.Add((action, priority));
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            _queue.CompleteAdding();
+            _thread.Join();
+        }
+
+        private void ProcessQueue()
+        {
+            DispatcherThreadId = Thread.CurrentThread.ManagedThreadId;
+            _started.Set();
+
+            foreach (var (action, _) in _queue.GetConsumingEnumerable())
+            {
+                action();
+
+                lock (_gate)
+                {
+                    _executedThreadIds.Add(Thread.CurrentThread.ManagedThreadId);
+                }
+            }
+        }
     }
 
     private sealed class ReplayControllerStub : IReplayController

@@ -283,6 +283,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
 - [x] NX-941 Simulation bar playback rate reset _(Done)_ — Reset configuration default when reverting routes
 - [x] NX-988 Simulation bar cancellation logging suppression _(Done)_ — Ignore replay controller cancellations in transport bar
+- [x] NX-990 Simulation bar playback dispatcher marshaling _(Done)_ — Marshal playback rate option mutations through UI dispatcher
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory

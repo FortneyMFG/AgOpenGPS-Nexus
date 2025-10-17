@@ -1,5 +1,4 @@
 using System.Buffers.Binary;
-using System.IO.Ports;
 using System.Threading.Channels;
 
 using RadioBridgeLinkMetrics = Aog.Core.Mesh.RadioBridge.RadioBridgeLinkMetrics;

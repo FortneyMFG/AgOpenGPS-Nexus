@@ -1,3 +1,4 @@
+using System.Threading.Channels;
 using Aog.Core.Jobs;
 
 namespace Aog.Plugins.JobTasks;
@@ -26,7 +27,7 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
     }
 
     /// <inheritdoc />
-    public async Task TrackJobAsync(JobMetadata job, CancellationToken cancellationToken = default)
+    public async Task TrackJobAsync(Aog.Core.Jobs.JobMetadata job, CancellationToken cancellationToken = default)
     {
         if (job is null)
         {

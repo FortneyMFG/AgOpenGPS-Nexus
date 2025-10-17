@@ -220,17 +220,32 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     /// Applies the provided scenario, updating the routed streams and descriptive metadata.
     /// </summary>
     /// <param name="scenario">Scenario definition to activate.</param>
-    public void ApplyScenario(SimulationScenarioConfiguration scenario)
-    {
-        ArgumentNullException.ThrowIfNull(scenario);
+public void ApplyScenario(SimulationScenarioConfiguration scenario)
+{
+    ArgumentNullException.ThrowIfNull(scenario);
 
-        UpdateRoutes(scenario.Routes);
-        ActiveScenarioTitle = $"Scenario: {scenario.ScenarioId}";
-        ActiveScenarioDescription = string.IsNullOrWhiteSpace(scenario.Description)
-            ? "No description provided."
-            : scenario.Description!;
-        ApplyScenarioOptions(scenario.Options);
+    UpdateRoutes(scenario.Routes);
+    ActiveScenarioTitle = $"Scenario: {scenario.ScenarioId}";
+    ActiveScenarioDescription = string.IsNullOrWhiteSpace(scenario.Description)
+        ? "No description provided."
+        : scenario.Description!;
+
+    // 1) Apply options to the runtime first (state of truth)
+    ApplyScenarioOptions(scenario.Options);
+
+    // 2) Reflect options in the UI summary
+    ActiveScenarioOptions = FormatScenarioOptions(scenario.Options);
+
+    // 3) If a valid TimeScale is provided, update playback rate
+    if (scenario.Options?.TimeScale is double timeScale &&
+        !double.IsNaN(timeScale) &&
+        !double.IsInfinity(timeScale) &&
+        timeScale > 0)
+    {
+        OnPlaybackRateSelected(timeScale);
     }
+}
+
 
     /// <summary>
     /// Applies the routes produced by the legacy guidance import wizard.

@@ -27,6 +27,20 @@ public sealed class NmeaSentenceParserTests
     }
 
     [Fact]
+    public void TryParse_GgaSentence_MalformedNumericFields_YieldsNulls()
+    {
+        const string sentence = "$GPGGA,12A519,48A7.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*44";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var gga = Assert.IsType<NmeaGgaSentence>(parsed);
+        Assert.Null(gga.FixTime);
+        Assert.Null(gga.LatitudeDegrees);
+    }
+
+    [Fact]
     public void TryParse_RmcSentence_ReturnsExpectedValues()
     {
         const string sentence = "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A";
@@ -43,6 +57,54 @@ public sealed class NmeaSentenceParserTests
         Assert.Equal(-3.1, rmc.MagneticVariationDegrees);
         Assert.NotNull(rmc.Timestamp);
         Assert.Equal(new DateTimeOffset(1994, 3, 23, 12, 35, 19, TimeSpan.Zero), rmc.Timestamp);
+    }
+
+[Fact]
+public void TryParse_RmcSentenceWithSouthLatitude_IsNegative()
+{
+    const string sentence = "$GPRMC,123520,A,3723.2475,S,12158.3416,W,000.0,000.0,230394,000.0,E*7F";
+
+    var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+    Assert.True(success);
+    Assert.Null(error);
+    var rmc = Assert.IsType<NmeaRmcSentence>(parsed);
+    Assert.True(rmc.LatitudeDegrees.HasValue);
+    Assert.True(rmc.LongitudeDegrees.HasValue);
+    Assert.Equal(-37.3875, Math.Round(rmc.LatitudeDegrees!.Value, 4));
+    Assert.Equal(-121.9724, Math.Round(rmc.LongitudeDegrees!.Value, 4));
+}
+
+[Fact]
+public void TryParse_GgaSentenceWithBlankNumericFields_AllowsNulls()
+{
+    const string sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,,,M,,M,,*5B";
+
+    var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+    Assert.True(success);
+    Assert.Null(error);
+    var gga = Assert.IsType<NmeaGgaSentence>(parsed);
+    Assert.Equal("GP", gga.TalkerId);
+    Assert.Equal(NmeaFixQuality.Gps, gga.FixQuality);
+    Assert.Equal(8, gga.SatelliteCount);
+    Assert.Null(gga.HorizontalDilution);
+    Assert.Null(gga.AltitudeMeters);
+    Assert.Null(gga.GeoidSeparationMeters);
+}
+
+
+    [Fact]
+    public void TryParse_RmcSentence_MalformedDate_YieldsNullTimestamp()
+    {
+        const string sentence = "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,23A394,003.1,W*1B";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var rmc = Assert.IsType<NmeaRmcSentence>(parsed);
+        Assert.Null(rmc.Timestamp);
     }
 
     [Fact]
@@ -76,6 +138,26 @@ public sealed class NmeaSentenceParserTests
     }
 
     [Fact]
+    public void TryParse_VtgRmcSequence_WithMissingLongitudeHemisphere_Succeeds()
+    {
+        const string vtgSentence = "$GPVTG,360.0,T,,M,000.0,N,000.0,K*65";
+        const string rmcSentence = "$GPRMC,181908,A,3723.2475,N,12158.3416,,000.0,360.0,130998,015.5,E*3A";
+
+        var vtgSuccess = _parser.TryParse(vtgSentence, out var vtgParsed, out var vtgError);
+
+        Assert.True(vtgSuccess);
+        Assert.Null(vtgError);
+        Assert.IsType<NmeaVtgSentence>(vtgParsed);
+
+        var rmcSuccess = _parser.TryParse(rmcSentence, out var rmcParsed, out var rmcError);
+
+        Assert.True(rmcSuccess);
+        Assert.Null(rmcError);
+        var rmc = Assert.IsType<NmeaRmcSentence>(rmcParsed);
+        Assert.Null(rmc.LongitudeDegrees);
+    }
+
+    [Fact]
     public void TryParse_InvalidChecksum_ReturnsFalse()
     {
         const string sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*00";
@@ -97,5 +179,18 @@ public sealed class NmeaSentenceParserTests
         Assert.False(success);
         Assert.Null(parsed);
         Assert.Null(error);
+    }
+
+    [Fact]
+    public void TryParse_GgaSentenceWithEmptyLatitudeHemisphere_TreatsAsPositive()
+    {
+        const string sentence = "$GPGGA,123519,4807.038,,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*09";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var gga = Assert.IsType<NmeaGgaSentence>(parsed);
+        Assert.Equal(48.1173, Math.Round(gga.LatitudeDegrees!.Value, 4));
     }
 }

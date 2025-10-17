@@ -436,32 +436,37 @@ public sealed class SimulationBarViewModelTests
             entry => entry.Level == LogLevel.Error && entry.Message.Contains("seek to", StringComparison.OrdinalIgnoreCase));
     }
 
-    private static SimulationPlaybackRateOptionViewModel CreatePlaybackRateOptionWithoutLabel(double rate)
-    {
-        var option = (SimulationPlaybackRateOptionViewModel)FormatterServices.GetUninitializedObject(
-            typeof(SimulationPlaybackRateOptionViewModel));
+// in your test class
 
-        SetField(option, "<Rate>k__BackingField", rate);
-        SetField(option, "<Label>k__BackingField", null);
-        SetField(option, "_onSelected", new Action<SimulationPlaybackRateOptionViewModel>(_ => { }));
-        SetField(option, "<SelectCommand>k__BackingField", new DelegateCommand(_ => { }));
+[Fact]
+public void ToggleAutoResumeCommand_WithNoSession_DoesNotChangeState()
+{
+    using var viewModel = CreateViewModel();
 
-        return option;
-    }
+    Action exec = () => viewModel.ToggleAutoResumeCommand.Execute(null);
+    exec.Should().NotThrow();
+    viewModel.IsAutoResumeEnabled.Should().BeFalse();
+}
 
-    private static void SetField(object target, string fieldName, object? value)
-    {
-        var field = typeof(SimulationPlaybackRateOptionViewModel).GetField(
-            fieldName,
-            BindingFlags.Instance | BindingFlags.NonPublic);
+private static SimulationPlaybackRateOptionViewModel CreatePlaybackRateOptionWithoutLabel(double rate)
+{
+    var option = (SimulationPlaybackRateOptionViewModel)FormatterServices.GetUninitializedObject(
+        typeof(SimulationPlaybackRateOptionViewModel));
 
-        if (field is null)
-        {
-            throw new InvalidOperationException(FormattableString.Invariant($"Field '{fieldName}' not found."));
-        }
+    SetField(option, "<Rate>k__BackingField", rate);
+    SetField(option, "<Label>k__BackingField", null);
+    SetField(option, "_onSelected", new Action<SimulationPlaybackRateOptionViewModel>(_ => { }));
+    SetField(option, "<SelectCommand>k__BackingField", new DelegateCommand(_ => { }));
 
-        field.SetValue(target, value);
-    }
+    return option;
+}
+
+private static void SetField(object target, string fieldName, object? value)
+{
+    var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)
+               ?? throw new InvalidOperationException($"Field '{fieldName}' not found.");
+    field.SetValue(target, value);
+}
 
     private static SimulationBarViewModel CreateViewModel()
     {

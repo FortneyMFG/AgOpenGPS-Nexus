@@ -44,6 +44,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private string _activeScenarioOptions = DescribeOptions(null);
     private IReadOnlyList<SimulationStreamRouteViewModel> _routes =
         new ReadOnlyCollection<SimulationStreamRouteViewModel>(Array.Empty<SimulationStreamRouteViewModel>());
+    private SimulationBarState _state = SimulationBarState.CreateDefault();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SimulationBarViewModel"/> class.
@@ -61,6 +62,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         _logger = logger;
 
         TogglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
+        ToggleAutoResumeCommand = new DelegateCommand(_ => ToggleAutoResume());
 
         InitializePlaybackRates(configuration?.Options?.TimeScale ?? 1.0);
         Routes = SimulationRouteViewModelBuilder.BuildRoutes(
@@ -78,6 +80,9 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
     /// <summary>Raised when the playback command should toggle between play/pause.</summary>
     public ICommand TogglePlaybackCommand { get; }
+
+    /// <summary>Raised when the auto-resume command should toggle its enabled state.</summary>
+    public ICommand ToggleAutoResumeCommand { get; }
 
     /// <summary>Gets the status text describing the current playback state.</summary>
     public string StatusText
@@ -194,6 +199,16 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         private set => SetProperty(ref _routes, value);
     }
 
+    /// <summary>Gets a value indicating whether auto resume is enabled for the active session.</summary>
+    public bool IsAutoResumeEnabled => _state.ReplaySession?.AutoResumeEnabled ?? false;
+
+    /// <summary>Updates the replay session tracked by the simulation bar.</summary>
+    /// <param name="session">Session snapshot published by the replay service.</param>
+    public void UpdateReplaySession(ReplaySessionState? session)
+    {
+        UpdateState(_state with { ReplaySession = session });
+    }
+
     /// <summary>
     /// PUBLIC API (added): safely set the selected playback rate from the outside.
     /// Validates input and updates controller + UI.
@@ -301,6 +316,41 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         else
         {
             FireAndForget(() => _replayController.PlayAsync(), "Failed to start playback.");
+        }
+    }
+
+    private void ToggleAutoResume()
+    {
+        if (_disposed || _state.ReplaySession is null)
+        {
+            return;
+        }
+
+        var current = _state.ReplaySession.Value;
+        var updated = current with { AutoResumeEnabled = !current.AutoResumeEnabled };
+        UpdateState(_state with { ReplaySession = updated });
+    }
+
+    private void UpdateState(SimulationBarState newState)
+    {
+        if (_state.Equals(newState))
+        {
+            return;
+        }
+
+        var previousSession = _state.ReplaySession;
+        var previousAutoResumeEnabled = previousSession?.AutoResumeEnabled ?? false;
+        var previousHasSession = previousSession.HasValue;
+
+        _state = newState;
+
+        var currentSession = _state.ReplaySession;
+        var currentAutoResumeEnabled = currentSession?.AutoResumeEnabled ?? false;
+        var currentHasSession = currentSession.HasValue;
+
+        if (previousHasSession != currentHasSession || previousAutoResumeEnabled != currentAutoResumeEnabled)
+        {
+            OnPropertyChanged(nameof(IsAutoResumeEnabled));
         }
     }
 
@@ -512,4 +562,15 @@ SelectedPlaybackRateLabel = option?.Label ?? string.Empty;
             ? "Options: (none)"
             : "Options: " + string.Join(", ", parts);
     }
+
+    /// <summary>Snapshot of simulation bar state tracked for replay-aware interactions.</summary>
+    /// <param name="ReplaySession">Replay session currently surfaced in the UI.</param>
+    private readonly record struct SimulationBarState(ReplaySessionState? ReplaySession)
+    {
+        public static SimulationBarState CreateDefault() => new(null);
+    }
+
+    /// <summary>Represents replay session state surfaced by the simulation bar.</summary>
+    /// <param name="AutoResumeEnabled">Indicates whether auto resume is currently enabled.</param>
+    public readonly record struct ReplaySessionState(bool AutoResumeEnabled);
 }

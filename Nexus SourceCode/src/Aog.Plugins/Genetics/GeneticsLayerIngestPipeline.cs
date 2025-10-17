@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using PlanarPoint = Aog.Core.Paths.PlanarPoint;
@@ -289,7 +290,7 @@ public sealed class GeneticsLayerIngestPipeline
     /// <summary>
     /// Attempts to retrieve a plan feature by zone identifier.
     /// </summary>
-    public bool TryGetPlan(string zoneId, out GeneticsPlanFeature feature)
+    public bool TryGetPlan(string zoneId, [NotNullWhen(true)] out GeneticsPlanFeature? feature)
     {
         var zoneKey = CreateStableKey(NormalizeRequired(zoneId, nameof(zoneId)));
         lock (_sync)
@@ -301,14 +302,14 @@ public sealed class GeneticsLayerIngestPipeline
             }
         }
 
-        feature = null!;
+        feature = null;
         return false;
     }
 
     /// <summary>
     /// Attempts to retrieve an as-applied feature by zone and session identifier.
     /// </summary>
-    public bool TryGetVariety(string zoneId, string sessionId, out GeneticsVarietyFeature feature)
+    public bool TryGetVariety(string zoneId, string sessionId, [NotNullWhen(true)] out GeneticsVarietyFeature? feature)
     {
         var zoneKey = CreateStableKey(NormalizeRequired(zoneId, nameof(zoneId)));
         var sessionKey = CreateStableKey(NormalizeRequired(sessionId, nameof(sessionId)));
@@ -321,7 +322,7 @@ public sealed class GeneticsLayerIngestPipeline
             }
         }
 
-        feature = null!;
+        feature = null;
         return false;
     }
 

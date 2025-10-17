@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Aog.Core.Legacy;
+using Aog.Core.Paths;
+using Aog.Core.Simulation.Configuration;
 using Aog.Core.V1;
 using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Settings;
@@ -255,6 +259,33 @@ public sealed class MainWindowViewModelTests
             .Should().Contain("GPS");
     }
 
+    [Fact]
+    public void LegacyImportScenario_UpdatesScenarioCollection()
+    {
+        var viewModel = CreateViewModel();
+
+        var baselineCount = viewModel.CreateScenarioEditorViewModel().Scenarios.Count;
+        var importResult = CreateSampleLegacyImportResult();
+        var wizard = viewModel.CreateLegacyImportWizardViewModel();
+
+        SetImportResult(wizard, importResult);
+
+        wizard.TryApplyRoutes().Should().BeTrue();
+
+        var updatedEditor = viewModel.CreateScenarioEditorViewModel();
+        updatedEditor.Scenarios.Select(scenario => scenario.ScenarioId)
+            .Should().Contain(importResult.Scenario.ScenarioId);
+        updatedEditor.Scenarios.Should().HaveCount(baselineCount + 1);
+
+        SetImportResult(wizard, importResult);
+        wizard.TryApplyRoutes().Should().BeTrue();
+
+        var dedupedEditor = viewModel.CreateScenarioEditorViewModel();
+        dedupedEditor.Scenarios.Select(scenario => scenario.ScenarioId)
+            .Count(id => id == importResult.Scenario.ScenarioId)
+            .Should().Be(1);
+    }
+
     private static MainWindowViewModel CreateViewModel() => CreateViewModel(out _);
 
     private static MainWindowViewModel CreateViewModel(out RecordingShellCommandDispatcher dispatcher)
@@ -281,6 +312,53 @@ public sealed class MainWindowViewModelTests
         {
             _settings = settings.Clone();
         }
+    }
+
+    private static void SetImportResult(LegacyImportWizardViewModel wizard, LegacyGuidanceImportResult result)
+    {
+        var field = typeof(LegacyImportWizardViewModel).GetField("_result", BindingFlags.Instance | BindingFlags.NonPublic);
+        if (field is null)
+        {
+            throw new InvalidOperationException("LegacyImportWizardViewModel._result field not found.");
+        }
+
+        field.SetValue(wizard, result);
+    }
+
+    private static LegacyGuidanceImportResult CreateSampleLegacyImportResult()
+    {
+        var abLines = new[]
+        {
+            new LegacyAbLinePlanar(
+                "Alpha",
+                new GeographicCoordinate(51.0, -114.0),
+                new GeographicCoordinate(51.001, -114.0),
+                new PlanarPoint(0, 0),
+                new PlanarPoint(10, 0),
+                0,
+                10),
+        };
+
+        var boundary = new[]
+        {
+            new PlanarPoint(0, 0),
+            new PlanarPoint(10, 0),
+            new PlanarPoint(10, 5),
+            new PlanarPoint(0, 5),
+        };
+
+        var scenario = new SimulationScenarioConfiguration(
+            "legacy:sample",
+            "Imported guidance",
+            new[] { new SimulationRouteConfiguration("pose", "legacy/udp/main_gps", "hardware") },
+            options: null);
+
+        return new LegacyGuidanceImportResult(
+            "SampleField",
+            new GeographicCoordinate(51.0, -114.0),
+            abLines,
+            boundary,
+            scenario);
     }
 
     private sealed class InMemoryUiPreferencesStore : IUiPreferencesStore

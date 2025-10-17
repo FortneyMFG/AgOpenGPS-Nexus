@@ -162,7 +162,7 @@ public sealed class JobEnvelopeAggregator
             .Select(ring => factory.CreateLinearRing(ToCoordinateArray(ring)))
             .ToArray();
 
-        var geometry = factory.CreatePolygon(shell, holes);
+        Geometry geometry = factory.CreatePolygon(shell, holes);
         if (!geometry.IsValid)
         {
             geometry = geometry.Buffer(0);
@@ -266,4 +266,3 @@ public sealed class JobEnvelopeAggregator
         return new ReadOnlyCollection<JobEnvelopeCoordinate>(coordinates);
     }
 }
-

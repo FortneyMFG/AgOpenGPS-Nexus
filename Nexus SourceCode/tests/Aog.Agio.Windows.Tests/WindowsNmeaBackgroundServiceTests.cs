@@ -9,6 +9,7 @@ using Aog.Agio.Nmea;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace Aog.Agio.Windows.Tests;
@@ -18,7 +19,7 @@ public sealed class WindowsNmeaBackgroundServiceTests
     [Fact]
     public async Task BackgroundService_RescansWhenStreamGoesSilent()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 1, 4, 0, 0, 0, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 1, 4, 0, 0, 0, TimeSpan.Zero));
         var enumerator = new FakeSerialPortEnumerator("COM7");
         var parser = new NmeaSentenceParser();
 
@@ -88,7 +89,7 @@ public sealed class WindowsNmeaBackgroundServiceTests
     [Fact]
     public async Task BackgroundService_LogsMissingVtgValuesAsNotAvailable()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero));
         var enumerator = new FakeSerialPortEnumerator("COM7");
         var parser = new NmeaSentenceParser();
 
@@ -265,14 +266,4 @@ public sealed class WindowsNmeaBackgroundServiceTests
         }
     }
 
-    private sealed class ManualTimeProvider : TimeProvider
-    {
-        private DateTimeOffset _current;
-
-        public ManualTimeProvider(DateTimeOffset start) => _current = start;
-
-        public override DateTimeOffset GetUtcNow() => _current;
-
-        public void Advance(TimeSpan delta) => _current += delta;
-    }
 }

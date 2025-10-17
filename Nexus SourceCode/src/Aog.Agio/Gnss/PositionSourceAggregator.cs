@@ -171,7 +171,7 @@ public sealed class PositionSourceAggregator : IPositionSource
             return;
         }
 
-        await _timeProvider.Delay(delay, cancellationToken).ConfigureAwait(false);
+        await Task.Delay(delay, _timeProvider, cancellationToken).ConfigureAwait(false);
     }
 
     private static IReadOnlyList<IPositionSourceFactory> BuildFactoryOrder(

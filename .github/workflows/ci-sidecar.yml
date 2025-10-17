@@ -1,0 +1,32 @@
+name: CI - Planner Sidecar
+
+on:
+  pull_request:
+    paths:
+      - 'planner/**'
+      - '.github/workflows/ci-sidecar.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'planner/**'
+      - '.github/workflows/ci-sidecar.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler-grpc libgrpc++-dev libprotobuf-dev cmake ninja-build
+      - name: Configure
+        run: |
+          cmake -S planner/sidecar -B build/sidecar -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build/sidecar --target f2c-sidecar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: f2c-sidecar
+          path: build/sidecar/f2c-sidecar

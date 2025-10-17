@@ -6,11 +6,6 @@ namespace Aog.Agio.Legacy;
 public sealed class LegacySteerCommandMetadata : LegacySteerMetadata
 {
     /// <summary>
-    /// Gets or sets the guidance controller status byte emitted by legacy clients.
-    /// </summary>
-    public byte GuidanceStatus { get; init; }
-
-    /// <summary>
     /// Gets or sets the forward speed in kilometres per hour carried by the PGN.
     /// </summary>
     public double SpeedKph { get; init; }
@@ -34,6 +29,7 @@ public sealed class LegacySteerCommandMetadata : LegacySteerMetadata
         SourceAddress = SourceAddress,
         GuidanceStatus = GuidanceStatus,
         SpeedKph = SpeedKph,
+        CurrentSpeedMps = CurrentSpeedMps,
         TramControl = TramControl,
     };
 }

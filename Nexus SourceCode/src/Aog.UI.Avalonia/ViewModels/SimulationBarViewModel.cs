@@ -494,9 +494,9 @@ private void SortPlaybackRates()
 
     private void NotifyPlaybackRateProperties()
     {
-        RaisePropertyChanged(nameof(SelectedPlaybackRate));
-        RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
-        RaisePropertyChanged(nameof(SelectedPlaybackRateOption));
+        OnPropertyChanged(nameof(SelectedPlaybackRate));
+        OnPropertyChanged(nameof(SelectedPlaybackRateLabel));
+        OnPropertyChanged(nameof(SelectedPlaybackRateOption));
     }
 
 
@@ -653,10 +653,7 @@ private void SortPlaybackRates()
 
     private void ExecuteOnDispatcher(Action action)
     {
-        if (action is null)
-        {
-            return;
-        }
+        ArgumentNullException.ThrowIfNull(action);
 
         if (_dispatcher.CheckAccess())
         {

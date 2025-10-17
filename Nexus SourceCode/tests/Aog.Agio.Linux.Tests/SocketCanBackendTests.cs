@@ -75,6 +75,42 @@ public sealed class SocketCanBackendTests
     }
 
     [Fact]
+    public async Task BackgroundService_RetriesWhenInterfaceMissing()
+    {
+        var factory = new MissingInterfaceSocketCanClientFactory();
+        var channel = new SocketCanFrameChannel();
+        var options = new SocketCanOptions
+        {
+            InterfaceName = "vcan-missing",
+            ReconnectDelay = TimeSpan.FromMilliseconds(10),
+        };
+        var monitor = new TestOptionsMonitor(options);
+
+        var service = new SocketCanBackgroundService(
+            factory,
+            channel,
+            monitor,
+            TimeProvider.System,
+            NullLogger<SocketCanBackgroundService>.Instance);
+
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        try
+        {
+            await WaitForAsync(() => factory.AttemptCount >= 2, TimeSpan.FromSeconds(1));
+            var attemptsBefore = factory.AttemptCount;
+
+            await Task.Delay(TimeSpan.FromMilliseconds(200)).ConfigureAwait(false);
+
+            Assert.True(factory.AttemptCount > attemptsBefore, "SocketCAN listener stopped retrying unexpectedly.");
+        }
+        finally
+        {
+            await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+        }
+    }
+
+    [Fact]
 [Fact]
 public async Task BackgroundService_PublishesFrameImmediatelyAfterTimeout()
 {
@@ -343,6 +379,25 @@ public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
         public ValueTask<ISocketCanClient> CreateAsync(SocketCanOptions options, CancellationToken cancellationToken)
         {
             return new ValueTask<ISocketCanClient>(_client);
+        }
+    }
+
+    private sealed class MissingInterfaceSocketCanClientFactory : ISocketCanClientFactory
+    {
+        private int _attemptCount;
+
+        public int AttemptCount => Volatile.Read(ref _attemptCount);
+
+        public ValueTask<ISocketCanClient> CreateAsync(SocketCanOptions options, CancellationToken cancellationToken)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            Interlocked.Increment(ref _attemptCount);
+            return ValueTask.FromException<ISocketCanClient>(new SocketCanInterfaceNotFoundException(options.InterfaceName));
         }
     }
 

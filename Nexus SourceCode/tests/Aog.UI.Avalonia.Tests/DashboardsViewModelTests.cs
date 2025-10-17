@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
@@ -54,6 +55,30 @@ public sealed class DashboardsViewModelTests
         viewModel.Bookmarks.Should().HaveCount(1);
         viewModel.ExportStatus.Should().Be("Export queued: CSV snapshot at 12:34:56");
         viewModel.SpeedSamples.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void ReplayTimelineBookmarks_DisplayInvariantTimestamps()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        var originalUiCulture = CultureInfo.CurrentUICulture;
+        try
+        {
+            var bookmark = new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(65), "Label", "Notes");
+
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ar-EG");
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ar-EG");
+
+            bookmark.TimestampDisplay.Should().Be("01:05");
+
+            var longBookmark = new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(3723), "Long", "Notes");
+            longBookmark.TimestampDisplay.Should().Be("01:02:03");
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+            CultureInfo.CurrentUICulture = originalUiCulture;
+        }
     }
 
     private sealed class FixedTimeProvider : TimeProvider

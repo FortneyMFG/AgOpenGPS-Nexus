@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Aog.UI.Avalonia.Models;
@@ -6,8 +6,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Skia;
 using SkiaSharp;
+using SkiaSharp.Views.Avalonia;
 
 namespace Aog.UI.Avalonia.Controls;
 
@@ -15,7 +15,7 @@ namespace Aog.UI.Avalonia.Controls;
 /// Interactive map surface rendered with Skia. Supports mouse pan/zoom and renders
 /// the current vehicle pose.
 /// </summary>
-public sealed class MapView : Control
+public sealed class MapView : SKElement
 {
     private readonly Rendering.MapViewport _viewport = new();
     private bool _isPanning;
@@ -105,16 +105,11 @@ public sealed class MapView : Control
     }
 
     /// <inheritdoc />
-    public override void Render(DrawingContext context)
+    protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
     {
-        base.Render(context);
+        base.OnPaintSurface(e);
 
-        if (context.PlatformImpl is not ISkiaDrawingContextImpl skiaContext)
-        {
-            return;
-        }
-
-        var canvas = skiaContext.SkSurface.Canvas;
+        var canvas = e.Surface.Canvas;
         canvas.Clear(new SKColor(24, 31, 36));
 
         canvas.Save();

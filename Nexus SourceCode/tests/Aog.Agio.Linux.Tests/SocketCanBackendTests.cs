@@ -357,6 +357,66 @@ public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
     await Task.WhenAll(fastTask, slowTask);
 }
 
+    [Fact]
+    public async Task FrameChannel_AllowsResubscriptionAfterEviction()
+    {
+        var channel = new SocketCanFrameChannel(subscriberCapacity: 2, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
+        using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+        var slowCompletion = new TaskCompletionSource<Exception?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var slowTask = Task.Run(async () =>
+        {
+            await using var enumerator = channel.ReadAllAsync(slowCts.Token).GetAsyncEnumerator();
+            try
+            {
+                while (await enumerator.MoveNextAsync())
+                {
+                    // Introduce slowness so this subscriber is evicted for backpressure.
+                    await Task.Delay(200, slowCts.Token);
+                }
+
+                slowCompletion.TrySetResult(null);
+            }
+            catch (Exception ex)
+            {
+                slowCompletion.TrySetResult(ex);
+            }
+        });
+
+        for (var i = 0; i < 32; i++)
+        {
+            await channel.PublishAsync(new CanFrame
+            {
+                Header = new Header(),
+                ArbitrationId = (uint)i,
+            }, CancellationToken.None);
+        }
+
+        await WaitForAsync(() => slowCompletion.Task.IsCompleted, TimeSpan.FromSeconds(2));
+
+        var slowResult = await slowCompletion.Task.ConfigureAwait(false);
+        Assert.IsType<OperationCanceledException>(slowResult);
+
+        using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        await using var fastEnumerator = channel.ReadAllAsync(fastCts.Token).GetAsyncEnumerator();
+
+        var firstFrame = new CanFrame { Header = new Header(), ArbitrationId = 0xA1u };
+        await channel.PublishAsync(firstFrame, CancellationToken.None);
+        Assert.True(await fastEnumerator.MoveNextAsync().ConfigureAwait(false));
+        Assert.Equal(firstFrame.ArbitrationId, fastEnumerator.Current.ArbitrationId);
+
+        var secondFrame = new CanFrame { Header = new Header(), ArbitrationId = 0xA2u };
+        await channel.PublishAsync(secondFrame, CancellationToken.None);
+        Assert.True(await fastEnumerator.MoveNextAsync().ConfigureAwait(false));
+        Assert.Equal(secondFrame.ArbitrationId, fastEnumerator.Current.ArbitrationId);
+
+        fastCts.Cancel();
+
+        slowCts.Cancel();
+        await slowTask.ConfigureAwait(false);
+    }
+
     }
 
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)

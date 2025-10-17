@@ -70,6 +70,7 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
 
             if (_subscribers.TryRemove(subscriptionId, out var removed))
             {
+                removed.ClearBackpressure();
                 removed.Channel.Writer.TryComplete(new OperationCanceledException("SocketCAN subscriber removed due to sustained backpressure."));
                 _logger.LogWarning(
                     "SocketCAN subscriber {SubscriptionId} evicted after {BackpressureDuration} of backpressure while publishing CAN frame {ArbitrationId}.",

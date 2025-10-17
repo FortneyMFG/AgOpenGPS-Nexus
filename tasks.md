@@ -522,6 +522,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-246 | GNSS correction services bootstrap | Done |  | — | [ADR-066](docs/ADR/ADR-roadmap.md) | ADR-066 GNSS correction services |
 | NX-742 | SocketCAN channel backpressure guardrails | Done | AI | — | — | Drop stalled subscribers and stress fast consumers |
 | NX-931 | Linux serial scan configuration binding | Done | AI | — | — | Bind `AgioHost:Linux:Serial:Scan` options, document overrides, add tests |
+| NX-952 | SocketCAN subscriber eviction reset | In Progress | AI | — | — | Ensure eviction clears backpressure and re-subscription regression test |
 
 ### Section D — Plugins (Logic + Sim Providers)
 

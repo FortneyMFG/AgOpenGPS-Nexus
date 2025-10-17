@@ -217,6 +217,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-290 Job Tasks plugin regression fixtures _(Done)_ — ADR-032 orchestration QA
 
 ### Section E — UI (Avalonia) + Sim Bar
+- [ ] NX-942 Planter panel stale row cleanup regression
 - [x] NX-040 Avalonia app bootstrap
 - [x] NX-041 Connection/settings panel
 - [x] NX-042 Map view

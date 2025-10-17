@@ -21,6 +21,8 @@ namespace Aog.UI.Avalonia.Tests;
 
 public sealed class MainWindowViewModelTests
 {
+    private static readonly DateTimeOffset SeedTimestamp = new(2024, 04, 01, 12, 00, 00, TimeSpan.Zero);
+
     [Fact]
     public void SimulationGraphSummary_ExposesEmbeddedGraph()
     {
@@ -90,6 +92,21 @@ public sealed class MainWindowViewModelTests
         viewModel.SteerDashboard.Series.Should().NotBeEmpty();
         viewModel.SteerDashboard.Series.SelectMany(series => series.Values).Should().NotBeEmpty();
         viewModel.SteerDashboard.TuningParameters.Should().NotBeEmpty();
+        viewModel.SteerDashboard.TuningEvents.Should().HaveCount(3);
+        viewModel.SteerDashboard.TuningEvents.Select(evt => evt.Timestamp)
+            .Should()
+            .Equal(
+                SeedTimestamp.AddMinutes(-1),
+                SeedTimestamp.AddMinutes(-2),
+                SeedTimestamp.AddMinutes(-5));
+        viewModel.SteerDashboard.TuningEvents.Select(evt => evt.Description)
+            .Should()
+            .Contain(new[]
+            {
+                "Adjusted P gain to 0.30 based on headland drift",
+                "Applied adaptive integral clamp after curve pass",
+                "Saved preset 'Spring Wheat 2024'",
+            });
         viewModel.ReplayTimeline.Bookmarks.Should().NotBeEmpty();
         viewModel.ReplayTimeline.SpeedSamples.Should().HaveCountGreaterThan(10);
     }
@@ -148,9 +165,10 @@ public sealed class MainWindowViewModelTests
 
         snapshot.Dashboard.Series.Should().HaveCount(viewModel.SteerDashboard.Series.Count);
         var sourceSeries = viewModel.SteerDashboard.Series.Single(series => series.Id == "autosteer.crossTrack");
-        var snapshotSeries = snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack");
-        snapshotSeries.Values.Should().Equal(sourceSeries.Values);
-        snapshotSeries.StrokeColor.Should().Be(((ISolidColorBrush)sourceSeries.Stroke).Color.ToString());
+        snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack")
+            .Values.Should().Equal(sourceSeries.Values);
+        snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack")
+            .StrokeColor.Should().Be(((ISolidColorBrush)sourceSeries.Stroke).Color.ToString());
 
         snapshot.Dashboard.TuningParameters.Select(parameter => parameter.Id)
             .Should().BeEquivalentTo(viewModel.SteerDashboard.TuningParameters.Select(parameter => parameter.Id));
@@ -299,7 +317,28 @@ public sealed class MainWindowViewModelTests
         var telemetryService = new TestCrashTelemetryService();
         var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
         dispatcher = new RecordingShellCommandDispatcher();
-        return new MainWindowViewModel(connection, null, preferencesService, themeManager, dispatcher, telemetryViewModel);
+
+        // Deterministic time for tests that assert relative timestamps.
+        var timeProvider = new FixedTimeProvider(SeedTimestamp);
+
+        return new MainWindowViewModel(
+            connection,
+            null,
+            preferencesService,
+            themeManager,
+            dispatcher,
+            telemetryViewModel,
+            timeProvider);
+    }
+
+    // Deterministic TimeProvider for stable tests.
+    private sealed class FixedTimeProvider : TimeProvider
+    {
+        private readonly DateTimeOffset _utcNow;
+
+        public FixedTimeProvider(DateTimeOffset utcNow) => _utcNow = utcNow;
+
+        public override DateTimeOffset GetUtcNow() => _utcNow;
     }
 
     private sealed class InMemoryConnectionSettingsStore : IConnectionSettingsStore
@@ -403,6 +442,7 @@ public sealed class MainWindowViewModelTests
             {
                 CurrentTheme = theme;
                 ThemeChanged?.Invoke(this, theme);
+            }
         }
     }
 
@@ -416,7 +456,6 @@ public sealed class MainWindowViewModelTests
             return ValueTask.FromResult(true);
         }
     }
-}
 
     private sealed class TestCrashTelemetryService : ICrashTelemetryService
     {

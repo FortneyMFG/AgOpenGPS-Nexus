@@ -244,6 +244,8 @@ public sealed class LegacyGuidanceImportService : ILegacyGuidanceImportService
             {
                 combinedBoundary.AddRange(exterior);
             }
+
+            stream.Seek(recordStart + contentBytes, SeekOrigin.Begin);
         }
 
         if (combinedBoundary.Count > 0)

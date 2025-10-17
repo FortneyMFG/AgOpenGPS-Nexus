@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Aog.Core.V1;
 using Aog.UI.Avalonia.ViewModels;
@@ -79,7 +80,7 @@ public sealed class PluginPanelsViewModelTests
         var statuses = new List<PlanterRowStatus>
         {
             new() { RowIndex = uint.MaxValue, TargetPopulationPerMeter = 12, ActualPopulationPerMeter = 12, Quality = PlanterRowQuality.Ok },
-            new() { RowIndex = 0, TargetPopulationPerMeter = 10, ActualPopulationPerMeter = 10, Quality = PlanterRowQuality.Ok },
+            new() { RowIndex = 0,           TargetPopulationPerMeter = 10, ActualPopulationPerMeter = 10, Quality = PlanterRowQuality.Ok },
         };
 
         viewModel.ApplyRowStatuses(statuses);
@@ -88,5 +89,42 @@ public sealed class PluginPanelsViewModelTests
         viewModel.Rows[0].RowIndex.Should().Be(0);
         viewModel.Summary.Should().Contain("Rows: 1");
         viewModel.Summary.Should().Contain("Ignored 1 invalid update");
+    }
+
+    [Fact]
+    public void PlanterPanel_SkipsNullStatuses()
+    {
+        var viewModel = new PlanterPanelViewModel();
+        var initialStatus = new PlanterRowStatus
+        {
+            RowIndex = 0,
+            TargetPopulationPerMeter = 12,
+            ActualPopulationPerMeter = 12,
+            Quality = PlanterRowQuality.Ok,
+        };
+
+        viewModel.ApplyRowStatuses(new[] { initialStatus });
+
+        var existingRow = viewModel.Rows[0];
+        var updateBatch = new List<PlanterRowStatus>
+        {
+            null!,
+            new()
+            {
+                RowIndex = 0,
+                TargetPopulationPerMeter = 12,
+                ActualPopulationPerMeter = 11,
+                SkipRate = 0.1,
+                Quality = PlanterRowQuality.Skip,
+            },
+        };
+
+        Action apply = () => viewModel.ApplyRowStatuses(updateBatch);
+
+        apply.Should().NotThrow();
+        viewModel.Rows.Should().ContainSingle();
+        viewModel.Rows[0].Should().BeSameAs(existingRow);
+        viewModel.Rows[0].Quality.Should().Be(PlanterRowQuality.Skip);
+        viewModel.Rows[0].SkipRate.Should().BeApproximately(0.1, 1e-6);
     }
 }

@@ -35,6 +35,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private readonly IUiPreferencesService _preferencesService;
     private readonly IThemeManager _themeManager;
     private readonly ShellLayoutPreferences _shellLayout;
+    private readonly TimeProvider _timeProvider;
     private bool _disposed;
 
     private UiTheme _selectedTheme;
@@ -52,23 +53,27 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     /// <param name="preferencesService">Service for persisting UI preferences.</param>
     /// <param name="themeManager">The theme manager used to apply theme changes.</param>
     /// <param name="telemetryPrivacy">Telemetry opt-in view-model.</param>
+    /// <param name="timeProvider">Provider used to generate deterministic timestamps.</param>
     public MainWindowViewModel(
         ConnectionSettingsViewModel connectionSettings,
         IReplayController? replayController,
         IUiPreferencesService preferencesService,
         IThemeManager themeManager,
         IShellCommandDispatcher commandDispatcher,
-        TelemetryPrivacyViewModel telemetryPrivacy)
+        TelemetryPrivacyViewModel telemetryPrivacy,
+        TimeProvider timeProvider)
     {
         ArgumentNullException.ThrowIfNull(connectionSettings);
         ArgumentNullException.ThrowIfNull(preferencesService);
         ArgumentNullException.ThrowIfNull(themeManager);
         ArgumentNullException.ThrowIfNull(commandDispatcher);
         ArgumentNullException.ThrowIfNull(telemetryPrivacy);
+        ArgumentNullException.ThrowIfNull(timeProvider);
 
         _connectionSettings = connectionSettings;
         _preferencesService = preferencesService;
         _themeManager = themeManager;
+        _timeProvider = timeProvider;
 
         TelemetryPrivacy = telemetryPrivacy;
 
@@ -91,9 +96,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         SteerDashboard = new SteerDashboardViewModel();
         SectionsPanel = new SectionsPanelViewModel();
         PlanterPanel = new PlanterPanelViewModel();
-        ReplayTimeline = new ReplayTimelineViewModel();
+        ReplayTimeline = new ReplayTimelineViewModel(timeProvider);
 
-        var layerEditJournal = new LayerEditEventJournalService(TimeProvider.System);
+        var layerEditJournal = new LayerEditEventJournalService(_timeProvider);
         ZoneEditorToolbar = new ZoneEditorToolbarViewModel(layerEditJournal);
         ZonePolicyPanel = new ZoneConstraintPolicyViewModel();
         ZoneImportExportPanel = new ZoneImportExportPanelViewModel();
@@ -520,9 +525,10 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
             .ToArray();
 
         SteerDashboard.ApplyHistoricalSamples(crossTrack, wheelAngles, controllerOutputs);
-        SteerDashboard.RecordTuningEvent(DateTimeOffset.Now.AddMinutes(-5), "Adjusted P gain to 0.30 based on headland drift");
-        SteerDashboard.RecordTuningEvent(DateTimeOffset.Now.AddMinutes(-2), "Applied adaptive integral clamp after curve pass");
-        SteerDashboard.RecordTuningEvent(DateTimeOffset.Now.AddMinutes(-1), "Saved preset 'Spring Wheat 2024'");
+        var seedTimestamp = _timeProvider.GetUtcNow();
+        SteerDashboard.RecordTuningEvent(seedTimestamp.AddMinutes(-5), "Adjusted P gain to 0.30 based on headland drift");
+        SteerDashboard.RecordTuningEvent(seedTimestamp.AddMinutes(-2), "Applied adaptive integral clamp after curve pass");
+        SteerDashboard.RecordTuningEvent(seedTimestamp.AddMinutes(-1), "Saved preset 'Spring Wheat 2024'");
 
         var bookmarks = new[]
         {

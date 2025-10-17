@@ -217,6 +217,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-290 Job Tasks plugin regression fixtures _(Done)_ — ADR-032 orchestration QA
 
 ### Section E — UI (Avalonia) + Sim Bar
+- [ ] NX-942 Planter panel stale row cleanup regression
 - [x] NX-040 Avalonia app bootstrap
 - [x] NX-041 Connection/settings panel
 - [x] NX-042 Map view
@@ -230,6 +231,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-065 UI theming + layout persistence
 - [x] NX-112 Layer-aware section map visualization _(Done)_
 - [x] NX-130 Presets & layout linking ADR _(Done)_
+- [ ] NX-948 MainWindow deterministic dashboard seeding
 
 - [x] NX-291 Zone editor toolbar integration _(Done)_ — ADR-044 zone drawing framework
 - [x] NX-292 Zone override toggles & policy UX _(Done)_ — ADR-027 constraint UX
@@ -264,6 +266,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-417 Simulation shell + companion parity automation _(Done)_ — Aligns with docs/reference/metadata-driven-ui-style-guide.md
 - [x] NX-418 Documentation, QA, and release readiness _(Done)_ — Aligns with artifacts/ui-screenshots/README.md
 - [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
+- [x] NX-941 Simulation bar playback rate reset _(Done)_ — Reset configuration default when reverting routes
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory
@@ -706,6 +709,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-341 | GitHub Actions release packaging (Win/Linux zips) | Done | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
 | NX-342 | Developer setup quick start doc | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/howto/developer-setup.md |
 | NX-343 | UI modernization AI prompt bundle | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/templates/ui-modernization-ai-prompts.md |
+| NX-947 | NuGet dependency alignment for .NET restore | In Progress | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Update pinned versions to published packages |
 
 ### Section H — Safety & QA
 

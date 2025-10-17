@@ -1,3 +1,4 @@
+using System;
 using Aog.Core.Replay;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Telemetry;
@@ -29,8 +30,10 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IThemeManager, ThemeManager>();
         services.TryAddSingleton<ICrashTelemetryService, CrashTelemetryService>();
         services.TryAddSingleton<IShellCommandDispatcher, ShellCommandDispatcher>();
+        services.TryAddSingleton(TimeProvider.System);
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, FieldOperationsDialogHandler>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, LoggingShellCommandHandler>());
+        services.TryAddSingleton(TimeProvider.System);
         services.TryAddSingleton<ConnectionSettingsViewModel>();
         services.TryAddSingleton<TelemetryPrivacyViewModel>();
         services.TryAddSingleton<IReplayController, NullReplayController>();

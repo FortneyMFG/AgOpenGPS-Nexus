@@ -38,16 +38,30 @@ public sealed class PlanterPanelViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(statuses);
 
         var ignored = 0;
+        var seenIndices = new HashSet<int>();
 
         foreach (var status in statuses)
         {
-            if (status.RowIndex > int.MaxValue)
+            if (status is null)
             {
                 ignored++;
                 continue;
             }
 
-            var index = (int)status.RowIndex;
+            int index;
+            try
+            {
+                // Covered for RowIndex wider than int (e.g., long/uint/ulong)
+                index = checked((int)status.RowIndex);
+            }
+            catch (OverflowException)
+            {
+                ignored++;
+                continue;
+            }
+
+            seenIndices.Add(index);
+
             if (!_rowsByIndex.TryGetValue(index, out var row))
             {
                 row = new PlanterRowViewModel(index);
@@ -55,6 +69,20 @@ public sealed class PlanterPanelViewModel : ObservableObject
             }
 
             row.ApplyStatus(status);
+        }
+
+        // Remove rows that were not present in this batch (but only if the batch had any valid indices).
+        if (seenIndices.Count > 0 && seenIndices.Count != _rows.Count)
+        {
+            for (var i = _rows.Count - 1; i >= 0; i--)
+            {
+                var row = _rows[i];
+                if (!seenIndices.Contains(row.RowIndex))
+                {
+                    _rows.RemoveAt(i);
+                    _rowsByIndex.Remove(row.RowIndex);
+                }
+            }
         }
 
         _ignoredRowCount = ignored;

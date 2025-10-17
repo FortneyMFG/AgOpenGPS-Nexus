@@ -386,6 +386,50 @@ public sealed class SocketCanBackendTests
     }
 
     [Fact]
+    public async Task SocketCanBusService_StopsPumpDelayWhenSubscriberCancelled()
+    {
+        var channel = new SocketCanFrameChannel();
+        var service = new SocketCanBusService(channel, NullLogger<SocketCanBusService>.Instance);
+        var writer = new BlockingServerStreamWriter<CanFrame>();
+        using var callCts = new CancellationTokenSource();
+        var context = new TestServerCallContext(callCts.Token);
+
+        var callTask = service.SubscribeFrames(new Empty(), writer, context);
+
+        try
+        {
+            for (var i = 0; i < 64; i++)
+            {
+                await channel.PublishAsync(new CanFrame
+                {
+                    Header = new Header(),
+                    ArbitrationId = (uint)i,
+                }, CancellationToken.None).ConfigureAwait(false);
+            }
+
+            await writer.WriteStarted.ConfigureAwait(false);
+
+            var stopwatch = Stopwatch.StartNew();
+            callCts.Cancel();
+            writer.ReleaseWrites();
+
+            var completed = await Task.WhenAny(callTask, Task.Delay(TimeSpan.FromSeconds(2))).ConfigureAwait(false);
+            stopwatch.Stop();
+
+            Assert.Same(callTask, completed);
+            await callTask.ConfigureAwait(false);
+
+            Assert.True(
+                stopwatch.Elapsed < TimeSpan.FromMilliseconds(250),
+                $"Subscription took {stopwatch.Elapsed.TotalMilliseconds}ms to cancel.");
+        }
+        finally
+        {
+            writer.ReleaseWrites();
+        }
+    }
+
+    [Fact]
     public async Task SocketCanBusService_RepeatedSubscribeCyclesDoNotLeakCancellationSources()
     {
         var channel = new SocketCanFrameChannel();
@@ -924,6 +968,32 @@ public sealed class SocketCanBackendTests
         {
             await Task.Delay(_delay).ConfigureAwait(false);
             Messages.Add(message);
+        }
+    }
+
+    private sealed class BlockingServerStreamWriter<T> : IServerStreamWriter<T>
+    {
+        private readonly TaskCompletionSource<object?> _writeStarted =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly TaskCompletionSource<object?> _release =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public List<T> Messages { get; } = new();
+
+        public Task WriteStarted => _writeStarted.Task;
+
+        public WriteOptions? WriteOptions { get; set; }
+
+        public Task WriteAsync(T message)
+        {
+            Messages.Add(message);
+            _writeStarted.TrySetResult(null);
+            return _release.Task;
+        }
+
+        public void ReleaseWrites()
+        {
+            _release.TrySetResult(null);
         }
     }
 

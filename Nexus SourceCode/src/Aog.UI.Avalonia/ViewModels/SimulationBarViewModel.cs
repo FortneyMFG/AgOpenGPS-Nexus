@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Aog.Core.Legacy;
 using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
-using Aog.Core.Legacy;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
 /// <summary>
 /// Presentation model for the simulation control bar rendered in the shell window.
 /// </summary>
-public sealed class SimulationBarViewModel : ObservableObject
+public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 {
     private readonly ReadOnlyCollection<SimulationPlaybackRateOptionViewModel> _playbackRates;
     private readonly ObservableCollection<SimulationStreamRouteViewModel> _routes;
@@ -21,6 +21,7 @@ public sealed class SimulationBarViewModel : ObservableObject
 
     private readonly DelegateCommand _togglePlaybackCommand;
     private readonly IReplayController? _replayController;
+    private bool _isReplayStateSubscribed;
     private ReplayState _state;
     private double _selectedPlaybackRate;
     private TimeSpan _position;
@@ -47,14 +48,7 @@ public sealed class SimulationBarViewModel : ObservableObject
         SyncPlaybackRateSelection(_selectedPlaybackRate);
 
         _replayController = replayController;
-        if (_replayController is not null)
-        {
-            var controllerState = NormalizeState(_replayController.State);
-            _state = controllerState;
-            SyncPlaybackRateSelection(controllerState.PlaybackRate);
-            Position = controllerState.Position;
-            _replayController.StateChanged += OnReplayStateChanged;
-        }
+        InitializeReplayControllerState();
     }
 
     /// <summary>
@@ -252,6 +246,29 @@ public sealed class SimulationBarViewModel : ObservableObject
         ActiveScenarioOptions = "—";
     }
 
+    /// <summary>
+    /// Releases resources held by the view-model, including event subscriptions.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!disposing)
+        {
+            return;
+        }
+
+        if (_replayController is not null && _isReplayStateSubscribed)
+        {
+            _replayController.StateChanged -= OnReplayStateChanged;
+            _isReplayStateSubscribed = false;
+        }
+    }
+
     private void TogglePlayback()
     {
         if (_replayController is not null)
@@ -271,6 +288,20 @@ public sealed class SimulationBarViewModel : ObservableObject
         _state = _state with { IsPlaying = !_state.IsPlaying };
         OnPropertyChanged(nameof(StatusText));
         OnPropertyChanged(nameof(PlayPauseLabel));
+    }
+
+    private void InitializeReplayControllerState()
+    {
+        if (_replayController is null)
+        {
+            return;
+        }
+
+        var controllerState = NormalizeState(_replayController.State);
+        _state = controllerState;
+        SyncPlaybackRateSelection(controllerState.PlaybackRate);
+        Position = controllerState.Position;
+        EnsureReplayControllerSubscription();
     }
 
     private ReadOnlyCollection<SimulationPlaybackRateOptionViewModel> BuildPlaybackRateOptions()
@@ -297,6 +328,17 @@ public sealed class SimulationBarViewModel : ObservableObject
         }
 
         return new ReadOnlyCollection<SimulationPlaybackRateOptionViewModel>(options);
+    }
+
+    private void EnsureReplayControllerSubscription()
+    {
+        if (_replayController is null || _isReplayStateSubscribed)
+        {
+            return;
+        }
+
+        _replayController.StateChanged += OnReplayStateChanged;
+        _isReplayStateSubscribed = true;
     }
 
     private void UpdateRoutes(IEnumerable<SimulationRouteConfiguration> routes)

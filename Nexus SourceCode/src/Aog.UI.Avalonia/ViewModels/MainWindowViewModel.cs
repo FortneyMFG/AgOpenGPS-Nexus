@@ -25,7 +25,7 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// <summary>
 /// Provides presentation data for the bootstrap shell window.
 /// </summary>
-public class MainWindowViewModel : INotifyPropertyChanged
+public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 {
     private const string SimulationResourceName = "Aog.UI.Avalonia.Resources.SimulationSample.json";
 
@@ -35,6 +35,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
     private readonly IUiPreferencesService _preferencesService;
     private readonly IThemeManager _themeManager;
     private readonly ShellLayoutPreferences _shellLayout;
+    private bool _disposed;
 
     private UiTheme _selectedTheme;
 
@@ -155,6 +156,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the connection settings view-model.</summary>
     public ConnectionSettingsViewModel Connection => _connectionSettings;
+
+    /// <summary>Releases resources held by the view-model.</summary>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 
     /// <summary>Gets or sets whether the top toolbar is visible.</summary>
     public bool IsTopToolbarVisible
@@ -349,6 +357,18 @@ public class MainWindowViewModel : INotifyPropertyChanged
     private void PersistShellLayout()
     {
         _preferencesService.UpdateShellLayout(_shellLayout);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!disposing || _disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        _connectionSettings.Dispose();
+        SimulationBar.Dispose();
     }
 
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)

@@ -1,18 +1,21 @@
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
 using Xunit;
 
-namespace Aog.UI.Avalonia.Tests;
+namespace Aog.UI.Avalonia.Tests.ViewModels;
 
 public sealed class SimulationBarViewModelTests
 {
     [Fact]
     public void TogglePlaybackCommand_TogglesState()
     {
-        var viewModel = CreateViewModel();
+        using var viewModel = CreateViewModel();
 
         viewModel.StatusText.Should().Be("Paused");
         viewModel.PlayPauseLabel.Should().Be("Play");
@@ -26,7 +29,7 @@ public sealed class SimulationBarViewModelTests
     [Fact]
     public void SeekFraction_UpdatesPosition()
     {
-        var viewModel = CreateViewModel();
+        using var viewModel = CreateViewModel();
 
         viewModel.SeekFraction = 0.5;
 
@@ -38,7 +41,7 @@ public sealed class SimulationBarViewModelTests
     [Fact]
     public void SelectingPlaybackRate_UpdatesSelection()
     {
-        var viewModel = CreateViewModel();
+        using var viewModel = CreateViewModel();
 
         var doubleRate = viewModel.PlaybackRates.Single(rate => Math.Abs(rate.Rate - 2.0) < 1e-6);
         doubleRate.SelectCommand.Execute(null);
@@ -50,7 +53,7 @@ public sealed class SimulationBarViewModelTests
     [Fact]
     public void PlaybackRates_ExposeFormattedLabels()
     {
-        var viewModel = CreateViewModel();
+        using var viewModel = CreateViewModel();
 
         viewModel.PlaybackRates.Select(option => option.Label)
             .Should()
@@ -61,7 +64,7 @@ public sealed class SimulationBarViewModelTests
     public void ApplyScenario_UpdatesMetadataAndRoutes()
     {
         var configuration = CreateConfigurationWithScenario();
-        var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = new SimulationBarViewModel(configuration);
         var scenario = new SimulationScenarioConfiguration(
             "test",
             "Scenario for testing",
@@ -80,6 +83,52 @@ public sealed class SimulationBarViewModelTests
 
         viewModel.ResetToConfigurationRoutes();
         viewModel.ActiveScenarioTitle.Should().Be("Scenario: configuration defaults");
+    }
+
+    [Fact]
+    public void DisposingAndRecreatingViewModel_DoesNotDuplicateReplayNotifications()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        var replayController = new ReplayControllerStub();
+
+        var first = new SimulationBarViewModel(configuration, replayController);
+        var firstStatusNotifications = 0;
+        first.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SimulationBarViewModel.StatusText))
+            {
+                firstStatusNotifications++;
+            }
+        };
+
+        replayController.SubscriptionCount.Should().Be(1);
+
+        first.Dispose();
+        replayController.SubscriptionCount.Should().Be(0);
+
+        var second = new SimulationBarViewModel(configuration, replayController);
+        var secondStatusNotifications = 0;
+        second.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SimulationBarViewModel.StatusText))
+            {
+                secondStatusNotifications++;
+            }
+        };
+
+        replayController.SubscriptionCount.Should().Be(1);
+
+        replayController.RaiseStateChanged(new ReplayState(
+            true,
+            TimeSpan.FromSeconds(10),
+            TimeSpan.FromMinutes(5),
+            1.0));
+
+        firstStatusNotifications.Should().Be(0);
+        secondStatusNotifications.Should().BeGreaterThan(0);
+        replayController.HandlerInvocationCount.Should().Be(1);
+
+        second.Dispose();
     }
 
     private static SimulationBarViewModel CreateViewModel()
@@ -132,5 +181,61 @@ public sealed class SimulationBarViewModelTests
 """;
 
         return SimulationConfigurationLoader.Load(json);
+    }
+
+    private sealed class ReplayControllerStub : IReplayController
+    {
+        private EventHandler<ReplayStateChangedEventArgs>? _stateChanged;
+
+        public int SubscriptionCount { get; private set; }
+
+        public int HandlerInvocationCount { get; private set; }
+
+        public ReplayState State { get; private set; } = new(false, TimeSpan.Zero, TimeSpan.FromMinutes(5), 1.0);
+
+        public event EventHandler<ReplayStateChangedEventArgs>? StateChanged
+        {
+            add
+            {
+                _stateChanged += value;
+                SubscriptionCount++;
+            }
+            remove
+            {
+                _stateChanged -= value;
+                SubscriptionCount--;
+            }
+        }
+
+        public ValueTask PlayAsync(CancellationToken cancellationToken = default) => ValueTask.CompletedTask;
+
+        public ValueTask PauseAsync(CancellationToken cancellationToken = default) => ValueTask.CompletedTask;
+
+        public ValueTask SeekAsync(TimeSpan position, CancellationToken cancellationToken = default)
+        {
+            State = State with { Position = position };
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask SetPlaybackRateAsync(double playbackRate, CancellationToken cancellationToken = default)
+        {
+            State = State with { PlaybackRate = playbackRate };
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+        public void RaiseStateChanged(ReplayState state)
+        {
+            State = state;
+            var handlers = _stateChanged;
+            if (handlers is null)
+            {
+                return;
+            }
+
+            HandlerInvocationCount += handlers.GetInvocationList().Length;
+            handlers.Invoke(this, new ReplayStateChangedEventArgs(state));
+        }
     }
 }

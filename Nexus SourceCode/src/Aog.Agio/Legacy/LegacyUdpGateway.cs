@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Aog.Agio;
 using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Aog.Agio.Legacy;
 
@@ -28,11 +30,12 @@ public sealed class LegacyUdpGateway
     private readonly ILegacyMeshPresencePublisher _meshPresencePublisher;
     private readonly TimeProvider _timeProvider;
     private readonly IActuatorFailsafeService _actuatorFailsafe;
+    private readonly ILogger<LegacyUdpGateway> _logger;
     private long _sequence;
     private long _steerCommandSequence;
     private long _steerStateSequence;
     private long _sectionSequence;
-    private SteerCmd? _lastFilteredSteerCommand;
+    private SteerCmd? _steerSnapshot;
 
     public LegacyUdpGateway(
         LegacyPoseCodec poseCodec,
@@ -46,7 +49,8 @@ public sealed class LegacyUdpGateway
         ILegacySectionObserver sectionObserver,
         ILegacyMeshPresencePublisher meshPresencePublisher,
         TimeProvider timeProvider,
-        IActuatorFailsafeService? actuatorFailsafe = null)
+        IActuatorFailsafeService? actuatorFailsafe = null,
+        ILogger<LegacyUdpGateway>? logger = null)
     {
         _poseCodec = poseCodec ?? throw new ArgumentNullException(nameof(poseCodec));
         _discoveryCodec = discoveryCodec ?? throw new ArgumentNullException(nameof(discoveryCodec));
@@ -60,6 +64,8 @@ public sealed class LegacyUdpGateway
         _meshPresencePublisher = meshPresencePublisher ?? throw new ArgumentNullException(nameof(meshPresencePublisher));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _actuatorFailsafe = actuatorFailsafe ?? NullActuatorFailsafeService.Instance;
+        _logger = logger ?? NullLogger<LegacyUdpGateway>.Instance;
+        _steerSnapshot = null;
     }
 
     /// <summary>
@@ -98,7 +104,7 @@ public sealed class LegacyUdpGateway
 
         var filteredCommand = _actuatorFailsafe.FilterSteerCommand(command);
         var filteredSnapshot = filteredCommand.Clone();
-        Volatile.Write(ref _lastFilteredSteerCommand, filteredSnapshot);
+        Volatile.Write(ref _steerSnapshot, filteredSnapshot);
         SectionMask? filteredSections = null;
 
         if (sections is not null)
@@ -126,17 +132,20 @@ public sealed class LegacyUdpGateway
             throw new ArgumentNullException(nameof(sections));
         }
 
-        var filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
-        var filteredCommand = Volatile.Read(ref _lastFilteredSteerCommand);
+        var filteredCommand = Volatile.Read(ref _steerSnapshot);
 
         if (filteredCommand is null)
         {
-            throw new InvalidOperationException("A steering command must be published before section updates.");
+            _logger.LogInformation(
+                "Ignoring section mask update because no steer command snapshot has been published yet.");
+            return;
         }
+
+        var filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
 
         var refreshedCommand = _actuatorFailsafe.FilterSteerCommand(filteredCommand);
         var refreshedSnapshot = refreshedCommand.Clone();
-        Volatile.Write(ref _lastFilteredSteerCommand, refreshedSnapshot);
+        Volatile.Write(ref _steerSnapshot, refreshedSnapshot);
 
         var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, filteredSections, metadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);

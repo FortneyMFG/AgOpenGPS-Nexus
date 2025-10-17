@@ -26,6 +26,8 @@ public sealed class LegacySteerCodec
     private const int StatePayloadLength = 8;
     private const int CommandFrameLength = 2 /* sync */ + 1 /* src */ + 1 /* pgn */ + 1 /* len */ + CommandPayloadLength + 1 /* checksum */;
     private const int StateFrameLength = 2 + 1 + 1 + 1 + StatePayloadLength + 1;
+    private const short MaxSteerAngleHundredths = 3276;
+    private const short MinSteerAngleHundredths = -MaxSteerAngleHundredths;
 
     /// <summary>
     /// Attempts to decode a steering command PGN into a typed command and section mask.
@@ -65,16 +67,19 @@ public sealed class LegacySteerCodec
             return false;
         }
 
-        var speedTenths = BinaryPrimitives.ReadUInt16LittleEndian(datagram.Slice(5, 2));
+        var speedHundredths = BinaryPrimitives.ReadUInt16LittleEndian(datagram.Slice(5, 2));
         var rawGuidanceStatus = datagram[7];
         var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(datagram.Slice(8, 2));
         var tramControl = datagram[10];
         var sectionsLow = datagram[11];
         var sectionsHigh = datagram[12];
 
+        var speedKph = speedHundredths * 0.01;
+
         metadata = new LegacySteerCommandMetadata
         {
-            SpeedKph = speedTenths * 0.1,
+            SpeedKph = speedKph,
+            CurrentSpeedMps = speedKph / 3.6,
             GuidanceStatus = rawGuidanceStatus,
             TramControl = tramControl,
         };
@@ -114,8 +119,18 @@ public sealed class LegacySteerCodec
         buffer[3] = SteerCommandPgn;
         buffer[4] = CommandPayloadLength;
 
-        var speedTenths = (ushort)Math.Clamp((int)Math.Round(metadata.SpeedKph * 10.0), 0, ushort.MaxValue);
-        BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(5, 2), speedTenths);
+        double speedKph;
+        if (metadata.CurrentSpeedMps is double speedMps && double.IsFinite(speedMps))
+        {
+            speedKph = speedMps * 3.6;
+        }
+        else
+        {
+            speedKph = metadata.SpeedKph;
+        }
+
+        var speedHundredths = (ushort)Math.Clamp((int)Math.Round(speedKph * 100.0), 0, ushort.MaxValue);
+        BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(5, 2), speedHundredths);
 
         var status = metadata.GuidanceStatus;
 
@@ -125,51 +140,76 @@ public sealed class LegacySteerCodec
 
         buffer[7] = status;
 
-        var steerHundredths = command.Enable
-            ? (short)Math.Clamp(Math.Round(command.TargetWheelAngleDeg * 100.0), short.MinValue, short.MaxValue)
-            : (short)0;
+        var steerHundredths = EncodeSteerAngle(command.TargetWheelAngleDeg, command.Enable);
         BinaryPrimitives.WriteInt16LittleEndian(buffer.AsSpan(8, 2), steerHundredths);
 
         buffer[10] = metadata.TramControl;
 
-uint mask = 0;
+        uint mask = 0;
 
-if (sectionMask is not null)
-{
-    var sectionCount = sectionMask.SectionCount;
+        if (sectionMask is not null)
+        {
+            var sectionCount = sectionMask.SectionCount;
 
-    if (sectionCount > 32)
-    {
-        throw new ArgumentOutOfRangeException(
-            nameof(sectionMask.SectionCount),
-            sectionCount,
-            "SectionCount must not exceed 32.");
-    }
+            if (sectionCount > 32)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(sectionMask.SectionCount),
+                    sectionCount,
+                    "SectionCount must not exceed 32.");
+            }
 
-    // Legacy PGN supports only 16 bits — hard cap it here
-    var cappedCount = Math.Min(sectionCount, 16);
+            // Legacy PGN supports only 16 bits — hard cap it here
+            var cappedCount = Math.Min(sectionCount, 16);
 
-    // If count is zero, mask must be zero
-    if (cappedCount == 0)
-    {
-        mask = 0;
-    }
-    else
-    {
-        // Build a mask of allowed bits
-        var allowedMask = (1u << cappedCount) - 1u;
+            // If count is zero, mask must be zero
+            if (cappedCount == 0)
+            {
+                mask = 0;
+            }
+            else
+            {
+                // Build a mask of allowed bits
+                var allowedMask = (1u << cappedCount) - 1u;
 
-        // Apply and clamp to 16 bits total
-        mask = sectionMask.Mask & allowedMask & 0xFFFFu;
-    }
-}
-
+                // Apply and clamp to 16 bits total
+                mask = sectionMask.Mask & allowedMask & 0xFFFFu;
+            }
+        }
 
         buffer[11] = (byte)(mask & 0xFF);
         buffer[12] = (byte)((mask >> 8) & 0xFF);
 
         LegacyChecksum.Write(buffer);
         return buffer;
+    }
+
+    /// <summary>
+    /// Scales a wheel angle in degrees to hundredths while respecting the Teensy PGN range (±3276).
+    /// </summary>
+    /// <param name="targetAngleDeg">Wheel angle in degrees.</param>
+    /// <param name="enabled">Whether steering output is enabled; disabled commands encode zero.</param>
+    /// <returns>Target angle expressed in hundredths of a degree, clamped to ±3276.</returns>
+    private static short EncodeSteerAngle(double targetAngleDeg, bool enabled)
+    {
+        if (!enabled || double.IsNaN(targetAngleDeg) || double.IsInfinity(targetAngleDeg))
+        {
+            return 0;
+        }
+
+        var scaledHundredths = Math.Round(targetAngleDeg * 100.0, MidpointRounding.AwayFromZero);
+
+        if (scaledHundredths > MaxSteerAngleHundredths)
+        {
+            return MaxSteerAngleHundredths;
+        }
+
+        if (scaledHundredths < MinSteerAngleHundredths)
+        {
+            return MinSteerAngleHundredths;
+        }
+
+        return (short)scaledHundredths;
     }
 
     /// <summary>

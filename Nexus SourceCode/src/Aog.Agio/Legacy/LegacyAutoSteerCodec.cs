@@ -49,21 +49,25 @@ public sealed class LegacyAutoSteerCodec
         // Speed and light-bar distance are not exposed via the current contracts; leave zeroed.
         payload[0] = 0;
         payload[1] = 0;
+
+        // Enable flag
         payload[2] = steer.Enable ? (byte)1 : (byte)0;
 
+        // Target wheel angle (scaled hundredths of a degree, little-endian)
         var steerAngle = EncodeSteerAngle(steer.TargetWheelAngleDeg, steer.Enable);
         payload[3] = (byte)(steerAngle & 0xFF);
         payload[4] = (byte)((steerAngle >> 8) & 0xFF);
 
+        // Reserved/unused
         payload[5] = 0;
 
+        // Section mask: clamp to declared count and to 16-bit payload width
         var sectionCount = Math.Clamp(sections.SectionCount, 0, 16);
         uint mask = 0u;
-
         if (sectionCount > 0)
         {
             var allowedMask = BuildAllowedMask(sectionCount);
-            mask = sections.Mask & allowedMask & 0xFFFFu;
+            mask = (sections.Mask & allowedMask) & 0xFFFFu;
         }
 
         payload[6] = (byte)(mask & 0xFF);
@@ -75,36 +79,29 @@ public sealed class LegacyAutoSteerCodec
 
     private static short EncodeSteerAngle(double targetAngleDeg, bool enabled)
     {
-        if (!enabled || double.IsNaN(targetAngleDeg) || double.IsInfinity(targetAngleDeg))
+        if (!enabled)
+        {
+            return 0;
+        }
+
+        // Guard against NaN/Infinity on input
+        if (!double.IsFinite(targetAngleDeg))
         {
             return 0;
         }
 
         var scaled = Math.Round(targetAngleDeg * 100d, MidpointRounding.AwayFromZero);
-        if (scaled >= short.MaxValue)
-        {
-            return short.MaxValue;
-        }
 
-        if (scaled <= short.MinValue)
-        {
-            return short.MinValue;
-        }
+        if (scaled >= short.MaxValue) return short.MaxValue;
+        if (scaled <= short.MinValue) return short.MinValue;
 
         return (short)scaled;
     }
 
     private static uint BuildAllowedMask(int sectionCount)
     {
-        if (sectionCount <= 0)
-        {
-            return 0u;
-        }
-
-        if (sectionCount >= 32)
-        {
-            return uint.MaxValue;
-        }
+        if (sectionCount <= 0) return 0u;
+        if (sectionCount >= 32) return uint.MaxValue;
 
         // Equivalent to SectionMask.SectionMaskForCount(sectionCount) when available.
         return (1u << sectionCount) - 1u;

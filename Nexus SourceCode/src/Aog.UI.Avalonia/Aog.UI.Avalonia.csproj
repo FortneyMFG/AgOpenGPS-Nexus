@@ -7,7 +7,7 @@
     <UseWindowsForms>false</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
-    <AvaloniaResource Include="**/*.axaml" />
+    <AvaloniaResource Include="**/*.axaml" Exclude="$(BaseIntermediateOutputPath)**;$(BaseOutputPath)**" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources/*.json" />

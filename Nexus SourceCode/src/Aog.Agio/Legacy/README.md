@@ -55,6 +55,17 @@ that corrupt checksums are rejected.
 Steering commands surface through `ILegacySteerCommandObserver`, feedback through
 `ILegacySteerStateObserver`, and section bitmasks through `ILegacySectionObserver`.
 
+The section payload is capped at 16 spray/boom sections. `SectionMask.SectionCount`
+values above 16 are truncated and their masks are clipped to 16 bits before
+encoding so downstream hardware never sees the extended widths yet surfaced by
+`Aog.Core.V1.SectionMask`. Guidance status bytes follow legacy semantics: bit 0
+denotes "autosteer engaged" and is toggled automatically from
+`SteerCmd.Enable`, while the remaining bits pass through from
+`LegacySteerCommandMetadata.GuidanceStatus` for controllers that piggyback mode
+flags or error codes. Extended PGNs and wider section masks will remain
+unimplemented until the codec enforces the 32-bit framing documented in the SRS.
+TODO(NX-042): expand the codec once the extended framing bug is addressed.
+
 ## UART framing helper
 
 `LegacySerialFrameCodec` produces and parses the COBS-framed serial messages used by legacy

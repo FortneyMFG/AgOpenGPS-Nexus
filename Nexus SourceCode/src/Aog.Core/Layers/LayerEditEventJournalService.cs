@@ -181,7 +181,7 @@ public sealed class LayerEditEventJournalService : ILayerEditEventJournalService
 
     private static string ComputeHash(LayerEditEventEntry entry)
     {
-        using var writerBuffer = new ArrayBufferWriter<byte>();
+        var writerBuffer = new ArrayBufferWriter<byte>();
         using (var jsonWriter = new Utf8JsonWriter(writerBuffer, new JsonWriterOptions { Indented = false }))
         {
             jsonWriter.WriteStartObject();
@@ -365,8 +365,7 @@ public sealed class LayerEditEventJournalService : ILayerEditEventJournalService
             jsonWriter.WriteEndObject();
         }
 
-        using var sha = SHA256.Create();
-        var hash = sha.ComputeHash(writerBuffer.WrittenSpan);
+        var hash = SHA256.HashData(writerBuffer.WrittenSpan);
         return Convert.ToHexString(hash);
     }
 

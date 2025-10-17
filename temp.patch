@@ -1,0 +1,21 @@
+*** Update File: Nexus SourceCode/src/Aog.Agio/Legacy/LegacySteerCommandMetadata.cs
+@@
+-public sealed class LegacySteerCommandMetadata : LegacySteerMetadata
++public sealed class LegacySteerCommandMetadata
+ {
++    /// <summary>
++    /// Gets or sets the source address override when encoding the PGN.
++    /// </summary>
++    public byte SourceAddress { get; init; }
++
+     /// <summary>
+     /// Gets or sets the guidance controller status byte emitted by legacy clients.
+     /// </summary>
+     public byte GuidanceStatus { get; init; }
+@@
+     public LegacySteerCommandMetadata Clone() => new()
+     {
+         SourceAddress = SourceAddress,
+         GuidanceStatus = GuidanceStatus,
+         SpeedKph = SpeedKph,
+*** End Patch

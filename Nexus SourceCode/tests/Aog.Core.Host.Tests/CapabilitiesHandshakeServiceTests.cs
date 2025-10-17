@@ -44,7 +44,7 @@ public sealed class CapabilitiesHandshakeServiceTests
         {
             SessionId = "session-response",
             NodeId = "agio-1",
-            Role = CapabilityRole.CapabilityRoleAgio,
+            Role = CapabilityRole.Agio,
         };
 
         response.AcceptedCapabilities.Add(new CapabilityDescriptor { Name = "nav.pose" });

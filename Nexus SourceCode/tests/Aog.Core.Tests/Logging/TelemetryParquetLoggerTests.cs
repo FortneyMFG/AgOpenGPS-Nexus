@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
 using Aog.Core.Logging;
@@ -354,13 +355,18 @@ public class TelemetryParquetLoggerTests
     {
         var field = (DataField)schema.DataFields.Single(
             f => string.Equals(f.Name, columnName, StringComparison.OrdinalIgnoreCase));
-        return (T[])reader.ReadColumn(field).Data;
+        return (T[])reader
+            .ReadColumnAsync(field, CancellationToken.None)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult()
+            .Data;
     }
 
     private static ParquetReader OpenReader(Stream stream)
     {
         return ParquetReader
-            .CreateAsync(stream)
+            .CreateAsync(stream, parquetOptions: null, leaveStreamOpen: false, cancellationToken: CancellationToken.None)
             .ConfigureAwait(false)
             .GetAwaiter()
             .GetResult();

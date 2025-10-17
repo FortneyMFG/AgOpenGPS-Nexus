@@ -3,7 +3,6 @@ using System.Reflection;
 using Aog.Agio.Linux.Gpsd;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Xunit;
 using Xunit.Sdk;
 
@@ -59,7 +58,7 @@ public sealed class GpsdClientTests
 
         var factory = new FakeGpsdConnectionFactory(feed);
         var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
-        var options = Options.Create(new GpsdClientOptions
+        var options = new TestOptionsMonitor<GpsdClientOptions>(new GpsdClientOptions
         {
             SocketPath = "/tmp/gpsd.sock",
             ReconnectDelay = TimeSpan.FromSeconds(1),
@@ -93,7 +92,7 @@ public sealed class GpsdClientTests
 
         var factory = new FakeGpsdConnectionFactory(feed);
         var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
-        var options = Options.Create(new GpsdClientOptions
+        var options = new TestOptionsMonitor<GpsdClientOptions>(new GpsdClientOptions
         {
             SocketPath = "/tmp/gpsd.sock",
             ReconnectDelay = TimeSpan.FromSeconds(1),

@@ -137,6 +137,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-915 gpsd TPV null field handling regression test
 - [ ] NX-934 Legacy UDP section mask snapshot fix
 - [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
+- [ ] NX-931 gpsd monitor restart on socket availability
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -510,6 +511,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-245 | Mesh-aware legacy UDP gateway updates | Done |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 presence integration |
 | NX-246 | GNSS correction services bootstrap | Done |  | — | [ADR-066](docs/ADR/ADR-roadmap.md) | ADR-066 GNSS correction services |
 | NX-742 | SocketCAN channel backpressure guardrails | Done | AI | — | — | Drop stalled subscribers and stress fast consumers |
+| NX-931 | gpsd monitor restart on socket availability | In Review | AI | — | — | Restart gpsd background service when socket path toggles |
 
 ### Section D — Plugins (Logic + Sim Providers)
 

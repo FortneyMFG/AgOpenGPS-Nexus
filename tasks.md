@@ -250,6 +250,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-310 Mesh share/subscribe UI _(Done)_ — ADR-047 live mesh UX
 - [x] NX-311 Radio provisioning UI flows _(Done)_ — ADR-048 provisioning UX
 - [x] NX-312 Companion metadata-driven parity pass _(Done)_ — ADR-034 remote parity
+- [x] NX-931 SimulationBar replay subscription cleanup _(Done)_ — Remove legacy EnsureReplayControllerSubscription helper
 - [x] NX-410 Legacy UI asset migration workbook _(Done)_ — See docs/plans/ui-shell-and-plugin-integration.md
 - [x] NX-411 Shell & navigation port from V6/AgValonia _(Done)_ — Aligns with artifacts/ui-core-spec.md
 - [x] NX-412 Map canvas & field operations UI port _(Done)_ — Aligns with artifacts/ui-inventory.json

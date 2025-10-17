@@ -332,17 +332,6 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         return $"{rate:0.#}×";
     }
 
-    private void EnsureReplayControllerSubscription()
-    {
-        if (_replayController is null || _isReplayStateSubscribed)
-        {
-            return;
-        }
-
-        _replayController.StateChanged += OnReplayStateChanged;
-        _isReplayStateSubscribed = true;
-    }
-
     private void UpdateRoutes(IEnumerable<SimulationRouteConfiguration> routes)
     {
         _routes.Clear();

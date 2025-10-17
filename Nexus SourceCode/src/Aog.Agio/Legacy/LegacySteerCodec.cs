@@ -133,26 +133,38 @@ public sealed class LegacySteerCodec
 
         buffer[10] = metadata.TramControl;
 
-        uint mask = 0;
-        if (sectionMask is not null)
-        {
-            if (sectionMask.SectionCount > 16)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(sectionMask),
-                    sectionMask.SectionCount,
-                    "Legacy steering PGNs support at most 16 sections.");
-            }
+uint mask = 0;
 
-            var allowedBits = (int)sectionMask.SectionCount;
-            if (allowedBits > 16)
-            {
-                allowedBits = 16;
-            }
+if (sectionMask is not null)
+{
+    var sectionCount = sectionMask.SectionCount;
 
-            var allowedMask = allowedBits == 0 ? 0u : (uint)((1u << allowedBits) - 1u);
-            mask = sectionMask.Mask & allowedMask;
-        }
+    if (sectionCount > 32)
+    {
+        throw new ArgumentOutOfRangeException(
+            nameof(sectionMask.SectionCount),
+            sectionCount,
+            "SectionCount must not exceed 32.");
+    }
+
+    // Legacy PGN supports only 16 bits — hard cap it here
+    var cappedCount = Math.Min(sectionCount, 16);
+
+    // If count is zero, mask must be zero
+    if (cappedCount == 0)
+    {
+        mask = 0;
+    }
+    else
+    {
+        // Build a mask of allowed bits
+        var allowedMask = (1u << cappedCount) - 1u;
+
+        // Apply and clamp to 16 bits total
+        mask = sectionMask.Mask & allowedMask & 0xFFFFu;
+    }
+}
+
 
         buffer[11] = (byte)(mask & 0xFF);
         buffer[12] = (byte)((mask >> 8) & 0xFF);

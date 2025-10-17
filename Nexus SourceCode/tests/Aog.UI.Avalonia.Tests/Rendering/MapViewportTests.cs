@@ -60,6 +60,22 @@ public class MapViewportTests
         var screenPoint = viewport.WorldToScreen(focusPoint);
         screenPoint.Should().BeApproximately(new Point(size.Width / 2, size.Height / 2), 1e-6);
     }
+
+    [Fact]
+    public void ZoomAt_ClampsScaleWithinConfiguredBounds()
+    {
+        var viewport = new MapViewport(minScale: 0.2, maxScale: 5.0);
+        var cursor = new Point(100, 100);
+        var worldAtCursor = viewport.ScreenToWorld(cursor);
+
+        viewport.ZoomAt(cursor, 0.01);
+        viewport.Scale.Should().BeApproximately(0.2, 1e-6);
+        viewport.ScreenToWorld(cursor).Should().BeApproximately(worldAtCursor, 1e-6);
+
+        viewport.ZoomAt(cursor, 100);
+        viewport.Scale.Should().BeApproximately(5.0, 1e-6);
+        viewport.ScreenToWorld(cursor).Should().BeApproximately(worldAtCursor, 1e-6);
+    }
 }
 
 internal static class PointAssertionsExtensions

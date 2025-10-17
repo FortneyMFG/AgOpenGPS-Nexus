@@ -90,6 +90,12 @@ The shell displays the current operating system description and exposes a connec
 An embedded simulation sample is parsed at startup and the window prints the ordered provider graph so contributors can verify the new configuration loader logic without additional tooling. The shell also exposes a simulation control bar (NX-043) that provides play/pause, scrub, and playback rate controls alongside combo boxes for selecting the source and mode for each routed stream.
 
 Replay controls are wired to an `IReplayController` service, enabling real telemetry sessions to drive the bar. The default dependency injection registration supplies a no-op controller for design-time usage, while the new `TelemetryReplayController` can be registered to stream Parquet logs with play, pause, seek, and playback rate support.
+
+### Map rendering
+
+- The in-shell map uses a custom `MapView` Skia control built directly on `Avalonia.Skia`, eliminating the deprecated `SkiaSharp.Views.Avalonia` package from the dependency graph.
+- Pointer panning/zooming logic lives in `Rendering/MapViewport`, which ensures viewport scale remains clamped even when scroll devices emit extreme deltas.
+- Rendering occurs within Avalonia's drawing pipeline so the view continues to work across platforms and DPI configurations supported by the 11.0.x tooling.
 ### Scenario editor
 
 - Launch the **Edit scenarios...** dialog from the Simulation controls panel to review available simulation presets.

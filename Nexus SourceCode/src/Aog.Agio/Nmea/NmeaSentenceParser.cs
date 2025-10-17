@@ -317,6 +317,11 @@ private static TimeOnly? TryParseTime(string value)
             return null;
         }
 
+        if (double.IsNaN(minutes) || double.IsInfinity(minutes) || minutes < 0 || minutes >= 60)
+        {
+            return null;
+        }
+
         var decimalDegrees = degrees + (minutes / 60.0);
 
         if (!string.IsNullOrWhiteSpace(hemisphere) &&

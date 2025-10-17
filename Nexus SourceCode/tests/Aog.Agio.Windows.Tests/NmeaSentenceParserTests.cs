@@ -27,6 +27,34 @@ public sealed class NmeaSentenceParserTests
     }
 
     [Fact]
+    public void TryParse_GgaSentenceWithOverRangeMinutes_RejectsLatitude()
+    {
+        const string sentence = "$GPGGA,123519,4760.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*49";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var gga = Assert.IsType<NmeaGgaSentence>(parsed);
+        Assert.Null(gga.LatitudeDegrees);
+        Assert.NotNull(gga.LongitudeDegrees);
+    }
+
+    [Fact]
+    public void TryParse_GgaSentenceWithOverRangeLongitudeMinutes_RejectsLongitude()
+    {
+        const string sentence = "$GPGGA,123519,4807.038,N,01160.000,E,1,08,0.9,545.4,M,46.9,M,,*43";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var gga = Assert.IsType<NmeaGgaSentence>(parsed);
+        Assert.Null(gga.LongitudeDegrees);
+        Assert.NotNull(gga.LatitudeDegrees);
+    }
+
+    [Fact]
     public void TryParse_GgaSentence_MalformedNumericFields_YieldsNulls()
     {
         const string sentence = "$GPGGA,12A519,48A7.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*44";

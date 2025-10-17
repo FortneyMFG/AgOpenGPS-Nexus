@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Agio.Linux.SocketCan;
@@ -291,6 +292,35 @@ public async Task SocketCanBusService_DropsSlowSubscribers()
 }
 
 [Fact]
+public async Task SocketCanBusService_RepeatedSubscribeCyclesDoNotLeakCancellationSources()
+{
+    var channel = new SocketCanFrameChannel();
+    var service = new SocketCanBusService(channel, NullLogger<SocketCanBusService>.Instance);
+
+    ForceGarbageCollection();
+    var baseline = GetLinkedTokenSourceCount();
+
+    for (var i = 0; i < 5; i++)
+    {
+        using var callCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        var context = new TestServerCallContext(callCts.Token);
+        var writer = new TestServerStreamWriter<CanFrame>();
+
+        var callTask = service.SubscribeFrames(new Empty(), writer, context);
+
+        await Task.Delay(10).ConfigureAwait(false);
+        callCts.Cancel();
+
+        await callTask.ConfigureAwait(false);
+
+        ForceGarbageCollection();
+
+        var current = GetLinkedTokenSourceCount();
+        Assert.Equal(baseline, current);
+    }
+}
+
+[Fact]
 public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
 {
     // Channel-level: verifies bounded per-subscriber queue and backpressure timeout.
@@ -372,6 +402,26 @@ public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
             await Task.Delay(10);
         }
     }
+
+    private static int GetLinkedTokenSourceCount()
+    {
+        var linkedType = typeof(CancellationTokenSource).GetNestedType("LinkedTokenSource", BindingFlags.NonPublic);
+        Assert.NotNull(linkedType);
+
+        var countField = linkedType!.GetField("s_linkedTokenSourceCount", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(countField);
+
+        var value = countField!.GetValue(null);
+        return Assert.IsType<int>(value);
+    }
+
+    private static void ForceGarbageCollection()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+    }
+
 
     private sealed class FakeSocketCanClientFactory : ISocketCanClientFactory
     {

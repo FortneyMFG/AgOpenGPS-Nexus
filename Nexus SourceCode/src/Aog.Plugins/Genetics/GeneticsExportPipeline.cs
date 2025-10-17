@@ -157,8 +157,10 @@ public sealed class GeneticsExportPipeline
         string? sessionId,
         DateTimeOffset? appliedAt,
         string? barcode,
-        IReadOnlyList<GeneticsChangeLogEntry> changeLog)
+        IReadOnlyList<GeneticsChangeLogEntry>? changeLog)
     {
+        var entries = changeLog ?? Array.Empty<GeneticsChangeLogEntry>();
+
         writer.WriteStartObject();
         writer.WriteString("type", "Feature");
         writer.WriteString("id", feature.FeatureId);
@@ -223,11 +225,11 @@ public sealed class GeneticsExportPipeline
 
         writer.WriteNumber("areaSquareMeters", feature.Geometry.AreaSquareMeters);
 
-        if (changeLog.Count > 0)
+        if (entries.Count > 0)
         {
             writer.WritePropertyName("changeLog");
             writer.WriteStartArray();
-            foreach (var entry in changeLog)
+            foreach (var entry in entries)
             {
                 writer.WriteStartObject();
                 writer.WriteString("changedAt", entry.ChangedAt.ToString("O", CultureInfo.InvariantCulture));

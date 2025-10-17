@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Aog.Core.Layers;
@@ -55,7 +56,8 @@ public sealed class CropLayerIngestionPipeline
         {
             BindJob(entry.JobId);
             BindSession(entry.SessionId);
-            BindContext(entry.Context);
+            var context = entry.Context ?? throw new InvalidOperationException("Journal entry must include context.");
+            BindContext(context);
 
             foreach (var operation in entry.Operations)
             {
@@ -74,7 +76,7 @@ public sealed class CropLayerIngestionPipeline
     /// <summary>
     /// Attempts to resolve a feature by identifier.
     /// </summary>
-    public bool TryGetFeature(string featureId, out CropZoneFeature feature)
+    public bool TryGetFeature(string featureId, [NotNullWhen(true)] out CropZoneFeature? feature)
     {
         if (string.IsNullOrWhiteSpace(featureId))
         {
@@ -90,7 +92,7 @@ public sealed class CropLayerIngestionPipeline
             }
         }
 
-        feature = null!;
+        feature = null;
         return false;
     }
 
@@ -213,29 +215,32 @@ public sealed class CropLayerIngestionPipeline
 
     private void ApplyCreate(LayerEditEventEntry entry, LayerEditEventOperation operation)
     {
+        var featureId = operation.FeatureId ?? throw new InvalidOperationException("Operations must include a feature identifier.");
         var feature = BuildFeature(entry, operation);
 
-        _features[operation.FeatureId] = feature;
+        _features[featureId] = feature;
     }
 
     private CropZoneFeature BuildFeature(LayerEditEventEntry entry, LayerEditEventOperation operation)
     {
-        if (string.IsNullOrWhiteSpace(operation.FeatureId))
+        var featureId = operation.FeatureId;
+
+        if (string.IsNullOrWhiteSpace(featureId))
         {
             throw new InvalidOperationException("Operations must include a feature identifier.");
         }
 
-        if (_features.ContainsKey(operation.FeatureId))
+        if (_features.ContainsKey(featureId))
         {
-            throw new InvalidOperationException($"Feature '{operation.FeatureId}' already exists in layer '{_layerId}'.");
+            throw new InvalidOperationException($"Feature '{featureId}' already exists in layer '{_layerId}'.");
         }
 
-    var geometry = CloneGeometry(operation.GeometryAfter, operation.FeatureId, required: true);
-    var attributes = ExtractAttributes(operation.AttributesAfter, null, requireAll: true);
+        var geometry = CloneGeometry(operation.GeometryAfter, featureId, required: true);
+        var attributes = ExtractAttributes(operation.AttributesAfter, null, requireAll: true);
         var area = ComputeArea(operation.Summary, null);
 
         return new CropZoneFeature(
-            operation.FeatureId,
+            featureId,
             attributes.Crop,
             attributes.Year,
             attributes.Status,
@@ -250,14 +255,16 @@ public sealed class CropLayerIngestionPipeline
 
     private void ApplyUpdate(LayerEditEventEntry entry, LayerEditEventOperation operation)
     {
-        if (!_features.TryGetValue(operation.FeatureId, out var existing))
+        var featureId = operation.FeatureId ?? throw new InvalidOperationException("Operations must include a feature identifier.");
+
+        if (!_features.TryGetValue(featureId, out var existing))
         {
-            throw new InvalidOperationException($"Cannot update crop feature '{operation.FeatureId}' because it has not been created.");
+            throw new InvalidOperationException($"Cannot update crop feature '{featureId}' because it has not been created.");
         }
 
-    var fallback = existing.ToAttributes();
-    var attributes = ExtractAttributes(operation.AttributesAfter, fallback, requireAll: false);
-    var geometry = CloneGeometry(operation.GeometryAfter, operation.FeatureId, required: false) ?? existing.GeometryNode.DeepClone();
+        var fallback = existing.ToAttributes();
+        var attributes = ExtractAttributes(operation.AttributesAfter, fallback, requireAll: false);
+        var geometry = CloneGeometry(operation.GeometryAfter, featureId, required: false) ?? existing.GeometryNode.DeepClone();
         var area = ComputeArea(operation.Summary, existing.AreaSqMeters);
 
         var updated = existing.With(
@@ -267,14 +274,16 @@ public sealed class CropLayerIngestionPipeline
             entry.CreatedAt,
             entry.Actor);
 
-        _features[operation.FeatureId] = updated;
+        _features[featureId] = updated;
     }
 
     private void ApplyDelete(LayerEditEventOperation operation)
     {
-        if (!_features.Remove(operation.FeatureId))
+        var featureId = operation.FeatureId ?? throw new InvalidOperationException("Operations must include a feature identifier.");
+
+        if (!_features.Remove(featureId))
         {
-            throw new InvalidOperationException($"Cannot delete crop feature '{operation.FeatureId}' because it does not exist.");
+            throw new InvalidOperationException($"Cannot delete crop feature '{featureId}' because it does not exist.");
         }
     }
 
@@ -434,7 +443,7 @@ public sealed class CropLayerIngestionPipeline
         return updated;
     }
 
-    private static bool TryReadString(JsonObject obj, string propertyName, out string value)
+    private static bool TryReadString(JsonObject obj, string propertyName, [NotNullWhen(true)] out string? value)
     {
         if (obj.TryGetPropertyValue(propertyName, out var node) && node is JsonValue jsonValue && jsonValue.TryGetValue<string>(out var raw) && !string.IsNullOrWhiteSpace(raw))
         {
@@ -442,7 +451,7 @@ public sealed class CropLayerIngestionPipeline
             return true;
         }
 
-        value = null!;
+        value = null;
         return false;
     }
 

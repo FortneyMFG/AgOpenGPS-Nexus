@@ -517,12 +517,15 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
             return Array.Empty<string>();
         }
 
-        return operators
+        var normalized = operators
             .Select(o => o?.Trim())
             .Where(o => !string.IsNullOrEmpty(o))
+            .Select(o => o!)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(o => o, StringComparer.OrdinalIgnoreCase)
             .ToArray();
+
+        return normalized;
     }
 
     private static string? SanitizeOptionalString(string? value)

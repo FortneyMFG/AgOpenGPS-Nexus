@@ -353,6 +353,15 @@ public sealed class SimulationBarViewModelTests
             entry => entry.Level == LogLevel.Error && entry.Message.Contains("seek to", StringComparison.OrdinalIgnoreCase));
     }
 
+    [Fact]
+    public void ToggleAutoResumeCommand_WithNoSession_DoesNotChangeState()
+    {
+        using var viewModel = CreateViewModel();
+
+        viewModel.Invoking(vm => vm.ToggleAutoResumeCommand.Execute(null)).Should().NotThrow();
+        viewModel.IsAutoResumeEnabled.Should().BeFalse();
+    }
+
     private static SimulationBarViewModel CreateViewModel()
     {
         const string json = """

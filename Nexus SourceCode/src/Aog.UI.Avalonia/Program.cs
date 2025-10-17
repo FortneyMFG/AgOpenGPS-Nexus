@@ -48,7 +48,7 @@ public static class Program
     }
 
     public static AppBuilder BuildAvaloniaApp(IServiceProvider services) =>
-        AppBuilder.Configure(() => services.GetRequiredService<App>())
+        AppBuilder.Configure(() => services.GetRequiredService<NexusApp>())
             .UsePlatformDetect()
             .LogToTrace();
 }

@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The original service collection to support fluent configuration.</returns>
     public static IServiceCollection AddAvaloniaUiShell(this IServiceCollection services)
     {
-        services.TryAddSingleton<App>();
+        services.TryAddSingleton<NexusApp>();
         services.TryAddSingleton<IRunModePlatform, SystemRunModePlatform>();
         services.TryAddSingleton<IAvaloniaRunModeService, AvaloniaRunModeService>();
         services.TryAddSingleton<IConnectionSettingsStore, JsonConnectionSettingsStore>();

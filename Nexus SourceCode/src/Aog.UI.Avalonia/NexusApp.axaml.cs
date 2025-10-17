@@ -3,17 +3,17 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Aog.UI.Avalonia.Settings;
-using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.Telemetry;
+using Aog.UI.Avalonia.Theming;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aog.UI.Avalonia;
 
-public partial class App : Application
+public partial class NexusApp : Application
 {
     private readonly IServiceProvider _services;
 
-    public App(
+    public NexusApp(
         IServiceProvider services,
         IUiPreferencesService preferencesService,
         IThemeManager themeManager,

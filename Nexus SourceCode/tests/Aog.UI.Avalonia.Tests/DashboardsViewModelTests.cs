@@ -48,12 +48,14 @@ public sealed class DashboardsViewModelTests
         var bookmarks = new[]
         {
             new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(10), "Test", "Note"),
+            new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(10), "Duplicate", "Note"),
         };
 
         viewModel.ApplySampleData(new[] { 1.0, 2.0 }, new[] { 0.0, 5.0 }, bookmarks);
         viewModel.ExportCsvCommand.Execute(null);
 
         viewModel.Bookmarks.Should().HaveCount(1);
+        viewModel.Bookmarks.Single().Label.Should().Be("Test");
         viewModel.ExportStatus.Should().Be("Export queued: CSV snapshot at 12:34:56");
         viewModel.SpeedSamples.Should().HaveCount(2);
     }

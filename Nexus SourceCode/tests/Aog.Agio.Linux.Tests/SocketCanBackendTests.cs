@@ -204,6 +204,73 @@ public async Task BackgroundService_ReconfiguresWhenOptionsChange()
         await callTask.ConfigureAwait(false);
     }
 
+    [Fact]
+    public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
+    {
+        var channel = new SocketCanFrameChannel(subscriberCapacity: 4, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
+        using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+        var fastFrames = new ConcurrentQueue<CanFrame>();
+
+        var fastTask = Task.Run(async () =>
+        {
+            try
+            {
+                await foreach (var frame in channel.ReadAllAsync(fastCts.Token))
+                {
+                    fastFrames.Enqueue(frame);
+                }
+            }
+            catch (OperationCanceledException) when (fastCts.IsCancellationRequested)
+            {
+            }
+        });
+
+        var slowCompletion = new TaskCompletionSource<Exception?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var slowTask = Task.Run(async () =>
+        {
+            await using var enumerator = channel.ReadAllAsync(slowCts.Token).GetAsyncEnumerator();
+            try
+            {
+                while (await enumerator.MoveNextAsync())
+                {
+                    await Task.Delay(200, slowCts.Token);
+                }
+
+                slowCompletion.TrySetResult(null);
+            }
+            catch (Exception ex)
+            {
+                slowCompletion.TrySetResult(ex);
+            }
+        });
+
+        for (var i = 0; i < 100; i++)
+        {
+            var frame = new CanFrame
+            {
+                Header = new Header { Sequence = (ulong)(i + 1) },
+                ArbitrationId = (uint)i,
+            };
+
+            await channel.PublishAsync(frame, CancellationToken.None);
+        }
+
+        await WaitForAsync(() => fastFrames.Count >= 100, TimeSpan.FromSeconds(2));
+        await WaitForAsync(() => slowCompletion.Task.IsCompleted, TimeSpan.FromSeconds(2));
+
+        var slowResult = await slowCompletion.Task.ConfigureAwait(false);
+        Assert.IsType<OperationCanceledException>(slowResult);
+        Assert.Contains(fastFrames, frame => frame.ArbitrationId == 99);
+
+        fastCts.Cancel();
+        slowCts.Cancel();
+
+        await Task.WhenAll(fastTask, slowTask);
+    }
+
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)
     {
         var stopwatch = Stopwatch.StartNew();

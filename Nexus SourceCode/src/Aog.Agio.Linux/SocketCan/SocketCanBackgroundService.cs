@@ -112,7 +112,6 @@ public sealed class SocketCanBackgroundService : BackgroundService
             var result = client.ReadFrame(cancellationToken);
             if (result.Status == SocketCanFrameReadStatus.Timeout)
             {
-                await DelayAsync(options.ReceiveTimeout, cancellationToken).ConfigureAwait(false);
                 continue;
             }
 

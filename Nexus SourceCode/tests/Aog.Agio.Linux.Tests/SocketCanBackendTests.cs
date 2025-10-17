@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -74,57 +75,110 @@ public sealed class SocketCanBackendTests
     }
 
     [Fact]
-    public async Task BackgroundService_ReconfiguresWhenOptionsChange()
+[Fact]
+public async Task BackgroundService_PublishesFrameImmediatelyAfterTimeout()
+{
+    var client = new FakeSocketCanClient("vcan0", Array.Empty<SocketCANSharp.CanFrame>());
+    var factory = new FakeSocketCanClientFactory(client);
+    var channel = new SocketCanFrameChannel();
+
+    var initialOptions = new SocketCanOptions
     {
-        var channel = new SocketCanFrameChannel();
-        var firstClient = new PassiveSocketCanClient("vcan0");
-        var secondClient = new PassiveSocketCanClient("vcan1");
-        var factory = new TrackingSocketCanClientFactory(options =>
-        {
-            return options.InterfaceName switch
-            {
-                "vcan0" => firstClient,
-                "vcan1" => secondClient,
-                _ => throw new InvalidOperationException($"Unexpected interface '{options.InterfaceName}'."),
-            };
-        });
+        InterfaceName = "vcan0",
+        ReceiveTimeout = TimeSpan.FromMilliseconds(200),
+        ReconnectDelay = TimeSpan.FromMilliseconds(10),
+        SourcePrefix = "test/socketcan",
+    };
+    var monitor = new TestOptionsMonitor(initialOptions);
 
-        var initialOptions = new SocketCanOptions
+    var service = new SocketCanBackgroundService(
+        factory,
+        channel,
+        monitor,
+        TimeProvider.System,
+        NullLogger<SocketCanBackgroundService>.Instance);
+
+    await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+    using var readCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+    await using var enumerator = channel.ReadAllAsync(readCts.Token).GetAsyncEnumerator();
+    var moveNextTask = enumerator.MoveNextAsync().AsTask();
+
+    // Ensure at least one receive timeout has occurred so the pump is in "publish immediately" mode.
+    await WaitForAsync(() => client.TimeoutCount > 0, TimeSpan.FromSeconds(1));
+
+    var frame = new SocketCANSharp.CanFrame(
+        SocketCanUtils.CreateCanIdWithFlags(0x456, isEff: false, isRtr: false, isErr: false),
+        new byte[] { 0x0A, 0x0B });
+
+    var stopwatch = Stopwatch.StartNew();
+    client.EnqueueFrame(frame);
+
+    Assert.True(await moveNextTask.ConfigureAwait(false));
+    stopwatch.Stop();
+
+    Assert.True(
+        stopwatch.Elapsed < TimeSpan.FromMilliseconds(100),
+        $"Frame was delayed by {stopwatch.Elapsed.TotalMilliseconds}ms");
+
+    var published = enumerator.Current;
+    Assert.Equal(0x456u, published.ArbitrationId);
+    Assert.Equal(new byte[] { 0x0A, 0x0B }, published.Payload.ToByteArray());
+}
+
+[Fact]
+public async Task BackgroundService_ReconfiguresWhenOptionsChange()
+{
+    var channel = new SocketCanFrameChannel();
+    var firstClient = new PassiveSocketCanClient("vcan0");
+    var secondClient = new PassiveSocketCanClient("vcan1");
+    var factory = new TrackingSocketCanClientFactory(options =>
+    {
+        return options.InterfaceName switch
         {
-            InterfaceName = "vcan0",
-            ReceiveTimeout = TimeSpan.FromMilliseconds(10),
-            ReconnectDelay = TimeSpan.FromMilliseconds(10),
-            SourcePrefix = "test/socketcan",
+            "vcan0" => firstClient,
+            "vcan1" => secondClient,
+            _ => throw new InvalidOperationException($"Unexpected interface '{options.InterfaceName}'."),
         };
-        var monitor = new TestOptionsMonitor(initialOptions);
+    });
 
-        var service = new SocketCanBackgroundService(
-            factory,
-            channel,
-            monitor,
-            TimeProvider.System,
-            NullLogger<SocketCanBackgroundService>.Instance);
+    var initialOptions = new SocketCanOptions
+    {
+        InterfaceName = "vcan0",
+        ReceiveTimeout = TimeSpan.FromMilliseconds(10),
+        ReconnectDelay = TimeSpan.FromMilliseconds(10),
+        SourcePrefix = "test/socketcan",
+    };
+    var monitor = new TestOptionsMonitor(initialOptions);
 
-        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+    var service = new SocketCanBackgroundService(
+        factory,
+        channel,
+        monitor,
+        TimeProvider.System,
+        NullLogger<SocketCanBackgroundService>.Instance);
 
-        await WaitForAsync(() => factory.CreatedInterfaces.Count >= 1, TimeSpan.FromSeconds(1));
-        Assert.Equal("vcan0", factory.CreatedInterfaces[0]);
+    await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
 
-        monitor.Update(new SocketCanOptions
-        {
-            InterfaceName = "vcan1",
-            ReceiveTimeout = initialOptions.ReceiveTimeout,
-            ReconnectDelay = initialOptions.ReconnectDelay,
-            SourcePrefix = initialOptions.SourcePrefix,
-            IncludeVirtualInterfaces = initialOptions.IncludeVirtualInterfaces,
-            ReceiveOwnMessages = initialOptions.ReceiveOwnMessages,
-        });
+    await WaitForAsync(() => factory.CreatedInterfaces.Count >= 1, TimeSpan.FromSeconds(1));
+    Assert.Equal("vcan0", factory.CreatedInterfaces[0]);
 
-        await WaitForAsync(() => factory.CreatedInterfaces.Count >= 2, TimeSpan.FromSeconds(1));
-        Assert.Equal("vcan1", factory.CreatedInterfaces[1]);
+    monitor.Update(new SocketCanOptions
+    {
+        InterfaceName = "vcan1",
+        ReceiveTimeout = initialOptions.ReceiveTimeout,
+        ReconnectDelay = initialOptions.ReconnectDelay,
+        SourcePrefix = initialOptions.SourcePrefix,
+        IncludeVirtualInterfaces = initialOptions.IncludeVirtualInterfaces,
+        ReceiveOwnMessages = initialOptions.ReceiveOwnMessages,
+    });
 
-        await WaitForAsync(() => firstClient.DisposeCount > 0, TimeSpan.FromSeconds(1));
-        Assert.Equal(1, firstClient.DisposeCount);
+    await WaitForAsync(() => factory.CreatedInterfaces.Count >= 2, TimeSpan.FromSeconds(1));
+    Assert.Equal("vcan1", factory.CreatedInterfaces[1]);
+
+    await WaitForAsync(() => firstClient.DisposeCount > 0, TimeSpan.FromSeconds(1));
+    Assert.Equal(1, firstClient.DisposeCount);
+}
 
         await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
     }
@@ -202,25 +256,31 @@ public sealed class SocketCanBackendTests
 
     private sealed class FakeSocketCanClient : ISocketCanClient
     {
-        private readonly Queue<SocketCANSharp.CanFrame> _frames;
+        private readonly ConcurrentQueue<SocketCANSharp.CanFrame> _frames;
+        private int _timeoutCount;
 
         public FakeSocketCanClient(string interfaceName, IEnumerable<SocketCANSharp.CanFrame> frames)
         {
             InterfaceName = interfaceName;
-            _frames = new Queue<SocketCANSharp.CanFrame>(frames);
+            _frames = new ConcurrentQueue<SocketCANSharp.CanFrame>(frames);
         }
 
         public string InterfaceName { get; }
 
+        public int TimeoutCount => Volatile.Read(ref _timeoutCount);
+
+        public void EnqueueFrame(SocketCANSharp.CanFrame frame) => _frames.Enqueue(frame);
+
         public SocketCanFrameReadResult ReadFrame(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (_frames.Count == 0)
+            if (_frames.TryDequeue(out var frame))
             {
-                return SocketCanFrameReadResult.Timeout();
+                return SocketCanFrameReadResult.FromFrame(frame);
             }
 
-            return SocketCanFrameReadResult.FromFrame(_frames.Dequeue());
+            Interlocked.Increment(ref _timeoutCount);
+            return SocketCanFrameReadResult.Timeout();
         }
 
         public void Dispose()

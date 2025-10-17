@@ -42,6 +42,46 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
+    public void TryDecodeSteerCommand_RemoteOrTramBitsAloneDoNotEngage()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd
+        {
+            TargetWheelAngleDeg = 5.0,
+            Enable = false,
+        };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            GuidanceStatus = 0b0000_0110, // remote + tram bits, no engaged bit
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        Assert.True(codec.TryDecodeSteerCommand(frame, out var decodedCommand, out _, out _));
+        Assert.False(decodedCommand.Enable);
+    }
+
+    [Fact]
+    public void TryDecodeSteerCommand_EngagedBitOverridesMetadata()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd
+        {
+            TargetWheelAngleDeg = -3.25,
+            Enable = true,
+        };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            GuidanceStatus = 0b0000_0110, // remote + tram bits preserved when engaged
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        Assert.True(codec.TryDecodeSteerCommand(frame, out var decodedCommand, out _, out _));
+        Assert.True(decodedCommand.Enable);
+    }
+
+    [Fact]
     public void EncodeSteerCommand_DefaultsStatusFromEnable()
     {
         var codec = new LegacySteerCodec();

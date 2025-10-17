@@ -25,4 +25,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\Aog.Agio.Linux\Serial\LinuxSerialPortEnumeratorOptions.cs">
+      <Link>Linked\LinuxSerialPortEnumeratorOptions.cs</Link>
+    </Compile>
+  </ItemGroup>
 </Project>

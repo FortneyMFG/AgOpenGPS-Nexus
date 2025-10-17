@@ -1,6 +1,5 @@
 using Aog.Agio.AogLink;
 using Aog.Protos.Capabilities.V1;
-using FluentAssertions;
 using Xunit;
 
 namespace Aog.Agio.Tests.AogLink;
@@ -22,7 +21,7 @@ public sealed class AogLinkBridgeTests
         var frame = bridge.CreateHandshakeFrame(request, sequence: 7, source: 0x20, destination: 0x10);
         var decoded = bridge.ParseHandshakeRequest(frame);
 
-        decoded.Should().BeEquivalentTo(request);
+        Assert.Equal(request, decoded);
     }
 
     [Fact]
@@ -38,6 +37,6 @@ public sealed class AogLinkBridgeTests
         var frame = bridge.CreateHandshakeResponseFrame(response, sequence: 8, source: 0x10, destination: 0x20);
 
         var decoded = bridge.ParseHandshakeResponse(frame);
-        decoded.Should().BeEquivalentTo(response);
+        Assert.Equal(response, decoded);
     }
 }

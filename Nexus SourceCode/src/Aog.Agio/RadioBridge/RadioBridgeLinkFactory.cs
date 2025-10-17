@@ -185,7 +185,7 @@ public sealed class RadioBridgeLinkFactory : IRadioBridgeLinkFactory
                     header.CopyTo(frame, 0);
                     if (payloadLength > 0 || true)
                     {
-                        await ReadExactAsync(stream, frame.AsMemory(14), payloadLength + 2, cancellationToken).ConfigureAwait(false);
+                        await ReadExactAsync(stream, frame.AsMemory(14, payloadLength + 2), cancellationToken).ConfigureAwait(false);
                     }
 
                     await _channel.Writer.WriteAsync(frame, cancellationToken).ConfigureAwait(false);

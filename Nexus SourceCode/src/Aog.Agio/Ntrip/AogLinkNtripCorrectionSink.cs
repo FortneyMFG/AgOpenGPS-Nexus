@@ -58,13 +58,13 @@ public sealed class AogLinkNtripCorrectionSink : INtripCorrectionSink
 
         var sequence = (ushort)(Interlocked.Increment(ref _sequence) & 0xFFFF);
         var header = new AogLinkFrameHeader(
-            version: 1,
-            messageClass: AogLinkMessageCatalog.GnssClass,
-            messageType: AogLinkMessageCatalog.RtcmCorrectionsType,
-            sequence: sequence,
-            source: AogLinkMessageCatalog.NtripSourceAddress,
-            destination: AogLinkMessageCatalog.BroadcastDestinationAddress,
-            payloadLength: (ushort)payload.Length);
+            Version: 1,
+            MessageClass: AogLinkMessageCatalog.GnssClass,
+            MessageType: AogLinkMessageCatalog.RtcmCorrectionsType,
+            Sequence: sequence,
+            Source: AogLinkMessageCatalog.NtripSourceAddress,
+            Destination: AogLinkMessageCatalog.BroadcastDestinationAddress,
+            PayloadLength: (ushort)payload.Length);
 
         header.Validate(payload.Length);
 

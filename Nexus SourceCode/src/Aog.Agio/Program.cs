@@ -95,6 +95,10 @@ public static class Program
                 services
                     .AddOptions<MeshTelemetryAggregatorOptions>()
                     .BindConfiguration("AgioHost:Mesh")
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
+                services
                     .AddOptions<LegacyMeshOptions>()
                     .BindConfiguration("AgioHost:LegacyMesh")
                     .ValidateDataAnnotations()

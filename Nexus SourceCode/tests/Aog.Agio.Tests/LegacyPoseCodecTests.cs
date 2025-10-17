@@ -182,14 +182,6 @@ public sealed class LegacyPoseCodecTests
     }
 
     [Theory]
-using System.Buffers.Binary;
-using Xunit;
-
-public class LegacyPoseCodecTests
-{
-    // --- 1) Lat/Lon coercion -------------------------------------------------
-
-    [Theory]
     [MemberData(nameof(EncodePose_CoercesInvalidLatLonData))]
     public void EncodePose_CoercesInvalidLatLon(double latitude, double longitude, double expectedLatitude, double expectedLongitude)
     {
@@ -214,8 +206,6 @@ public class LegacyPoseCodecTests
         { 95d,                 -181d,       90d,  -180d },    // clamp / wrap
         { -120d,                540d,      -90d,   180d },    // clamp / wrap
     };
-
-    // --- 2) Non-finite dynamics -> zero --------------------------------------
 
     [Theory]
     [InlineData(double.NaN)]
@@ -251,10 +241,9 @@ public class LegacyPoseCodecTests
         // Integer-scaled extras zeroed
         Assert.Equal(0, BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(43, 2)));  // (reserved/flags)
         Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(45, 2)));   // YawRate (scaled)
-        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(47, 2)));
-        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(49, 2)));
+        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(47, 2)));   // IMU roll
+        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(49, 2)));   // IMU pitch
     }
-}
 
     private static byte ComputeChecksum(ReadOnlySpan<byte> frame)
     {

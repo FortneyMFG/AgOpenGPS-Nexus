@@ -1,5 +1,6 @@
-using Aog.Agio.Nmea;
 using Aog.Agio.Windows;
+using Aog.Agio.Serial;
+using Aog.Agio.Nmea;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;

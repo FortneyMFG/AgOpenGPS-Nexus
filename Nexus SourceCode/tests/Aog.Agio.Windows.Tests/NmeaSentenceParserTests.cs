@@ -200,7 +200,7 @@ public void TryParse_GgaSentenceWithBlankNumericFields_AllowsNulls()
     [Fact]
     public void TryParse_UnsupportedSentence_ReturnsFalse()
     {
-        const string sentence = "$GPXYZ,1,2,3*53";
+        const string sentence = "$GPXYZ,1,2,3*50";
 
         var success = _parser.TryParse(sentence, out var parsed, out var error);
 

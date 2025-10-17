@@ -712,7 +712,7 @@ public sealed class LegacyUdpGatewayTests
         Assert.True(recordedMetadata.IsSteerSwitchOn);
         Assert.Equal(metadata.IsRemoteSwitchOn, recordedMetadata.IsRemoteSwitchOn);
         Assert.Equal(metadata.IsWorkSwitchOn, recordedMetadata.IsWorkSwitchOn);
-        Assert.Equal(frame.Span[12], recordedMetadata.RawPwm);
+        Assert.Equal(frame.AsSpan()[12], recordedMetadata.RawPwm);
 
         Assert.Empty(poseObserver.Poses);
         Assert.Empty(discoveryObserver.Announcements);

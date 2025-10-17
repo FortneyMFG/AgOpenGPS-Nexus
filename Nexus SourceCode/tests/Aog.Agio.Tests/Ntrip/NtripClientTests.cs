@@ -86,8 +86,8 @@ public sealed class NtripClientTests
 
     private static async Task<string> RunNtripServerAsync(TcpListener listener, string expectedMountPoint, byte[] payload, CancellationToken cancellationToken)
     {
-        await using var client = await listener.AcceptTcpClientAsync(cancellationToken).ConfigureAwait(false);
-        await using var network = client.GetStream();
+        using var client = await listener.AcceptTcpClientAsync(cancellationToken).ConfigureAwait(false);
+        using var network = client.GetStream();
 
         var request = await ReadRequestAsync(network, cancellationToken).ConfigureAwait(false);
         Assert.Contains($"GET /{expectedMountPoint} HTTP/1.1", request, StringComparison.Ordinal);

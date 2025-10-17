@@ -37,7 +37,8 @@ public sealed class LegacySteerCodecTests
         Assert.Equal(metadata.GuidanceStatus, decodedMetadata.GuidanceStatus);
         var expectedSpeedKph = metadata.CurrentSpeedMps!.Value * 3.6;
         Assert.Equal(expectedSpeedKph, decodedMetadata.SpeedKph, 6);
-        Assert.Equal(metadata.CurrentSpeedMps, decodedMetadata.CurrentSpeedMps, 6);
+        Assert.True(decodedMetadata.CurrentSpeedMps.HasValue);
+        Assert.Equal(metadata.CurrentSpeedMps!.Value, decodedMetadata.CurrentSpeedMps.Value, 6);
         Assert.Equal(metadata.TramControl, decodedMetadata.TramControl);
         Assert.Equal(0x7F, decodedMetadata.SourceAddress);
         Assert.Equal((uint)(sections.Mask & 0xFFF), decodedSections.Mask);

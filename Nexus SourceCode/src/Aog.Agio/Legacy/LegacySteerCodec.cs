@@ -157,7 +157,7 @@ public sealed class LegacySteerCodec
             }
             else
             {
-                var allowedMask = (1u << cappedCount) - 1u;
+                var allowedMask = (1u << (int)cappedCount) - 1u;
                 mask = sectionMask.Mask & allowedMask & 0xFFFFu;
             }
         }

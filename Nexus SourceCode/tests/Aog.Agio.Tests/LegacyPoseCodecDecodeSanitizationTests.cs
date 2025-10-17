@@ -8,23 +8,23 @@ namespace Aog.Agio.Tests;
 
 public sealed class LegacyPoseCodecDecodeSanitizationTests
 {
-    public static TheoryData<Action<Span<byte>>, Func<Pose, double>> NonFiniteFieldMutations => new()
+    public static TheoryData<Action<byte[]>, Func<Pose, double>> NonFiniteFieldMutations => new()
     {
-        { payload => BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(24, 4), float.NaN), pose => pose.SpeedMps },
-        { payload => BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(24, 4), float.PositiveInfinity), pose => pose.SpeedMps },
-        { payload => BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(28, 4), float.NaN), pose => pose.RollRad },
-        { payload => BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(28, 4), float.NegativeInfinity), pose => pose.RollRad },
-        { payload => BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(32, 4), float.NaN), pose => pose.AltitudeM },
-        { payload => BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(32, 4), float.PositiveInfinity), pose => pose.AltitudeM },
-        { payload => BinaryPrimitives.WriteUInt16LittleEndian(payload.Slice(47, 2), BitConverter.HalfToUInt16Bits(Half.NaN)), pose => pose.PitchRad },
-        { payload => BinaryPrimitives.WriteUInt16LittleEndian(payload.Slice(47, 2), BitConverter.HalfToUInt16Bits(Half.PositiveInfinity)), pose => pose.PitchRad },
-        { payload => BinaryPrimitives.WriteUInt16LittleEndian(payload.Slice(49, 2), BitConverter.HalfToUInt16Bits(Half.NaN)), pose => pose.YawRateRadps },
-        { payload => BinaryPrimitives.WriteUInt16LittleEndian(payload.Slice(49, 2), BitConverter.HalfToUInt16Bits(Half.NegativeInfinity)), pose => pose.YawRateRadps },
+        { frame => BinaryPrimitives.WriteSingleLittleEndian(GetPayload(frame).Slice(24, 4), float.NaN), pose => pose.SpeedMps },
+        { frame => BinaryPrimitives.WriteSingleLittleEndian(GetPayload(frame).Slice(24, 4), float.PositiveInfinity), pose => pose.SpeedMps },
+        { frame => BinaryPrimitives.WriteSingleLittleEndian(GetPayload(frame).Slice(28, 4), float.NaN), pose => pose.RollRad },
+        { frame => BinaryPrimitives.WriteSingleLittleEndian(GetPayload(frame).Slice(28, 4), float.NegativeInfinity), pose => pose.RollRad },
+        { frame => BinaryPrimitives.WriteSingleLittleEndian(GetPayload(frame).Slice(32, 4), float.NaN), pose => pose.AltitudeM },
+        { frame => BinaryPrimitives.WriteSingleLittleEndian(GetPayload(frame).Slice(32, 4), float.PositiveInfinity), pose => pose.AltitudeM },
+        { frame => BinaryPrimitives.WriteUInt16LittleEndian(GetPayload(frame).Slice(47, 2), BitConverter.HalfToUInt16Bits(Half.NaN)), pose => pose.PitchRad },
+        { frame => BinaryPrimitives.WriteUInt16LittleEndian(GetPayload(frame).Slice(47, 2), BitConverter.HalfToUInt16Bits(Half.PositiveInfinity)), pose => pose.PitchRad },
+        { frame => BinaryPrimitives.WriteUInt16LittleEndian(GetPayload(frame).Slice(49, 2), BitConverter.HalfToUInt16Bits(Half.NaN)), pose => pose.YawRateRadps },
+        { frame => BinaryPrimitives.WriteUInt16LittleEndian(GetPayload(frame).Slice(49, 2), BitConverter.HalfToUInt16Bits(Half.NegativeInfinity)), pose => pose.YawRateRadps },
     };
 
     [Theory]
     [MemberData(nameof(NonFiniteFieldMutations))]
-    public void TryDecodePose_NormalizesNonFiniteField(Action<Span<byte>> mutatePayload, Func<Pose, double> selector)
+    public void TryDecodePose_NormalizesNonFiniteField(Action<byte[]> mutateFrame, Func<Pose, double> selector)
     {
         var codec = new LegacyPoseCodec();
         var frame = codec.EncodePose(
@@ -48,11 +48,12 @@ public sealed class LegacyPoseCodecDecodeSanitizationTests
                 ImuYawRateHundredths = -75,
             });
 
-        var payload = frame.AsSpan(5, LegacyPoseCodec.MainAntennaPayloadLength);
-        mutatePayload(payload);
+        mutateFrame(frame);
         LegacyChecksum.Write(frame);
 
         Assert.True(codec.TryDecodePose(frame, out var pose, out _));
         Assert.Equal(0d, selector(pose));
     }
+
+    private static Span<byte> GetPayload(byte[] frame) => frame.AsSpan(5, LegacyPoseCodec.MainAntennaPayloadLength);
 }

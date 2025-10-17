@@ -10,7 +10,7 @@ namespace Aog.Plugins.TelemetryLogging;
 /// <summary>
 /// Describes a captured telemetry session and the files required to replay it.
 /// </summary>
-public sealed class TelemetryLogManifest
+public sealed record TelemetryLogManifest
 {
     /// <summary>
     /// Gets the current schema version written by the telemetry logging plugin.
@@ -142,12 +142,19 @@ public sealed class TelemetryLogManifest
     /// <summary>
     /// Normalises metadata after deserialization, ensuring optional collections are populated.
     /// </summary>
-    public void Normalise()
+    public TelemetryLogManifest Normalise()
     {
-        FieldIds = FieldIds?.Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => id.Trim()).ToList()
+        var normalizedFieldIds = FieldIds?.Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => id.Trim()).ToList()
             ?? new List<string>();
-        JobTags = JobTags?.Where(tag => !string.IsNullOrWhiteSpace(tag)).Select(tag => tag.Trim()).ToList()
+        var normalizedJobTags = JobTags?.Where(tag => !string.IsNullOrWhiteSpace(tag)).Select(tag => tag.Trim()).ToList()
             ?? new List<string>();
-        Files ??= new TelemetryLogFileNames();
+        var normalizedFiles = Files ?? new TelemetryLogFileNames();
+        
+        return this with
+        {
+            FieldIds = normalizedFieldIds,
+            JobTags = normalizedJobTags,
+            Files = normalizedFiles
+        };
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Agio.Legacy;
@@ -116,7 +117,7 @@ public sealed class LegacyMeshPresencePublisherTests
             DefaultJobId = "job:alpha",
         });
 
-        var publisher = new LegacyMeshPresencePublisher(meshService, options);
+        var publisher = new LegacyMeshPresencePublisher(meshService, options, NullLogger<LegacyMeshPresencePublisher>.Instance);
         meshService.Registrations.Clear();
 
         var pose = new Pose
@@ -198,7 +199,7 @@ public sealed class LegacyMeshPresencePublisherTests
         Assert.Contains("device:legacy", entry.Message, StringComparison.Ordinal);
     }
 
-    private sealed class RecordingMeshService : ILiveTelemetryMeshService
+    private class RecordingMeshService : ILiveTelemetryMeshService
     {
         public List<MeshDeviceRegistration> Registrations { get; } = new();
         public List<MeshPresenceUpdate> PresenceUpdates { get; } = new();
@@ -211,9 +212,12 @@ public sealed class LegacyMeshPresencePublisherTests
 
         public ValueTask PublishAsync(MeshPublishRequest request, CancellationToken cancellationToken = default) => ValueTask.CompletedTask;
 
-        public IAsyncEnumerable<MeshPublication> SubscribeAsync(MeshSubscriptionRequest request, CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<MeshPublication> SubscribeAsync(MeshSubscriptionRequest request, CancellationToken cancellationToken = default) =>
+            EmptyAsync();
+
+        private static async IAsyncEnumerable<MeshPublication> EmptyAsync()
         {
-            return AsyncEnumerable.Empty<MeshPublication>();
+            yield break;
         }
 
         public ValueTask UpdatePresenceAsync(MeshPresenceUpdate update, CancellationToken cancellationToken = default)
@@ -223,6 +227,15 @@ public sealed class LegacyMeshPresencePublisherTests
         }
 
         public IReadOnlyList<MeshPresenceSnapshot> ListPresence(string? seasonId = null, string? jobId = null) => Array.Empty<MeshPresenceSnapshot>();
+
+        public MeshDiagnosticsSnapshot GetDiagnostics() =>
+            new(
+                DateTimeOffset.UtcNow,
+                Registrations.Count,
+                ActiveSubscriptionCount: 0,
+                ActivePresenceCount: PresenceUpdates.Count,
+                Acl: new MeshDiagnosticsAclSnapshot(0, 0, 0, 0, 0, 0),
+                Traffic: new MeshDiagnosticsTrafficSnapshot(0, 0, 0, 0, 0, 0));
     }
 
     private sealed class FailingMeshService : RecordingMeshService

@@ -159,22 +159,13 @@ public sealed class CoreHealthServiceTests
         private readonly ConcurrentQueue<DelayRequest> _requests = new();
         private readonly SemaphoreSlim _signal = new(0);
 
-        public override ValueTask Delay(TimeSpan delay, CancellationToken cancellationToken = default)
+        public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
         {
-            var request = new DelayRequest(delay);
+            var request = new DelayRequest(dueTime);
             _requests.Enqueue(request);
             _signal.Release();
 
-            if (cancellationToken.CanBeCanceled)
-            {
-                cancellationToken.Register(static state =>
-                {
-                    var tuple = (Tuple<DelayRequest, CancellationToken>)state!;
-                    tuple.Item1.TryCancel(tuple.Item2);
-                }, Tuple.Create(request, cancellationToken));
-            }
-
-            return new ValueTask(request.Task);
+            return new TestTimer(callback, state, request);
         }
 
         public async Task<DelayRequest> WaitForDelayAsync(CancellationToken cancellationToken = default)
@@ -202,9 +193,41 @@ public sealed class CoreHealthServiceTests
 
             public Task Task => _tcs.Task;
 
+            public void Complete()
+            {
+                _tcs.TrySetResult(true);
+            }
+
+            public bool TryCancel(CancellationToken cancellationToken)
+            {
+                return _tcs.TrySetCanceled(cancellationToken);
+            }
+        }
+
+        private sealed class TestTimer : ITimer
+        {
+            private readonly TimerCallback _callback;
+            private readonly object? _state;
+            private readonly DelayRequest _request;
+
+            public TestTimer(TimerCallback callback, object? state, DelayRequest request)
+            {
+                _callback = callback;
+                _state = state;
+                _request = request;
+            }
+
+            public void Dispose()
+            {
+                // No-op for test implementation
+            }
+        }
+            public TimeSpan Delay { get; }
+
+            public Task Task => _tcs.Task;
+
             public void Complete() => _tcs.TrySetResult(true);
 
             public void TryCancel(CancellationToken token) => _tcs.TrySetCanceled(token);
         }
     }
-}

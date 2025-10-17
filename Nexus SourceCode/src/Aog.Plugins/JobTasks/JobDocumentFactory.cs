@@ -45,7 +45,7 @@ internal static class JobDocumentFactory
             CreatedAt = metadata.CreatedAt,
             UpdatedAt = metadata.UpdatedAt,
             ActiveSessionId = metadata.ActiveSessionId,
-            Context = CreateContext(metadata.Context),
+            Context = CreateContext(metadata.Context ?? throw new InvalidDataException("Job metadata is missing required context data.")),
             Tags = metadata.Tags is { Count: > 0 } ? new List<string>(metadata.Tags) : null,
             Paths = new JobPathsDocument
             {
@@ -59,18 +59,10 @@ internal static class JobDocumentFactory
             Stats = CreateStatistics(snapshot.Stats),
             Sessions = sessions.Count > 0 ? sessions.Select(CreateSession).ToList() : new List<JobSessionDocument>(),
             Extensions = snapshot.Extensions is null ? null : new Dictionary<string, JsonElement>(snapshot.Extensions),
-            Equipment = CreateEquipment(snapshot.Equipment)
+            Equipment = CreateEquipment(snapshot.Equipment),
+            StartedAt = (metadata.State is JobLifecycleState.Active or JobLifecycleState.Paused or JobLifecycleState.Mounted) ? metadata.CreatedAt : null,
+            EndedAt = (metadata.State is JobLifecycleState.Completed or JobLifecycleState.Closed) ? metadata.UpdatedAt : null
         };
-
-        if (metadata.State is JobLifecycleState.Active or JobLifecycleState.Paused or JobLifecycleState.Mounted)
-        {
-            document.StartedAt = metadata.CreatedAt;
-        }
-
-        if (metadata.State is JobLifecycleState.Completed or JobLifecycleState.Closed)
-        {
-            document.EndedAt = metadata.UpdatedAt;
-        }
 
         return document;
     }

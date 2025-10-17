@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -234,8 +235,8 @@ public sealed class CropLayerIngestionPipeline
             throw new InvalidOperationException($"Feature '{operation.FeatureId}' already exists in layer '{_layerId}'.");
         }
 
-        var geometry = CloneGeometry(operation.GeometryAfterNode, operation.FeatureId, required: true);
-        var attributes = ExtractAttributes(operation.AttributesAfterNode, null, requireAll: true);
+    var geometry = CloneGeometry(operation.GeometryAfter, operation.FeatureId, required: true);
+    var attributes = ExtractAttributes(operation.AttributesAfter, null, requireAll: true);
         var area = ComputeArea(operation.Summary, null);
 
         return new CropZoneFeature(
@@ -259,9 +260,9 @@ public sealed class CropLayerIngestionPipeline
             throw new InvalidOperationException($"Cannot update crop feature '{operation.FeatureId}' because it has not been created.");
         }
 
-        var fallback = existing.ToAttributes();
-        var attributes = ExtractAttributes(operation.AttributesAfterNode, fallback, requireAll: false);
-        var geometry = CloneGeometry(operation.GeometryAfterNode, operation.FeatureId, required: false) ?? existing.GeometryNode.DeepClone();
+    var fallback = existing.ToAttributes();
+    var attributes = ExtractAttributes(operation.AttributesAfter, fallback, requireAll: false);
+    var geometry = CloneGeometry(operation.GeometryAfter, operation.FeatureId, required: false) ?? existing.GeometryNode.DeepClone();
         var area = ComputeArea(operation.Summary, existing.AreaSqMeters);
 
         var updated = existing.With(
@@ -392,7 +393,7 @@ public sealed class CropLayerIngestionPipeline
             return null;
         }
 
-        if (geometryNode is JsonNull)
+        if (geometryNode.GetValueKind() == JsonValueKind.Null)
         {
             if (required)
             {
@@ -458,7 +459,7 @@ public sealed class CropLayerIngestionPipeline
             return false;
         }
 
-        if (node is null || node is JsonNull)
+        if (node is null || node.GetValueKind() == JsonValueKind.Null)
         {
             return true;
         }
@@ -475,7 +476,7 @@ public sealed class CropLayerIngestionPipeline
     private static bool TryReadInt(JsonObject obj, string propertyName, out int value)
     {
         value = default;
-        if (!obj.TryGetPropertyValue(propertyName, out var node) || node is null || node is JsonNull)
+        if (!obj.TryGetPropertyValue(propertyName, out var node) || node is null || node.GetValueKind() == JsonValueKind.Null)
         {
             return false;
         }

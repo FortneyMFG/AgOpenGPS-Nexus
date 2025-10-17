@@ -159,15 +159,15 @@ public sealed class NtripClientOptions
     /// <returns>The encoded request path.</returns>
     public string GetRequestPath()
     {
-        var mount = MountPoint.StartsWith('/', StringComparison.Ordinal) ? MountPoint : $"/{MountPoint}";
-        return Uri.EscapeUriString(mount);
+        var mount = MountPoint.StartsWith("/", StringComparison.Ordinal) ? MountPoint : $"/{MountPoint}";
+        return Uri.EscapeDataString(mount);
     }
 
     private static bool IsSafeHeaderValue(string value)
     {
         foreach (var ch in value)
         {
-            if (ch is < ' ' or >= 0x7F)
+            if (ch < ' ' || ch >= 127)
             {
                 return false;
             }

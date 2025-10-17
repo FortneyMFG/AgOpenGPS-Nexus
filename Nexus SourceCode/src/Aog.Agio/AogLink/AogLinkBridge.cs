@@ -15,13 +15,13 @@ public sealed class AogLinkBridge
 
         var payload = request.ToByteArray();
         var header = new AogLinkFrameHeader(
-            version: 1,
-            messageClass: AogLinkMessageCatalog.ControlClass,
-            messageType: AogLinkMessageCatalog.HandshakeRequestType,
-            sequence: sequence,
-            source: source,
-            destination: destination,
-            payloadLength: (ushort)payload.Length);
+            Version: 1,
+            MessageClass: AogLinkMessageCatalog.ControlClass,
+            MessageType: AogLinkMessageCatalog.HandshakeRequestType,
+            Sequence: sequence,
+            Source: source,
+            Destination: destination,
+            PayloadLength: (ushort)payload.Length);
 
         return new AogLinkFrame(header, payload);
     }
@@ -45,13 +45,13 @@ public sealed class AogLinkBridge
 
         var payload = response.ToByteArray();
         var header = new AogLinkFrameHeader(
-            version: 1,
-            messageClass: AogLinkMessageCatalog.ControlClass,
-            messageType: AogLinkMessageCatalog.HandshakeResponseType,
-            sequence: sequence,
-            source: source,
-            destination: destination,
-            payloadLength: (ushort)payload.Length);
+            Version: 1,
+            MessageClass: AogLinkMessageCatalog.ControlClass,
+            MessageType: AogLinkMessageCatalog.HandshakeResponseType,
+            Sequence: sequence,
+            Source: source,
+            Destination: destination,
+            PayloadLength: (ushort)payload.Length);
 
         return new AogLinkFrame(header, payload);
     }

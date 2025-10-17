@@ -925,7 +925,9 @@ public sealed class LegacyMigrationOptions
     }
 
     internal string ResolveLogsDirectory()
-        => Path.GetFullPath(Path.IsPathRooted(LogsDirectoryName) ? LogsDirectoryName : Path.Combine(InputDirectory, LogsDirectoryName));
+    {
+        return Path.GetFullPath(Path.IsPathRooted(LogsDirectoryName) ? LogsDirectoryName : Path.Combine(InputDirectory, LogsDirectoryName));
+    }
 
     internal string ResolveFieldHistoryPath()
         => Path.GetFullPath(Path.IsPathRooted(FieldHistoryFileName) ? FieldHistoryFileName : Path.Combine(InputDirectory, FieldHistoryFileName));

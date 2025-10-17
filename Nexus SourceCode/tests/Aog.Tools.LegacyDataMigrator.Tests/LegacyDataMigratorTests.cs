@@ -20,7 +20,7 @@ public sealed class LegacyDataMigratorTests
     [Fact]
     public async Task MigrateAsync_WritesTelemetryAndHistory()
     {
-        var legacyPath = Path.Combine(AppContext.BaseDirectory, SampleLegacyPath);
+        var legacyPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", SampleLegacyPath));
         using var temp = new TempDirectory();
 
         var migrator = new LegacyDataMigrator();
@@ -49,10 +49,10 @@ public sealed class LegacyDataMigratorTests
             reader.RowGroupCount.Should().Be(1);
             var schema = reader.Schema;
             using var rowGroup = reader.OpenRowGroupReader(0);
-            var latitudeField = (DataField<double>)schema.DataFields.Single(f => f.Name == "latitude_deg");
-            var speedField = (DataField<double>)schema.DataFields.Single(f => f.Name == "speed_mps");
-            var latitudes = (double[])ReadColumn(rowGroup, latitudeField);
-            var speeds = (double[])ReadColumn(rowGroup, speedField);
+            var latitudeField = schema.DataFields.Single(f => f.Name == "latitude_deg");
+            var speedField = schema.DataFields.Single(f => f.Name == "speed_mps");
+            var latitudes = ReadColumn(rowGroup, latitudeField).Cast<double>().ToArray();
+            var speeds = ReadColumn(rowGroup, speedField).Cast<double>().ToArray();
 
             latitudes.Should().ContainInOrder(45.123, 45.124);
             speeds.Should().Contain(new[] { 5.5, 5.6 });
@@ -64,8 +64,8 @@ public sealed class LegacyDataMigratorTests
             reader.RowGroupCount.Should().Be(1);
             var schema = reader.Schema;
             using var rowGroup = reader.OpenRowGroupReader(0);
-            var payloadField = (DataField<byte[]?>)schema.DataFields.Single(f => f.Name == "payload");
-            var payloads = (byte[]?[])ReadColumn(rowGroup, payloadField);
+            var payloadField = schema.DataFields.Single(f => f.Name == "payload");
+            var payloads = ReadColumn(rowGroup, payloadField).Cast<byte[]?>().ToArray();
             payloads.Should().HaveCount(1);
             payloads[0].Should().BeEquivalentTo(new byte[] { 0x0A, 0xFF });
         }
@@ -77,10 +77,10 @@ public sealed class LegacyDataMigratorTests
             reader.RowGroupCount.Should().Be(1);
             var schema = reader.Schema;
             using var rowGroup = reader.OpenRowGroupReader(0);
-            var temperatureField = (DataField<double?>)schema.DataFields.Single(f => f.Name == "temperature_c");
-            var rainfallField = (DataField<double?>)schema.DataFields.Single(f => f.Name == "rainfall_mm");
-            var temperatures = (double?[])ReadColumn(rowGroup, temperatureField);
-            var rainfall = (double?[])ReadColumn(rowGroup, rainfallField);
+            var temperatureField = schema.DataFields.Single(f => f.Name == "temperature_c");
+            var rainfallField = schema.DataFields.Single(f => f.Name == "rainfall_mm");
+            var temperatures = ReadColumn(rowGroup, temperatureField).Cast<double?>().ToArray();
+            var rainfall = ReadColumn(rowGroup, rainfallField).Cast<double?>().ToArray();
 
             temperatures.Should().Equal(new double?[] { 12.5, 13.1 });
             rainfall.Should().Equal(new double?[] { 0.3, 0.8 });
@@ -164,7 +164,7 @@ public sealed class LegacyDataMigratorTests
     [Fact]
     public async Task ProgramMain_ReturnsZeroOnSuccess()
     {
-        var legacyPath = Path.Combine(AppContext.BaseDirectory, SampleLegacyPath);
+        var legacyPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", SampleLegacyPath));
         using var tempOutput = new TempDirectory();
 
         var exitCode = await Program.Main(new[] { "migrate", "--input", legacyPath, "--output", tempOutput.Path });

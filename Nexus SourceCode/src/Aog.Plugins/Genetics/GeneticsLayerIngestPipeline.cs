@@ -674,7 +674,7 @@ public sealed class GeneticsLayerIngestPipeline
         using var sha = SHA256.Create();
         var bytes = Encoding.UTF8.GetBytes(value);
         var hash = sha.ComputeHash(bytes);
-        var hex = Convert.ToHexString(hash).ToLowerInvariant(CultureInfo.InvariantCulture);
+    var hex = Convert.ToHexString(hash).ToLowerInvariant();
         return hex[..12];
     }
 
@@ -874,9 +874,9 @@ public sealed class GeneticsLayerIngestPipeline
         {
             public bool Equals(VarietyKey x, VarietyKey y)
             {
-                return string.Equals(x.JobId, y.JobId, StringComparer.Ordinal)
-                    && string.Equals(x.Brand, y.Brand, StringComparer.Ordinal)
-                    && string.Equals(x.Product, y.Product, StringComparer.Ordinal)
+                return string.Equals(x.JobId, y.JobId, StringComparison.Ordinal)
+                    && string.Equals(x.Brand, y.Brand, StringComparison.Ordinal)
+                    && string.Equals(x.Product, y.Product, StringComparison.Ordinal)
                     && string.Equals(x.TraitStack, y.TraitStack, StringComparison.Ordinal)
                     && string.Equals(x.Lot, y.Lot, StringComparison.Ordinal)
                     && string.Equals(x.Treatment, y.Treatment, StringComparison.Ordinal)
@@ -886,13 +886,13 @@ public sealed class GeneticsLayerIngestPipeline
             public int GetHashCode(VarietyKey obj)
             {
                 var hash = new HashCode();
-                hash.Add(obj.JobId, StringComparer.Ordinal);
-                hash.Add(obj.Brand, StringComparer.Ordinal);
-                hash.Add(obj.Product, StringComparer.Ordinal);
-                hash.Add(obj.TraitStack, StringComparer.Ordinal);
-                hash.Add(obj.Lot, StringComparer.Ordinal);
-                hash.Add(obj.Treatment, StringComparer.Ordinal);
-                hash.Add(obj.Barcode, StringComparer.Ordinal);
+                hash.Add(obj.JobId?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Brand?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Product?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.TraitStack?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Lot?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Treatment?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Barcode?.ToUpperInvariant() ?? string.Empty);
                 return hash.ToHashCode();
             }
         }

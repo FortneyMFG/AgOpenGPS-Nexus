@@ -223,8 +223,9 @@ public sealed class NtripClient
                 }
 
                 headerBuffer.Write(buffer.AsSpan(0, read));
-                var span = headerBuffer.WrittenSpan;
-                var index = span.IndexOf(HeaderTerminator.Span);
+                var headerString = Encoding.ASCII.GetString(headerBuffer.WrittenMemory.Span);
+                var index = headerString.IndexOf("\r\n\r\n", StringComparison.Ordinal);
+                
                 if (index < 0)
                 {
                     if (headerBuffer.WrittenCount > 16384)
@@ -235,14 +236,13 @@ public sealed class NtripClient
                     continue;
                 }
 
-                var headerSpan = span.Slice(0, index);
-                var statusLineEnd = headerSpan.IndexOf("\r\n"u8);
+                var statusLineEnd = headerString.IndexOf("\r\n", StringComparison.Ordinal);
                 if (statusLineEnd < 0)
                 {
                     throw new InvalidOperationException("Malformed NTRIP response: missing status line terminator.");
                 }
 
-                var statusLine = Encoding.ASCII.GetString(headerSpan.Slice(0, statusLineEnd));
+                var statusLine = headerString.Substring(0, statusLineEnd);
                 if (!statusLine.Contains(" 200", StringComparison.OrdinalIgnoreCase) && !statusLine.StartsWith("ICY 200", StringComparison.OrdinalIgnoreCase))
                 {
                     throw new InvalidOperationException($"NTRIP caster rejected request: {statusLine}.");

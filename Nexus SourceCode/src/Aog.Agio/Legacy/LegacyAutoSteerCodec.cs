@@ -62,7 +62,7 @@ public sealed class LegacyAutoSteerCodec
         payload[5] = 0;
 
         // Section mask: clamp to declared count and to 16-bit payload width
-        var sectionCount = Math.Clamp(sections.SectionCount, 0, 16);
+        var sectionCount = (uint)Math.Clamp(sections.SectionCount, 0, 16);
         uint mask = 0u;
         if (sectionCount > 0)
         {
@@ -98,12 +98,12 @@ public sealed class LegacyAutoSteerCodec
         return (short)scaled;
     }
 
-    private static uint BuildAllowedMask(int sectionCount)
+    private static uint BuildAllowedMask(uint sectionCount)
     {
         if (sectionCount <= 0) return 0u;
         if (sectionCount >= 32) return uint.MaxValue;
 
         // Equivalent to SectionMask.SectionMaskForCount(sectionCount) when available.
-        return (1u << sectionCount) - 1u;
+        return (1u << (int)sectionCount) - 1u;
     }
 }

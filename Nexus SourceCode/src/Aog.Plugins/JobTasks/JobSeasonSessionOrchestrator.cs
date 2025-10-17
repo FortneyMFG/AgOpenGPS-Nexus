@@ -395,7 +395,7 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
                 JobSessionState.Active,
                 now,
                 now,
-                endedAt: null,
+
                 sanitized.WorkOrderId,
                 sanitized.ActiveOperators,
                 sanitized.Notes);

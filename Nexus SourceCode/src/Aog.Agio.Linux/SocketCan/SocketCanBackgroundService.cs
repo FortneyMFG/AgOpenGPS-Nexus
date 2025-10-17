@@ -48,6 +48,20 @@ public sealed class SocketCanBackgroundService : BackgroundService
         while (!stoppingToken.IsCancellationRequested)
         {
             var options = SnapshotOptions(_options.CurrentValue);
+            if (string.IsNullOrWhiteSpace(options.InterfaceName))
+            {
+                _logger.LogInformation(
+                    "SocketCAN monitor disabled. Configure AgioHost:Linux:SocketCan:InterfaceName to enable.");
+
+                var enabled = await WaitForInterfaceAsync(stoppingToken).ConfigureAwait(false);
+                if (!enabled)
+                {
+                    break;
+                }
+
+                continue;
+            }
+
             ISocketCanClient? client = null;
             var reconfigured = false;
             var nextDelay = options.ReconnectDelay;
@@ -163,6 +177,28 @@ public sealed class SocketCanBackgroundService : BackgroundService
             || current.ReceiveTimeout != updated.ReceiveTimeout
             || current.ReconnectDelay != updated.ReconnectDelay
             || !string.Equals(current.SourcePrefix, updated.SourcePrefix, StringComparison.Ordinal);
+    }
+
+    private async Task<bool> WaitForInterfaceAsync(CancellationToken stoppingToken)
+    {
+        var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var registration = _options.OnChange((updated, _) =>
+        {
+            if (!string.IsNullOrWhiteSpace(updated.InterfaceName))
+            {
+                completion.TrySetResult(true);
+            }
+        });
+
+        try
+        {
+            await completion.Task.WaitAsync(stoppingToken).ConfigureAwait(false);
+            return true;
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            return false;
+        }
     }
 
     private CanFrame TranslateFrame(SocketCANSharp.CanFrame frame, string source)

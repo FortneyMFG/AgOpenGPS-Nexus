@@ -264,6 +264,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-304 Yield overlay UX updates _(Done)_ — ADR-049 yield visualization
 - [x] NX-305 Profit heatmap & analytics UI _(Done)_ — ADR-050 profit visualization
 - [ ] NX-987 Simulation bar playback rate label multiplier — Format selected rate using multiplier notation
+- [ ] NX-999 Simulation bar playback rate options read-only guard
 - [ ] NX-989 Simulation bar cancellation log level reduction — Treat OperationCanceledException as informational noise
 - [ ] NX-996 Replay timeline disposal leak — Ensure view-model detaches timeline/exporter handlers
 - [x] NX-306 Field health severity UX _(Done)_ — ADR-052 field health visualization

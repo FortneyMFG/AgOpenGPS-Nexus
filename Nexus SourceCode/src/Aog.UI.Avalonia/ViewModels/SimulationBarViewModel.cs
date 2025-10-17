@@ -23,7 +23,8 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private readonly SimulationConfiguration? _configuration;
     private readonly IReplayController? _replayController;
     private readonly ILogger<SimulationBarViewModel>? _logger;
-    private readonly List<SimulationPlaybackRateOptionViewModel> _playbackRates = new();
+    private readonly ObservableCollection<SimulationPlaybackRateOptionViewModel> _playbackRates = new();
+    private readonly ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> _playbackRateView;
     private readonly EventHandler<ReplayStateChangedEventArgs>? _stateChangedHandler;
 
     private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRateOption;
@@ -63,6 +64,8 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
         TogglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
         ToggleAutoResumeCommand = new DelegateCommand(_ => ToggleAutoResume());
+
+        _playbackRateView = new ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel>(_playbackRates);
 
         InitializePlaybackRates(configuration?.Options?.TimeScale ?? 1.0);
         Routes = SimulationRouteViewModelBuilder.BuildRoutes(
@@ -140,8 +143,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>Gets the available playback rates.</summary>
-    public IReadOnlyList<SimulationPlaybackRateOptionViewModel> PlaybackRates =>
-        new ReadOnlyCollection<SimulationPlaybackRateOptionViewModel>(_playbackRates);
+    public ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> PlaybackRates => _playbackRateView;
 
     /// <summary>Gets the currently selected playback rate multiplier.</summary>
     public double SelectedPlaybackRate
@@ -397,13 +399,26 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         var option = new SimulationPlaybackRateOptionViewModel(rate, OnPlaybackRateOptionSelected);
         _playbackRates.Add(option);
         SortPlaybackRates();
-        OnPropertyChanged(nameof(PlaybackRates));
         return option;
     }
 
     private void SortPlaybackRates()
     {
-        _playbackRates.Sort((left, right) => left.Rate.CompareTo(right.Rate));
+        if (_playbackRates.Count < 2)
+        {
+            return;
+        }
+
+        var ordered = _playbackRates.OrderBy(option => option.Rate).ToList();
+        for (var targetIndex = 0; targetIndex < ordered.Count; targetIndex++)
+        {
+            var item = ordered[targetIndex];
+            var currentIndex = _playbackRates.IndexOf(item);
+            if (currentIndex != targetIndex)
+            {
+                _playbackRates.Move(currentIndex, targetIndex);
+            }
+        }
     }
 
 // Call this when a playback rate option is chosen (e.g., from the UI).

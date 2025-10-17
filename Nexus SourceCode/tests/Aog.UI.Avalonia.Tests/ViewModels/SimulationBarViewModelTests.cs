@@ -59,6 +59,19 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+    public void PlaybackRates_DisallowExternalMutation()
+    {
+        using var viewModel = CreateViewModel();
+
+        var readOnlyRates = viewModel.PlaybackRates;
+        var attempt = () => ((IList<SimulationPlaybackRateOptionViewModel>)readOnlyRates)
+            .Add(new SimulationPlaybackRateOptionViewModel(3.0, _ => { }));
+
+        attempt.Should().Throw<NotSupportedException>();
+        readOnlyRates.Should().HaveCount(3);
+    }
+
+    [Fact]
     public void PlaybackRates_ExposeFormattedLabels()
     {
         using var viewModel = CreateViewModel();

@@ -48,7 +48,10 @@ public sealed class LegacySteerCodec
 
         if (datagram.Length != CommandFrameLength) return false;
         if (datagram[0] != LegacyPoseCodec.Sync0 || datagram[1] != LegacyPoseCodec.Sync1) return false;
-        if (datagram[2] != CommandSourceAddress || datagram[3] != SteerCommandPgn) return false;
+
+        var sourceAddress = datagram[2];
+        if (sourceAddress < 0x01 || sourceAddress > 0xFD) return false;
+        if (datagram[3] != SteerCommandPgn) return false;
         if (datagram[4] != CommandPayloadLength) return false;
         if (!LegacyChecksum.Validate(datagram)) return false;
 
@@ -63,7 +66,7 @@ public sealed class LegacySteerCodec
 
         metadata = new LegacySteerCommandMetadata
         {
-            SourceAddress = datagram[2],
+            SourceAddress = sourceAddress,
             SpeedKph = speedKph,
             CurrentSpeedMps = speedKph / 3.6,
             GuidanceStatus = rawGuidanceStatus,

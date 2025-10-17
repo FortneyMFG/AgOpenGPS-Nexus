@@ -103,17 +103,7 @@ public sealed class JobTasksPersistence
                 ? Path.GetFullPath(trimmed)
                 : Path.GetFullPath(Path.Combine(normalizedManifestRoot, trimmed));
 
-            if (!SharesRoot(normalizedManifestRoot, absoluteCandidate))
-            {
-                return RebaseToTargetRoot(absoluteCandidate, fallbackAbsolute);
-            }
-
-            string relativeToManifest;
-            try
-            {
-                relativeToManifest = Path.GetRelativePath(normalizedManifestRoot, absoluteCandidate);
-            }
-            catch (ArgumentException)
+            if (!TryGetRelativePath(normalizedManifestRoot, absoluteCandidate, out var relativeToManifest))
             {
                 return RebaseToTargetRoot(absoluteCandidate, fallbackAbsolute);
             }
@@ -125,19 +115,9 @@ public sealed class JobTasksPersistence
 
             var rebased = Path.GetFullPath(Path.Combine(normalizedJobRoot, relativeToManifest));
 
-            if (!SharesRoot(normalizedJobRoot, rebased))
+            if (!TryGetRelativePath(normalizedJobRoot, rebased, out var relativeToJobRoot))
             {
                 return fallbackAbsolute;
-            }
-
-            string relativeToJobRoot;
-            try
-            {
-                relativeToJobRoot = Path.GetRelativePath(normalizedJobRoot, rebased);
-            }
-            catch (ArgumentException)
-            {
-                return RebaseToTargetRoot(absoluteCandidate, fallbackAbsolute);
             }
 
             return IsOutsideRoot(relativeToJobRoot)
@@ -178,6 +158,26 @@ public sealed class JobTasksPersistence
                 : StringComparison.Ordinal;
 
             return string.Equals(firstRoot, secondRoot, comparison);
+        }
+
+        static bool TryGetRelativePath(string basePath, string targetPath, out string relativePath)
+        {
+            relativePath = string.Empty;
+
+            if (!SharesRoot(basePath, targetPath))
+            {
+                return false;
+            }
+
+            try
+            {
+                relativePath = Path.GetRelativePath(basePath, targetPath);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
         }
 
         var resolvedLayout = layout with

@@ -141,16 +141,16 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-938 Legacy steer command speed encoding fix
 - [ ] NX-915 gpsd TPV null field handling regression test
 - [ ] NX-934 Legacy UDP section mask snapshot fix
-- [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
-- [ ] NX-931 gpsd monitor restart on socket availability
+- [x] NX-921 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
+- [ ] NX-932 gpsd monitor restart on socket availability
 - [ ] NX-952 Aog.Agio.Windows targeting pack restore guard
 - [x] NX-953 SocketCAN burst tolerance for transient backpressure
 - [x] NX-967 Linux serial enumerator canonical dedupe
 - [x] NX-997 Linux NMEA stream switch logging
 - [ ] NX-971 Linux NMEA VTG null speed log fix
 - [ ] NX-988 Parquet.Net v5 compatibility fixes
-- [ ] NX-988 SocketCAN pump cancellation regression fix
-- [x] NX-988 TimeProvider registration for NMEA auto scanner
+- [ ] NX-989 SocketCAN pump cancellation regression fix
+- [x] NX-990 TimeProvider registration for NMEA auto scanner
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -216,6 +216,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-278 Guidance lane publishing contracts _(Done)_ — ADR-033 guidance planner
 - [x] NX-279 Turn planner integration in guidance plugin _(Done)_ — ADR-033 guidance planner
 - [x] NX-280 Guidance plugin regression suite _(Done)_ — ADR-033 QA coverage
+- [ ] NX-998 Guidance Orchestrator plugin SRS/ADR scaffolding — ADR-069 Guidance Orchestrator
 - [x] NX-281 Mapping plugin zone overlay updates _(Done)_ — ADR-027 zones + ADR-029 mapping kernel
 - [x] NX-282 Variable rate plugin zone gating _(Done)_ — ADR-027 gating semantics
 - [x] NX-283 Device Manager plugin capability surfacing _(Done)_ — ADR-031 compatibility dashboard
@@ -264,6 +265,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-305 Profit heatmap & analytics UI _(Done)_ — ADR-050 profit visualization
 - [ ] NX-987 Simulation bar playback rate label multiplier — Format selected rate using multiplier notation
 - [ ] NX-999 Simulation bar playback rate options read-only guard
+- [ ] NX-989 Simulation bar cancellation log level reduction — Treat OperationCanceledException as informational noise
+- [ ] NX-996 Replay timeline disposal leak — Ensure view-model detaches timeline/exporter handlers
 - [x] NX-306 Field health severity UX _(Done)_ — ADR-052 field health visualization
 - [x] NX-307 Weather timeline & overlay UX _(Done)_ — ADR-053 weather visualization
 - [x] NX-308 Report builder preview & share UI _(Done)_ — ADR-051 report builder UI
@@ -276,7 +279,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-411 Shell & navigation port from V6/AgValonia _(Done)_ — Aligns with artifacts/ui-core-spec.md
 - [x] NX-412 Map canvas & field operations UI port _(Done)_ — Aligns with artifacts/ui-inventory.json
 - [x] NX-413 Job & field lifecycle dialogs port _(Done)_ — Aligns with artifacts/ui-backlog.json
-- [x] NX-414 Settings, hotkeys, and appearance consolidation _(Done)_ — Aligns with artifacts/ui-theme-tokens.json
+- [x] NX-419 Settings, hotkeys, and appearance consolidation _(Done)_ — Aligns with artifacts/ui-theme-tokens.json
 - [x] NX-415 Plugin UI surfaces (guidance, device, analytics, video) _(Done)_ — Aligns with artifacts/ui-to-plugin.yaml
 - [x] NX-416 Diagnostics & AgIO workspace port _(Done)_ — Aligns with artifacts/ui-core-spec.md
 - [x] NX-417 Simulation shell + companion parity automation _(Done)_ — Aligns with docs/reference/metadata-driven-ui-style-guide.md
@@ -284,6 +287,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
 - [x] NX-941 Simulation bar playback rate reset _(Done)_ — Reset configuration default when reverting routes
 - [x] NX-988 Simulation bar cancellation logging suppression _(Done)_ — Ignore replay controller cancellations in transport bar
+- [x] NX-989 Simulation bar design-time data parity _(Done)_ — Align design-time view model with runtime dependencies for the Avalonia designer
+- [x] NX-989 Simulation bar auto-resume guard _(Done)_ — Skip toggling when no replay session is active
+- [x] NX-991 Simulation bar cancellation logging suppression _(Done)_ — Ignore replay controller cancellations in transport bar
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory
@@ -332,7 +338,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-103 Sync tasks.md with tasks.csv tracker _(Done)_
 - [x] NX-125 Stack responsibility reference ADR _(Done)_
 - [x] NX-151 Backlog update for ADR + official plugin tasks _(Done)_
-- [x] NX-116 README experiment narrative refresh _(Done)_
+- [x] NX-123 README experiment narrative refresh _(Done)_
 - [x] NX-124 Spatial constraint zones ADR & SRS sync _(Done)_
 - [x] NX-134 Official plugin dependency map & manifests _(Done)_
 
@@ -351,7 +357,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-342 Developer setup quick start _(Done)_ — SRS §2.8 Documentation
 - [x] NX-922 NuGet local feed path normalization _(Done)_ — Ensure artifacts/nuget source resolves cross-platform
 - [ ] NX-512 README Nexus guide expansion _(In Progress)_ — docs/README.md narrative refresh
-- [x] NX-953 .NET 8 toolchain regression sweep _(Done)_ — Restore CLI, protobuf, and Parquet compatibility after SDK updates
+- [x] NX-960 .NET 8 toolchain regression sweep _(Done)_ — Restore CLI, protobuf, and Parquet compatibility after SDK updates
 - [x] NX-600 NX CLI Plugin backlog update _(Done)_ — Seed implementation tasks for unified `nx` host
 - [x] NX-601 NX CLI Plugin host scaffold _(Done)_ — SRS §18 CLI host with System.CommandLine + Spectre.Console
 - [x] NX-602 NX CLI Plugin endpoint resolver & core status _(Done)_ — SRS §18 transport negotiation + Core health probe
@@ -401,7 +407,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-095 Dealer support escalation process
 - [x] NX-096 Community preview program
 - [x] NX-097 1.0 launch readiness review
-- [ ] NX-938 Legacy steer command guidance status disable fix
+- [ ] NX-943 Legacy steer command guidance status disable fix
 - [ ] NX-940 Legacy steer angle saturation clamp
 
 - [x] NX-333 Legacy zone importer & converter _(Done)_ — ADR-027 zone interop
@@ -536,7 +542,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-245 | Mesh-aware legacy UDP gateway updates | Done |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 presence integration |
 | NX-246 | GNSS correction services bootstrap | Done |  | — | [ADR-066](docs/ADR/ADR-roadmap.md) | ADR-066 GNSS correction services |
 | NX-742 | SocketCAN channel backpressure guardrails | Done | AI | — | — | Drop stalled subscribers and stress fast consumers |
-| NX-931 | Linux serial scan configuration binding | Done | AI | — | — | Bind `AgioHost:Linux:Serial:Scan` options, document overrides, add tests |
+| NX-933 | Linux serial scan configuration binding | Done | AI | — | — | Bind `AgioHost:Linux:Serial:Scan` options, document overrides, add tests |
 | NX-986 | Linux serial symlink deduplication fix | In Progress | AI | — | — | Collapse duplicate device nodes discovered via symlinks |
 | NX-952 | SocketCAN subscriber eviction reset | In Progress | AI | — | — | Ensure eviction clears backpressure and re-subscription regression test |
 | NX-967 | Linux serial enumerator canonical dedupe | Done | AI | — | — | Canonicalize enumerated device paths and dedupe results |
@@ -660,7 +666,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-411 | Shell & navigation port from V6/AgValonia | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port menus/toolbars per artifacts/ui-core-spec.md |
 | NX-412 | Map canvas & field operations UI port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Integrate map canvas + boundary/flag dialogs per plan |
 | NX-413 | Job & field lifecycle dialogs port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Rebuild job/field dialogs aligned with artifacts/ui-backlog.json |
-| NX-414 | Settings, hotkeys, and appearance consolidation | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port settings dialogs with theme tokens |
+| NX-419 | Settings, hotkeys, and appearance consolidation | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port settings dialogs with theme tokens |
 | NX-415 | Plugin UI surfaces (sections, autosteer, video) | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Implement plugin injection per artifacts/ui-to-plugin.yaml |
 | NX-416 | Diagnostics & AgIO workspace port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port diagnostics dialogs aligning with UI core spec |
 | NX-417 | Simulation shell + companion parity automation | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Wire simulator dialog + metadata snapshot harness |
@@ -777,12 +783,12 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-095 | Dealer support escalation process and SLA tracking | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Runbook + contacts |
 | NX-096 | Community preview program with opt-in builds and survey loop | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Capture structured feedback |
 | NX-097 | 1.0 launch readiness review and sign-off checklist | Done |  | — | [SRS §1.4 Release Management](docs/SRS/NOTES.md#srs-14-release-management) | Cross-team go/no-go |
-| NX-931 | Legacy shapefile multi-part boundary import fix | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Preserve exterior vertices from multi-part polygons |
+| NX-936 | Legacy shapefile multi-part boundary import fix | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Preserve exterior vertices from multi-part polygons |
 | NX-937 | Legacy pose codec non-finite guard | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Normalize NaN/∞ pose fields before encoding |
-| NX-938 | Legacy steer command guidance status disable fix | Planned |  | — | — | Ensure disabled steer commands encode status zero |
+| NX-943 | Legacy steer command guidance status disable fix | Planned |  | — | — | Ensure disabled steer commands encode status zero |
 | NX-939 | Legacy pose lat/lon sanitization | In Progress |  | — | — | Clamp invalid coordinates before encoding |
-| NX-940 | Legacy steer command source override | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Allow overriding UDP source address metadata |
-| NX-940 | Legacy frame checksum length guard | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Guard short frames before validating checksum |
+| NX-944 | Legacy steer command source override | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Allow overriding UDP source address metadata |
+| NX-945 | Legacy frame checksum length guard | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Guard short frames before validating checksum |
 | NX-940 | Legacy steer angle saturation clamp | In Progress |  | — | — | Limit steer command payload to ±3276 hundredths |
 
 ## Legend

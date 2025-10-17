@@ -49,7 +49,7 @@ public sealed class ZoneProtoMapperTests
         var proto = ZoneProtoMapper.ToProto(definition);
 
         proto.ZoneId.Should().Be(definition.ZoneId);
-        proto.Type.Should().Be(Aog.Core.V1.ZoneType.ZoneTypeKeepOut);
+        proto.Type.Should().Be(Aog.Core.V1.ZoneType.KeepOut);
         proto.Label.Should().Be(definition.Label);
         proto.Priority.Should().Be(definition.Priority);
         proto.Enabled.Should().BeTrue();

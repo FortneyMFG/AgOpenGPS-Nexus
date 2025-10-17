@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -35,7 +36,7 @@ public sealed class ReplayTimelineBookmarkViewModel
         get
         {
             var format = Timestamp.TotalHours >= 1 ? "hh\\:mm\\:ss" : "mm\\:ss";
-            return Timestamp.ToString(format);
+            return Timestamp.ToString(format, CultureInfo.InvariantCulture);
         }
     }
 }

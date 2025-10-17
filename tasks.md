@@ -386,6 +386,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-096 Community preview program
 - [x] NX-097 1.0 launch readiness review
 - [ ] NX-938 Legacy steer command guidance status disable fix
+- [ ] NX-940 Legacy steer angle saturation clamp
 
 - [x] NX-333 Legacy zone importer & converter _(Done)_ — ADR-027 zone interop
 - [x] NX-334 Legacy job migration tooling _(Done)_ — ADR-040/041 season/session migration
@@ -760,6 +761,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-937 | Legacy pose codec non-finite guard | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Normalize NaN/∞ pose fields before encoding |
 | NX-938 | Legacy steer command guidance status disable fix | Planned |  | — | — | Ensure disabled steer commands encode status zero |
 | NX-939 | Legacy pose lat/lon sanitization | In Progress |  | — | — | Clamp invalid coordinates before encoding |
+| NX-940 | Legacy steer angle saturation clamp | In Progress |  | — | — | Limit steer command payload to ±3276 hundredths |
 
 ## Legend
 

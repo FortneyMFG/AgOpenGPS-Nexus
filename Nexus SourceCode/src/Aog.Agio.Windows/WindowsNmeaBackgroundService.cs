@@ -10,6 +10,7 @@ namespace Aog.Agio.Windows;
 public sealed class WindowsNmeaBackgroundService : BackgroundService
 {
     private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan StreamVerificationInterval = TimeSpan.FromSeconds(2);
 
     private readonly NmeaAutoScanner _scanner;
     private readonly ILogger<WindowsNmeaBackgroundService> _logger;
@@ -47,7 +48,7 @@ public sealed class WindowsNmeaBackgroundService : BackgroundService
                     result.Vtg.TrueCourseDegrees);
 
                 // TODO(NX-022): Wire the parsed stream into the GNSS gRPC service once defined.
-                await Task.Delay(Timeout.InfiniteTimeSpan, stoppingToken);
+                await MonitorActiveStreamAsync(result, stoppingToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -58,6 +59,43 @@ public sealed class WindowsNmeaBackgroundService : BackgroundService
                 _logger.LogError(ex, "Unexpected error during NMEA COM scan. Retrying in {Delay}.", RetryDelay);
                 await Task.Delay(RetryDelay, stoppingToken);
             }
+        }
+    }
+
+    private async Task MonitorActiveStreamAsync(NmeaPortScanResult activePort, CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            await Task.Delay(StreamVerificationInterval, stoppingToken).ConfigureAwait(false);
+
+            NmeaPortScanResult? verificationResult;
+            try
+            {
+                verificationResult = await _scanner
+                    .ScanAsync(stoppingToken, logOnSuccess: false, logWhenNoneDetected: false)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation(
+                    "Monitoring for NMEA stream on {PortName} was canceled. Resuming auto-scan.",
+                    activePort.PortName);
+                return;
+            }
+
+            if (verificationResult is null)
+            {
+                _logger.LogInformation(
+                    "NMEA stream on {PortName} stopped producing sentences. Resuming auto-scan.",
+                    activePort.PortName);
+                return;
+            }
+
+            activePort = verificationResult;
         }
     }
 }

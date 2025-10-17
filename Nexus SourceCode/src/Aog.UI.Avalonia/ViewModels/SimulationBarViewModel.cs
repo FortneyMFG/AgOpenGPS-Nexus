@@ -229,7 +229,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         ActiveScenarioDescription = string.IsNullOrWhiteSpace(scenario.Description)
             ? "No description provided."
             : scenario.Description!;
-        ActiveScenarioOptions = FormatScenarioOptions(scenario.Options);
+        ApplyScenarioOptions(scenario.Options);
     }
 
     /// <summary>
@@ -243,7 +243,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         UpdateRoutes(result.Scenario.Routes);
         ActiveScenarioTitle = $"Legacy import: {result.FieldName}";
         ActiveScenarioDescription = $"Imported {result.AbLines.Count} AB lines with {result.Boundary.Count} boundary points.";
-        ActiveScenarioOptions = FormatScenarioOptions(result.Scenario.Options);
+        ApplyScenarioOptions(result.Scenario.Options);
     }
 
     /// <summary>
@@ -455,6 +455,16 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         }
 
         return state;
+    }
+
+    private void ApplyScenarioOptions(SimulationOptionsConfiguration? options)
+    {
+        ActiveScenarioOptions = FormatScenarioOptions(options);
+
+        if (options?.TimeScale is double timeScale)
+        {
+            OnPlaybackRateSelected(timeScale);
+        }
     }
 
     private static string FormatTimestamp(TimeSpan value)

@@ -93,6 +93,47 @@ public sealed class SocketCanBackendTests
         await callTask.ConfigureAwait(false);
     }
 
+    [Fact]
+    public async Task SocketCanBusService_DropsSlowSubscribers()
+    {
+        var channel = new SocketCanFrameChannel();
+        var service = new SocketCanBusService(channel);
+        var slowWriter = new SlowServerStreamWriter<CanFrame>(TimeSpan.FromMilliseconds(200));
+        var slowContext = new TestServerCallContext(CancellationToken.None);
+
+        var slowCallTask = service.SubscribeFrames(new Empty(), slowWriter, slowContext);
+
+        for (var i = 0; i < 50; i++)
+        {
+            await channel.PublishAsync(new CanFrame
+            {
+                Header = new Header(),
+                ArbitrationId = (uint)i,
+            }, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        await WaitForAsync(() => slowCallTask.IsCompleted, TimeSpan.FromSeconds(5));
+        await slowCallTask.ConfigureAwait(false);
+
+        Assert.True(slowWriter.Messages.Count < 50);
+
+        var fastWriter = new TestServerStreamWriter<CanFrame>();
+        using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        var fastContext = new TestServerCallContext(fastCts.Token);
+
+        var fastCallTask = service.SubscribeFrames(new Empty(), fastWriter, fastContext);
+
+        var finalFrame = new CanFrame { Header = new Header(), ArbitrationId = 0xABC };
+        await channel.PublishAsync(finalFrame, CancellationToken.None).ConfigureAwait(false);
+
+        await WaitForAsync(() => fastWriter.Messages.Count > 0, TimeSpan.FromSeconds(1));
+        var received = Assert.Single(fastWriter.Messages);
+        Assert.Equal(0xABCu, received.ArbitrationId);
+
+        fastCts.Cancel();
+        await fastCallTask.ConfigureAwait(false);
+    }
+
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -166,6 +207,26 @@ public sealed class SocketCanBackendTests
         {
             Messages.Add(message);
             return Task.CompletedTask;
+        }
+    }
+
+    private sealed class SlowServerStreamWriter<T> : IServerStreamWriter<T>
+    {
+        private readonly TimeSpan _delay;
+
+        public SlowServerStreamWriter(TimeSpan delay)
+        {
+            _delay = delay;
+        }
+
+        public List<T> Messages { get; } = new();
+
+        public WriteOptions? WriteOptions { get; set; }
+
+        public async Task WriteAsync(T message)
+        {
+            await Task.Delay(_delay).ConfigureAwait(false);
+            Messages.Add(message);
         }
     }
 

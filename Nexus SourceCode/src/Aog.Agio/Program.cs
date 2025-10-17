@@ -6,7 +6,6 @@ using Aog.Agio.Safety;
 using Aog.Agio.Telemetry;
 using Aog.Agio.Timing;
 using Aog.Core.Mesh;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -43,8 +42,14 @@ public static class Program
         GenericHost.CreateDefaultBuilder(args ?? Array.Empty<string>())
             .ConfigureAppConfiguration((_, configurationBuilder) =>
             {
-                configurationBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                configurationBuilder.AddEnvironmentVariables(prefix: "NEXUS_");
+                Microsoft.Extensions.Configuration.JsonConfigurationExtensions.AddJsonFile(
+                    configurationBuilder,
+                    "appsettings.json",
+                    optional: true,
+                    reloadOnChange: true);
+                Microsoft.Extensions.Configuration.EnvironmentVariablesExtensions.AddEnvironmentVariables(
+                    configurationBuilder,
+                    prefix: "NEXUS_");
             })
             .UseSerilog((context, services, loggerConfiguration) =>
             {

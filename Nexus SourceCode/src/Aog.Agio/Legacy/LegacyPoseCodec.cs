@@ -125,7 +125,9 @@ public sealed class LegacyPoseCodec
     /// Encodes a typed pose into the legacy UDP PGN representation.
     /// </summary>
     /// <param name="pose">Pose to encode.</param>
-    /// <param name="metadata">Legacy metadata describing additional fields.</param>
+    /// <param name="metadata">Legacy metadata describing additional fields. When omitted or when
+    /// <see cref="LegacyPoseMetadata.SourceAddress"/> is zero, the header defaults to
+    /// <see cref="MainAntennaSourceAddress"/>.</param>
     /// <returns>Byte array ready to send over UDP.</returns>
     public byte[] EncodePose(Pose pose, LegacyPoseMetadata? metadata = null)
     {
@@ -134,12 +136,14 @@ public sealed class LegacyPoseCodec
             throw new ArgumentNullException(nameof(pose));
         }
 
-        metadata ??= new LegacyPoseMetadata();
-
         var buffer = new byte[MainAntennaFrameLength];
         buffer[0] = Sync0;
         buffer[1] = Sync1;
-        buffer[2] = metadata.SourceAddress;
+        metadata ??= new LegacyPoseMetadata();
+        var sourceAddress = metadata.SourceAddress != 0
+            ? metadata.SourceAddress
+            : MainAntennaSourceAddress;
+        buffer[2] = sourceAddress;
         buffer[3] = MainAntennaPosePgn;
         buffer[4] = MainAntennaPayloadLength;
 

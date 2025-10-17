@@ -119,6 +119,26 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
             return;
         }
 
+        FileAttributes attributes;
+        try
+        {
+            attributes = File.GetAttributes(path);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException)
+        {
+            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its attributes could not be read.", path);
+            return;
+        }
+
+        if ((attributes & FileAttributes.Directory) != 0)
+        {
+            _logger.LogDebug(
+                "Skipping serial device candidate {Path} because its attributes ({Attributes}) indicate it is not a file.",
+                path,
+                attributes);
+            return;
+        }
+
         var fullPath = Path.GetFullPath(path);
 
         string canonicalPath;

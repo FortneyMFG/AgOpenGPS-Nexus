@@ -52,7 +52,11 @@ internal static class TelemetryParquetReplayLoader
         }
 
         using var stream = File.OpenRead(path);
-        using var reader = ParquetReader.Create(stream);
+        using var reader = ParquetReader
+            .CreateAsync(stream)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
         var schema = reader.Schema;
 
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
@@ -103,7 +107,11 @@ internal static class TelemetryParquetReplayLoader
         }
 
         using var stream = File.OpenRead(path);
-        using var reader = ParquetReader.Create(stream);
+        using var reader = ParquetReader
+            .CreateAsync(stream)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
         var schema = reader.Schema;
 
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
@@ -158,7 +166,11 @@ internal static class TelemetryParquetReplayLoader
         }
 
         using var stream = File.OpenRead(path);
-        using var reader = ParquetReader.Create(stream);
+        using var reader = ParquetReader
+            .CreateAsync(stream)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
         var schema = reader.Schema;
 
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
@@ -202,7 +214,11 @@ internal static class TelemetryParquetReplayLoader
         }
 
         using var stream = File.OpenRead(path);
-        using var reader = ParquetReader.Create(stream);
+        using var reader = ParquetReader
+            .CreateAsync(stream)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
         var schema = reader.Schema;
 
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
@@ -241,7 +257,11 @@ internal static class TelemetryParquetReplayLoader
         }
 
         using var stream = File.OpenRead(path);
-        using var reader = ParquetReader.Create(stream);
+        using var reader = ParquetReader
+            .CreateAsync(stream)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
         var schema = reader.Schema;
 
         for (var rowGroupIndex = 0; rowGroupIndex < reader.RowGroupCount; rowGroupIndex++)
@@ -364,14 +384,14 @@ internal static class TelemetryParquetReplayLoader
             (bus, token) => bus.PublishAsync(message, token));
     }
 
-    private static T[] ReadColumn<T>(Schema schema, ParquetRowGroupReader reader, string columnName)
+    private static T[] ReadColumn<T>(ParquetSchema schema, ParquetRowGroupReader reader, string columnName)
     {
         var field = GetRequiredDataField(schema, columnName);
         return (T[])reader.ReadColumn(field).Data;
     }
 
     private static string?[] ReadOptionalStringColumn(
-        Schema schema,
+        ParquetSchema schema,
         ParquetRowGroupReader reader,
         string columnName,
         int rowCount)
@@ -384,7 +404,7 @@ internal static class TelemetryParquetReplayLoader
         return (string?[])reader.ReadColumn(field).Data;
     }
 
-    private static DataField GetRequiredDataField(Schema schema, string columnName)
+    private static DataField GetRequiredDataField(ParquetSchema schema, string columnName)
     {
         if (TryGetDataField(schema, columnName, out var field) && field is not null)
         {
@@ -394,7 +414,7 @@ internal static class TelemetryParquetReplayLoader
         throw new InvalidOperationException($"Telemetry parquet file is missing required column '{columnName}'.");
     }
 
-    private static bool TryGetDataField(Schema schema, string columnName, out DataField? field)
+    private static bool TryGetDataField(ParquetSchema schema, string columnName, out DataField? field)
     {
         foreach (var candidate in schema.Fields)
         {

@@ -150,7 +150,7 @@ public sealed class ArmingStateMachine
     public void EnsureCanEmitOutputs()
     {
         var result = EvaluateOutputs();
-        if (!result.Allowed)
+        if (!result.IsAllowed)
         {
             throw new InvalidOperationException(result.Reason ?? "Outputs are currently blocked.");
         }
@@ -208,7 +208,7 @@ public readonly record struct ProfileValidityUpdateResult(
 /// <summary>
 /// Represents the result of checking whether outputs are allowed.
 /// </summary>
-public readonly record struct OutputGateResult(bool Allowed, string? Reason)
+public readonly record struct OutputGateResult(bool IsAllowed, string? Reason)
 {
     public static OutputGateResult Allowed()
         => new(true, null);

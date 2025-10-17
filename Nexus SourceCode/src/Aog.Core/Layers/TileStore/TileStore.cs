@@ -525,7 +525,7 @@ public sealed record TileStoreSegmentStatistics(string FileName, long TotalRecor
 
 /// <summary>Result returned by <see cref="TileStore.Compact"/>.</summary>
 public sealed record TileStoreCompactionResult(
-    bool Compacted,
+    bool WasCompacted,
     int RemovedSegmentCount,
     long TotalRecords,
     long LiveRecords)

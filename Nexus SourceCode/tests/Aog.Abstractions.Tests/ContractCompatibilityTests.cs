@@ -28,11 +28,22 @@ public class ContractCompatibilityTests
     private static string GetSourceRoot()
     {
         var path = AppContext.BaseDirectory;
-        for (var i = 0; i < 5; i++)
+        while (!string.IsNullOrEmpty(path))
         {
-            path = Path.GetDirectoryName(path) ?? throw new InvalidOperationException("Failed to resolve source root.");
+            if (File.Exists(Path.Combine(path, "Nexus.sln")))
+            {
+                return path;
+            }
+
+            var parent = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(parent) || string.Equals(parent, path, StringComparison.Ordinal))
+            {
+                break;
+            }
+
+            path = parent;
         }
 
-        return path;
+        throw new InvalidOperationException("Failed to resolve source root.");
     }
 }

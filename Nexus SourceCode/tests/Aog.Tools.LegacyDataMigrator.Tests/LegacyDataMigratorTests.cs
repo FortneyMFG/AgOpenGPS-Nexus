@@ -7,6 +7,7 @@ using Aog.Tools.LegacyDataMigrator;
 using FluentAssertions;
 using Parquet;
 using Parquet.Data;
+using Parquet.Schema;
 using Xunit;
 
 namespace Aog.Tools.LegacyDataMigrator.Tests;
@@ -42,7 +43,7 @@ public sealed class LegacyDataMigratorTests
 
         var posePath = Path.Combine(temp.Path, "pose.parquet");
         File.Exists(posePath).Should().BeTrue();
-        using (var reader = ParquetReader.Create(File.OpenRead(posePath)))
+        using (var reader = OpenReader(posePath))
         {
             reader.RowGroupCount.Should().Be(1);
             var schema = reader.Schema;
@@ -57,7 +58,7 @@ public sealed class LegacyDataMigratorTests
         }
 
         var canPath = Path.Combine(temp.Path, "can.parquet");
-        using (var reader = ParquetReader.Create(File.OpenRead(canPath)))
+        using (var reader = OpenReader(canPath))
         {
             reader.RowGroupCount.Should().Be(1);
             var schema = reader.Schema;
@@ -70,7 +71,7 @@ public sealed class LegacyDataMigratorTests
 
         var weatherPath = Path.Combine(temp.Path, "weather.parquet");
         File.Exists(weatherPath).Should().BeTrue();
-        using (var reader = ParquetReader.Create(File.OpenRead(weatherPath)))
+        using (var reader = OpenReader(weatherPath))
         {
             reader.RowGroupCount.Should().Be(1);
             var schema = reader.Schema;
@@ -169,6 +170,15 @@ public sealed class LegacyDataMigratorTests
         exitCode.Should().Be(0);
 
         Directory.EnumerateFiles(tempOutput.Path).Should().Contain(file => file.EndsWith("pose.parquet", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static ParquetReader OpenReader(string path)
+    {
+        return ParquetReader
+            .CreateAsync(path)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
     }
 
     private sealed class TempDirectory : IDisposable

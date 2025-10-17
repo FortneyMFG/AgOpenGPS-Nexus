@@ -147,6 +147,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-953 SocketCAN burst tolerance for transient backpressure
 - [x] NX-967 Linux serial enumerator canonical dedupe
 - [ ] NX-971 Linux NMEA VTG null speed log fix
+- [ ] NX-988 Parquet.Net v5 compatibility fixes
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling

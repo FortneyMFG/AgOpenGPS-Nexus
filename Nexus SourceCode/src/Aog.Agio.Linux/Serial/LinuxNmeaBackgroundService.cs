@@ -139,6 +139,19 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
                 return;
             }
 
+            var portChanged = !string.Equals(verificationResult.PortName, activePort.PortName, StringComparison.Ordinal);
+            var baudChanged = verificationResult.BaudRate != activePort.BaudRate;
+
+            if (portChanged || baudChanged)
+            {
+                _logger.LogInformation(
+                    "Active NMEA stream switched from {PreviousDevice} ({PreviousBaudRate} baud) to {CurrentDevice} ({CurrentBaudRate} baud).",
+                    activePort.PortName,
+                    activePort.BaudRate,
+                    verificationResult.PortName,
+                    verificationResult.BaudRate);
+            }
+
             activePort = verificationResult;
         }
     }

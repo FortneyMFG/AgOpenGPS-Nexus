@@ -89,10 +89,25 @@ public sealed class SocketCanBusService : CanBusService.CanBusServiceBase
                 }
 
                 var waitTask = queue.Writer.WaitToWriteAsync(cancellationSource.Token).AsTask();
-                var completed = await Task.WhenAny(waitTask, Task.Delay(SlowSubscriberTimeout)).ConfigureAwait(false);
+                Task completed;
+                Task delayTask = Task.Delay(SlowSubscriberTimeout, cancellationSource.Token);
+
+                try
+                {
+                    completed = await Task.WhenAny(waitTask, delayTask).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (cancellationSource.IsCancellationRequested)
+                {
+                    break;
+                }
 
                 if (completed != waitTask)
                 {
+                    if (delayTask.IsCanceled)
+                    {
+                        break;
+                    }
+
                     LogSlowSubscriberEvicted(context, frame, "Writer wait timed out");
                     cancellationSource.Cancel();
                     break;

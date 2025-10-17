@@ -86,6 +86,71 @@ public sealed class LinuxNmeaBackgroundServiceTests
     }
 
     [Fact]
+    public async Task BackgroundService_LogsWhenActivePortChangesDuringMonitoring()
+    {
+        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 04, 0, 0, 0, TimeSpan.Zero));
+        var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB3");
+        var parser = new NmeaSentenceParser();
+
+        var activeStream = new[]
+        {
+            "$GPGGA,123519,4807.038,N,01131.000,E,1,10,0.8,545.4,M,46.9,M,,*48",
+            "$GPRMC,123520,A,4807.100,N,01131.200,E,022.4,084.4,230394,003.1,W*66",
+            "$GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*48",
+        };
+
+        var idleStream = Enumerable.Repeat<string?>(null, 8).ToArray();
+
+        var sessionScripts = new[]
+        {
+            activeStream,
+            idleStream,
+            activeStream,
+        };
+
+        var sessionFactory = new ScriptedSerialPortSessionFactory(
+            sessionScripts,
+            () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
+
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
+        {
+            ProbeDuration = TimeSpan.FromSeconds(1),
+            ReadTimeout = TimeSpan.FromMilliseconds(50),
+            BaudRates = new[] { 9600, 4800 },
+            MaxReadAttemptsPerPort = 8,
+        });
+
+        var scanner = new NmeaAutoScanner(
+            enumerator,
+            sessionFactory,
+            parser,
+            NullLogger<NmeaAutoScanner>.Instance,
+            timeProvider,
+            options);
+
+        var logger = new TestLogger<LinuxNmeaBackgroundService>();
+        var service = new LinuxNmeaBackgroundService(scanner, logger, options);
+
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        try
+        {
+            await WaitForConditionAsync(
+                () => logger.Count(LogLevel.Information, static message => message.Contains("NMEA stream detected", StringComparison.Ordinal)) >= 1,
+                TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+
+            await WaitForConditionAsync(
+                () => logger.Count(LogLevel.Information, static message => message.Contains("Active NMEA stream switched", StringComparison.Ordinal)) >= 1,
+                TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+        }
+        finally
+        {
+            await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+            scanner.Dispose();
+        }
+    }
+
+    [Fact]
     public async Task BackgroundService_RescansAfterReadFailure()
     {
         var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero));

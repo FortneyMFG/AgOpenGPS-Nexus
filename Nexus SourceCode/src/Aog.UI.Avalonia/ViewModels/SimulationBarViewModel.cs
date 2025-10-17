@@ -422,6 +422,10 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
                 {
                     await operation().ConfigureAwait(false);
                 }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, failureMessage);
@@ -441,7 +445,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
     private static string FormatPlaybackRateLabel(double rate)
     {
-        return FormattableString.Invariant($"{rate * 100:0.#}%");
+        return FormattableString.Invariant($"{rate:0.##}×");
     }
 
     private static string DescribeOptions(SimulationOptionsConfiguration? options)

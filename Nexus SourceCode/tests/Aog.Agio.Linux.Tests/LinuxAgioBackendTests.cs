@@ -5,6 +5,7 @@ using Aog.Agio.Linux;
 using Aog.Agio.Linux.Gpsd;
 using Aog.Agio.Linux.Serial;
 using Aog.Agio.Linux.SocketCan;
+using Aog.Agio.Nmea;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +25,6 @@ public sealed class LinuxAgioBackendTests
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(new ConfigurationBuilder().AddInMemoryCollection().Build());
         services.AddLogging();
-        services.AddSingleton(TimeProvider.System);
 
         backend.ConfigureServices(services);
 
@@ -58,7 +58,6 @@ public sealed class LinuxAgioBackendTests
 
         services.AddSingleton<IConfiguration>(configuration);
         services.AddLogging();
-        services.AddSingleton(TimeProvider.System);
 
         backend.ConfigureServices(services);
 
@@ -70,5 +69,21 @@ public sealed class LinuxAgioBackendTests
         Assert.Equal(TimeSpan.FromSeconds(1), options.ReadTimeout);
         Assert.Equal(new[] { 4800, 230400 }, options.BaudRates);
         Assert.Equal(10, options.MaxReadAttemptsPerPort);
+    }
+
+    [Fact]
+    public void ConfigureServices_ResolvesNmeaAutoScanner()
+    {
+        var backend = new LinuxAgioBackend();
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationBuilder().AddInMemoryCollection().Build());
+        services.AddLogging();
+
+        backend.ConfigureServices(services);
+
+        using var provider = services.BuildServiceProvider();
+
+        var scanner = provider.GetRequiredService<NmeaAutoScanner>();
+        Assert.NotNull(scanner);
     }
 }

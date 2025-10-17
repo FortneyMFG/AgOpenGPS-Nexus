@@ -87,6 +87,4 @@ public sealed class PlanterMonitorPublisher
             Quality = evaluation.Quality
         };
     }
-
-    }
 }

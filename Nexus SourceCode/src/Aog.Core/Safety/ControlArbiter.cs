@@ -182,7 +182,7 @@ public sealed class ConstraintGateSnapshot
         var insideKeepOut = mask?.InsideKeepOut == true;
         var insideWorkDisabled = mask?.InsideWorkDisabled == true;
 
-        var reason = insideKeepOut
+        ConstraintGateReason? reason = insideKeepOut
             ? ConstraintGateReason.KeepOut
             : insideWorkDisabled
                 ? ConstraintGateReason.WorkDisabled

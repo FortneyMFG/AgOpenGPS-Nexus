@@ -66,6 +66,42 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+    public void Constructor_WithEmptyOptions_DoesNotThrowWhenReadingLabels()
+    {
+        const string json = """
+{
+  "schemaVersion": "1.0.0",
+  "providers": [
+    { "providerId": "sim.clock.fixed", "outputs": ["time"] },
+    { "providerId": "sim.vehicle.bicycle", "inputs": ["time"], "outputs": ["pose"] }
+  ],
+  "routes": [
+    { "stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation" }
+  ],
+  "options": {},
+  "scenarios": []
+}
+""";
+
+        var configuration = SimulationConfigurationLoader.Load(json);
+
+        using var viewModel = new SimulationBarViewModel(configuration);
+
+        Action readLabels = () =>
+        {
+            _ = viewModel.SelectedPlaybackRateLabel;
+            foreach (var option in viewModel.PlaybackRates)
+            {
+                _ = option.Label;
+            }
+        };
+
+        readLabels.Should().NotThrow();
+        viewModel.SelectedPlaybackRate.Should().Be(1.0);
+        viewModel.SelectedPlaybackRateLabel.Should().Be("1×");
+    }
+
+    [Fact]
     public void Constructor_WithConfiguredTimeScale_UsesConfiguredPlaybackRate()
     {
         const string json = """

@@ -35,8 +35,8 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private string _statusText = "Paused";
     private string _playPauseLabel = "Play";
     private string _positionDisplay = FormatPosition(TimeSpan.Zero, DefaultDuration);
-    private double _selectedPlaybackRate = 1.0;
-    private string _selectedPlaybackRateLabel = FormatPlaybackRateLabel(1.0);
+    private double? _selectedPlaybackRate;
+    private string? _selectedPlaybackRateLabel;
     private string _activeScenarioTitle = "Scenario: configuration defaults";
     private string _activeScenarioDescription = "Routes sourced from configuration.";
     private string _activeScenarioOptions = DescribeOptions(null);
@@ -139,14 +139,10 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     /// <summary>Gets the currently selected playback rate multiplier.</summary>
     public double SelectedPlaybackRate
     {
-        get => _selectedPlaybackRate;
+        get => _selectedPlaybackRate ?? 1.0;
         private set
         {
-            if (SetProperty(ref _selectedPlaybackRate, value))
-            {
-                SelectedPlaybackRateLabel = FormatPlaybackRateLabel(value);
-            }
-            else
+            if (SetProperty(ref _selectedPlaybackRate, value) || _selectedPlaybackRateLabel is null)
             {
                 SelectedPlaybackRateLabel = FormatPlaybackRateLabel(value);
             }
@@ -156,7 +152,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     /// <summary>Gets a formatted label describing the selected playback rate.</summary>
     public string SelectedPlaybackRateLabel
     {
-        get => _selectedPlaybackRateLabel;
+        get => _selectedPlaybackRateLabel ?? FormatPlaybackRateLabel(SelectedPlaybackRate);
         private set => SetProperty(ref _selectedPlaybackRateLabel, value);
     }
 

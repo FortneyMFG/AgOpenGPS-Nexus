@@ -38,7 +38,7 @@ public sealed class GpsdClientTests
         Assert.Equal(84.4, reports[0].TrackDegrees);
         Assert.Equal(3, reports[0].Mode);
         Assert.Equal(2, reports[1].Mode);
-        Assert.Contains("?WATCH={\"enable\":true,\"json\":true}", factory.WrittenLines);
+        Assert.Contains(GpsdClientTestHelpers.WatchCommand, factory.WrittenLines);
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public sealed class GpsdClientTests
             // drain the async enumerable to ensure the command is written before exit
         }
 
-        Assert.Single(factory.WrittenLines, "?WATCH={\"enable\":true,\"json\":true}");
+        Assert.Single(factory.WrittenLines, GpsdClientTestHelpers.WatchCommand);
     }
 
     [Fact]

@@ -14,6 +14,7 @@ namespace Aog.Core.Legacy;
 public sealed class LegacyGuidanceImportService : ILegacyGuidanceImportService
 {
     private const double EarthRadiusMeters = 6_378_137.0;
+    private const double OrientationTolerance = 1e-12;
 
     public LegacyGuidanceImportResult Import(string fieldName, Stream abLineCsv, string boundaryShapefilePath)
     {
@@ -193,29 +194,75 @@ public sealed class LegacyGuidanceImportService : ILegacyGuidanceImportService
                 coordinates[i] = new GeographicCoordinate(latitude, longitude);
             }
 
-            // Assume the first part represents the exterior ring.
-            var startIndex = partIndices[0];
-            var endIndex = numPoints;
-            if (numParts > 1)
+            var exterior = new List<GeographicCoordinate>();
+            double? exteriorOrientation = null;
+
+            for (var part = 0; part < numParts; part++)
             {
-                endIndex = partIndices[1];
+                var startIndex = partIndices[part];
+                var endIndex = part + 1 < numParts ? partIndices[part + 1] : numPoints;
+
+                if (startIndex < 0 || startIndex >= coordinates.Length || endIndex > coordinates.Length || endIndex <= startIndex)
+                {
+                    continue;
+                }
+
+                var ring = new List<GeographicCoordinate>(endIndex - startIndex);
+                for (var i = startIndex; i < endIndex; i++)
+                {
+                    ring.Add(coordinates[i]);
+                }
+
+                if (ring.Count > 1 && ring[0].EqualsApprox(ring[^1]))
+                {
+                    ring.RemoveAt(ring.Count - 1);
+                }
+
+                if (ring.Count == 0)
+                {
+                    continue;
+                }
+
+                var orientation = ComputeSignedArea(ring);
+
+                if (exteriorOrientation is null && Math.Abs(orientation) > OrientationTolerance)
+                {
+                    exteriorOrientation = orientation;
+                }
+
+                var includeRing = exteriorOrientation is null || Math.Abs(orientation) <= OrientationTolerance || Math.Sign(orientation) == Math.Sign(exteriorOrientation.Value);
+
+                if (includeRing)
+                {
+                    exterior.AddRange(ring);
+                }
             }
 
-            var exterior = new List<GeographicCoordinate>(endIndex - startIndex);
-            for (var i = startIndex; i < endIndex; i++)
+            if (exterior.Count > 0)
             {
-                exterior.Add(coordinates[i]);
+                return exterior;
             }
-
-            if (exterior.Count > 1 && exterior[0].EqualsApprox(exterior[^1]))
-            {
-                exterior.RemoveAt(exterior.Count - 1);
-            }
-
-            return exterior;
         }
 
         throw new InvalidDataException("No polygon records were found in the shapefile.");
+    }
+
+    private static double ComputeSignedArea(IReadOnlyList<GeographicCoordinate> ring)
+    {
+        if (ring.Count < 3)
+        {
+            return 0.0;
+        }
+
+        double area = 0.0;
+        for (var i = 0; i < ring.Count; i++)
+        {
+            var current = ring[i];
+            var next = ring[(i + 1) % ring.Count];
+            area += (current.LongitudeDeg * next.LatitudeDeg) - (next.LongitudeDeg * current.LatitudeDeg);
+        }
+
+        return area / 2.0;
     }
 
     private static bool IsPolygonShapeType(int shapeType)

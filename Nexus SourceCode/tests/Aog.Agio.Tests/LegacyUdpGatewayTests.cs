@@ -6,6 +6,7 @@ using Aog.Agio;
 using Aog.Agio.Legacy;
 using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Aog.Agio.Tests;
@@ -302,7 +303,7 @@ public sealed class LegacyUdpGatewayTests
     }
 
     [Fact]
-    public async Task PublishSteerCommandAsync_UsesUpdatedSectionWidthAfterMaskUpdate()
+    public async Task PublishSectionMaskAsync_WithoutSteerSnapshotLogsWarning()
     {
         var poseCodec = new LegacyPoseCodec();
         var discoveryCodec = new LegacyDiscoveryCodec();
@@ -313,7 +314,7 @@ public sealed class LegacyUdpGatewayTests
         var steerCommandObserver = new RecordingSteerCommandObserver();
         var steerStateObserver = new RecordingSteerStateObserver();
         var sectionObserver = new RecordingSectionObserver();
-        var failsafe = new RecordingFailsafeService();
+        var logger = new RecordingLogger<LegacyUdpGateway>();
 
         var gateway = new LegacyUdpGateway(
             poseCodec,
@@ -327,52 +328,24 @@ public sealed class LegacyUdpGatewayTests
             sectionObserver,
             NullLegacyMeshPresencePublisher.Instance,
             new FixedTimeProvider(DateTimeOffset.UtcNow),
-            failsafe);
+            logger: logger);
 
-        var initialCommand = new SteerCmd
-        {
-            Enable = true,
-            TargetWheelAngleDeg = 8.5,
-            FeedForward = 0.05,
-            ControllerOutput = 0.2,
-        };
-
-        var initialSections = new SectionMask
+        var sections = new SectionMask
         {
             SectionCount = 8,
-            Mask = 0x00FF,
-        };
-
-        await gateway.PublishSteerCommandAsync(initialCommand, initialSections).ConfigureAwait(false);
-
-        transport.Frames.Clear();
-
-        var updatedSections = new SectionMask
-        {
-            SectionCount = 4,
             Mask = 0x000F,
         };
 
-        await gateway.PublishSectionMaskAsync(updatedSections).ConfigureAwait(false);
+        await gateway.PublishSectionMaskAsync(sections).ConfigureAwait(false);
 
-        transport.Frames.Clear();
+        Assert.Empty(transport.Frames);
 
-        var refreshedCommand = new SteerCmd
-        {
-            Enable = true,
-            TargetWheelAngleDeg = -3.25,
-            FeedForward = 0.12,
-            ControllerOutput = -0.45,
-        };
-
-        await gateway.PublishSteerCommandAsync(refreshedCommand).ConfigureAwait(false);
-
-        var frame = Assert.Single(transport.Frames);
-        Assert.True(steerCodec.TryDecodeSteerCommand(frame.Span, out var decodedCommand, out _, out var decodedSections));
-        Assert.Equal(refreshedCommand.Enable, decodedCommand.Enable);
-        Assert.Equal(updatedSections.Mask, decodedSections.Mask);
-        var allowedMask = (1u << updatedSections.SectionCount) - 1u;
-        Assert.Equal(decodedSections.Mask, decodedSections.Mask & allowedMask);
+        var entry = Assert.Single(logger.Entries);
+        Assert.Equal(LogLevel.Information, entry.Level);
+        Assert.Contains(
+            "no steer command snapshot has been published",
+            entry.Message,
+            StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -894,6 +867,31 @@ public sealed class LegacyUdpGatewayTests
         {
             Discoveries.Add(announcement);
             return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingLogger<T> : ILogger<T>
+    {
+        public List<LogEntry> Entries { get; } = new();
+
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            Entries.Add(new LogEntry(logLevel, formatter(state, exception), exception));
+        }
+
+        public readonly record struct LogEntry(LogLevel Level, string Message, Exception? Exception);
+
+        private sealed class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new();
+
+            public void Dispose()
+            {
+            }
         }
     }
 

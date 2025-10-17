@@ -9,23 +9,29 @@ namespace Aog.Agio.Legacy;
 /// </summary>
 public sealed class LegacySteerCodec
 {
-    /// <summary>
-    /// Legacy PGN that transports steering commands and section bitmasks.
-    /// </summary>
+    /// <summary>Legacy PGN that transports steering commands and section bitmasks.</summary>
     public const byte SteerCommandPgn = 0xFE;
 
-    /// <summary>
-    /// Legacy PGN that transports steering feedback from hardware.
-    /// </summary>
+    /// <summary>Legacy PGN that transports steering feedback from hardware.</summary>
     public const byte SteerStatePgn = 0xFD;
 
     private const byte CommandSourceAddress = 0x7F;
     private const byte StateSourceAddress = 0x7E;
+
+    // Guidance status engaged bit
     private const byte EngagedBit = 0x01;
+
     private const int CommandPayloadLength = 8;
     private const int StatePayloadLength = 8;
-    private const int CommandFrameLength = 2 /* sync */ + 1 /* src */ + 1 /* pgn */ + 1 /* len */ + CommandPayloadLength + 1 /* checksum */;
-    private const int StateFrameLength = 2 + 1 + 1 + 1 + StatePayloadLength + 1;
+
+    private const int CommandFrameLength =
+        2 /* sync */ + 1 /* src */ + 1 /* pgn */ + 1 /* len */ + CommandPayloadLength + 1 /* checksum */;
+    private const int StateFrameLength =
+        2 /* sync */ + 1 /* src */ + 1 /* pgn */ + 1 /* len */ + StatePayloadLength + 1 /* checksum */;
+
+    // Teensy/autosteer constraint: ±32.76° in hundredths
+    private const short MaxSteerAngleHundredths = 3276;
+    private const short MinSteerAngleHundredths = -MaxSteerAngleHundredths;
 
     /// <summary>
     /// Attempts to decode a steering command PGN into a typed command and section mask.
@@ -40,46 +46,29 @@ public sealed class LegacySteerCodec
         metadata = new LegacySteerCommandMetadata();
         sectionMask = new SectionMask();
 
-        if (datagram.Length != CommandFrameLength)
-        {
-            return false;
-        }
+        if (datagram.Length != CommandFrameLength) return false;
+        if (datagram[0] != LegacyPoseCodec.Sync0 || datagram[1] != LegacyPoseCodec.Sync1) return false;
+        if (datagram[2] != CommandSourceAddress || datagram[3] != SteerCommandPgn) return false;
+        if (datagram[4] != CommandPayloadLength) return false;
+        if (!LegacyChecksum.Validate(datagram)) return false;
 
-        if (datagram[0] != LegacyPoseCodec.Sync0 || datagram[1] != LegacyPoseCodec.Sync1)
-        {
-            return false;
-        }
-
-        if (datagram[2] != CommandSourceAddress || datagram[3] != SteerCommandPgn)
-        {
-            return false;
-        }
-
-        if (datagram[4] != CommandPayloadLength)
-        {
-            return false;
-        }
-
-        if (!LegacyChecksum.Validate(datagram))
-        {
-            return false;
-        }
-
-        var speedTenths = BinaryPrimitives.ReadUInt16LittleEndian(datagram.Slice(5, 2));
+        var speedHundredths = BinaryPrimitives.ReadUInt16LittleEndian(datagram.Slice(5, 2));
         var rawGuidanceStatus = datagram[7];
         var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(datagram.Slice(8, 2));
         var tramControl = datagram[10];
         var sectionsLow = datagram[11];
         var sectionsHigh = datagram[12];
 
+        var speedKph = speedHundredths * 0.01;
+
         metadata = new LegacySteerCommandMetadata
         {
-            SpeedKph = speedTenths * 0.1,
+            SourceAddress = datagram[2],
+            SpeedKph = speedKph,
+            CurrentSpeedMps = speedKph / 3.6,
             GuidanceStatus = rawGuidanceStatus,
             TramControl = tramControl,
         };
-
-        const byte EngagedBit = 0x01;
 
         command.TargetWheelAngleDeg = steerHundredths / 100.0;
         command.Enable = (rawGuidanceStatus & EngagedBit) != 0;
@@ -98,78 +87,99 @@ public sealed class LegacySteerCodec
     public byte[] EncodeSteerCommand(
         SteerCmd command,
         SectionMask? sectionMask = null,
-        LegacySteerCommandMetadata? metadata = null)
+        LegacySteerCommandMetadata? metadata = null,
+        LegacySteerMetadata? steerMetadata = null)
     {
-        if (command is null)
+        if (command is null) throw new ArgumentNullException(nameof(command));
+        metadata ??= new LegacySteerCommandMetadata();
+
+        // Resolve source address (allow caller override when sane)
+        var sourceAddress = metadata.SourceAddress;
+        if (sourceAddress < 0x01 || sourceAddress > 0xFD)
         {
-            throw new ArgumentNullException(nameof(command));
+            sourceAddress = CommandSourceAddress;
         }
 
-        metadata ??= new LegacySteerCommandMetadata();
+        // Merge status flags: steerMetadata overrides metadata when present
+        var statusFlags = steerMetadata?.GuidanceStatus ?? metadata.GuidanceStatus;
 
         var buffer = new byte[CommandFrameLength];
         buffer[0] = LegacyPoseCodec.Sync0;
         buffer[1] = LegacyPoseCodec.Sync1;
-        buffer[2] = CommandSourceAddress;
+        buffer[2] = sourceAddress;
         buffer[3] = SteerCommandPgn;
         buffer[4] = CommandPayloadLength;
 
-        var speedTenths = (ushort)Math.Clamp((int)Math.Round(metadata.SpeedKph * 10.0), 0, ushort.MaxValue);
-        BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(5, 2), speedTenths);
+        // Speed: prefer CurrentSpeedMps if provided/finite; otherwise fall back to SpeedKph
+        double speedKph;
+        if (metadata.CurrentSpeedMps is double speedMps && double.IsFinite(speedMps))
+        {
+            speedKph = speedMps * 3.6;
+        }
+        else
+        {
+            speedKph = metadata.SpeedKph;
+        }
 
-        var status = metadata.GuidanceStatus;
+        var speedHundredths = (ushort)Math.Clamp((int)Math.Round(speedKph * 100.0), 0, ushort.MaxValue);
+        BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(5, 2), speedHundredths);
 
-        status = command.Enable
-            ? (byte)(status | EngagedBit)
-            : (byte)(status & ~EngagedBit);
-
+        var status = statusFlags;
+        status = command.Enable ? (byte)(status | EngagedBit) : (byte)(status & ~EngagedBit);
         buffer[7] = status;
 
-        var steerHundredths = command.Enable
-            ? (short)Math.Clamp(Math.Round(command.TargetWheelAngleDeg * 100.0), short.MinValue, short.MaxValue)
-            : (short)0;
+        var steerHundredths = EncodeSteerAngle(command.TargetWheelAngleDeg, command.Enable);
         BinaryPrimitives.WriteInt16LittleEndian(buffer.AsSpan(8, 2), steerHundredths);
 
         buffer[10] = metadata.TramControl;
 
-uint mask = 0;
+        uint mask = 0;
+        if (sectionMask is not null)
+        {
+            var sectionCount = sectionMask.SectionCount;
+            if (sectionCount > 32)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(sectionMask.SectionCount),
+                    sectionCount,
+                    "SectionCount must not exceed 32.");
+            }
 
-if (sectionMask is not null)
-{
-    var sectionCount = sectionMask.SectionCount;
+            // Legacy PGN supports only 16 bits — hard cap it here
+            var cappedCount = Math.Min(sectionCount, 16);
 
-    if (sectionCount > 32)
-    {
-        throw new ArgumentOutOfRangeException(
-            nameof(sectionMask.SectionCount),
-            sectionCount,
-            "SectionCount must not exceed 32.");
-    }
-
-    // Legacy PGN supports only 16 bits — hard cap it here
-    var cappedCount = Math.Min(sectionCount, 16);
-
-    // If count is zero, mask must be zero
-    if (cappedCount == 0)
-    {
-        mask = 0;
-    }
-    else
-    {
-        // Build a mask of allowed bits
-        var allowedMask = (1u << cappedCount) - 1u;
-
-        // Apply and clamp to 16 bits total
-        mask = sectionMask.Mask & allowedMask & 0xFFFFu;
-    }
-}
-
+            if (cappedCount == 0)
+            {
+                mask = 0;
+            }
+            else
+            {
+                var allowedMask = (1u << cappedCount) - 1u;
+                mask = sectionMask.Mask & allowedMask & 0xFFFFu;
+            }
+        }
 
         buffer[11] = (byte)(mask & 0xFF);
         buffer[12] = (byte)((mask >> 8) & 0xFF);
 
         LegacyChecksum.Write(buffer);
         return buffer;
+    }
+
+    /// <summary>
+    /// Scales a wheel angle in degrees to hundredths while respecting the Teensy PGN range (±3276).
+    /// </summary>
+    private static short EncodeSteerAngle(double targetAngleDeg, bool enabled)
+    {
+        if (!enabled || double.IsNaN(targetAngleDeg) || double.IsInfinity(targetAngleDeg))
+        {
+            return 0;
+        }
+
+        var scaledHundredths = Math.Round(targetAngleDeg * 100.0, MidpointRounding.AwayFromZero);
+        if (scaledHundredths > MaxSteerAngleHundredths) return MaxSteerAngleHundredths;
+        if (scaledHundredths < MinSteerAngleHundredths) return MinSteerAngleHundredths;
+        return (short)scaledHundredths;
     }
 
     /// <summary>
@@ -183,30 +193,11 @@ if (sectionMask is not null)
         state = new SteerState();
         metadata = new LegacySteerStateMetadata();
 
-        if (datagram.Length != StateFrameLength)
-        {
-            return false;
-        }
-
-        if (datagram[0] != LegacyPoseCodec.Sync0 || datagram[1] != LegacyPoseCodec.Sync1)
-        {
-            return false;
-        }
-
-        if (datagram[2] != StateSourceAddress || datagram[3] != SteerStatePgn)
-        {
-            return false;
-        }
-
-        if (datagram[4] != StatePayloadLength)
-        {
-            return false;
-        }
-
-        if (!LegacyChecksum.Validate(datagram))
-        {
-            return false;
-        }
+        if (datagram.Length != StateFrameLength) return false;
+        if (datagram[0] != LegacyPoseCodec.Sync0 || datagram[1] != LegacyPoseCodec.Sync1) return false;
+        if (datagram[2] != StateSourceAddress || datagram[3] != SteerStatePgn) return false;
+        if (datagram[4] != StatePayloadLength) return false;
+        if (!LegacyChecksum.Validate(datagram)) return false;
 
         var actualHundredths = BinaryPrimitives.ReadInt16LittleEndian(datagram.Slice(5, 2));
         var headingHundredths = BinaryPrimitives.ReadUInt16LittleEndian(datagram.Slice(7, 2));
@@ -243,11 +234,7 @@ if (sectionMask is not null)
     /// </summary>
     public byte[] EncodeSteerState(SteerState state, LegacySteerStateMetadata? metadata = null)
     {
-        if (state is null)
-        {
-            throw new ArgumentNullException(nameof(state));
-        }
-
+        if (state is null) throw new ArgumentNullException(nameof(state));
         metadata ??= new LegacySteerStateMetadata();
 
         var buffer = new byte[StateFrameLength];
@@ -269,20 +256,9 @@ if (sectionMask is not null)
         var switchByte = metadata.SwitchByte;
         if (switchByte == 0)
         {
-            if (metadata.IsWorkSwitchOn)
-            {
-                switchByte |= 0x01;
-            }
-
-            if (metadata.IsSteerSwitchOn || state.Engaged)
-            {
-                switchByte |= 0x02;
-            }
-
-            if (metadata.IsRemoteSwitchOn)
-            {
-                switchByte |= 0x04;
-            }
+            if (metadata.IsWorkSwitchOn) { switchByte |= 0x01; }
+            if (metadata.IsSteerSwitchOn || state.Engaged) { switchByte |= 0x02; }
+            if (metadata.IsRemoteSwitchOn) { switchByte |= 0x04; }
         }
         else if (state.Engaged)
         {

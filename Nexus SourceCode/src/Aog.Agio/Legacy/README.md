@@ -49,11 +49,25 @@ that corrupt checksums are rejected.
 
 | PGN | Direction | Payload summary | Notes |
 | --- | --- | --- | --- |
-| `0xFE` | Core → Legacy | `speed_tenths_kph`, `guidance_status`, `target_angle_hundredths_deg`, `tram_control`, `section_bitmap_low`, `section_bitmap_high` | Encoded via `EncodeSteerCommand`; `SectionMask.Mask` is packed little-endian (sections 1–8 in byte 11, 9–16 in byte 12). |
+| `0xFE` | Core → Legacy | `speed_hundredths_kph`, `guidance_status`, `target_angle_hundredths_deg`, `tram_control`, `section_bitmap_low`, `section_bitmap_high` | Encoded via `EncodeSteerCommand`; `SectionMask.Mask` is packed little-endian (sections 1–8 in byte 11, 9–16 in byte 12). |
 | `0xFD` | Legacy → Core | `actual_angle_hundredths_deg`, `heading_hundredths_deg`, `roll_hundredths_deg`, `switch_bits`, `pwm` | Decoded via `TryDecodeSteerState`; switch bits expose work/steer/remote inputs and populate `LegacySteerStateMetadata`. |
 
 Steering commands surface through `ILegacySteerCommandObserver`, feedback through
 `ILegacySteerStateObserver`, and section bitmasks through `ILegacySectionObserver`.
+
+When available, `LegacySteerCommandMetadata.CurrentSpeedMps` is converted to the legacy
+`speed_hundredths_kph` format before being written to payload bytes 5–6 so
+downstream legacy hardware receives the current vehicle speed.
+The section payload is capped at 16 spray/boom sections. `SectionMask.SectionCount`
+values above 16 are truncated and their masks are clipped to 16 bits before
+encoding so downstream hardware never sees the extended widths yet surfaced by
+`Aog.Core.V1.SectionMask`. Guidance status bytes follow legacy semantics: bit 0
+denotes "autosteer engaged" and is toggled automatically from
+`SteerCmd.Enable`, while the remaining bits pass through from
+`LegacySteerCommandMetadata.GuidanceStatus` for controllers that piggyback mode
+flags or error codes. Extended PGNs and wider section masks will remain
+unimplemented until the codec enforces the 32-bit framing documented in the SRS.
+TODO(NX-042): expand the codec once the extended framing bug is addressed.
 
 ## UART framing helper
 

@@ -136,6 +136,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-673 Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests
 - [x] NX-935 Legacy pose codec default source fallback _(Done)_ — Default main antenna source address when metadata is omitted
 - [x] NX-963 Legacy pose dual heading sanitization fix _(Done)_ — Guard secondary heading against non-finite values
+- [ ] NX-938 Legacy steer command speed encoding fix
 - [ ] NX-915 gpsd TPV null field handling regression test
 - [ ] NX-934 Legacy UDP section mask snapshot fix
 - [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
@@ -386,6 +387,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-096 Community preview program
 - [x] NX-097 1.0 launch readiness review
 - [ ] NX-938 Legacy steer command guidance status disable fix
+- [ ] NX-940 Legacy steer angle saturation clamp
 
 - [x] NX-333 Legacy zone importer & converter _(Done)_ — ADR-027 zone interop
 - [x] NX-334 Legacy job migration tooling _(Done)_ — ADR-040/041 season/session migration
@@ -760,6 +762,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-937 | Legacy pose codec non-finite guard | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Normalize NaN/∞ pose fields before encoding |
 | NX-938 | Legacy steer command guidance status disable fix | Planned |  | — | — | Ensure disabled steer commands encode status zero |
 | NX-939 | Legacy pose lat/lon sanitization | In Progress |  | — | — | Clamp invalid coordinates before encoding |
+| NX-940 | Legacy steer command source override | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Allow overriding UDP source address metadata |
+| NX-940 | Legacy frame checksum length guard | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Guard short frames before validating checksum |
+| NX-940 | Legacy steer angle saturation clamp | In Progress |  | — | — | Limit steer command payload to ±3276 hundredths |
 
 ## Legend
 

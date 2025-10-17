@@ -114,15 +114,12 @@ public sealed class LegacySteerCodec
         var speedTenths = (ushort)Math.Clamp((int)Math.Round(metadata.SpeedKph * 10.0), 0, ushort.MaxValue);
         BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(5, 2), speedTenths);
 
+        const byte EngagedBit = 0x01;
         var status = metadata.GuidanceStatus;
-        if (!command.Enable)
-        {
-            status = 0;
-        }
-        else if (status == 0)
-        {
-            status = 1;
-        }
+
+        status = command.Enable
+            ? (byte)(status | EngagedBit)
+            : (byte)(status & ~EngagedBit);
 
         buffer[7] = status;
 

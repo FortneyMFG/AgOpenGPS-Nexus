@@ -52,33 +52,39 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
-using System.Buffers.Binary;
-using Xunit;
-
-public class LegacySteerCodecTests
-{
-    [Fact]
-    public void EncodeSteerCommand_DisabledCommandForcesStatusZeroAndAngleZero()
+    public void EncodeSteerCommand_DisabledCommandClearsEngagedBitAndZeroesAngle()
     {
         var codec = new LegacySteerCodec();
         var command = new SteerCmd { TargetWheelAngleDeg = 12.34, Enable = false };
         var metadata = new LegacySteerCommandMetadata
         {
-            GuidanceStatus = 3,   // should be overridden to 0 when disabled
-            SpeedKph = 4.2,       // leave as-is unless your spec says otherwise
+            GuidanceStatus = 0b0000_0011,
+            SpeedKph = 4.2,
         };
 
         var frame = codec.EncodeSteerCommand(command, metadata: metadata);
 
-        // Status byte: index 7 per your earlier tests
-        Assert.Equal(0, frame[7]);
+        Assert.Equal(0b0000_0010, frame[7]);
 
-        // Angle hundredths at bytes 8-9 (little-endian)
         var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(frame.AsSpan(8, 2));
         Assert.Equal(0, steerHundredths);
     }
-}
 
+    [Fact]
+    public void EncodeSteerCommand_PreservesMetadataStatusBitsWhenEnabled()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { TargetWheelAngleDeg = -1.5, Enable = true };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            GuidanceStatus = 0b0010_0100,
+            SpeedKph = 7.8,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        Assert.Equal(0b0010_0101, frame[7]);
+    }
 
     [Fact]
     public void EncodeAndDecodeSteerState_RoundTrips()

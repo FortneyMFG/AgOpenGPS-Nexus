@@ -38,6 +38,7 @@ public sealed class LegacyUdpGateway
     private long _steerStateSequence;
     private long _sectionSequence;
 
+    // Snapshots for section-only updates
     private SteerCmd? _steerSnapshot;
     private LegacySteerCommandMetadata? _lastSteerMetadata;
 
@@ -110,7 +111,7 @@ public sealed class LegacyUdpGateway
         var metadataSnapshot = metadata?.Clone() ?? new LegacySteerCommandMetadata();
         Volatile.Write(ref _lastSteerMetadata, metadataSnapshot);
 
-        // Build supplemental steer metadata (raw flags + optional source override)
+        // Supplemental steer metadata for codec
         LegacySteerMetadata steerMetadata = new()
         {
             GuidanceStatus = metadataSnapshot.GuidanceStatus,

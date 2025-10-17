@@ -4,7 +4,13 @@
   "title": "Layer.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "kind"],
+  "required": [
+    "id",
+    "kind",
+    "createdBy",
+    "createdAt",
+    "lastModifiedAt"
+  ],
   "properties": {
     "schemaVersion": {
       "type": "string",

@@ -134,6 +134,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-671 gpsd disable toggle for Linux backend _(Done)_ — Allows operators to opt out of gpsd monitoring when the daemon is not present
 - [x] NX-701 SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
 - [x] NX-673 Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests
+- [x] NX-935 Legacy pose codec default source fallback _(Done)_ — Default main antenna source address when metadata is omitted
 - [ ] NX-915 gpsd TPV null field handling regression test
 - [ ] NX-934 Legacy UDP section mask snapshot fix
 - [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
@@ -748,6 +749,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-096 | Community preview program with opt-in builds and survey loop | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Capture structured feedback |
 | NX-097 | 1.0 launch readiness review and sign-off checklist | Done |  | — | [SRS §1.4 Release Management](docs/SRS/NOTES.md#srs-14-release-management) | Cross-team go/no-go |
 | NX-931 | Legacy shapefile multi-part boundary import fix | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Preserve exterior vertices from multi-part polygons |
+| NX-937 | Legacy pose codec non-finite guard | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Normalize NaN/∞ pose fields before encoding |
 | NX-938 | Legacy steer command guidance status disable fix | Planned |  | — | — | Ensure disabled steer commands encode status zero |
 | NX-939 | Legacy pose lat/lon sanitization | In Progress |  | — | — | Clamp invalid coordinates before encoding |
 

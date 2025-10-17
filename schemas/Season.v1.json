@@ -4,7 +4,14 @@
   "title": "Season.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "dateRange"],
+  "required": [
+    "id",
+    "name",
+    "dateRange",
+    "createdBy",
+    "createdAt",
+    "lastModifiedAt"
+  ],
   "properties": {
     "schemaVersion": {
       "type": "string",

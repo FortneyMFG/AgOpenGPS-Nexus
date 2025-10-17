@@ -35,6 +35,11 @@ public sealed class SimulationPlaybackRateOptionViewModel : ObservableObject
     public double Rate { get; }
 
     /// <summary>
+    /// Gets the numeric multiplier associated with the playback rate.
+    /// </summary>
+    public double Multiplier => Rate;
+
+    /// <summary>
     /// Gets the formatted label displayed in the UI.
     /// </summary>
     public string Label { get; }

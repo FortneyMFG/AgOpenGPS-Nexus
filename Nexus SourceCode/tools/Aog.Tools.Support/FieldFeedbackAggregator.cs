@@ -104,16 +104,19 @@ public sealed class FieldFeedbackAggregator
                     continue;
                 }
 
+                FieldFeedbackEvent? evt = null;
                 try
                 {
-                    if (JsonSerializer.Deserialize<FieldFeedbackEvent>(line, SerializerOptions) is { } evt)
-                    {
-                        yield return evt;
-                    }
+                    evt = JsonSerializer.Deserialize<FieldFeedbackEvent>(line, SerializerOptions);
                 }
                 catch (JsonException)
                 {
                     // Ignore malformed rows so a single bad upload does not break aggregation.
+                }
+
+                if (evt is not null)
+                {
+                    yield return evt;
                 }
             }
 

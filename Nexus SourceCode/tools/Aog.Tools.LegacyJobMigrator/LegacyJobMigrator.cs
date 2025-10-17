@@ -48,10 +48,10 @@ public sealed class LegacyJobMigrator
             return new LegacyJobMigrationReport(
                 inputPath,
                 outputPath,
-                updated: false,
-                skipped: true,
-                sessionId: null,
-                seasonAssigned: false);
+                Updated: false,
+                Skipped: true,
+                SessionId: null,
+                SeasonAssigned: false);
         }
 
         var jobState = GetString(root, "state");
@@ -167,10 +167,10 @@ public sealed class LegacyJobMigrator
         return new LegacyJobMigrationReport(
             inputPath,
             outputPath,
-            updated: true,
-            skipped: false,
-            sessionId,
-            assignedSeason);
+            Updated: true,
+            Skipped: false,
+            SessionId: sessionId,
+            SeasonAssigned: assignedSeason);
     }
 
     private static string CreateTempFilePath(string directory)

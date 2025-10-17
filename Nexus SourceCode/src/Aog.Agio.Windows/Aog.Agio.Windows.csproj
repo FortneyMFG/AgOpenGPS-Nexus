@@ -14,6 +14,10 @@
     <UseLocalAogAbstractions Condition="'$(UseLocalAogAbstractions)' == '' and Exists('..\Aog.Abstractions\Aog.Abstractions.csproj')">true</UseLocalAogAbstractions>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
   <!-- Common packages -->
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.9" />

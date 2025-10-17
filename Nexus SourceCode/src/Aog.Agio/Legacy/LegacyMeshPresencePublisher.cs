@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Aog.Core.Mesh;
 using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Aog.Agio.Legacy;
@@ -13,7 +15,7 @@ namespace Aog.Agio.Legacy;
 /// <summary>
 /// Bridges decoded legacy telemetry into the live telemetry mesh presence stream.
 /// </summary>
-public sealed class LegacyMeshPresencePublisher : ILegacyMeshPresencePublisher
+public sealed class LegacyMeshPresencePublisher : ILegacyMeshPresencePublisher, IHostedService
 {
     private readonly ILiveTelemetryMeshService _meshService;
     private readonly MeshSessionDescriptor _defaultSession;
@@ -23,6 +25,8 @@ public sealed class LegacyMeshPresencePublisher : ILegacyMeshPresencePublisher
     private readonly string _deviceLabel;
     private readonly IReadOnlyList<string> _capabilities;
     private readonly Dictionary<string, string> _staticMetadata;
+    private readonly ILogger<LegacyMeshPresencePublisher> _logger;
+    private readonly MeshDeviceRegistration _registration;
     private LegacyDiscoveryAnnouncement? _lastDiscovery;
 
     /// <summary>
@@ -30,13 +34,16 @@ public sealed class LegacyMeshPresencePublisher : ILegacyMeshPresencePublisher
     /// </summary>
     public LegacyMeshPresencePublisher(
         ILiveTelemetryMeshService meshService,
-        IOptions<LegacyMeshOptions> optionsAccessor)
+        IOptions<LegacyMeshOptions> optionsAccessor,
+        ILogger<LegacyMeshPresencePublisher> logger)
     {
         _meshService = meshService ?? throw new ArgumentNullException(nameof(meshService));
         if (optionsAccessor is null)
         {
             throw new ArgumentNullException(nameof(optionsAccessor));
         }
+
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         var options = optionsAccessor.Value ?? throw new ArgumentException("Mesh options must be configured.", nameof(optionsAccessor));
 
@@ -54,7 +61,7 @@ public sealed class LegacyMeshPresencePublisher : ILegacyMeshPresencePublisher
         _capabilities = NormalizeCapabilities(options.Capabilities);
         _staticMetadata = NormalizeMetadata(options.Metadata);
 
-        var registration = new MeshDeviceRegistration(
+        _registration = new MeshDeviceRegistration(
             _deviceId,
             _deviceLabel,
             _capabilities,
@@ -63,8 +70,6 @@ public sealed class LegacyMeshPresencePublisher : ILegacyMeshPresencePublisher
                 new MeshShareGrant(_shareSeasonId, _shareJobId, MeshDataTier.Presence)
             }),
             MeshSubscribeProfile.Empty);
-
-        _meshService.RegisterOrUpdateDeviceAsync(registration, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />
@@ -100,6 +105,29 @@ public sealed class LegacyMeshPresencePublisher : ILegacyMeshPresencePublisher
 
         await _meshService.UpdatePresenceAsync(update, cancellationToken).ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// Performs asynchronous registration of the legacy mesh device with the mesh service.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token controlling the operation.</param>
+    public async Task InitializeAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        try
+        {
+            await _meshService.RegisterOrUpdateDeviceAsync(_registration, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to register legacy mesh presence device {DeviceId}.", _deviceId);
+            throw;
+        }
+    }
+
+    Task IHostedService.StartAsync(CancellationToken cancellationToken) => InitializeAsync(cancellationToken);
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     private MeshSessionDescriptor BuildSessionDescriptor(Header? header)
     {

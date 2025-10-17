@@ -139,6 +139,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-934 Legacy UDP section mask snapshot fix
 - [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
 - [ ] NX-931 gpsd monitor restart on socket availability
+- [ ] NX-952 Aog.Agio.Windows targeting pack restore guard
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling

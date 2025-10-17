@@ -70,7 +70,6 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
         _replayController = replayController;
         _logger = logger;
         _dispatcher = dispatcher ?? Dispatcher.UIThread;
-        _dispatcher = dispatcher ?? Dispatcher.UIThread;
 
         TogglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
         ToggleAutoResumeCommand = new DelegateCommand(_ => ToggleAutoResume());
@@ -165,28 +164,28 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
         private set => SetProperty(ref _selectedPlaybackRateMultiplier, value);
     }
 
-/// <summary>Gets a formatted label describing the selected playback rate.</summary>
-public string SelectedPlaybackRateLabel
-{
-    get
+    /// <summary>Gets a formatted label describing the selected playback rate.</summary>
+    public string SelectedPlaybackRateLabel
     {
-        var option = _selectedPlaybackRateOption;
-        if (option is not null)
+        get
         {
-            if (!string.IsNullOrWhiteSpace(option.Label))
+            var option = _selectedPlaybackRateOption;
+            if (option is not null)
             {
-                return option.Label;
+                if (!string.IsNullOrWhiteSpace(option.Label))
+                {
+                    return option.Label;
+                }
+
+                // Fallback to formatted multiplier if no label
+                return FormatPlaybackRateLabel(ClampPlaybackRate(option.Multiplier));
             }
 
-            // Fallback to formatted multiplier if no label
-            return FormatPlaybackRateLabel(ClampPlaybackRate(option.Multiplier));
+            // No option selected — use current multiplier (clamped)
+            return FormatPlaybackRateLabel(ClampPlaybackRate(_selectedPlaybackRateMultiplier));
         }
-
-        // No option selected — use current multiplier (clamped)
-        return FormatPlaybackRateLabel(ClampPlaybackRate(_selectedPlaybackRateMultiplier));
+        private set => SetProperty(ref _selectedPlaybackRateLabel, value);
     }
-    private set => SetProperty(ref _selectedPlaybackRateLabel, value);
-}
 
 
     /// <summary>Gets or sets the friendly title describing the active scenario.</summary>
@@ -314,17 +313,16 @@ public string SelectedPlaybackRateLabel
 
     private void InitializePlaybackRates(double initialRate)
     {
-        void Initialize()
+        ExecuteOnDispatcher(() =>
         {
             _playbackRates.Clear();
             _playbackRates.Add(new SimulationPlaybackRateOptionViewModel(0.5, OnPlaybackRateOptionSelected));
             _playbackRates.Add(new SimulationPlaybackRateOptionViewModel(1.0, OnPlaybackRateOptionSelected));
             _playbackRates.Add(new SimulationPlaybackRateOptionViewModel(2.0, OnPlaybackRateOptionSelected));
             SortPlaybackRates();
-            SelectPlaybackRate(initialRate, updateController: false);
-        }
+        });
 
-        ExecuteOnDispatcher(Initialize);
+        SelectPlaybackRate(initialRate, updateController: false);
     }
 
     private void TogglePlayback()
@@ -464,44 +462,35 @@ private void SortPlaybackRates()
 }
 
 // Call this when a playback rate option is chosen (e.g., from the UI).
-private void UpdateSelectedPlaybackRateOption(SimulationPlaybackRateOptionViewModel option)
-{
-    if (option is null)
-        return;
-
-    if (_selectedPlaybackRateOption == option)
+    private void UpdateSelectedPlaybackRateOption(SimulationPlaybackRateOptionViewModel option)
     {
-        // Ensure visual state is correct without re-firing callbacks.
+        if (option is null)
+        {
+            return;
+        }
+
+        if (_selectedPlaybackRateOption == option)
+        {
+            // Ensure visual state is correct without re-firing callbacks.
+            option.SetSelected(true, suppressCallback: true);
+            // Still notify in case dependent bindings read through properties.
+            NotifyPlaybackRateProperties();
+            return;
+        }
+
+        _selectedPlaybackRateOption?.SetSelected(false, suppressCallback: true);
         option.SetSelected(true, suppressCallback: true);
-        // Still notify in case dependent bindings read through properties.
+        _selectedPlaybackRateOption = option;
+
         NotifyPlaybackRateProperties();
-        return;
     }
 
-    _selectedPlaybackRateOption?.SetSelected(false, suppressCallback: true);
-    option.SetSelected(true, suppressCallback: true);
-    _selectedPlaybackRateOption = option;
-
-    NotifyPlaybackRateProperties();
-}
-
-private void NotifyPlaybackRateProperties()
-{
-    RaisePropertyChanged(nameof(SelectedPlaybackRate));
-    RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
-    RaisePropertyChanged(nameof(SelectedPlaybackRateOption));
-}
-
-
-#if false
-// Centralized place to notify anything bound to the selected rate/label/option.
-private void NotifyPlaybackRateProperties()
-{
-    RaisePropertyChanged(nameof(SelectedPlaybackRate));
-    RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
-    RaisePropertyChanged(nameof(SelectedPlaybackRateOption));
-}
-#endif
+    private void NotifyPlaybackRateProperties()
+    {
+        RaisePropertyChanged(nameof(SelectedPlaybackRate));
+        RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
+        RaisePropertyChanged(nameof(SelectedPlaybackRateOption));
+    }
 
 
     private void UpdateSeekFraction(double value, bool triggerSeek)

@@ -57,7 +57,7 @@ public sealed class SimulationBarViewModelTests
 
         viewModel.PlaybackRates.Select(option => option.Label)
             .Should()
-            .ContainInOrder("50%", "100%", "200%");
+            .ContainInOrder("0.5×", "1×", "2×");
     }
 
     [Fact]
@@ -129,6 +129,26 @@ public sealed class SimulationBarViewModelTests
         replayController.HandlerInvocationCount.Should().Be(1);
 
         second.Dispose();
+    }
+
+    [Fact]
+    public void CreatingAndDisposingMultipleInstances_ReleasesReplayControllerSubscriptions()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        var replayController = new ReplayControllerStub();
+
+        for (var iteration = 0; iteration < 3; iteration++)
+        {
+            replayController.SubscriptionCount.Should().Be(0);
+
+            using (var viewModel = new SimulationBarViewModel(configuration, replayController))
+            {
+                replayController.SubscriptionCount.Should().Be(1);
+                viewModel.StatusText.Should().Be("Paused");
+            }
+
+            replayController.SubscriptionCount.Should().Be(0);
+        }
     }
 
     private static SimulationBarViewModel CreateViewModel()

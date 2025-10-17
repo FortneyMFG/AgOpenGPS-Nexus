@@ -132,6 +132,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-245 Mesh-aware legacy UDP gateway updates _(Done)_ — ADR-047 presence integration
 - [x] NX-246 GNSS correction services bootstrap _(Done)_ — ADR-066 GNSS correction services
 - [x] NX-671 gpsd disable toggle for Linux backend _(Done)_ — Allows operators to opt out of gpsd monitoring when the daemon is not present
+- [x] NX-701 SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -498,6 +499,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-244 | RadioBridge provisioning documentation kit | Done |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 provisioning docs |
 | NX-245 | Mesh-aware legacy UDP gateway updates | Done |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 presence integration |
 | NX-246 | GNSS correction services bootstrap | Done |  | — | [ADR-066](docs/ADR/ADR-roadmap.md) | ADR-066 GNSS correction services |
+| NX-742 | SocketCAN channel backpressure guardrails | Done | AI | — | — | Drop stalled subscribers and stress fast consumers |
 
 ### Section D — Plugins (Logic + Sim Providers)
 

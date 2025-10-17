@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 using Aog.Core.V1;
+using Google.Protobuf;
 
 namespace Aog.Bridge.Host.AogLink.Legacy;
 
@@ -9,11 +11,11 @@ namespace Aog.Bridge.Host.AogLink.Legacy;
 /// </summary>
 public static class LegacySteerStateExtensions
 {
+    private const int LegacyHeadingFieldNumber = 65000;
+
     private sealed class LegacySteerStateMetadataHolder
     {
         public double? HeadingDegrees { get; set; }
-
-        public bool HasData => HeadingDegrees is not null;
     }
 
     private static readonly ConditionalWeakTable<SteerState, LegacySteerStateMetadataHolder> Metadata = new();
@@ -30,6 +32,8 @@ public static class LegacySteerStateExtensions
 
         var holder = Metadata.GetOrCreateValue(state);
         holder.HeadingDegrees = headingDegrees;
+
+        state.UnknownFields = PersistLegacyHeading(state.UnknownFields, headingDegrees);
     }
 
     /// <summary>
@@ -49,6 +53,14 @@ public static class LegacySteerStateExtensions
             return true;
         }
 
+        if (state.UnknownFields is not null
+            && TryReadLegacyHeadingFromUnknownFields(state.UnknownFields, out var persistedHeading))
+        {
+            Metadata.GetOrCreateValue(state).HeadingDegrees = persistedHeading;
+            headingDegrees = persistedHeading;
+            return true;
+        }
+
         headingDegrees = default;
         return false;
     }
@@ -63,13 +75,118 @@ public static class LegacySteerStateExtensions
             return;
         }
 
-        if (Metadata.TryGetValue(state, out var holder))
+        Metadata.Remove(state);
+
+        state.UnknownFields = RemoveLegacyHeadingField(state.UnknownFields);
+    }
+
+    private static UnknownFieldSet? PersistLegacyHeading(UnknownFieldSet? existingFields, double headingDegrees)
+    {
+        var filteredFields = RemoveLegacyHeadingField(existingFields);
+
+        using var buffer = new MemoryStream();
+        using (var writer = new CodedOutputStream(buffer, leaveOpen: true))
         {
-            holder.HeadingDegrees = null;
-            if (!holder.HasData)
+            writer.WriteTag(LegacyHeadingFieldNumber, WireFormat.WireType.Fixed64);
+            writer.WriteDouble(headingDegrees);
+            writer.Flush();
+        }
+
+        buffer.Position = 0;
+        using var reader = new CodedInputStream(buffer, leaveOpen: true);
+        var tag = reader.ReadTag();
+        return tag == 0
+            ? filteredFields
+            : UnknownFieldSet.MergeFieldFrom(filteredFields, reader);
+    }
+
+    private static UnknownFieldSet? RemoveLegacyHeadingField(UnknownFieldSet? existingFields)
+    {
+        if (existingFields is null)
+        {
+            return null;
+        }
+
+        using var buffer = new MemoryStream();
+        using (var writer = new CodedOutputStream(buffer, leaveOpen: true))
+        {
+            existingFields.WriteTo(writer);
+            writer.Flush();
+        }
+
+        buffer.Position = 0;
+        using var reader = new CodedInputStream(buffer, leaveOpen: true);
+        UnknownFieldSet? filtered = null;
+        while (reader.ReadTag() is uint tag and not 0)
+        {
+            if (WireFormat.GetTagFieldNumber(tag) == LegacyHeadingFieldNumber)
             {
-                Metadata.Remove(state);
+                reader.SkipLastField();
+                continue;
+            }
+
+            filtered = UnknownFieldSet.MergeFieldFrom(filtered, reader);
+        }
+
+        return filtered;
+    }
+
+    private static bool TryReadLegacyHeadingFromUnknownFields(
+        UnknownFieldSet unknownFields,
+        out double headingDegrees)
+    {
+        using var buffer = new MemoryStream();
+        using (var writer = new CodedOutputStream(buffer, leaveOpen: true))
+        {
+            unknownFields.WriteTo(writer);
+            writer.Flush();
+        }
+
+        buffer.Position = 0;
+        using var reader = new CodedInputStream(buffer, leaveOpen: true);
+        while (reader.ReadTag() is uint tag and not 0)
+        {
+            if (WireFormat.GetTagFieldNumber(tag) != LegacyHeadingFieldNumber)
+            {
+                reader.SkipLastField();
+                continue;
+            }
+
+            switch (WireFormat.GetTagWireType(tag))
+            {
+                case WireFormat.WireType.Fixed64:
+                    headingDegrees = reader.ReadDouble();
+                    return true;
+                case WireFormat.WireType.LengthDelimited:
+                {
+                    var payload = reader.ReadBytes();
+                    if (payload.Length == sizeof(double))
+                    {
+                        headingDegrees = BitConverter.ToDouble(payload.ToByteArray(), 0);
+                        return true;
+                    }
+
+                    if (double.TryParse(payload.ToStringUtf8(), out var parsed))
+                    {
+                        headingDegrees = parsed;
+                        return true;
+                    }
+
+                    break;
+                }
+                case WireFormat.WireType.Varint:
+                    headingDegrees = BitConverter.Int64BitsToDouble((long)reader.ReadUInt64());
+                    return true;
+                case WireFormat.WireType.Fixed32:
+                    headingDegrees = reader.ReadFloat();
+                    return true;
+                default:
+                    reader.SkipLastField();
+                    break;
             }
         }
+
+        headingDegrees = default;
+        return false;
     }
 }

@@ -57,7 +57,7 @@ public sealed class SimulationBarViewModelTests
 
         viewModel.PlaybackRates.Select(option => option.Label)
             .Should()
-            .ContainInOrder("50%", "100%", "200%");
+            .ContainInOrder("0.5×", "1×", "2×");
     }
 
     [Fact]

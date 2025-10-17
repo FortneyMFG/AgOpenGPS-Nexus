@@ -138,14 +138,20 @@ public sealed class LegacyUdpGatewayTests
             ControllerOutput = -0.35,
         };
         var expectedSnapshot = sanitizedCommand.Clone();
+        var sanitizedSections = new SectionMask
+        {
+            SectionCount = 8,
+            Mask = 0x0003,
+        };
         var failsafe = new RecordingFailsafeService
         {
-            SteerResult = sanitizedCommand,
-            SectionResult = new SectionMask
-            {
-                SectionCount = 8,
-                Mask = 0x0003,
-            },
+            SectionResult = sanitizedSections,
+        };
+        var steerCallCount = 0;
+        failsafe.FilterSteerCommandCallback = command =>
+        {
+            steerCallCount++;
+            return steerCallCount == 1 ? sanitizedCommand : command;
         };
 
         var gateway = new LegacyUdpGateway(
@@ -203,8 +209,96 @@ public sealed class LegacyUdpGatewayTests
         Assert.Equal(expectedSnapshot.TargetWheelAngleDeg, decodedCommand.TargetWheelAngleDeg, 3);
         Assert.Equal(expectedSnapshot.FeedForward, decodedCommand.FeedForward, 3);
         Assert.Equal(expectedSnapshot.ControllerOutput, decodedCommand.ControllerOutput, 3);
-        Assert.Equal(failsafe.SectionResult.Mask, decodedSections.Mask);
+        Assert.Equal(failsafe.SectionResult!.Mask, decodedSections.Mask);
         Assert.Equal(failsafe.SectionResult.SectionCount, decodedSections.SectionCount);
+    }
+
+    [Fact]
+    public async Task PublishSectionMaskAsync_ReevaluatesFailsafeOnSend()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
+        var transport = new RecordingTransport();
+        var poseObserver = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var safeCommand = new SteerCmd
+        {
+            Enable = false,
+            TargetWheelAngleDeg = 0,
+            FeedForward = 0,
+            ControllerOutput = 0,
+        };
+        var safeSections = new SectionMask
+        {
+            SectionCount = 8,
+            Mask = 0x0000,
+        };
+        var failsafe = new RecordingFailsafeService();
+        var steerCall = 0;
+        failsafe.FilterSteerCommandCallback = command =>
+        {
+            steerCall++;
+            return steerCall == 1 ? command.Clone() : safeCommand;
+        };
+        var sectionCall = 0;
+        failsafe.FilterSectionMaskCallback = mask =>
+        {
+            sectionCall++;
+            return sectionCall == 1 ? mask.Clone() : safeSections;
+        };
+
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            poseObserver,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
+            new FixedTimeProvider(DateTimeOffset.UtcNow),
+            failsafe);
+
+        var initialCommand = new SteerCmd
+        {
+            Enable = true,
+            TargetWheelAngleDeg = 12.5,
+            FeedForward = 0.2,
+            ControllerOutput = 0.4,
+        };
+
+        var initialSections = new SectionMask
+        {
+            SectionCount = 8,
+            Mask = 0x00FF,
+        };
+
+        await gateway.PublishSteerCommandAsync(initialCommand, initialSections).ConfigureAwait(false);
+
+        transport.Frames.Clear();
+
+        var updatedSections = new SectionMask
+        {
+            SectionCount = 8,
+            Mask = 0x00F0,
+        };
+
+        await gateway.PublishSectionMaskAsync(updatedSections).ConfigureAwait(false);
+
+        var frame = Assert.Single(transport.Frames);
+        Assert.True(steerCodec.TryDecodeSteerCommand(frame.Span, out var decodedCommand, out _, out var decodedSections));
+        Assert.Equal(safeCommand.Enable, decodedCommand.Enable);
+        Assert.Equal(safeCommand.TargetWheelAngleDeg, decodedCommand.TargetWheelAngleDeg, 3);
+        Assert.Equal(safeCommand.FeedForward, decodedCommand.FeedForward, 3);
+        Assert.Equal(safeCommand.ControllerOutput, decodedCommand.ControllerOutput, 3);
+        Assert.Equal(safeSections.Mask, decodedSections.Mask);
+        Assert.Equal(safeSections.SectionCount, decodedSections.SectionCount);
     }
 
     [Fact]
@@ -653,9 +747,13 @@ public sealed class LegacyUdpGatewayTests
 
     private sealed class RecordingFailsafeService : IActuatorFailsafeService
     {
-        public SteerCmd SteerResult { get; set; } = new();
+        public SteerCmd? SteerResult { get; set; }
 
-        public SectionMask SectionResult { get; set; } = new();
+        public SectionMask? SectionResult { get; set; }
+
+        public Func<SteerCmd, SteerCmd>? FilterSteerCommandCallback { get; set; }
+
+        public Func<SectionMask, SectionMask>? FilterSectionMaskCallback { get; set; }
 
         public bool ReportHeartbeatCalled { get; private set; }
 
@@ -663,11 +761,11 @@ public sealed class LegacyUdpGatewayTests
 
         public SectionMask? LastSectionMask { get; private set; }
 
-        public bool HasActiveHeartbeat => true;
+        public bool HasActiveHeartbeat { get; set; } = true;
 
-        public DateTimeOffset? LastHeartbeatUtc => null;
+        public DateTimeOffset? LastHeartbeatUtc { get; set; }
 
-        public TimeSpan HeartbeatTimeout => TimeSpan.Zero;
+        public TimeSpan HeartbeatTimeout { get; set; } = TimeSpan.Zero;
 
         public void ReportHeartbeat()
         {
@@ -680,14 +778,28 @@ public sealed class LegacyUdpGatewayTests
 
         public SteerCmd FilterSteerCommand(SteerCmd command)
         {
+            ArgumentNullException.ThrowIfNull(command);
             LastSteerCommand = command;
-            return SteerResult;
+
+            if (FilterSteerCommandCallback is not null)
+            {
+                return FilterSteerCommandCallback(command);
+            }
+
+            return SteerResult ?? command;
         }
 
         public SectionMask FilterSectionMask(SectionMask mask)
         {
+            ArgumentNullException.ThrowIfNull(mask);
             LastSectionMask = mask;
-            return SectionResult;
+
+            if (FilterSectionMaskCallback is not null)
+            {
+                return FilterSectionMaskCallback(mask);
+            }
+
+            return SectionResult ?? mask;
         }
     }
 

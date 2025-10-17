@@ -134,7 +134,11 @@ public sealed class LegacyUdpGateway
             throw new InvalidOperationException("A steering command must be published before section updates.");
         }
 
-        var frame = _steerCodec.EncodeSteerCommand(filteredCommand, filteredSections, metadata);
+        var refreshedCommand = _actuatorFailsafe.FilterSteerCommand(filteredCommand);
+        var refreshedSnapshot = refreshedCommand.Clone();
+        Volatile.Write(ref _lastFilteredSteerCommand, refreshedSnapshot);
+
+        var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, filteredSections, metadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 

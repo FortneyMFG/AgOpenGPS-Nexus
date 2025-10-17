@@ -1,3 +1,4 @@
+using System;
 using System.Buffers.Binary;
 using Aog.Agio.Legacy;
 using Aog.Core.V1;
@@ -36,7 +37,7 @@ public sealed class LegacySteerCodecTests
         Assert.Equal(metadata.GuidanceStatus, decodedMetadata.GuidanceStatus);
         Assert.Equal(metadata.SpeedKph, decodedMetadata.SpeedKph, 6);
         Assert.Equal(metadata.TramControl, decodedMetadata.TramControl);
-        Assert.Equal((uint)(sections.Mask & 0xFFFF), decodedSections.Mask);
+        Assert.Equal((uint)(sections.Mask & 0xFFF), decodedSections.Mask);
         Assert.Equal(16u, decodedSections.SectionCount);
     }
 
@@ -52,6 +53,12 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
+using System.Buffers.Binary;
+using Xunit;
+
+public class LegacySteerCodecTests
+{
+    [Fact]
     public void EncodeSteerCommand_TruncatesMaskAboveSectionCount()
     {
         var codec = new LegacySteerCodec();
@@ -64,16 +71,11 @@ public sealed class LegacySteerCodecTests
 
         var frame = codec.EncodeSteerCommand(command, sections);
 
-        var encodedMask = (uint)(frame[11] | (frame[12] << 8));
+        // Section mask is little-endian at bytes 11..12
+        var encodedMask = BinaryPrimitives.ReadUInt16LittleEndian(frame.AsSpan(11, 2));
         Assert.Equal(0b0000_1010_0000_1111u, encodedMask);
     }
 
-    [Fact]
-using System.Buffers.Binary;
-using Xunit;
-
-public class LegacySteerCodecTests
-{
     [Fact]
     public void EncodeSteerCommand_DisabledCommandForcesStatusZeroAndAngleZero()
     {
@@ -81,21 +83,66 @@ public class LegacySteerCodecTests
         var command = new SteerCmd { TargetWheelAngleDeg = 12.34, Enable = false };
         var metadata = new LegacySteerCommandMetadata
         {
-            GuidanceStatus = 3,   // should be overridden to 0 when disabled
-            SpeedKph = 4.2,       // leave as-is unless your spec says otherwise
+            GuidanceStatus = 3,  // should be overridden when disabled
+            SpeedKph = 4.2,
         };
 
         var frame = codec.EncodeSteerCommand(command, metadata: metadata);
 
-        // Status byte: index 7 per your earlier tests
+        // Status byte: index 7
         Assert.Equal(0, frame[7]);
 
-        // Angle hundredths at bytes 8-9 (little-endian)
+        // Angle (hundredths of a degree), bytes 8..9 little-endian
         var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(frame.AsSpan(8, 2));
         Assert.Equal(0, steerHundredths);
     }
 }
 
+
+    [Fact]
+    public void EncodeSteerCommand_AllowsFullSixteenBitMask()
+    {
+        var codec = new LegacySteerCodec();
+        var sections = new SectionMask
+        {
+            SectionCount = 16,
+            Mask = 0xFFFF,
+        };
+
+        var frame = codec.EncodeSteerCommand(new SteerCmd { Enable = true }, sections);
+
+        Assert.Equal(0xFF, frame[11]);
+        Assert.Equal(0xFF, frame[12]);
+    }
+
+    [Fact]
+    public void EncodeSteerCommand_TruncatesMaskAboveSixteenBits()
+    {
+        var codec = new LegacySteerCodec();
+        var sections = new SectionMask
+        {
+            SectionCount = 16,
+            Mask = 0x1FFFF,
+        };
+
+        var frame = codec.EncodeSteerCommand(new SteerCmd { Enable = true }, sections);
+
+        Assert.Equal(0xFF, frame[11]);
+        Assert.Equal(0xFF, frame[12]);
+    }
+
+    [Fact]
+    public void EncodeSteerCommand_ThrowsWhenSectionCountExceedsSixteen()
+    {
+        var codec = new LegacySteerCodec();
+        var sections = new SectionMask
+        {
+            SectionCount = 17,
+            Mask = 0x1FFFF,
+        };
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => codec.EncodeSteerCommand(new SteerCmd { Enable = true }, sections));
+    }
 
     [Fact]
     public void EncodeAndDecodeSteerState_RoundTrips()

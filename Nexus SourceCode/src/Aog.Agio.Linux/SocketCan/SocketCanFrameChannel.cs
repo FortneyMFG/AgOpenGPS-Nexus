@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Aog.Core.V1;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Aog.Agio.Linux.SocketCan;
 
@@ -17,8 +19,12 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
     private readonly ConcurrentDictionary<Guid, Subscriber> _subscribers = new();
     private readonly int _subscriberCapacity;
     private readonly long _maxSubscriberBackpressureTicks;
+    private readonly ILogger<SocketCanFrameChannel> _logger;
 
-    public SocketCanFrameChannel(int subscriberCapacity = 64, TimeSpan? maxSubscriberBackpressure = null)
+    public SocketCanFrameChannel(
+        int subscriberCapacity = 64,
+        TimeSpan? maxSubscriberBackpressure = null,
+        ILogger<SocketCanFrameChannel>? logger = null)
     {
         if (subscriberCapacity <= 0)
         {
@@ -33,6 +39,7 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
 
         _subscriberCapacity = subscriberCapacity;
         _maxSubscriberBackpressureTicks = ToStopwatchTicks(backpressure);
+        _logger = logger ?? NullLogger<SocketCanFrameChannel>.Instance;
     }
 
     /// <inheritdoc />
@@ -56,7 +63,7 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
                 continue;
             }
 
-            if (!subscriber.ShouldEvict(nowTicks, _maxSubscriberBackpressureTicks))
+            if (!subscriber.ShouldEvict(nowTicks, _maxSubscriberBackpressureTicks, out var backpressureDurationTicks))
             {
                 continue;
             }
@@ -64,6 +71,11 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
             if (_subscribers.TryRemove(subscriptionId, out var removed))
             {
                 removed.Channel.Writer.TryComplete(new OperationCanceledException("SocketCAN subscriber removed due to sustained backpressure."));
+                _logger.LogWarning(
+                    "SocketCAN subscriber {SubscriptionId} evicted after {BackpressureDuration} of backpressure while publishing CAN frame {ArbitrationId}.",
+                    subscriptionId,
+                    ToTimeSpan(backpressureDurationTicks),
+                    frame.ArbitrationId);
             }
         }
 
@@ -111,6 +123,12 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
         return Math.Max(1, ticks);
     }
 
+    private static TimeSpan ToTimeSpan(long stopwatchTicks)
+    {
+        var seconds = (double)stopwatchTicks / Stopwatch.Frequency;
+        return TimeSpan.FromSeconds(seconds);
+    }
+
     private sealed class Subscriber
     {
         private long _firstBackpressureTicks;
@@ -124,7 +142,7 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
 
         public void ClearBackpressure() => Interlocked.Exchange(ref _firstBackpressureTicks, 0);
 
-        public bool ShouldEvict(long nowTicks, long maxBackpressureTicks)
+        public bool ShouldEvict(long nowTicks, long maxBackpressureTicks, out long backpressureDuration)
         {
             var first = Interlocked.CompareExchange(ref _firstBackpressureTicks, nowTicks, 0);
             if (first == 0)
@@ -132,7 +150,8 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
                 first = nowTicks;
             }
 
-            return nowTicks - first >= maxBackpressureTicks;
+            backpressureDuration = nowTicks - first;
+            return backpressureDuration >= maxBackpressureTicks;
         }
     }
 }

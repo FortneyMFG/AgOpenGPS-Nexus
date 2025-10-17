@@ -42,6 +42,20 @@ public sealed class GpsdClientTests
     }
 
     [Fact]
+    public async Task WatchAsync_WritesWatchCommand()
+    {
+        var factory = new FakeGpsdConnectionFactory(Array.Empty<string>());
+        var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
+
+        await foreach (var _ in client.WatchAsync(CancellationToken.None))
+        {
+            // drain the async enumerable to ensure the command is written before exit
+        }
+
+        Assert.Single(factory.WrittenLines, "?WATCH={\"enable\":true,\"json\":true}");
+    }
+
+    [Fact]
     public async Task WatchAsync_ThrowsWhenSocketUnavailable()
     {
         var factory = new NullGpsdConnectionFactory();

@@ -10,6 +10,8 @@ namespace Aog.Agio.Linux.Gpsd;
 /// </summary>
 public sealed class GpsdClient
 {
+    private const string WatchCommand = "?WATCH={\"enable\":true,\"json\":true}";
+
     private static readonly Encoding Utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
     private readonly IGpsdConnectionFactory _connectionFactory;
@@ -42,7 +44,7 @@ public sealed class GpsdClient
 
         try
         {
-            await writer.WriteLineAsync("?WATCH={\"enable\":true,\"json\":true}", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync(WatchCommand, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is IOException or ObjectDisposedException)
         {

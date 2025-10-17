@@ -97,7 +97,7 @@ public sealed class SimulationBarViewModel : ObservableObject
     /// <summary>
     /// Gets the formatted label describing the selected playback rate.
     /// </summary>
-    public string SelectedPlaybackRateLabel => $"{SelectedPlaybackRate:0.##}×";
+    public string SelectedPlaybackRateLabel => $"{SelectedPlaybackRate * 100:0.#}%";
 
     /// <summary>
     /// Gets the total duration represented on the scrubber.
@@ -286,9 +286,14 @@ public sealed class SimulationBarViewModel : ObservableObject
             OnPlaybackRateSelected(option.Rate);
         }
 
-        foreach (var rate in new[] { 0.5, 1.0, 2.0 })
+        foreach (var optionDefinition in new (double Rate, string Label)[]
         {
-            options.Add(new SimulationPlaybackRateOptionViewModel(rate, SelectOption));
+            (0.5, "50%"),
+            (1.0, "100%"),
+            (2.0, "200%"),
+        })
+        {
+            options.Add(new SimulationPlaybackRateOptionViewModel(optionDefinition.Rate, SelectOption, optionDefinition.Label));
         }
 
         return new ReadOnlyCollection<SimulationPlaybackRateOptionViewModel>(options);

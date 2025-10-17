@@ -83,7 +83,7 @@ public sealed class JobTasksPersistence
         var snapshot = JobDocumentFactory.ToSnapshot(document);
         var layout = snapshot.Layout;
         var normalizedJobRoot = Path.GetFullPath(jobRoot);
-        var manifestRoot = string.IsNullOrWhiteSpace(layout.JobRoot)
+        var normalizedManifestRoot = string.IsNullOrWhiteSpace(layout.JobRoot)
             ? normalizedJobRoot
             : Path.GetFullPath(layout.JobRoot);
 
@@ -91,14 +91,101 @@ public sealed class JobTasksPersistence
         var defaultResumeFile = Path.GetFullPath(Path.Combine(normalizedJobRoot, "Resume.txt"));
         var defaultAttachmentsDirectory = Path.GetFullPath(Path.Combine(normalizedJobRoot, "attachments"));
 
+        string ResolvePath(string? candidate, string fallbackAbsolute)
+        {
+            if (string.IsNullOrWhiteSpace(candidate))
+            {
+                return fallbackAbsolute;
+            }
+
+            var trimmed = candidate.Trim();
+            var absoluteCandidate = Path.IsPathFullyQualified(trimmed)
+                ? Path.GetFullPath(trimmed)
+                : Path.GetFullPath(Path.Combine(normalizedManifestRoot, trimmed));
+
+            if (!SharesRoot(normalizedManifestRoot, absoluteCandidate))
+            {
+                return RebaseToTargetRoot(absoluteCandidate, fallbackAbsolute);
+            }
+
+            string relativeToManifest;
+            try
+            {
+                relativeToManifest = Path.GetRelativePath(normalizedManifestRoot, absoluteCandidate);
+            }
+            catch (ArgumentException)
+            {
+                return RebaseToTargetRoot(absoluteCandidate, fallbackAbsolute);
+            }
+
+            if (IsOutsideRoot(relativeToManifest))
+            {
+                return fallbackAbsolute;
+            }
+
+            var rebased = Path.GetFullPath(Path.Combine(normalizedJobRoot, relativeToManifest));
+
+            if (!SharesRoot(normalizedJobRoot, rebased))
+            {
+                return fallbackAbsolute;
+            }
+
+            string relativeToJobRoot;
+            try
+            {
+                relativeToJobRoot = Path.GetRelativePath(normalizedJobRoot, rebased);
+            }
+            catch (ArgumentException)
+            {
+                return RebaseToTargetRoot(absoluteCandidate, fallbackAbsolute);
+            }
+
+            return IsOutsideRoot(relativeToJobRoot)
+                ? fallbackAbsolute
+                : rebased;
+        }
+
+        string? ResolveOptionalPath(string? candidate, string fallbackAbsolute)
+        {
+            return candidate is null ? null : ResolvePath(candidate, fallbackAbsolute);
+        }
+
+        string RebaseToTargetRoot(string absoluteCandidate, string fallbackAbsolute)
+        {
+            var trimmed = absoluteCandidate.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var leafName = Path.GetFileName(trimmed);
+
+            if (string.IsNullOrEmpty(leafName))
+            {
+                return fallbackAbsolute;
+            }
+
+            return Path.GetFullPath(Path.Combine(normalizedJobRoot, leafName));
+        }
+
+        static bool SharesRoot(string first, string second)
+        {
+            var firstRoot = Path.GetPathRoot(first);
+            var secondRoot = Path.GetPathRoot(second);
+
+            if (string.IsNullOrEmpty(firstRoot) || string.IsNullOrEmpty(secondRoot))
+            {
+                return true;
+            }
+
+            var comparison = OperatingSystem.IsWindows()
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
+
+            return string.Equals(firstRoot, secondRoot, comparison);
+        }
+
         var resolvedLayout = layout with
         {
             JobRoot = normalizedJobRoot,
-            DataDirectory = ResolveLayoutPath(layout.DataDirectory, manifestRoot, normalizedJobRoot, defaultDataDirectory),
-            ResumeFile = ResolveLayoutPath(layout.ResumeFile, manifestRoot, normalizedJobRoot, defaultResumeFile),
-            AttachmentsDirectory = layout.AttachmentsDirectory is null
-                ? null
-                : ResolveLayoutPath(layout.AttachmentsDirectory, manifestRoot, normalizedJobRoot, defaultAttachmentsDirectory)
+            DataDirectory = ResolvePath(layout.DataDirectory, defaultDataDirectory),
+            ResumeFile = ResolvePath(layout.ResumeFile, defaultResumeFile),
+            AttachmentsDirectory = ResolveOptionalPath(layout.AttachmentsDirectory, defaultAttachmentsDirectory)
         };
 
         if (resolvedLayout.AttachmentsDirectory is null)
@@ -111,33 +198,6 @@ public sealed class JobTasksPersistence
         }
 
         return snapshot with { Layout = resolvedLayout };
-    }
-
-    private static string ResolveLayoutPath(string? candidate, string manifestRoot, string jobRoot, string fallback)
-    {
-        if (string.IsNullOrWhiteSpace(candidate))
-        {
-            return fallback;
-        }
-
-        var normalizedFallback = Path.GetFullPath(fallback);
-        var normalizedJobRoot = Path.GetFullPath(jobRoot);
-        var normalizedManifestRoot = Path.GetFullPath(manifestRoot);
-
-        var absoluteCandidate = Path.IsPathFullyQualified(candidate)
-            ? Path.GetFullPath(candidate)
-            : Path.GetFullPath(Path.Combine(normalizedManifestRoot, candidate));
-
-        var relativeToManifest = Path.GetRelativePath(normalizedManifestRoot, absoluteCandidate);
-        if (IsOutsideRoot(relativeToManifest))
-        {
-            return normalizedFallback;
-        }
-
-        var rebased = Path.GetFullPath(Path.Combine(normalizedJobRoot, relativeToManifest));
-        return IsOutsideRoot(Path.GetRelativePath(normalizedJobRoot, rebased))
-            ? normalizedFallback
-            : rebased;
     }
 
     private static bool IsOutsideRoot(string relativePath)

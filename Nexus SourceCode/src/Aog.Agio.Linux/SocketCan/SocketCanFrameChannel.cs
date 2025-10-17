@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Channels;
@@ -13,36 +14,60 @@ namespace Aog.Agio.Linux.SocketCan;
 /// </summary>
 public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCanFrameSource
 {
-    private readonly ConcurrentDictionary<Guid, Channel<CanFrame>> _subscribers = new();
+    private readonly ConcurrentDictionary<Guid, Subscriber> _subscribers = new();
+    private readonly int _subscriberCapacity;
+    private readonly long _maxSubscriberBackpressureTicks;
 
-    public SocketCanFrameChannel()
+    public SocketCanFrameChannel(int subscriberCapacity = 64, TimeSpan? maxSubscriberBackpressure = null)
     {
+        if (subscriberCapacity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(subscriberCapacity), subscriberCapacity, "Channel capacity must be positive.");
+        }
+
+        var backpressure = maxSubscriberBackpressure ?? TimeSpan.FromSeconds(1);
+        if (backpressure <= TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxSubscriberBackpressure), backpressure, "Backpressure tolerance must be positive.");
+        }
+
+        _subscriberCapacity = subscriberCapacity;
+        _maxSubscriberBackpressureTicks = ToStopwatchTicks(backpressure);
     }
 
     /// <inheritdoc />
-    public async ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken)
+    public ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken)
     {
         if (frame is null)
         {
             throw new ArgumentNullException(nameof(frame));
         }
 
-        foreach (var (subscriptionId, channel) in _subscribers)
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var nowTicks = Stopwatch.GetTimestamp();
+
+        foreach (var (subscriptionId, subscriber) in _subscribers)
         {
-            if (channel.Writer.TryWrite(frame))
+            var writer = subscriber.Channel.Writer;
+            if (writer.TryWrite(frame))
+            {
+                subscriber.ClearBackpressure();
+                continue;
+            }
+
+            if (!subscriber.ShouldEvict(nowTicks, _maxSubscriberBackpressureTicks))
             {
                 continue;
             }
 
-            try
+            if (_subscribers.TryRemove(subscriptionId, out var removed))
             {
-                await channel.Writer.WriteAsync(frame, cancellationToken).ConfigureAwait(false);
-            }
-            catch (ChannelClosedException)
-            {
-                _subscribers.TryRemove(subscriptionId, out _);
+                removed.Channel.Writer.TryComplete(new OperationCanceledException("SocketCAN subscriber removed due to sustained backpressure."));
             }
         }
+
+        return ValueTask.CompletedTask;
     }
 
     /// <inheritdoc />
@@ -50,14 +75,17 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var subscriptionId = Guid.NewGuid();
-        var channel = Channel.CreateUnbounded<CanFrame>(new UnboundedChannelOptions
+        var channel = Channel.CreateBounded<CanFrame>(new BoundedChannelOptions(_subscriberCapacity)
         {
             AllowSynchronousContinuations = false,
+            FullMode = BoundedChannelFullMode.Wait,
             SingleReader = true,
             SingleWriter = false,
         });
 
-        if (!_subscribers.TryAdd(subscriptionId, channel))
+        var subscriber = new Subscriber(channel);
+
+        if (!_subscribers.TryAdd(subscriptionId, subscriber))
         {
             channel.Writer.TryComplete();
             throw new InvalidOperationException("Failed to register SocketCAN subscriber channel.");
@@ -74,6 +102,37 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
         {
             _subscribers.TryRemove(subscriptionId, out _);
             channel.Writer.TryComplete();
+        }
+    }
+
+    private static long ToStopwatchTicks(TimeSpan duration)
+    {
+        var ticks = (long)Math.Round(duration.TotalSeconds * Stopwatch.Frequency, MidpointRounding.AwayFromZero);
+        return Math.Max(1, ticks);
+    }
+
+    private sealed class Subscriber
+    {
+        private long _firstBackpressureTicks;
+
+        public Subscriber(Channel<CanFrame> channel)
+        {
+            Channel = channel;
+        }
+
+        public Channel<CanFrame> Channel { get; }
+
+        public void ClearBackpressure() => Interlocked.Exchange(ref _firstBackpressureTicks, 0);
+
+        public bool ShouldEvict(long nowTicks, long maxBackpressureTicks)
+        {
+            var first = Interlocked.CompareExchange(ref _firstBackpressureTicks, nowTicks, 0);
+            if (first == 0)
+            {
+                first = nowTicks;
+            }
+
+            return nowTicks - first >= maxBackpressureTicks;
         }
     }
 }

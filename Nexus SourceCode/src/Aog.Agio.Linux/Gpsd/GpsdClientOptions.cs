@@ -5,16 +5,33 @@ namespace Aog.Agio.Linux.Gpsd;
 /// </summary>
 public sealed class GpsdClientOptions
 {
-    private string _socketPath = "/var/run/gpsd.sock";
+    private string? _socketPath = "/var/run/gpsd.sock";
     private TimeSpan _reconnectDelay = TimeSpan.FromSeconds(10);
 
     /// <summary>
-    /// Gets or sets the unix domain socket path exposed by gpsd.
+    /// Gets or sets the unix domain socket path exposed by gpsd. Set to <c>null</c> or
+    /// <see cref="string.Empty"/> to disable the gpsd worker explicitly.
     /// </summary>
-    public string SocketPath
+    public string? SocketPath
     {
         get => _socketPath;
-        set => _socketPath = string.IsNullOrWhiteSpace(value) ? _socketPath : value;
+        set
+        {
+            if (value is null || value.Length == 0)
+            {
+                _socketPath = null;
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(
+                    "Socket path cannot contain only whitespace. Assign null or empty to disable gpsd.",
+                    nameof(value));
+            }
+
+            _socketPath = value;
+        }
     }
 
     /// <summary>

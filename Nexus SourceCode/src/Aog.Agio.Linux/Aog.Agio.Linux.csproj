@@ -9,6 +9,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.9" />
     <PackageReference Include="SocketCANSharp" Version="0.13.0" />
   </ItemGroup>
 

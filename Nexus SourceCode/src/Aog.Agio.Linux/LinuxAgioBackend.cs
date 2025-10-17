@@ -29,7 +29,11 @@ public sealed class LinuxAgioBackend : IAgioBackend
         services
             .AddOptions<LinuxSerialPortEnumeratorOptions>()
             .BindConfiguration("AgioHost:Linux:Serial");
-        services.AddOptions<GpsdClientOptions>();
+
+        services
+            .AddOptions<GpsdClientOptions>()
+            .BindConfiguration("AgioHost:Linux:Gpsd");
+
         services.AddOptions<SocketCanOptions>();
 
         services.AddSingleton<NmeaSentenceParser>();

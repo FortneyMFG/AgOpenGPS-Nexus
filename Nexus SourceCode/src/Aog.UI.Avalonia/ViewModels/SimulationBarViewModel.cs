@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Aog.Core.Legacy;
@@ -22,6 +23,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private const double MinPlaybackRate = 0.1;
     private const double MaxPlaybackRate = 4.0;
     private static readonly TimeSpan DefaultDuration = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan SeekDebounceDelay = TimeSpan.FromMilliseconds(50);
 
     private readonly SimulationConfiguration? _configuration;
     private readonly IReplayController? _replayController;
@@ -48,6 +50,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private string _activeScenarioOptions = DescribeOptions(null);
     private IReadOnlyList<SimulationStreamRouteViewModel> _routes =
         new ReadOnlyCollection<SimulationStreamRouteViewModel>(Array.Empty<SimulationStreamRouteViewModel>());
+    private CancellationTokenSource? _seekCancellationSource;
     private SimulationBarState _state = SimulationBarState.CreateDefault();
 
     /// <summary>
@@ -297,6 +300,10 @@ public string SelectedPlaybackRateLabel
 
         _disposed = true;
 
+        _seekCancellationSource?.Cancel();
+        _seekCancellationSource?.Dispose();
+        _seekCancellationSource = null;
+
         if (_replayController is not null && _stateChangedHandler is not null)
         {
             _replayController.StateChanged -= _stateChangedHandler;
@@ -510,9 +517,9 @@ private void NotifyPlaybackRateProperties()
         var newPosition = TimeSpan.FromTicks((long)(Duration.Ticks * clamped));
         Position = newPosition;
 
-        if (triggerSeek && _replayController is not null)
+        if (triggerSeek)
         {
-            FireAndForget(() => _replayController.SeekAsync(newPosition), "Failed to seek to requested position.");
+            ScheduleSeek(newPosition);
         }
     }
 
@@ -603,6 +610,59 @@ private void OnReplayStateChanged(ReplayState state)
                     _logger?.LogError(ex, failureMessage);
                 }
             });
+    }
+
+    private void ScheduleSeek(TimeSpan position)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        var controller = _replayController;
+        if (controller is null)
+        {
+            return;
+        }
+
+        var previous = _seekCancellationSource;
+        previous?.Cancel();
+
+        var current = new CancellationTokenSource();
+        _seekCancellationSource = current;
+
+        var token = current.Token;
+        FireAndForget(
+            () => DebouncedSeekAsync(controller, position, current, token),
+            "Failed to seek to requested position.");
+    }
+
+    private async ValueTask DebouncedSeekAsync(
+        IReplayController controller,
+        TimeSpan position,
+        CancellationTokenSource source,
+        CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(SeekDebounceDelay, token).ConfigureAwait(false);
+
+            if (_disposed || token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await controller.SeekAsync(position, token).ConfigureAwait(false);
+        }
+        finally
+        {
+            if (ReferenceEquals(_seekCancellationSource, source))
+            {
+                _seekCancellationSource = null;
+            }
+
+            source.Dispose();
+        }
     }
 
     private static string FormatPosition(TimeSpan position, TimeSpan duration)

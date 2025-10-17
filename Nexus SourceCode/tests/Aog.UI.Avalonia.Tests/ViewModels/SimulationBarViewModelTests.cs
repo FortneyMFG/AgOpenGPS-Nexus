@@ -510,6 +510,36 @@ public sealed class SimulationBarViewModelTests
             entry => entry.Level == LogLevel.Error && entry.Message.Contains("seek to", StringComparison.OrdinalIgnoreCase));
     }
 
+    [Fact]
+    public async Task SeekFraction_WhenUpdatedRapidly_OnlySeeksToFinalPosition()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        var positions = new ConcurrentQueue<TimeSpan>();
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var replayController = new ReplayControllerStub(
+            seekAsync: position =>
+            {
+                positions.Enqueue(position);
+                completion.TrySetResult();
+                return ValueTask.CompletedTask;
+            });
+
+        using var viewModel = new SimulationBarViewModel(configuration, replayController);
+
+        viewModel.SeekFraction = 0.1;
+        viewModel.SeekFraction = 0.2;
+        viewModel.SeekFraction = 0.3;
+
+        await completion.Task.WaitAsync(TimeSpan.FromSeconds(1));
+        await Task.Delay(100);
+
+        var recorded = positions.ToArray();
+        recorded.Should().ContainSingle();
+
+        var expectedPosition = TimeSpan.FromTicks((long)(viewModel.Duration.Ticks * 0.3));
+        recorded[0].Should().Be(expectedPosition);
+    }
 // in your test class
 
 [Fact]

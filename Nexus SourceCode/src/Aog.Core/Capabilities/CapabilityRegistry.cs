@@ -311,11 +311,15 @@ public static class CapabilityRegistry
     /// <summary>
     /// Gets all registered capability definitions.
     /// </summary>
+    /// <value>A read-only collection containing every canonical capability definition.</value>
     public static IReadOnlyCollection<CapabilityDefinition> All => ReadOnlyDefinitions;
 
     /// <summary>
     /// Attempts to resolve a capability definition by its canonical name or alias.
     /// </summary>
+    /// <param name="capabilityName">The canonical name or alias of the capability to resolve.</param>
+    /// <param name="definition">When this method returns, contains the resolved capability if found; otherwise <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> when a capability definition was found; otherwise, <see langword="false"/>.</returns>
     public static bool TryGetDefinition(string? capabilityName, out CapabilityDefinition definition)
     {
         if (string.IsNullOrWhiteSpace(capabilityName))
@@ -348,16 +352,27 @@ public static class CapabilityRegistry
 /// </summary>
 public enum CapabilityCategory
 {
+    /// <summary>Capabilities that provide guidance and steering services.</summary>
     Guidance,
+    /// <summary>Capabilities that operate on mapping data and visualization.</summary>
     Mapping,
+    /// <summary>Capabilities associated with agronomic zone management.</summary>
     Zones,
+    /// <summary>Capabilities that command and monitor section control hardware.</summary>
     Sections,
+    /// <summary>Capabilities focused on data import, export, and transformation.</summary>
     DataOperations,
+    /// <summary>Capabilities that provide replay and historical analysis services.</summary>
     Replay,
+    /// <summary>Capabilities that discover, manage, or monitor physical devices.</summary>
     Devices,
+    /// <summary>Capabilities tied to navigation, pose estimation, and sensor fusion.</summary>
     Navigation,
+    /// <summary>Capabilities that expose transport or bridge infrastructure.</summary>
     Transports,
+    /// <summary>Capabilities that provide telemetry logging and monitoring.</summary>
     Telemetry,
+    /// <summary>Capabilities that surface agronomy-specific data or analytics.</summary>
     Agronomy,
 }
 
@@ -369,6 +384,16 @@ public sealed class CapabilityDefinition
     private readonly IReadOnlyDictionary<string, string> _attributes;
     private readonly IReadOnlyList<string> _aliases;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CapabilityDefinition"/> class.
+    /// </summary>
+    /// <param name="name">The canonical name of the capability.</param>
+    /// <param name="category">The functional category that owns the capability.</param>
+    /// <param name="summary">A human-readable description of the capability.</param>
+    /// <param name="defaultVersion">The default semantic version assigned to the capability.</param>
+    /// <param name="attributes">Optional metadata attributes attached to the capability descriptor.</param>
+    /// <param name="aliases">Optional alias names that map back to the canonical capability.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> or <paramref name="summary"/> are blank.</exception>
     public CapabilityDefinition(
         string name,
         CapabilityCategory category,

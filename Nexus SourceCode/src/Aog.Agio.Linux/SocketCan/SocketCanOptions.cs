@@ -56,15 +56,23 @@ public sealed class SocketCanOptions
 
     /// <summary>
     /// Gets or sets the time to wait before retrying after a failure to connect or read from the CAN interface.
+    /// Values less than or equal to zero fall back to <see cref="DefaultReconnectDelay"/>.
     /// </summary>
     public TimeSpan ReconnectDelay
     {
         get => _reconnectDelay;
         set
         {
-            if (value < TimeSpan.Zero && value != Timeout.InfiniteTimeSpan)
+            if (value == Timeout.InfiniteTimeSpan)
             {
-                throw new ValidationException("Reconnect delay cannot be negative.");
+                _reconnectDelay = value;
+                return;
+            }
+
+            if (value <= TimeSpan.Zero)
+            {
+                _reconnectDelay = DefaultReconnectDelay;
+                return;
             }
 
             _reconnectDelay = value;

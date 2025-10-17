@@ -111,6 +111,45 @@ public sealed class SocketCanBackendTests
     }
 
     [Fact]
+    public async Task BackgroundService_ClampsZeroReconnectDelay()
+    {
+        var factory = new MissingInterfaceSocketCanClientFactory();
+        var channel = new SocketCanFrameChannel();
+        var options = new SocketCanOptions
+        {
+            InterfaceName = "vcan-missing",
+            ReconnectDelay = TimeSpan.Zero,
+        };
+        var monitor = new TestOptionsMonitor(options);
+
+        Assert.Equal(SocketCanOptions.DefaultReconnectDelay, options.ReconnectDelay);
+
+        var service = new SocketCanBackgroundService(
+            factory,
+            channel,
+            monitor,
+            TimeProvider.System,
+            NullLogger<SocketCanBackgroundService>.Instance);
+
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        try
+        {
+            await WaitForAsync(() => factory.AttemptCount >= 1, TimeSpan.FromSeconds(1));
+
+            var attemptsBefore = factory.AttemptCount;
+            await Task.Delay(TimeSpan.FromMilliseconds(200)).ConfigureAwait(false);
+
+            Assert.Equal(SocketCanOptions.DefaultReconnectDelay, monitor.CurrentValue.ReconnectDelay);
+            Assert.Equal(attemptsBefore, factory.AttemptCount);
+        }
+        finally
+        {
+            await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+        }
+    }
+
+    [Fact]
 [Fact]
 public async Task BackgroundService_PublishesFrameImmediatelyAfterTimeout()
 {

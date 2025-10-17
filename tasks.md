@@ -134,6 +134,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-671 gpsd disable toggle for Linux backend _(Done)_ — Allows operators to opt out of gpsd monitoring when the daemon is not present
 - [x] NX-701 SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
 - [x] NX-673 Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests
+- [x] NX-956 SocketCAN reconnect delay clamp _(Done)_ — Guard zero/negative delays by restoring the default backoff
 - [x] NX-935 Legacy pose codec default source fallback _(Done)_ — Default main antenna source address when metadata is omitted
 - [x] NX-963 Legacy pose dual heading sanitization fix _(Done)_ — Guard secondary heading against non-finite values
 - [ ] NX-938 Legacy steer command speed encoding fix

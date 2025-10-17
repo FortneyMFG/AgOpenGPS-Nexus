@@ -187,7 +187,7 @@ public async Task BackgroundService_ReconfiguresWhenOptionsChange()
     public async Task SocketCanBusService_ForwardsFramesToSubscribers()
     {
         var channel = new SocketCanFrameChannel();
-        var service = new SocketCanBusService(channel);
+        var service = new SocketCanBusService(channel, NullLogger<SocketCanBusService>.Instance);
         var writer = new TestServerStreamWriter<CanFrame>();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
         var context = new TestServerCallContext(cts.Token);
@@ -211,15 +211,22 @@ public async Task SocketCanBusService_DropsSlowSubscribers()
     // Service-level: verifies a slow gRPC writer triggers drop,
     // and a later fast subscriber still receives fresh frames.
     var channel = new SocketCanFrameChannel(subscriberCapacity: 4, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
-    var service = new SocketCanBusService(channel);
+    var service = new SocketCanBusService(channel, NullLogger<SocketCanBusService>.Instance);
 
     // Slow subscriber simulates backpressure on the server stream.
     var slowWriter = new SlowServerStreamWriter<CanFrame>(TimeSpan.FromMilliseconds(200));
-    var slowContext = new TestServerCallContext(CancellationToken.None);
+    using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+    var slowContext = new TestServerCallContext(slowCts.Token);
     var slowCallTask = service.SubscribeFrames(new Empty(), slowWriter, slowContext);
 
-    // Publish a burst that should overflow the per-subscriber buffer and cause a drop.
-    for (var i = 0; i < 50; i++)
+    // Fast subscriber should continue receiving frames while the slow peer is evicted.
+    var fastWriter = new TestServerStreamWriter<CanFrame>();
+    using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+    var fastContext = new TestServerCallContext(fastCts.Token);
+    var fastCallTask = service.SubscribeFrames(new Empty(), fastWriter, fastContext);
+
+    // Publish a burst that should overflow the slow subscriber buffer and trigger eviction.
+    for (var i = 0; i < 64; i++)
     {
         await channel.PublishAsync(new CanFrame
         {
@@ -228,24 +235,20 @@ public async Task SocketCanBusService_DropsSlowSubscribers()
         }, CancellationToken.None).ConfigureAwait(false);
     }
 
+    await WaitForAsync(() => fastWriter.Messages.Count >= 10, TimeSpan.FromSeconds(2));
     await WaitForAsync(() => slowCallTask.IsCompleted, TimeSpan.FromSeconds(5));
     await slowCallTask.ConfigureAwait(false);
 
-    // If the slow subscriber had kept up, it would have 50 messages.
-    Assert.True(slowWriter.Messages.Count < 50);
+    // If the slow subscriber had kept up, it would have the full burst.
+    Assert.True(slowWriter.Messages.Count < 64);
 
-    // Now verify a fresh/fast subscriber still gets new frames promptly.
-    var fastWriter = new TestServerStreamWriter<CanFrame>();
-    using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-    var fastContext = new TestServerCallContext(fastCts.Token);
-    var fastCallTask = service.SubscribeFrames(new Empty(), fastWriter, fastContext);
-
+    // Publish another frame to ensure the fast subscriber continues to receive updates.
     var finalFrame = new CanFrame { Header = new Header(), ArbitrationId = 0xABC };
     await channel.PublishAsync(finalFrame, CancellationToken.None).ConfigureAwait(false);
 
-    await WaitForAsync(() => fastWriter.Messages.Count > 0, TimeSpan.FromSeconds(1));
-    var received = Assert.Single(fastWriter.Messages);
-    Assert.Equal(0xABCu, received.ArbitrationId);
+    await WaitForAsync(
+        () => fastWriter.Messages.Exists(frame => frame.ArbitrationId == 0xABCu),
+        TimeSpan.FromSeconds(2));
 
     fastCts.Cancel();
     await fastCallTask.ConfigureAwait(false);

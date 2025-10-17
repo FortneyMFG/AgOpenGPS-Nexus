@@ -42,6 +42,33 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
+    public void DecodeSteerCommand_InfersEnableFromEngagedBitOnly()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd
+        {
+            Enable = false,
+            TargetWheelAngleDeg = 15,
+        };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            GuidanceStatus = 0b0000_0110, // remote + gps + engaged cleared
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        // Force another status bit to remain while the engaged bit is cleared
+        frame[7] = 0b0000_0010;
+
+        Assert.True(codec.TryDecodeSteerCommand(frame, out var decodedCommand, out _, out _));
+        Assert.False(decodedCommand.Enable);
+
+        frame[7] |= 0b0000_0001;
+        Assert.True(codec.TryDecodeSteerCommand(frame, out decodedCommand, out _, out _));
+        Assert.True(decodedCommand.Enable);
+    }
+
+    [Fact]
     public void EncodeSteerCommand_DefaultsStatusFromEnable()
     {
         var codec = new LegacySteerCodec();
@@ -52,12 +79,6 @@ public sealed class LegacySteerCodecTests
         Assert.Equal(1, frame[7]);
     }
 
-    [Fact]
-using System.Buffers.Binary;
-using Xunit;
-
-public class LegacySteerCodecTests
-{
     [Fact]
     public void EncodeSteerCommand_DisabledCommandClearsEngagedBitAndZeroesAngle()
     {
@@ -95,7 +116,6 @@ public class LegacySteerCodecTests
         var encodedMask = BinaryPrimitives.ReadUInt16LittleEndian(frame.AsSpan(11, 2));
         Assert.Equal(0b0000_1010_0000_1111u, encodedMask);
     }
-}
 
     [Fact]
     public void EncodeSteerCommand_PreservesMetadataStatusBitsWhenEnabled()

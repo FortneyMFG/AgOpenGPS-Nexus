@@ -248,6 +248,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-130 Presets & layout linking ADR _(Done)_
 - [ ] NX-948 MainWindow deterministic dashboard seeding
 - [ ] NX-995 Simulation bar design-time view model compile fix — Unseal view-model for design-time designer usage
+- [ ] NX-990 Shell menu tooltip timezone clarification
 
 - [x] NX-291 Zone editor toolbar integration _(Done)_ — ADR-044 zone drawing framework
 - [x] NX-292 Zone override toggles & policy UX _(Done)_ — ADR-027 constraint UX
@@ -264,7 +265,10 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-303 Genetics picker & barcode UI _(Done)_ — ADR-046 genetics UX
 - [x] NX-304 Yield overlay UX updates _(Done)_ — ADR-049 yield visualization
 - [x] NX-305 Profit heatmap & analytics UI _(Done)_ — ADR-050 profit visualization
+- [ ] NX-1006 Simulation playback rate clamp guard
 - [ ] NX-987 Simulation bar playback rate label multiplier — Format selected rate using multiplier notation
+- [ ] NX-989 Simulation bar playback rate option sorting — Ensure legacy imports insert multiplier-sorted options
+- [ ] NX-999 Simulation bar playback rate options read-only guard
 - [ ] NX-989 Simulation bar cancellation log level reduction — Treat OperationCanceledException as informational noise
 - [ ] NX-996 Replay timeline disposal leak — Ensure view-model detaches timeline/exporter handlers
 - [x] NX-306 Field health severity UX _(Done)_ — ADR-052 field health visualization
@@ -287,6 +291,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
 - [x] NX-941 Simulation bar playback rate reset _(Done)_ — Reset configuration default when reverting routes
 - [x] NX-988 Simulation bar cancellation logging suppression _(Done)_ — Ignore replay controller cancellations in transport bar
+- [x] NX-990 Simulation bar playback dispatcher marshaling _(Done)_ — Marshal playback rate option mutations through UI dispatcher
 - [x] NX-989 Simulation bar design-time data parity _(Done)_ — Align design-time view model with runtime dependencies for the Avalonia designer
 - [x] NX-989 Simulation bar auto-resume guard _(Done)_ — Skip toggling when no replay session is active
 - [x] NX-991 Simulation bar cancellation logging suppression _(Done)_ — Ignore replay controller cancellations in transport bar

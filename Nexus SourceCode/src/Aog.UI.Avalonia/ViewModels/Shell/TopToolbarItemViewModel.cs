@@ -52,6 +52,9 @@ public sealed class TopToolbarItemViewModel : ObservableObject
     /// <summary>Gets an optional descriptive tooltip.</summary>
     public string? Description { get; }
 
+    /// <summary>Gets the tooltip text displayed for the toolbar item.</summary>
+    public string Tooltip => Description ?? string.Empty;
+
     /// <summary>Gets the command invoked when the toolbar item is activated.</summary>
     public ICommand Command { get; }
 

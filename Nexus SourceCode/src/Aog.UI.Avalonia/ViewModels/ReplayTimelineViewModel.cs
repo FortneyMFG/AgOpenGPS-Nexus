@@ -110,6 +110,12 @@ public sealed class ReplayTimelineViewModel : ObservableObject, IDisposable
         _bookmarks.Clear();
         foreach (var bookmark in bookmarks)
         {
+            var hasDuplicateTimestamp = _bookmarks.Any(existing => existing.Timestamp == bookmark.Timestamp);
+            if (hasDuplicateTimestamp)
+            {
+                continue;
+            }
+
             _bookmarks.Add(bookmark);
         }
     }

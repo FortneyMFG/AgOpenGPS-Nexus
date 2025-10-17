@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
@@ -52,9 +53,21 @@ public sealed class ZonePolicyAndImportViewModelTests
         panel.HasNoActivity.Should().BeTrue();
 
         var shapefile = panel.Workflows.First();
+        var observedProperties = new List<string>();
+        shapefile.PropertyChanged += (_, args) =>
+        {
+            if (!string.IsNullOrEmpty(args.PropertyName))
+            {
+                observedProperties.Add(args.PropertyName);
+            }
+        };
+
         shapefile.ExecuteCommand.Execute(null);
 
-        shapefile.Progress.Should().Be(1.0);
+        shapefile.ExportProgress.Should().Be(1.0);
+        shapefile.ExportProgressPercent.Should().Be(100.0);
+        observedProperties.Should().Contain(nameof(ZoneImportWorkflowViewModel.ExportProgress));
+        observedProperties.Should().Contain(nameof(ZoneImportWorkflowViewModel.ExportProgressPercent));
         shapefile.StatusDisplay.Should().Contain("Imported");
         shapefile.LastRunDisplay.Should().NotBe("—");
 

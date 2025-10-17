@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using Aog.Agio.Legacy;
 using Aog.Core.V1;
 using Xunit;
@@ -48,6 +49,18 @@ public sealed class LegacySteerCodecTests
         var frame = codec.EncodeSteerCommand(command);
 
         Assert.Equal(1, frame[7]);
+    }
+
+    [Fact]
+    public void EncodeSteerCommand_DisabledCommandZeroesAngle()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { TargetWheelAngleDeg = 12.34, Enable = false };
+
+        var frame = codec.EncodeSteerCommand(command);
+        var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(frame.AsSpan(8, 2));
+
+        Assert.Equal(0, steerHundredths);
     }
 
     [Fact]

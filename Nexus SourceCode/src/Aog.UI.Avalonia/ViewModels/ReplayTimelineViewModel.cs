@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 
 namespace Aog.UI.Avalonia.ViewModels;
@@ -22,6 +23,7 @@ public sealed class ReplayTimelineViewModel : ObservableObject, IDisposable
     private IReadOnlyList<double> _speedSamples = Array.Empty<double>();
     private IReadOnlyList<double> _headingSamples = Array.Empty<double>();
     private string _exportStatus = "Exports generate CSV/GeoJSON in upcoming milestones.";
+    private double _exportProgress;
     private bool _disposed;
 
     /// <summary>
@@ -36,8 +38,8 @@ public sealed class ReplayTimelineViewModel : ObservableObject, IDisposable
         _timeline = timeline;
         _exporter = exporter;
 
-        ExportCsvCommand = new DelegateCommand(_ => UpdateExportStatus("CSV"));
-        ExportGeoJsonCommand = new DelegateCommand(_ => UpdateExportStatus("GeoJSON"));
+        ExportCsvCommand = new DelegateCommand(parameter => UpdateExportStatus("CSV", parameter));
+        ExportGeoJsonCommand = new DelegateCommand(parameter => UpdateExportStatus("GeoJSON", parameter));
         _readonlyBookmarks = new ReadOnlyObservableCollection<ReplayTimelineBookmarkViewModel>(_bookmarks);
 
         if (timeline is not null)
@@ -82,6 +84,12 @@ public sealed class ReplayTimelineViewModel : ObservableObject, IDisposable
         get => _exportStatus;
         private set => SetProperty(ref _exportStatus, value);
     }
+
+    /// <summary>Gets the normalized progress of the active export if any.</summary>
+    public double ExportProgress => _exportProgress;
+
+    /// <summary>Gets a value indicating whether an export is currently in flight.</summary>
+    public bool IsExportInProgress => _exportProgress is > 0d and < 1d;
 
     /// <summary>Gets the command used to trigger CSV exports.</summary>
     public DelegateCommand ExportCsvCommand { get; }
@@ -135,14 +143,52 @@ public sealed class ReplayTimelineViewModel : ObservableObject, IDisposable
         }
     }
 
-    private void UpdateExportStatus(string format)
+    private void UpdateExportStatus(string format, object? progressArgument)
     {
         if (_disposed)
         {
             return;
         }
 
+        if (TryConvertProgress(progressArgument, out var progress))
+        {
+            _exportProgress = Math.Clamp(progress, 0d, 1d);
+        }
+
         ExportStatus = $"Export queued: {format} snapshot at {_timeProvider.GetLocalNow():HH:mm:ss}";
+        OnPropertyChanged(nameof(ExportProgress));
+        OnPropertyChanged(nameof(IsExportInProgress));
+    }
+
+    private static bool TryConvertProgress(object? progressArgument, out double progress)
+    {
+        switch (progressArgument)
+        {
+            case null:
+                progress = 0d;
+                return false;
+            case double direct:
+                progress = direct;
+                return true;
+            case float floatValue:
+                progress = floatValue;
+                return true;
+            case int intValue:
+                progress = intValue;
+                return true;
+            case IConvertible convertible:
+                try
+                {
+                    progress = Convert.ToDouble(convertible, CultureInfo.InvariantCulture);
+                    return true;
+                }
+                catch (FormatException) { }
+                catch (InvalidCastException) { }
+                break;
+        }
+
+        progress = 0d;
+        return false;
     }
 
     private void OnSamplesChanged(ReplayTimelineSamplesChangedEventArgs args)

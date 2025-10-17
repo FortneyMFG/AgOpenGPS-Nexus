@@ -46,6 +46,21 @@ public sealed class LegacyPoseCodecTests
     }
 
     [Fact]
+    public void EncodePose_DefaultsSourceAddressWhenMetadataMissing()
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = 40.0,
+            LongitudeDeg = -86.0,
+        };
+
+        var frame = codec.EncodePose(pose);
+
+        Assert.Equal(LegacyPoseCodec.MainAntennaSourceAddress, frame[2]);
+    }
+
+    [Fact]
     public void TryDecodePose_RoundTripsEncodedFrame()
     {
         var codec = new LegacyPoseCodec();

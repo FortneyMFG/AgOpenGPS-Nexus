@@ -74,13 +74,14 @@ public sealed class SimulationBarViewModelTests
             {
                 new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
             },
-            new SimulationOptionsConfiguration(1337, 0.75));
+            new SimulationOptionsConfiguration(1337, 1.5));
 
         viewModel.ApplyScenario(scenario);
 
         viewModel.ActiveScenarioTitle.Should().Be("Scenario: test");
         viewModel.ActiveScenarioDescription.Should().Contain("Scenario for testing");
         viewModel.ActiveScenarioOptions.Should().Contain("seed=1337");
+        viewModel.SelectedPlaybackRate.Should().Be(1.5);
         viewModel.Routes.Should().ContainSingle(route => route.Stream == "pose");
 
         viewModel.ResetToConfigurationRoutes();

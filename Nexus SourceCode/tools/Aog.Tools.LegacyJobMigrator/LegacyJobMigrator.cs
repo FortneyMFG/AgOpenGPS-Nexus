@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,8 +35,11 @@ public sealed class LegacyJobMigrator
         var inputPath = Path.GetFullPath(options.JobFilePath);
         var outputPath = Path.GetFullPath(options.OutputFilePath ?? inputPath);
 
-        await using var stream = File.OpenRead(inputPath);
-        var node = await JsonNode.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
+        JsonNode? node;
+        await using (var stream = File.OpenRead(inputPath))
+        {
+            node = await JsonNode.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
         if (node is not JsonObject root)
         {
             throw new InvalidDataException("job.json must contain a JSON object.");
@@ -140,6 +144,7 @@ public sealed class LegacyJobMigrator
         var json = root.ToJsonString(new JsonSerializerOptions
         {
             WriteIndented = options.WriteIndented,
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
         });
 
         var outputDirectory = Path.GetDirectoryName(outputPath);

@@ -7,12 +7,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
-using Schema = Parquet.Schema.Schema;
+using ParquetSchema = Parquet.Schema.ParquetSchema;
 
 namespace Aog.Tools.LegacyDataMigrator;
 
@@ -25,7 +26,8 @@ public sealed class LegacyDataMigrator
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
     };
 
     private static readonly DateTimeOffset FieldHealthBaseTimestamp = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -1551,7 +1553,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<double> PitchRad = new("pitch_rad");
         public static readonly DataField<double> SpeedMps = new("speed_mps");
         public static readonly DataField<double> YawRateRadps = new("yaw_rate_radps");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Frame,
@@ -1588,7 +1590,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<double> MagYUt = new("mag_y_ut");
         public static readonly DataField<double> MagZUt = new("mag_z_ut");
         public static readonly DataField<double> TemperatureC = new("temperature_c");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Frame,
@@ -1621,7 +1623,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<byte[]?> Payload = new("payload");
         public static readonly DataField<bool> IsExtendedId = new("is_extended_id");
         public static readonly DataField<bool> IsRemoteRequest = new("is_remote_request");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Frame,
@@ -1646,7 +1648,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<string?> SessionId = new("session_id");
         public static readonly DataField<uint> SectionCount = new("section_count");
         public static readonly DataField<uint> Mask = new("mask");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Frame,
@@ -1669,7 +1671,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<string> PluginId = new("plugin_id");
         public static readonly DataField<string> Topic = new("topic");
         public static readonly DataField<byte[]?> Payload = new("payload");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Source,
@@ -1704,7 +1706,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<double?> SoilTempC = new("soil_temp_c");
         public static readonly DataField<double?> SoilMoisturePct = new("soil_moisture_pct");
         public static readonly DataField<double?> LeafWetnessPct = new("leaf_wetness_pct");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Source,

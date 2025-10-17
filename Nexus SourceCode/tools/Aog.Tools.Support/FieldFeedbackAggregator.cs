@@ -97,9 +97,16 @@ public sealed class FieldFeedbackAggregator
     {
         if (string.Equals(Path.GetExtension(path), ".jsonl", StringComparison.OrdinalIgnoreCase))
         {
-            foreach (var line in File.ReadLines(path))
+            var bytes = File.ReadAllBytes(path);
+            if (bytes.Length == 0)
             {
-                if (string.IsNullOrWhiteSpace(line))
+                yield break;
+            }
+
+            var reader = new Utf8JsonReader(bytes, new JsonReaderOptions { AllowTrailingCommas = true });
+            while (reader.Read())
+            {
+                if (reader.TokenType != JsonTokenType.StartObject)
                 {
                     continue;
                 }
@@ -107,11 +114,11 @@ public sealed class FieldFeedbackAggregator
                 FieldFeedbackEvent? evt = null;
                 try
                 {
-                    evt = JsonSerializer.Deserialize<FieldFeedbackEvent>(line, SerializerOptions);
+                    evt = JsonSerializer.Deserialize<FieldFeedbackEvent>(ref reader, SerializerOptions);
                 }
                 catch (JsonException)
                 {
-                    // Ignore malformed rows so a single bad upload does not break aggregation.
+                    // Skip malformed payloads so a single bad upload does not break aggregation.
                 }
 
                 if (evt is not null)

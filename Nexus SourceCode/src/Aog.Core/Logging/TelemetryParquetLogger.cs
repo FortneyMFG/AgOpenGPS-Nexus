@@ -10,6 +10,7 @@ using Google.Protobuf.WellKnownTypes;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
+using ParquetSchema = Parquet.Schema.ParquetSchema;
 
 namespace Aog.Core.Logging;
 
@@ -298,7 +299,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DataField<double> PitchRad = new("pitch_rad");
             public static readonly DataField<double> SpeedMps = new("speed_mps");
             public static readonly DataField<double> YawRateRadps = new("yaw_rate_radps");
-            public static readonly Schema Schema = new(
+            public static readonly ParquetSchema Schema = new(
                 Sequence,
                 Timestamp,
                 Frame,
@@ -335,7 +336,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DataField<double> MagYUt = new("mag_y_ut");
             public static readonly DataField<double> MagZUt = new("mag_z_ut");
             public static readonly DataField<double> TemperatureC = new("temperature_c");
-            public static readonly Schema Schema = new(
+            public static readonly ParquetSchema Schema = new(
                 Sequence,
                 Timestamp,
                 Frame,
@@ -368,7 +369,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DataField<byte[]?> Payload = new("payload");
             public static readonly DataField<bool> IsExtendedId = new("is_extended_id");
             public static readonly DataField<bool> IsRemoteRequest = new("is_remote_request");
-            public static readonly Schema Schema = new(
+            public static readonly ParquetSchema Schema = new(
                 Sequence,
                 Timestamp,
                 Frame,
@@ -393,7 +394,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DataField<string?> SessionId = new("session_id");
             public static readonly DataField<uint> SectionCount = new("section_count");
             public static readonly DataField<uint> Mask = new("mask");
-            public static readonly Schema Schema = new(
+            public static readonly ParquetSchema Schema = new(
                 Sequence,
                 Timestamp,
                 Frame,
@@ -416,7 +417,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DataField<string> PluginId = new("plugin_id");
             public static readonly DataField<string> Topic = new("topic");
             public static readonly DataField<byte[]?> Payload = new("payload");
-            public static readonly Schema Schema = new(
+            public static readonly ParquetSchema Schema = new(
                 Sequence,
                 Timestamp,
                 Source,
@@ -441,7 +442,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DataField<byte[]?> Payload = new("payload");
             public static readonly DataField<string?> MetadataJson = new("metadata_json");
             public static readonly DataField<string?> PresenceJson = new("presence_json");
-            public static readonly Schema Schema = new(
+            public static readonly ParquetSchema Schema = new(
                 Sequence,
                 PublisherDeviceId,
                 Topic,

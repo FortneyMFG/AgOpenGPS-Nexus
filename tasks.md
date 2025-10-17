@@ -131,6 +131,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-244 RadioBridge provisioning documentation kit _(Done)_ — ADR-048 provisioning docs
 - [x] NX-245 Mesh-aware legacy UDP gateway updates _(Done)_ — ADR-047 presence integration
 - [x] NX-246 GNSS correction services bootstrap _(Done)_ — ADR-066 GNSS correction services
+- [x] NX-671 gpsd disable toggle for Linux backend _(Done)_ — Allows operators to opt out of gpsd monitoring when the daemon is not present
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling

@@ -3,6 +3,7 @@ using Aog.Agio.Linux.Serial;
 using Aog.Agio.Linux.SocketCan;
 using Aog.Agio.Nmea;
 using Aog.Agio.Serial;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -26,7 +27,9 @@ public sealed class LinuxAgioBackend : IAgioBackend
 
         services.AddOptions<NmeaSerialPortScanOptions>();
         services.AddOptions<LinuxSerialPortEnumeratorOptions>();
-        services.AddOptions<GpsdClientOptions>();
+        services
+            .AddOptions<GpsdClientOptions>()
+            .BindConfiguration("AgioHost:Linux:Gpsd");
         services.AddOptions<SocketCanOptions>();
 
         services.AddSingleton<NmeaSentenceParser>();

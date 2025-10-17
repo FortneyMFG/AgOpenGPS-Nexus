@@ -65,8 +65,9 @@ public sealed class LegacyCompatibilityBridge
         if (_steerCodec.TryDecodeSteerState(datagram, out var steerState, out var steerMetadata))
         {
             StampHeader(steerState, "legacy/pgn/steer_state", "vehicle");
-            steerState.HeadingErrorRad = LegacyAngles.DegreesToRadians(steerMetadata.HeadingDeg);
+            steerState.SetLegacyHeadingDegrees(steerMetadata.HeadingDeg);
             steerState.LateralErrorM = 0;
+            steerState.HeadingErrorRad = 0;
 
             envelope.Header = BuildTelemetryHeader(MessageType.LinkMessageTypeTelemetrySteerState, steerState.CalculateSize());
             envelope.SteerState = steerState;

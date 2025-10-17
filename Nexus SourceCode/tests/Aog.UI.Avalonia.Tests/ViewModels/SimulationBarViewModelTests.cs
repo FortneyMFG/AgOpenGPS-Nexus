@@ -89,6 +89,13 @@ public sealed class SimulationBarViewModelTests
 
         viewModel.SelectedPlaybackRate.Should().Be(0.75);
         viewModel.SelectedPlaybackRateLabel.Should().Be("75%");
+        viewModel.PlaybackRates.Select(option => option.Rate)
+            .Should()
+            .Equal(0.5, 0.75, 1.0, 2.0);
+
+        var customRate = viewModel.PlaybackRates.Single(option => Math.Abs(option.Rate - 0.75) < 1e-6);
+        customRate.IsSelected.Should().BeTrue();
+        customRate.Label.Should().Be($"{0.75:0.#}×");
     }
 
     [Fact]
@@ -118,6 +125,29 @@ public sealed class SimulationBarViewModelTests
         viewModel.SelectedPlaybackRate.Should().Be(1.0);
         viewModel.ActiveScenarioOptions.Should().Contain("seed=2024");
         viewModel.ActiveScenarioOptions.Should().Contain("timeScale=1");
+    }
+
+    [Fact]
+    public void ApplyScenario_WithCustomPlaybackRate_AddsPlaybackRateOption()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        using var viewModel = new SimulationBarViewModel(configuration);
+        var scenario = new SimulationScenarioConfiguration(
+            "custom-rate",
+            "Scenario requesting three-quarter speed",
+            new[]
+            {
+                new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+            },
+            new SimulationOptionsConfiguration(42, 0.75));
+
+        viewModel.ApplyScenario(scenario);
+
+        viewModel.SelectedPlaybackRate.Should().Be(0.75);
+        viewModel.PlaybackRates.Select(option => option.Rate)
+            .Should()
+            .Equal(0.5, 0.75, 1.0, 2.0);
+        viewModel.PlaybackRates.Single(option => Math.Abs(option.Rate - 0.75) < 1e-6).IsSelected.Should().BeTrue();
     }
 
     [Fact]

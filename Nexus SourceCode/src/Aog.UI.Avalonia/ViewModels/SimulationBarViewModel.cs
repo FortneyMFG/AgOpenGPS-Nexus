@@ -189,6 +189,20 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>
+    /// PUBLIC API (added): safely set the selected playback rate from the outside.
+    /// Validates input and updates controller + UI.
+    /// </summary>
+    public void SetSelectedPlaybackRate(double rate)
+    {
+        if (double.IsNaN(rate) || double.IsInfinity(rate) || rate <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(rate));
+        }
+
+        SelectPlaybackRate(rate, updateController: true);
+    }
+
+    /// <summary>
     /// Applies a scenario to the bar, updating playback rate and routing metadata.
     /// </summary>
     /// <param name="scenario">Scenario definition selected by the operator.</param>

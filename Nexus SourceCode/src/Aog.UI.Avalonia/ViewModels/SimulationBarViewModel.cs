@@ -422,9 +422,9 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
                 {
                     await operation().ConfigureAwait(false);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
-                    return;
+                    _logger?.LogInformation(ex, failureMessage);
                 }
                 catch (Exception ex)
                 {

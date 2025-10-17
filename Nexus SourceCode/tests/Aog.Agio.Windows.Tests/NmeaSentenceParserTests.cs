@@ -27,6 +27,20 @@ public sealed class NmeaSentenceParserTests
     }
 
     [Fact]
+    public void TryParse_GgaSentence_MalformedNumericFields_YieldsNulls()
+    {
+        const string sentence = "$GPGGA,12A519,48A7.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*44";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var gga = Assert.IsType<NmeaGgaSentence>(parsed);
+        Assert.Null(gga.FixTime);
+        Assert.Null(gga.LatitudeDegrees);
+    }
+
+    [Fact]
     public void TryParse_RmcSentence_ReturnsExpectedValues()
     {
         const string sentence = "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A";
@@ -43,6 +57,19 @@ public sealed class NmeaSentenceParserTests
         Assert.Equal(-3.1, rmc.MagneticVariationDegrees);
         Assert.NotNull(rmc.Timestamp);
         Assert.Equal(new DateTimeOffset(1994, 3, 23, 12, 35, 19, TimeSpan.Zero), rmc.Timestamp);
+    }
+
+    [Fact]
+    public void TryParse_RmcSentence_MalformedDate_YieldsNullTimestamp()
+    {
+        const string sentence = "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,23A394,003.1,W*1B";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var rmc = Assert.IsType<NmeaRmcSentence>(parsed);
+        Assert.Null(rmc.Timestamp);
     }
 
     [Fact]

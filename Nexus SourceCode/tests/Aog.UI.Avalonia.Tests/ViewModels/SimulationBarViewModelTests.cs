@@ -235,6 +235,28 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+    public void SetSelectedPlaybackRate_WhenBelowMinimum_ClampsToLowerBound()
+    {
+        using var viewModel = CreateViewModel();
+
+        viewModel.SetSelectedPlaybackRate(-2);
+
+        viewModel.SelectedPlaybackRate.Should().BeApproximately(0.1, 1e-6);
+        viewModel.SelectedPlaybackRateLabel.Should().Be("0.1×");
+    }
+
+    [Fact]
+    public void SetSelectedPlaybackRate_WhenAboveMaximum_ClampsToUpperBound()
+    {
+        using var viewModel = CreateViewModel();
+
+        viewModel.SetSelectedPlaybackRate(10);
+
+        viewModel.SelectedPlaybackRate.Should().BeApproximately(4.0, 1e-6);
+        viewModel.SelectedPlaybackRateLabel.Should().Be("4×");
+    }
+
+    [Fact]
     public void DisposingAndRecreatingViewModel_DoesNotDuplicateReplayNotifications()
     {
         var configuration = CreateConfigurationWithScenario();

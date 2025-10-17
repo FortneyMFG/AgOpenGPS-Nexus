@@ -18,6 +18,8 @@ namespace Aog.UI.Avalonia.ViewModels;
 public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 {
     private const double PlaybackRateComparisonTolerance = 1e-6;
+    private const double MinPlaybackRate = 0.1;
+    private const double MaxPlaybackRate = 4.0;
     private static readonly TimeSpan DefaultDuration = TimeSpan.FromMinutes(5);
 
     private readonly SimulationConfiguration? _configuration;
@@ -136,20 +138,18 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     public IReadOnlyList<SimulationPlaybackRateOptionViewModel> PlaybackRates =>
         new ReadOnlyCollection<SimulationPlaybackRateOptionViewModel>(_playbackRates);
 
-    /// <summary>Gets the currently selected playback rate multiplier.</summary>
+    /// <summary>
+    /// Gets the currently selected playback rate multiplier. Values are clamped between
+    /// <see cref="MinPlaybackRate"/> and <see cref="MaxPlaybackRate"/>.
+    /// </summary>
     public double SelectedPlaybackRate
     {
         get => _selectedPlaybackRate;
         private set
         {
-            if (SetProperty(ref _selectedPlaybackRate, value))
-            {
-                SelectedPlaybackRateLabel = FormatPlaybackRateLabel(value);
-            }
-            else
-            {
-                SelectedPlaybackRateLabel = FormatPlaybackRateLabel(value);
-            }
+            var clamped = ClampPlaybackRate(value);
+            SetProperty(ref _selectedPlaybackRate, clamped);
+            SelectedPlaybackRateLabel = FormatPlaybackRateLabel(clamped);
         }
     }
 
@@ -194,12 +194,13 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     /// </summary>
     public void SetSelectedPlaybackRate(double rate)
     {
-        if (double.IsNaN(rate) || double.IsInfinity(rate) || rate <= 0)
+        if (double.IsNaN(rate) || double.IsInfinity(rate))
         {
             throw new ArgumentOutOfRangeException(nameof(rate));
         }
 
-        SelectPlaybackRate(rate, updateController: true);
+        var clamped = ClampPlaybackRate(rate);
+        SelectPlaybackRate(clamped, updateController: true);
     }
 
     /// <summary>
@@ -308,24 +309,32 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
     private void SelectPlaybackRate(double rate, bool updateController)
     {
-        if (rate <= 0)
-        {
-            rate = 1.0;
-        }
-
-        var option = EnsurePlaybackRateOption(rate);
+        var clamped = ClampPlaybackRate(rate);
+        var option = EnsurePlaybackRateOption(clamped);
 
         foreach (var candidate in _playbackRates)
         {
             candidate.SetSelected(candidate == option, suppressCallback: true);
         }
 
-        SelectedPlaybackRate = rate;
+        SelectedPlaybackRate = clamped;
 
         if (updateController && !_isUpdatingFromController && _replayController is not null)
         {
-            FireAndForget(() => _replayController.SetPlaybackRateAsync(rate), "Failed to set playback rate.");
+            FireAndForget(
+                () => _replayController.SetPlaybackRateAsync(clamped),
+                "Failed to set playback rate.");
         }
+    }
+
+    private static double ClampPlaybackRate(double rate)
+    {
+        if (double.IsNaN(rate) || double.IsInfinity(rate))
+        {
+            return 1.0;
+        }
+
+        return Math.Clamp(rate, MinPlaybackRate, MaxPlaybackRate);
     }
 
     private SimulationPlaybackRateOptionViewModel EnsurePlaybackRateOption(double rate)

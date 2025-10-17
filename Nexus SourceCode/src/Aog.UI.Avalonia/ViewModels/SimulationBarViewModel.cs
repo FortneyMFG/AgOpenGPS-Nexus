@@ -18,6 +18,8 @@ namespace Aog.UI.Avalonia.ViewModels;
 public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 {
     private const double PlaybackRateComparisonTolerance = 1e-6;
+    private const double MinPlaybackRate = 0.1;
+    private const double MaxPlaybackRate = 4.0;
     private static readonly TimeSpan DefaultDuration = TimeSpan.FromMinutes(5);
 
     private readonly SimulationConfiguration? _configuration;
@@ -145,33 +147,39 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     /// <summary>Gets the available playback rates.</summary>
     public ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> PlaybackRates => _playbackRateView;
 
-    /// <summary>Gets the currently selected playback rate multiplier.</summary>
+    /// <summary>
+    /// Gets the currently selected playback rate multiplier. Values are clamped between
+    /// <see cref="MinPlaybackRate"/> and <see cref="MaxPlaybackRate"/>.
+    /// </summary>
     public double SelectedPlaybackRate
     {
         get => _selectedPlaybackRateMultiplier;
         private set => SetProperty(ref _selectedPlaybackRateMultiplier, value);
     }
 
-    /// <summary>Gets a formatted label describing the selected playback rate.</summary>
-    public string SelectedPlaybackRateLabel
+/// <summary>Gets a formatted label describing the selected playback rate.</summary>
+public string SelectedPlaybackRateLabel
+{
+    get
     {
-        get
+        var option = _selectedPlaybackRateOption;
+        if (option is not null)
         {
-            var option = _selectedPlaybackRate;
-            if (option is null)
-            {
-                return FormatPlaybackRateLabel(_selectedPlaybackRateMultiplier);
-            }
-
             if (!string.IsNullOrWhiteSpace(option.Label))
             {
                 return option.Label;
             }
 
-            return FormatPlaybackRateLabel(option.Multiplier);
+            // Fallback to formatted multiplier if no label
+            return FormatPlaybackRateLabel(ClampPlaybackRate(option.Multiplier));
         }
-        private set => SetProperty(ref _selectedPlaybackRateLabel, value);
+
+        // No option selected — use current multiplier (clamped)
+        return FormatPlaybackRateLabel(ClampPlaybackRate(_selectedPlaybackRateMultiplier));
     }
+    private set => SetProperty(ref _selectedPlaybackRateLabel, value);
+}
+
 
     /// <summary>Gets or sets the friendly title describing the active scenario.</summary>
     public string ActiveScenarioTitle
@@ -217,12 +225,13 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     /// </summary>
     public void SetSelectedPlaybackRate(double rate)
     {
-        if (double.IsNaN(rate) || double.IsInfinity(rate) || rate <= 0)
+        if (double.IsNaN(rate) || double.IsInfinity(rate))
         {
             throw new ArgumentOutOfRangeException(nameof(rate));
         }
 
-        SelectPlaybackRate(rate, updateController: true);
+        var clamped = ClampPlaybackRate(rate);
+        SelectPlaybackRate(clamped, updateController: true);
     }
 
     /// <summary>
@@ -369,24 +378,35 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         SelectPlaybackRate(option.Rate, updateController: true);
     }
 
-    private void SelectPlaybackRate(double rate, bool updateController)
+private void SelectPlaybackRate(double rate, bool updateController)
+{
+    var effectiveRate = ClampPlaybackRate(rate);
+    var option = EnsurePlaybackRateOption(effectiveRate);
+
+    // Toggle selection using the unified helper (updates selection state & notifies bindings)
+    UpdateSelectedPlaybackRateOption(option);
+
+    // Keep scalar + label properties in sync (handle null labels defensively)
+    SelectedPlaybackRate = effectiveRate;
+    SelectedPlaybackRateLabel = option?.Label ?? $"{effectiveRate:0.##}x";
+
+    if (updateController && !_isUpdatingFromController && _replayController is not null)
     {
-        if (rate <= 0)
+        FireAndForget(
+            () => _replayController.SetPlaybackRateAsync(effectiveRate),
+            "Failed to set playback rate.");
+    }
+}
+
+
+    private static double ClampPlaybackRate(double rate)
+    {
+        if (double.IsNaN(rate) || double.IsInfinity(rate))
         {
-            rate = 1.0;
+            return 1.0;
         }
 
-        var option = EnsurePlaybackRateOption(rate);
-        UpdateSelectedPlaybackRateOption(option);
-
-        _selectedPlaybackRate = option;
-        SelectedPlaybackRateLabel = option.Label;
-        SelectedPlaybackRate = rate;
-
-        if (updateController && !_isUpdatingFromController && _replayController is not null)
-        {
-            FireAndForget(() => _replayController.SetPlaybackRateAsync(rate), "Failed to set playback rate.");
-        }
+        return Math.Clamp(rate, MinPlaybackRate, MaxPlaybackRate);
     }
 
     private SimulationPlaybackRateOptionViewModel EnsurePlaybackRateOption(double rate)

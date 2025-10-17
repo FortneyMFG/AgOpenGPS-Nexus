@@ -264,6 +264,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-303 Genetics picker & barcode UI _(Done)_ — ADR-046 genetics UX
 - [x] NX-304 Yield overlay UX updates _(Done)_ — ADR-049 yield visualization
 - [x] NX-305 Profit heatmap & analytics UI _(Done)_ — ADR-050 profit visualization
+- [ ] NX-1006 Simulation playback rate clamp guard
 - [ ] NX-987 Simulation bar playback rate label multiplier — Format selected rate using multiplier notation
 - [ ] NX-989 Simulation bar playback rate option sorting — Ensure legacy imports insert multiplier-sorted options
 - [ ] NX-999 Simulation bar playback rate options read-only guard

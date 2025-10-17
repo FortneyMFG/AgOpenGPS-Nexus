@@ -343,28 +343,49 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
-    public void ResetToConfigurationRoutes_RaisesPlaybackRateNotificationsEvenWhenAlreadyAtConfigurationRate()
-    {
-        var configuration = CreateConfigurationWithScenario();
-        using var viewModel = new SimulationBarViewModel(configuration);
-        var notifications = new List<string>();
-        viewModel.PropertyChanged += (_, args) =>
+        [Fact]
+        public void SetSelectedPlaybackRate_WhenBelowMinimum_ClampsToLowerBound()
         {
-            if (args.PropertyName is not null)
+            using var viewModel = CreateViewModel();
+
+            viewModel.SetSelectedPlaybackRate(-2);
+
+            viewModel.SelectedPlaybackRate.Should().BeApproximately(0.1, 1e-6);
+            viewModel.SelectedPlaybackRateLabel.Should().Be("0.1×");
+        }
+
+        [Fact]
+        public void SetSelectedPlaybackRate_WhenAboveMaximum_ClampsToUpperBound()
+        {
+            using var viewModel = CreateViewModel();
+
+            viewModel.SetSelectedPlaybackRate(10);
+
+            viewModel.SelectedPlaybackRate.Should().BeApproximately(4.0, 1e-6);
+            viewModel.SelectedPlaybackRateLabel.Should().Be("4×");
+        }
+
+        [Fact]
+        public void ResetToConfigurationRoutes_RaisesPlaybackRateNotificationsEvenWhenAlreadyAtConfigurationRate()
+        {
+            var configuration = CreateConfigurationWithScenario();
+            using var viewModel = new SimulationBarViewModel(configuration);
+            var notifications = new List<string>();
+            viewModel.PropertyChanged += (_, args) =>
             {
-                notifications.Add(args.PropertyName);
-            }
-        };
+                if (args.PropertyName is not null)
+                {
+                    notifications.Add(args.PropertyName);
+                }
+            };
 
-        viewModel.ResetToConfigurationRoutes();
+            viewModel.ResetToConfigurationRoutes();
 
-        notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRate))
-            .Should()
-            .BeGreaterThan(0);
-        notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRateLabel))
-            .Should()
-            .BeGreaterThan(0);
-    }
+            notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRate))
+                .Should().BeGreaterThan(0);
+            notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRateLabel))
+                .Should().BeGreaterThan(0);
+        }
 
     [Fact]
     public void DisposingAndRecreatingViewModel_DoesNotDuplicateReplayNotifications()

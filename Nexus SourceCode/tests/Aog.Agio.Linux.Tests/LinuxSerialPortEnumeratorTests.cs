@@ -74,6 +74,36 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
     }
 
     [Fact]
+    public void GetPortNames_PrefixAndDirectorySymlink_ProducesSingleCanonicalEntry()
+    {
+        Skip.IfNot(OperatingSystem.IsLinux());
+
+        var devDir = CreateSubDirectory("dev");
+        var usb0 = CreateDevice(devDir, "ttyUSB0");
+
+        var byIdDir = CreateSubDirectory("serial/by-id");
+        var linkPath = Path.Combine(byIdDir, "usb-u-blox");
+        var relativeTarget = Path.GetRelativePath(byIdDir, usb0);
+        File.CreateSymbolicLink(linkPath, relativeTarget);
+
+        var options = Options.Create(new LinuxSerialPortEnumeratorOptions
+        {
+            DevicePrefixes = new[]
+            {
+                Path.Combine(devDir, "ttyUSB"),
+                byIdDir + "/",
+            },
+        });
+
+        var enumerator = new LinuxSerialPortEnumerator(NullLogger<LinuxSerialPortEnumerator>.Instance, options);
+
+        var ports = enumerator.GetPortNames().ToArray();
+
+        Assert.Single(ports);
+        Assert.Equal(usb0, ports[0]);
+    }
+
+    [Fact]
     public void GetPortNames_NoPrefixesConfigured_ReturnsEmptyAndLogs()
     {
         var options = Options.Create(new LinuxSerialPortEnumeratorOptions

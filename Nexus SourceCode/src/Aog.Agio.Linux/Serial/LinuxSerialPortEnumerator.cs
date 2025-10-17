@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Logging;
@@ -115,19 +116,65 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
             return;
         }
 
-        string fullPath;
+        string canonicalPath;
         try
         {
-            fullPath = Path.GetFullPath(path);
+            canonicalPath = CanonicalizePath(path);
         }
         catch (Exception)
         {
             return;
         }
 
-        if (seen.Add(fullPath))
+        if (seen.Add(canonicalPath))
         {
-            results.Add(fullPath);
+            results.Add(canonicalPath);
         }
+    }
+
+    private static string CanonicalizePath(string path)
+    {
+        var fullPath = Path.GetFullPath(path);
+
+        try
+        {
+            var info = GetFileSystemInfo(fullPath);
+
+            if (string.IsNullOrEmpty(info.LinkTarget))
+            {
+                return fullPath;
+            }
+
+            var targetInfo = info.ResolveLinkTarget(returnFinalTarget: true);
+            if (targetInfo is null)
+            {
+                return fullPath;
+            }
+
+            var targetPath = targetInfo.FullName;
+            if (!Path.IsPathFullyQualified(targetPath))
+            {
+                var basePath = Path.GetDirectoryName(fullPath);
+                targetPath = basePath is not null
+                    ? Path.GetFullPath(targetPath, basePath)
+                    : Path.GetFullPath(targetPath);
+            }
+
+            return Path.GetFullPath(targetPath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException or PlatformNotSupportedException)
+        {
+            return fullPath;
+        }
+    }
+
+    private static FileSystemInfo GetFileSystemInfo(string fullPath)
+    {
+        if (Directory.Exists(fullPath))
+        {
+            return new DirectoryInfo(fullPath);
+        }
+
+        return new FileInfo(fullPath);
     }
 }

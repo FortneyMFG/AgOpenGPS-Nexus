@@ -124,6 +124,10 @@ public abstract class WeatherReportSectionContributorBase : IReportSectionContri
     /// <summary>
     /// Renders the section payload using the supplied snapshots.
     /// </summary>
+    /// <param name="context">Section context provided by the report generator.</param>
+    /// <param name="snapshots">Snapshots to render into a section payload.</param>
+    /// <param name="cancellationToken">Token used to cancel rendering.</param>
+    /// <returns>Rendered section payload.</returns>
     protected abstract ValueTask<ReportSectionResult> RenderInternalAsync(
         ReportSectionContext context,
         IReadOnlyList<WeatherSnapshot> snapshots,
@@ -240,6 +244,7 @@ public sealed class WeatherReportSummarySectionContributor : WeatherReportSectio
     /// <summary>
     /// Initialises a new instance of the <see cref="WeatherReportSummarySectionContributor"/> class.
     /// </summary>
+    /// <param name="snapshotProvider">Snapshot provider supplying weather data.</param>
     public WeatherReportSummarySectionContributor(IWeatherSnapshotProvider snapshotProvider)
         : base(snapshotProvider)
     {
@@ -280,6 +285,7 @@ public sealed class WeatherReportTimelineSectionContributor : WeatherReportSecti
     /// <summary>
     /// Initialises a new instance of the <see cref="WeatherReportTimelineSectionContributor"/> class.
     /// </summary>
+    /// <param name="snapshotProvider">Snapshot provider supplying weather data.</param>
     public WeatherReportTimelineSectionContributor(IWeatherSnapshotProvider snapshotProvider)
         : base(snapshotProvider)
     {
@@ -342,6 +348,8 @@ public sealed record WeatherSummaryReport
     /// <summary>
     /// Creates a summary representation from the supplied snapshot collection.
     /// </summary>
+    /// <param name="snapshots">Snapshots to summarize.</param>
+    /// <returns>Weather summary generated from the provided snapshots.</returns>
     public static WeatherSummaryReport Create(IReadOnlyList<WeatherSnapshot> snapshots)
     {
         if (snapshots is null)
@@ -458,6 +466,14 @@ public sealed record WeatherMetricSummary
     /// <summary>
     /// Initialises a new instance of the <see cref="WeatherMetricSummary"/> class.
     /// </summary>
+    /// <param name="metricId">Stable identifier for the metric.</param>
+    /// <param name="displayName">Human readable metric name.</param>
+    /// <param name="unit">Optional unit associated with the metric.</param>
+    /// <param name="minimum">Minimum observed value.</param>
+    /// <param name="maximum">Maximum observed value.</param>
+    /// <param name="average">Average observed value.</param>
+    /// <param name="latest">Latest recorded value.</param>
+    /// <param name="sum">Summed value across all observations (when applicable).</param>
     public WeatherMetricSummary(
         string metricId,
         string displayName,
@@ -525,6 +541,8 @@ public sealed record WeatherTimelineReport
     /// <summary>
     /// Creates a timeline from the supplied snapshot collection.
     /// </summary>
+    /// <param name="snapshots">Snapshots to convert into timeline observations.</param>
+    /// <returns>Weather timeline generated from the provided snapshots.</returns>
     public static WeatherTimelineReport Create(IReadOnlyList<WeatherSnapshot> snapshots)
     {
         if (snapshots is null)
@@ -575,6 +593,26 @@ public sealed record WeatherTimelineObservation
     /// <summary>
     /// Initialises a new instance of the <see cref="WeatherTimelineObservation"/> class.
     /// </summary>
+    /// <param name="capturedAt">Observation timestamp.</param>
+    /// <param name="source">Data source identifier.</param>
+    /// <param name="temperatureC">Ambient temperature in degrees Celsius.</param>
+    /// <param name="humidityPct">Relative humidity percentage.</param>
+    /// <param name="windKph">Wind speed in kilometres per hour.</param>
+    /// <param name="windDirectionDeg">Wind direction in degrees.</param>
+    /// <param name="windGustKph">Wind gust speed in kilometres per hour.</param>
+    /// <param name="rainfallMm">Rainfall measured in millimetres.</param>
+    /// <param name="pressureKpa">Atmospheric pressure in kilopascals.</param>
+    /// <param name="dewPointC">Dew point temperature in degrees Celsius.</param>
+    /// <param name="wetBulbC">Wet bulb temperature in degrees Celsius.</param>
+    /// <param name="deltaTC">Delta T value in degrees Celsius.</param>
+    /// <param name="evapotranspirationMm">Evapotranspiration in millimetres.</param>
+    /// <param name="solarIrradianceWm2">Solar irradiance in watts per square metre.</param>
+    /// <param name="uvIndex">UV index reading.</param>
+    /// <param name="cloudCoverPct">Cloud cover percentage.</param>
+    /// <param name="visibilityKm">Visibility distance in kilometres.</param>
+    /// <param name="soilTempC">Soil temperature in degrees Celsius.</param>
+    /// <param name="soilMoisturePct">Soil moisture percentage.</param>
+    /// <param name="leafWetnessPct">Leaf wetness percentage.</param>
     public WeatherTimelineObservation(
         DateTimeOffset capturedAt,
         string source,

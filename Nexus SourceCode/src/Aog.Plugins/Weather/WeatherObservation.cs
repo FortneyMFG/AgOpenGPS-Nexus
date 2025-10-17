@@ -11,8 +11,8 @@ public sealed class WeatherObservation
     /// <summary>
     /// Initializes a new instance of the <see cref="WeatherObservation"/> class.
     /// </summary>
-    /// <param name="snapshot">The snapshot produced by the ingest pipeline.</param>
-    /// <param name="location">The location associated with the originating sensor, if known.</param>
+    /// <param name="snapshot">Snapshot produced by the ingest pipeline.</param>
+    /// <param name="location">Optional location associated with the sensor.</param>
     public WeatherObservation(WeatherSnapshot snapshot, PlanarPoint? location)
     {
         Snapshot = snapshot ?? throw new ArgumentNullException(nameof(snapshot));

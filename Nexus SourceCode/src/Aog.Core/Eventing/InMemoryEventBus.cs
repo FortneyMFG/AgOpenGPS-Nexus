@@ -13,6 +13,12 @@ public sealed class InMemoryEventBus : IEventBus
     private readonly Dictionary<Type, Subscribers> _subscriptions = new();
     private readonly object _gate = new();
 
+    /// <summary>
+    /// Subscribes the specified handler to events of type <typeparamref name="TEvent"/>.
+    /// </summary>
+    /// <typeparam name="TEvent">Event type to listen for.</typeparam>
+    /// <param name="handler">Handler invoked for each published event.</param>
+    /// <returns>A disposable subscription handle.</returns>
     public IDisposable Subscribe<TEvent>(Func<TEvent, CancellationToken, ValueTask> handler)
     {
         ArgumentNullException.ThrowIfNull(handler);
@@ -41,6 +47,12 @@ public sealed class InMemoryEventBus : IEventBus
         return new SubscriptionHandle(this, subscription);
     }
 
+    /// <summary>
+    /// Publishes an event to all registered handlers.
+    /// </summary>
+    /// <typeparam name="TEvent">Event type to broadcast.</typeparam>
+    /// <param name="message">Event payload.</param>
+    /// <param name="cancellationToken">Token used to cancel publication.</param>
     public async ValueTask PublishAsync<TEvent>(TEvent message, CancellationToken cancellationToken = default)
     {
         Subscribers? subscribers;

@@ -30,6 +30,9 @@ public sealed class CoverageAnalyticsParityHarness
     /// <summary>
     /// Loads the supplied CSV files and computes the per-metric deltas.
     /// </summary>
+    /// <param name="legacyCsvPath">Path to the legacy CSV export.</param>
+    /// <param name="nexusCsvPath">Path to the Nexus CSV export.</param>
+    /// <returns>Parity report describing per-metric differences.</returns>
     public CoverageParityReport Compare(string legacyCsvPath, string nexusCsvPath)
     {
         if (legacyCsvPath is null)
@@ -109,6 +112,10 @@ public sealed class CoverageAnalyticsParityHarness
 /// </summary>
 public sealed class CoverageParityReport
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CoverageParityReport"/> class.
+    /// </summary>
+    /// <param name="metrics">Per-metric comparison results produced by the parity harness.</param>
     public CoverageParityReport(IReadOnlyList<CoverageMetricDifference> metrics)
     {
         Metrics = metrics ?? throw new ArgumentNullException(nameof(metrics));

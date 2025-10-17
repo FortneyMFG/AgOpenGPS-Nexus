@@ -203,17 +203,42 @@ public sealed class NmeaSentenceParser
             return null;
         }
 
+        var hourValue = hours.Value;
+        var minuteValue = minutes.Value;
+
+        if (hourValue is < 0 or > 23)
+        {
+            return null;
+        }
+
+        if (minuteValue is < 0 or > 59)
+        {
+            return null;
+        }
+
         if (!double.TryParse(secondsComponent, NumberStyles.Float, Invariant, out var secondsDouble))
         {
             return null;
         }
 
-        var totalSeconds = (hours.Value * 60 + minutes.Value) * 60 + secondsDouble;
-        var ticks = (long)Math.Round(totalSeconds * TimeSpan.TicksPerSecond);
+        if (double.IsNaN(secondsDouble) || double.IsInfinity(secondsDouble) || secondsDouble < 0 || secondsDouble >= 60)
+        {
+            return null;
+        }
+
+        var totalTicks =
+            (hourValue * TimeSpan.TicksPerHour) +
+            (minuteValue * TimeSpan.TicksPerMinute) +
+            (long)Math.Round(secondsDouble * TimeSpan.TicksPerSecond);
+
+        if (totalTicks < 0 || totalTicks >= TimeSpan.TicksPerDay)
+        {
+            return null;
+        }
 
         try
         {
-            return TimeOnly.FromTimeSpan(TimeSpan.FromTicks(ticks));
+            return TimeOnly.FromTimeSpan(TimeSpan.FromTicks(totalTicks));
         }
         catch
         {

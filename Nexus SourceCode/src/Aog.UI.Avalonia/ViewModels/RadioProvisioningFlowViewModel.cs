@@ -102,21 +102,21 @@ public sealed class RadioProvisioningFlowViewModel
                 "Run through the validation checklist to confirm the bridge negotiates correctly with the mesh.",
                 new List<RadioProvisioningGuideStepViewModel>
                 {
-                    new(
-                        "Execute the RadioBridge transport tests to verify retry logic and Hamming decoding remain healthy.",
-                        "Run the automated RadioBridge transport tests to validate retry handling and Hamming decoding before promoting the bridge to production.",
-                        RadioProvisioningStepStatus.Pending,
+                    new RadioProvisioningGuideStepViewModel(
+                        primaryText: "Execute the RadioBridge transport tests to verify retry logic and Hamming decoding remain healthy.",
+                        detail: "Run the automated RadioBridge transport tests to validate retry handling and Hamming decoding before promoting the bridge to production.",
+                        status: RadioProvisioningStepStatus.Pending,
                         updatedAt: null,
                         command: "dotnet test tests/Aog.Core.Tests --filter RadioBridgeTransportTests"),
-                    new(
-                        "Inspect mesh diagnostics for the device and confirm radio.kind, radio.fec, RSSI, and retry counters are reported.",
-                        "Review the mesh diagnostics dashboard to ensure the bridge is emitting radio metadata and reliability counters in real time.",
-                        RadioProvisioningStepStatus.Pending,
+                    new RadioProvisioningGuideStepViewModel(
+                        primaryText: "Inspect mesh diagnostics for the device and confirm radio.kind, radio.fec, RSSI, and retry counters are reported.",
+                        detail: "Review the mesh diagnostics dashboard to ensure the bridge is emitting radio metadata and reliability counters in real time.",
+                        status: RadioProvisioningStepStatus.Pending,
                         updatedAt: null),
-                    new(
-                        "Replay a sample mesh publication or coverage topic and verify frames reach the radio modem or simulator.",
-                        "Replay a known-good publication through the mesh to confirm frames traverse the bridge and reach the modem or simulator endpoints.",
-                        RadioProvisioningStepStatus.Pending,
+                    new RadioProvisioningGuideStepViewModel(
+                        primaryText: "Replay a sample mesh publication or coverage topic and verify frames reach the radio modem or simulator.",
+                        detail: "Replay a known-good publication through the mesh to confirm frames traverse the bridge and reach the modem or simulator endpoints.",
+                        status: RadioProvisioningStepStatus.Pending,
                         updatedAt: null)
                 })
         };

@@ -135,7 +135,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-701 SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
 - [x] NX-673 Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests
 - [ ] NX-915 gpsd TPV null field handling regression test
+- [ ] NX-934 Legacy UDP section mask snapshot fix
 - [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
+- [ ] NX-931 gpsd monitor restart on socket availability
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -250,6 +252,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-310 Mesh share/subscribe UI _(Done)_ — ADR-047 live mesh UX
 - [x] NX-311 Radio provisioning UI flows _(Done)_ — ADR-048 provisioning UX
 - [x] NX-312 Companion metadata-driven parity pass _(Done)_ — ADR-034 remote parity
+- [x] NX-931 SimulationBar replay subscription cleanup _(Done)_ — Remove legacy EnsureReplayControllerSubscription helper
 - [x] NX-410 Legacy UI asset migration workbook _(Done)_ — See docs/plans/ui-shell-and-plugin-integration.md
 - [x] NX-411 Shell & navigation port from V6/AgValonia _(Done)_ — Aligns with artifacts/ui-core-spec.md
 - [x] NX-412 Map canvas & field operations UI port _(Done)_ — Aligns with artifacts/ui-inventory.json
@@ -259,6 +262,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-416 Diagnostics & AgIO workspace port _(Done)_ — Aligns with artifacts/ui-core-spec.md
 - [x] NX-417 Simulation shell + companion parity automation _(Done)_ — Aligns with docs/reference/metadata-driven-ui-style-guide.md
 - [x] NX-418 Documentation, QA, and release readiness _(Done)_ — Aligns with artifacts/ui-screenshots/README.md
+- [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory
@@ -374,6 +378,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-095 Dealer support escalation process
 - [x] NX-096 Community preview program
 - [x] NX-097 1.0 launch readiness review
+- [ ] NX-938 Legacy steer command guidance status disable fix
 
 - [x] NX-333 Legacy zone importer & converter _(Done)_ — ADR-027 zone interop
 - [x] NX-334 Legacy job migration tooling _(Done)_ — ADR-040/041 season/session migration
@@ -742,6 +747,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-095 | Dealer support escalation process and SLA tracking | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Runbook + contacts |
 | NX-096 | Community preview program with opt-in builds and survey loop | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Capture structured feedback |
 | NX-097 | 1.0 launch readiness review and sign-off checklist | Done |  | — | [SRS §1.4 Release Management](docs/SRS/NOTES.md#srs-14-release-management) | Cross-team go/no-go |
+| NX-938 | Legacy steer command guidance status disable fix | Planned |  | — | — | Ensure disabled steer commands encode status zero |
 
 ## Legend
 

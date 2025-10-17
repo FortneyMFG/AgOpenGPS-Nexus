@@ -115,14 +115,20 @@ public sealed class LegacySteerCodec
         BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(5, 2), speedTenths);
 
         var status = metadata.GuidanceStatus;
-        if (status == 0 && command.Enable)
+        if (!command.Enable)
+        {
+            status = 0;
+        }
+        else if (status == 0)
         {
             status = 1;
         }
 
         buffer[7] = status;
 
-        var steerHundredths = (short)Math.Clamp(Math.Round(command.TargetWheelAngleDeg * 100.0), short.MinValue, short.MaxValue);
+        var steerHundredths = command.Enable
+            ? (short)Math.Clamp(Math.Round(command.TargetWheelAngleDeg * 100.0), short.MinValue, short.MaxValue)
+            : (short)0;
         BinaryPrimitives.WriteInt16LittleEndian(buffer.AsSpan(8, 2), steerHundredths);
 
         buffer[10] = metadata.TramControl;

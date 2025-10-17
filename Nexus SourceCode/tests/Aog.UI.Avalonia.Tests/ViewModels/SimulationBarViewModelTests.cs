@@ -82,6 +82,39 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+    public void PlaybackRateLabel_UsesCurrentUICulture()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        var originalUiCulture = CultureInfo.CurrentUICulture;
+
+        try
+        {
+            var culture = CultureInfo.GetCultureInfo("fr-FR");
+            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentUICulture = culture;
+
+            using var viewModel = CreateViewModel();
+            var scenario = new SimulationScenarioConfiguration(
+                "fractional-rate",
+                "Scenario requesting 1.5x speed",
+                new[]
+                {
+                    new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+                },
+                new SimulationOptionsConfiguration(2024, 1.5));
+
+            viewModel.ApplyScenario(scenario);
+
+            viewModel.SelectedPlaybackRateLabel.Should().Be("1,5×");
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+            CultureInfo.CurrentUICulture = originalUiCulture;
+        }
+    }
+
+    [Fact]
     public void Constructor_WithConfiguredTimeScale_UsesConfiguredPlaybackRate()
     {
         const string json = """

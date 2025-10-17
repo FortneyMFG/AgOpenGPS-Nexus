@@ -142,6 +142,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
 - [ ] NX-931 gpsd monitor restart on socket availability
 - [ ] NX-952 Aog.Agio.Windows targeting pack restore guard
+- [x] NX-953 SocketCAN burst tolerance for transient backpressure
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -221,6 +222,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 ### Section E — UI (Avalonia) + Sim Bar
 - [ ] NX-942 Planter panel stale row cleanup regression
+- [x] NX-954 Simulation route mode case-insensitive selection _(Done)_ — Mirror SelectedMode setter canonicalization and tests
 - [x] NX-980 Sections panel sixteen-toggle support _(Done)_ — Expand UI and tests for 16-section masks
 - [x] NX-040 Avalonia app bootstrap
 - [x] NX-041 Connection/settings panel

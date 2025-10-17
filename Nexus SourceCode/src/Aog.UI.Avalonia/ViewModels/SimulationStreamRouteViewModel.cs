@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Aog.Core.Simulation.Configuration;
 
 namespace Aog.UI.Avalonia.ViewModels;
@@ -40,9 +39,14 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         Stream = stream;
         _availableSources = availableSources;
         _availableModes = availableModes;
-        _selectedSource = ContainsIgnoreCase(availableSources, selectedSource)
-            ? selectedSource
-            : availableSources[0];
+        if (!ContainsIgnoreCase(availableSources, selectedSource, out var canonicalSource))
+        {
+            _selectedSource = availableSources[0];
+        }
+        else
+        {
+            _selectedSource = canonicalSource;
+        }
         _selectedMode = ContainsIgnoreCase(availableModes, mode)
             ? mode
             : availableModes[0];
@@ -71,17 +75,22 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         get => _selectedSource;
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Equals(_selectedSource, StringComparison.Ordinal))
+            if (string.IsNullOrWhiteSpace(value))
             {
                 return;
             }
 
-            if (!ContainsIgnoreCase(_availableSources, value))
+            if (!ContainsIgnoreCase(_availableSources, value, out var canonicalSource))
             {
                 return;
             }
 
-            SetProperty(ref _selectedSource, value);
+            if (canonicalSource.Equals(_selectedSource, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            SetProperty(ref _selectedSource, canonicalSource);
         }
     }
 
@@ -93,17 +102,20 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         get => _selectedMode;
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Equals(_selectedMode, StringComparison.Ordinal))
+            if (string.IsNullOrWhiteSpace(value))
             {
                 return;
             }
 
-            if (!ContainsIgnoreCase(_availableModes, value))
+            var matchedMode = _availableModes.FirstOrDefault(
+                candidate => candidate.Equals(value, StringComparison.OrdinalIgnoreCase));
+
+            if (matchedMode is null || matchedMode.Equals(_selectedMode, StringComparison.Ordinal))
             {
                 return;
             }
 
-            SetProperty(ref _selectedMode, value);
+            SetProperty(ref _selectedMode, matchedMode);
         }
     }
 
@@ -117,6 +129,21 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
 
     private static bool ContainsIgnoreCase(IEnumerable<string> source, string value)
     {
-        return source.Any(candidate => candidate.Equals(value, StringComparison.OrdinalIgnoreCase));
+        return ContainsIgnoreCase(source, value, out _);
+    }
+
+    private static bool ContainsIgnoreCase(IEnumerable<string> source, string value, out string? match)
+    {
+        foreach (var candidate in source)
+        {
+            if (candidate.Equals(value, StringComparison.OrdinalIgnoreCase))
+            {
+                match = candidate;
+                return true;
+            }
+        }
+
+        match = null;
+        return false;
     }
 }

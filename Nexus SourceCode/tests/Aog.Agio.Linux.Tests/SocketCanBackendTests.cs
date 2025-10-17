@@ -291,6 +291,65 @@ public async Task SocketCanBusService_DropsSlowSubscribers()
 }
 
 [Fact]
+public async Task FrameChannel_DeliversBurstToRecoveringSubscriber()
+{
+    var channel = new SocketCanFrameChannel(
+        subscriberCapacity: 4,
+        maxSubscriberBackpressure: TimeSpan.FromMilliseconds(250));
+
+    using var cts = new CancellationTokenSource();
+    var receivedFrames = new ConcurrentQueue<CanFrame>();
+    var subscriptionReady = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    var subscriberTask = Task.Run(async () =>
+    {
+        await using var enumerator = channel.ReadAllAsync(cts.Token).GetAsyncEnumerator();
+        subscriptionReady.TrySetResult();
+
+        // Pause briefly before reading to allow the bounded buffer to fill up.
+        await Task.Delay(TimeSpan.FromMilliseconds(100), cts.Token);
+
+        try
+        {
+            while (await enumerator.MoveNextAsync())
+            {
+                receivedFrames.Enqueue(enumerator.Current);
+                // Simulate light processing work after the initial pause.
+                await Task.Delay(TimeSpan.FromMilliseconds(5), cts.Token);
+            }
+        }
+        catch (OperationCanceledException) when (cts.IsCancellationRequested)
+        {
+        }
+    });
+
+    await subscriptionReady.Task.ConfigureAwait(false);
+
+    const int frameCount = 16;
+    for (var i = 0; i < frameCount; i++)
+    {
+        var frame = new CanFrame
+        {
+            Header = new Header { Sequence = (ulong)(i + 1) },
+            ArbitrationId = (uint)i,
+        };
+
+        await channel.PublishAsync(frame, CancellationToken.None);
+    }
+
+    await WaitForAsync(() => receivedFrames.Count == frameCount, TimeSpan.FromSeconds(2));
+
+    var received = receivedFrames.ToArray();
+    Assert.Equal(frameCount, received.Length);
+    Assert.Equal(
+        Enumerable.Range(0, frameCount).Select(value => (uint)value),
+        received.Select(frame => frame.ArbitrationId));
+
+    cts.Cancel();
+    await subscriberTask.ConfigureAwait(false);
+}
+
+[Fact]
 public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
 {
     // Channel-level: verifies bounded per-subscriber queue and backpressure timeout.

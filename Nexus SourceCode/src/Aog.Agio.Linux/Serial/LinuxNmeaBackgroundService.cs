@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Agio.Serial;
@@ -42,14 +43,14 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
                 }
 
                 _logger.LogInformation(
-                    "NMEA stream detected on {Device} at {BaudRate} baud. Lat={Latitude:F6}, Lon={Longitude:F6}, Alt={Altitude:F1}m, Speed={Speed:F2}km/h, Course={Course:F1}°.",
+                    "NMEA stream detected on {Device} at {BaudRate} baud. Lat={Latitude}, Lon={Longitude}, Alt={Altitude}m, Speed={Speed}km/h, Course={Course}°.",
                     result.PortName,
                     result.BaudRate,
-                    result.Gga.LatitudeDegrees,
-                    result.Gga.LongitudeDegrees,
-                    result.Gga.AltitudeMeters,
-                    result.Vtg.SpeedKilometersPerHour,
-                    result.Vtg.TrueCourseDegrees);
+                    FormatNullable(result.Gga.LatitudeDegrees, "F6"),
+                    FormatNullable(result.Gga.LongitudeDegrees, "F6"),
+                    FormatNullable(result.Gga.AltitudeMeters, "F1"),
+                    FormatNullable(result.Vtg.SpeedKilometersPerHour, "F2"),
+                    FormatNullable(result.Vtg.TrueCourseDegrees, "F1"));
 
                 await MonitorActiveStreamAsync(result, stoppingToken).ConfigureAwait(false);
             }
@@ -96,5 +97,10 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
 
             activePort = verificationResult;
         }
+    }
+
+    private static string FormatNullable(double? value, string format)
+    {
+        return value?.ToString(format, CultureInfo.InvariantCulture) ?? "n/a";
     }
 }

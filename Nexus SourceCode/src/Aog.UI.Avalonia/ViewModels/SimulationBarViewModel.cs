@@ -513,9 +513,9 @@ SelectedPlaybackRateLabel = option?.Label ?? string.Empty;
                 {
                     await operation().ConfigureAwait(false);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
-                    return;
+                    _logger?.LogInformation(ex, failureMessage);
                 }
                 catch (Exception ex)
                 {

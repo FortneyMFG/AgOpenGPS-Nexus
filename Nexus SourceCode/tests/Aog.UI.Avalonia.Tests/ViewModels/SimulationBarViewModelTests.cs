@@ -402,7 +402,7 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
-    public async Task TogglePlaybackCommand_WhenReplayControllerCancels_DoesNotLogError()
+    public async Task TogglePlaybackCommand_WhenReplayControllerCancels_LogsInformation()
     {
         var configuration = CreateConfigurationWithScenario();
         var logger = new TestLogger<SimulationBarViewModel>();
@@ -415,7 +415,10 @@ public sealed class SimulationBarViewModelTests
 
         await WaitForLogAsync(logger);
 
-        logger.Entries.Should().BeEmpty();
+        logger.Entries.Should().HaveCount(1);
+        logger.Entries.Should().OnlyContain(entry => entry.Level == LogLevel.Information);
+        logger.Entries.Should().ContainSingle(
+            entry => entry.Message.Contains("start playback", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]

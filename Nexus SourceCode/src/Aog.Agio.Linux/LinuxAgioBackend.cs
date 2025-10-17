@@ -25,6 +25,7 @@ public sealed class LinuxAgioBackend : IAgioBackend
             throw new ArgumentNullException(nameof(services));
         }
 
+        services.AddSingleton(TimeProvider.System);
         services
             .AddOptions<NmeaSerialPortScanOptions>()
             .BindConfiguration("AgioHost:Linux:Serial:Scan");

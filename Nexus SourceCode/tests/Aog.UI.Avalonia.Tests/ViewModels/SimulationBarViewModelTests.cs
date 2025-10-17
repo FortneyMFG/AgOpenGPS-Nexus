@@ -88,7 +88,7 @@ public sealed class SimulationBarViewModelTests
         using var viewModel = new SimulationBarViewModel(configuration);
 
         viewModel.SelectedPlaybackRate.Should().Be(0.75);
-        viewModel.SelectedPlaybackRateLabel.Should().Be("75%");
+        viewModel.SelectedPlaybackRateLabel.Should().Be("0.75×");
         viewModel.PlaybackRates.Select(option => option.Rate)
             .Should()
             .Equal(0.5, 0.75, 1.0, 2.0);
@@ -316,6 +316,23 @@ public sealed class SimulationBarViewModelTests
 
         logger.Entries.Should().Contain(
             entry => entry.Level == LogLevel.Error && entry.Message.Contains("start playback", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task TogglePlaybackCommand_WhenReplayControllerCancels_DoesNotLogError()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        var logger = new TestLogger<SimulationBarViewModel>();
+        var replayController = new ReplayControllerStub(
+            playAsync: () => ValueTask.FromException(new OperationCanceledException()));
+
+        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+
+        viewModel.TogglePlaybackCommand.Execute(null);
+
+        await WaitForLogAsync(logger);
+
+        logger.Entries.Should().BeEmpty();
     }
 
     [Fact]

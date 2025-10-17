@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Aog.Agio.Linux.Serial;
 
@@ -21,6 +22,7 @@ public sealed class LinuxSerialPortEnumeratorOptions
     /// Gets or sets the absolute path prefixes that should be probed for serial devices.
     /// Entries may optionally end with <c>/</c> to treat them as directories whose children will be returned verbatim.
     /// Values are normalized by trimming surrounding whitespace and discarding any paths that are not rooted.
+    /// Relative paths are ignored and logged as warnings so that misconfigurations surface during diagnostics.
     /// </summary>
     public string[] DevicePrefixes
     {
@@ -51,6 +53,9 @@ public sealed class LinuxSerialPortEnumeratorOptions
 
                 if (!trimmed.StartsWith("/", StringComparison.Ordinal))
                 {
+                    Trace.TraceWarning(
+                        "Ignoring Linux serial device prefix '{0}' because it is not an absolute path.",
+                        prefix);
                     continue;
                 }
 

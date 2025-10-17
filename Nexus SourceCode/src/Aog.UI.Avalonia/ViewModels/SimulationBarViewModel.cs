@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Aog.Core.Legacy;
 using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -23,6 +26,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private readonly IReplayController? _replayController;
     private readonly EventHandler<ReplayStateChangedEventArgs> _replayStateChangedHandler;
     private readonly ReplayStateSubscription _replayStateSubscription;
+    private readonly ILogger<SimulationBarViewModel> _logger;
     private bool _disposed;
     private ReplayState _state;
     private double _selectedPlaybackRate;
@@ -33,10 +37,14 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private string _activeScenarioDescription = "Using routes from the loaded configuration.";
     private string _activeScenarioOptions = "—";
 
-    public SimulationBarViewModel(SimulationConfiguration? configuration, IReplayController? replayController = null)
+    public SimulationBarViewModel(
+        SimulationConfiguration? configuration,
+        IReplayController? replayController = null,
+        ILogger<SimulationBarViewModel>? logger = null)
     {
         _configuration = configuration;
         _duration = configuration?.Duration ?? _defaultDuration;
+        _logger = logger ?? NullLogger<SimulationBarViewModel>.Instance;
 
         _togglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
         _state = new ReplayState(isPlaying: false, position: TimeSpan.Zero, duration: _duration, playbackRate: 1.0);
@@ -167,7 +175,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
             if (_replayController is not null)
             {
-                _ = _replayController.SeekAsync(position);
+                ExecuteReplayOperation(() => _replayController.SeekAsync(position), $"seek to {position}");
             }
             else
             {
@@ -276,11 +284,11 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         {
             if (_state.IsPlaying)
             {
-                _ = _replayController.PauseAsync();
+                ExecuteReplayOperation(() => _replayController.PauseAsync(), "pause playback");
             }
             else
             {
-                _ = _replayController.PlayAsync();
+                ExecuteReplayOperation(() => _replayController.PlayAsync(), "start playback");
             }
 
             return;
@@ -332,17 +340,6 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         return $"{rate:0.#}×";
     }
 
-    private void EnsureReplayControllerSubscription()
-    {
-        if (_replayController is null || _isReplayStateSubscribed)
-        {
-            return;
-        }
-
-        _replayController.StateChanged += OnReplayStateChanged;
-        _isReplayStateSubscribed = true;
-    }
-
     private void UpdateRoutes(IEnumerable<SimulationRouteConfiguration> routes)
     {
         _routes.Clear();
@@ -390,11 +387,45 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
         if (_replayController is not null)
         {
-            _ = _replayController.SetPlaybackRateAsync(rate);
+            ExecuteReplayOperation(() => _replayController.SetPlaybackRateAsync(rate), $"set playback rate to {rate:0.###}x");
         }
         else
         {
             _state = _state with { PlaybackRate = rate };
+        }
+    }
+
+    private void ExecuteReplayOperation(Func<ValueTask> operation, string operationDescription)
+    {
+        try
+        {
+            ObserveReplayTask(operation(), operationDescription);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Replay controller operation '{Operation}' failed.", operationDescription);
+        }
+    }
+
+    private void ObserveReplayTask(ValueTask task, string operationDescription)
+    {
+        if (task.IsCompletedSuccessfully)
+        {
+            return;
+        }
+
+        _ = ObserveReplayTaskAsync(task, operationDescription);
+    }
+
+    private async Task ObserveReplayTaskAsync(ValueTask task, string operationDescription)
+    {
+        try
+        {
+            await task.ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Replay controller operation '{Operation}' failed.", operationDescription);
         }
     }
 

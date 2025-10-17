@@ -15,83 +15,189 @@ public sealed class GpsdBackgroundService : BackgroundService
 {
     private readonly GpsdClient _client;
     private readonly ILogger<GpsdBackgroundService> _logger;
-    private readonly GpsdClientOptions _options;
+    private readonly IDisposable _optionsReloadToken;
+    private GpsdClientOptions _options;
+    private CancellationTokenSource? _reloadTokenSource = new();
 
     public GpsdBackgroundService(
         GpsdClient client,
         ILogger<GpsdBackgroundService> logger,
-        IOptions<GpsdClientOptions> options)
+        IOptionsMonitor<GpsdClientOptions> options)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = (options ?? throw new ArgumentNullException(nameof(options))).Value ?? throw new ArgumentException("Options are required.", nameof(options));
+        if (options is null)
+        {
+            throw new ArgumentNullException(nameof(options));
+        }
+
+        _options = options.CurrentValue ?? throw new ArgumentException("Options are required.", nameof(options));
+        _optionsReloadToken = options.OnChange(OnOptionsChanged);
     }
 
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (string.IsNullOrEmpty(_options.SocketPath))
-        {
-            _logger.LogInformation("gpsd monitor disabled. No socket path configured.");
-            return;
-        }
-
-        _logger.LogInformation("Starting gpsd monitor for socket {SocketPath}.", _options.SocketPath);
-
         while (!stoppingToken.IsCancellationRequested)
         {
+            var options = Volatile.Read(ref _options) ?? new GpsdClientOptions();
+
+            if (string.IsNullOrEmpty(options.SocketPath))
+            {
+                _logger.LogInformation("gpsd monitor disabled. No socket path configured.");
+
+                try
+                {
+                    await WaitForOptionsChangeAsync(stoppingToken).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+
+                continue;
+            }
+
+            _logger.LogInformation("Starting gpsd monitor for socket {SocketPath}.", options.SocketPath);
+
+            using var iterationCancellation = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, GetReloadToken());
+            var iterationToken = iterationCancellation.Token;
+
             try
             {
-                await foreach (var report in _client.WatchAsync(stoppingToken).WithCancellation(stoppingToken))
+                while (!iterationToken.IsCancellationRequested)
                 {
-                    var latitude = FormatDouble(report.LatitudeDegrees, "F6");
-                    var longitude = FormatDouble(report.LongitudeDegrees, "F6");
-                    var altitude = FormatDouble(report.AltitudeMeters, "F1");
-                    var speed = FormatDouble(report.SpeedMetersPerSecond, "F2");
-                    var track = FormatDouble(report.TrackDegrees, "F1");
-                    var timestamp = report.Timestamp?.ToString("o", CultureInfo.InvariantCulture) ?? "n/a";
-                    var mode = report.Mode?.ToString(CultureInfo.InvariantCulture) ?? "n/a";
+                    try
+                    {
+                        await foreach (var report in _client.WatchAsync(iterationToken).WithCancellation(iterationToken))
+                        {
+                            var latitude = FormatDouble(report.LatitudeDegrees, "F6");
+                            var longitude = FormatDouble(report.LongitudeDegrees, "F6");
+                            var altitude = FormatDouble(report.AltitudeMeters, "F1");
+                            var speed = FormatDouble(report.SpeedMetersPerSecond, "F2");
+                            var track = FormatDouble(report.TrackDegrees, "F1");
+                            var timestamp = report.Timestamp?.ToString("o", CultureInfo.InvariantCulture) ?? "n/a";
+                            var mode = report.Mode?.ToString(CultureInfo.InvariantCulture) ?? "n/a";
 
-                    _logger.LogInformation(
-                        "gpsd TPV: Mode={Mode}, Lat={Latitude}, Lon={Longitude}, Alt={Altitude}m, Speed={Speed}m/s, Track={Track}°, Time={Timestamp}",
-                        mode,
-                        latitude,
-                        longitude,
-                        altitude,
-                        speed,
-                        track,
-                        timestamp);
+                            _logger.LogInformation(
+                                "gpsd TPV: Mode={Mode}, Lat={Latitude}, Lon={Longitude}, Alt={Altitude}m, Speed={Speed}m/s, Track={Track}°, Time={Timestamp}",
+                                mode,
+                                latitude,
+                                longitude,
+                                altitude,
+                                speed,
+                                track,
+                                timestamp);
+                        }
+                    }
+                    catch (GpsdSocketUnavailableException ex)
+                    {
+                        _logger.LogWarning(ex, "gpsd socket {SocketPath} unavailable. Retrying in {Delay}.", options.SocketPath, options.ReconnectDelay);
+                    }
+                    catch (OperationCanceledException) when (iterationToken.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "gpsd stream failed. Retrying in {Delay}.", options.ReconnectDelay);
+                    }
+
+                    if (iterationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    try
+                    {
+                        await Task.Delay(options.ReconnectDelay, iterationToken).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException) when (iterationToken.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
                 }
             }
-            catch (GpsdSocketUnavailableException ex)
+            catch (OperationCanceledException) when (iterationToken.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
             {
-                _logger.LogWarning(ex, "gpsd socket {SocketPath} unavailable. Retrying in {Delay}.", _options.SocketPath, _options.ReconnectDelay);
-            }
-            catch (OperationCanceledException)
-            {
-                break;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "gpsd stream failed. Retrying in {Delay}.", _options.ReconnectDelay);
-            }
-
-            if (stoppingToken.IsCancellationRequested)
-            {
-                break;
-            }
-
-            try
-            {
-                await Task.Delay(_options.ReconnectDelay, stoppingToken).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-                break;
+                // configuration changed; restart the loop with updated options
             }
         }
     }
 
     private static string FormatDouble(double? value, string format)
         => value?.ToString(format, CultureInfo.InvariantCulture) ?? "n/a";
+
+    private void OnOptionsChanged(GpsdClientOptions options)
+    {
+        if (options is null)
+        {
+            return;
+        }
+
+        Volatile.Write(ref _options, options);
+        SignalReload();
+    }
+
+    private CancellationToken GetReloadToken()
+        => Volatile.Read(ref _reloadTokenSource)?.Token ?? CancellationToken.None;
+
+    private void SignalReload()
+    {
+        var newSource = new CancellationTokenSource();
+        var previous = Interlocked.Exchange(ref _reloadTokenSource, newSource);
+
+        if (previous is not null)
+        {
+            try
+            {
+                previous.Cancel();
+            }
+            finally
+            {
+                previous.Dispose();
+            }
+        }
+    }
+
+    private async Task WaitForOptionsChangeAsync(CancellationToken stoppingToken)
+    {
+        using var waitCancellation = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, GetReloadToken());
+
+        try
+        {
+            await Task.Delay(Timeout.InfiniteTimeSpan, waitCancellation.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+        {
+            // configuration changed; resume loop
+        }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _optionsReloadToken.Dispose();
+
+            var previous = Interlocked.Exchange(ref _reloadTokenSource, null);
+            if (previous is not null)
+            {
+                try
+                {
+                    previous.Cancel();
+                }
+                finally
+                {
+                    previous.Dispose();
+                }
+            }
+        }
+
+        base.Dispose(disposing);
+    }
 }

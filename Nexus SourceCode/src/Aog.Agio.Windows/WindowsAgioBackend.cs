@@ -21,6 +21,7 @@ public sealed class WindowsAgioBackend : IAgioBackend
             throw new ArgumentNullException(nameof(services));
         }
 
+        services.AddSingleton(TimeProvider.System);
         services.AddOptions<NmeaSerialPortScanOptions>();
 
         services.AddSingleton<NmeaSentenceParser>();

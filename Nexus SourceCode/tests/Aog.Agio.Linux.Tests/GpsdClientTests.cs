@@ -77,7 +77,7 @@ public sealed class GpsdClientTests
         var task = (Task)executeAsync!.Invoke(service, new object[] { cts.Token })!;
         await task.WaitAsync(TimeSpan.FromSeconds(5));
 
-        Assert.Contains("?WATCH={\"enable\":true,\"json\":true}", factory.WrittenLines);
+        Assert.Contains(GpsdClientTestHelpers.WatchCommand, factory.WrittenLines);
     }
 
     [Fact]

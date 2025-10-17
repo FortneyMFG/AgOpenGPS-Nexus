@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Logging;
@@ -108,7 +109,7 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         }
     }
 
-    private static void AddResult(string path, HashSet<string> seen, List<string> results)
+    private void AddResult(string path, HashSet<string> seen, List<string> results)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -125,9 +126,59 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
             return;
         }
 
-        if (seen.Add(fullPath))
+        var canonicalPath = ResolveCanonicalPath(fullPath);
+
+        if (seen.Add(canonicalPath))
         {
             results.Add(fullPath);
+        }
+        else
+        {
+            _logger.LogDebug(
+                "Skipping serial device {Path} because canonical path {CanonicalPath} was already discovered.",
+                fullPath,
+                canonicalPath);
+        }
+    }
+
+    private static string ResolveCanonicalPath(string fullPath)
+    {
+        try
+        {
+            var info = Directory.Exists(fullPath)
+                ? new DirectoryInfo(fullPath)
+                : new FileInfo(fullPath);
+
+            try
+            {
+                var target = info.ResolveLinkTarget(returnFinalTarget: true);
+                if (target is not null)
+                {
+                    return Path.GetFullPath(target.FullName);
+                }
+            }
+            catch (IOException)
+            {
+                // Ignore failures resolving the link target; fall back to the original path.
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Ignore failures resolving the link target; fall back to the original path.
+            }
+            catch (PlatformNotSupportedException)
+            {
+                // Ignore failures resolving the link target; fall back to the original path.
+            }
+            catch (NotSupportedException)
+            {
+                // Ignore failures resolving the link target; fall back to the original path.
+            }
+
+            return info.FullName;
+        }
+        catch (Exception)
+        {
+            return fullPath;
         }
     }
 }

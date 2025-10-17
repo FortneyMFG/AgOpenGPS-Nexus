@@ -6,6 +6,7 @@ using Aog.Agio;
 using Aog.Agio.Legacy;
 using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Aog.Agio.Tests;
@@ -299,6 +300,52 @@ public sealed class LegacyUdpGatewayTests
         Assert.Equal(safeCommand.ControllerOutput, decodedCommand.ControllerOutput, 3);
         Assert.Equal(safeSections.Mask, decodedSections.Mask);
         Assert.Equal(safeSections.SectionCount, decodedSections.SectionCount);
+    }
+
+    [Fact]
+    public async Task PublishSectionMaskAsync_WithoutSteerSnapshotLogsWarning()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
+        var transport = new RecordingTransport();
+        var poseObserver = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var logger = new RecordingLogger<LegacyUdpGateway>();
+
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            poseObserver,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
+            new FixedTimeProvider(DateTimeOffset.UtcNow),
+            logger: logger);
+
+        var sections = new SectionMask
+        {
+            SectionCount = 8,
+            Mask = 0x000F,
+        };
+
+        await gateway.PublishSectionMaskAsync(sections).ConfigureAwait(false);
+
+        Assert.Empty(transport.Frames);
+
+        var entry = Assert.Single(logger.Entries);
+        Assert.Equal(LogLevel.Information, entry.Level);
+        Assert.Contains(
+            "no steer command snapshot has been published",
+            entry.Message,
+            StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -820,6 +867,31 @@ public sealed class LegacyUdpGatewayTests
         {
             Discoveries.Add(announcement);
             return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingLogger<T> : ILogger<T>
+    {
+        public List<LogEntry> Entries { get; } = new();
+
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            Entries.Add(new LogEntry(logLevel, formatter(state, exception), exception));
+        }
+
+        public readonly record struct LogEntry(LogLevel Level, string Message, Exception? Exception);
+
+        private sealed class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new();
+
+            public void Dispose()
+            {
+            }
         }
     }
 

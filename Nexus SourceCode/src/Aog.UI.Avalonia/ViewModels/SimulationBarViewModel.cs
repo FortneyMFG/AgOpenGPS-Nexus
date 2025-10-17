@@ -256,6 +256,9 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         ActiveScenarioTitle = "Scenario: configuration defaults";
         ActiveScenarioDescription = "Using routes from the loaded configuration.";
         ActiveScenarioOptions = "—";
+
+        var defaultPlaybackRate = _configuration?.Options?.TimeScale ?? 1.0;
+        OnPlaybackRateSelected(defaultPlaybackRate);
     }
 
     /// <summary>

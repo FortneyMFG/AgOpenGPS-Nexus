@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Agio.Linux.SocketCan;
@@ -10,6 +11,7 @@ using Aog.Core.V1;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using SocketCANSharp;
@@ -196,28 +198,84 @@ public async Task BackgroundService_ReconfiguresWhenOptionsChange()
 
     await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
 
-    await WaitForAsync(() => factory.CreatedInterfaces.Count >= 1, TimeSpan.FromSeconds(1));
-    Assert.Equal("vcan0", factory.CreatedInterfaces[0]);
-
-    monitor.Update(new SocketCanOptions
+    try
     {
-        InterfaceName = "vcan1",
-        ReceiveTimeout = initialOptions.ReceiveTimeout,
-        ReconnectDelay = initialOptions.ReconnectDelay,
-        SourcePrefix = initialOptions.SourcePrefix,
-        IncludeVirtualInterfaces = initialOptions.IncludeVirtualInterfaces,
-        ReceiveOwnMessages = initialOptions.ReceiveOwnMessages,
-    });
+        await WaitForAsync(() => factory.CreatedInterfaces.Count >= 1, TimeSpan.FromSeconds(1));
+        Assert.Equal("vcan0", factory.CreatedInterfaces[0]);
 
-    await WaitForAsync(() => factory.CreatedInterfaces.Count >= 2, TimeSpan.FromSeconds(1));
-    Assert.Equal("vcan1", factory.CreatedInterfaces[1]);
+        monitor.Update(new SocketCanOptions
+        {
+            InterfaceName = "vcan1",
+            ReceiveTimeout = initialOptions.ReceiveTimeout,
+            ReconnectDelay = initialOptions.ReconnectDelay,
+            SourcePrefix = initialOptions.SourcePrefix,
+            IncludeVirtualInterfaces = initialOptions.IncludeVirtualInterfaces,
+            ReceiveOwnMessages = initialOptions.ReceiveOwnMessages,
+        });
 
-    await WaitForAsync(() => firstClient.DisposeCount > 0, TimeSpan.FromSeconds(1));
-    Assert.Equal(1, firstClient.DisposeCount);
-}
+        await WaitForAsync(() => factory.CreatedInterfaces.Count >= 2, TimeSpan.FromSeconds(1));
+        Assert.Equal("vcan1", factory.CreatedInterfaces[1]);
 
+        await WaitForAsync(() => firstClient.DisposeCount > 0, TimeSpan.FromSeconds(1));
+        Assert.Equal(1, firstClient.DisposeCount);
+    }
+    finally
+    {
         await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
     }
+}
+
+[Fact]
+public async Task BackgroundService_WarnsAndContinuesWhenSourcePrefixUpdateEmpty()
+{
+    var channel = new SocketCanFrameChannel();
+    var client = new PassiveSocketCanClient("vcan0");
+    var factory = new TrackingSocketCanClientFactory(_ => client);
+    var initialOptions = new SocketCanOptions
+    {
+        InterfaceName = "vcan0",
+        ReceiveTimeout = TimeSpan.FromMilliseconds(10),
+        ReconnectDelay = TimeSpan.FromMilliseconds(10),
+        SourcePrefix = "test/socketcan",
+        IncludeVirtualInterfaces = true,
+        ReceiveOwnMessages = true,
+    };
+    var monitor = new TestOptionsMonitor(initialOptions);
+    var logger = new TestLogger<SocketCanBackgroundService>();
+
+    var service = new SocketCanBackgroundService(
+        factory,
+        channel,
+        monitor,
+        TimeProvider.System,
+        logger);
+
+    await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+    try
+    {
+        await WaitForAsync(() => factory.CreatedInterfaces.Count >= 1, TimeSpan.FromSeconds(1));
+
+        var invalid = CloneWithSourcePrefix(initialOptions, string.Empty);
+        monitor.Update(invalid);
+
+        var defaultPrefix = new SocketCanOptions().SourcePrefix;
+        Assert.Contains(
+            logger.Entries,
+            entry => entry.Level == LogLevel.Warning
+                && entry.Message.Contains("SourcePrefix update was empty", StringComparison.Ordinal)
+                && entry.Message.Contains(defaultPrefix, StringComparison.Ordinal));
+
+        await Task.Delay(TimeSpan.FromMilliseconds(100)).ConfigureAwait(false);
+
+        Assert.Single(factory.CreatedInterfaces);
+        Assert.Equal(0, client.DisposeCount);
+    }
+    finally
+    {
+        await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+    }
+}
 
     [Fact]
     public async Task SocketCanBusService_ForwardsFramesToSubscribers()
@@ -359,6 +417,23 @@ public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
 
     }
 
+    private static SocketCanOptions CloneWithSourcePrefix(SocketCanOptions template, string? sourcePrefix)
+    {
+        var clone = new SocketCanOptions
+        {
+            InterfaceName = template.InterfaceName,
+            IncludeVirtualInterfaces = template.IncludeVirtualInterfaces,
+            ReceiveOwnMessages = template.ReceiveOwnMessages,
+            ReceiveTimeout = template.ReceiveTimeout,
+            ReconnectDelay = template.ReconnectDelay,
+        };
+
+        var field = typeof(SocketCanOptions).GetField("_sourcePrefix", BindingFlags.Instance | BindingFlags.NonPublic);
+        field?.SetValue(clone, sourcePrefix);
+
+        return clone;
+    }
+
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -492,6 +567,36 @@ public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
         public FixedTimeProvider(DateTimeOffset now) => _now = now;
 
         public override DateTimeOffset GetUtcNow() => _now;
+    }
+
+    private sealed class TestLogger<T> : ILogger<T>
+    {
+        private sealed class NullScope : IDisposable
+        {
+            public static readonly NullScope Instance = new();
+
+            public void Dispose()
+            {
+            }
+        }
+
+        public List<(LogLevel Level, string Message)> Entries { get; } = new();
+
+        public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            if (formatter is null)
+            {
+                throw new ArgumentNullException(nameof(formatter));
+            }
+
+            var message = formatter(state, exception);
+            Entries.Add((logLevel, message));
+        }
     }
 
     private sealed class TestOptionsMonitor : IOptionsMonitor<SocketCanOptions>

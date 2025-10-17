@@ -135,6 +135,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-701 SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
 - [x] NX-673 Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests
 - [ ] NX-915 gpsd TPV null field handling regression test
+- [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -204,6 +205,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-282 Variable rate plugin zone gating _(Done)_ — ADR-027 gating semantics
 - [x] NX-283 Device Manager plugin capability surfacing _(Done)_ — ADR-031 compatibility dashboard
 - [x] NX-284 Plugin manifest compliance CI gate _(Done)_ — ADR-031 manifest governance
+- [x] NX-925 Plugin manifest requiredTransports validation _(Done)_
 - [x] NX-285 Telemetry logging plugin season/session updates _(Done)_ — ADR-040/041 lifecycle data
 - [x] NX-286 Telemetry logging mesh event capture _(Done)_ — ADR-047 live telemetry mesh
 - [x] NX-287 Telemetry export updates for new layers _(Done)_ — ADR-051 report builder + new layers
@@ -572,6 +574,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-282 | Variable rate plugin zone gating | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating semantics |
 | NX-283 | Device Manager plugin capability surfacing | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 compatibility dashboard |
 | NX-284 | Plugin manifest compliance CI gate | Done |  | — | [ADR-031](docs/ADR/ADR-031-official-plugin-bundle.md) | ADR-031 manifest governance |
+| NX-925 | Plugin manifest requiredTransports validation | Done |  | — | — | Guard against blank/null transport entries |
 | NX-285 | Telemetry logging plugin season/session updates | Done |  | — | [ADR-040](docs/ADR/ADR-040_SeasonOrganizers.md) | ADR-040/041 lifecycle data |
 | NX-286 | Telemetry logging mesh event capture | Done |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 live telemetry mesh |
 | NX-287 | Telemetry export updates for new layers | Done |  | — | [ADR-051](docs/ADR/ADR-051_ReportBuilder.md) | ADR-051 report builder + new layers |

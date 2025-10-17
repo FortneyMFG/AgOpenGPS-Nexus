@@ -338,6 +338,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-342 Developer setup quick start _(Done)_ — SRS §2.8 Documentation
 - [x] NX-922 NuGet local feed path normalization _(Done)_ — Ensure artifacts/nuget source resolves cross-platform
 - [ ] NX-512 README Nexus guide expansion _(In Progress)_ — docs/README.md narrative refresh
+- [x] NX-953 .NET 8 toolchain regression sweep _(Done)_ — Restore CLI, protobuf, and Parquet compatibility after SDK updates
 - [x] NX-600 NX CLI Plugin backlog update _(Done)_ — Seed implementation tasks for unified `nx` host
 - [x] NX-601 NX CLI Plugin host scaffold _(Done)_ — SRS §18 CLI host with System.CommandLine + Spectre.Console
 - [x] NX-602 NX CLI Plugin endpoint resolver & core status _(Done)_ — SRS §18 transport negotiation + Core health probe

@@ -6,12 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="../proto/capabilities.proto" GrpcServices="Client;Server" ProtoRoot="../proto" />
-    <Protobuf Include="../proto/core.proto" GrpcServices="None" ProtoRoot="../proto" />
-    <Protobuf Include="../proto/agio_sim.proto" GrpcServices="Client;Server" ProtoRoot="../proto" />
-    <Protobuf Include="../proto/aog_link.proto" GrpcServices="None" ProtoRoot="../proto" />
-    <Protobuf Include="../proto/guidance.proto" GrpcServices="None" ProtoRoot="../proto" />
-    <Protobuf Include="../proto/nexus/cli/reflection.proto" GrpcServices="Client" ProtoRoot="../proto" />
+    <Protobuf Include="../../proto/capabilities.proto" GrpcServices="Client;Server" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/core.proto" GrpcServices="None" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/agio_sim.proto" GrpcServices="Client;Server" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/aog_link.proto" GrpcServices="None" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/guidance.proto" GrpcServices="None" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/nexus/cli/reflection.proto" GrpcServices="Client" ProtoRoot="../../proto" />
 
   </ItemGroup>
 

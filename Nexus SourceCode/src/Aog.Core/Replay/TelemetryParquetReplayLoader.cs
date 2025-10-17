@@ -12,6 +12,7 @@ using Google.Protobuf.WellKnownTypes;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
+using ParquetSchema = Parquet.Schema.ParquetSchema;
 
 namespace Aog.Core.Replay;
 

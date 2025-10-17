@@ -13,6 +13,7 @@ public sealed class PlanterPanelViewModel : ObservableObject
     private readonly ObservableCollection<PlanterRowViewModel> _rows = new();
     private readonly Dictionary<int, PlanterRowViewModel> _rowsByIndex = new();
     private string _summary = "No planter rows reported.";
+    private int _ignoredRowCount;
 
     /// <summary>
     /// Gets the collection of row view-models displayed in the UI.
@@ -36,17 +37,31 @@ public sealed class PlanterPanelViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(statuses);
 
+        var ignored = 0;
         var seenIndices = new HashSet<int>();
 
         foreach (var status in statuses)
         {
             if (status is null)
             {
+                ignored++;
                 continue;
             }
 
-            var index = checked((int)status.RowIndex);
+            int index;
+            try
+            {
+                // Covered for RowIndex wider than int (e.g., long/uint/ulong)
+                index = checked((int)status.RowIndex);
+            }
+            catch (OverflowException)
+            {
+                ignored++;
+                continue;
+            }
+
             seenIndices.Add(index);
+
             if (!_rowsByIndex.TryGetValue(index, out var row))
             {
                 row = new PlanterRowViewModel(index);
@@ -56,21 +71,21 @@ public sealed class PlanterPanelViewModel : ObservableObject
             row.ApplyStatus(status);
         }
 
-        if (seenIndices.Count != _rows.Count)
+        // Remove rows that were not present in this batch (but only if the batch had any valid indices).
+        if (seenIndices.Count > 0 && seenIndices.Count != _rows.Count)
         {
             for (var i = _rows.Count - 1; i >= 0; i--)
             {
                 var row = _rows[i];
-                if (seenIndices.Contains(row.RowIndex))
+                if (!seenIndices.Contains(row.RowIndex))
                 {
-                    continue;
+                    _rows.RemoveAt(i);
+                    _rowsByIndex.Remove(row.RowIndex);
                 }
-
-                _rows.RemoveAt(i);
-                _rowsByIndex.Remove(row.RowIndex);
             }
         }
 
+        _ignoredRowCount = ignored;
         UpdateSummary();
     }
 
@@ -91,7 +106,9 @@ public sealed class PlanterPanelViewModel : ObservableObject
     {
         if (_rows.Count == 0)
         {
-            Summary = "No planter rows reported.";
+            Summary = _ignoredRowCount > 0
+                ? $"No planter rows reported. Ignored {_ignoredRowCount} invalid update{(_ignoredRowCount == 1 ? string.Empty : "s")}."
+                : "No planter rows reported.";
             return;
         }
 
@@ -119,6 +136,13 @@ public sealed class PlanterPanelViewModel : ObservableObject
             }
         }
 
-        Summary = $"Rows: {_rows.Count} • OK {ok} • Skips {skips} • Doubles {doubles} • Unknown {unknown}";
+        var summary = $"Rows: {_rows.Count} • OK {ok} • Skips {skips} • Doubles {doubles} • Unknown {unknown}";
+
+        if (_ignoredRowCount > 0)
+        {
+            summary += $" • Ignored {_ignoredRowCount} invalid update{(_ignoredRowCount == 1 ? string.Empty : "s")}";
+        }
+
+        Summary = summary;
     }
 }

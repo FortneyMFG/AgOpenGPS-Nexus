@@ -299,7 +299,14 @@ public sealed class MainWindowViewModelTests
         var telemetryService = new TestCrashTelemetryService();
         var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
         dispatcher = new RecordingShellCommandDispatcher();
-        return new MainWindowViewModel(connection, null, preferencesService, themeManager, dispatcher, telemetryViewModel);
+        return new MainWindowViewModel(
+            connection,
+            null,
+            preferencesService,
+            themeManager,
+            dispatcher,
+            telemetryViewModel,
+            TimeProvider.System);
     }
 
     private sealed class InMemoryConnectionSettingsStore : IConnectionSettingsStore

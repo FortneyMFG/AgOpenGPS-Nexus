@@ -58,13 +58,15 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         IUiPreferencesService preferencesService,
         IThemeManager themeManager,
         IShellCommandDispatcher commandDispatcher,
-        TelemetryPrivacyViewModel telemetryPrivacy)
+        TelemetryPrivacyViewModel telemetryPrivacy,
+        TimeProvider timeProvider)
     {
         ArgumentNullException.ThrowIfNull(connectionSettings);
         ArgumentNullException.ThrowIfNull(preferencesService);
         ArgumentNullException.ThrowIfNull(themeManager);
         ArgumentNullException.ThrowIfNull(commandDispatcher);
         ArgumentNullException.ThrowIfNull(telemetryPrivacy);
+        ArgumentNullException.ThrowIfNull(timeProvider);
 
         _connectionSettings = connectionSettings;
         _preferencesService = preferencesService;
@@ -91,7 +93,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         SteerDashboard = new SteerDashboardViewModel();
         SectionsPanel = new SectionsPanelViewModel();
         PlanterPanel = new PlanterPanelViewModel();
-        ReplayTimeline = new ReplayTimelineViewModel();
+        ReplayTimeline = new ReplayTimelineViewModel(timeProvider);
 
         var layerEditJournal = new LayerEditEventJournalService(TimeProvider.System);
         ZoneEditorToolbar = new ZoneEditorToolbarViewModel(layerEditJournal);

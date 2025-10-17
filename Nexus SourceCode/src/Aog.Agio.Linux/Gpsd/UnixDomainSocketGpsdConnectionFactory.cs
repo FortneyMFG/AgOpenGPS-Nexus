@@ -19,7 +19,6 @@ public sealed class UnixDomainSocketGpsdConnectionFactory : IGpsdConnectionFacto
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = options ?? throw new ArgumentNullException(nameof(options));
-        _ = options.CurrentValue ?? throw new ArgumentException("Options are required.", nameof(options));
     }
 
     /// <inheritdoc />

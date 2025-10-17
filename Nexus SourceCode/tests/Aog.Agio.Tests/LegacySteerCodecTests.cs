@@ -24,7 +24,7 @@ public sealed class LegacySteerCodecTests
         };
         var metadata = new LegacySteerCommandMetadata
         {
-            SpeedKph = 14.6,
+            CurrentSpeedMps = 4.06,
             GuidanceStatus = 2,
             TramControl = 0x5A,
         };
@@ -35,7 +35,9 @@ public sealed class LegacySteerCodecTests
         Assert.Equal(command.TargetWheelAngleDeg, decodedCommand.TargetWheelAngleDeg, 3);
         Assert.True(decodedCommand.Enable);
         Assert.Equal(metadata.GuidanceStatus, decodedMetadata.GuidanceStatus);
-        Assert.Equal(metadata.SpeedKph, decodedMetadata.SpeedKph, 6);
+        var expectedSpeedKph = metadata.CurrentSpeedMps!.Value * 3.6;
+        Assert.Equal(expectedSpeedKph, decodedMetadata.SpeedKph, 6);
+        Assert.Equal(metadata.CurrentSpeedMps, decodedMetadata.CurrentSpeedMps, 6);
         Assert.Equal(metadata.TramControl, decodedMetadata.TramControl);
         Assert.Equal(0x7F, decodedMetadata.SourceAddress);
         Assert.Equal((uint)(sections.Mask & 0xFFF), decodedSections.Mask);
@@ -96,6 +98,22 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
+    public void EncodeSteerCommand_PopulatesSpeedFromCurrentSpeedMps()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { Enable = true };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            CurrentSpeedMps = 5.5,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        var rawSpeed = BinaryPrimitives.ReadUInt16LittleEndian(frame.AsSpan(5, 2));
+        Assert.Equal((ushort)1980, rawSpeed); // 5.5 m/s = 19.8 km/h -> 1980 hundredths
+    }
+
+    [Fact]
     public void EncodeSteerCommand_DisabledCommandClearsEngagedBitAndZeroesAngle()
     {
         var codec = new LegacySteerCodec();
@@ -114,6 +132,20 @@ public sealed class LegacySteerCodecTests
         // Angle should be zero when disabled
         var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(frame.AsSpan(8, 2));
         Assert.Equal(0, steerHundredths);
+    }
+
+    [Theory]
+    [InlineData(90.0, 3276)]
+    [InlineData(-90.0, -3276)]
+    public void EncodeSteerCommand_ClampsSteerAngleToHardwareRange(double angleDeg, short expectedHundredths)
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { TargetWheelAngleDeg = angleDeg, Enable = true };
+
+        var frame = codec.EncodeSteerCommand(command);
+        var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(frame.AsSpan(8, 2));
+
+        Assert.Equal(expectedHundredths, steerHundredths);
     }
 
     [Fact]
@@ -165,6 +197,28 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
+    public void EncodeSteerCommand_PreservesSteerMetadataFlagsWhenEnabled()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { TargetWheelAngleDeg = 2.5, Enable = true };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            GuidanceStatus = 0b0000_1000,
+            TramControl = 0x3C,
+        };
+        var steerMetadata = new LegacySteerMetadata
+        {
+            GuidanceStatus = 0b0000_0110,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata, steerMetadata: steerMetadata);
+
+        // Expect engaged bit set + steerMetadata flags merged
+        Assert.Equal(0b0000_0111, frame[7]);
+        Assert.Equal(metadata.TramControl, frame[10]);
+    }
+
+    [Fact]
     public void EncodeSteerCommand_AllowsFullSixteenBitMask()
     {
         var codec = new LegacySteerCodec();
@@ -197,16 +251,17 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
-    public void EncodeSteerCommand_ThrowsWhenSectionCountExceedsSixteen()
+    public void EncodeSteerCommand_ThrowsWhenSectionCountExceedsThirtyTwo()
     {
         var codec = new LegacySteerCodec();
         var sections = new SectionMask
         {
-            SectionCount = 17,
-            Mask = 0x1FFFF,
+            SectionCount = 33,
+            Mask = 0xFFFFFFFF,
         };
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => codec.EncodeSteerCommand(new SteerCmd { Enable = true }, sections));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            codec.EncodeSteerCommand(new SteerCmd { Enable = true }, sections));
     }
 
     [Fact]

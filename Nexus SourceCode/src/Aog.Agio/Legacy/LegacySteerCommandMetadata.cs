@@ -16,6 +16,12 @@ public sealed class LegacySteerCommandMetadata : LegacySteerMetadata
     public double SpeedKph { get; init; }
 
     /// <summary>
+    /// Gets or sets the instantaneous vehicle speed in metres per second provided by callers.
+    /// When present, it is converted to the legacy <c>speed_hundredths_kph</c> payload during encoding.
+    /// </summary>
+    public double? CurrentSpeedMps { get; init; }
+
+    /// <summary>
     /// Gets or sets the raw tram control byte preserved from the PGN payload.
     /// </summary>
     public byte TramControl { get; init; }

@@ -97,34 +97,9 @@ public sealed class FieldFeedbackAggregator
     {
         if (string.Equals(Path.GetExtension(path), ".jsonl", StringComparison.OrdinalIgnoreCase))
         {
-            var bytes = File.ReadAllBytes(path);
-            if (bytes.Length == 0)
+            foreach (var evt in ReadJsonLines(path))
             {
-                yield break;
-            }
-
-            var reader = new Utf8JsonReader(bytes, new JsonReaderOptions { AllowTrailingCommas = true });
-            while (reader.Read())
-            {
-                if (reader.TokenType != JsonTokenType.StartObject)
-                {
-                    continue;
-                }
-
-                FieldFeedbackEvent? evt = null;
-                try
-                {
-                    evt = JsonSerializer.Deserialize<FieldFeedbackEvent>(ref reader, SerializerOptions);
-                }
-                catch (JsonException)
-                {
-                    // Skip malformed payloads so a single bad upload does not break aggregation.
-                }
-
-                if (evt is not null)
-                {
-                    yield return evt;
-                }
+                yield return evt;
             }
 
             yield break;
@@ -153,6 +128,42 @@ public sealed class FieldFeedbackAggregator
                 yield return evt;
             }
         }
+    }
+
+    private static IReadOnlyList<FieldFeedbackEvent> ReadJsonLines(string path)
+    {
+        var bytes = File.ReadAllBytes(path);
+        if (bytes.Length == 0)
+        {
+            return Array.Empty<FieldFeedbackEvent>();
+        }
+
+        var reader = new Utf8JsonReader(bytes, new JsonReaderOptions { AllowTrailingCommas = true });
+        var events = new List<FieldFeedbackEvent>();
+        while (reader.Read())
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                continue;
+            }
+
+            FieldFeedbackEvent? evt = null;
+            try
+            {
+                evt = JsonSerializer.Deserialize<FieldFeedbackEvent>(ref reader, SerializerOptions);
+            }
+            catch (JsonException)
+            {
+                // Skip malformed payloads so a single bad upload does not break aggregation.
+            }
+
+            if (evt is not null)
+            {
+                events.Add(evt);
+            }
+        }
+
+        return events;
     }
 
     private static SeverityLevel NormalizeSeverity(string? severity)

@@ -1,4 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Aog.Agio.Linux;
 using Aog.Agio.Linux.Serial;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -65,6 +73,60 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
         Assert.Equal(device, ports[0]);
     }
 
+    [Fact]
+    public void GetPortNames_NoPrefixesConfigured_ReturnsEmptyAndLogs()
+    {
+        var options = Options.Create(new LinuxSerialPortEnumeratorOptions
+        {
+            DevicePrefixes = Array.Empty<string>(),
+        });
+
+        var logger = new ListLogger<LinuxSerialPortEnumerator>();
+        var enumerator = new LinuxSerialPortEnumerator(logger, options);
+
+        var ports = enumerator.GetPortNames().ToArray();
+
+        Assert.Empty(ports);
+        Assert.Contains(logger.Entries, entry => entry.Level == LogLevel.Information && entry.Message.Contains("no device prefixes"));
+    }
+
+    [Fact]
+    public void ConfigureServices_CustomPrefixesFromConfiguration_ReplaceDefaults()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["AgioHost:Linux:Serial:DevicePrefixes:0"] = "/dev/custom0",
+                ["AgioHost:Linux:Serial:DevicePrefixes:1"] = "/dev/custom1",
+            })
+            .Build();
+
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(configuration);
+
+        var backend = new LinuxAgioBackend();
+        backend.ConfigureServices(services);
+
+        using var provider = services.BuildServiceProvider();
+        var options = provider.GetRequiredService<IOptions<LinuxSerialPortEnumeratorOptions>>().Value;
+
+        Assert.Equal(new[] { "/dev/custom0", "/dev/custom1" }, options.DevicePrefixes);
+    }
+
+    [Fact]
+    public void DevicePrefixes_SetterClonesAssignedArray()
+    {
+        var prefixes = new[] { "/dev/original" };
+        var options = new LinuxSerialPortEnumeratorOptions
+        {
+            DevicePrefixes = prefixes,
+        };
+
+        prefixes[0] = "/dev/mutated";
+
+        Assert.Equal("/dev/original", options.DevicePrefixes[0]);
+    }
+
     public void Dispose()
     {
         try
@@ -92,5 +154,28 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
         var path = Path.Combine(directory, name);
         File.WriteAllText(path, string.Empty);
         return Path.GetFullPath(path);
+    }
+
+    private sealed class ListLogger<T> : ILogger<T>
+    {
+        private sealed class Scope : IDisposable
+        {
+            public static Scope Instance { get; } = new();
+
+            public void Dispose()
+            {
+            }
+        }
+
+        public List<(LogLevel Level, string Message)> Entries { get; } = new();
+
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => Scope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            Entries.Add((logLevel, formatter(state, exception)));
+        }
     }
 }

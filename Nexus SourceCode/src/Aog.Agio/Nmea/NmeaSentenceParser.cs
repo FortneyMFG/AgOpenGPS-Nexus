@@ -198,7 +198,7 @@ public sealed class NmeaSentenceParser
         var minutes = SafeParseInt(value.Substring(2, 2));
         var secondsComponent = value[4..];
 
-        if (hours is null || minutes is null)
+        if (hours is not int hourValue || minutes is not int minuteValue)
         {
             return null;
         }
@@ -208,7 +208,7 @@ public sealed class NmeaSentenceParser
             return null;
         }
 
-        var totalSeconds = (hours.Value * 60 + minutes.Value) * 60 + secondsDouble;
+        var totalSeconds = (hourValue * 60 + minuteValue) * 60 + secondsDouble;
         var ticks = (long)Math.Round(totalSeconds * TimeSpan.TicksPerSecond);
 
         try
@@ -232,16 +232,16 @@ public sealed class NmeaSentenceParser
         var month = SafeParseInt(value.Substring(2, 2));
         var yearComponent = SafeParseInt(value.Substring(4, 2));
 
-        if (day is null || month is null || yearComponent is null)
+        if (day is not int dayValue || month is not int monthValue || yearComponent is not int yearValue)
         {
             return null;
         }
 
-        var year = yearComponent.Value >= 80 ? 1900 + yearComponent.Value : 2000 + yearComponent.Value;
+        var year = yearValue >= 80 ? 1900 + yearValue : 2000 + yearValue;
 
         try
         {
-            var date = new DateOnly(year, month.Value, day.Value);
+            var date = new DateOnly(year, monthValue, dayValue);
             var timeComponent = time ?? TimeOnly.MinValue;
             var dateTime = date.ToDateTime(timeComponent, DateTimeKind.Unspecified);
             return new DateTimeOffset(dateTime, TimeSpan.Zero);
@@ -274,18 +274,24 @@ public sealed class NmeaSentenceParser
 
     private static double? TryParseCoordinate(string value, string? hemisphere, int degreeDigits)
     {
-        if (string.IsNullOrWhiteSpace(value) || value.Length < degreeDigits + 2)
+        if (string.IsNullOrWhiteSpace(value) || value.Length <= degreeDigits)
         {
             return null;
         }
 
-        if (!double.TryParse(value, NumberStyles.Float, Invariant, out var raw))
+        var degreesPart = value[..degreeDigits];
+        var minutesPart = value[degreeDigits..];
+
+        if (SafeParseInt(degreesPart) is not int degrees)
         {
             return null;
         }
 
-        var degrees = Math.Floor(raw / 100);
-        var minutes = raw - (degrees * 100);
+        if (!double.TryParse(minutesPart, NumberStyles.Float, Invariant, out var minutes))
+        {
+            return null;
+        }
+
         var decimalDegrees = degrees + (minutes / 60.0);
 
         if (!string.IsNullOrWhiteSpace(hemisphere) &&
@@ -314,6 +320,11 @@ public sealed class NmeaSentenceParser
 
     private static int? SafeParseInt(string value)
     {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
         return int.TryParse(value, NumberStyles.Integer, Invariant, out var result) ? result : null;
     }
 

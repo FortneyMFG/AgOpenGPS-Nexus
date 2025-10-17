@@ -44,7 +44,6 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
     private string _playPauseLabel = "Play";
     private string _positionDisplay = FormatPosition(TimeSpan.Zero, DefaultDuration);
     private double _selectedPlaybackRateMultiplier = 1.0;
-    private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRate;
     private string _selectedPlaybackRateLabel = FormatPlaybackRateLabel(1.0);
     private string _activeScenarioTitle = "Scenario: configuration defaults";
     private string _activeScenarioDescription = "Routes sourced from configuration.";
@@ -77,6 +76,7 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
         _playbackRateView = new ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel>(_playbackRates);
 
         InitializePlaybackRates(configuration?.Options?.TimeScale ?? 1.0);
+        NotifyPlaybackRateProperties();
         Routes = SimulationRouteViewModelBuilder.BuildRoutes(
             configuration,
             configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>());
@@ -185,6 +185,13 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
             return FormatPlaybackRateLabel(ClampPlaybackRate(_selectedPlaybackRateMultiplier));
         }
         private set => SetProperty(ref _selectedPlaybackRateLabel, value);
+    }
+
+    /// <summary>Gets the currently selected playback rate option.</summary>
+    public SimulationPlaybackRateOptionViewModel? SelectedPlaybackRateOption
+    {
+        get => _selectedPlaybackRateOption;
+        private set => SetProperty(ref _selectedPlaybackRateOption, value);
     }
 
 
@@ -469,7 +476,7 @@ private void SortPlaybackRates()
             return;
         }
 
-        if (_selectedPlaybackRateOption == option)
+        if (ReferenceEquals(_selectedPlaybackRateOption, option))
         {
             // Ensure visual state is correct without re-firing callbacks.
             option.SetSelected(true, suppressCallback: true);
@@ -480,7 +487,7 @@ private void SortPlaybackRates()
 
         _selectedPlaybackRateOption?.SetSelected(false, suppressCallback: true);
         option.SetSelected(true, suppressCallback: true);
-        _selectedPlaybackRateOption = option;
+        SelectedPlaybackRateOption = option;
 
         NotifyPlaybackRateProperties();
     }
@@ -516,63 +523,47 @@ private void SortPlaybackRates()
         }
     }
 
-#if false
-private void UpdateSeekFraction(double value, bool triggerSeek)
-{
-    var clamped = double.IsNaN(value) ? 0 : Math.Clamp(value, 0, 1);
-
-    if (!SetProperty(ref _seekFraction, clamped, nameof(SeekFraction)))
+    private void UpdateSeekFraction(TimeSpan position, bool triggerSeek)
     {
-        return;
-    }
-
-    if (_isUpdatingFromController)
-    {
-        return;
-    }
-
-    var newPosition = TimeSpan.FromTicks((long)(Duration.Ticks * clamped));
-    Position = newPosition;
-
-    if (triggerSeek && _replayController is not null)
-    {
-        FireAndForget(() => _replayController.SeekAsync(newPosition), "Failed to seek to requested position.");
-    }
-}
-#endif
-
-private void OnReplayStateChanged(ReplayState state)
-{
-    ExecuteOnDispatcher(() =>
-    {
-        _isUpdatingFromController = true;
-        try
+        if (Duration <= TimeSpan.Zero)
         {
-            SetIsPlaying(state.IsPlaying);
-            Duration = state.Duration;
-            Position = state.Position;
-
-            var fraction = Duration > TimeSpan.Zero
-                ? Math.Clamp(state.Position.TotalSeconds / Duration.TotalSeconds, 0, 1)
-                : 0;
-            SetProperty(ref _seekFraction, fraction, nameof(SeekFraction));
-
-            // Normalize and clamp rate (0 or negative -> 1.0), then ensure option exists.
-            var normalizedRate = ClampPlaybackRate(state.PlaybackRate <= 0 ? 1.0 : state.PlaybackRate);
-            SelectedPlaybackRate = normalizedRate;
-
-            var option = EnsurePlaybackRateOption(normalizedRate);
-            UpdateSelectedPlaybackRateOption(option);
-
-            // Keep label consistent with option (fallback to formatted multiplier).
-            SelectedPlaybackRateLabel = option?.Label ?? FormatPlaybackRateLabel(normalizedRate);
+            UpdateSeekFraction(0, triggerSeek);
+            return;
         }
-        finally
+
+        var fraction = Math.Clamp(position.TotalSeconds / Duration.TotalSeconds, 0, 1);
+        UpdateSeekFraction(fraction, triggerSeek);
+    }
+
+    private void OnReplayStateChanged(ReplayState state)
+    {
+        ExecuteOnDispatcher(() =>
         {
-            _isUpdatingFromController = false;
-        }
-    });
-}
+            _isUpdatingFromController = true;
+            try
+            {
+                SetIsPlaying(state.IsPlaying);
+                Duration = state.Duration;
+                Position = state.Position;
+
+                UpdateSeekFraction(state.Position, triggerSeek: false);
+
+                // Normalize and clamp rate (0 or negative -> 1.0), then ensure option exists.
+                var normalizedRate = ClampPlaybackRate(state.PlaybackRate <= 0 ? 1.0 : state.PlaybackRate);
+                SelectedPlaybackRate = normalizedRate;
+
+                var option = EnsurePlaybackRateOption(normalizedRate);
+                UpdateSelectedPlaybackRateOption(option);
+
+                // Keep label consistent with option (fallback to formatted multiplier).
+                SelectedPlaybackRateLabel = option?.Label ?? FormatPlaybackRateLabel(normalizedRate);
+            }
+            finally
+            {
+                _isUpdatingFromController = false;
+            }
+        });
+    }
 
 
     private void SetIsPlaying(bool isPlaying)

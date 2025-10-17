@@ -1,4 +1,3 @@
-using System;
 using Aog.Protos.Capabilities.V1;
 using Google.Protobuf;
 

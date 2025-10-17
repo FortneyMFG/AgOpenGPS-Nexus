@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -251,6 +252,34 @@ public sealed class MainWindowViewModelTests
             invocation.InjectionPoint == "menu.file" && invocation.CommandId == "core.profile.manage");
         profileItem.LastInvocationHandled.Should().BeTrue();
         profileItem.LastInvocationTimestamp.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void ShellMenuItemTooltip_IncludesLocalOffset()
+    {
+        var originalTz = Environment.GetEnvironmentVariable("TZ");
+        try
+        {
+            Environment.SetEnvironmentVariable("TZ", "Asia/Seoul");
+            TimeZoneInfo.ClearCachedData();
+
+            var viewModel = CreateViewModel(out _);
+            var profileItem = viewModel.ShellMenuBar.FileMenu.Items.First();
+
+            profileItem.Command!.Execute(null);
+
+            var tooltip = profileItem.Tooltip;
+            tooltip.Should().Contain("Last invoked");
+
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTimeOffset.UtcNow);
+            var expectedOffset = offset.ToString(@"+hh\:mm;-hh\:mm", CultureInfo.InvariantCulture);
+            tooltip.Should().Contain(expectedOffset);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("TZ", originalTz);
+            TimeZoneInfo.ClearCachedData();
+        }
     }
 
     [Fact]

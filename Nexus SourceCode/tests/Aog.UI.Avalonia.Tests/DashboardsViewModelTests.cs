@@ -1,4 +1,6 @@
 using System;
+using System.Globalization;
+using System.Collections.Generic;
 using System.Linq;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
@@ -56,6 +58,54 @@ public sealed class DashboardsViewModelTests
         viewModel.SpeedSamples.Should().HaveCount(2);
     }
 
+        [Fact]
+        public void ReplayTimelineBookmarks_DisplayInvariantTimestamps()
+        {
+            var originalCulture = CultureInfo.CurrentCulture;
+            var originalUiCulture = CultureInfo.CurrentUICulture;
+            try
+            {
+                var bookmark = new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(65), "Label", "Notes");
+
+                CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ar-EG");
+                CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ar-EG");
+
+                bookmark.TimestampDisplay.Should().Be("01:05");
+
+                var longBookmark = new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(3723), "Long", "Notes");
+                longBookmark.TimestampDisplay.Should().Be("01:02:03");
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = originalCulture;
+                CultureInfo.CurrentUICulture = originalUiCulture;
+            }
+        }
+
+        [Fact]
+        public void ReplayTimeline_RaisesPropertyChangedForExportProgress()
+        {
+            var timeProvider = new FixedTimeProvider(new DateTimeOffset(2024, 1, 1, 7, 0, 0, TimeSpan.Zero));
+            var viewModel = new ReplayTimelineViewModel(timeProvider);
+            var observed = new List<string>();
+            viewModel.PropertyChanged += (_, args) => observed.Add(args.PropertyName ?? string.Empty);
+
+            viewModel.ExportGeoJsonCommand.Execute(0.25);
+
+            observed.Should().Contain(nameof(ReplayTimelineViewModel.ExportStatus));
+            observed.Should().Contain(nameof(ReplayTimelineViewModel.ExportProgress));
+            observed.Should().Contain(nameof(ReplayTimelineViewModel.IsExportInProgress));
+            viewModel.ExportProgress.Should().Be(0.25);
+            viewModel.IsExportInProgress.Should().BeTrue();
+
+            observed.Clear();
+            viewModel.ExportGeoJsonCommand.Execute(1.0);
+
+            observed.Should().Contain(nameof(ReplayTimelineViewModel.ExportProgress));
+            observed.Should().Contain(nameof(ReplayTimelineViewModel.IsExportInProgress));
+            viewModel.ExportProgress.Should().Be(1.0);
+            viewModel.IsExportInProgress.Should().BeFalse();
+        }
     private sealed class FixedTimeProvider : TimeProvider
     {
         private readonly DateTimeOffset _localNow;

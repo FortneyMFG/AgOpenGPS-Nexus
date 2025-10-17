@@ -303,7 +303,7 @@ public sealed class TelemetryReplayController : IReplayController
 
                 if (delay > TimeSpan.Zero)
                 {
-                    await _timeProvider.Delay(delay, cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(delay, _timeProvider, cancellationToken).ConfigureAwait(false);
                 }
 
                 await frame.PublishAsync(_eventBus, cancellationToken).ConfigureAwait(false);

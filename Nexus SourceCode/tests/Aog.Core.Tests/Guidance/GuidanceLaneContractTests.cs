@@ -70,7 +70,7 @@ public sealed class GuidanceLaneContractTests
         var proto = publish.ToProto();
         proto.Header.Sequence.Should().Be(42);
         proto.Metadata.LaneId.Should().Be("lane-001");
-        proto.Metadata.Template.Should().Be(Aog.Guidance.V1.LaneTemplate.LaneTemplateStraight);
+        proto.Metadata.Template.Should().Be(Aog.Guidance.V1.LaneTemplate.Straight);
         proto.LaneSpacingM.Should().BeApproximately(3.0, 1e-9);
         proto.Passes.Should().HaveCount(1);
         proto.Passes[0].Points.Select(p => p.EastingM).Should().ContainInOrder(0, 10, 20);

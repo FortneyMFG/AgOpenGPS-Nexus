@@ -1,3 +1,4 @@
+using System;
 using System.Buffers.Binary;
 using Aog.Core.V1;
 
@@ -86,23 +87,68 @@ public sealed class LegacyPoseCodec
         var ageTimes100 = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(41, 2));
         var imuHeadingHundredths = BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(43, 2));
         var imuRollHundredths = BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(45, 2));
-        var imuPitchHundredths = BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(47, 2));
-        var imuYawRateHundredths = BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(49, 2));
+        var imuPitchHundredthsRaw = payload.Slice(47, 2);
+        var imuPitchHundredthsValue = BinaryPrimitives.ReadUInt16LittleEndian(imuPitchHundredthsRaw);
+        var imuPitchHundredths = (short)imuPitchHundredthsValue;
+
+        var imuYawRateHundredthsRaw = payload.Slice(49, 2);
+        var imuYawRateHundredthsValue = BinaryPrimitives.ReadUInt16LittleEndian(imuYawRateHundredthsRaw);
+        var imuYawRateHundredths = (short)imuYawRateHundredthsValue;
 
         var headingRadians = double.IsFinite(headingDualDeg) && !float.IsNaN(headingDualDeg)
             ? DegreesToRadians(headingDualDeg)
             : DegreesToRadians(headingDeg);
 
+        var sanitizedSpeedMps = 0d;
+        var rawSpeed = (double)speedKph;
+        if (double.IsFinite(rawSpeed))
+        {
+            var candidate = rawSpeed / 3.6d;
+            if (double.IsFinite(candidate))
+            {
+                sanitizedSpeedMps = candidate;
+            }
+        }
+
+        var sanitizedRollRad = 0d;
+        var rawRoll = (double)rollDeg;
+        if (double.IsFinite(rawRoll))
+        {
+            var candidate = DegreesToRadians(rawRoll);
+            if (double.IsFinite(candidate))
+            {
+                sanitizedRollRad = candidate;
+            }
+        }
+
+        var sanitizedAltitude = (double)altitudeMeters;
+        if (!double.IsFinite(sanitizedAltitude))
+        {
+            sanitizedAltitude = 0d;
+        }
+
+        var sanitizedPitchRad = DegreesHundredthsToRadians(imuPitchHundredths);
+        if (!double.IsFinite(sanitizedPitchRad) || !Half.IsFinite(BitConverter.UInt16BitsToHalf(imuPitchHundredthsValue)))
+        {
+            sanitizedPitchRad = 0d;
+        }
+
+        var sanitizedYawRateRadps = DegreesHundredthsToRadians(imuYawRateHundredths);
+        if (!double.IsFinite(sanitizedYawRateRadps) || !Half.IsFinite(BitConverter.UInt16BitsToHalf(imuYawRateHundredthsValue)))
+        {
+            sanitizedYawRateRadps = 0d;
+        }
+
         pose = new Pose
         {
             LongitudeDeg = longitude,
             LatitudeDeg = latitude,
-            AltitudeM = altitudeMeters,
+            AltitudeM = sanitizedAltitude,
             HeadingRad = headingRadians,
-            SpeedMps = speedKph / 3.6,
-            RollRad = DegreesToRadians(rollDeg),
-            PitchRad = DegreesHundredthsToRadians(imuPitchHundredths),
-            YawRateRadps = DegreesHundredthsToRadians(imuYawRateHundredths),
+            SpeedMps = sanitizedSpeedMps,
+            RollRad = sanitizedRollRad,
+            PitchRad = sanitizedPitchRad,
+            YawRateRadps = sanitizedYawRateRadps,
         };
 
         metadata = new LegacyPoseMetadata

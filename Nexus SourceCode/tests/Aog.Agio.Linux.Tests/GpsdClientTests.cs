@@ -81,6 +81,40 @@ public sealed class GpsdClientTests
     }
 
     [Fact]
+    public async Task BackgroundService_Continues_WhenCoreFieldsMissing()
+    {
+        var feed = new[]
+        {
+            "{\"class\":\"VERSION\",\"release\":\"3.23\"}",
+            "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
+            "{\"class\":\"TPV\",\"mode\":3}",
+            "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1174,\"lon\":11.5168,\"alt\":545.4,\"speed\":0.514,\"track\":84.4,\"time\":\"2024-01-01T12:35:19.000Z\"}",
+        };
+
+        var factory = new FakeGpsdConnectionFactory(feed);
+        var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
+        var options = Options.Create(new GpsdClientOptions
+        {
+            SocketPath = "/tmp/gpsd.sock",
+            ReconnectDelay = TimeSpan.FromSeconds(1),
+        });
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+        var logger = new ThrowingLogger<GpsdBackgroundService>();
+        var service = new GpsdBackgroundService(client, logger, options);
+
+        var executeAsync = typeof(GpsdBackgroundService).GetMethod(
+            "ExecuteAsync",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(executeAsync);
+
+        var task = (Task)executeAsync!.Invoke(service, new object[] { cts.Token })!;
+        await task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.Contains("?WATCH={\"enable\":true,\"json\":true}", factory.WrittenLines);
+    }
+
+    [Fact]
     public async Task WatchAsync_WritesWatchCommand()
     {
         var factory = new FakeGpsdConnectionFactory(Array.Empty<string>());

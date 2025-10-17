@@ -30,5 +30,12 @@ public sealed class ReplayTimelineBookmarkViewModel
     public string Notes { get; }
 
     /// <summary>Gets a friendly timestamp for display.</summary>
-    public string TimestampDisplay => Timestamp.ToString("mm\:ss");
+    public string TimestampDisplay
+    {
+        get
+        {
+            var format = Timestamp.TotalHours >= 1 ? "hh\\:mm\\:ss" : "mm\\:ss";
+            return Timestamp.ToString(format);
+        }
+    }
 }

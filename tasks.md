@@ -134,6 +134,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-671 gpsd disable toggle for Linux backend _(Done)_ — Allows operators to opt out of gpsd monitoring when the daemon is not present
 - [x] NX-701 SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
 - [x] NX-673 Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests
+- [x] NX-956 SocketCAN reconnect delay clamp _(Done)_ — Guard zero/negative delays by restoring the default backoff
 - [x] NX-935 Legacy pose codec default source fallback _(Done)_ — Default main antenna source address when metadata is omitted
 - [x] NX-963 Legacy pose dual heading sanitization fix _(Done)_ — Guard secondary heading against non-finite values
 - [ ] NX-938 Legacy steer command speed encoding fix
@@ -142,6 +143,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
 - [ ] NX-931 gpsd monitor restart on socket availability
 - [ ] NX-952 Aog.Agio.Windows targeting pack restore guard
+- [x] NX-953 SocketCAN burst tolerance for transient backpressure
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -221,6 +223,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 ### Section E — UI (Avalonia) + Sim Bar
 - [ ] NX-942 Planter panel stale row cleanup regression
+- [x] NX-954 Simulation route mode case-insensitive selection _(Done)_ — Mirror SelectedMode setter canonicalization and tests
 - [x] NX-980 Sections panel sixteen-toggle support _(Done)_ — Expand UI and tests for 16-section masks
 - [x] NX-040 Avalonia app bootstrap
 - [x] NX-041 Connection/settings panel
@@ -522,6 +525,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-246 | GNSS correction services bootstrap | Done |  | — | [ADR-066](docs/ADR/ADR-roadmap.md) | ADR-066 GNSS correction services |
 | NX-742 | SocketCAN channel backpressure guardrails | Done | AI | — | — | Drop stalled subscribers and stress fast consumers |
 | NX-931 | Linux serial scan configuration binding | Done | AI | — | — | Bind `AgioHost:Linux:Serial:Scan` options, document overrides, add tests |
+| NX-952 | SocketCAN subscriber eviction reset | In Progress | AI | — | — | Ensure eviction clears backpressure and re-subscription regression test |
 
 ### Section D — Plugins (Logic + Sim Providers)
 

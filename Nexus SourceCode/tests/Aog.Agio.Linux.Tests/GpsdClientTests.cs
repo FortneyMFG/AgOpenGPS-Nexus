@@ -19,6 +19,7 @@ public sealed class GpsdClientTests
             "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
             "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1173,\"lon\":11.5167,\"alt\":545.4,\"speed\":0.514,\"track\":84.4,\"time\":\"2024-01-01T12:35:19.000Z\"}",
             "{\"class\":\"TPV\",\"mode\":2,\"lat\":48.1174,\"lon\":11.5168,\"speed\":0.420,\"track\":83.0}",
+            "{\"class\":\"TPV\",\"mode\":99,\"lat\":48.1175,\"lon\":11.5169,\"speed\":0.400,\"track\":82.5}",
         };
 
         var factory = new FakeGpsdConnectionFactory(feed);
@@ -28,10 +29,6 @@ public sealed class GpsdClientTests
         await foreach (var report in client.WatchAsync(CancellationToken.None))
         {
             reports.Add(report);
-            if (reports.Count >= 2)
-            {
-                break;
-            }
         }
 
         Assert.Equal(2, reports.Count);

@@ -13,6 +13,7 @@ public sealed class PlanterPanelViewModel : ObservableObject
     private readonly ObservableCollection<PlanterRowViewModel> _rows = new();
     private readonly Dictionary<int, PlanterRowViewModel> _rowsByIndex = new();
     private string _summary = "No planter rows reported.";
+    private int _ignoredRowCount;
 
     /// <summary>
     /// Gets the collection of row view-models displayed in the UI.
@@ -36,9 +37,17 @@ public sealed class PlanterPanelViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(statuses);
 
+        var ignored = 0;
+
         foreach (var status in statuses)
         {
-            var index = checked((int)status.RowIndex);
+            if (status.RowIndex > int.MaxValue)
+            {
+                ignored++;
+                continue;
+            }
+
+            var index = (int)status.RowIndex;
             if (!_rowsByIndex.TryGetValue(index, out var row))
             {
                 row = new PlanterRowViewModel(index);
@@ -48,6 +57,7 @@ public sealed class PlanterPanelViewModel : ObservableObject
             row.ApplyStatus(status);
         }
 
+        _ignoredRowCount = ignored;
         UpdateSummary();
     }
 
@@ -68,7 +78,9 @@ public sealed class PlanterPanelViewModel : ObservableObject
     {
         if (_rows.Count == 0)
         {
-            Summary = "No planter rows reported.";
+            Summary = _ignoredRowCount > 0
+                ? $"No planter rows reported. Ignored {_ignoredRowCount} invalid update{(_ignoredRowCount == 1 ? string.Empty : "s")}."
+                : "No planter rows reported.";
             return;
         }
 
@@ -96,6 +108,13 @@ public sealed class PlanterPanelViewModel : ObservableObject
             }
         }
 
-        Summary = $"Rows: {_rows.Count} • OK {ok} • Skips {skips} • Doubles {doubles} • Unknown {unknown}";
+        var summary = $"Rows: {_rows.Count} • OK {ok} • Skips {skips} • Doubles {doubles} • Unknown {unknown}";
+
+        if (_ignoredRowCount > 0)
+        {
+            summary += $" • Ignored {_ignoredRowCount} invalid update{(_ignoredRowCount == 1 ? string.Empty : "s")}";
+        }
+
+        Summary = summary;
     }
 }

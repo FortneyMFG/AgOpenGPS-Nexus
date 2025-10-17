@@ -71,4 +71,22 @@ public sealed class PluginPanelsViewModelTests
         viewModel.Summary.Should().Contain("Skips 1");
         viewModel.Summary.Should().Contain("Doubles 1");
     }
+
+    [Fact]
+    public void PlanterPanel_IgnoresOutOfRangeRowIndexes()
+    {
+        var viewModel = new PlanterPanelViewModel();
+        var statuses = new List<PlanterRowStatus>
+        {
+            new() { RowIndex = uint.MaxValue, TargetPopulationPerMeter = 12, ActualPopulationPerMeter = 12, Quality = PlanterRowQuality.Ok },
+            new() { RowIndex = 0, TargetPopulationPerMeter = 10, ActualPopulationPerMeter = 10, Quality = PlanterRowQuality.Ok },
+        };
+
+        viewModel.ApplyRowStatuses(statuses);
+
+        viewModel.Rows.Should().HaveCount(1);
+        viewModel.Rows[0].RowIndex.Should().Be(0);
+        viewModel.Summary.Should().Contain("Rows: 1");
+        viewModel.Summary.Should().Contain("Ignored 1 invalid update");
+    }
 }

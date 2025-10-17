@@ -104,12 +104,20 @@ public sealed class RadioProvisioningFlowViewModel
                 {
                     new(
                         "Execute the RadioBridge transport tests to verify retry logic and Hamming decoding remain healthy.",
-                        null,
-                        "dotnet test tests/Aog.Core.Tests --filter RadioBridgeTransportTests"),
+                        "Run the automated RadioBridge transport tests to validate retry handling and Hamming decoding before promoting the bridge to production.",
+                        RadioProvisioningStepStatus.Pending,
+                        updatedAt: null,
+                        command: "dotnet test tests/Aog.Core.Tests --filter RadioBridgeTransportTests"),
                     new(
-                        "Inspect mesh diagnostics for the device and confirm radio.kind, radio.fec, RSSI, and retry counters are reported."),
+                        "Inspect mesh diagnostics for the device and confirm radio.kind, radio.fec, RSSI, and retry counters are reported.",
+                        "Review the mesh diagnostics dashboard to ensure the bridge is emitting radio metadata and reliability counters in real time.",
+                        RadioProvisioningStepStatus.Pending,
+                        updatedAt: null),
                     new(
-                        "Replay a sample mesh publication or coverage topic and verify frames reach the radio modem or simulator.")
+                        "Replay a sample mesh publication or coverage topic and verify frames reach the radio modem or simulator.",
+                        "Replay a known-good publication through the mesh to confirm frames traverse the bridge and reach the modem or simulator endpoints.",
+                        RadioProvisioningStepStatus.Pending,
+                        updatedAt: null)
                 })
         };
 
@@ -176,6 +184,20 @@ public sealed class RadioProvisioningGuideStepViewModel
         PrimaryText = primaryText ?? throw new ArgumentNullException(nameof(primaryText));
         SecondaryText = secondaryText;
         Command = command;
+        Status = RadioProvisioningStepStatus.Pending;
+        UpdatedAt = null;
+    }
+
+    public RadioProvisioningGuideStepViewModel(
+        string primaryText,
+        string detail,
+        RadioProvisioningStepStatus status,
+        DateTimeOffset? updatedAt,
+        string? command = null)
+        : this(primaryText, detail, command)
+    {
+        Status = status;
+        UpdatedAt = updatedAt;
     }
 
     /// <summary>Gets the primary description for the step.</summary>
@@ -186,6 +208,12 @@ public sealed class RadioProvisioningGuideStepViewModel
 
     /// <summary>Gets an optional command or configuration snippet.</summary>
     public string? Command { get; }
+
+    /// <summary>Gets the provisioning status associated with the guide step.</summary>
+    public RadioProvisioningStepStatus Status { get; private set; }
+
+    /// <summary>Gets the last time the guide step status was updated, if available.</summary>
+    public DateTimeOffset? UpdatedAt { get; private set; }
 
     /// <summary>Gets a value indicating whether a secondary note should be rendered.</summary>
     public bool HasSecondaryText => !string.IsNullOrWhiteSpace(SecondaryText);

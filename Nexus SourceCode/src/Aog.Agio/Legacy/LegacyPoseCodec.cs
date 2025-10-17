@@ -145,8 +145,11 @@ public sealed class LegacyPoseCodec
 
         var payload = buffer.AsSpan(5, MainAntennaPayloadLength);
 
-        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(0, 8), pose.LongitudeDeg);
-        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(8, 8), pose.LatitudeDeg);
+        var longitude = SanitizeLongitude(pose.LongitudeDeg);
+        var latitude = SanitizeLatitude(pose.LatitudeDeg);
+
+        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(0, 8), longitude);
+        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(8, 8), latitude);
 
         var headingDeg = (float)RadiansToDegrees(pose.HeadingRad);
         if (float.IsNaN(headingDeg) || float.IsInfinity(headingDeg))
@@ -208,6 +211,46 @@ public sealed class LegacyPoseCodec
     private static double RadiansToDegrees(double radians) => radians * 180d / Math.PI;
 
     private static double DegreesHundredthsToRadians(short hundredths) => DegreesToRadians(hundredths / 100d);
+
+    private static double SanitizeLongitude(double longitude)
+    {
+        if (!double.IsFinite(longitude))
+        {
+            return 0d;
+        }
+
+        if (longitude >= 180d)
+        {
+            return 180d;
+        }
+
+        if (longitude <= -180d)
+        {
+            return -180d;
+        }
+
+        return longitude;
+    }
+
+    private static double SanitizeLatitude(double latitude)
+    {
+        if (!double.IsFinite(latitude))
+        {
+            return 0d;
+        }
+
+        if (latitude >= 90d)
+        {
+            return 90d;
+        }
+
+        if (latitude <= -90d)
+        {
+            return -90d;
+        }
+
+        return latitude;
+    }
 
     private static short EncodeSignedAngleHundredths(double radians)
     {

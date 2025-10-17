@@ -749,6 +749,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-097 | 1.0 launch readiness review and sign-off checklist | Done |  | — | [SRS §1.4 Release Management](docs/SRS/NOTES.md#srs-14-release-management) | Cross-team go/no-go |
 | NX-931 | Legacy shapefile multi-part boundary import fix | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Preserve exterior vertices from multi-part polygons |
 | NX-938 | Legacy steer command guidance status disable fix | Planned |  | — | — | Ensure disabled steer commands encode status zero |
+| NX-939 | Legacy pose lat/lon sanitization | In Progress |  | — | — | Clamp invalid coordinates before encoding |
 
 ## Legend
 

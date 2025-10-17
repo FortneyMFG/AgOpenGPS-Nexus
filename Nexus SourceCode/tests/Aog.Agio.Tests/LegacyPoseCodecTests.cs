@@ -110,6 +110,32 @@ public sealed class LegacyPoseCodecTests
         Assert.NotNull(metadata);
     }
 
+    [Theory]
+    [MemberData(nameof(EncodePose_CoercesInvalidLatLonData))]
+    public void EncodePose_CoercesInvalidLatLon(double latitude, double longitude, double expectedLatitude, double expectedLongitude)
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = latitude,
+            LongitudeDeg = longitude,
+        };
+
+        var frame = codec.EncodePose(pose);
+        Assert.True(codec.TryDecodePose(frame, out var decodedPose, out _));
+
+        Assert.Equal(expectedLatitude, decodedPose.LatitudeDeg, 6);
+        Assert.Equal(expectedLongitude, decodedPose.LongitudeDeg, 6);
+    }
+
+    public static TheoryData<double, double, double, double> EncodePose_CoercesInvalidLatLonData => new()
+    {
+        { double.NaN, 12.5d, 0d, 12.5d },
+        { 44.1d, double.PositiveInfinity, 44.1d, 0d },
+        { 95d, -181d, 90d, -180d },
+        { -120d, 540d, -90d, 180d },
+    };
+
     private static byte ComputeChecksum(ReadOnlySpan<byte> frame)
     {
         int sum = 0;

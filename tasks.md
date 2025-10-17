@@ -188,6 +188,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-248 Crop analytics API surface _(Done)_ — ADR-045 rotation analytics
 - [x] NX-249 Crop report sections for report builder _(Done)_ — ADR-045 reporting integration
 - [x] NX-250 Crop plugin regression fixtures _(Done)_ — ADR-045 QA hooks
+- [x] NX-1015 Crop plugin analyzer cleanup _(Done)_ — Remove stale using directives flagged by IDE0005
 - [x] NX-251 Genetics plugin layer ingestion pipeline _(Done)_ — ADR-046 genetics plugin
 - [x] NX-252 Genetics barcode & lot tracking integration _(Done)_ — ADR-046 barcode workflows
 - [x] NX-253 Genetics export pipelines (CSV/GeoJSON/ISOXML) _(Done)_ — ADR-046 export formats

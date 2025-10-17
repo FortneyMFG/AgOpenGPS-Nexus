@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Legacy;
@@ -184,6 +186,27 @@ public sealed class SimulationBarViewModelTests
         notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRateLabel))
             .Should()
             .BeGreaterThan(0);
+    }
+
+    [Fact]
+    public void SelectedPlaybackRateLabel_WhenOptionHasNoLabel_FallsBackToMultiplier()
+    {
+        using var viewModel = CreateViewModel();
+
+        var playbackRatesField = typeof(SimulationBarViewModel)
+            .GetField("_playbackRates", BindingFlags.Instance | BindingFlags.NonPublic);
+        playbackRatesField.Should().NotBeNull();
+
+        var playbackRates = (IList<SimulationPlaybackRateOptionViewModel>)playbackRatesField!
+            .GetValue(viewModel)!;
+
+        var unlabeledOption = CreatePlaybackRateOptionWithoutLabel(3.25);
+        playbackRates.Add(unlabeledOption);
+
+        viewModel.SetSelectedPlaybackRate(3.25);
+
+        viewModel.SelectedPlaybackRate.Should().Be(3.25);
+        viewModel.SelectedPlaybackRateLabel.Should().Be("3.25×");
     }
 
     [Fact]
@@ -411,6 +434,33 @@ public sealed class SimulationBarViewModelTests
 
         logger.Entries.Should().Contain(
             entry => entry.Level == LogLevel.Error && entry.Message.Contains("seek to", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static SimulationPlaybackRateOptionViewModel CreatePlaybackRateOptionWithoutLabel(double rate)
+    {
+        var option = (SimulationPlaybackRateOptionViewModel)FormatterServices.GetUninitializedObject(
+            typeof(SimulationPlaybackRateOptionViewModel));
+
+        SetField(option, "<Rate>k__BackingField", rate);
+        SetField(option, "<Label>k__BackingField", null);
+        SetField(option, "_onSelected", new Action<SimulationPlaybackRateOptionViewModel>(_ => { }));
+        SetField(option, "<SelectCommand>k__BackingField", new DelegateCommand(_ => { }));
+
+        return option;
+    }
+
+    private static void SetField(object target, string fieldName, object? value)
+    {
+        var field = typeof(SimulationPlaybackRateOptionViewModel).GetField(
+            fieldName,
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
+        if (field is null)
+        {
+            throw new InvalidOperationException(FormattableString.Invariant($"Field '{fieldName}' not found."));
+        }
+
+        field.SetValue(target, value);
     }
 
     private static SimulationBarViewModel CreateViewModel()

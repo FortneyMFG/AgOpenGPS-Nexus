@@ -36,7 +36,8 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private string _statusText = "Paused";
     private string _playPauseLabel = "Play";
     private string _positionDisplay = FormatPosition(TimeSpan.Zero, DefaultDuration);
-    private double _selectedPlaybackRate = 1.0;
+    private double _selectedPlaybackRateMultiplier = 1.0;
+    private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRate;
     private string _selectedPlaybackRateLabel = FormatPlaybackRateLabel(1.0);
     private string _activeScenarioTitle = "Scenario: configuration defaults";
     private string _activeScenarioDescription = "Routes sourced from configuration.";
@@ -140,24 +141,28 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     /// <summary>Gets the currently selected playback rate multiplier.</summary>
     public double SelectedPlaybackRate
     {
-        get => _selectedPlaybackRate;
-        private set
-        {
-            if (SetProperty(ref _selectedPlaybackRate, value))
-            {
-                SelectedPlaybackRateLabel = FormatPlaybackRateLabel(value);
-            }
-            else
-            {
-                SelectedPlaybackRateLabel = FormatPlaybackRateLabel(value);
-            }
-        }
+        get => _selectedPlaybackRateMultiplier;
+        private set => SetProperty(ref _selectedPlaybackRateMultiplier, value);
     }
 
     /// <summary>Gets a formatted label describing the selected playback rate.</summary>
     public string SelectedPlaybackRateLabel
     {
-        get => _selectedPlaybackRateLabel;
+        get
+        {
+            var option = _selectedPlaybackRate;
+            if (option is null)
+            {
+                return FormatPlaybackRateLabel(_selectedPlaybackRateMultiplier);
+            }
+
+            if (!string.IsNullOrWhiteSpace(option.Label))
+            {
+                return option.Label;
+            }
+
+            return FormatPlaybackRateLabel(option.Multiplier);
+        }
         private set => SetProperty(ref _selectedPlaybackRateLabel, value);
     }
 
@@ -319,6 +324,8 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         var option = EnsurePlaybackRateOption(rate);
         UpdateSelectedPlaybackRateOption(option);
 
+        _selectedPlaybackRate = option;
+        SelectedPlaybackRateLabel = option.Label;
         SelectedPlaybackRate = rate;
 
         if (updateController && !_isUpdatingFromController && _replayController is not null)
@@ -420,8 +427,15 @@ private void NotifyPlaybackRateProperties()
             SelectedPlaybackRate = state.PlaybackRate;
 
             var option = EnsurePlaybackRateOption(state.PlaybackRate);
-            UpdateSelectedPlaybackRateOption(option);
-        }
+// Inside the SimulationBarViewModel setter or handler:
+_selectedPlaybackRate = option;
+
+// Use the unified method to toggle selection and notify bindings
+UpdateSelectedPlaybackRateOption(option);
+
+// Ensure label and related properties stay in sync
+SelectedPlaybackRateLabel = option?.Label ?? string.Empty;
+
         finally
         {
             _isUpdatingFromController = false;

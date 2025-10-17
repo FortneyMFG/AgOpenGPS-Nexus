@@ -21,6 +21,30 @@ public sealed class LegacyCompatibilityBridgeTests
         Assert.Equal(pose.LatitudeDeg, envelope.Pose.LatitudeDeg);
     }
 
+    [Fact]
+    public void TryConvertLegacySteerState_AttachesHeadingMetadata()
+    {
+        var bridge = CreateBridge();
+        var steerCodec = new LegacySteerCodec();
+        var sourceState = new Aog.Core.V1.SteerState
+        {
+            MeasuredWheelAngleDeg = 1.5,
+            AppliedEffort = 0.25,
+            HeadingErrorRad = 0,
+        };
+
+        var metadata = new LegacySteerStateMetadata { HeadingDeg = 87.5 };
+        var frame = steerCodec.EncodeSteerState(sourceState, metadata);
+
+        Assert.True(bridge.TryConvertLegacyFrame(frame, out var envelope));
+        var steerState = Assert.IsType<Aog.Core.V1.SteerState>(envelope.SteerState);
+
+        Assert.Equal(MessageType.LinkMessageTypeTelemetrySteerState, envelope.Header.MessageType);
+        Assert.Equal(0, steerState.HeadingErrorRad);
+        Assert.True(steerState.TryGetLegacyHeadingDegrees(out var heading));
+        Assert.Equal(metadata.HeadingDeg, heading, 3);
+    }
+
     private static LegacyCompatibilityBridge CreateBridge()
     {
         return new LegacyCompatibilityBridge(

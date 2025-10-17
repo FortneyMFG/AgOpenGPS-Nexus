@@ -307,9 +307,24 @@ public sealed class NmeaSentenceParser
         return int.TryParse(value, NumberStyles.Integer, Invariant, out var result) ? result : null;
     }
 
-    private static double? TryParseDouble(string value)
+    private static double? TryParseDouble(ReadOnlySpan<char> value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (value.IsEmpty)
+        {
+            return null;
+        }
+
+        var hasNonWhitespace = false;
+        for (var i = 0; i < value.Length; i++)
+        {
+            if (!char.IsWhiteSpace(value[i]))
+            {
+                hasNonWhitespace = true;
+                break;
+            }
+        }
+
+        if (!hasNonWhitespace)
         {
             return null;
         }
@@ -319,16 +334,13 @@ public sealed class NmeaSentenceParser
 
     private static double? TryParseSignedDouble(string value, string? sign)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        var parsed = TryParseDouble(value);
+        if (parsed is null)
         {
             return null;
         }
 
-        if (!double.TryParse(value, NumberStyles.Float, Invariant, out var result))
-        {
-            return null;
-        }
-
+        var result = parsed.Value;
         if (string.Equals(sign, "W", StringComparison.OrdinalIgnoreCase) || string.Equals(sign, "S", StringComparison.OrdinalIgnoreCase))
         {
             result *= -1.0;

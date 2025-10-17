@@ -122,7 +122,9 @@ public sealed class LegacySteerCodec
 
         buffer[7] = status;
 
-        var steerHundredths = (short)Math.Clamp(Math.Round(command.TargetWheelAngleDeg * 100.0), short.MinValue, short.MaxValue);
+        var steerHundredths = command.Enable
+            ? (short)Math.Clamp(Math.Round(command.TargetWheelAngleDeg * 100.0), short.MinValue, short.MaxValue)
+            : (short)0;
         BinaryPrimitives.WriteInt16LittleEndian(buffer.AsSpan(8, 2), steerHundredths);
 
         buffer[10] = metadata.TramControl;

@@ -133,7 +133,20 @@ public sealed class LegacySteerCodec
 
         buffer[10] = metadata.TramControl;
 
-        var mask = sectionMask?.Mask ?? 0;
+        var mask = sectionMask?.Mask ?? 0u;
+        var sectionCount = sectionMask is null ? 0u : Convert.ToUInt32(sectionMask.SectionCount);
+
+        if (sectionCount == 0)
+        {
+            mask = 0;
+        }
+        else if (sectionCount < 32)
+        {
+            mask &= (1u << (int)sectionCount) - 1u;
+        }
+
+        mask &= 0xFFFF;
+
         buffer[11] = (byte)(mask & 0xFF);
         buffer[12] = (byte)((mask >> 8) & 0xFF);
 

@@ -52,6 +52,23 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
+    public void EncodeSteerCommand_TruncatesMaskAboveSectionCount()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { Enable = true };
+        var sections = new SectionMask
+        {
+            SectionCount = 12,
+            Mask = 0b1111_1010_0000_1111,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, sections);
+
+        var encodedMask = (uint)(frame[11] | (frame[12] << 8));
+        Assert.Equal(0b0000_1010_0000_1111u, encodedMask);
+    }
+
+    [Fact]
 using System.Buffers.Binary;
 using Xunit;
 

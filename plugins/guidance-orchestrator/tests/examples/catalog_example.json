@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "plan_id": "plan-abc123",
+    "field_rev": 5,
+    "source": "f2c",
+    "created_utc": "2025-01-01T00:00:00Z",
+    "orientation_source": "optimal_f2c",
+    "bearing_rad": 0.7854,
+    "confidence": 0.92,
+    "orientation_reason": "Optimal F2C solve p50"
+  },
+  "paths": {
+    "headland-0": {
+      "meta": {
+        "id": "headland-0",
+        "family": "Headland",
+        "index": 0,
+        "length_m": 1600.0,
+        "peak_curv_per_m": 0.08,
+        "est_coverage_m2": 7500.0,
+        "legal": true,
+        "quality": 0.95,
+        "source": "f2c",
+        "f2c_version": "1.0.0",
+        "f2c_license": "Apache-2.0"
+      },
+      "spline": [[0.0, 0.0], [800.0, 0.0], [800.0, 800.0], [0.0, 800.0], [0.0, 0.0]],
+      "knots": [0.0, 400.0, 800.0, 1200.0, 1600.0]
+    }
+  },
+  "order": ["headland-0"],
+  "retention": {
+    "kept": ["plan-abc123", "plan-old-1"],
+    "evicted": ["plan-old-0"]
+  }
+}

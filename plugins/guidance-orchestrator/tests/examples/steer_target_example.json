@@ -1,0 +1,13 @@
+{
+  "preview_point_xy": [2.5, 0.4],
+  "ref_heading_rad": 1.0472,
+  "ref_curvature_per_m": 0.01,
+  "desired_curvature_per_m": 0.012,
+  "cross_track_m": -0.15,
+  "heading_err_rad": 0.02,
+  "speed_mps": 3.2,
+  "engaged": true,
+  "plan_id": "plan-abc123",
+  "path_id": "path-05",
+  "ts_utc": "2025-01-01T00:00:00Z"
+}

@@ -355,7 +355,10 @@ public sealed class AxleCentricTelemetry
     public AxleCentricTelemetry(int axleCount, IReadOnlyDictionary<string, double> modeCurvatureLimits, double maximumSlipLimit, string profileHash)
     {
         AxleCount = axleCount;
-        ModeCurvatureLimits = new ReadOnlyDictionary<string, double>(modeCurvatureLimits ?? new Dictionary<string, double>());
+        var curvatureLimits = modeCurvatureLimits is null
+            ? new Dictionary<string, double>()
+            : new Dictionary<string, double>(modeCurvatureLimits);
+        ModeCurvatureLimits = new ReadOnlyDictionary<string, double>(curvatureLimits);
         MaximumSlipLimit = maximumSlipLimit;
         ProfileHash = profileHash ?? string.Empty;
     }

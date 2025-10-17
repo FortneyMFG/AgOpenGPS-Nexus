@@ -27,8 +27,8 @@ public sealed class CrossTrackReplayHarnessTests
             var playbackBus = new InMemoryEventBus();
             using var harness = new CrossTrackReplayHarness(playbackBus, scenario.Start, scenario.End);
 
-            var timeProvider = new ManualTimeProvider();
-            timeProvider.SetUtcNow(scenario.StartTimestamp);
+            var timeProvider = new FakeTimeProvider();
+            timeProvider.SetUtcNow(new DateTimeOffset(scenario.StartTimestamp, TimeSpan.Zero));
 
             var replayOptions = new TelemetryReplayOptions
             {
@@ -127,7 +127,7 @@ public sealed class CrossTrackReplayHarnessTests
     }
 
     private static async Task AdvanceUntilAsync(
-        ManualTimeProvider provider,
+        FakeTimeProvider provider,
         Func<bool> predicate,
         TimeSpan step,
         int maxSteps = 200)

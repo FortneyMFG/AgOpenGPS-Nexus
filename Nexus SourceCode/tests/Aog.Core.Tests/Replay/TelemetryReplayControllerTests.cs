@@ -57,8 +57,8 @@ public sealed class TelemetryReplayControllerTests
             return ValueTask.CompletedTask;
         });
 
-        var timeProvider = new ManualTimeProvider();
-        timeProvider.SetUtcNow(scenario.StartTimestamp);
+        var timeProvider = new FakeTimeProvider();
+        timeProvider.SetUtcNow(new DateTimeOffset(scenario.StartTimestamp, TimeSpan.Zero));
 
         await using var controller = await TelemetryReplayController.CreateAsync(
             playbackBus,
@@ -152,8 +152,8 @@ public sealed class TelemetryReplayControllerTests
             return ValueTask.CompletedTask;
         });
 
-        var timeProvider = new ManualTimeProvider();
-        timeProvider.SetUtcNow(scenario.StartTimestamp);
+        var timeProvider = new FakeTimeProvider();
+        timeProvider.SetUtcNow(new DateTimeOffset(scenario.StartTimestamp, TimeSpan.Zero));
 
         await using var controller = await TelemetryReplayController.CreateAsync(
             playbackBus,
@@ -178,7 +178,7 @@ public sealed class TelemetryReplayControllerTests
         plugins.Should().HaveCount(scenario.ControllerCommands.Count);
     }
 
-    private static async Task AdvanceUntilAsync(ManualTimeProvider provider, Func<bool> predicate, TimeSpan step, int maxSteps = 40)
+    private static async Task AdvanceUntilAsync(FakeTimeProvider provider, Func<bool> predicate, TimeSpan step, int maxSteps = 40)
     {
         for (var i = 0; i < maxSteps && !predicate(); i++)
         {

@@ -23,9 +23,11 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private readonly SimulationConfiguration? _configuration;
     private readonly IReplayController? _replayController;
     private readonly ILogger<SimulationBarViewModel>? _logger;
-    private readonly List<SimulationPlaybackRateOptionViewModel> _playbackRates = new();
+    private readonly ObservableCollection<SimulationPlaybackRateOptionViewModel> _playbackRates = new();
+    private readonly ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> _playbackRateView;
     private readonly EventHandler<ReplayStateChangedEventArgs>? _stateChangedHandler;
 
+    private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRateOption;
     private bool _disposed;
     private bool _isPlaying;
     private bool _isUpdatingFromController;
@@ -35,13 +37,15 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private string _statusText = "Paused";
     private string _playPauseLabel = "Play";
     private string _positionDisplay = FormatPosition(TimeSpan.Zero, DefaultDuration);
-    private double _selectedPlaybackRate = 1.0;
+    private double _selectedPlaybackRateMultiplier = 1.0;
+    private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRate;
     private string _selectedPlaybackRateLabel = FormatPlaybackRateLabel(1.0);
     private string _activeScenarioTitle = "Scenario: configuration defaults";
     private string _activeScenarioDescription = "Routes sourced from configuration.";
     private string _activeScenarioOptions = DescribeOptions(null);
     private IReadOnlyList<SimulationStreamRouteViewModel> _routes =
         new ReadOnlyCollection<SimulationStreamRouteViewModel>(Array.Empty<SimulationStreamRouteViewModel>());
+    private SimulationBarState _state = SimulationBarState.CreateDefault();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SimulationBarViewModel"/> class.
@@ -59,6 +63,9 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         _logger = logger;
 
         TogglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
+        ToggleAutoResumeCommand = new DelegateCommand(_ => ToggleAutoResume());
+
+        _playbackRateView = new ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel>(_playbackRates);
 
         InitializePlaybackRates(configuration?.Options?.TimeScale ?? 1.0);
         Routes = SimulationRouteViewModelBuilder.BuildRoutes(
@@ -76,6 +83,9 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
     /// <summary>Raised when the playback command should toggle between play/pause.</summary>
     public ICommand TogglePlaybackCommand { get; }
+
+    /// <summary>Raised when the auto-resume command should toggle its enabled state.</summary>
+    public ICommand ToggleAutoResumeCommand { get; }
 
     /// <summary>Gets the status text describing the current playback state.</summary>
     public string StatusText
@@ -133,30 +143,33 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>Gets the available playback rates.</summary>
-    public IReadOnlyList<SimulationPlaybackRateOptionViewModel> PlaybackRates =>
-        new ReadOnlyCollection<SimulationPlaybackRateOptionViewModel>(_playbackRates);
+    public ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> PlaybackRates => _playbackRateView;
 
     /// <summary>Gets the currently selected playback rate multiplier.</summary>
     public double SelectedPlaybackRate
     {
-        get => _selectedPlaybackRate;
-        private set
-        {
-            if (SetProperty(ref _selectedPlaybackRate, value))
-            {
-                SelectedPlaybackRateLabel = FormatPlaybackRateLabel(value);
-            }
-            else
-            {
-                SelectedPlaybackRateLabel = FormatPlaybackRateLabel(value);
-            }
-        }
+        get => _selectedPlaybackRateMultiplier;
+        private set => SetProperty(ref _selectedPlaybackRateMultiplier, value);
     }
 
     /// <summary>Gets a formatted label describing the selected playback rate.</summary>
     public string SelectedPlaybackRateLabel
     {
-        get => _selectedPlaybackRateLabel;
+        get
+        {
+            var option = _selectedPlaybackRate;
+            if (option is null)
+            {
+                return FormatPlaybackRateLabel(_selectedPlaybackRateMultiplier);
+            }
+
+            if (!string.IsNullOrWhiteSpace(option.Label))
+            {
+                return option.Label;
+            }
+
+            return FormatPlaybackRateLabel(option.Multiplier);
+        }
         private set => SetProperty(ref _selectedPlaybackRateLabel, value);
     }
 
@@ -186,6 +199,16 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     {
         get => _routes;
         private set => SetProperty(ref _routes, value);
+    }
+
+    /// <summary>Gets a value indicating whether auto resume is enabled for the active session.</summary>
+    public bool IsAutoResumeEnabled => _state.ReplaySession?.AutoResumeEnabled ?? false;
+
+    /// <summary>Updates the replay session tracked by the simulation bar.</summary>
+    /// <param name="session">Session snapshot published by the replay service.</param>
+    public void UpdateReplaySession(ReplaySessionState? session)
+    {
+        UpdateState(_state with { ReplaySession = session });
     }
 
     /// <summary>
@@ -219,6 +242,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
         var targetRate = scenario.Options?.TimeScale ?? _configuration?.Options?.TimeScale ?? 1.0;
         SelectPlaybackRate(targetRate, updateController: true);
+        NotifyPlaybackRateProperties();
     }
 
     /// <summary>
@@ -248,6 +272,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
         var targetRate = _configuration?.Options?.TimeScale ?? 1.0;
         SelectPlaybackRate(targetRate, updateController: true);
+        NotifyPlaybackRateProperties();
     }
 
     /// <inheritdoc />
@@ -299,6 +324,41 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         }
     }
 
+    private void ToggleAutoResume()
+    {
+        if (_disposed || _state.ReplaySession is null)
+        {
+            return;
+        }
+
+        var current = _state.ReplaySession.Value;
+        var updated = current with { AutoResumeEnabled = !current.AutoResumeEnabled };
+        UpdateState(_state with { ReplaySession = updated });
+    }
+
+    private void UpdateState(SimulationBarState newState)
+    {
+        if (_state.Equals(newState))
+        {
+            return;
+        }
+
+        var previousSession = _state.ReplaySession;
+        var previousAutoResumeEnabled = previousSession?.AutoResumeEnabled ?? false;
+        var previousHasSession = previousSession.HasValue;
+
+        _state = newState;
+
+        var currentSession = _state.ReplaySession;
+        var currentAutoResumeEnabled = currentSession?.AutoResumeEnabled ?? false;
+        var currentHasSession = currentSession.HasValue;
+
+        if (previousHasSession != currentHasSession || previousAutoResumeEnabled != currentAutoResumeEnabled)
+        {
+            OnPropertyChanged(nameof(IsAutoResumeEnabled));
+        }
+    }
+
     private void OnPlaybackRateOptionSelected(SimulationPlaybackRateOptionViewModel option)
     {
         if (option is null)
@@ -317,12 +377,10 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         }
 
         var option = EnsurePlaybackRateOption(rate);
+        UpdateSelectedPlaybackRateOption(option);
 
-        foreach (var candidate in _playbackRates)
-        {
-            candidate.SetSelected(candidate == option, suppressCallback: true);
-        }
-
+        _selectedPlaybackRate = option;
+        SelectedPlaybackRateLabel = option.Label;
         SelectedPlaybackRate = rate;
 
         if (updateController && !_isUpdatingFromController && _replayController is not null)
@@ -344,14 +402,58 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         var option = new SimulationPlaybackRateOptionViewModel(rate, OnPlaybackRateOptionSelected);
         _playbackRates.Add(option);
         SortPlaybackRates();
-        OnPropertyChanged(nameof(PlaybackRates));
         return option;
     }
 
     private void SortPlaybackRates()
     {
-        _playbackRates.Sort((left, right) => left.Rate.CompareTo(right.Rate));
+        if (_playbackRates.Count < 2)
+        {
+            return;
+        }
+
+        var ordered = _playbackRates.OrderBy(option => option.Rate).ToList();
+        for (var targetIndex = 0; targetIndex < ordered.Count; targetIndex++)
+        {
+            var item = ordered[targetIndex];
+            var currentIndex = _playbackRates.IndexOf(item);
+            if (currentIndex != targetIndex)
+            {
+                _playbackRates.Move(currentIndex, targetIndex);
+            }
+        }
     }
+
+// Call this when a playback rate option is chosen (e.g., from the UI).
+private void UpdateSelectedPlaybackRateOption(SimulationPlaybackRateOptionViewModel option)
+{
+    if (option is null)
+        return;
+
+    if (_selectedPlaybackRateOption == option)
+    {
+        // Ensure visual state is correct without re-firing callbacks.
+        option.SetSelected(true, suppressCallback: true);
+        // Still notify in case dependent bindings read through properties.
+        NotifyPlaybackRateProperties();
+        return;
+    }
+
+    _selectedPlaybackRateOption?.SetSelected(false, suppressCallback: true);
+    option.SetSelected(true, suppressCallback: true);
+    _selectedPlaybackRateOption = option;
+
+    NotifyPlaybackRateProperties();
+}
+
+// Centralized place to notify anything bound to the selected rate/label/option.
+private void NotifyPlaybackRateProperties()
+{
+    RaisePropertyChanged(nameof(SelectedPlaybackRate));
+    RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
+    RaisePropertyChanged(nameof(SelectedPlaybackRateOption));
+}
+
 
     private void UpdateSeekFraction(double value, bool triggerSeek)
     {
@@ -393,11 +495,15 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
             SelectedPlaybackRate = state.PlaybackRate;
 
             var option = EnsurePlaybackRateOption(state.PlaybackRate);
-            foreach (var candidate in _playbackRates)
-            {
-                candidate.SetSelected(candidate == option, suppressCallback: true);
-            }
-        }
+// Inside the SimulationBarViewModel setter or handler:
+_selectedPlaybackRate = option;
+
+// Use the unified method to toggle selection and notify bindings
+UpdateSelectedPlaybackRateOption(option);
+
+// Ensure label and related properties stay in sync
+SelectedPlaybackRateLabel = option?.Label ?? string.Empty;
+
         finally
         {
             _isUpdatingFromController = false;
@@ -425,9 +531,9 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
                 {
                     await operation().ConfigureAwait(false);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
-                    return;
+                    _logger?.LogInformation(ex, failureMessage);
                 }
                 catch (Exception ex)
                 {
@@ -474,4 +580,15 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
             ? "Options: (none)"
             : "Options: " + string.Join(", ", parts);
     }
+
+    /// <summary>Snapshot of simulation bar state tracked for replay-aware interactions.</summary>
+    /// <param name="ReplaySession">Replay session currently surfaced in the UI.</param>
+    private readonly record struct SimulationBarState(ReplaySessionState? ReplaySession)
+    {
+        public static SimulationBarState CreateDefault() => new(null);
+    }
+
+    /// <summary>Represents replay session state surfaced by the simulation bar.</summary>
+    /// <param name="AutoResumeEnabled">Indicates whether auto resume is currently enabled.</param>
+    public readonly record struct ReplaySessionState(bool AutoResumeEnabled);
 }

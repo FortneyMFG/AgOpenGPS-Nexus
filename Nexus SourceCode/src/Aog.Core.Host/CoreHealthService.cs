@@ -55,7 +55,7 @@ public sealed class CoreHealthService : BackgroundService
             try
             {
                 var delaySeconds = Volatile.Read(ref _intervalSeconds);
-                await _timeProvider.Delay(TimeSpan.FromSeconds(delaySeconds), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(delaySeconds), _timeProvider, stoppingToken);
             }
             catch (OperationCanceledException)
             {

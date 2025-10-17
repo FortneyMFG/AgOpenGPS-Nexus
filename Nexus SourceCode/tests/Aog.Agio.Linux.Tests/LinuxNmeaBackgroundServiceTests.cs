@@ -11,6 +11,7 @@ using Aog.Agio.Nmea;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace Aog.Agio.Linux.Tests;
@@ -20,7 +21,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
     [Fact]
     public async Task BackgroundService_RescansWhenStreamStops()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero));
         var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB0");
         var parser = new NmeaSentenceParser();
 
@@ -88,7 +89,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
     [Fact]
     public async Task BackgroundService_LogsWhenActivePortChangesDuringMonitoring()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 04, 0, 0, 0, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 01, 04, 0, 0, 0, TimeSpan.Zero));
         var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB3");
         var parser = new NmeaSentenceParser();
 
@@ -153,7 +154,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
     [Fact]
     public async Task BackgroundService_RescansAfterReadFailure()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero));
         var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB2");
         var parser = new NmeaSentenceParser();
 
@@ -216,7 +217,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
     [Fact]
     public async Task BackgroundService_LogsMissingVtgDataWithoutException()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero));
         var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB1");
         var parser = new NmeaSentenceParser();
 
@@ -274,7 +275,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
     [Fact]
     public async Task BackgroundService_RescansWhenOptionsUpdate()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero));
         var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB2");
         var parser = new NmeaSentenceParser();
 
@@ -351,7 +352,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
     [Fact]
     public async Task BackgroundService_LogsSpeedAsUnavailableWhenVtgSpeedMissing()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero));
         var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB2");
         var parser = new NmeaSentenceParser();
 
@@ -566,20 +567,4 @@ public sealed class LinuxNmeaBackgroundServiceTests
         }
     }
 
-    private sealed class ManualTimeProvider : TimeProvider
-    {
-        private DateTimeOffset _current;
-
-        public ManualTimeProvider(DateTimeOffset start)
-        {
-            _current = start;
-        }
-
-        public override DateTimeOffset GetUtcNow() => _current;
-
-        public void Advance(TimeSpan delta)
-        {
-            _current += delta;
-        }
-    }
 }

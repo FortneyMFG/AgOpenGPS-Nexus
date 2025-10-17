@@ -15,7 +15,7 @@ public sealed class AogLinkBridgeTests
         {
             NodeId = "core-node",
             SessionId = "session-123",
-            Role = CapabilityRole.CapabilityRoleCore,
+            Role = CapabilityRole.Core,
         };
         request.Capabilities.Add(new CapabilityDescriptor { Name = "guidance.control", Version = "1.0.0" });
 
@@ -33,7 +33,7 @@ public sealed class AogLinkBridgeTests
         {
             NodeId = "agio",
             SessionId = "session",
-            Role = CapabilityRole.CapabilityRoleAgio,
+            Role = CapabilityRole.Agio,
         };
         var frame = bridge.CreateHandshakeResponseFrame(response, sequence: 8, source: 0x10, destination: 0x20);
 

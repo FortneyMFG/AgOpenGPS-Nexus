@@ -179,14 +179,14 @@ public sealed class CorrectionSourceAggregator : ICorrectionSource
     /// <inheritdoc />
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    private async ValueTask DelayAsync(TimeSpan delay, CancellationToken cancellationToken)
+    private async Task DelayAsync(TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay <= TimeSpan.Zero)
         {
             return;
         }
 
-        await _timeProvider.Delay(delay, cancellationToken).ConfigureAwait(false);
+        await Task.Delay(delay, _timeProvider, cancellationToken).ConfigureAwait(false);
     }
 
     private static IReadOnlyList<ICorrectionSourceFactory> BuildFactoryOrder(

@@ -1,0 +1,158 @@
+syntax = "proto3";
+
+package aog.guidance.v1;
+
+option csharp_namespace = "Aog.Guidance.V1";
+option go_package = "github.com/AgOpenGPS-Nexus/planner/proto/aog/guidance/v1;guidancepb";
+
+service Planner {
+  rpc MakePlan(PlanRequest) returns (PlanResponse);
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+enum PlanStatus {
+  PLAN_STATUS_UNSPECIFIED = 0;
+  PLAN_STATUS_OK = 1;
+  PLAN_STATUS_UNIMPLEMENTED = 2;
+  PLAN_STATUS_FAILED = 3;
+  PLAN_STATUS_FALLBACK = 4;
+}
+
+enum OrientationSource {
+  ORIENTATION_SOURCE_UNSPECIFIED = 0;
+  ORIENTATION_SOURCE_AB_OPERATOR = 1;
+  ORIENTATION_SOURCE_AB_PROFILE = 2;
+  ORIENTATION_SOURCE_OPTIMAL_F2C = 3;
+  ORIENTATION_SOURCE_INHERITED = 4;
+}
+
+enum PathFamily {
+  PATH_FAMILY_UNSPECIFIED = 0;
+  PATH_FAMILY_HEADLAND = 1;
+  PATH_FAMILY_SWATH = 2;
+  PATH_FAMILY_WORK_EDGE = 3;
+  PATH_FAMILY_CONTOUR = 4;
+}
+
+message Polygon {
+  string id = 1;
+  repeated double outer = 2; // flattened [x0, y0, x1, y1, ...]
+  repeated double holes = 3; // concatenated holes delim by hole_offsets
+  repeated uint32 hole_offsets = 4;
+  string crs = 5;
+  double origin_lat = 6;
+  double origin_lon = 7;
+  double origin_h = 8;
+  string enu_epoch = 9;
+  uint64 rev = 10;
+}
+
+message EffectiveWidth {
+  double total = 1;
+  repeated double spans = 2; // flattened [y0, y1]
+  double centroid = 3;
+  uint64 rev = 4;
+}
+
+message Implement {
+  double width_nom = 1;
+  double min_turn_radius = 2;
+}
+
+message HeadlandSettings {
+  uint32 count = 1;
+  double width = 2;
+  double smoothing = 3;
+  double max_curv_per_m = 4;
+}
+
+message SwathSettings {
+  double spacing = 1;
+  double smoothing = 2;
+  double max_curv_per_m = 3;
+  double straightness_bias = 4;
+}
+
+message OrientationConfig {
+  string mode = 1; // "AB" or "OPTIMAL"
+  double bearing_rad = 2;
+  double nudge_m = 3;
+}
+
+message PlanRequest {
+  uint64 field_rev = 1;
+  repeated uint64 hole_revs = 2;
+  Polygon field = 3;
+  Implement implement = 4;
+  EffectiveWidth width = 5;
+  HeadlandSettings headlands = 6;
+  SwathSettings swaths = 7;
+  OrientationConfig orientation = 8;
+  OrientationSource orientation_source = 9;
+  string plan_key = 10;
+  string planner_seed = 11;
+  string sequencer_seed = 12;
+}
+
+message PathMeta {
+  string id = 1;
+  PathFamily family = 2;
+  uint32 index = 3;
+  double length_m = 4;
+  double peak_curv_per_m = 5;
+  double est_coverage_m2 = 6;
+  bool legal = 7;
+  double quality = 8;
+  string source = 9; // f2c|fallback
+  string f2c_version = 10;
+  string f2c_license = 11;
+}
+
+message Path {
+  PathMeta meta = 1;
+  repeated double spline = 2; // flattened [x0, y0, ...]
+  repeated double knots = 3;
+}
+
+message PlanMeta {
+  string plan_id = 1;
+  uint64 field_rev = 2;
+  string source = 3;
+  string created_utc = 4;
+  OrientationSource orientation_source = 5;
+  double bearing_rad = 6;
+  double confidence = 7;
+  string orientation_reason = 8;
+}
+
+message Catalog {
+  PlanMeta meta = 1;
+  map<string, Path> paths = 2;
+  repeated string order = 3;
+  repeated Path connectors = 4;
+  repeated string retained_kept = 5;
+  repeated string retained_evicted = 6;
+}
+
+message PlanResponse {
+  PlanStatus status = 1;
+  string message = 2;
+  Catalog catalog = 3;
+  uint32 plan_ms = 4;
+}
+
+message HealthCheckRequest {
+  bool include_timestamp = 1;
+}
+
+message HealthCheckResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+  }
+  Status status = 1;
+  string f2c_version = 2;
+  string f2c_license = 3;
+  string timestamp_utc = 4;
+}

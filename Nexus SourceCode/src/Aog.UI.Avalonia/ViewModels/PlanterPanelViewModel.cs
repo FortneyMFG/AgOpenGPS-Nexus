@@ -38,6 +38,11 @@ public sealed class PlanterPanelViewModel : ObservableObject
 
         foreach (var status in statuses)
         {
+            if (status is null)
+            {
+                continue;
+            }
+
             var index = checked((int)status.RowIndex);
             if (!_rowsByIndex.TryGetValue(index, out var row))
             {

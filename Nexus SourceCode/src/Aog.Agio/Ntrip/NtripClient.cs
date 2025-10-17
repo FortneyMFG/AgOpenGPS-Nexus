@@ -265,14 +265,14 @@ public sealed class NtripClient
         }
     }
 
-    private ValueTask DelayAsync(TimeSpan delay, CancellationToken cancellationToken)
+    private Task DelayAsync(TimeSpan delay, CancellationToken cancellationToken)
     {
         if (delay <= TimeSpan.Zero)
         {
-            return ValueTask.CompletedTask;
+            return Task.CompletedTask;
         }
 
-        return _timeProvider.Delay(delay, cancellationToken);
+        return Task.Delay(delay, _timeProvider, cancellationToken);
     }
 
     private sealed class NtripConnection : IAsyncDisposable

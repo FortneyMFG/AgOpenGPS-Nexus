@@ -45,11 +45,18 @@ public sealed class CoverageAnalyticsParityHarness
         var legacyMetrics = LoadMetrics(legacyCsvPath);
         var nexusMetrics = LoadMetrics(nexusCsvPath);
 
-        if (!legacyMetrics.Keys.SetEquals(nexusMetrics.Keys))
+        var missingFromNexus = legacyMetrics.Keys
+            .Except(nexusMetrics.Keys, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        var missingFromLegacy = nexusMetrics.Keys
+            .Except(legacyMetrics.Keys, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (missingFromNexus.Count > 0 || missingFromLegacy.Count > 0)
         {
-            var missingLegacy = string.Join(", ", legacyMetrics.Keys.Except(nexusMetrics.Keys));
-            var missingNexus = string.Join(", ", nexusMetrics.Keys.Except(legacyMetrics.Keys));
-            throw new InvalidDataException($"Metric mismatch. Legacy missing [{missingNexus}], Nexus missing [{missingLegacy}].");
+            var missingLegacyList = string.Join(", ", missingFromLegacy);
+            var missingNexusList = string.Join(", ", missingFromNexus);
+            throw new InvalidDataException($"Metric mismatch. Legacy missing [{missingLegacyList}], Nexus missing [{missingNexusList}].");
         }
 
         var differences = new List<CoverageMetricDifference>(legacyMetrics.Count);

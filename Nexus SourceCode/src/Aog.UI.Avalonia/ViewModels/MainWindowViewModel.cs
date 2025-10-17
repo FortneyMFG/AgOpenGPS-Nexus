@@ -387,6 +387,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _disposed = true;
         _connectionSettings.Dispose();
         SimulationBar.Dispose();
+        ReplayTimeline.Dispose();
     }
 
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)

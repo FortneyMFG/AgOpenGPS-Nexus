@@ -30,7 +30,7 @@
             </Style>
           </ToggleButton.Styles>
           <ToggleButton.ToolTip>
-            <ToolTip Content="{Binding Description}"/>
+            <ToolTip Content="{Binding Tooltip}"/>
           </ToggleButton.ToolTip>
         </ToggleButton>
       </DataTemplate>

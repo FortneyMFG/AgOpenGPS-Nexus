@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Legacy;
@@ -9,6 +12,7 @@ using Aog.Core.Paths;
 using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
 using Aog.UI.Avalonia.ViewModels;
+using Avalonia.Threading;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -56,6 +60,19 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+    public void PlaybackRates_DisallowExternalMutation()
+    {
+        using var viewModel = CreateViewModel();
+
+        var readOnlyRates = viewModel.PlaybackRates;
+        var attempt = () => ((IList<SimulationPlaybackRateOptionViewModel>)readOnlyRates)
+            .Add(new SimulationPlaybackRateOptionViewModel(3.0, _ => { }));
+
+        attempt.Should().Throw<NotSupportedException>();
+        readOnlyRates.Should().HaveCount(3);
+    }
+
+    [Fact]
     public void PlaybackRates_ExposeFormattedLabels()
     {
         using var viewModel = CreateViewModel();
@@ -66,39 +83,36 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
-    public void Constructor_WithEmptyOptions_DoesNotThrowWhenReadingLabels()
+    public void PlaybackRateLabel_UsesCurrentUICulture()
     {
-        const string json = """
-{
-  "schemaVersion": "1.0.0",
-  "providers": [
-    { "providerId": "sim.clock.fixed", "outputs": ["time"] },
-    { "providerId": "sim.vehicle.bicycle", "inputs": ["time"], "outputs": ["pose"] }
-  ],
-  "routes": [
-    { "stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation" }
-  ],
-  "options": {},
-  "scenarios": []
-}
-""";
+        var originalCulture = CultureInfo.CurrentCulture;
+        var originalUiCulture = CultureInfo.CurrentUICulture;
 
-        var configuration = SimulationConfigurationLoader.Load(json);
-
-        using var viewModel = new SimulationBarViewModel(configuration);
-
-        Action readLabels = () =>
+        try
         {
-            _ = viewModel.SelectedPlaybackRateLabel;
-            foreach (var option in viewModel.PlaybackRates)
-            {
-                _ = option.Label;
-            }
-        };
+            var culture = CultureInfo.GetCultureInfo("fr-FR");
+            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentUICulture = culture;
 
-        readLabels.Should().NotThrow();
-        viewModel.SelectedPlaybackRate.Should().Be(1.0);
-        viewModel.SelectedPlaybackRateLabel.Should().Be("1×");
+            using var viewModel = CreateViewModel();
+            var scenario = new SimulationScenarioConfiguration(
+                "fractional-rate",
+                "Scenario requesting 1.5x speed",
+                new[]
+                {
+                    new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+                },
+                new SimulationOptionsConfiguration(2024, 1.5));
+
+            viewModel.ApplyScenario(scenario);
+
+            viewModel.SelectedPlaybackRateLabel.Should().Be("1,5×");
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+            CultureInfo.CurrentUICulture = originalUiCulture;
+        }
     }
 
     [Fact]
@@ -121,7 +135,7 @@ public sealed class SimulationBarViewModelTests
 
         var configuration = SimulationConfigurationLoader.Load(json);
 
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
 
         viewModel.SelectedPlaybackRate.Should().Be(0.75);
         viewModel.SelectedPlaybackRateLabel.Should().Be("0.75×");
@@ -132,13 +146,14 @@ public sealed class SimulationBarViewModelTests
         var customRate = viewModel.PlaybackRates.Single(option => Math.Abs(option.Rate - 0.75) < 1e-6);
         customRate.IsSelected.Should().BeTrue();
         customRate.Label.Should().Be($"{0.75:0.#}×");
+        viewModel.PlaybackRates.Count(option => option.IsSelected).Should().Be(1);
     }
 
     [Fact]
     public void ApplyScenario_UpdatesMetadataAndRoutes()
     {
         var configuration = CreateConfigurationWithScenario();
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
         var scenario = new SimulationScenarioConfiguration(
             "test",
             "Scenario for testing",
@@ -167,7 +182,7 @@ public sealed class SimulationBarViewModelTests
     public void ApplyScenario_WithCustomPlaybackRate_AddsPlaybackRateOption()
     {
         var configuration = CreateConfigurationWithScenario();
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
         var scenario = new SimulationScenarioConfiguration(
             "custom-rate",
             "Scenario requesting three-quarter speed",
@@ -184,13 +199,68 @@ public sealed class SimulationBarViewModelTests
             .Should()
             .Equal(0.5, 0.75, 1.0, 2.0);
         viewModel.PlaybackRates.Single(option => Math.Abs(option.Rate - 0.75) < 1e-6).IsSelected.Should().BeTrue();
+        viewModel.PlaybackRates.Count(option => option.IsSelected).Should().Be(1);
+    }
+
+    [Fact]
+    public void ApplyScenario_RaisesPlaybackRateNotificationsEvenWhenRateUnchanged()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        using var viewModel = new SimulationBarViewModel(configuration);
+        var notifications = new List<string>();
+        viewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is not null)
+            {
+                notifications.Add(args.PropertyName);
+            }
+        };
+
+        var scenario = new SimulationScenarioConfiguration(
+            "same-rate",
+            "Scenario that keeps the default playback rate",
+            new[]
+            {
+                new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+            },
+            new SimulationOptionsConfiguration(2024, 1.0));
+
+        viewModel.ApplyScenario(scenario);
+
+        notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRate))
+            .Should()
+            .BeGreaterThan(0);
+        notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRateLabel))
+            .Should()
+            .BeGreaterThan(0);
+    }
+
+    [Fact]
+    public void SelectedPlaybackRateLabel_WhenOptionHasNoLabel_FallsBackToMultiplier()
+    {
+        using var viewModel = CreateViewModel();
+
+        var playbackRatesField = typeof(SimulationBarViewModel)
+            .GetField("_playbackRates", BindingFlags.Instance | BindingFlags.NonPublic);
+        playbackRatesField.Should().NotBeNull();
+
+        var playbackRates = (IList<SimulationPlaybackRateOptionViewModel>)playbackRatesField!
+            .GetValue(viewModel)!;
+
+        var unlabeledOption = CreatePlaybackRateOptionWithoutLabel(3.25);
+        playbackRates.Add(unlabeledOption);
+
+        viewModel.SetSelectedPlaybackRate(3.25);
+
+        viewModel.SelectedPlaybackRate.Should().Be(3.25);
+        viewModel.SelectedPlaybackRateLabel.Should().Be("3.25×");
     }
 
     [Fact]
     public void ResetToConfigurationRoutes_WhenConfigurationOmitsTimeScale_RevertsToNormalRate()
     {
         var configuration = CreateConfigurationWithoutTimeScaleOption();
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
         var scenario = new SimulationScenarioConfiguration(
             "half-speed",
             "Scenario that halves playback speed",
@@ -214,7 +284,7 @@ public sealed class SimulationBarViewModelTests
     public void ApplyLegacyImport_WithTimeScale_AdjustsPlaybackRate()
     {
         var configuration = CreateConfigurationWithScenario();
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
 
         var scenario = new SimulationScenarioConfiguration(
             "legacy-import",
@@ -223,7 +293,7 @@ public sealed class SimulationBarViewModelTests
             {
                 new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
             },
-            new SimulationOptionsConfiguration(null, 0.5));
+            new SimulationOptionsConfiguration(null, 0.75));
 
         var result = new LegacyGuidanceImportResult(
             "Field A",
@@ -250,15 +320,18 @@ public sealed class SimulationBarViewModelTests
 
         viewModel.ApplyLegacyImport(result);
 
-        viewModel.SelectedPlaybackRate.Should().Be(0.5);
-        viewModel.ActiveScenarioOptions.Should().Contain("timeScale=0.5");
+        viewModel.SelectedPlaybackRate.Should().Be(0.75);
+        viewModel.PlaybackRates.Select(option => option.Rate)
+            .Should()
+            .Equal(0.5, 0.75, 1.0, 2.0);
+        viewModel.ActiveScenarioOptions.Should().Contain("timeScale=0.75");
     }
 
     [Fact]
     public void ResetToConfigurationRoutes_RestoresConfigurationPlaybackRate()
     {
         var configuration = CreateConfigurationWithTimeScale(1.2);
-        using var viewModel = new SimulationBarViewModel(configuration);
+        using var viewModel = CreateViewModel(configuration);
 
         var doubleRate = viewModel.PlaybackRates.Single(rate => Math.Abs(rate.Rate - 2.0) < 1e-6);
         doubleRate.SelectCommand.Execute(null);
@@ -271,12 +344,57 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+        [Fact]
+        public void SetSelectedPlaybackRate_WhenBelowMinimum_ClampsToLowerBound()
+        {
+            using var viewModel = CreateViewModel();
+
+            viewModel.SetSelectedPlaybackRate(-2);
+
+            viewModel.SelectedPlaybackRate.Should().BeApproximately(0.1, 1e-6);
+            viewModel.SelectedPlaybackRateLabel.Should().Be("0.1×");
+        }
+
+        [Fact]
+        public void SetSelectedPlaybackRate_WhenAboveMaximum_ClampsToUpperBound()
+        {
+            using var viewModel = CreateViewModel();
+
+            viewModel.SetSelectedPlaybackRate(10);
+
+            viewModel.SelectedPlaybackRate.Should().BeApproximately(4.0, 1e-6);
+            viewModel.SelectedPlaybackRateLabel.Should().Be("4×");
+        }
+
+        [Fact]
+        public void ResetToConfigurationRoutes_RaisesPlaybackRateNotificationsEvenWhenAlreadyAtConfigurationRate()
+        {
+            var configuration = CreateConfigurationWithScenario();
+            using var viewModel = new SimulationBarViewModel(configuration);
+            var notifications = new List<string>();
+            viewModel.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName is not null)
+                {
+                    notifications.Add(args.PropertyName);
+                }
+            };
+
+            viewModel.ResetToConfigurationRoutes();
+
+            notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRate))
+                .Should().BeGreaterThan(0);
+            notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRateLabel))
+                .Should().BeGreaterThan(0);
+        }
+
+    [Fact]
     public void DisposingAndRecreatingViewModel_DoesNotDuplicateReplayNotifications()
     {
         var configuration = CreateConfigurationWithScenario();
         var replayController = new ReplayControllerStub();
 
-        var first = new SimulationBarViewModel(configuration, replayController);
+        var first = CreateViewModel(configuration, replayController);
         var firstStatusNotifications = 0;
         first.PropertyChanged += (_, e) =>
         {
@@ -291,7 +409,7 @@ public sealed class SimulationBarViewModelTests
         first.Dispose();
         replayController.SubscriptionCount.Should().Be(0);
 
-        var second = new SimulationBarViewModel(configuration, replayController);
+        var second = CreateViewModel(configuration, replayController);
         var secondStatusNotifications = 0;
         second.PropertyChanged += (_, e) =>
         {
@@ -326,7 +444,7 @@ public sealed class SimulationBarViewModelTests
         {
             replayController.SubscriptionCount.Should().Be(0);
 
-            using (var viewModel = new SimulationBarViewModel(configuration, replayController))
+            using (var viewModel = CreateViewModel(configuration, replayController))
             {
                 replayController.SubscriptionCount.Should().Be(1);
                 viewModel.StatusText.Should().Be("Paused");
@@ -344,7 +462,7 @@ public sealed class SimulationBarViewModelTests
         var replayController = new ReplayControllerStub(
             playAsync: () => ValueTask.FromException(new InvalidOperationException("play failed")));
 
-        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+        using var viewModel = CreateViewModel(configuration, replayController, logger);
 
         viewModel.TogglePlaybackCommand.Execute(null);
 
@@ -355,20 +473,23 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
-    public async Task TogglePlaybackCommand_WhenReplayControllerCancels_DoesNotLogError()
+    public async Task TogglePlaybackCommand_WhenReplayControllerCancels_LogsInformation()
     {
         var configuration = CreateConfigurationWithScenario();
         var logger = new TestLogger<SimulationBarViewModel>();
         var replayController = new ReplayControllerStub(
             playAsync: () => ValueTask.FromException(new OperationCanceledException()));
 
-        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+        using var viewModel = CreateViewModel(configuration, replayController, logger);
 
         viewModel.TogglePlaybackCommand.Execute(null);
 
         await WaitForLogAsync(logger);
 
-        logger.Entries.Should().BeEmpty();
+        logger.Entries.Should().HaveCount(1);
+        logger.Entries.Should().OnlyContain(entry => entry.Level == LogLevel.Information);
+        logger.Entries.Should().ContainSingle(
+            entry => entry.Message.Contains("start playback", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -379,7 +500,7 @@ public sealed class SimulationBarViewModelTests
         var replayController = new ReplayControllerStub(
             seekAsync: _ => new ValueTask(Task.Run(() => throw new InvalidOperationException("seek failed"))));
 
-        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+        using var viewModel = CreateViewModel(configuration, replayController, logger);
 
         viewModel.SeekFraction = 0.5;
 
@@ -388,6 +509,69 @@ public sealed class SimulationBarViewModelTests
         logger.Entries.Should().Contain(
             entry => entry.Level == LogLevel.Error && entry.Message.Contains("seek to", StringComparison.OrdinalIgnoreCase));
     }
+
+    [Fact]
+    public async Task SeekFraction_WhenUpdatedRapidly_OnlySeeksToFinalPosition()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        var positions = new ConcurrentQueue<TimeSpan>();
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var replayController = new ReplayControllerStub(
+            seekAsync: position =>
+            {
+                positions.Enqueue(position);
+                completion.TrySetResult();
+                return ValueTask.CompletedTask;
+            });
+
+        using var viewModel = new SimulationBarViewModel(configuration, replayController);
+
+        viewModel.SeekFraction = 0.1;
+        viewModel.SeekFraction = 0.2;
+        viewModel.SeekFraction = 0.3;
+
+        await completion.Task.WaitAsync(TimeSpan.FromSeconds(1));
+        await Task.Delay(100);
+
+        var recorded = positions.ToArray();
+        recorded.Should().ContainSingle();
+
+        var expectedPosition = TimeSpan.FromTicks((long)(viewModel.Duration.Ticks * 0.3));
+        recorded[0].Should().Be(expectedPosition);
+    }
+// in your test class
+
+[Fact]
+public void ToggleAutoResumeCommand_WithNoSession_DoesNotChangeState()
+{
+    using var viewModel = CreateViewModel();
+
+    Action exec = () => viewModel.ToggleAutoResumeCommand.Execute(null);
+    exec.Should().NotThrow();
+    viewModel.IsAutoResumeEnabled.Should().BeFalse();
+}
+
+private static SimulationPlaybackRateOptionViewModel CreatePlaybackRateOptionWithoutLabel(double rate)
+{
+    var option = (SimulationPlaybackRateOptionViewModel)FormatterServices.GetUninitializedObject(
+        typeof(SimulationPlaybackRateOptionViewModel));
+
+    SetField(option, "<Rate>k__BackingField", rate);
+    SetField(option, "<Label>k__BackingField", null);
+    SetField(option, "_onSelected", new Action<SimulationPlaybackRateOptionViewModel>(_ => { }));
+    SetField(option, "<SelectCommand>k__BackingField", new DelegateCommand(_ => { }));
+
+    return option;
+}
+
+private static void SetField(object target, string fieldName, object? value)
+{
+    var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)
+               ?? throw new InvalidOperationException($"Field '{fieldName}' not found.");
+    field.SetValue(target, value);
+}
+
 
     private static SimulationBarViewModel CreateViewModel()
     {
@@ -409,7 +593,16 @@ public sealed class SimulationBarViewModelTests
 """;
 
         var configuration = SimulationConfigurationLoader.Load(json);
-        return new SimulationBarViewModel(configuration);
+        return CreateViewModel(configuration);
+    }
+
+    private static SimulationBarViewModel CreateViewModel(
+        SimulationConfiguration configuration,
+        IReplayController? replayController = null,
+        ILogger<SimulationBarViewModel>? logger = null,
+        IDispatcher? dispatcher = null)
+    {
+        return new SimulationBarViewModel(configuration, replayController, logger, dispatcher ?? new InlineDispatcher());
     }
 
     private static SimulationConfiguration CreateConfigurationWithTimeScale(double timeScale)
@@ -479,6 +672,113 @@ public sealed class SimulationBarViewModelTests
 """;
 
         return SimulationConfigurationLoader.Load(json);
+    }
+
+    private sealed class InlineDispatcher : IDispatcher
+    {
+        public bool CheckAccess() => true;
+
+        public void VerifyAccess()
+        {
+        }
+
+        public void Post(Action action, DispatcherPriority priority = default)
+        {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            action();
+        }
+    }
+
+    private sealed class RecordingDispatcher : IDispatcher, IDisposable
+    {
+        private readonly BlockingCollection<(Action action, DispatcherPriority priority)> _queue = new();
+        private readonly List<int> _executedThreadIds = new();
+        private readonly ManualResetEventSlim _started = new();
+        private readonly Thread _thread;
+        private readonly object _gate = new();
+        private bool _disposed;
+
+        public RecordingDispatcher()
+        {
+            _thread = new Thread(ProcessQueue)
+            {
+                IsBackground = true,
+                Name = "RecordingDispatcher"
+            };
+
+            _thread.Start();
+            _started.Wait();
+        }
+
+        public int DispatcherThreadId { get; private set; }
+
+        public IReadOnlyList<int> ExecutedThreadIds
+        {
+            get
+            {
+                lock (_gate)
+                {
+                    return _executedThreadIds.ToArray();
+                }
+            }
+        }
+
+        public bool CheckAccess() => Thread.CurrentThread.ManagedThreadId == DispatcherThreadId;
+
+        public void VerifyAccess()
+        {
+            if (!CheckAccess())
+            {
+                throw new InvalidOperationException("Access from non-dispatcher thread.");
+            }
+        }
+
+        public void Post(Action action, DispatcherPriority priority = default)
+        {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(RecordingDispatcher));
+            }
+
+            _queue.Add((action, priority));
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            _queue.CompleteAdding();
+            _thread.Join();
+        }
+
+        private void ProcessQueue()
+        {
+            DispatcherThreadId = Thread.CurrentThread.ManagedThreadId;
+            _started.Set();
+
+            foreach (var (action, _) in _queue.GetConsumingEnumerable())
+            {
+                action();
+
+                lock (_gate)
+                {
+                    _executedThreadIds.Add(Thread.CurrentThread.ManagedThreadId);
+                }
+            }
+        }
     }
 
     private sealed class ReplayControllerStub : IReplayController

@@ -58,7 +58,7 @@ public sealed class JobLifecycleOrchestrator : IJobLifecycleOrchestrator, IDispo
                 sanitized.MountImmediately ? JobLifecycleState.Mounted : JobLifecycleState.Planned,
                 timestamp,
                 timestamp,
-                activeSessionId: null,
+                null,
                 sanitized.Context,
                 sanitized.Tags);
 

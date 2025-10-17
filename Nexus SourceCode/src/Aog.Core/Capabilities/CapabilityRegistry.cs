@@ -11,6 +11,9 @@ namespace Aog.Core.Capabilities;
 /// </summary>
 public static class CapabilityRegistry
 {
+    /// <summary>
+    /// Immutable catalog describing every capability baked into the Core platform.
+    /// </summary>
     private static readonly CapabilityDefinition[] Definitions =
     {
         new(
@@ -305,8 +308,14 @@ public static class CapabilityRegistry
             })
     };
 
+    /// <summary>
+    /// Lazily materialized read-only wrapper around <see cref="Definitions"/> for callers.
+    /// </summary>
     private static readonly IReadOnlyCollection<CapabilityDefinition> ReadOnlyDefinitions = Array.AsReadOnly(Definitions);
 
+    /// <summary>
+    /// Lookup table keyed by capability name or alias for fast resolution.
+    /// </summary>
     private static readonly IReadOnlyDictionary<string, CapabilityDefinition> DefinitionsByName = BuildIndex();
 
     /// <summary>
@@ -340,6 +349,12 @@ public static class CapabilityRegistry
         return false;
     }
 
+    /// <summary>
+    /// Builds a case-insensitive dictionary mapping every known name to its capability definition.
+    /// </summary>
+    /// <returns>
+    /// A read-only dictionary keyed by canonical capability names and aliases.
+    /// </returns>
     private static IReadOnlyDictionary<string, CapabilityDefinition> BuildIndex()
     {
         var dictionary = new Dictionary<string, CapabilityDefinition>(StringComparer.OrdinalIgnoreCase);

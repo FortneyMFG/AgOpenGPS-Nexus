@@ -22,6 +22,8 @@ public sealed class SocketCanBackgroundService : BackgroundService
     private readonly IOptionsMonitor<SocketCanOptions> _options;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<SocketCanBackgroundService> _logger;
+    private static readonly TimeSpan MaxReconnectBackoff = TimeSpan.FromMinutes(1);
+
     private long _sequence;
 
     public SocketCanBackgroundService(
@@ -41,11 +43,14 @@ public sealed class SocketCanBackgroundService : BackgroundService
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var reconnectAttempt = 0;
+
         while (!stoppingToken.IsCancellationRequested)
         {
             var options = SnapshotOptions(_options.CurrentValue);
             ISocketCanClient? client = null;
             var reconfigured = false;
+            var nextDelay = options.ReconnectDelay;
             using var reconfigureCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             using var changeRegistration = _options.OnChange((updated, _) =>
             {
@@ -53,24 +58,31 @@ public sealed class SocketCanBackgroundService : BackgroundService
                 {
                     reconfigured = true;
                     reconfigureCts.Cancel();
+                    reconnectAttempt = 0;
                 }
             });
             try
             {
                 client = await _clientFactory.CreateAsync(options, reconfigureCts.Token).ConfigureAwait(false);
                 _logger.LogInformation("SocketCAN interface {Interface} connected.", client.InterfaceName);
+                reconnectAttempt = 0;
+                nextDelay = options.ReconnectDelay;
                 await PumpAsync(client, options, reconfigureCts.Token).ConfigureAwait(false);
             }
             catch (SocketCanInterfaceNotFoundException ex) when (!stoppingToken.IsCancellationRequested)
             {
+                reconnectAttempt++;
+                nextDelay = CalculateBackoffDelay(options.ReconnectDelay, reconnectAttempt);
                 _logger.LogWarning(
                     "SocketCAN interface {Interface} not found. Retrying in {Delay}.",
                     ex.InterfaceName,
-                    options.ReconnectDelay);
+                    nextDelay);
             }
             catch (SocketCanException ex) when (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogError(ex, "SocketCAN error on interface {Interface}.", options.InterfaceName);
+                reconnectAttempt = 0;
+                nextDelay = options.ReconnectDelay;
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -95,7 +107,7 @@ public sealed class SocketCanBackgroundService : BackgroundService
             if (!reconfigured)
             {
                 using var delayCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, reconfigureCts.Token);
-                await DelayAsync(options.ReconnectDelay, delayCts.Token).ConfigureAwait(false);
+                await DelayAsync(nextDelay, delayCts.Token).ConfigureAwait(false);
             }
         }
     }
@@ -197,5 +209,34 @@ public sealed class SocketCanBackgroundService : BackgroundService
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
         }
+    }
+
+    private static TimeSpan CalculateBackoffDelay(TimeSpan baseDelay, int attempt)
+    {
+        if (baseDelay <= TimeSpan.Zero || baseDelay == Timeout.InfiniteTimeSpan)
+        {
+            return baseDelay;
+        }
+
+        var cappedAttempt = Math.Max(1, attempt);
+        var delayTicks = baseDelay.Ticks;
+        for (var i = 1; i < cappedAttempt && delayTicks < MaxReconnectBackoff.Ticks; i++)
+        {
+            if (delayTicks > MaxReconnectBackoff.Ticks / 2)
+            {
+                delayTicks = MaxReconnectBackoff.Ticks;
+                break;
+            }
+
+            delayTicks = Math.Min(delayTicks * 2, MaxReconnectBackoff.Ticks);
+        }
+
+        if (delayTicks <= 0)
+        {
+            return baseDelay;
+        }
+
+        var delay = TimeSpan.FromTicks(delayTicks);
+        return delay < baseDelay ? baseDelay : delay;
     }
 }

@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using System.Reflection;
 using Aog.Agio.Linux.Gpsd;
 using Microsoft.Extensions.Logging;
@@ -102,6 +103,19 @@ public sealed class GpsdClientTests
         await Assert.ThrowsAsync<GpsdSocketUnavailableException>(async () => await ConsumeAsync(client.WatchAsync(CancellationToken.None)));
     }
 
+    [Fact]
+    public async Task WatchAsync_PropagatesAccessDenied()
+    {
+        var factory = new AccessDeniedConnectionFactory();
+        var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
+
+        var exception = await Assert.ThrowsAsync<GpsdUnavailableException>(async () => await ConsumeAsync(client.WatchAsync(CancellationToken.None)));
+
+        Assert.Contains("SocketError: AccessDenied", exception.Message);
+        var inner = Assert.IsType<SocketException>(exception.InnerException);
+        Assert.Equal(SocketError.AccessDenied, inner.SocketErrorCode);
+    }
+
     private static async Task ConsumeAsync(IAsyncEnumerable<GpsdTpvReport> source)
     {
         await foreach (var _ in source)
@@ -136,6 +150,14 @@ public sealed class GpsdClientTests
     private sealed class NullGpsdConnectionFactory : IGpsdConnectionFactory
     {
         public Task<Stream?> ConnectAsync(CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
+    }
+
+    private sealed class AccessDeniedConnectionFactory : IGpsdConnectionFactory
+    {
+        public Task<Stream?> ConnectAsync(CancellationToken cancellationToken)
+        {
+            throw new SocketException((int)SocketError.AccessDenied);
+        }
     }
 
     private sealed class FakeGpsdStream : Stream

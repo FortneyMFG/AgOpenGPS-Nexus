@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Aog.Agio.Linux;
 
 namespace Aog.Agio.Linux.Gpsd;
 
@@ -71,11 +72,11 @@ public sealed class GpsdBackgroundService : BackgroundService
                     {
                         await foreach (var report in _client.WatchAsync(iterationToken).WithCancellation(iterationToken))
                         {
-                            var latitude = FormatDouble(report.LatitudeDegrees, "F6");
-                            var longitude = FormatDouble(report.LongitudeDegrees, "F6");
-                            var altitude = FormatDouble(report.AltitudeMeters, "F1");
-                            var speed = FormatDouble(report.SpeedMetersPerSecond, "F2");
-                            var track = FormatDouble(report.TrackDegrees, "F1");
+                            var latitude = FormatHelpers.FormatDouble(report.LatitudeDegrees, "F6");
+                            var longitude = FormatHelpers.FormatDouble(report.LongitudeDegrees, "F6");
+                            var altitude = FormatHelpers.FormatDouble(report.AltitudeMeters, "F1");
+                            var speed = FormatHelpers.FormatDouble(report.SpeedMetersPerSecond, "F2");
+                            var track = FormatHelpers.FormatDouble(report.TrackDegrees, "F1");
                             var timestamp = report.Timestamp?.ToString("o", CultureInfo.InvariantCulture) ?? "n/a";
                             var mode = report.Mode?.ToString(CultureInfo.InvariantCulture) ?? "n/a";
 
@@ -128,9 +129,6 @@ public sealed class GpsdBackgroundService : BackgroundService
             }
         }
     }
-
-    private static string FormatDouble(double? value, string format)
-        => value?.ToString(format, CultureInfo.InvariantCulture) ?? "n/a";
 
     private void OnOptionsChanged(GpsdClientOptions options)
     {

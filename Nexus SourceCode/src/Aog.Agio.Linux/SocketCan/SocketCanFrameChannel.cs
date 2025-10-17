@@ -43,7 +43,7 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
     }
 
     /// <inheritdoc />
-    public ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken)
+    public async ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken)
     {
         if (frame is null)
         {
@@ -52,7 +52,7 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var nowTicks = Stopwatch.GetTimestamp();
+        var backpressureWindow = ToTimeSpan(_maxSubscriberBackpressureTicks);
 
         foreach (var (subscriptionId, subscriber) in _subscribers)
         {
@@ -63,23 +63,41 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
                 continue;
             }
 
-            if (!subscriber.ShouldEvict(nowTicks, _maxSubscriberBackpressureTicks, out var backpressureDurationTicks))
+            var nowTicks = Stopwatch.GetTimestamp();
+            subscriber.MarkBackpressure(nowTicks);
+
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            linkedCts.CancelAfter(backpressureWindow);
+
+            try
             {
+                await writer.WriteAsync(frame, linkedCts.Token).ConfigureAwait(false);
+                subscriber.ClearBackpressure();
                 continue;
             }
-
-            if (_subscribers.TryRemove(subscriptionId, out var removed))
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
             {
-                removed.Channel.Writer.TryComplete(new OperationCanceledException("SocketCAN subscriber removed due to sustained backpressure."));
-                _logger.LogWarning(
-                    "SocketCAN subscriber {SubscriptionId} evicted after {BackpressureDuration} of backpressure while publishing CAN frame {ArbitrationId}.",
-                    subscriptionId,
-                    ToTimeSpan(backpressureDurationTicks),
-                    frame.ArbitrationId);
+                nowTicks = Stopwatch.GetTimestamp();
+                if (!subscriber.ShouldEvict(nowTicks, _maxSubscriberBackpressureTicks, out var backpressureDurationTicks))
+                {
+                    continue;
+                }
+
+                if (_subscribers.TryRemove(subscriptionId, out var removed))
+                {
+                    removed.Channel.Writer.TryComplete(new OperationCanceledException("SocketCAN subscriber removed due to sustained backpressure."));
+                    _logger.LogWarning(
+                        "SocketCAN subscriber {SubscriptionId} evicted after {BackpressureDuration} of backpressure while publishing CAN frame {ArbitrationId}.",
+                        subscriptionId,
+                        ToTimeSpan(backpressureDurationTicks),
+                        frame.ArbitrationId);
+                }
+            }
+            catch (ChannelClosedException)
+            {
+                _subscribers.TryRemove(subscriptionId, out _);
             }
         }
-
-        return ValueTask.CompletedTask;
     }
 
     /// <inheritdoc />
@@ -142,12 +160,15 @@ public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCan
 
         public void ClearBackpressure() => Interlocked.Exchange(ref _firstBackpressureTicks, 0);
 
+        public void MarkBackpressure(long nowTicks) => Interlocked.CompareExchange(ref _firstBackpressureTicks, nowTicks, 0);
+
         public bool ShouldEvict(long nowTicks, long maxBackpressureTicks, out long backpressureDuration)
         {
-            var first = Interlocked.CompareExchange(ref _firstBackpressureTicks, nowTicks, 0);
+            var first = Volatile.Read(ref _firstBackpressureTicks);
             if (first == 0)
             {
-                first = nowTicks;
+                backpressureDuration = 0;
+                return false;
             }
 
             backpressureDuration = nowTicks - first;

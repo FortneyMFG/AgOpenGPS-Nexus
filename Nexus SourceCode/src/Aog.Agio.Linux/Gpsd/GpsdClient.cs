@@ -11,7 +11,7 @@ namespace Aog.Agio.Linux.Gpsd;
 /// </summary>
 public sealed class GpsdClient
 {
-    private const string WatchCommand = "?WATCH={\"enable\":true,\"json\":true}";
+    private const string WatchCommand = """?WATCH={"enable":true,"json":true}""";
 
     private static readonly Encoding Utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 

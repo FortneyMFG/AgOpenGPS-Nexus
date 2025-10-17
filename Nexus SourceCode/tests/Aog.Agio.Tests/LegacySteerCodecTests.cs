@@ -133,6 +133,20 @@ public sealed class LegacySteerCodecTests
         Assert.Equal(0, steerHundredths);
     }
 
+    [Theory]
+    [InlineData(90.0, 3276)]
+    [InlineData(-90.0, -3276)]
+    public void EncodeSteerCommand_ClampsSteerAngleToHardwareRange(double angleDeg, short expectedHundredths)
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { TargetWheelAngleDeg = angleDeg, Enable = true };
+
+        var frame = codec.EncodeSteerCommand(command);
+        var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(frame.AsSpan(8, 2));
+
+        Assert.Equal(expectedHundredths, steerHundredths);
+    }
+
     [Fact]
     public void EncodeSteerCommand_TruncatesMaskAboveSectionCount()
     {

@@ -26,6 +26,8 @@ public sealed class LegacySteerCodec
     private const int StatePayloadLength = 8;
     private const int CommandFrameLength = 2 /* sync */ + 1 /* src */ + 1 /* pgn */ + 1 /* len */ + CommandPayloadLength + 1 /* checksum */;
     private const int StateFrameLength = 2 + 1 + 1 + 1 + StatePayloadLength + 1;
+    private const short MaxSteerAngleHundredths = 3276;
+    private const short MinSteerAngleHundredths = -MaxSteerAngleHundredths;
 
     /// <summary>
     /// Attempts to decode a steering command PGN into a typed command and section mask.
@@ -138,9 +140,7 @@ public sealed class LegacySteerCodec
 
         buffer[7] = status;
 
-        var steerHundredths = command.Enable
-            ? (short)Math.Clamp(Math.Round(command.TargetWheelAngleDeg * 100.0), short.MinValue, short.MaxValue)
-            : (short)0;
+        var steerHundredths = EncodeSteerAngle(command.TargetWheelAngleDeg, command.Enable);
         BinaryPrimitives.WriteInt16LittleEndian(buffer.AsSpan(8, 2), steerHundredths);
 
         buffer[10] = metadata.TramControl;
@@ -182,6 +182,34 @@ public sealed class LegacySteerCodec
 
         LegacyChecksum.Write(buffer);
         return buffer;
+    }
+
+    /// <summary>
+    /// Scales a wheel angle in degrees to hundredths while respecting the Teensy PGN range (±3276).
+    /// </summary>
+    /// <param name="targetAngleDeg">Wheel angle in degrees.</param>
+    /// <param name="enabled">Whether steering output is enabled; disabled commands encode zero.</param>
+    /// <returns>Target angle expressed in hundredths of a degree, clamped to ±3276.</returns>
+    private static short EncodeSteerAngle(double targetAngleDeg, bool enabled)
+    {
+        if (!enabled || double.IsNaN(targetAngleDeg) || double.IsInfinity(targetAngleDeg))
+        {
+            return 0;
+        }
+
+        var scaledHundredths = Math.Round(targetAngleDeg * 100.0, MidpointRounding.AwayFromZero);
+
+        if (scaledHundredths > MaxSteerAngleHundredths)
+        {
+            return MaxSteerAngleHundredths;
+        }
+
+        if (scaledHundredths < MinSteerAngleHundredths)
+        {
+            return MinSteerAngleHundredths;
+        }
+
+        return (short)scaledHundredths;
     }
 
     /// <summary>

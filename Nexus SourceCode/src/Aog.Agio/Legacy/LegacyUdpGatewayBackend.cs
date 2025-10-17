@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Aog.Core.Mesh;
 using Aog.Core.V1;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Aog.Agio.Legacy;
 
@@ -35,6 +36,7 @@ public sealed class LegacyUdpGatewayBackend : IAgioBackend
         services.AddSingleton<ILegacySectionObserver, NullLegacySectionObserver>();
         services.AddSingleton<LegacyMeshPresencePublisher>();
         services.AddSingleton<ILegacyMeshPresencePublisher>(provider => provider.GetRequiredService<LegacyMeshPresencePublisher>());
+        services.AddSingleton<IHostedService>(provider => provider.GetRequiredService<LegacyMeshPresencePublisher>());
         services.AddSingleton<LegacyUdpGateway>();
     }
 

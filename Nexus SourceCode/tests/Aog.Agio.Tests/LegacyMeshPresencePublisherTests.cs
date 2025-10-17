@@ -7,6 +7,8 @@ using Aog.Agio.Legacy;
 using Aog.Core.Mesh;
 using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -15,7 +17,7 @@ namespace Aog.Agio.Tests;
 public sealed class LegacyMeshPresencePublisherTests
 {
     [Fact]
-    public void Constructor_RegistersDeviceWithMesh()
+    public async Task InitializeAsync_RegistersDeviceWithMesh()
     {
         var meshService = new RecordingMeshService();
         var options = Options.Create(new LegacyMeshOptions
@@ -29,7 +31,8 @@ public sealed class LegacyMeshPresencePublisherTests
             Capabilities = new List<string> { "legacy.gateway", " legacy.pose " },
         });
 
-        _ = new LegacyMeshPresencePublisher(meshService, options);
+        var publisher = new LegacyMeshPresencePublisher(meshService, options, NullLogger<LegacyMeshPresencePublisher>.Instance);
+        await publisher.InitializeAsync(CancellationToken.None);
 
         var registration = Assert.Single(meshService.Registrations);
         Assert.Equal("device:legacy", registration.DeviceId);
@@ -54,7 +57,8 @@ public sealed class LegacyMeshPresencePublisherTests
             Metadata = new Dictionary<string, string> { ["operator"] = "Ada" },
         });
 
-        var publisher = new LegacyMeshPresencePublisher(meshService, options);
+        var publisher = new LegacyMeshPresencePublisher(meshService, options, NullLogger<LegacyMeshPresencePublisher>.Instance);
+        await publisher.InitializeAsync(CancellationToken.None);
         meshService.Registrations.Clear();
 
         var pose = new Pose
@@ -112,7 +116,8 @@ public sealed class LegacyMeshPresencePublisherTests
             DefaultJobId = "job:alpha",
         });
 
-        var publisher = new LegacyMeshPresencePublisher(meshService, options);
+        var publisher = new LegacyMeshPresencePublisher(meshService, options, NullLogger<LegacyMeshPresencePublisher>.Instance);
+        await publisher.InitializeAsync(CancellationToken.None);
         var announcement = new LegacyDiscoveryAnnouncement
         {
             VendorId = 0x7C,
@@ -136,12 +141,35 @@ public sealed class LegacyMeshPresencePublisherTests
         Assert.Equal(((byte)LegacyDeviceCapabilityFlags.OverTheAirUpdates).ToString(), metadata["legacy.discovery.capabilitiesMask"]);
     }
 
+    [Fact]
+    public async Task InitializeAsync_LogsAndRethrowsRegistrationFailures()
+    {
+        var meshService = new FailingMeshService();
+        var options = Options.Create(new LegacyMeshOptions
+        {
+            DeviceId = "device:legacy",
+            Label = "Legacy Gateway",
+            DefaultSeasonId = "season:2025",
+            DefaultJobId = "job:alpha",
+        });
+
+        var logger = new RecordingLogger<LegacyMeshPresencePublisher>();
+        var publisher = new LegacyMeshPresencePublisher(meshService, options, logger);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => publisher.InitializeAsync(CancellationToken.None));
+
+        var entry = Assert.Single(logger.Entries);
+        Assert.Equal(LogLevel.Error, entry.Level);
+        Assert.Same(exception, entry.Exception);
+        Assert.Contains("device:legacy", entry.Message, StringComparison.Ordinal);
+    }
+
     private sealed class RecordingMeshService : ILiveTelemetryMeshService
     {
         public List<MeshDeviceRegistration> Registrations { get; } = new();
         public List<MeshPresenceUpdate> PresenceUpdates { get; } = new();
 
-        public ValueTask RegisterOrUpdateDeviceAsync(MeshDeviceRegistration registration, CancellationToken cancellationToken = default)
+        public virtual ValueTask RegisterOrUpdateDeviceAsync(MeshDeviceRegistration registration, CancellationToken cancellationToken = default)
         {
             Registrations.Add(registration);
             return ValueTask.CompletedTask;
@@ -161,5 +189,38 @@ public sealed class LegacyMeshPresencePublisherTests
         }
 
         public IReadOnlyList<MeshPresenceSnapshot> ListPresence(string? seasonId = null, string? jobId = null) => Array.Empty<MeshPresenceSnapshot>();
+    }
+
+    private sealed class FailingMeshService : RecordingMeshService
+    {
+        public override ValueTask RegisterOrUpdateDeviceAsync(MeshDeviceRegistration registration, CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("Failed to register device.");
+        }
+    }
+
+    private sealed class RecordingLogger<T> : ILogger<T>
+    {
+        public List<LogEntry> Entries { get; } = new();
+
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            Entries.Add(new LogEntry(logLevel, formatter(state, exception), exception));
+        }
+
+        public readonly record struct LogEntry(LogLevel Level, string Message, Exception? Exception);
+
+        private sealed class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new();
+
+            public void Dispose()
+            {
+            }
+        }
     }
 }

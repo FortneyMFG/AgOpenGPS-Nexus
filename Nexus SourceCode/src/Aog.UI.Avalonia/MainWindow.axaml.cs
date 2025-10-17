@@ -110,6 +110,13 @@ public partial class MainWindow : Window
         _windowStateSubscription?.Dispose();
         Closing -= OnClosing;
         Closed -= OnClosed;
+
+        if (DataContext is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+
+        DataContext = null;
     }
 
 }

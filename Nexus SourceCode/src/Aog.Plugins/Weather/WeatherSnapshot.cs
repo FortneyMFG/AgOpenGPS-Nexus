@@ -108,6 +108,73 @@ public sealed record WeatherSnapshot
     public double? LeafWetnessPct { get; init; }
 
     /// <summary>
+    /// Deconstructs the snapshot into individual measurements for callers that prefer positional access.
+    /// </summary>
+    /// <param name="capturedAt">The timestamp when the snapshot was captured.</param>
+    /// <param name="source">The identifier for the data provider that produced the snapshot.</param>
+    /// <param name="temperatureC">The ambient air temperature in degrees Celsius.</param>
+    /// <param name="humidityPct">The relative humidity percentage.</param>
+    /// <param name="windKph">The sustained wind speed in kilometres per hour.</param>
+    /// <param name="windDirectionDeg">The wind direction in degrees following meteorological convention.</param>
+    /// <param name="windGustKph">The peak wind gust measured in kilometres per hour.</param>
+    /// <param name="rainfallMm">The total rainfall measured in millimetres.</param>
+    /// <param name="pressureKpa">The barometric pressure measured in kilopascals.</param>
+    /// <param name="dewPointC">The dew point temperature in degrees Celsius.</param>
+    /// <param name="wetBulbC">The wet-bulb temperature in degrees Celsius.</param>
+    /// <param name="deltaTC">The Delta T (dry bulb minus wet bulb) temperature in degrees Celsius.</param>
+    /// <param name="evapotranspirationMm">The evapotranspiration amount in millimetres.</param>
+    /// <param name="solarIrradianceWm2">The solar irradiance in watts per square metre.</param>
+    /// <param name="uvIndex">The ultraviolet index.</param>
+    /// <param name="cloudCoverPct">The estimated cloud cover percentage.</param>
+    /// <param name="visibilityKm">The visibility distance in kilometres.</param>
+    /// <param name="soilTempC">The soil temperature in degrees Celsius.</param>
+    /// <param name="soilMoisturePct">The soil moisture percentage.</param>
+    /// <param name="leafWetnessPct">The leaf wetness percentage.</param>
+    public void Deconstruct(
+        out DateTimeOffset capturedAt,
+        out string source,
+        out double? temperatureC,
+        out double? humidityPct,
+        out double? windKph,
+        out double? windDirectionDeg,
+        out double? windGustKph,
+        out double? rainfallMm,
+        out double? pressureKpa,
+        out double? dewPointC,
+        out double? wetBulbC,
+        out double? deltaTC,
+        out double? evapotranspirationMm,
+        out double? solarIrradianceWm2,
+        out double? uvIndex,
+        out double? cloudCoverPct,
+        out double? visibilityKm,
+        out double? soilTempC,
+        out double? soilMoisturePct,
+        out double? leafWetnessPct)
+    {
+        capturedAt = CapturedAt;
+        source = Source;
+        temperatureC = TemperatureC;
+        humidityPct = HumidityPct;
+        windKph = WindKph;
+        windDirectionDeg = WindDirectionDeg;
+        windGustKph = WindGustKph;
+        rainfallMm = RainfallMm;
+        pressureKpa = PressureKpa;
+        dewPointC = DewPointC;
+        wetBulbC = WetBulbC;
+        deltaTC = DeltaTC;
+        evapotranspirationMm = EvapotranspirationMm;
+        solarIrradianceWm2 = SolarIrradianceWm2;
+        uvIndex = UvIndex;
+        cloudCoverPct = CloudCoverPct;
+        visibilityKm = VisibilityKm;
+        soilTempC = SoilTempC;
+        soilMoisturePct = SoilMoisturePct;
+        leafWetnessPct = LeafWetnessPct;
+    }
+
+    /// <summary>
     /// Creates a snapshot from the provided sample, optionally merging missing values from the previous snapshot.
     /// </summary>
     /// <param name="previous">The previous snapshot to merge with when <paramref name="mergePartial"/> is <see langword="true"/>.</param>

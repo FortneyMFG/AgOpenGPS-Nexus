@@ -244,6 +244,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-942 Planter panel stale row cleanup regression
 - [x] NX-954 Simulation route mode case-insensitive selection _(Done)_ — Mirror SelectedMode setter canonicalization and tests
 - [x] NX-980 Sections panel sixteen-toggle support _(Done)_ — Expand UI and tests for 16-section masks
+- [x] NX-1120 Avalonia App.axaml include cleanup _(Done)_ — Exclude build output directories from AvaloniaResource glob
 - [x] NX-040 Avalonia app bootstrap
 - [x] NX-041 Connection/settings panel
 - [x] NX-042 Map view
@@ -622,6 +623,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-273 | Weather overlay data feed | Done |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 visualization pipeline |
 | NX-274 | Weather report sections | Done |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 reporting integration |
 | NX-275 | Weather plugin regression fixtures | Done |  | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | ADR-053 QA hooks |
+| NX-1019 | WeatherSensorReading XML documentation cleanup | In Progress | AI | — | [ADR-053](docs/ADR/ADR-053_WeatherPlugin.md) | Address CS1591 warnings for weather sensor ingest types |
 | NX-276 | Autosteer plugin constraint gating updates | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md), [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-027 gating + ADR-033 guidance planner |
 | NX-277 | Sections plugin constraint gating updates | Done |  | — | [ADR-027](docs/ADR/ADR-027-spatial-constraints.md) | ADR-027 gating |
 | NX-278 | Guidance lane publishing contracts | Done |  | — | [ADR-033](docs/ADR/ADR-033-guidance-planner-autosteer.md) | ADR-033 guidance planner |

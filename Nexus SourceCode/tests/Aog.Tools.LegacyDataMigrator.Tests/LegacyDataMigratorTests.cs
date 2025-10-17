@@ -1,4 +1,10 @@
 using System.Text.Json;
+using FluentAssertions;
+using Parquet;
+using Parquet.File;
+using Parquet.Schema;
+using Xunit;
+
 namespace Aog.Tools.LegacyDataMigrator.Tests;
 
 public sealed class LegacyDataMigratorTests

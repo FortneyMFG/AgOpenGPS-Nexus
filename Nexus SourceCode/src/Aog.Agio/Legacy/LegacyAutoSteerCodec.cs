@@ -1,3 +1,5 @@
+using Aog.Core.V1;
+
 namespace Aog.Agio.Legacy;
 
 /// <summary>

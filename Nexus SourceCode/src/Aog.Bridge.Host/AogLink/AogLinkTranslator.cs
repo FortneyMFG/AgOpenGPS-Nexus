@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using Aog.Core.V1;
 using Aog.Link.V1;
+using Aog.Protos.Capabilities.V1;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
@@ -29,7 +30,7 @@ public sealed class AogLinkTranslator
     /// <summary>
     /// Creates a discovery response advertising the bridge capabilities.
     /// </summary>
-    public LinkEnvelope CreateDiscoveryResponse(DiscoveryAnnounce announce, IEnumerable<nexus.capabilities.v1.CapabilityDescriptor> capabilities)
+    public LinkEnvelope CreateDiscoveryResponse(DiscoveryAnnounce announce, IEnumerable<CapabilityDescriptor> capabilities)
     {
         if (announce is null)
             throw new ArgumentNullException(nameof(announce));

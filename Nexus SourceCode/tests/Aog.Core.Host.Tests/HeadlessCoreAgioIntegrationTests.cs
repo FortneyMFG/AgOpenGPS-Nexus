@@ -90,7 +90,6 @@ public sealed class HeadlessCoreAgioIntegrationTests
             }
 
             await server.ShutdownAsync();
-            server.Dispose();
         }
     }
 

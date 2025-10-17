@@ -12,11 +12,11 @@ public sealed class BridgeHostOptions
     public string FirmwareVersion { get; set; } = "0.1.0";
 
     [Required]
-    [ValidateComplexType]
+    [ValidateObjectMembers]
     public GrpcEndpointOptions Grpc { get; set; } = new();
 
     [Required]
-    [ValidateComplexType]
+    [ValidateObjectMembers]
     public UdpLinkOptions Udp { get; set; } = new();
 
     public sealed class GrpcEndpointOptions

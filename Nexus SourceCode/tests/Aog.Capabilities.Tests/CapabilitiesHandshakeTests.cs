@@ -109,6 +109,7 @@ public sealed class CapabilitiesHandshakeTests
 
     private static ServerCallContext CreateContext()
     {
+        WriteOptions? writeOptions = null;
         return TestServerCallContext.Create(
             method: "capabilities.v1.CapabilitiesService/Handshake",
             host: null,
@@ -118,7 +119,8 @@ public sealed class CapabilitiesHandshakeTests
             peer: "ipv4:127.0.0.1",
             authContext: null,
             contextPropagationToken: null,
-            responseTrailers: null,
-            writeHeadersFunc: _ => Task.CompletedTask);
+            writeHeadersFunc: _ => Task.CompletedTask,
+            writeOptionsGetter: () => writeOptions ?? new WriteOptions(),
+            writeOptionsSetter: options => writeOptions = options);
     }
 }

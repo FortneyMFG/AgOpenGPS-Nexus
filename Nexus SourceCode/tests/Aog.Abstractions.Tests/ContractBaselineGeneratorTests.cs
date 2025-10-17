@@ -1,5 +1,6 @@
 using Aog.Abstractions.Contracts;
 using Google.Protobuf;
+using Xunit;
 
 namespace Aog.Abstractions.Tests
 {

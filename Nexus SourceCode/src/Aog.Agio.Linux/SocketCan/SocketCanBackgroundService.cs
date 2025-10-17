@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SocketCANSharp;
 using SocketCANSharp.Network;
+using ProtoCanFrame = Aog.Core.V1.CanFrame;
+using SocketCanFrame = SocketCANSharp.CanFrame;
 
 namespace Aog.Agio.Linux.SocketCan;
 
@@ -220,9 +222,9 @@ public sealed class SocketCanBackgroundService : BackgroundService
         }
     }
 
-    private CanFrame TranslateFrame(SocketCANSharp.CanFrame frame, string source)
+    private ProtoCanFrame TranslateFrame(SocketCanFrame frame, string source)
     {
-        var protobuf = new CanFrame
+        var protobuf = new ProtoCanFrame
         {
             Header = new Header
             {
@@ -239,7 +241,7 @@ public sealed class SocketCanBackgroundService : BackgroundService
         return protobuf;
     }
 
-    private static uint GetArbitrationId(SocketCANSharp.CanFrame frame)
+    private static uint GetArbitrationId(SocketCanFrame frame)
     {
         var raw = SocketCanUtils.ExtractRawCanId(frame.CanId);
         if ((frame.CanId & (uint)CanIdFlags.CAN_EFF_FLAG) != 0)

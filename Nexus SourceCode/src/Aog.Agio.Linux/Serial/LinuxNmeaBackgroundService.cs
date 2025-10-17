@@ -198,26 +198,23 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
         }
     }
 
-    protected override void Dispose(bool disposing)
+    public override void Dispose()
     {
-        if (disposing)
-        {
-            _optionsReloadToken.Dispose();
+        _optionsReloadToken.Dispose();
 
-            var previous = Interlocked.Exchange(ref _reloadTokenSource, null);
-            if (previous is not null)
+        var previous = Interlocked.Exchange(ref _reloadTokenSource, null);
+        if (previous is not null)
+        {
+            try
             {
-                try
-                {
-                    previous.Cancel();
-                }
-                finally
-                {
-                    previous.Dispose();
-                }
+                previous.Cancel();
+            }
+            finally
+            {
+                previous.Dispose();
             }
         }
 
-        base.Dispose(disposing);
+        base.Dispose();
     }
 }

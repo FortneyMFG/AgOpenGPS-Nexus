@@ -1,3 +1,6 @@
+using Aog.Agio.AogLink;
+using Microsoft.Extensions.Logging;
+
 namespace Aog.Agio.Ntrip;
 
 /// <summary>
@@ -5,16 +8,16 @@ namespace Aog.Agio.Ntrip;
 /// </summary>
 public sealed class AogLinkNtripCorrectionSink : INtripCorrectionSink
 {
-    private readonly IEnumerable<Aog.Agio.AogLink.IAogLinkTransportDriver> _drivers;
-    private readonly Microsoft.Extensions.Logging.ILogger<AogLinkNtripCorrectionSink> _logger;
+    private readonly IEnumerable<IAogLinkTransportDriver> _drivers;
+    private readonly ILogger<AogLinkNtripCorrectionSink> _logger;
     private int _sequence;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AogLinkNtripCorrectionSink"/> class.
     /// </summary>
     public AogLinkNtripCorrectionSink(
-        IEnumerable<Aog.Agio.AogLink.IAogLinkTransportDriver> drivers,
-        Microsoft.Extensions.Logging.ILogger<AogLinkNtripCorrectionSink> logger)
+        IEnumerable<IAogLinkTransportDriver> drivers,
+        ILogger<AogLinkNtripCorrectionSink> logger)
     {
         _drivers = drivers ?? throw new ArgumentNullException(nameof(drivers));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -33,7 +36,7 @@ public sealed class AogLinkNtripCorrectionSink : INtripCorrectionSink
             throw new InvalidOperationException("RTCM payload exceeds maximum frame size supported by AOG-Link.");
         }
 
-        List<Aog.Agio.AogLink.IAogLinkTransportDriver>? enabled = null;
+        List<IAogLinkTransportDriver>? enabled = null;
         foreach (var driver in _drivers)
         {
             if (!driver.IsEnabled)
@@ -41,7 +44,7 @@ public sealed class AogLinkNtripCorrectionSink : INtripCorrectionSink
                 continue;
             }
 
-            enabled ??= new List<Aog.Agio.AogLink.IAogLinkTransportDriver>();
+            enabled ??= new List<IAogLinkTransportDriver>();
             enabled.Add(driver);
         }
 
@@ -52,19 +55,19 @@ public sealed class AogLinkNtripCorrectionSink : INtripCorrectionSink
         }
 
         var sequence = (ushort)(Interlocked.Increment(ref _sequence) & 0xFFFF);
-        var header = new Aog.Agio.AogLink.AogLinkFrameHeader(
+        var header = new AogLinkFrameHeader(
             Version: 1,
-            MessageClass: Aog.Agio.AogLink.AogLinkMessageCatalog.GnssClass,
-            MessageType: Aog.Agio.AogLink.AogLinkMessageCatalog.RtcmCorrectionsType,
+            MessageClass: AogLinkMessageCatalog.GnssClass,
+            MessageType: AogLinkMessageCatalog.RtcmCorrectionsType,
             Sequence: sequence,
-            Source: Aog.Agio.AogLink.AogLinkMessageCatalog.NtripSourceAddress,
-            Destination: Aog.Agio.AogLink.AogLinkMessageCatalog.BroadcastDestinationAddress,
+            Source: AogLinkMessageCatalog.NtripSourceAddress,
+            Destination: AogLinkMessageCatalog.BroadcastDestinationAddress,
             PayloadLength: (ushort)payload.Length);
 
         header.Validate(payload.Length);
 
         var copy = payload.ToArray();
-        var frame = new Aog.Agio.AogLink.AogLinkFrame(header, copy);
+        var frame = new AogLinkFrame(header, copy);
 
         foreach (var driver in enabled)
         {

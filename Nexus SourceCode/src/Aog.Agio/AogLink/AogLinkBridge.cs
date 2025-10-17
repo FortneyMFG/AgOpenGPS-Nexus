@@ -1,4 +1,6 @@
 
+using Aog.Protos.Capabilities.V1;
+
 namespace Aog.Agio.AogLink;
 
 /// <summary>

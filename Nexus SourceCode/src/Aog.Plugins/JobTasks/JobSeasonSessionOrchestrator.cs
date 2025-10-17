@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 
 namespace Aog.Plugins.JobTasks;
@@ -388,6 +389,7 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
                 JobSessionState.Active,
                 now,
                 now,
+                null,
 
                 sanitized.WorkOrderId,
                 sanitized.ActiveOperators,

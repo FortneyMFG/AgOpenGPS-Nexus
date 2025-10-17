@@ -135,6 +135,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-701 SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
 - [x] NX-673 Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests
 - [x] NX-935 Legacy pose codec default source fallback _(Done)_ — Default main antenna source address when metadata is omitted
+- [x] NX-963 Legacy pose dual heading sanitization fix _(Done)_ — Guard secondary heading against non-finite values
 - [ ] NX-915 gpsd TPV null field handling regression test
 - [ ] NX-934 Legacy UDP section mask snapshot fix
 - [x] NX-922 NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly

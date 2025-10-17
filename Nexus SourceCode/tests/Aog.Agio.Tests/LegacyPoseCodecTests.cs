@@ -114,6 +114,29 @@ public sealed class LegacyPoseCodecTests
     }
 
     [Fact]
+    public void TryDecodePose_DefaultsHeadingToZeroWhenBothHeadingsInvalid()
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = 10,
+            LongitudeDeg = 20,
+            HeadingRad = 1.0,
+        };
+
+        var frame = codec.EncodePose(pose);
+        var payload = frame.AsSpan(5, LegacyPoseCodec.MainAntennaPayloadLength);
+
+        BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(16, 4), float.NaN);
+        BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(20, 4), float.PositiveInfinity);
+
+        frame[^1] = ComputeChecksum(frame);
+
+        Assert.True(codec.TryDecodePose(frame, out var decodedPose, out _));
+        Assert.Equal(0d, decodedPose.HeadingRad);
+    }
+
+    [Fact]
     public void TryDecodePose_ReturnsFalseForInvalidChecksum()
     {
         var codec = new LegacyPoseCodec();

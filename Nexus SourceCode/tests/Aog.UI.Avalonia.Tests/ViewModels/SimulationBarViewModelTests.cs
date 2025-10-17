@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Aog.Core.Legacy;
+using Aog.Core.Paths;
 using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
 using Aog.UI.Avalonia.ViewModels;
@@ -64,6 +66,32 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+    public void Constructor_WithConfiguredTimeScale_UsesConfiguredPlaybackRate()
+    {
+        const string json = """
+{
+  "schemaVersion": "1.0.0",
+  "providers": [
+    { "providerId": "sim.clock.fixed", "outputs": ["time"] },
+    { "providerId": "sim.vehicle.bicycle", "inputs": ["time"], "outputs": ["pose"] }
+  ],
+  "routes": [
+    { "stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation" }
+  ],
+  "options": { "seed": 2024, "timeScale": 0.75 },
+  "scenarios": []
+}
+""";
+
+        var configuration = SimulationConfigurationLoader.Load(json);
+
+        using var viewModel = new SimulationBarViewModel(configuration);
+
+        viewModel.SelectedPlaybackRate.Should().Be(0.75);
+        viewModel.SelectedPlaybackRateLabel.Should().Be("75%");
+    }
+
+    [Fact]
     public void ApplyScenario_UpdatesMetadataAndRoutes()
     {
         var configuration = CreateConfigurationWithScenario();
@@ -75,17 +103,89 @@ public sealed class SimulationBarViewModelTests
             {
                 new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
             },
-            new SimulationOptionsConfiguration(1337, 0.75));
+            new SimulationOptionsConfiguration(1337, 1.5));
 
         viewModel.ApplyScenario(scenario);
 
         viewModel.ActiveScenarioTitle.Should().Be("Scenario: test");
         viewModel.ActiveScenarioDescription.Should().Contain("Scenario for testing");
         viewModel.ActiveScenarioOptions.Should().Contain("seed=1337");
+        viewModel.SelectedPlaybackRate.Should().Be(1.5);
         viewModel.Routes.Should().ContainSingle(route => route.Stream == "pose");
 
         viewModel.ResetToConfigurationRoutes();
         viewModel.ActiveScenarioTitle.Should().Be("Scenario: configuration defaults");
+        viewModel.SelectedPlaybackRate.Should().Be(1.0);
+        viewModel.ActiveScenarioOptions.Should().Contain("seed=2024");
+        viewModel.ActiveScenarioOptions.Should().Contain("timeScale=1");
+    }
+
+    [Fact]
+    public void ResetToConfigurationRoutes_WhenConfigurationOmitsTimeScale_RevertsToNormalRate()
+    {
+        var configuration = CreateConfigurationWithoutTimeScaleOption();
+        using var viewModel = new SimulationBarViewModel(configuration);
+        var scenario = new SimulationScenarioConfiguration(
+            "half-speed",
+            "Scenario that halves playback speed",
+            new[]
+            {
+                new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+            },
+            new SimulationOptionsConfiguration(null, 0.5));
+
+        viewModel.ApplyScenario(scenario);
+        viewModel.SelectedPlaybackRate.Should().Be(0.5);
+
+        viewModel.ResetToConfigurationRoutes();
+
+        viewModel.SelectedPlaybackRate.Should().Be(1.0);
+        viewModel.ActiveScenarioOptions.Should().Contain("seed=2024");
+        viewModel.ActiveScenarioOptions.Should().NotContain("timeScale");
+    }
+
+    [Fact]
+    public void ApplyLegacyImport_WithTimeScale_AdjustsPlaybackRate()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        using var viewModel = new SimulationBarViewModel(configuration);
+
+        var scenario = new SimulationScenarioConfiguration(
+            "legacy-import",
+            "Legacy import scenario",
+            new[]
+            {
+                new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+            },
+            new SimulationOptionsConfiguration(null, 0.5));
+
+        var result = new LegacyGuidanceImportResult(
+            "Field A",
+            new GeographicCoordinate(40.0, -93.0),
+            new[]
+            {
+                new LegacyAbLinePlanar(
+                    "AB1",
+                    new GeographicCoordinate(40.0, -93.0),
+                    new GeographicCoordinate(40.0001, -93.0001),
+                    new PlanarPoint(0, 0),
+                    new PlanarPoint(10, 0),
+                    0,
+                    10)
+            },
+            new[]
+            {
+                new PlanarPoint(0, 0),
+                new PlanarPoint(0, 10),
+                new PlanarPoint(10, 10),
+                new PlanarPoint(10, 0)
+            },
+            scenario);
+
+        viewModel.ApplyLegacyImport(result);
+
+        viewModel.SelectedPlaybackRate.Should().Be(0.5);
+        viewModel.ActiveScenarioOptions.Should().Contain("timeScale=0.5");
     }
 
     [Fact]
@@ -272,6 +372,26 @@ public sealed class SimulationBarViewModelTests
       "options": { "timeScale": 1.0 }
     }
   ]
+}
+""";
+
+        return SimulationConfigurationLoader.Load(json);
+    }
+
+    private static SimulationConfiguration CreateConfigurationWithoutTimeScaleOption()
+    {
+        const string json = """
+{
+  "schemaVersion": "1.0.0",
+  "providers": [
+    { "providerId": "sim.clock.fixed", "outputs": ["time"] },
+    { "providerId": "sim.vehicle.bicycle", "inputs": ["time"], "outputs": ["pose"] }
+  ],
+  "routes": [
+    { "stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation" }
+  ],
+  "options": { "seed": 2024 },
+  "scenarios": []
 }
 """;
 

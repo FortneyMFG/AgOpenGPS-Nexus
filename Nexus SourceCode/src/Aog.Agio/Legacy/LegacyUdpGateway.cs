@@ -112,7 +112,17 @@ public sealed class LegacyUdpGateway
             filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
         }
 
-        var frame = _steerCodec.EncodeSteerCommand(filteredSnapshot, filteredSections, metadata);
+        LegacySteerMetadata? steerMetadata = null;
+
+        if (metadata is not null)
+        {
+            steerMetadata = new LegacySteerMetadata
+            {
+                GuidanceStatus = metadata.GuidanceStatus,
+            };
+        }
+
+        var frame = _steerCodec.EncodeSteerCommand(filteredSnapshot, filteredSections, metadata, steerMetadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 
@@ -147,7 +157,17 @@ public sealed class LegacyUdpGateway
         var refreshedSnapshot = refreshedCommand.Clone();
         Volatile.Write(ref _steerSnapshot, refreshedSnapshot);
 
-        var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, filteredSections, metadata);
+        LegacySteerMetadata? steerMetadata = null;
+
+        if (metadata is not null)
+        {
+            steerMetadata = new LegacySteerMetadata
+            {
+                GuidanceStatus = metadata.GuidanceStatus,
+            };
+        }
+
+        var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, filteredSections, metadata, steerMetadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 

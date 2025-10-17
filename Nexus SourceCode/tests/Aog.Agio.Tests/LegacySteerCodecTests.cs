@@ -181,6 +181,27 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
+    public void EncodeSteerCommand_PreservesSteerMetadataFlagsWhenEnabled()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { TargetWheelAngleDeg = 2.5, Enable = true };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            GuidanceStatus = 0b0000_1000,
+            TramControl = 0x3C,
+        };
+        var steerMetadata = new LegacySteerMetadata
+        {
+            GuidanceStatus = 0b0000_0110,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata, steerMetadata: steerMetadata);
+
+        Assert.Equal(0b0000_0111, frame[7]);
+        Assert.Equal(metadata.TramControl, frame[10]);
+    }
+
+    [Fact]
     public void EncodeSteerCommand_AllowsFullSixteenBitMask()
     {
         var codec = new LegacySteerCodec();

@@ -103,7 +103,8 @@ public sealed class LegacySteerCodec
     public byte[] EncodeSteerCommand(
         SteerCmd command,
         SectionMask? sectionMask = null,
-        LegacySteerCommandMetadata? metadata = null)
+        LegacySteerCommandMetadata? metadata = null,
+        LegacySteerMetadata? steerMetadata = null)
     {
         if (command is null)
         {
@@ -111,6 +112,8 @@ public sealed class LegacySteerCodec
         }
 
         metadata ??= new LegacySteerCommandMetadata();
+
+        var statusFlags = steerMetadata?.GuidanceStatus ?? metadata.GuidanceStatus;
 
         var buffer = new byte[CommandFrameLength];
         buffer[0] = LegacyPoseCodec.Sync0;
@@ -132,7 +135,7 @@ public sealed class LegacySteerCodec
         var speedHundredths = (ushort)Math.Clamp((int)Math.Round(speedKph * 100.0), 0, ushort.MaxValue);
         BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(5, 2), speedHundredths);
 
-        var status = metadata.GuidanceStatus;
+        var status = statusFlags;
 
         status = command.Enable
             ? (byte)(status | EngagedBit)

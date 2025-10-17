@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -188,6 +189,22 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+    public void ResetToConfigurationRoutes_RestoresConfigurationPlaybackRate()
+    {
+        var configuration = CreateConfigurationWithTimeScale(1.2);
+        using var viewModel = new SimulationBarViewModel(configuration);
+
+        var doubleRate = viewModel.PlaybackRates.Single(rate => Math.Abs(rate.Rate - 2.0) < 1e-6);
+        doubleRate.SelectCommand.Execute(null);
+
+        viewModel.SelectedPlaybackRate.Should().Be(2.0);
+
+        viewModel.ResetToConfigurationRoutes();
+
+        viewModel.SelectedPlaybackRate.Should().BeApproximately(1.2, 1e-6);
+    }
+
+    [Fact]
     public void DisposingAndRecreatingViewModel_DoesNotDuplicateReplayNotifications()
     {
         var configuration = CreateConfigurationWithScenario();
@@ -310,6 +327,26 @@ public sealed class SimulationBarViewModelTests
 
         var configuration = SimulationConfigurationLoader.Load(json);
         return new SimulationBarViewModel(configuration);
+    }
+
+    private static SimulationConfiguration CreateConfigurationWithTimeScale(double timeScale)
+    {
+        var json = FormattableString.Invariant($"""
+{
+  "schemaVersion": "1.0.0",
+  "providers": [
+    { "providerId": "sim.clock.fixed", "outputs": ["time"] },
+    { "providerId": "sim.vehicle.bicycle", "inputs": ["time"], "outputs": ["pose"] }
+  ],
+  "routes": [
+    { "stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation" }
+  ],
+  "options": { "seed": 2024, "timeScale": {timeScale:0.###} },
+  "scenarios": []
+}
+""");
+
+        return SimulationConfigurationLoader.Load(json);
     }
 
     private static SimulationConfiguration CreateConfigurationWithScenario()

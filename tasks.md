@@ -265,6 +265,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-417 Simulation shell + companion parity automation _(Done)_ — Aligns with docs/reference/metadata-driven-ui-style-guide.md
 - [x] NX-418 Documentation, QA, and release readiness _(Done)_ — Aligns with artifacts/ui-screenshots/README.md
 - [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
+- [x] NX-941 Simulation bar playback rate reset _(Done)_ — Reset configuration default when reverting routes
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory

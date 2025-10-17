@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
@@ -54,6 +55,31 @@ public sealed class DashboardsViewModelTests
         viewModel.Bookmarks.Should().HaveCount(1);
         viewModel.ExportStatus.Should().Be("Export queued: CSV snapshot at 12:34:56");
         viewModel.SpeedSamples.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void ReplayTimeline_RaisesPropertyChangedForExportProgress()
+    {
+        var timeProvider = new FixedTimeProvider(new DateTimeOffset(2024, 1, 1, 7, 0, 0, TimeSpan.Zero));
+        var viewModel = new ReplayTimelineViewModel(timeProvider);
+        var observed = new List<string>();
+        viewModel.PropertyChanged += (_, args) => observed.Add(args.PropertyName ?? string.Empty);
+
+        viewModel.ExportGeoJsonCommand.Execute(0.25);
+
+        observed.Should().Contain(nameof(ReplayTimelineViewModel.ExportStatus));
+        observed.Should().Contain(nameof(ReplayTimelineViewModel.ExportProgress));
+        observed.Should().Contain(nameof(ReplayTimelineViewModel.IsExportInProgress));
+        viewModel.ExportProgress.Should().Be(0.25);
+        viewModel.IsExportInProgress.Should().BeTrue();
+
+        observed.Clear();
+        viewModel.ExportGeoJsonCommand.Execute(1.0);
+
+        observed.Should().Contain(nameof(ReplayTimelineViewModel.ExportProgress));
+        observed.Should().Contain(nameof(ReplayTimelineViewModel.IsExportInProgress));
+        viewModel.ExportProgress.Should().Be(1.0);
+        viewModel.IsExportInProgress.Should().BeFalse();
     }
 
     private sealed class FixedTimeProvider : TimeProvider

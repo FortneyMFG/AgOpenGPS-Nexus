@@ -277,7 +277,21 @@ public void ApplyScenario(SimulationScenarioConfiguration scenario)
         UpdateRoutes(routes);
         ActiveScenarioTitle = "Scenario: configuration defaults";
         ActiveScenarioDescription = "Using routes from the loaded configuration.";
-        ActiveScenarioOptions = "—";
+
+        var defaultOptions = _configuration?.Options;
+        ActiveScenarioOptions = FormatScenarioOptions(defaultOptions);
+
+        if (defaultOptions?.TimeScale is double timeScale &&
+            !double.IsNaN(timeScale) &&
+            !double.IsInfinity(timeScale) &&
+            timeScale > 0)
+        {
+            OnPlaybackRateSelected(timeScale);
+        }
+        else
+        {
+            OnPlaybackRateSelected(1.0);
+        }
     }
 
     /// <summary>

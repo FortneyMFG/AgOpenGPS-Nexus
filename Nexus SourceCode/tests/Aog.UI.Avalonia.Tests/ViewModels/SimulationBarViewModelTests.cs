@@ -114,6 +114,33 @@ public sealed class SimulationBarViewModelTests
 
         viewModel.ResetToConfigurationRoutes();
         viewModel.ActiveScenarioTitle.Should().Be("Scenario: configuration defaults");
+        viewModel.SelectedPlaybackRate.Should().Be(1.0);
+        viewModel.ActiveScenarioOptions.Should().Contain("seed=2024");
+        viewModel.ActiveScenarioOptions.Should().Contain("timeScale=1");
+    }
+
+    [Fact]
+    public void ResetToConfigurationRoutes_WhenConfigurationOmitsTimeScale_RevertsToNormalRate()
+    {
+        var configuration = CreateConfigurationWithoutTimeScaleOption();
+        using var viewModel = new SimulationBarViewModel(configuration);
+        var scenario = new SimulationScenarioConfiguration(
+            "half-speed",
+            "Scenario that halves playback speed",
+            new[]
+            {
+                new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+            },
+            new SimulationOptionsConfiguration(null, 0.5));
+
+        viewModel.ApplyScenario(scenario);
+        viewModel.SelectedPlaybackRate.Should().Be(0.5);
+
+        viewModel.ResetToConfigurationRoutes();
+
+        viewModel.SelectedPlaybackRate.Should().Be(1.0);
+        viewModel.ActiveScenarioOptions.Should().Contain("seed=2024");
+        viewModel.ActiveScenarioOptions.Should().NotContain("timeScale");
     }
 
     [Fact]
@@ -308,6 +335,26 @@ public sealed class SimulationBarViewModelTests
       "options": { "timeScale": 1.0 }
     }
   ]
+}
+""";
+
+        return SimulationConfigurationLoader.Load(json);
+    }
+
+    private static SimulationConfiguration CreateConfigurationWithoutTimeScaleOption()
+    {
+        const string json = """
+{
+  "schemaVersion": "1.0.0",
+  "providers": [
+    { "providerId": "sim.clock.fixed", "outputs": ["time"] },
+    { "providerId": "sim.vehicle.bicycle", "inputs": ["time"], "outputs": ["pose"] }
+  ],
+  "routes": [
+    { "stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation" }
+  ],
+  "options": { "seed": 2024 },
+  "scenarios": []
 }
 """;
 

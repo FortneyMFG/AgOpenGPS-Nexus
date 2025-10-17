@@ -108,7 +108,7 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         }
     }
 
-    private static void AddResult(string path, HashSet<string> seen, List<string> results)
+    private void AddResult(string path, HashSet<string> seen, List<string> results)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -120,9 +120,44 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         {
             fullPath = Path.GetFullPath(path);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its full path could not be resolved.", path);
             return;
+        }
+
+        FileAttributes attributes;
+        try
+        {
+            attributes = File.GetAttributes(fullPath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its attributes could not be read.", fullPath);
+            return;
+        }
+
+        if ((attributes & FileAttributes.Directory) != 0)
+        {
+            _logger.LogDebug("Skipping serial device candidate {Path} because it points to a directory.", fullPath);
+            return;
+        }
+
+        if ((attributes & FileAttributes.ReparsePoint) != 0)
+        {
+            try
+            {
+                if (Directory.Exists(fullPath))
+                {
+                    _logger.LogDebug("Skipping serial device candidate {Path} because it targets a directory reparse point.", fullPath);
+                    return;
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its reparse point target could not be inspected.", fullPath);
+                return;
+            }
         }
 
         if (seen.Add(fullPath))

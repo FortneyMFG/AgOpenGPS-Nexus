@@ -36,9 +36,12 @@ public sealed class PlanterPanelViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(statuses);
 
+        var seenIndices = new HashSet<int>();
+
         foreach (var status in statuses)
         {
             var index = checked((int)status.RowIndex);
+            seenIndices.Add(index);
             if (!_rowsByIndex.TryGetValue(index, out var row))
             {
                 row = new PlanterRowViewModel(index);
@@ -46,6 +49,21 @@ public sealed class PlanterPanelViewModel : ObservableObject
             }
 
             row.ApplyStatus(status);
+        }
+
+        if (seenIndices.Count != _rows.Count)
+        {
+            for (var i = _rows.Count - 1; i >= 0; i--)
+            {
+                var row = _rows[i];
+                if (seenIndices.Contains(row.RowIndex))
+                {
+                    continue;
+                }
+
+                _rows.RemoveAt(i);
+                _rowsByIndex.Remove(row.RowIndex);
+            }
         }
 
         UpdateSummary();

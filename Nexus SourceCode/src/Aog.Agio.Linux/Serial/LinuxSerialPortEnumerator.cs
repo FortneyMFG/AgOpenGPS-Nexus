@@ -27,7 +27,15 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         var seen = new HashSet<string>(StringComparer.Ordinal);
         var results = new List<string>();
 
-        foreach (var prefix in _options.DevicePrefixes ?? Array.Empty<string>())
+        var prefixes = _options.DevicePrefixes ?? Array.Empty<string>();
+
+        if (prefixes.Length == 0)
+        {
+            _logger.LogInformation("Skipping serial port enumeration because no device prefixes are configured.");
+            return Array.Empty<string>();
+        }
+
+        foreach (var prefix in prefixes)
         {
             if (string.IsNullOrWhiteSpace(prefix))
             {

@@ -7,7 +7,7 @@
     <Description>Sample Nexus CLI plugin adapter exposing calibrate/sniff verbs.</Description>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="2.0.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Nexus.Plugin.Cli.Abstractions\Nexus.Plugin.Cli.Abstractions.csproj" />

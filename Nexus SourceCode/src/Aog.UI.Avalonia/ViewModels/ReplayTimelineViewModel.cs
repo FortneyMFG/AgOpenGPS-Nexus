@@ -10,6 +10,7 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// </summary>
 public sealed class ReplayTimelineViewModel : ObservableObject
 {
+    private readonly TimeProvider _timeProvider;
     private readonly ObservableCollection<ReplayTimelineBookmarkViewModel> _bookmarks = new();
     private readonly ReadOnlyObservableCollection<ReplayTimelineBookmarkViewModel> _readonlyBookmarks;
 
@@ -20,8 +21,9 @@ public sealed class ReplayTimelineViewModel : ObservableObject
     /// <summary>
     /// Initializes a new instance of the <see cref="ReplayTimelineViewModel"/> class.
     /// </summary>
-    public ReplayTimelineViewModel()
+    public ReplayTimelineViewModel(TimeProvider? timeProvider = null)
     {
+        _timeProvider = timeProvider ?? TimeProvider.System;
         ExportCsvCommand = new DelegateCommand(_ => UpdateExportStatus("CSV"));
         ExportGeoJsonCommand = new DelegateCommand(_ => UpdateExportStatus("GeoJSON"));
         _readonlyBookmarks = new ReadOnlyObservableCollection<ReplayTimelineBookmarkViewModel>(_bookmarks);
@@ -76,6 +78,6 @@ public sealed class ReplayTimelineViewModel : ObservableObject
 
     private void UpdateExportStatus(string format)
     {
-        ExportStatus = $"Export queued: {format} snapshot at {DateTimeOffset.Now:HH:mm:ss}";
+        ExportStatus = $"Export queued: {format} snapshot at {_timeProvider.GetLocalNow():HH:mm:ss}";
     }
 }

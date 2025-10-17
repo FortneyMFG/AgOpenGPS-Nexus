@@ -41,7 +41,8 @@ public sealed class DashboardsViewModelTests
     [Fact]
     public void ReplayTimeline_UpdatesStatusOnExport()
     {
-        var viewModel = new ReplayTimelineViewModel();
+        var timeProvider = new FixedTimeProvider(new DateTimeOffset(2024, 1, 1, 12, 34, 56, TimeSpan.Zero));
+        var viewModel = new ReplayTimelineViewModel(timeProvider);
         var bookmarks = new[]
         {
             new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(10), "Test", "Note"),
@@ -51,7 +52,21 @@ public sealed class DashboardsViewModelTests
         viewModel.ExportCsvCommand.Execute(null);
 
         viewModel.Bookmarks.Should().HaveCount(1);
-        viewModel.ExportStatus.Should().Contain("CSV");
+        viewModel.ExportStatus.Should().Be("Export queued: CSV snapshot at 12:34:56");
         viewModel.SpeedSamples.Should().HaveCount(2);
+    }
+
+    private sealed class FixedTimeProvider : TimeProvider
+    {
+        private readonly DateTimeOffset _localNow;
+
+        public FixedTimeProvider(DateTimeOffset localNow)
+        {
+            _localNow = localNow;
+        }
+
+        public override DateTimeOffset GetUtcNow() => _localNow.ToUniversalTime();
+
+        public override DateTimeOffset GetLocalNow() => _localNow;
     }
 }

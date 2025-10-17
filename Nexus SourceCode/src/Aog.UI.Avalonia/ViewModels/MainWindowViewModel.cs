@@ -96,7 +96,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         SteerDashboard = new SteerDashboardViewModel();
         SectionsPanel = new SectionsPanelViewModel();
         PlanterPanel = new PlanterPanelViewModel();
-        ReplayTimeline = new ReplayTimelineViewModel();
+        ReplayTimeline = new ReplayTimelineViewModel(timeProvider);
 
         var layerEditJournal = new LayerEditEventJournalService(_timeProvider);
         ZoneEditorToolbar = new ZoneEditorToolbarViewModel(layerEditJournal);

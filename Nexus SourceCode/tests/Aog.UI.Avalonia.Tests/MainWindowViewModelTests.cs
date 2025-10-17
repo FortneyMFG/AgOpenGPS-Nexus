@@ -165,9 +165,10 @@ public sealed class MainWindowViewModelTests
 
         snapshot.Dashboard.Series.Should().HaveCount(viewModel.SteerDashboard.Series.Count);
         var sourceSeries = viewModel.SteerDashboard.Series.Single(series => series.Id == "autosteer.crossTrack");
-        var snapshotSeries = snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack");
-        snapshotSeries.Values.Should().Equal(sourceSeries.Values);
-        snapshotSeries.StrokeColor.Should().Be(((ISolidColorBrush)sourceSeries.Stroke).Color.ToString());
+        snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack")
+            .Values.Should().Equal(sourceSeries.Values);
+        snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack")
+            .StrokeColor.Should().Be(((ISolidColorBrush)sourceSeries.Stroke).Color.ToString());
 
         snapshot.Dashboard.TuningParameters.Select(parameter => parameter.Id)
             .Should().BeEquivalentTo(viewModel.SteerDashboard.TuningParameters.Select(parameter => parameter.Id));
@@ -316,18 +317,26 @@ public sealed class MainWindowViewModelTests
         var telemetryService = new TestCrashTelemetryService();
         var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
         dispatcher = new RecordingShellCommandDispatcher();
+
+        // Deterministic time for tests that assert relative timestamps.
         var timeProvider = new FixedTimeProvider(SeedTimestamp);
-        return new MainWindowViewModel(connection, null, preferencesService, themeManager, dispatcher, telemetryViewModel, timeProvider);
+
+        return new MainWindowViewModel(
+            connection,
+            null,
+            preferencesService,
+            themeManager,
+            dispatcher,
+            telemetryViewModel,
+            timeProvider);
     }
 
+    // Deterministic TimeProvider for stable tests.
     private sealed class FixedTimeProvider : TimeProvider
     {
         private readonly DateTimeOffset _utcNow;
 
-        public FixedTimeProvider(DateTimeOffset utcNow)
-        {
-            _utcNow = utcNow;
-        }
+        public FixedTimeProvider(DateTimeOffset utcNow) => _utcNow = utcNow;
 
         public override DateTimeOffset GetUtcNow() => _utcNow;
     }
@@ -433,6 +442,7 @@ public sealed class MainWindowViewModelTests
             {
                 CurrentTheme = theme;
                 ThemeChanged?.Invoke(this, theme);
+            }
         }
     }
 
@@ -446,7 +456,6 @@ public sealed class MainWindowViewModelTests
             return ValueTask.FromResult(true);
         }
     }
-}
 
     private sealed class TestCrashTelemetryService : ICrashTelemetryService
     {

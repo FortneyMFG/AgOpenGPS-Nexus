@@ -54,6 +54,16 @@ Systemd installs two units:
 - `aog-core.service` – headless Core orchestration, depends on AGiO and emits
   health heartbeats for supervision.【F:tools/packaging/linux/systemd/aog-core.service†L1-L26】【F:Nexus SourceCode/src/Aog.Core.Host/CoreHealthService.cs†L8-L68】
 
+When `aog-agio.service` loads the Linux backend it activates three independent
+hardware watchers. Tune them via `/etc/aog/agio/appsettings.json` or the
+matching `NEXUS_` environment overrides:
+
+| Subsystem | Default behavior | Disable/tune via |
+| --- | --- | --- |
+| Serial NMEA auto-scanner | Probes `/dev/ttyUSB*`, `/dev/ttyACM*`, `/dev/ttyAMA*`, `/dev/ttyS*`, and `/dev/serial/by-id/`, opening the first port that produces GGA/RMC/VTG sentences and streaming them over gRPC.【F:Nexus SourceCode/src/Aog.Agio.Linux/Serial/LinuxSerialPortEnumerator.cs†L17-L89】【F:Nexus SourceCode/src/Aog.Agio/Serial/NmeaAutoScanner.cs†L18-L118】 | Trim `AgioHost:Linux:Serial:DevicePrefixes` or set it to an empty array to pause enumeration.【F:Nexus SourceCode/src/Aog.Agio.Linux/Serial/LinuxSerialPortEnumeratorOptions.cs†L10-L37】 |
+| gpsd monitor | Connects to `/var/run/gpsd.sock`, issues a WATCH request, and logs TPV reports while the daemon is present.【F:Nexus SourceCode/src/Aog.Agio.Linux/Gpsd/GpsdBackgroundService.cs†L27-L98】 | Clear `AgioHost:Linux:Gpsd:SocketPath` (empty string or `null`) to skip gpsd integration entirely.【F:Nexus SourceCode/src/Aog.Agio.Linux/Gpsd/GpsdClientOptions.cs†L8-L36】 |
+| SocketCAN bridge | Consumes frames from `can0` by default, republishes them through `SocketCanBusService`, and supports hot reconfiguration when the interface changes.【F:Nexus SourceCode/src/Aog.Agio.Linux/SocketCan/SocketCanBackgroundService.cs†L19-L137】【F:Nexus SourceCode/src/Aog.Agio.Linux/SocketCan/SocketCanBusService.cs†L14-L84】 | Set `AgioHost:Linux:SocketCan:InterfaceName` to a specific bus (for example `vcan0`), or leave it empty to keep the worker idle until an interface is provided.【F:Nexus SourceCode/src/Aog.Agio.Linux/SocketCan/SocketCanOptions.cs†L21-L70】 |
+
 Common commands:
 
 ```bash

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -29,11 +30,31 @@ public sealed class GpsdClient
     /// <exception cref="GpsdSocketUnavailableException">Thrown when gpsd is not reachable.</exception>
     public async IAsyncEnumerable<GpsdTpvReport> WatchAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await using var stream = await _connectionFactory.ConnectAsync(cancellationToken).ConfigureAwait(false);
-        if (stream is null)
+        Stream? connection;
+        try
+        {
+            connection = await _connectionFactory.ConnectAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (GpsdUnavailableException)
+        {
+            throw;
+        }
+        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AccessDenied)
+        {
+            throw new GpsdUnavailableException(
+                $"Failed to connect to gpsd. SocketError: {ex.SocketErrorCode}.",
+                ex);
+        }
+        catch (SocketException ex)
+        {
+            throw new GpsdSocketUnavailableException("Failed to connect to gpsd.", ex);
+        }
+        if (connection is null)
         {
             throw new GpsdSocketUnavailableException("gpsd socket is unavailable.");
         }
+
+        await using var stream = connection;
 
         using var reader = new StreamReader(stream, Utf8NoBom, detectEncodingFromByteOrderMarks: false, bufferSize: 1024, leaveOpen: true);
         using var writer = new StreamWriter(stream, Utf8NoBom, bufferSize: 1024, leaveOpen: true)

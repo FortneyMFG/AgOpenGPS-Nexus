@@ -133,20 +133,31 @@ A successful build confirms the SDK is installed correctly. Subsequent runs can 
 ## 7. Switch Nexus to GPS Input
 
 Until the AGiO packaging (NX-062) ships, run the AGiO host directly. Export the project
-path override because the host project still lives under [`Aog.Agio`](../../Nexus%20SourceCode/src/Aog.Agio/Aog.Agio.csproj):
+path override because the host project still lives under [`Aog.Agio`](../../Nexus%20SourceCode/src/Aog.Agio/Aog.Agio.csproj).
+Select the Linux backend so serial, gpsd, and SocketCAN services all light up:
 
 ```bash
 export NEXUS_AGIO_PROJECT="Nexus SourceCode/src/Aog.Agio/Aog.Agio.csproj"
-./tools/scripts/nexus.sh run agio -- --backend Serial --port /dev/ttyACM0 --baud 115200
+export NEXUS_AGIOHOST__BACKEND__ASSEMBLY="Aog.Agio.Linux"
+export NEXUS_AGIOHOST__BACKEND__TYPE="Aog.Agio.Linux.LinuxAgioBackend"
+./tools/scripts/nexus.sh run agio
 ```
 
-- Replace `/dev/ttyACM0` with your device.
-- The `Serial` backend publishes GNSS fixes over gRPC for the Core/Sim hosts.
-- Logs appear in the console; look for `FixAcquired` events.
-- To disable the gpsd watcher when you are not running the gpsd daemon on the Pi,
-  export `NEXUS_AGIOHOST__LINUX__GPSD__SOCKETPATH=` (empty value) in the same shell or add
-  it to your service environment file. The worker treats a blank socket as an explicit
-  opt-out and exits immediately while leaving serial scanning enabled.
+The Linux backend wires three subsystems; use the knobs below to tune or disable them as
+needed:
+
+| Subsystem | Default behavior | How to tweak or disable |
+| --- | --- | --- |
+| Serial NMEA auto-scanner | Enumerates `/dev/ttyUSB*`, `/dev/ttyACM*`, `/dev/ttyAMA*`, `/dev/ttyS*`, and `/dev/serial/by-id/` to locate GNSS receivers, then publishes the first stream that emits GGA/RMC/VTG sentences.【F:Nexus SourceCode/src/Aog.Agio.Linux/Serial/LinuxSerialPortEnumerator.cs†L17-L89】【F:Nexus SourceCode/src/Aog.Agio/Serial/NmeaAutoScanner.cs†L18-L118】 | Set `AgioHost:Linux:Serial:DevicePrefixes` to a narrower list (or an empty array) in `/etc/aog/agio/appsettings.json` or via `NEXUS_AGIOHOST__LINUX__SERIAL__DEVICEPREFIXES__0=...` overrides to skip specific ports.【F:Nexus SourceCode/src/Aog.Agio.Linux/Serial/LinuxSerialPortEnumeratorOptions.cs†L10-L37】 |
+| gpsd monitor | Connects to `/var/run/gpsd.sock`, logs TPV updates, and retries when the daemon is unavailable.【F:Nexus SourceCode/src/Aog.Agio.Linux/Gpsd/GpsdBackgroundService.cs†L27-L98】 | Leave the socket blank by exporting `NEXUS_AGIOHOST__LINUX__GPSD__SOCKETPATH=` (or setting the value to `null`/`""` in appsettings) to disable the worker entirely.【F:Nexus SourceCode/src/Aog.Agio.Linux/Gpsd/GpsdClientOptions.cs†L8-L36】 |
+| SocketCAN bridge | Opens `can0` (or another configured interface), republishes frames over gRPC, and exposes them through the `SocketCanBusService` stream.【F:Nexus SourceCode/src/Aog.Agio.Linux/SocketCan/SocketCanBackgroundService.cs†L19-L122】【F:Nexus SourceCode/src/Aog.Agio.Linux/SocketCan/SocketCanBusService.cs†L14-L84】 | Point `AgioHost:Linux:SocketCan:InterfaceName` at `vcan0`/`can1`, or set it to an empty string to pause the monitor until a non-empty value is provided.【F:Nexus SourceCode/src/Aog.Agio.Linux/SocketCan/SocketCanOptions.cs†L21-L70】 |
+
+If you need the legacy single-port serial backend, pass explicit arguments instead of
+selecting the Linux bundle:
+
+```bash
+./tools/scripts/nexus.sh run agio -- --backend Serial --port /dev/ttyACM0 --baud 115200
+```
 
 Leave the AGiO host running and, in a second SSH session, start the simulator again to
 exercise the pipeline with mixed simulated and live data. Once the Core host is available,

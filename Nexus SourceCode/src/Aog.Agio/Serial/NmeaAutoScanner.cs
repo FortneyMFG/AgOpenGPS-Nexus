@@ -36,13 +36,19 @@ public sealed class NmeaAutoScanner
     /// <summary>
     /// Attempts to find a serial device producing valid NMEA GGA/RMC/VTG sentences.
     /// </summary>
-    public Task<NmeaPortScanResult?> ScanAsync(CancellationToken cancellationToken)
+    public Task<NmeaPortScanResult?> ScanAsync(
+        CancellationToken cancellationToken,
+        bool logOnSuccess = true,
+        bool logWhenNoneDetected = true)
     {
-        var result = ScanInternal(cancellationToken);
+        var result = ScanInternal(cancellationToken, logOnSuccess, logWhenNoneDetected);
         return Task.FromResult(result);
     }
 
-    private NmeaPortScanResult? ScanInternal(CancellationToken cancellationToken)
+    private NmeaPortScanResult? ScanInternal(
+        CancellationToken cancellationToken,
+        bool logOnSuccess,
+        bool logWhenNoneDetected)
     {
         foreach (var portName in _enumerator.GetPortNames())
         {
@@ -121,10 +127,13 @@ public sealed class NmeaAutoScanner
 
                     if (lastGga is not null && lastRmc is not null && lastVtg is not null)
                     {
-                        _logger.LogInformation(
-                            "Detected NMEA stream on {PortName} at {BaudRate} baud.",
-                            portName,
-                            baudRate);
+                        if (logOnSuccess)
+                        {
+                            _logger.LogInformation(
+                                "Detected NMEA stream on {PortName} at {BaudRate} baud.",
+                                portName,
+                                baudRate);
+                        }
 
                         return new NmeaPortScanResult(portName, baudRate, lastGga, lastRmc, lastVtg);
                     }
@@ -132,7 +141,11 @@ public sealed class NmeaAutoScanner
             }
         }
 
-        _logger.LogWarning("No NMEA-capable serial devices were detected during the scan.");
+        if (logWhenNoneDetected)
+        {
+            _logger.LogWarning("No NMEA-capable serial devices were detected during the scan.");
+        }
+
         return null;
     }
 

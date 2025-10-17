@@ -39,7 +39,9 @@ public sealed class SocketCanNetworkInterfaceProvider : ICanNetworkInterfaceProv
     /// <inheritdoc />
     public IReadOnlyList<CanNetworkInterface> GetAll(bool includeVirtualInterfaces)
     {
-        return CanNetworkInterface.GetAllInterfaces(includeVirtualInterfaces);
+        return CanNetworkInterface
+            .GetAllInterfaces(includeVirtualInterfaces)
+            .ToList();
     }
 }
 
@@ -182,7 +184,8 @@ internal sealed class SocketCanClient : ISocketCanClient
 
         try
         {
-            var bytesRead = _socket.Read(out var frame);
+            var frame = default(CanFrame);
+            var bytesRead = _socket.Read(ref frame);
             if (bytesRead <= 0)
             {
                 return SocketCanFrameReadResult.Timeout();

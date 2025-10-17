@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Aog.Core.Capabilities;
 
@@ -320,15 +321,23 @@ public static class CapabilityRegistry
     /// <param name="capabilityName">The canonical name or alias of the capability to resolve.</param>
     /// <param name="definition">When this method returns, contains the resolved capability if found; otherwise <see langword="null"/>.</param>
     /// <returns><see langword="true"/> when a capability definition was found; otherwise, <see langword="false"/>.</returns>
-    public static bool TryGetDefinition(string? capabilityName, out CapabilityDefinition definition)
+    public static bool TryGetDefinition(string? capabilityName, [NotNullWhen(true)] out CapabilityDefinition? definition)
     {
         if (string.IsNullOrWhiteSpace(capabilityName))
         {
-            definition = null!;
+            definition = null;
             return false;
         }
 
-        return DefinitionsByName.TryGetValue(capabilityName.Trim(), out definition);
+        var normalizedName = capabilityName.Trim();
+        if (DefinitionsByName.TryGetValue(normalizedName, out var resolved))
+        {
+            definition = resolved;
+            return true;
+        }
+
+        definition = null;
+        return false;
     }
 
     private static IReadOnlyDictionary<string, CapabilityDefinition> BuildIndex()

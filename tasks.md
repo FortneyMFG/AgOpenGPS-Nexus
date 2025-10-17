@@ -189,6 +189,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-1114 Capability registry XML documentation cleanup — Add XML docs for capability registry and weather snapshot models
 - [ ] NX-910 Job manifest cross-drive fallback fix
 - [x] NX-1017 Job Tasks orchestrator analyzer cleanup — Remove redundant Channel using directive
+- [x] NX-1018 Core nullability warning cleanup — Season aggregator, capability registry, job orchestrator, report builder adjustments
 - [ ] NX-1112 Legacy bridge & Linux adapter dependency alignment — Restore build after upstream API changes
 
 - [x] NX-247 Crop plugin layer ingestion pipeline _(Done)_ — ADR-045 crop type plugin

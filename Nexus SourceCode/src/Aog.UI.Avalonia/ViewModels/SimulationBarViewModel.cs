@@ -17,7 +17,7 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// <summary>
 /// View-model powering the simulation transport bar rendered in the shell.
 /// </summary>
-public sealed class SimulationBarViewModel : ObservableObject, IDisposable
+public class SimulationBarViewModel : ObservableObject, IDisposable
 {
     private const double PlaybackRateComparisonTolerance = 1e-6;
     private const double MinPlaybackRate = 0.1;

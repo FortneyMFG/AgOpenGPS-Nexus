@@ -247,6 +247,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-112 Layer-aware section map visualization _(Done)_
 - [x] NX-130 Presets & layout linking ADR _(Done)_
 - [ ] NX-948 MainWindow deterministic dashboard seeding
+- [ ] NX-995 Simulation bar design-time view model compile fix — Unseal view-model for design-time designer usage
 - [ ] NX-990 Shell menu tooltip timezone clarification
 
 - [x] NX-291 Zone editor toolbar integration _(Done)_ — ADR-044 zone drawing framework

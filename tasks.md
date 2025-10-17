@@ -182,6 +182,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-171 Official Telemetry Logging plugin GA _(Done)_
 - [x] NX-172 Official File IO plugin GA _(Done)_
 - [ ] NX-910 Job manifest cross-drive fallback fix
+- [x] NX-1017 Job Tasks orchestrator analyzer cleanup — Remove redundant Channel using directive
 
 - [x] NX-247 Crop plugin layer ingestion pipeline _(Done)_ — ADR-045 crop type plugin
 - [x] NX-248 Crop analytics API surface _(Done)_ — ADR-045 rotation analytics

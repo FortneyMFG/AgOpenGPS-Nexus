@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Aog.Core.Simulation.Configuration;
 
 namespace Aog.UI.Avalonia.ViewModels;
@@ -39,17 +40,12 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         Stream = stream;
         _availableSources = availableSources;
         _availableModes = availableModes;
-        if (!ContainsIgnoreCase(availableSources, selectedSource, out var canonicalSource))
-        {
-            _selectedSource = availableSources[0];
-        }
-        else
-        {
-            _selectedSource = canonicalSource;
-        }
-        _selectedMode = ContainsIgnoreCase(availableModes, mode)
-            ? mode
-            : availableModes[0];
+
+        var normalizedSource = Normalize(selectedSource, _availableSources);
+        _selectedSource = normalizedSource ?? selectedSource ?? _availableSources[0];
+
+        var normalizedMode = Normalize(mode, _availableModes);
+        _selectedMode = normalizedMode ?? mode ?? _availableModes[0];
     }
 
     /// <summary>
@@ -80,12 +76,8 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
                 return;
             }
 
-            if (!ContainsIgnoreCase(_availableSources, value, out var canonicalSource))
-            {
-                return;
-            }
-
-            if (canonicalSource.Equals(_selectedSource, StringComparison.Ordinal))
+            var canonicalSource = Normalize(value, _availableSources);
+            if (canonicalSource is null || canonicalSource.Equals(_selectedSource, StringComparison.Ordinal))
             {
                 return;
             }
@@ -107,15 +99,14 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
                 return;
             }
 
-            var matchedMode = _availableModes.FirstOrDefault(
-                candidate => candidate.Equals(value, StringComparison.OrdinalIgnoreCase));
+            var canonicalMode = Normalize(value, _availableModes);
 
-            if (matchedMode is null || matchedMode.Equals(_selectedMode, StringComparison.Ordinal))
+            if (canonicalMode is null || canonicalMode.Equals(_selectedMode, StringComparison.Ordinal))
             {
                 return;
             }
 
-            SetProperty(ref _selectedMode, matchedMode);
+            SetProperty(ref _selectedMode, canonicalMode);
         }
     }
 
@@ -127,23 +118,14 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         return new SimulationRouteConfiguration(Stream, SelectedSource, SelectedMode);
     }
 
-    private static bool ContainsIgnoreCase(IEnumerable<string> source, string value)
+    private static string? Normalize(string? proposed, IReadOnlyList<string> canon)
     {
-        return ContainsIgnoreCase(source, value, out _);
-    }
-
-    private static bool ContainsIgnoreCase(IEnumerable<string> source, string value, out string? match)
-    {
-        foreach (var candidate in source)
+        if (proposed is null)
         {
-            if (candidate.Equals(value, StringComparison.OrdinalIgnoreCase))
-            {
-                match = candidate;
-                return true;
-            }
+            return null;
         }
 
-        match = null;
-        return false;
+        return canon.FirstOrDefault(candidate =>
+            string.Equals(candidate, proposed, StringComparison.OrdinalIgnoreCase));
     }
 }

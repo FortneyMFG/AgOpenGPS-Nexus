@@ -31,17 +31,18 @@ public sealed class UnixDomainSocketGpsdConnectionFactory : IGpsdConnectionFacto
             return null;
         }
 
-        if (!File.Exists(socketPath))
-        {
-            _logger.LogDebug("gpsd socket {SocketPath} does not exist.", socketPath);
-            return null;
-        }
-
         var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
         try
         {
             await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketPath), cancellationToken).ConfigureAwait(false);
             return new NetworkStream(socket, ownsSocket: true);
+        }
+        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AccessDenied)
+        {
+            socket.Dispose();
+            throw new GpsdUnavailableException(
+                $"Failed to connect to gpsd socket '{socketPath}'. SocketError: {ex.SocketErrorCode}.",
+                ex);
         }
         catch (Exception ex)
         {

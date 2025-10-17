@@ -219,6 +219,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
         var targetRate = scenario.Options?.TimeScale ?? _configuration?.Options?.TimeScale ?? 1.0;
         SelectPlaybackRate(targetRate, updateController: true);
+        NotifyPlaybackRateProperties();
     }
 
     /// <summary>
@@ -245,6 +246,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
         var targetRate = _configuration?.Options?.TimeScale ?? 1.0;
         SelectPlaybackRate(targetRate, updateController: true);
+        NotifyPlaybackRateProperties();
     }
 
     /// <inheritdoc />
@@ -348,6 +350,12 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private void SortPlaybackRates()
     {
         _playbackRates.Sort((left, right) => left.Rate.CompareTo(right.Rate));
+    }
+
+    private void NotifyPlaybackRateProperties()
+    {
+        RaisePropertyChanged(nameof(SelectedPlaybackRate));
+        RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
     }
 
     private void UpdateSeekFraction(double value, bool triggerSeek)

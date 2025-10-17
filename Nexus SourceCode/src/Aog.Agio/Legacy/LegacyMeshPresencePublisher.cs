@@ -139,13 +139,15 @@ public sealed class LegacyMeshPresencePublisher : ILegacyMeshPresencePublisher, 
 
     private static MeshPose BuildMeshPose(Pose pose)
     {
+        var latitude = double.IsFinite(pose.LatitudeDeg) ? pose.LatitudeDeg : 0.0;
+        var longitude = double.IsFinite(pose.LongitudeDeg) ? pose.LongitudeDeg : 0.0;
         var altitude = double.IsFinite(pose.AltitudeM) ? pose.AltitudeM : (double?)null;
         var headingDegrees = double.IsFinite(pose.HeadingRad) ? pose.HeadingRad * 180.0 / Math.PI : (double?)null;
         var speed = double.IsFinite(pose.SpeedMps) ? pose.SpeedMps : (double?)null;
 
         return new MeshPose(
-            pose.LatitudeDeg,
-            pose.LongitudeDeg,
+            latitude,
+            longitude,
             altitude,
             headingDegrees,
             speed);

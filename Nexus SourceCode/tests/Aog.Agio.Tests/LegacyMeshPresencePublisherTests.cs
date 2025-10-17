@@ -105,6 +105,40 @@ public sealed class LegacyMeshPresencePublisherTests
     }
 
     [Fact]
+    public async Task PublishPresenceAsync_DropsNonFinitePoseValues()
+    {
+        var meshService = new RecordingMeshService();
+        var options = Options.Create(new LegacyMeshOptions
+        {
+            DeviceId = "device:legacy",
+            Label = "Legacy Gateway",
+            DefaultSeasonId = "season:2025",
+            DefaultJobId = "job:alpha",
+        });
+
+        var publisher = new LegacyMeshPresencePublisher(meshService, options);
+        meshService.Registrations.Clear();
+
+        var pose = new Pose
+        {
+            LatitudeDeg = double.NaN,
+            LongitudeDeg = double.PositiveInfinity,
+            AltitudeM = double.NaN,
+            HeadingRad = double.NegativeInfinity,
+            SpeedMps = double.NaN,
+        };
+
+        await publisher.PublishPresenceAsync(pose, new LegacyPoseMetadata(), CancellationToken.None);
+
+        var update = Assert.Single(meshService.PresenceUpdates);
+        Assert.Equal(0.0, update.Pose.Latitude);
+        Assert.Equal(0.0, update.Pose.Longitude);
+        Assert.Null(update.Pose.AltitudeMeters);
+        Assert.Null(update.Pose.HeadingDegrees);
+        Assert.Null(update.Pose.SpeedMetersPerSecond);
+    }
+
+    [Fact]
     public async Task PublishPresenceAsync_UsesDiscoveryMetadata()
     {
         var meshService = new RecordingMeshService();

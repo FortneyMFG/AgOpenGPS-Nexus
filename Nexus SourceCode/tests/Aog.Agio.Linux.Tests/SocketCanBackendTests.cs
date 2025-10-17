@@ -31,18 +31,19 @@ public sealed class SocketCanBackendTests
         var client = new FakeSocketCanClient("vcan0", frames);
         var factory = new FakeSocketCanClientFactory(client);
         var channel = new SocketCanFrameChannel();
-        var options = Options.Create(new SocketCanOptions
+        var options = new SocketCanOptions
         {
             InterfaceName = "vcan0",
             ReceiveTimeout = TimeSpan.FromMilliseconds(10),
             ReconnectDelay = TimeSpan.FromMilliseconds(10),
             SourcePrefix = "test/socketcan",
-        });
+        };
+        var optionsMonitor = new TestOptionsMonitor(options);
 
         var service = new SocketCanBackgroundService(
             factory,
             channel,
-            options,
+            optionsMonitor,
             new FixedTimeProvider(new DateTimeOffset(2024, 01, 01, 12, 00, 00, TimeSpan.Zero)),
             NullLogger<SocketCanBackgroundService>.Instance);
 
@@ -68,6 +69,62 @@ public sealed class SocketCanBackendTests
         Assert.True(second.IsRemoteRequest);
         Assert.Equal(ByteString.Empty, second.Payload);
         Assert.Equal<ulong>(2, second.Header.Sequence);
+
+        await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task BackgroundService_ReconfiguresWhenOptionsChange()
+    {
+        var channel = new SocketCanFrameChannel();
+        var firstClient = new PassiveSocketCanClient("vcan0");
+        var secondClient = new PassiveSocketCanClient("vcan1");
+        var factory = new TrackingSocketCanClientFactory(options =>
+        {
+            return options.InterfaceName switch
+            {
+                "vcan0" => firstClient,
+                "vcan1" => secondClient,
+                _ => throw new InvalidOperationException($"Unexpected interface '{options.InterfaceName}'."),
+            };
+        });
+
+        var initialOptions = new SocketCanOptions
+        {
+            InterfaceName = "vcan0",
+            ReceiveTimeout = TimeSpan.FromMilliseconds(10),
+            ReconnectDelay = TimeSpan.FromMilliseconds(10),
+            SourcePrefix = "test/socketcan",
+        };
+        var monitor = new TestOptionsMonitor(initialOptions);
+
+        var service = new SocketCanBackgroundService(
+            factory,
+            channel,
+            monitor,
+            TimeProvider.System,
+            NullLogger<SocketCanBackgroundService>.Instance);
+
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        await WaitForAsync(() => factory.CreatedInterfaces.Count >= 1, TimeSpan.FromSeconds(1));
+        Assert.Equal("vcan0", factory.CreatedInterfaces[0]);
+
+        monitor.Update(new SocketCanOptions
+        {
+            InterfaceName = "vcan1",
+            ReceiveTimeout = initialOptions.ReceiveTimeout,
+            ReconnectDelay = initialOptions.ReconnectDelay,
+            SourcePrefix = initialOptions.SourcePrefix,
+            IncludeVirtualInterfaces = initialOptions.IncludeVirtualInterfaces,
+            ReceiveOwnMessages = initialOptions.ReceiveOwnMessages,
+        });
+
+        await WaitForAsync(() => factory.CreatedInterfaces.Count >= 2, TimeSpan.FromSeconds(1));
+        Assert.Equal("vcan1", factory.CreatedInterfaces[1]);
+
+        await WaitForAsync(() => firstClient.DisposeCount > 0, TimeSpan.FromSeconds(1));
+        Assert.Equal(1, firstClient.DisposeCount);
 
         await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
     }
@@ -119,6 +176,30 @@ public sealed class SocketCanBackendTests
         }
     }
 
+    private sealed class TrackingSocketCanClientFactory : ISocketCanClientFactory
+    {
+        private readonly Func<SocketCanOptions, ISocketCanClient> _factory;
+
+        public TrackingSocketCanClientFactory(Func<SocketCanOptions, ISocketCanClient> factory)
+        {
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+        }
+
+        public List<string> CreatedInterfaces { get; } = new();
+
+        public ValueTask<ISocketCanClient> CreateAsync(SocketCanOptions options, CancellationToken cancellationToken)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            CreatedInterfaces.Add(options.InterfaceName);
+            return new ValueTask<ISocketCanClient>(_factory(options));
+        }
+    }
+
     private sealed class FakeSocketCanClient : ISocketCanClient
     {
         private readonly Queue<SocketCANSharp.CanFrame> _frames;
@@ -147,6 +228,29 @@ public sealed class SocketCanBackendTests
         }
     }
 
+    private sealed class PassiveSocketCanClient : ISocketCanClient
+    {
+        public PassiveSocketCanClient(string interfaceName)
+        {
+            InterfaceName = interfaceName;
+        }
+
+        public string InterfaceName { get; }
+
+        public int DisposeCount { get; private set; }
+
+        public SocketCanFrameReadResult ReadFrame(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return SocketCanFrameReadResult.Timeout();
+        }
+
+        public void Dispose()
+        {
+            DisposeCount++;
+        }
+    }
+
     private sealed class FixedTimeProvider : TimeProvider
     {
         private readonly DateTimeOffset _now;
@@ -154,6 +258,99 @@ public sealed class SocketCanBackendTests
         public FixedTimeProvider(DateTimeOffset now) => _now = now;
 
         public override DateTimeOffset GetUtcNow() => _now;
+    }
+
+    private sealed class TestOptionsMonitor : IOptionsMonitor<SocketCanOptions>
+    {
+        private readonly object _gate = new();
+        private SocketCanOptions _current;
+        private List<Action<SocketCanOptions, string>> _listeners = new();
+
+        public TestOptionsMonitor(SocketCanOptions current)
+        {
+            _current = current ?? throw new ArgumentNullException(nameof(current));
+        }
+
+        public SocketCanOptions CurrentValue
+        {
+            get
+            {
+                lock (_gate)
+                {
+                    return _current;
+                }
+            }
+        }
+
+        public SocketCanOptions Get(string? name) => CurrentValue;
+
+        public IDisposable OnChange(Action<SocketCanOptions, string> listener)
+        {
+            if (listener is null)
+            {
+                throw new ArgumentNullException(nameof(listener));
+            }
+
+            lock (_gate)
+            {
+                _listeners = new List<Action<SocketCanOptions, string>>(_listeners) { listener };
+            }
+
+            return new ChangeHandle(this, listener);
+        }
+
+        public void Update(SocketCanOptions options, string name = Options.DefaultName)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            List<Action<SocketCanOptions, string>> listeners;
+            lock (_gate)
+            {
+                _current = options;
+                listeners = _listeners;
+            }
+
+            foreach (var listener in listeners)
+            {
+                listener(options, name);
+            }
+        }
+
+        private void Unregister(Action<SocketCanOptions, string> listener)
+        {
+            lock (_gate)
+            {
+                _listeners = new List<Action<SocketCanOptions, string>>(_listeners);
+                _listeners.Remove(listener);
+            }
+        }
+
+        private sealed class ChangeHandle : IDisposable
+        {
+            private TestOptionsMonitor? _monitor;
+            private Action<SocketCanOptions, string>? _listener;
+
+            public ChangeHandle(TestOptionsMonitor monitor, Action<SocketCanOptions, string> listener)
+            {
+                _monitor = monitor;
+                _listener = listener;
+            }
+
+            public void Dispose()
+            {
+                var listener = Interlocked.Exchange(ref _listener, null);
+                var monitor = Interlocked.Exchange(ref _monitor, null);
+                if (listener is null || monitor is null)
+                {
+                    return;
+                }
+
+                monitor.Unregister(listener);
+            }
+        }
     }
 
     private sealed class TestServerStreamWriter<T> : IServerStreamWriter<T>

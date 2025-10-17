@@ -59,6 +59,27 @@ using Xunit;
 public class LegacySteerCodecTests
 {
     [Fact]
+    public void EncodeSteerCommand_DisabledCommandClearsEngagedBitAndZeroesAngle()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { TargetWheelAngleDeg = 12.34, Enable = false };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            GuidanceStatus = 0b0000_0011, // engaged + remote
+            SpeedKph = 4.2,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        // Expect engaged bit (0x01) cleared, other bits preserved (0b10)
+        Assert.Equal(0b0000_0010, frame[7]);
+
+        // Angle should be zero when disabled
+        var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(frame.AsSpan(8, 2));
+        Assert.Equal(0, steerHundredths);
+    }
+
+    [Fact]
     public void EncodeSteerCommand_TruncatesMaskAboveSectionCount()
     {
         var codec = new LegacySteerCodec();
@@ -71,33 +92,26 @@ public class LegacySteerCodecTests
 
         var frame = codec.EncodeSteerCommand(command, sections);
 
-        // Section mask is little-endian at bytes 11..12
         var encodedMask = BinaryPrimitives.ReadUInt16LittleEndian(frame.AsSpan(11, 2));
         Assert.Equal(0b0000_1010_0000_1111u, encodedMask);
     }
+}
 
     [Fact]
-    public void EncodeSteerCommand_DisabledCommandForcesStatusZeroAndAngleZero()
+    public void EncodeSteerCommand_PreservesMetadataStatusBitsWhenEnabled()
     {
         var codec = new LegacySteerCodec();
-        var command = new SteerCmd { TargetWheelAngleDeg = 12.34, Enable = false };
+        var command = new SteerCmd { TargetWheelAngleDeg = -1.5, Enable = true };
         var metadata = new LegacySteerCommandMetadata
         {
-            GuidanceStatus = 3,  // should be overridden when disabled
-            SpeedKph = 4.2,
+            GuidanceStatus = 0b0010_0100,
+            SpeedKph = 7.8,
         };
 
         var frame = codec.EncodeSteerCommand(command, metadata: metadata);
 
-        // Status byte: index 7
-        Assert.Equal(0, frame[7]);
-
-        // Angle (hundredths of a degree), bytes 8..9 little-endian
-        var steerHundredths = BinaryPrimitives.ReadInt16LittleEndian(frame.AsSpan(8, 2));
-        Assert.Equal(0, steerHundredths);
+        Assert.Equal(0b0010_0101, frame[7]);
     }
-}
-
 
     [Fact]
     public void EncodeSteerCommand_AllowsFullSixteenBitMask()

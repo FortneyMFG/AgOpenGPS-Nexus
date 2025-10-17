@@ -81,15 +81,37 @@ public sealed class GpsdClient
 
             if (line is null)
             {
-                yield break;
+                throw new GpsdSocketUnavailableException("gpsd stream ended unexpectedly.");
             }
 
-            if (!GpsdTpvReport.TryParse(line, out var report) || report is null)
+            if (!TryParseTpv(line, out var report) || report is null)
             {
                 continue;
             }
 
             yield return report;
         }
+    }
+
+    private static bool TryParseTpv(string? json, out GpsdTpvReport? report)
+    {
+        if (!GpsdTpvReport.TryParse(json, out report) || report is null)
+        {
+            return false;
+        }
+
+        if (report.LatitudeDegrees is { } latitude && (latitude < -90 || latitude > 90))
+        {
+            report = null;
+            return false;
+        }
+
+        if (report.LongitudeDegrees is { } longitude && (longitude < -180 || longitude > 180))
+        {
+            report = null;
+            return false;
+        }
+
+        return true;
     }
 }

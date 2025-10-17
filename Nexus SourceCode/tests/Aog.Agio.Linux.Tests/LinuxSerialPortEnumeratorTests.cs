@@ -152,6 +152,48 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
         Assert.Equal("/dev/original", options.DevicePrefixes[0]);
     }
 
+    [Fact]
+    public void GetPortNames_SymlinkAndCanonicalPath_CollapsesToSingleEntry()
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            return;
+        }
+
+        var devDir = CreateSubDirectory("dev");
+        var byIdDir = CreateSubDirectory(Path.Combine("dev", "serial", "by-id"));
+        var device = CreateDevice(devDir, "ttyACM0");
+
+        var symlinkPath = Path.Combine(byIdDir, "gnss-device");
+        if (File.Exists(symlinkPath))
+        {
+            File.Delete(symlinkPath);
+        }
+
+        File.CreateSymbolicLink(symlinkPath, device);
+
+        var logger = new ListLogger<LinuxSerialPortEnumerator>();
+        var options = Options.Create(new LinuxSerialPortEnumeratorOptions
+        {
+            DevicePrefixes = new[]
+            {
+                Path.Combine(devDir, "ttyACM"),
+                byIdDir + "/",
+            },
+        });
+
+        var enumerator = new LinuxSerialPortEnumerator(logger, options);
+
+        var ports = enumerator.GetPortNames().ToArray();
+
+        Assert.Single(ports);
+        var symlinkFullPath = Path.GetFullPath(symlinkPath);
+        Assert.Contains(ports[0], new[] { device, symlinkFullPath });
+        Assert.Contains(
+            logger.Entries,
+            entry => entry.Level == LogLevel.Debug && entry.Message.Contains(symlinkFullPath, StringComparison.Ordinal));
+    }
+
     public void Dispose()
     {
         try

@@ -1,7 +1,7 @@
 using System;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using Aog.Agio.Linux;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -46,11 +46,11 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
                     "NMEA stream detected on {Device} at {BaudRate} baud. Lat={Latitude}, Lon={Longitude}, Alt={Altitude}m, Speed={Speed}km/h, Course={Course}°.",
                     result.PortName,
                     result.BaudRate,
-                    FormatNullable(result.Gga.LatitudeDegrees, "F6"),
-                    FormatNullable(result.Gga.LongitudeDegrees, "F6"),
-                    FormatNullable(result.Gga.AltitudeMeters, "F1"),
-                    FormatNullable(result.Vtg.SpeedKilometersPerHour, "F2"),
-                    FormatNullable(result.Vtg.TrueCourseDegrees, "F1"));
+                    FormatHelpers.FormatDouble(result.Gga.LatitudeDegrees, "F6"),
+                    FormatHelpers.FormatDouble(result.Gga.LongitudeDegrees, "F6"),
+                    FormatHelpers.FormatDouble(result.Gga.AltitudeMeters, "F1"),
+                    FormatHelpers.FormatDouble(result.Vtg.SpeedKilometersPerHour, "F2"),
+                    FormatHelpers.FormatDouble(result.Vtg.TrueCourseDegrees, "F1"));
 
                 await MonitorActiveStreamAsync(result, stoppingToken).ConfigureAwait(false);
             }
@@ -99,8 +99,4 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
         }
     }
 
-    private static string FormatNullable(double? value, string format)
-    {
-        return value?.ToString(format, CultureInfo.InvariantCulture) ?? "n/a";
-    }
 }

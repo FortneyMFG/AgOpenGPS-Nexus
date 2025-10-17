@@ -96,6 +96,7 @@ public sealed class SimulationBarViewModelTests
         var customRate = viewModel.PlaybackRates.Single(option => Math.Abs(option.Rate - 0.75) < 1e-6);
         customRate.IsSelected.Should().BeTrue();
         customRate.Label.Should().Be($"{0.75:0.#}×");
+        viewModel.PlaybackRates.Count(option => option.IsSelected).Should().Be(1);
     }
 
     [Fact]
@@ -148,6 +149,7 @@ public sealed class SimulationBarViewModelTests
             .Should()
             .Equal(0.5, 0.75, 1.0, 2.0);
         viewModel.PlaybackRates.Single(option => Math.Abs(option.Rate - 0.75) < 1e-6).IsSelected.Should().BeTrue();
+        viewModel.PlaybackRates.Count(option => option.IsSelected).Should().Be(1);
     }
 
     [Fact]

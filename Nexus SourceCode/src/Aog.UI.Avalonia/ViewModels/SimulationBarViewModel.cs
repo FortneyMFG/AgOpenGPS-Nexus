@@ -26,6 +26,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private readonly List<SimulationPlaybackRateOptionViewModel> _playbackRates = new();
     private readonly EventHandler<ReplayStateChangedEventArgs>? _stateChangedHandler;
 
+    private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRateOption;
     private bool _disposed;
     private bool _isPlaying;
     private bool _isUpdatingFromController;
@@ -314,11 +315,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         }
 
         var option = EnsurePlaybackRateOption(rate);
-
-        foreach (var candidate in _playbackRates)
-        {
-            candidate.SetSelected(candidate == option, suppressCallback: true);
-        }
+        UpdateSelectedPlaybackRateOption(option);
 
         SelectedPlaybackRate = rate;
 
@@ -348,6 +345,19 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private void SortPlaybackRates()
     {
         _playbackRates.Sort((left, right) => left.Rate.CompareTo(right.Rate));
+    }
+
+    private void UpdateSelectedPlaybackRateOption(SimulationPlaybackRateOptionViewModel option)
+    {
+        if (_selectedPlaybackRateOption == option)
+        {
+            option.SetSelected(true, suppressCallback: true);
+            return;
+        }
+
+        _selectedPlaybackRateOption?.SetSelected(false, suppressCallback: true);
+        option.SetSelected(true, suppressCallback: true);
+        _selectedPlaybackRateOption = option;
     }
 
     private void UpdateSeekFraction(double value, bool triggerSeek)
@@ -390,10 +400,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
             SelectedPlaybackRate = state.PlaybackRate;
 
             var option = EnsurePlaybackRateOption(state.PlaybackRate);
-            foreach (var candidate in _playbackRates)
-            {
-                candidate.SetSelected(candidate == option, suppressCallback: true);
-            }
+            UpdateSelectedPlaybackRateOption(option);
         }
         finally
         {

@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Security.Cryptography;
 using System.Text;
-using Aog.Core.Paths;
+using PlanarPoint = Aog.Core.Paths.PlanarPoint;
 
 namespace Aog.Plugins.Genetics;
 

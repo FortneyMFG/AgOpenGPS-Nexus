@@ -1,13 +1,9 @@
 using System.Globalization;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Parquet;
-using Parquet.Data;
-using Parquet.Schema;
 using ParquetSchema = Parquet.Schema.ParquetSchema;
 
 namespace Aog.Tools.LegacyDataMigrator;

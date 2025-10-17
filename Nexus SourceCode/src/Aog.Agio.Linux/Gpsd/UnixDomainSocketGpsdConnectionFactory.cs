@@ -11,20 +11,21 @@ namespace Aog.Agio.Linux.Gpsd;
 public sealed class UnixDomainSocketGpsdConnectionFactory : IGpsdConnectionFactory
 {
     private readonly ILogger<UnixDomainSocketGpsdConnectionFactory> _logger;
-    private readonly GpsdClientOptions _options;
+    private readonly IOptionsMonitor<GpsdClientOptions> _options;
 
     public UnixDomainSocketGpsdConnectionFactory(
         ILogger<UnixDomainSocketGpsdConnectionFactory> logger,
-        IOptions<GpsdClientOptions> options)
+        IOptionsMonitor<GpsdClientOptions> options)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = (options ?? throw new ArgumentNullException(nameof(options))).Value ?? throw new ArgumentException("Options are required.", nameof(options));
+        _options = options ?? throw new ArgumentNullException(nameof(options));
+        _ = options.CurrentValue ?? throw new ArgumentException("Options are required.", nameof(options));
     }
 
     /// <inheritdoc />
     public async Task<Stream?> ConnectAsync(CancellationToken cancellationToken)
     {
-        var socketPath = _options.SocketPath;
+        var socketPath = _options.CurrentValue?.SocketPath;
         if (string.IsNullOrEmpty(socketPath))
         {
             _logger.LogDebug("gpsd socket path not configured; skipping connection attempt.");

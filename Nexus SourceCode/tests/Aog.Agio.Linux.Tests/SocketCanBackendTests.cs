@@ -205,70 +205,119 @@ public async Task BackgroundService_ReconfiguresWhenOptionsChange()
     }
 
     [Fact]
-    public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
+[Fact]
+public async Task SocketCanBusService_DropsSlowSubscribers()
+{
+    // Service-level: verifies a slow gRPC writer triggers drop,
+    // and a later fast subscriber still receives fresh frames.
+    var channel = new SocketCanFrameChannel(subscriberCapacity: 4, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
+    var service = new SocketCanBusService(channel);
+
+    // Slow subscriber simulates backpressure on the server stream.
+    var slowWriter = new SlowServerStreamWriter<CanFrame>(TimeSpan.FromMilliseconds(200));
+    var slowContext = new TestServerCallContext(CancellationToken.None);
+    var slowCallTask = service.SubscribeFrames(new Empty(), slowWriter, slowContext);
+
+    // Publish a burst that should overflow the per-subscriber buffer and cause a drop.
+    for (var i = 0; i < 50; i++)
     {
-        var channel = new SocketCanFrameChannel(subscriberCapacity: 4, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
-        using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-
-        var fastFrames = new ConcurrentQueue<CanFrame>();
-
-        var fastTask = Task.Run(async () =>
+        await channel.PublishAsync(new CanFrame
         {
-            try
-            {
-                await foreach (var frame in channel.ReadAllAsync(fastCts.Token))
-                {
-                    fastFrames.Enqueue(frame);
-                }
-            }
-            catch (OperationCanceledException) when (fastCts.IsCancellationRequested)
-            {
-            }
-        });
+            Header = new Header(),
+            ArbitrationId = (uint)i,
+        }, CancellationToken.None).ConfigureAwait(false);
+    }
 
-        var slowCompletion = new TaskCompletionSource<Exception?>(TaskCreationOptions.RunContinuationsAsynchronously);
+    await WaitForAsync(() => slowCallTask.IsCompleted, TimeSpan.FromSeconds(5));
+    await slowCallTask.ConfigureAwait(false);
 
-        var slowTask = Task.Run(async () =>
+    // If the slow subscriber had kept up, it would have 50 messages.
+    Assert.True(slowWriter.Messages.Count < 50);
+
+    // Now verify a fresh/fast subscriber still gets new frames promptly.
+    var fastWriter = new TestServerStreamWriter<CanFrame>();
+    using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+    var fastContext = new TestServerCallContext(fastCts.Token);
+    var fastCallTask = service.SubscribeFrames(new Empty(), fastWriter, fastContext);
+
+    var finalFrame = new CanFrame { Header = new Header(), ArbitrationId = 0xABC };
+    await channel.PublishAsync(finalFrame, CancellationToken.None).ConfigureAwait(false);
+
+    await WaitForAsync(() => fastWriter.Messages.Count > 0, TimeSpan.FromSeconds(1));
+    var received = Assert.Single(fastWriter.Messages);
+    Assert.Equal(0xABCu, received.ArbitrationId);
+
+    fastCts.Cancel();
+    await fastCallTask.ConfigureAwait(false);
+}
+
+[Fact]
+public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
+{
+    // Channel-level: verifies bounded per-subscriber queue and backpressure timeout.
+    var channel = new SocketCanFrameChannel(subscriberCapacity: 4, maxSubscriberBackpressure: TimeSpan.FromMilliseconds(50));
+    using var fastCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+    using var slowCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+    var fastFrames = new ConcurrentQueue<CanFrame>();
+
+    var fastTask = Task.Run(async () =>
+    {
+        try
         {
-            await using var enumerator = channel.ReadAllAsync(slowCts.Token).GetAsyncEnumerator();
-            try
+            await foreach (var frame in channel.ReadAllAsync(fastCts.Token))
             {
-                while (await enumerator.MoveNextAsync())
-                {
-                    await Task.Delay(200, slowCts.Token);
-                }
-
-                slowCompletion.TrySetResult(null);
+                fastFrames.Enqueue(frame);
             }
-            catch (Exception ex)
-            {
-                slowCompletion.TrySetResult(ex);
-            }
-        });
-
-        for (var i = 0; i < 100; i++)
-        {
-            var frame = new CanFrame
-            {
-                Header = new Header { Sequence = (ulong)(i + 1) },
-                ArbitrationId = (uint)i,
-            };
-
-            await channel.PublishAsync(frame, CancellationToken.None);
         }
+        catch (OperationCanceledException) when (fastCts.IsCancellationRequested) { }
+    });
 
-        await WaitForAsync(() => fastFrames.Count >= 100, TimeSpan.FromSeconds(2));
-        await WaitForAsync(() => slowCompletion.Task.IsCompleted, TimeSpan.FromSeconds(2));
+    var slowCompletion = new TaskCompletionSource<Exception?>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        var slowResult = await slowCompletion.Task.ConfigureAwait(false);
-        Assert.IsType<OperationCanceledException>(slowResult);
-        Assert.Contains(fastFrames, frame => frame.ArbitrationId == 99);
+    var slowTask = Task.Run(async () =>
+    {
+        await using var enumerator = channel.ReadAllAsync(slowCts.Token).GetAsyncEnumerator();
+        try
+        {
+            while (await enumerator.MoveNextAsync())
+            {
+                // Artificial slowness to trip backpressure handling
+                await Task.Delay(200, slowCts.Token);
+            }
 
-        fastCts.Cancel();
-        slowCts.Cancel();
+            slowCompletion.TrySetResult(null);
+        }
+        catch (Exception ex)
+        {
+            slowCompletion.TrySetResult(ex);
+        }
+    });
 
-        await Task.WhenAll(fastTask, slowTask);
+    for (var i = 0; i < 100; i++)
+    {
+        var frame = new CanFrame
+        {
+            Header = new Header { Sequence = (ulong)(i + 1) },
+            ArbitrationId = (uint)i,
+        };
+
+        await channel.PublishAsync(frame, CancellationToken.None);
+    }
+
+    await WaitForAsync(() => fastFrames.Count >= 100, TimeSpan.FromSeconds(2));
+    await WaitForAsync(() => slowCompletion.Task.IsCompleted, TimeSpan.FromSeconds(2));
+
+    var slowResult = await slowCompletion.Task.ConfigureAwait(false);
+    Assert.IsType<OperationCanceledException>(slowResult);
+    Assert.Contains(fastFrames, frame => frame.ArbitrationId == 99);
+
+    fastCts.Cancel();
+    slowCts.Cancel();
+
+    await Task.WhenAll(fastTask, slowTask);
+}
+
     }
 
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)
@@ -490,6 +539,26 @@ public async Task BackgroundService_ReconfiguresWhenOptionsChange()
         {
             Messages.Add(message);
             return Task.CompletedTask;
+        }
+    }
+
+    private sealed class SlowServerStreamWriter<T> : IServerStreamWriter<T>
+    {
+        private readonly TimeSpan _delay;
+
+        public SlowServerStreamWriter(TimeSpan delay)
+        {
+            _delay = delay;
+        }
+
+        public List<T> Messages { get; } = new();
+
+        public WriteOptions? WriteOptions { get; set; }
+
+        public async Task WriteAsync(T message)
+        {
+            await Task.Delay(_delay).ConfigureAwait(false);
+            Messages.Add(message);
         }
     }
 

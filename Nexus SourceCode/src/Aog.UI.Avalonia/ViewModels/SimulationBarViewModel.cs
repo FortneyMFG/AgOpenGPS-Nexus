@@ -46,16 +46,23 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         _duration = configuration?.Duration ?? _defaultDuration;
         _logger = logger ?? NullLogger<SimulationBarViewModel>.Instance;
 
+        var configuredPlaybackRate = configuration?.Options?.TimeScale;
+        var initialPlaybackRate = configuredPlaybackRate.HasValue &&
+            !double.IsNaN(configuredPlaybackRate.Value) &&
+            !double.IsInfinity(configuredPlaybackRate.Value) &&
+            configuredPlaybackRate.Value > 0
+            ? configuredPlaybackRate.Value
+            : 1.0;
+
         _togglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
-        _state = new ReplayState(isPlaying: false, position: TimeSpan.Zero, duration: _duration, playbackRate: 1.0);
-        _selectedPlaybackRate = _state.PlaybackRate;
+        _state = new ReplayState(isPlaying: false, position: TimeSpan.Zero, duration: _duration, playbackRate: initialPlaybackRate);
 
         _playbackRates = BuildPlaybackRateOptions();
         var initialRoutes = configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>();
         _routes = new ObservableCollection<SimulationStreamRouteViewModel>(
             SimulationRouteViewModelBuilder.BuildRoutes(configuration, initialRoutes));
 
-        SyncPlaybackRateSelection(_selectedPlaybackRate);
+        OnPlaybackRateSelected(initialPlaybackRate);
 
         _replayController = replayController;
         _replayStateChangedHandler = OnReplayStateChanged;

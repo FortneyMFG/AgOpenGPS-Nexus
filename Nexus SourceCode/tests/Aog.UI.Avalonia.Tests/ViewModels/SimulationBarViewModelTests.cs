@@ -63,6 +63,32 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+    public void Constructor_WithConfiguredTimeScale_UsesConfiguredPlaybackRate()
+    {
+        const string json = """
+{
+  "schemaVersion": "1.0.0",
+  "providers": [
+    { "providerId": "sim.clock.fixed", "outputs": ["time"] },
+    { "providerId": "sim.vehicle.bicycle", "inputs": ["time"], "outputs": ["pose"] }
+  ],
+  "routes": [
+    { "stream": "pose", "source": "sim.vehicle.bicycle", "mode": "simulation" }
+  ],
+  "options": { "seed": 2024, "timeScale": 0.75 },
+  "scenarios": []
+}
+""";
+
+        var configuration = SimulationConfigurationLoader.Load(json);
+
+        using var viewModel = new SimulationBarViewModel(configuration);
+
+        viewModel.SelectedPlaybackRate.Should().Be(0.75);
+        viewModel.SelectedPlaybackRateLabel.Should().Be("75%");
+    }
+
+    [Fact]
     public void ApplyScenario_UpdatesMetadataAndRoutes()
     {
         var configuration = CreateConfigurationWithScenario();

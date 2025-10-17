@@ -44,16 +44,17 @@ public sealed class GpsdBackgroundService : BackgroundService
             {
                 await foreach (var report in _client.WatchAsync(stoppingToken).WithCancellation(stoppingToken))
                 {
-                    var latitude = report.LatitudeDegrees?.ToString("F6", CultureInfo.InvariantCulture) ?? "n/a";
-                    var longitude = report.LongitudeDegrees?.ToString("F6", CultureInfo.InvariantCulture) ?? "n/a";
-                    var altitude = report.AltitudeMeters?.ToString("F1", CultureInfo.InvariantCulture) ?? "n/a";
-                    var speed = report.SpeedMetersPerSecond?.ToString("F2", CultureInfo.InvariantCulture) ?? "n/a";
-                    var track = report.TrackDegrees?.ToString("F1", CultureInfo.InvariantCulture) ?? "n/a";
+                    var latitude = FormatDouble(report.LatitudeDegrees, "F6");
+                    var longitude = FormatDouble(report.LongitudeDegrees, "F6");
+                    var altitude = FormatDouble(report.AltitudeMeters, "F1");
+                    var speed = FormatDouble(report.SpeedMetersPerSecond, "F2");
+                    var track = FormatDouble(report.TrackDegrees, "F1");
                     var timestamp = report.Timestamp?.ToString("o", CultureInfo.InvariantCulture) ?? "n/a";
+                    var mode = report.Mode?.ToString(CultureInfo.InvariantCulture) ?? "n/a";
 
                     _logger.LogInformation(
                         "gpsd TPV: Mode={Mode}, Lat={Latitude}, Lon={Longitude}, Alt={Altitude}m, Speed={Speed}m/s, Track={Track}°, Time={Timestamp}",
-                        report.Mode?.ToString(CultureInfo.InvariantCulture) ?? "n/a",
+                        mode,
                         latitude,
                         longitude,
                         altitude,
@@ -90,4 +91,7 @@ public sealed class GpsdBackgroundService : BackgroundService
             }
         }
     }
+
+    private static string FormatDouble(double? value, string format)
+        => value?.ToString(format, CultureInfo.InvariantCulture) ?? "n/a";
 }

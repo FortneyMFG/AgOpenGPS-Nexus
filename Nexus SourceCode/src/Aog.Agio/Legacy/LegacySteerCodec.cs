@@ -21,6 +21,7 @@ public sealed class LegacySteerCodec
 
     private const byte CommandSourceAddress = 0x7F;
     private const byte StateSourceAddress = 0x7E;
+    private const byte EngagedBit = 0x01;
     private const int CommandPayloadLength = 8;
     private const int StatePayloadLength = 8;
     private const int CommandFrameLength = 2 /* sync */ + 1 /* src */ + 1 /* pgn */ + 1 /* len */ + CommandPayloadLength + 1 /* checksum */;
@@ -116,7 +117,6 @@ public sealed class LegacySteerCodec
         var speedTenths = (ushort)Math.Clamp((int)Math.Round(metadata.SpeedKph * 10.0), 0, ushort.MaxValue);
         BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(5, 2), speedTenths);
 
-        const byte EngagedBit = 0x01;
         var status = metadata.GuidanceStatus;
 
         status = command.Enable

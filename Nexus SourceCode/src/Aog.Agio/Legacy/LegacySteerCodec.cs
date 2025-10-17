@@ -74,6 +74,7 @@ public sealed class LegacySteerCodec
 
         metadata = new LegacySteerCommandMetadata
         {
+            SourceAddress = datagram[2],
             SpeedKph = speedTenths * 0.1,
             GuidanceStatus = rawGuidanceStatus,
             TramControl = tramControl,
@@ -107,10 +108,16 @@ public sealed class LegacySteerCodec
 
         metadata ??= new LegacySteerCommandMetadata();
 
+        var sourceAddress = metadata.SourceAddress;
+        if (sourceAddress < 0x01 || sourceAddress > 0xFD)
+        {
+            sourceAddress = CommandSourceAddress;
+        }
+
         var buffer = new byte[CommandFrameLength];
         buffer[0] = LegacyPoseCodec.Sync0;
         buffer[1] = LegacyPoseCodec.Sync1;
-        buffer[2] = CommandSourceAddress;
+        buffer[2] = sourceAddress;
         buffer[3] = SteerCommandPgn;
         buffer[4] = CommandPayloadLength;
 

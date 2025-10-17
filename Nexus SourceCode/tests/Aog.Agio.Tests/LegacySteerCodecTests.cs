@@ -37,6 +37,7 @@ public sealed class LegacySteerCodecTests
         Assert.Equal(metadata.GuidanceStatus, decodedMetadata.GuidanceStatus);
         Assert.Equal(metadata.SpeedKph, decodedMetadata.SpeedKph, 6);
         Assert.Equal(metadata.TramControl, decodedMetadata.TramControl);
+        Assert.Equal(0x7F, decodedMetadata.SourceAddress);
         Assert.Equal((uint)(sections.Mask & 0xFFF), decodedSections.Mask);
         Assert.Equal(16u, decodedSections.SectionCount); // legacy PGN capacity
     }
@@ -146,6 +147,21 @@ public sealed class LegacySteerCodecTests
         var frame = codec.EncodeSteerCommand(command, metadata: metadata);
 
         Assert.Equal(0b0010_0101, frame[7]);
+    }
+
+    [Fact]
+    public void EncodeSteerCommand_UsesMetadataSourceAddressWhenValid()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { Enable = true };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            SourceAddress = 0x42,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        Assert.Equal(0x42, frame[2]);
     }
 
     [Fact]

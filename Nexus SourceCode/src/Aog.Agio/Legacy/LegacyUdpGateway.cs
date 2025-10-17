@@ -33,6 +33,7 @@ public sealed class LegacyUdpGateway
     private long _steerStateSequence;
     private long _sectionSequence;
     private SteerCmd? _lastFilteredSteerCommand;
+    private LegacySteerCommandMetadata? _lastSteerMetadata;
 
     public LegacyUdpGateway(
         LegacyPoseCodec poseCodec,
@@ -106,7 +107,10 @@ public sealed class LegacyUdpGateway
             filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
         }
 
-        var frame = _steerCodec.EncodeSteerCommand(filteredSnapshot, filteredSections, metadata);
+        var metadataSnapshot = metadata?.Clone() ?? new LegacySteerCommandMetadata();
+        Volatile.Write(ref _lastSteerMetadata, metadataSnapshot);
+
+        var frame = _steerCodec.EncodeSteerCommand(filteredSnapshot, filteredSections, metadataSnapshot);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 
@@ -138,7 +142,15 @@ public sealed class LegacyUdpGateway
         var refreshedSnapshot = refreshedCommand.Clone();
         Volatile.Write(ref _lastFilteredSteerCommand, refreshedSnapshot);
 
-        var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, filteredSections, metadata);
+        var metadataSnapshot = metadata?.Clone() ?? Volatile.Read(ref _lastSteerMetadata);
+        if (metadataSnapshot is null)
+        {
+            throw new InvalidOperationException("A steering command must be published before section updates.");
+        }
+
+        Volatile.Write(ref _lastSteerMetadata, metadataSnapshot);
+
+        var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, filteredSections, metadataSnapshot);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 

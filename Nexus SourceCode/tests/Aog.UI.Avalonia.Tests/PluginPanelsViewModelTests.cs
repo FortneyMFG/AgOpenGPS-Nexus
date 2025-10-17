@@ -53,6 +53,35 @@ public sealed class PluginPanelsViewModelTests
     }
 
     [Fact]
+    public void SectionsPanel_RendersAllSixteenSections()
+    {
+        var viewModel = new SectionsPanelViewModel();
+        const uint rawMask = 0b1010_1100_1111_0001;
+        var mask = new SectionMask { SectionCount = 16, Mask = rawMask };
+
+        viewModel.ApplySectionMask(mask);
+
+        viewModel.SectionCount.Should().Be(16);
+        viewModel.CurrentMask.Should().Be(rawMask);
+        viewModel.Sections.Should().HaveCount(16);
+
+        for (var index = 0; index < 16; index++)
+        {
+            viewModel.Sections[index].IsVisible.Should().BeTrue($"Section {index} should be visible");
+
+            var expectedState = (rawMask & (1u << index)) != 0;
+            viewModel.Sections[index].IsEnabled.Should().Be(expectedState, $"Section {index} should reflect the mask");
+        }
+
+        // Toggle the last section manually and ensure the mask updates correctly.
+        viewModel.Sections[15].IsEnabled = false;
+
+        viewModel.IsAutoEnabled.Should().BeFalse();
+        viewModel.CurrentMask.Should().Be(rawMask & ~(1u << 15));
+        viewModel.Sections[15].IsEnabled.Should().BeFalse();
+    }
+
+    [Fact]
     public void PlanterPanel_AppliesStatusesAndSummarises()
     {
         var viewModel = new PlanterPanelViewModel();

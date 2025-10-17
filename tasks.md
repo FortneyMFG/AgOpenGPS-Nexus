@@ -219,6 +219,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 ### Section E — UI (Avalonia) + Sim Bar
 - [ ] NX-942 Planter panel stale row cleanup regression
+- [x] NX-980 Sections panel sixteen-toggle support _(Done)_ — Expand UI and tests for 16-section masks
 - [x] NX-040 Avalonia app bootstrap
 - [x] NX-041 Connection/settings panel
 - [x] NX-042 Map view

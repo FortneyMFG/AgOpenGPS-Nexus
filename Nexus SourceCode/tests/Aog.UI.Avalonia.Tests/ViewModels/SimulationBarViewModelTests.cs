@@ -88,7 +88,7 @@ public sealed class SimulationBarViewModelTests
         using var viewModel = new SimulationBarViewModel(configuration);
 
         viewModel.SelectedPlaybackRate.Should().Be(0.75);
-        viewModel.SelectedPlaybackRateLabel.Should().Be("75%");
+        viewModel.SelectedPlaybackRateLabel.Should().Be("0.75×");
         viewModel.PlaybackRates.Select(option => option.Rate)
             .Should()
             .Equal(0.5, 0.75, 1.0, 2.0);

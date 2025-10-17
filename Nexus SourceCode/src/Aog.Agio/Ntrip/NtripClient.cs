@@ -1,10 +1,8 @@
-using System.Buffers;
 using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Text;
-using Microsoft.Extensions.Logging;
 
 namespace Aog.Agio.Ntrip;
 
@@ -17,7 +15,7 @@ public sealed class NtripClient
 
     private readonly NtripClientOptions _options;
     private readonly IReadOnlyList<INtripCorrectionSink> _sinks;
-    private readonly ILogger<NtripClient> _logger;
+    private readonly Microsoft.Extensions.Logging.ILogger<NtripClient> _logger;
     private readonly TimeProvider _timeProvider;
 
     /// <summary>
@@ -26,7 +24,7 @@ public sealed class NtripClient
     public NtripClient(
         NtripClientOptions options,
         IEnumerable<INtripCorrectionSink> sinks,
-        ILogger<NtripClient> logger,
+        Microsoft.Extensions.Logging.ILogger<NtripClient> logger,
         TimeProvider? timeProvider = null)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
@@ -42,7 +40,7 @@ public sealed class NtripClient
     /// </summary>
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting NTRIP client for mountpoint {MountPoint} on {Host}:{Port}.", _options.MountPoint, _options.Host, _options.Port);
+        Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(_logger, "Starting NTRIP client for mountpoint {MountPoint} on {Host}:{Port}.", _options.MountPoint, _options.Host, _options.Port);
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -60,12 +58,12 @@ public sealed class NtripClient
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "NTRIP session terminated unexpectedly. Reconnecting in {Delay}.", _options.ReconnectBackoff);
+                Microsoft.Extensions.Logging.LoggerExtensions.LogError(_logger, ex, "NTRIP session terminated unexpectedly. Reconnecting in {Delay}.", _options.ReconnectBackoff);
                 await DelayAsync(_options.ReconnectBackoff, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        _logger.LogInformation("NTRIP client for mountpoint {MountPoint} shutting down.", _options.MountPoint);
+        Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(_logger, "NTRIP client for mountpoint {MountPoint} shutting down.", _options.MountPoint);
     }
 
     private async Task<bool> RunSessionAsync(CancellationToken cancellationToken)
@@ -77,7 +75,7 @@ public sealed class NtripClient
             await PublishAsync(connection.InitialPayload, cancellationToken).ConfigureAwait(false);
         }
 
-        var buffer = ArrayPool<byte>.Shared.Rent(_options.ReceiveBufferSize);
+        var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(_options.ReceiveBufferSize);
         try
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -85,7 +83,7 @@ public sealed class NtripClient
                 var read = await connection.Stream.ReadAsync(buffer.AsMemory(0, _options.ReceiveBufferSize), cancellationToken).ConfigureAwait(false);
                 if (read == 0)
                 {
-                    _logger.LogWarning("NTRIP connection closed by caster. Will attempt to reconnect after {Delay}.", _options.ReconnectBackoff);
+                    Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(_logger, "NTRIP connection closed by caster. Will attempt to reconnect after {Delay}.", _options.ReconnectBackoff);
                     return false;
                 }
 
@@ -94,7 +92,7 @@ public sealed class NtripClient
         }
         finally
         {
-            ArrayPool<byte>.Shared.Return(buffer);
+            System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
         }
 
         return true;
@@ -109,7 +107,7 @@ public sealed class NtripClient
 
         if (_sinks.Count == 0)
         {
-            _logger.LogDebug("Discarding {Length} bytes of RTCM corrections because no sinks are registered.", payload.Length);
+            Microsoft.Extensions.Logging.LoggerExtensions.LogDebug(_logger, "Discarding {Length} bytes of RTCM corrections because no sinks are registered.", payload.Length);
             return;
         }
 
@@ -127,7 +125,7 @@ public sealed class NtripClient
 
         try
         {
-            _logger.LogDebug("Connecting to NTRIP caster {Host}:{Port}...", _options.Host, _options.Port);
+            Microsoft.Extensions.Logging.LoggerExtensions.LogDebug(_logger, "Connecting to NTRIP caster {Host}:{Port}...", _options.Host, _options.Port);
 
             await tcpClient.ConnectAsync(_options.Host, _options.Port, connectCts.Token).ConfigureAwait(false);
             connectCts.Token.ThrowIfCancellationRequested();
@@ -149,7 +147,7 @@ public sealed class NtripClient
             await SendRequestAsync(stream, cancellationToken).ConfigureAwait(false);
             var response = await ReadResponseAsync(stream, cancellationToken).ConfigureAwait(false);
 
-            _logger.LogInformation("Established NTRIP session with {Host}:{Port} ({StatusLine}).", _options.Host, _options.Port, response.StatusLine);
+            Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(_logger, "Established NTRIP session with {Host}:{Port} ({StatusLine}).", _options.Host, _options.Port, response.StatusLine);
 
             return new NtripConnection(tcpClient, stream, response.InitialPayload);
         }
@@ -169,11 +167,11 @@ public sealed class NtripClient
 
         if (_options.AllowInvalidCertificates)
         {
-            _logger.LogWarning("Ignoring TLS certificate validation errors: {Errors}.", sslPolicyErrors);
+            Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(_logger, "Ignoring TLS certificate validation errors: {Errors}.", sslPolicyErrors);
             return true;
         }
 
-        _logger.LogError("TLS certificate validation failed: {Errors}.", sslPolicyErrors);
+        Microsoft.Extensions.Logging.LoggerExtensions.LogError(_logger, "TLS certificate validation failed: {Errors}.", sslPolicyErrors);
         return false;
     }
 
@@ -206,8 +204,8 @@ public sealed class NtripClient
 
     private async Task<NtripResponse> ReadResponseAsync(Stream stream, CancellationToken cancellationToken)
     {
-        var buffer = ArrayPool<byte>.Shared.Rent(4096);
-        var headerBuffer = new ArrayBufferWriter<byte>();
+        var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(4096);
+        var headerBuffer = new System.Buffers.ArrayBufferWriter<byte>();
         try
         {
             while (true)
@@ -257,7 +255,7 @@ public sealed class NtripClient
         }
         finally
         {
-            ArrayPool<byte>.Shared.Return(buffer);
+            System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
         }
     }
 

@@ -118,6 +118,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-118 gRPC ⇄ AOG-Link translator _(Done)_
 - [x] NX-119 AOG-Link ⇄ PGN compatibility bridge _(Done)_
 - [x] NX-120 AOG-Link Ethernet/UDP driver _(Done)_
+- [ ] NX-1015 NTRIP client logging cleanup for implicit usings — Remove redundant using directives flagged by analyzers
 - [x] NX-121 AOG-Link RS-485/serial driver _(Done)_
 - [x] NX-122 AOG-Link CAN/CAN-FD driver _(Done)_
 
@@ -152,6 +153,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-988 Parquet.Net v5 compatibility fixes
 - [ ] NX-989 SocketCAN pump cancellation regression fix
 - [x] NX-990 TimeProvider registration for NMEA auto scanner
+- [x] NX-1015 AogLinkBridge protobuf helper import cleanup — Remove redundant Google.Protobuf using directive from bridge serializer
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -181,12 +183,15 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-170 Official Job Tasks plugin GA _(Done)_
 - [x] NX-171 Official Telemetry Logging plugin GA _(Done)_
 - [x] NX-172 Official File IO plugin GA _(Done)_
+- [x] NX-1110 Telemetry log manifest cleanup _(Done)_ — Remove redundant usings flagged by analyzers
 - [ ] NX-910 Job manifest cross-drive fallback fix
+- [x] NX-1017 Job Tasks orchestrator analyzer cleanup — Remove redundant Channel using directive
 
 - [x] NX-247 Crop plugin layer ingestion pipeline _(Done)_ — ADR-045 crop type plugin
 - [x] NX-248 Crop analytics API surface _(Done)_ — ADR-045 rotation analytics
 - [x] NX-249 Crop report sections for report builder _(Done)_ — ADR-045 reporting integration
 - [x] NX-250 Crop plugin regression fixtures _(Done)_ — ADR-045 QA hooks
+- [x] NX-1015 Crop plugin analyzer cleanup _(Done)_ — Remove stale using directives flagged by IDE0005
 - [x] NX-251 Genetics plugin layer ingestion pipeline _(Done)_ — ADR-046 genetics plugin
 - [x] NX-252 Genetics barcode & lot tracking integration _(Done)_ — ADR-046 barcode workflows
 - [x] NX-253 Genetics export pipelines (CSV/GeoJSON/ISOXML) _(Done)_ — ADR-046 export formats

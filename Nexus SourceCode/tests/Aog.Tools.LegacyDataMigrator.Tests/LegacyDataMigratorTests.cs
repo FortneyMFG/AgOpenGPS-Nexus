@@ -2,7 +2,6 @@ using System.Text.Json;
 using Aog.Tools.LegacyDataMigrator;
 using FluentAssertions;
 using Parquet;
-using Parquet.Data;
 using Parquet.Schema;
 using Xunit;
 

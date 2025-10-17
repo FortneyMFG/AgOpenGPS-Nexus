@@ -102,17 +102,20 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         get => _selectedMode;
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Equals(_selectedMode, StringComparison.Ordinal))
+            if (string.IsNullOrWhiteSpace(value))
             {
                 return;
             }
 
-            if (!ContainsIgnoreCase(_availableModes, value))
+            var matchedMode = _availableModes.FirstOrDefault(
+                candidate => candidate.Equals(value, StringComparison.OrdinalIgnoreCase));
+
+            if (matchedMode is null || matchedMode.Equals(_selectedMode, StringComparison.Ordinal))
             {
                 return;
             }
 
-            SetProperty(ref _selectedMode, value);
+            SetProperty(ref _selectedMode, matchedMode);
         }
     }
 

@@ -220,22 +220,32 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     /// Applies the provided scenario, updating the routed streams and descriptive metadata.
     /// </summary>
     /// <param name="scenario">Scenario definition to activate.</param>
-    public void ApplyScenario(SimulationScenarioConfiguration scenario)
+public void ApplyScenario(SimulationScenarioConfiguration scenario)
+{
+    ArgumentNullException.ThrowIfNull(scenario);
+
+    UpdateRoutes(scenario.Routes);
+    ActiveScenarioTitle = $"Scenario: {scenario.ScenarioId}";
+    ActiveScenarioDescription = string.IsNullOrWhiteSpace(scenario.Description)
+        ? "No description provided."
+        : scenario.Description!;
+
+    // 1) Apply options to the runtime first (state of truth)
+    ApplyScenarioOptions(scenario.Options);
+
+    // 2) Reflect options in the UI summary
+    ActiveScenarioOptions = FormatScenarioOptions(scenario.Options);
+
+    // 3) If a valid TimeScale is provided, update playback rate
+    if (scenario.Options?.TimeScale is double timeScale &&
+        !double.IsNaN(timeScale) &&
+        !double.IsInfinity(timeScale) &&
+        timeScale > 0)
     {
-        ArgumentNullException.ThrowIfNull(scenario);
-
-        UpdateRoutes(scenario.Routes);
-        ActiveScenarioTitle = $"Scenario: {scenario.ScenarioId}";
-        ActiveScenarioDescription = string.IsNullOrWhiteSpace(scenario.Description)
-            ? "No description provided."
-            : scenario.Description!;
-        ActiveScenarioOptions = FormatScenarioOptions(scenario.Options);
-
-        if (scenario.Options?.TimeScale is double timeScale)
-        {
-            OnPlaybackRateSelected(timeScale);
-        }
+        OnPlaybackRateSelected(timeScale);
     }
+}
+
 
     /// <summary>
     /// Applies the routes produced by the legacy guidance import wizard.
@@ -248,7 +258,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         UpdateRoutes(result.Scenario.Routes);
         ActiveScenarioTitle = $"Legacy import: {result.FieldName}";
         ActiveScenarioDescription = $"Imported {result.AbLines.Count} AB lines with {result.Boundary.Count} boundary points.";
-        ActiveScenarioOptions = FormatScenarioOptions(result.Scenario.Options);
+        ApplyScenarioOptions(result.Scenario.Options);
     }
 
     /// <summary>
@@ -460,6 +470,16 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         }
 
         return state;
+    }
+
+    private void ApplyScenarioOptions(SimulationOptionsConfiguration? options)
+    {
+        ActiveScenarioOptions = FormatScenarioOptions(options);
+
+        if (options?.TimeScale is double timeScale)
+        {
+            OnPlaybackRateSelected(timeScale);
+        }
     }
 
     private static string FormatTimestamp(TimeSpan value)

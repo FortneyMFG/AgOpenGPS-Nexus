@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Aog.Core.Legacy;
+using Aog.Core.Paths;
 using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
 using Aog.UI.Avalonia.ViewModels;
@@ -86,6 +88,50 @@ public sealed class SimulationBarViewModelTests
 
         viewModel.ResetToConfigurationRoutes();
         viewModel.ActiveScenarioTitle.Should().Be("Scenario: configuration defaults");
+    }
+
+    [Fact]
+    public void ApplyLegacyImport_WithTimeScale_AdjustsPlaybackRate()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        using var viewModel = new SimulationBarViewModel(configuration);
+
+        var scenario = new SimulationScenarioConfiguration(
+            "legacy-import",
+            "Legacy import scenario",
+            new[]
+            {
+                new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+            },
+            new SimulationOptionsConfiguration(null, 0.5));
+
+        var result = new LegacyGuidanceImportResult(
+            "Field A",
+            new GeographicCoordinate(40.0, -93.0),
+            new[]
+            {
+                new LegacyAbLinePlanar(
+                    "AB1",
+                    new GeographicCoordinate(40.0, -93.0),
+                    new GeographicCoordinate(40.0001, -93.0001),
+                    new PlanarPoint(0, 0),
+                    new PlanarPoint(10, 0),
+                    0,
+                    10)
+            },
+            new[]
+            {
+                new PlanarPoint(0, 0),
+                new PlanarPoint(0, 10),
+                new PlanarPoint(10, 10),
+                new PlanarPoint(10, 0)
+            },
+            scenario);
+
+        viewModel.ApplyLegacyImport(result);
+
+        viewModel.SelectedPlaybackRate.Should().Be(0.5);
+        viewModel.ActiveScenarioOptions.Should().Contain("timeScale=0.5");
     }
 
     [Fact]

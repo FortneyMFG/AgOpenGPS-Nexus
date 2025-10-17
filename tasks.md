@@ -387,6 +387,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-092 Legacy data migration utility _(Done)_
 - [x] NX-093 Bridging workflow knowledge base
 - [x] NX-094 Field feedback telemetry aggregator
+- [x] NX-955 Field feedback aggregator JSONL regression fix _(Done)_ — Restore newline-delimited parsing and unit coverage
 - [x] NX-095 Dealer support escalation process
 - [x] NX-096 Community preview program
 - [x] NX-097 1.0 launch readiness review

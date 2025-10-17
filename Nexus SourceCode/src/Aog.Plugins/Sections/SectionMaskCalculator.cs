@@ -115,9 +115,11 @@ public sealed class SectionMaskCalculator
 /// <summary>
 /// Represents a single section's coverage observation used to compute a mask.
 /// </summary>
-/// <param name="HasCoverage">True when coverage is currently required under the boom.</param>
-/// <param name="DistanceToCoverageStartMeters">Distance to the next coverage boundary ahead of the vehicle. Null when unknown.</param>
-/// <param name="IsSuppressed">True to prevent the section from activating (e.g. manual override, boundary conditions).</param>
+/// <remarks>
+/// <para><see cref="HasCoverage"/> indicates whether coverage is currently required under the boom.</para>
+/// <para><see cref="DistanceToCoverageStartMeters"/> is the distance to the next coverage boundary ahead of the vehicle. Null when unknown.</para>
+/// <para><see cref="IsSuppressed"/> prevents the section from activating (e.g. manual override, boundary conditions).</para>
+/// </remarks>
 public readonly record struct SectionObservation
 {
     /// <summary>

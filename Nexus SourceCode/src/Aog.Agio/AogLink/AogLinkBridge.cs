@@ -1,5 +1,4 @@
 using Aog.Protos.Capabilities.V1;
-using Google.Protobuf;
 
 namespace Aog.Agio.AogLink;
 
@@ -12,7 +11,7 @@ public sealed class AogLinkBridge
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var payload = request.ToByteArray();
+        var payload = global::Google.Protobuf.MessageExtensions.ToByteArray(request);
         var header = new AogLinkFrameHeader(
             Version: 1,
             MessageClass: AogLinkMessageCatalog.ControlClass,
@@ -42,7 +41,7 @@ public sealed class AogLinkBridge
     {
         ArgumentNullException.ThrowIfNull(response);
 
-        var payload = response.ToByteArray();
+        var payload = global::Google.Protobuf.MessageExtensions.ToByteArray(response);
         var header = new AogLinkFrameHeader(
             Version: 1,
             MessageClass: AogLinkMessageCatalog.ControlClass,

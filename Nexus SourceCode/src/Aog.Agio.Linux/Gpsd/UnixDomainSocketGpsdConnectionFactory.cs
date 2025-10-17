@@ -25,7 +25,13 @@ public sealed class UnixDomainSocketGpsdConnectionFactory : IGpsdConnectionFacto
     public async Task<Stream?> ConnectAsync(CancellationToken cancellationToken)
     {
         var socketPath = _options.SocketPath;
-        if (string.IsNullOrWhiteSpace(socketPath) || !File.Exists(socketPath))
+        if (string.IsNullOrEmpty(socketPath))
+        {
+            _logger.LogDebug("gpsd socket path not configured; skipping connection attempt.");
+            return null;
+        }
+
+        if (!File.Exists(socketPath))
         {
             _logger.LogDebug("gpsd socket {SocketPath} does not exist.", socketPath);
             return null;

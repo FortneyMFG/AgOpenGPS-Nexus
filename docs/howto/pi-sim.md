@@ -143,6 +143,10 @@ export NEXUS_AGIO_PROJECT="Nexus SourceCode/src/Aog.Agio/Aog.Agio.csproj"
 - Replace `/dev/ttyACM0` with your device.
 - The `Serial` backend publishes GNSS fixes over gRPC for the Core/Sim hosts.
 - Logs appear in the console; look for `FixAcquired` events.
+- To disable the gpsd watcher when you are not running the gpsd daemon on the Pi,
+  export `NEXUS_AGIOHOST__LINUX__GPSD__SOCKETPATH=` (empty value) in the same shell or add
+  it to your service environment file. The worker treats a blank socket as an explicit
+  opt-out and exits immediately while leaving serial scanning enabled.
 
 Leave the AGiO host running and, in a second SSH session, start the simulator again to
 exercise the pipeline with mixed simulated and live data. Once the Core host is available,

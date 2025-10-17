@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Legacy;
@@ -96,6 +99,7 @@ public sealed class SimulationBarViewModelTests
         var customRate = viewModel.PlaybackRates.Single(option => Math.Abs(option.Rate - 0.75) < 1e-6);
         customRate.IsSelected.Should().BeTrue();
         customRate.Label.Should().Be($"{0.75:0.#}×");
+        viewModel.PlaybackRates.Count(option => option.IsSelected).Should().Be(1);
     }
 
     [Fact]
@@ -148,6 +152,61 @@ public sealed class SimulationBarViewModelTests
             .Should()
             .Equal(0.5, 0.75, 1.0, 2.0);
         viewModel.PlaybackRates.Single(option => Math.Abs(option.Rate - 0.75) < 1e-6).IsSelected.Should().BeTrue();
+        viewModel.PlaybackRates.Count(option => option.IsSelected).Should().Be(1);
+    }
+
+    [Fact]
+    public void ApplyScenario_RaisesPlaybackRateNotificationsEvenWhenRateUnchanged()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        using var viewModel = new SimulationBarViewModel(configuration);
+        var notifications = new List<string>();
+        viewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is not null)
+            {
+                notifications.Add(args.PropertyName);
+            }
+        };
+
+        var scenario = new SimulationScenarioConfiguration(
+            "same-rate",
+            "Scenario that keeps the default playback rate",
+            new[]
+            {
+                new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
+            },
+            new SimulationOptionsConfiguration(2024, 1.0));
+
+        viewModel.ApplyScenario(scenario);
+
+        notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRate))
+            .Should()
+            .BeGreaterThan(0);
+        notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRateLabel))
+            .Should()
+            .BeGreaterThan(0);
+    }
+
+    [Fact]
+    public void SelectedPlaybackRateLabel_WhenOptionHasNoLabel_FallsBackToMultiplier()
+    {
+        using var viewModel = CreateViewModel();
+
+        var playbackRatesField = typeof(SimulationBarViewModel)
+            .GetField("_playbackRates", BindingFlags.Instance | BindingFlags.NonPublic);
+        playbackRatesField.Should().NotBeNull();
+
+        var playbackRates = (IList<SimulationPlaybackRateOptionViewModel>)playbackRatesField!
+            .GetValue(viewModel)!;
+
+        var unlabeledOption = CreatePlaybackRateOptionWithoutLabel(3.25);
+        playbackRates.Add(unlabeledOption);
+
+        viewModel.SetSelectedPlaybackRate(3.25);
+
+        viewModel.SelectedPlaybackRate.Should().Be(3.25);
+        viewModel.SelectedPlaybackRateLabel.Should().Be("3.25×");
     }
 
     [Fact]
@@ -232,6 +291,30 @@ public sealed class SimulationBarViewModelTests
         viewModel.ResetToConfigurationRoutes();
 
         viewModel.SelectedPlaybackRate.Should().BeApproximately(1.2, 1e-6);
+    }
+
+    [Fact]
+    public void ResetToConfigurationRoutes_RaisesPlaybackRateNotificationsEvenWhenAlreadyAtConfigurationRate()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        using var viewModel = new SimulationBarViewModel(configuration);
+        var notifications = new List<string>();
+        viewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is not null)
+            {
+                notifications.Add(args.PropertyName);
+            }
+        };
+
+        viewModel.ResetToConfigurationRoutes();
+
+        notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRate))
+            .Should()
+            .BeGreaterThan(0);
+        notifications.Count(name => name == nameof(SimulationBarViewModel.SelectedPlaybackRateLabel))
+            .Should()
+            .BeGreaterThan(0);
     }
 
     [Fact]
@@ -353,14 +436,37 @@ public sealed class SimulationBarViewModelTests
             entry => entry.Level == LogLevel.Error && entry.Message.Contains("seek to", StringComparison.OrdinalIgnoreCase));
     }
 
-    [Fact]
-    public void ToggleAutoResumeCommand_WithNoSession_DoesNotChangeState()
-    {
-        using var viewModel = CreateViewModel();
+// in your test class
 
-        viewModel.Invoking(vm => vm.ToggleAutoResumeCommand.Execute(null)).Should().NotThrow();
-        viewModel.IsAutoResumeEnabled.Should().BeFalse();
-    }
+[Fact]
+public void ToggleAutoResumeCommand_WithNoSession_DoesNotChangeState()
+{
+    using var viewModel = CreateViewModel();
+
+    Action exec = () => viewModel.ToggleAutoResumeCommand.Execute(null);
+    exec.Should().NotThrow();
+    viewModel.IsAutoResumeEnabled.Should().BeFalse();
+}
+
+private static SimulationPlaybackRateOptionViewModel CreatePlaybackRateOptionWithoutLabel(double rate)
+{
+    var option = (SimulationPlaybackRateOptionViewModel)FormatterServices.GetUninitializedObject(
+        typeof(SimulationPlaybackRateOptionViewModel));
+
+    SetField(option, "<Rate>k__BackingField", rate);
+    SetField(option, "<Label>k__BackingField", null);
+    SetField(option, "_onSelected", new Action<SimulationPlaybackRateOptionViewModel>(_ => { }));
+    SetField(option, "<SelectCommand>k__BackingField", new DelegateCommand(_ => { }));
+
+    return option;
+}
+
+private static void SetField(object target, string fieldName, object? value)
+{
+    var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)
+               ?? throw new InvalidOperationException($"Field '{fieldName}' not found.");
+    field.SetValue(target, value);
+}
 
     private static SimulationBarViewModel CreateViewModel()
     {

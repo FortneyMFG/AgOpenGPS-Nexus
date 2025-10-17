@@ -303,3 +303,4 @@ public sealed class AutoSteerLiteSettings
         ConstraintSlowdownMultiplier = ConstraintSlowdownMultiplier,
         ConstraintDistanceMarginMeters = ConstraintDistanceMarginMeters
     };
+}

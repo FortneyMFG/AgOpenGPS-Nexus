@@ -73,7 +73,7 @@ public sealed class MeshRetentionWorker : IAsyncDisposable
         await _meshService.RegisterOrUpdateDeviceAsync(registration, cancellationToken).ConfigureAwait(false);
 
         _enumerator = _meshService
-            .SubscribeAsync(new MeshSubscriptionRequest(_options.DeviceId, tierMask: MeshDataTier.All), _shutdown.Token)
+            .SubscribeAsync(new MeshSubscriptionRequest(_options.DeviceId, null, null, null, MeshDataTier.All), _shutdown.Token)
             .GetAsyncEnumerator(_shutdown.Token);
 
         _pumpTask = Task.Run(() => PumpAsync(_enumerator, _shutdown.Token), CancellationToken.None);
@@ -165,7 +165,11 @@ public sealed class MeshRetentionWorker : IAsyncDisposable
             return "{}";
         }
 
-        var ordered = new SortedDictionary<string, string>(metadata, StringComparer.OrdinalIgnoreCase);
+        var ordered = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in metadata)
+        {
+            ordered[pair.Key] = pair.Value;
+        }
         return JsonSerializer.Serialize(ordered, JsonOptions);
     }
 

@@ -154,6 +154,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-988 Parquet.Net v5 compatibility fixes
 - [ ] NX-989 SocketCAN pump cancellation regression fix
 - [x] NX-990 TimeProvider registration for NMEA auto scanner
+- [x] NX-1003 AGiO host configuration namespace cleanup _(Done)_ — Remove redundant configuration using to silence IDE0005
 - [x] NX-1015 AogLinkBridge protobuf helper import cleanup — Remove redundant Google.Protobuf using directive from bridge serializer
 
 ### Section D — Plugins (Logic + Sim Providers)

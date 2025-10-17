@@ -76,7 +76,7 @@ public sealed class ReplayTimelineViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>Gets the bookmarks surfaced alongside the timeline.</summary>
-    public ReadOnlyObservableCollection<ReplayTimelineBookmarkViewModel> Bookmarks => _readonlyBookmarks;
+    public IReadOnlyList<ReplayTimelineBookmarkViewModel> Bookmarks => _bookmarkView;
 
     /// <summary>Gets a status message that reflects the latest export command.</summary>
     public string ExportStatus

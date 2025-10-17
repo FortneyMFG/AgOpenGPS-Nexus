@@ -144,6 +144,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-931 gpsd monitor restart on socket availability
 - [ ] NX-952 Aog.Agio.Windows targeting pack restore guard
 - [x] NX-953 SocketCAN burst tolerance for transient backpressure
+- [ ] NX-971 Linux NMEA VTG null speed log fix
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling

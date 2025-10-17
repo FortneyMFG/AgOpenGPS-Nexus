@@ -9,192 +9,199 @@ using Aog.Core.V1;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Aog.Agio.Linux.SocketCan;
-
-/// <summary>
-/// Publishes SocketCAN frames to subscribers via an asynchronous channel.
-/// </summary>
-public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCanFrameSource
+namespace Aog.Agio.Linux.SocketCan
 {
-    private readonly ConcurrentDictionary<Guid, Subscriber> _subscribers = new();
-    private readonly int _subscriberCapacity;
-    private readonly long _maxSubscriberBackpressureTicks;
-    private readonly ILogger<SocketCanFrameChannel> _logger;
-
-    public SocketCanFrameChannel(
-        int subscriberCapacity = 64,
-        TimeSpan? maxSubscriberBackpressure = null,
-        ILogger<SocketCanFrameChannel>? logger = null)
+    /// <summary>
+    /// Publishes SocketCAN frames to subscribers via an asynchronous channel.
+    /// </summary>
+    public sealed class SocketCanFrameChannel : ISocketCanFramePublisher, ISocketCanFrameSource
     {
-        if (subscriberCapacity <= 0)
+        private readonly ConcurrentDictionary<Guid, Subscriber> _subscribers = new();
+        private readonly int _subscriberCapacity;
+        private readonly long _maxSubscriberBackpressureTicks;
+        private readonly ILogger<SocketCanFrameChannel> _logger;
+
+        public SocketCanFrameChannel(
+            int subscriberCapacity = 64,
+            TimeSpan? maxSubscriberBackpressure = null,
+            ILogger<SocketCanFrameChannel>? logger = null)
         {
-            throw new ArgumentOutOfRangeException(nameof(subscriberCapacity), subscriberCapacity, "Channel capacity must be positive.");
-        }
-
-        var backpressure = maxSubscriberBackpressure ?? TimeSpan.FromSeconds(1);
-        if (backpressure <= TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maxSubscriberBackpressure), backpressure, "Backpressure tolerance must be positive.");
-        }
-
-        _subscriberCapacity = subscriberCapacity;
-        _maxSubscriberBackpressureTicks = ToStopwatchTicks(backpressure);
-        _logger = logger ?? NullLogger<SocketCanFrameChannel>.Instance;
-    }
-
-    /// <inheritdoc />
-    public async ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken)
-    {
-        if (frame is null)
-        {
-            throw new ArgumentNullException(nameof(frame));
-        }
-
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var backpressureWindow = ToTimeSpan(_maxSubscriberBackpressureTicks);
-
-        foreach (var (subscriptionId, subscriber) in _subscribers)
-        {
-            var writer = subscriber.Channel.Writer;
-            if (writer.TryWrite(frame))
+            if (subscriberCapacity <= 0)
             {
-                subscriber.ClearBackpressure();
-                continue;
+                throw new ArgumentOutOfRangeException(nameof(subscriberCapacity), subscriberCapacity, "Channel capacity must be positive.");
             }
 
-            var nowTicks = Stopwatch.GetTimestamp();
-            subscriber.MarkBackpressure(nowTicks);
-
-            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            linkedCts.CancelAfter(backpressureWindow);
-
-            try
+            var backpressure = maxSubscriberBackpressure ?? TimeSpan.FromSeconds(1);
+            if (backpressure <= TimeSpan.Zero)
             {
-                await writer.WriteAsync(frame, linkedCts.Token).ConfigureAwait(false);
-                subscriber.ClearBackpressure();
-                continue;
+                throw new ArgumentOutOfRangeException(nameof(maxSubscriberBackpressure), backpressure, "Backpressure tolerance must be positive.");
             }
-            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+
+            _subscriberCapacity = subscriberCapacity;
+            _maxSubscriberBackpressureTicks = ToStopwatchTicks(backpressure);
+            _logger = logger ?? NullLogger<SocketCanFrameChannel>.Instance;
+        }
+
+        /// <inheritdoc />
+        public async ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken)
+        {
+            if (frame is null)
             {
-                nowTicks = Stopwatch.GetTimestamp();
-                if (!subscriber.ShouldEvict(nowTicks, _maxSubscriberBackpressureTicks, out var backpressureDurationTicks))
+                throw new ArgumentNullException(nameof(frame));
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var backpressureWindow = ToTimeSpan(_maxSubscriberBackpressureTicks);
+
+            foreach (var (subscriptionId, subscriber) in _subscribers)
+            {
+                var writer = subscriber.Channel.Writer;
+                if (writer.TryWrite(frame))
                 {
+                    subscriber.ClearBackpressure();
                     continue;
                 }
 
-                if (_subscribers.TryRemove(subscriptionId, out var removed))
+                var nowTicks = Stopwatch.GetTimestamp();
+                subscriber.MarkBackpressure(nowTicks);
+
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                linkedCts.CancelAfter(backpressureWindow);
+
+                try
                 {
-                    removed.Channel.Writer.TryComplete(new OperationCanceledException("SocketCAN subscriber removed due to sustained backpressure."));
-                    _logger.LogWarning(
-                        "SocketCAN subscriber {SubscriptionId} evicted after {BackpressureDuration} of backpressure while publishing CAN frame {ArbitrationId}.",
-                        subscriptionId,
-                        ToTimeSpan(backpressureDurationTicks),
-                        frame.ArbitrationId);
+                    await writer.WriteAsync(frame, linkedCts.Token).ConfigureAwait(false);
+                    subscriber.ClearBackpressure();
+                    continue;
+                }
+                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    // Timed out waiting for a slow subscriber -> consider eviction.
+                    nowTicks = Stopwatch.GetTimestamp();
+                    if (!subscriber.ShouldEvict(nowTicks, _maxSubscriberBackpressureTicks, out var backpressureDurationTicks))
+                    {
+                        // Not yet over the threshold; keep the subscriber.
+                        continue;
+                    }
+
+                    if (_subscribers.TryRemove(subscriptionId, out var removed))
+                    {
+                        // Clear any backpressure marker before completing the writer.
+                        removed.ClearBackpressure();
+                        removed.Channel.Writer.TryComplete(
+                            new OperationCanceledException("SocketCAN subscriber removed due to sustained backpressure."));
+                        _logger.LogWarning(
+                            "SocketCAN subscriber {SubscriptionId} evicted after {BackpressureDuration} of backpressure while publishing CAN frame {ArbitrationId}.",
+                            subscriptionId,
+                            ToTimeSpan(backpressureDurationTicks),
+                            frame.ArbitrationId);
+                    }
+                }
+                catch (ChannelClosedException)
+                {
+                    // Reader has gone away; clean up the subscription entry.
+                    _subscribers.TryRemove(subscriptionId, out _);
                 }
             }
-            catch (ChannelClosedException)
+        }
+
+        /// <inheritdoc />
+        public async IAsyncEnumerable<CanFrame> ReadAllAsync(
+            [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            var subscriptionId = Guid.NewGuid();
+            var channel = Channel.CreateBounded<CanFrame>(new BoundedChannelOptions(_subscriberCapacity)
+            {
+                AllowSynchronousContinuations = false,
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = true,
+                SingleWriter = false,
+            });
+
+            var subscriber = new Subscriber(channel);
+
+            if (!_subscribers.TryAdd(subscriptionId, subscriber))
+            {
+                channel.Writer.TryComplete();
+                throw new InvalidOperationException("Failed to register SocketCAN subscriber channel.");
+            }
+
+            try
+            {
+                await foreach (var frame in channel.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    yield return frame;
+                }
+            }
+            finally
             {
                 _subscribers.TryRemove(subscriptionId, out _);
+                channel.Writer.TryComplete();
             }
         }
-    }
 
-    /// <inheritdoc />
-    public async IAsyncEnumerable<CanFrame> ReadAllAsync(
-        [EnumeratorCancellation] CancellationToken cancellationToken)
-    {
-        var subscriptionId = Guid.NewGuid();
-        var channel = Channel.CreateBounded<CanFrame>(new BoundedChannelOptions(_subscriberCapacity)
+        private static long ToStopwatchTicks(TimeSpan duration)
         {
-            AllowSynchronousContinuations = false,
-            FullMode = BoundedChannelFullMode.Wait,
-            SingleReader = true,
-            SingleWriter = false,
-        });
-
-        var subscriber = new Subscriber(channel);
-
-        if (!_subscribers.TryAdd(subscriptionId, subscriber))
-        {
-            channel.Writer.TryComplete();
-            throw new InvalidOperationException("Failed to register SocketCAN subscriber channel.");
+            var ticks = (long)Math.Round(duration.TotalSeconds * Stopwatch.Frequency, MidpointRounding.AwayFromZero);
+            return Math.Max(1, ticks);
         }
 
-        try
+        private static TimeSpan ToTimeSpan(long stopwatchTicks)
         {
-            await foreach (var frame in channel.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
+            var seconds = (double)stopwatchTicks / Stopwatch.Frequency;
+            return TimeSpan.FromSeconds(seconds);
+        }
+
+        private sealed class Subscriber
+        {
+            private long _firstBackpressureTicks;
+
+            public Subscriber(Channel<CanFrame> channel)
             {
-                yield return frame;
+                Channel = channel;
             }
-        }
-        finally
-        {
-            _subscribers.TryRemove(subscriptionId, out _);
-            channel.Writer.TryComplete();
-        }
-    }
 
-    private static long ToStopwatchTicks(TimeSpan duration)
-    {
-        var ticks = (long)Math.Round(duration.TotalSeconds * Stopwatch.Frequency, MidpointRounding.AwayFromZero);
-        return Math.Max(1, ticks);
-    }
+            public Channel<CanFrame> Channel { get; }
 
-    private static TimeSpan ToTimeSpan(long stopwatchTicks)
-    {
-        var seconds = (double)stopwatchTicks / Stopwatch.Frequency;
-        return TimeSpan.FromSeconds(seconds);
-    }
+            public void ClearBackpressure() => Interlocked.Exchange(ref _firstBackpressureTicks, 0);
 
-    private sealed class Subscriber
-    {
-        private long _firstBackpressureTicks;
+            public void MarkBackpressure(long nowTicks) => Interlocked.CompareExchange(ref _firstBackpressureTicks, nowTicks, 0);
 
-        public Subscriber(Channel<CanFrame> channel)
-        {
-            Channel = channel;
-        }
-
-        public Channel<CanFrame> Channel { get; }
-
-        public void ClearBackpressure() => Interlocked.Exchange(ref _firstBackpressureTicks, 0);
-
-        public void MarkBackpressure(long nowTicks) => Interlocked.CompareExchange(ref _firstBackpressureTicks, nowTicks, 0);
-
-        public bool ShouldEvict(long nowTicks, long maxBackpressureTicks, out long backpressureDuration)
-        {
-            var first = Volatile.Read(ref _firstBackpressureTicks);
-            if (first == 0)
+            public bool ShouldEvict(long nowTicks, long maxBackpressureTicks, out long backpressureDuration)
             {
-                backpressureDuration = 0;
-                return false;
-            }
+                var first = Volatile.Read(ref _firstBackpressureTicks);
+                if (first == 0)
+                {
+                    backpressureDuration = 0;
+                    return false;
+                }
 
-            backpressureDuration = nowTicks - first;
-            return backpressureDuration >= maxBackpressureTicks;
+                backpressureDuration = nowTicks - first;
+                return backpressureDuration >= maxBackpressureTicks;
+            }
         }
     }
-}
 
-/// <summary>
-/// Publishes translated CAN frames to downstream services.
-/// </summary>
-public interface ISocketCanFramePublisher
-{
     /// <summary>
-    /// Publishes a CAN frame to all subscribers.
+    /// Publishes translated CAN frames to downstream services.
     /// </summary>
-    ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken);
-}
+    public interface ISocketCanFramePublisher
+    {
+        /// <summary>
+        /// Publishes a CAN frame to all subscribers.
+        /// </summary>
+        ValueTask PublishAsync(CanFrame frame, CancellationToken cancellationToken);
+    }
 
-/// <summary>
-/// Exposes an asynchronous stream of translated CAN frames.
-/// </summary>
-public interface ISocketCanFrameSource
-{
     /// <summary>
-    /// Reads all frames published to the channel until the supplied token is cancelled.
+    /// Exposes an asynchronous stream of translated CAN frames.
     /// </summary>
-    IAsyncEnumerable<CanFrame> ReadAllAsync(CancellationToken cancellationToken);
+    public interface ISocketCanFrameSource
+    {
+        /// <summary>
+        /// Reads all frames published to the channel until the supplied token is cancelled.
+        /// </summary>
+        IAsyncEnumerable<CanFrame> ReadAllAsync(CancellationToken cancellationToken);
+    }
 }

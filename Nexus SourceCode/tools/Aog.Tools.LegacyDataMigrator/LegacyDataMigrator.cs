@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
+using Schema = Parquet.Schema.Schema;
 
 namespace Aog.Tools.LegacyDataMigrator;
 

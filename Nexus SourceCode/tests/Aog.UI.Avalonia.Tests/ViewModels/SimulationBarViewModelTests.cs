@@ -319,6 +319,23 @@ public sealed class SimulationBarViewModelTests
     }
 
     [Fact]
+    public async Task TogglePlaybackCommand_WhenReplayControllerCancels_DoesNotLogError()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        var logger = new TestLogger<SimulationBarViewModel>();
+        var replayController = new ReplayControllerStub(
+            playAsync: () => ValueTask.FromException(new OperationCanceledException()));
+
+        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+
+        viewModel.TogglePlaybackCommand.Execute(null);
+
+        await WaitForLogAsync(logger);
+
+        logger.Entries.Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task SeekFraction_WhenReplayControllerFails_LogsError()
     {
         var configuration = CreateConfigurationWithScenario();

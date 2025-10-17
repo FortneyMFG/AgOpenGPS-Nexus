@@ -137,6 +137,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-956 SocketCAN reconnect delay clamp _(Done)_ — Guard zero/negative delays by restoring the default backoff
 - [x] NX-935 Legacy pose codec default source fallback _(Done)_ — Default main antenna source address when metadata is omitted
 - [x] NX-963 Legacy pose dual heading sanitization fix _(Done)_ — Guard secondary heading against non-finite values
+- [ ] NX-986 Linux serial symlink deduplication fix
 - [ ] NX-938 Legacy steer command speed encoding fix
 - [ ] NX-915 gpsd TPV null field handling regression test
 - [ ] NX-934 Legacy UDP section mask snapshot fix
@@ -145,6 +146,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-952 Aog.Agio.Windows targeting pack restore guard
 - [x] NX-953 SocketCAN burst tolerance for transient backpressure
 - [x] NX-967 Linux serial enumerator canonical dedupe
+- [ ] NX-971 Linux NMEA VTG null speed log fix
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -388,6 +390,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-092 Legacy data migration utility _(Done)_
 - [x] NX-093 Bridging workflow knowledge base
 - [x] NX-094 Field feedback telemetry aggregator
+- [x] NX-955 Field feedback aggregator JSONL regression fix _(Done)_ — Restore newline-delimited parsing and unit coverage
 - [x] NX-095 Dealer support escalation process
 - [x] NX-096 Community preview program
 - [x] NX-097 1.0 launch readiness review
@@ -504,6 +507,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-024 | Linux serial NMEA auto-scan | Done |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Reuse parser |
 | NX-025 | Linux gpsd provider | Done |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Emulated feed test |
 | NX-026 | TimingCaps probe (Linux PPS/PTP) | Done |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Report jitter |
+| NX-959 | Linux NMEA scan hot reload | In Progress |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Cancel and restart serial scan loop when configuration changes |
 | NX-027 | Legacy UDP gateway skeleton | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Loopback test |
 | NX-029 | Agio.Linux SocketCAN backend (CAN→gRPC) | Done |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Streams CAN frames + section relays |
 | NX-066 | GNSS source policy + TCP/UDP provider | Done |  | — | [SRS Option O-STACK-1](docs/SRS/options/O-STACK-1_DotNet8Avalonia.md) | Aggregates `IPositionSource` feeds |
@@ -526,6 +530,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-246 | GNSS correction services bootstrap | Done |  | — | [ADR-066](docs/ADR/ADR-roadmap.md) | ADR-066 GNSS correction services |
 | NX-742 | SocketCAN channel backpressure guardrails | Done | AI | — | — | Drop stalled subscribers and stress fast consumers |
 | NX-931 | Linux serial scan configuration binding | Done | AI | — | — | Bind `AgioHost:Linux:Serial:Scan` options, document overrides, add tests |
+| NX-986 | Linux serial symlink deduplication fix | In Progress | AI | — | — | Collapse duplicate device nodes discovered via symlinks |
 | NX-952 | SocketCAN subscriber eviction reset | In Progress | AI | — | — | Ensure eviction clears backpressure and re-subscription regression test |
 | NX-967 | Linux serial enumerator canonical dedupe | Done | AI | — | — | Canonicalize enumerated device paths and dedupe results |
 

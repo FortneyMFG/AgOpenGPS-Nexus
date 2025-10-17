@@ -635,7 +635,7 @@ public sealed class LegacyDataMigrator
 
         var schema = TelemetrySchemas.Pose.Schema;
         await using var stream = CreateParquetStream(outputDirectory, "pose.parquet");
-        await using var writer = await ParquetWriter.CreateAsync(schema, stream).ConfigureAwait(false);
+        using var writer = await ParquetWriter.CreateAsync(schema, stream).ConfigureAwait(false);
         using var rowGroup = writer.CreateRowGroup();
 
         await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
@@ -666,7 +666,7 @@ public sealed class LegacyDataMigrator
         }
 
         await using var stream = CreateParquetStream(outputDirectory, "imu.parquet");
-        await using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Imu.Schema, stream).ConfigureAwait(false);
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Imu.Schema, stream).ConfigureAwait(false);
         using var rowGroup = writer.CreateRowGroup();
 
         await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
@@ -699,7 +699,7 @@ public sealed class LegacyDataMigrator
         }
 
         await using var stream = CreateParquetStream(outputDirectory, "can.parquet");
-        await using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Can.Schema, stream).ConfigureAwait(false);
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Can.Schema, stream).ConfigureAwait(false);
         using var rowGroup = writer.CreateRowGroup();
 
         await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Can.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
@@ -726,7 +726,7 @@ public sealed class LegacyDataMigrator
         }
 
         await using var stream = CreateParquetStream(outputDirectory, "io.parquet");
-        await using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Io.Schema, stream).ConfigureAwait(false);
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Io.Schema, stream).ConfigureAwait(false);
         using var rowGroup = writer.CreateRowGroup();
 
         await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Io.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
@@ -751,7 +751,7 @@ public sealed class LegacyDataMigrator
         }
 
         await using var stream = CreateParquetStream(outputDirectory, "plugin.parquet");
-        await using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Plugin.Schema, stream).ConfigureAwait(false);
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Plugin.Schema, stream).ConfigureAwait(false);
         using var rowGroup = writer.CreateRowGroup();
 
         await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Plugin.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
@@ -776,7 +776,7 @@ public sealed class LegacyDataMigrator
         }
 
         await using var stream = CreateParquetStream(outputDirectory, "weather.parquet");
-        await using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Weather.Schema, stream).ConfigureAwait(false);
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Weather.Schema, stream).ConfigureAwait(false);
         using var rowGroup = writer.CreateRowGroup();
 
         await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);

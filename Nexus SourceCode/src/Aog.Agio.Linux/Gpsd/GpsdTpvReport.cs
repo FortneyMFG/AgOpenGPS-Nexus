@@ -53,6 +53,10 @@ public sealed record GpsdTpvReport(
             var speed = TryGetDouble(root, "speed");
             var track = TryGetDouble(root, "track");
             var mode = TryGetInt(root, "mode");
+            if (mode is < 1 or > 3)
+            {
+                return false;
+            }
 
             report = new GpsdTpvReport(timestamp, latitude, longitude, altitude, speed, track, mode);
             return true;

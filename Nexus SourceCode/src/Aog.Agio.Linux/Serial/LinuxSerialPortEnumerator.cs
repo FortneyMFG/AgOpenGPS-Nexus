@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,13 +21,14 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         IOptions<LinuxSerialPortEnumeratorOptions> options)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = (options ?? throw new ArgumentNullException(nameof(options))).Value ?? throw new ArgumentException("Options are required.", nameof(options));
+        _options = (options ?? throw new ArgumentNullException(nameof(options))).Value
+                   ?? throw new ArgumentException("Options are required.", nameof(options));
     }
 
     /// <inheritdoc />
     public IEnumerable<string> GetPortNames()
     {
-        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var seen = new HashSet<string>(StringComparer.Ordinal); // canonical-path de-dupe
         var results = new List<string>();
 
         var prefixes = _options.DevicePrefixes ?? Array.Empty<string>();
@@ -109,26 +112,52 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         }
     }
 
-    private static void AddResult(string path, HashSet<string> seen, List<string> results)
+    private void AddResult(string path, HashSet<string> seen, List<string> results)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
             return;
         }
 
+        var fullPath = Path.GetFullPath(path);
+
         string canonicalPath;
         try
         {
-            canonicalPath = CanonicalizePath(path);
+            canonicalPath = CanonicalizePath(fullPath);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its full path could not be resolved.", path);
+            return;
+        }
+
+        // Skip directories; legit serials are device files (char devices) not directories.
+        try
+        {
+            if (Directory.Exists(canonicalPath))
+            {
+                _logger.LogDebug("Skipping serial device candidate {Path} because it is a directory.", canonicalPath);
+                return;
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its attributes could not be read.", canonicalPath);
             return;
         }
 
         if (seen.Add(canonicalPath))
         {
-            results.Add(canonicalPath);
+            // Keep the discovered (possibly symlinked) path for operator familiarity; de-dupe by canonical.
+            results.Add(fullPath);
+        }
+        else
+        {
+            _logger.LogDebug(
+                "Skipping serial device {Path} because canonical path {CanonicalPath} was already discovered.",
+                fullPath,
+                canonicalPath);
         }
     }
 

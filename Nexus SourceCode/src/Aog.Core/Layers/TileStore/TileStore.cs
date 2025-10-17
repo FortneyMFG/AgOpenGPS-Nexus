@@ -403,7 +403,7 @@ public sealed class TileStore : ILayerControllerTileSink, IDisposable
         var payload = JsonSerializer.Serialize(tile, _serializerOptions);
         var bytes = Utf8NoBom.GetBytes(payload);
         stream.Write(bytes, 0, bytes.Length);
-        stream.WriteByte((byte)\n);
+        stream.WriteByte((byte)'\n');
         if (flush)
         {
             stream.Flush(true);

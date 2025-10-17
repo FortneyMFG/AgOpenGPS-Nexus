@@ -1,7 +1,6 @@
 using Aog.Agio.Nmea;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Aog.Agio.Windows.Tests;
@@ -29,7 +28,7 @@ public sealed class NmeaAutoScannerTests
             },
             () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
 
-        var options = Options.Create(new NmeaSerialPortScanOptions
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
         {
             ProbeDuration = TimeSpan.FromSeconds(2),
             ReadTimeout = TimeSpan.FromMilliseconds(50),
@@ -37,7 +36,7 @@ public sealed class NmeaAutoScannerTests
             MaxReadAttemptsPerPort = 25,
         });
 
-        var scanner = new NmeaAutoScanner(
+        using var scanner = new NmeaAutoScanner(
             enumerator,
             sessionFactory,
             parser,
@@ -63,7 +62,7 @@ public sealed class NmeaAutoScannerTests
         var enumerator = new FakeSerialPortEnumerator("COM9");
         var parser = new NmeaSentenceParser();
         var sessionFactory = new FakeSerialPortSessionFactory(new Dictionary<(string Port, int Baud), IEnumerable<string>>(), () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
-        var options = Options.Create(new NmeaSerialPortScanOptions
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
         {
             ProbeDuration = TimeSpan.FromSeconds(1),
             ReadTimeout = TimeSpan.FromMilliseconds(50),
@@ -71,7 +70,7 @@ public sealed class NmeaAutoScannerTests
             MaxReadAttemptsPerPort = 5,
         });
 
-        var scanner = new NmeaAutoScanner(
+        using var scanner = new NmeaAutoScanner(
             enumerator,
             sessionFactory,
             parser,

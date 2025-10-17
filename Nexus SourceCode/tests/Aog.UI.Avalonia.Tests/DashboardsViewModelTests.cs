@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
@@ -54,6 +56,26 @@ public sealed class DashboardsViewModelTests
         viewModel.Bookmarks.Should().HaveCount(1);
         viewModel.ExportStatus.Should().Be("Export queued: CSV snapshot at 12:34:56");
         viewModel.SpeedSamples.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void ReplayTimeline_BookmarksAreReadOnly()
+    {
+        var viewModel = new ReplayTimelineViewModel();
+        var bookmarks = new[]
+        {
+            new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(10), "Test", "Note"),
+        };
+
+        viewModel.ApplySampleData(Array.Empty<double>(), Array.Empty<double>(), bookmarks);
+
+        var observableCollectionCast = viewModel.Bookmarks as ObservableCollection<ReplayTimelineBookmarkViewModel>;
+        observableCollectionCast.Should().BeNull();
+
+        var modifyingAction = () => ((ICollection<ReplayTimelineBookmarkViewModel>)viewModel.Bookmarks)
+            .Add(new ReplayTimelineBookmarkViewModel(TimeSpan.Zero, "Injected", "Should fail"));
+
+        modifyingAction.Should().Throw<NotSupportedException>();
     }
 
     private sealed class FixedTimeProvider : TimeProvider

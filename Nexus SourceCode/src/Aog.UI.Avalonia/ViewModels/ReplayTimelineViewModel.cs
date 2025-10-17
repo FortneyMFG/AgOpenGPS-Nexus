@@ -12,7 +12,7 @@ public sealed class ReplayTimelineViewModel : ObservableObject
 {
     private readonly TimeProvider _timeProvider;
     private readonly ObservableCollection<ReplayTimelineBookmarkViewModel> _bookmarks = new();
-    private readonly ReadOnlyObservableCollection<ReplayTimelineBookmarkViewModel> _readonlyBookmarks;
+    private readonly ReadOnlyObservableCollection<ReplayTimelineBookmarkViewModel> _bookmarkView;
 
     private IReadOnlyList<double> _speedSamples = Array.Empty<double>();
     private IReadOnlyList<double> _headingSamples = Array.Empty<double>();
@@ -26,7 +26,7 @@ public sealed class ReplayTimelineViewModel : ObservableObject
         _timeProvider = timeProvider ?? TimeProvider.System;
         ExportCsvCommand = new DelegateCommand(_ => UpdateExportStatus("CSV"));
         ExportGeoJsonCommand = new DelegateCommand(_ => UpdateExportStatus("GeoJSON"));
-        _readonlyBookmarks = new ReadOnlyObservableCollection<ReplayTimelineBookmarkViewModel>(_bookmarks);
+        _bookmarkView = new ReadOnlyObservableCollection<ReplayTimelineBookmarkViewModel>(_bookmarks);
     }
 
     /// <summary>Gets the normalized vehicle speed samples used to render the timeline chart.</summary>
@@ -44,7 +44,7 @@ public sealed class ReplayTimelineViewModel : ObservableObject
     }
 
     /// <summary>Gets the bookmarks surfaced alongside the timeline.</summary>
-    public ReadOnlyObservableCollection<ReplayTimelineBookmarkViewModel> Bookmarks => _readonlyBookmarks;
+    public IReadOnlyList<ReplayTimelineBookmarkViewModel> Bookmarks => _bookmarkView;
 
     /// <summary>Gets a status message that reflects the latest export command.</summary>
     public string ExportStatus

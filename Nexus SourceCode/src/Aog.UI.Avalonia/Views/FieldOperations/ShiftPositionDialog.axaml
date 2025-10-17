@@ -11,8 +11,7 @@
         Height="420"
         MinWidth="460"
         MinHeight="360"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance vm:ShiftPositionDialogViewModel, IsDesignTimeCreatable=True}">
+        mc:Ignorable="d">
   <Grid Margin="20" RowDefinitions="Auto,*" RowSpacing="16">
     <StackPanel>
       <TextBlock Text="Shift position" FontSize="24" FontWeight="Bold"/>

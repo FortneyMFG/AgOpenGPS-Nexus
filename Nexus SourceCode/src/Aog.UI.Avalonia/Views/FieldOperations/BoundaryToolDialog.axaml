@@ -10,8 +10,7 @@
         Height="620"
         MinWidth="780"
         MinHeight="520"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance vm:BoundaryToolViewModel, IsDesignTimeCreatable=True}">
+        mc:Ignorable="d">
   <Grid RowDefinitions="Auto,*" Margin="20" RowSpacing="16">
     <StackPanel Orientation="Horizontal" Spacing="24" VerticalAlignment="Center">
       <StackPanel>

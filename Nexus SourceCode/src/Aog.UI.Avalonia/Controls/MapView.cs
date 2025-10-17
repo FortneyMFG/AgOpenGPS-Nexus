@@ -6,8 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Skia;
-using SkiaSharp;
+using Avalonia.Media.Immutable;
 
 namespace Aog.UI.Avalonia.Controls;
 
@@ -20,7 +19,7 @@ public sealed class MapView : Control
     private readonly Rendering.MapViewport _viewport = new();
     private bool _isPanning;
     private bool _hasUserPanned;
-    private Pointer? _panPointer;
+    private IPointer? _panPointer;
     private Point _lastPointerPosition;
 
     /// <summary>
@@ -29,8 +28,7 @@ public sealed class MapView : Control
     public static readonly StyledProperty<VehiclePose> VehiclePoseProperty =
         AvaloniaProperty.Register<MapView, VehiclePose>(
             nameof(VehiclePose),
-            VehiclePose.Origin,
-            notifying: static (sender, _) => sender.InvalidateVisual());
+            VehiclePose.Origin);
 
     /// <summary>
     /// Identifies the <see cref="GuidanceTracks"/> styled property.
@@ -38,8 +36,7 @@ public sealed class MapView : Control
     public static readonly StyledProperty<IReadOnlyList<GuidanceTrack>> GuidanceTracksProperty =
         AvaloniaProperty.Register<MapView, IReadOnlyList<GuidanceTrack>>(
             nameof(GuidanceTracks),
-            Array.Empty<GuidanceTrack>(),
-            notifying: static (sender, _) => sender.InvalidateVisual());
+            Array.Empty<GuidanceTrack>());
 
     /// <summary>
     /// Identifies the <see cref="Layers"/> styled property.
@@ -47,8 +44,7 @@ public sealed class MapView : Control
     public static readonly StyledProperty<IReadOnlyList<MapLayer>> LayersProperty =
         AvaloniaProperty.Register<MapView, IReadOnlyList<MapLayer>>(
             nameof(Layers),
-            Array.Empty<MapLayer>(),
-            notifying: static (sender, _) => sender.InvalidateVisual());
+            Array.Empty<MapLayer>());
 
     /// <summary>
     /// Gets or sets the pose to render on the map.
@@ -89,18 +85,28 @@ public sealed class MapView : Control
     }
 
     /// <inheritdoc />
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == VehiclePoseProperty && !_hasUserPanned)
+        if (change.Property == VehiclePoseProperty)
         {
-            CenterOnPose(Bounds.Size);
+            if (!_hasUserPanned)
+            {
+                CenterOnPose(Bounds.Size);
+            }
+
+            InvalidateVisual();
         }
         else if (change.Property == BoundsProperty && !_hasUserPanned &&
                  change.NewValue is Rect rect && rect.Width > 0 && rect.Height > 0)
         {
             CenterOnPose(rect.Size);
+            InvalidateVisual();
+        }
+        else if (change.Property == GuidanceTracksProperty || change.Property == LayersProperty)
+        {
+            InvalidateVisual();
         }
     }
 
@@ -109,23 +115,16 @@ public sealed class MapView : Control
     {
         base.Render(context);
 
-        if (context.PlatformImpl is not ISkiaDrawingContextImpl skiaContext)
-        {
-            return;
-        }
+        var backgroundBrush = new ImmutableSolidColorBrush(Color.FromRgb(24, 31, 36));
+        context.FillRectangle(backgroundBrush, new Rect(Bounds.Size));
 
-        var canvas = skiaContext.SkSurface.Canvas;
-        canvas.Clear(new SKColor(24, 31, 36));
-
-        canvas.Save();
-        DrawLayers(canvas);
-        DrawGuidance(canvas);
-        DrawAxes(canvas);
-        DrawVehicle(canvas);
-        canvas.Restore();
+        DrawLayers(context);
+        DrawGuidance(context);
+        DrawAxes(context);
+        DrawVehicle(context);
     }
 
-    private void DrawLayers(SKCanvas canvas)
+    private void DrawLayers(DrawingContext context)
     {
         var layers = Layers;
         if (layers is null || layers.Count == 0)
@@ -151,39 +150,26 @@ public sealed class MapView : Control
                 var top = Math.Min(topLeft.Y, bottomRight.Y);
                 var bottom = Math.Max(topLeft.Y, bottomRight.Y);
 
-                var rect = new SKRect((float)left, (float)top, (float)right, (float)bottom);
+                var rect = new Rect(new Point(left, top), new Point(right, bottom));
                 var fillColor = layer.Style.Evaluate(cell.Value);
                 if (layer.Style.IsPlanned)
                 {
-                    fillColor = fillColor.WithAlpha((byte)(fillColor.A * 0.55));
+                    fillColor = Color.FromArgb((byte)(fillColor.A * 0.55), fillColor.R, fillColor.G, fillColor.B);
                 }
 
-                using var fillPaint = new SKPaint
-                {
-                    Color = ToSkColor(fillColor),
-                    IsStroke = false,
-                    IsAntialias = true,
-                };
-
-                canvas.DrawRect(rect, fillPaint);
+                var fillBrush = new ImmutableSolidColorBrush(fillColor);
+                context.FillRectangle(fillBrush, rect);
 
                 if (layer.Style.OutlineColor.A > 0)
                 {
-                    using var outlinePaint = new SKPaint
-                    {
-                        Color = ToSkColor(layer.Style.OutlineColor),
-                        StrokeWidth = 1,
-                        IsStroke = true,
-                        IsAntialias = true,
-                    };
-
-                    canvas.DrawRect(rect, outlinePaint);
+                    var outlinePen = new Pen(new ImmutableSolidColorBrush(layer.Style.OutlineColor), 1);
+                    context.DrawRectangle(outlinePen, rect);
                 }
             }
         }
     }
 
-    private void DrawGuidance(SKCanvas canvas)
+    private void DrawGuidance(DrawingContext context)
     {
         var tracks = GuidanceTracks;
         if (tracks is null || tracks.Count == 0)
@@ -193,35 +179,30 @@ public sealed class MapView : Control
 
         foreach (var track in tracks.Where(t => t.Points.Count >= 2))
         {
-            using var paint = new SKPaint
+            var geometry = new StreamGeometry();
+            using (var ctx = geometry.Open())
             {
-                Color = ToSkColor(track.Color),
-                StrokeWidth = Math.Max((float)track.Thickness, 1f),
-                IsStroke = true,
-                IsAntialias = true,
-                StrokeCap = SKStrokeCap.Round,
-            };
-
-            using var path = new SKPath();
-            for (var index = 0; index < track.Points.Count; index++)
-            {
-                var point = track.Points[index];
-                var screen = ToSkPoint(_viewport.WorldToScreen(point));
-                if (index == 0)
+                var start = _viewport.WorldToScreen(track.Points[0]);
+                ctx.BeginFigure(start, false);
+                for (var index = 1; index < track.Points.Count; index++)
                 {
-                    path.MoveTo(screen);
+                    var next = _viewport.WorldToScreen(track.Points[index]);
+                    ctx.LineTo(next);
                 }
-                else
-                {
-                    path.LineTo(screen);
-                }
+                ctx.EndFigure(false);
             }
 
-            canvas.DrawPath(path, paint);
+            var pen = new Pen(new ImmutableSolidColorBrush(track.Color), Math.Max(track.Thickness, 1))
+            {
+                LineCap = PenLineCap.Round,
+                LineJoin = PenLineJoin.Round,
+            };
+
+            context.DrawGeometry(null, pen, geometry);
         }
     }
 
-    private void DrawAxes(SKCanvas canvas)
+    private void DrawAxes(DrawingContext context)
     {
         var viewportBounds = Bounds;
         var topLeftWorld = _viewport.ScreenToWorld(new Point(0, 0));
@@ -231,78 +212,58 @@ public sealed class MapView : Control
         var worldTop = Math.Max(topLeftWorld.Y, bottomRightWorld.Y);
         var worldBottom = Math.Min(topLeftWorld.Y, bottomRightWorld.Y);
 
-        using var axisPaint = new SKPaint
+        var axisPen = new Pen(new ImmutableSolidColorBrush(Color.FromRgb(64, 86, 96)), 2)
         {
-            Color = new SKColor(64, 86, 96),
-            StrokeWidth = 2,
-            IsStroke = true,
-            IsAntialias = true,
+            LineCap = PenLineCap.Round,
         };
 
         if (worldLeft <= 0 && worldRight >= 0)
         {
-            var start = ToSkPoint(_viewport.WorldToScreen(new Point(0, worldBottom)));
-            var end = ToSkPoint(_viewport.WorldToScreen(new Point(0, worldTop)));
-            canvas.DrawLine(start, end, axisPaint);
+            var start = _viewport.WorldToScreen(new Point(0, worldBottom));
+            var end = _viewport.WorldToScreen(new Point(0, worldTop));
+            context.DrawLine(axisPen, start, end);
         }
 
         if (worldBottom <= 0 && worldTop >= 0)
         {
-            var start = ToSkPoint(_viewport.WorldToScreen(new Point(worldLeft, 0)));
-            var end = ToSkPoint(_viewport.WorldToScreen(new Point(worldRight, 0)));
-            canvas.DrawLine(start, end, axisPaint);
+            var start = _viewport.WorldToScreen(new Point(worldLeft, 0));
+            var end = _viewport.WorldToScreen(new Point(worldRight, 0));
+            context.DrawLine(axisPen, start, end);
         }
     }
 
-    private void DrawVehicle(SKCanvas canvas)
+    private void DrawVehicle(DrawingContext context)
     {
         var pose = VehiclePose;
-        var center = ToSkPoint(_viewport.WorldToScreen(new Point(pose.X, pose.Y)));
+        var center = _viewport.WorldToScreen(new Point(pose.X, pose.Y));
 
-        float radius = Math.Max((float)(_viewport.Scale * 0.5), 6f);
-        using var bodyPaint = new SKPaint
+        var radius = Math.Max(_viewport.Scale * 0.5, 6);
+        var bodyBrush = new ImmutableSolidColorBrush(Color.FromRgb(17, 201, 141));
+        var outlinePen = new Pen(new ImmutableSolidColorBrush(Color.FromRgb(10, 87, 67)), 2);
+        var ellipseRect = new Rect(center.X - radius, center.Y - radius, radius * 2, radius * 2);
+        context.DrawEllipse(bodyBrush, outlinePen, ellipseRect);
+
+        var headingRadians = pose.HeadingDegrees * Math.PI / 180.0;
+        var headingDir = new Vector(Math.Cos(headingRadians), -Math.Sin(headingRadians));
+        var headingLength = Math.Max(radius * 2.2, 28);
+        var tip = new Point(center.X + headingDir.X * headingLength, center.Y + headingDir.Y * headingLength);
+
+        var headingPen = new Pen(new ImmutableSolidColorBrush(Colors.White), 3)
         {
-            Color = new SKColor(17, 201, 141),
-            IsStroke = false,
-            IsAntialias = true,
+            LineCap = PenLineCap.Round,
         };
 
-        using var outlinePaint = new SKPaint
-        {
-            Color = new SKColor(10, 87, 67),
-            StrokeWidth = 2,
-            IsStroke = true,
-            IsAntialias = true,
-        };
+        context.DrawLine(headingPen, center, tip);
 
-        canvas.DrawCircle(center, radius, bodyPaint);
-        canvas.DrawCircle(center, radius, outlinePaint);
-
-        float headingRadians = (float)(pose.HeadingDegrees * Math.PI / 180.0);
-        var screenDir = new SKPoint((float)Math.Cos(headingRadians), (float)-Math.Sin(headingRadians));
-        float headingLength = Math.Max(radius * 2.2f, 28f);
-        var tip = new SKPoint(center.X + screenDir.X * headingLength, center.Y + screenDir.Y * headingLength);
-
-        using var headingPaint = new SKPaint
-        {
-            Color = new SKColor(255, 255, 255),
-            StrokeWidth = 3,
-            IsStroke = true,
-            IsAntialias = true,
-            StrokeCap = SKStrokeCap.Round,
-        };
-
-        canvas.DrawLine(center, tip, headingPaint);
-
-        var backDir = new SKPoint(-screenDir.X, -screenDir.Y);
-        var arrowAngle = (float)(Math.PI / 6); // 30 degrees.
-        float arrowSize = Math.Max(headingLength * 0.35f, 14f);
+        var backDir = -headingDir;
+        var arrowAngle = Math.PI / 6; // 30 degrees.
+        var arrowSize = Math.Max(headingLength * 0.35, 14);
         var leftHeadDir = Rotate(backDir, arrowAngle);
         var rightHeadDir = Rotate(backDir, -arrowAngle);
-        var left = new SKPoint(tip.X + leftHeadDir.X * arrowSize, tip.Y + leftHeadDir.Y * arrowSize);
-        var right = new SKPoint(tip.X + rightHeadDir.X * arrowSize, tip.Y + rightHeadDir.Y * arrowSize);
-        canvas.DrawLine(tip, left, headingPaint);
-        canvas.DrawLine(tip, right, headingPaint);
+        var left = new Point(tip.X + leftHeadDir.X * arrowSize, tip.Y + leftHeadDir.Y * arrowSize);
+        var right = new Point(tip.X + rightHeadDir.X * arrowSize, tip.Y + rightHeadDir.Y * arrowSize);
+        context.DrawLine(headingPen, tip, left);
+        context.DrawLine(headingPen, tip, right);
     }
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -383,14 +344,10 @@ public sealed class MapView : Control
         InvalidateVisual();
     }
 
-    private static SKPoint ToSkPoint(Point point) => new((float)point.X, (float)point.Y);
-
-    private static SKColor ToSkColor(Color color) => new(color.R, color.G, color.B, color.A);
-
-    private static SKPoint Rotate(SKPoint vector, float radians)
+    private static Vector Rotate(Vector vector, double radians)
     {
-        var cos = MathF.Cos(radians);
-        var sin = MathF.Sin(radians);
-        return new SKPoint(vector.X * cos - vector.Y * sin, vector.X * sin + vector.Y * cos);
+        var cos = Math.Cos(radians);
+        var sin = Math.Sin(radians);
+        return new Vector(vector.X * cos - vector.Y * sin, vector.X * sin + vector.Y * cos);
     }
 }

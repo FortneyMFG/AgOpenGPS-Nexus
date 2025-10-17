@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.ViewModels;
@@ -13,7 +14,6 @@ public partial class MainWindow : Window
     private Size _lastNormalSize;
     private PixelPoint? _lastNormalPosition;
     private IDisposable? _clientSizeSubscription;
-    private IDisposable? _positionSubscription;
     private IDisposable? _windowStateSubscription;
 
     public MainWindow(MainWindowViewModel viewModel, IUiPreferencesService preferencesService)
@@ -37,13 +37,7 @@ public partial class MainWindow : Window
             }
         });
 
-        _positionSubscription = this.GetObservable(PositionProperty).Subscribe(position =>
-        {
-            if (WindowState == WindowState.Normal)
-            {
-                _lastNormalPosition = position;
-            }
-        });
+        PositionChanged += OnPositionChanged;
 
         _windowStateSubscription = this.GetObservable(WindowStateProperty).Subscribe(state =>
         {
@@ -106,10 +100,10 @@ public partial class MainWindow : Window
     private void OnClosed(object? sender, EventArgs e)
     {
         _clientSizeSubscription?.Dispose();
-        _positionSubscription?.Dispose();
         _windowStateSubscription?.Dispose();
         Closing -= OnClosing;
         Closed -= OnClosed;
+        PositionChanged -= OnPositionChanged;
 
         if (DataContext is IDisposable disposable)
         {
@@ -119,4 +113,11 @@ public partial class MainWindow : Window
         DataContext = null;
     }
 
+    private void OnPositionChanged(object? sender, PixelPointEventArgs e)
+    {
+        if (WindowState == WindowState.Normal)
+        {
+            _lastNormalPosition = e.Point;
+        }
+    }
 }

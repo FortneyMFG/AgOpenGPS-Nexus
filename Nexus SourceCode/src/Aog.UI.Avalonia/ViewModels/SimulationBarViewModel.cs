@@ -31,6 +31,7 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
     private readonly ObservableCollection<SimulationPlaybackRateOptionViewModel> _playbackRates = new();
     private readonly ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> _playbackRateView;
     private readonly EventHandler<ReplayStateChangedEventArgs>? _stateChangedHandler;
+    private readonly IDispatcher _dispatcher;
 
     private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRateOption;
     private bool _disposed;
@@ -68,6 +69,7 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
         _configuration = configuration;
         _replayController = replayController;
         _logger = logger;
+        _dispatcher = dispatcher ?? Dispatcher.UIThread;
         _dispatcher = dispatcher ?? Dispatcher.UIThread;
 
         TogglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
@@ -312,17 +314,17 @@ public string SelectedPlaybackRateLabel
 
     private void InitializePlaybackRates(double initialRate)
     {
-        ExecuteOnDispatcher(
-            () =>
-            {
-                _playbackRateOptions.Clear();
-                _playbackRateOptions.Add(new SimulationPlaybackRateOptionViewModel(0.5, OnPlaybackRateOptionSelected));
-                _playbackRateOptions.Add(new SimulationPlaybackRateOptionViewModel(1.0, OnPlaybackRateOptionSelected));
-                _playbackRateOptions.Add(new SimulationPlaybackRateOptionViewModel(2.0, OnPlaybackRateOptionSelected));
-                SortPlaybackRateOptionsOnDispatcher();
-            });
+        void Initialize()
+        {
+            _playbackRates.Clear();
+            _playbackRates.Add(new SimulationPlaybackRateOptionViewModel(0.5, OnPlaybackRateOptionSelected));
+            _playbackRates.Add(new SimulationPlaybackRateOptionViewModel(1.0, OnPlaybackRateOptionSelected));
+            _playbackRates.Add(new SimulationPlaybackRateOptionViewModel(2.0, OnPlaybackRateOptionSelected));
+            SortPlaybackRates();
+            SelectPlaybackRate(initialRate, updateController: false);
+        }
 
-        SelectPlaybackRate(initialRate, updateController: false);
+        ExecuteOnDispatcher(Initialize);
     }
 
     private void TogglePlayback()
@@ -491,6 +493,7 @@ private void NotifyPlaybackRateProperties()
 }
 
 
+#if false
 // Centralized place to notify anything bound to the selected rate/label/option.
 private void NotifyPlaybackRateProperties()
 {
@@ -498,6 +501,7 @@ private void NotifyPlaybackRateProperties()
     RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
     RaisePropertyChanged(nameof(SelectedPlaybackRateOption));
 }
+#endif
 
 
     private void UpdateSeekFraction(double value, bool triggerSeek)
@@ -523,6 +527,7 @@ private void NotifyPlaybackRateProperties()
         }
     }
 
+#if false
 private void UpdateSeekFraction(double value, bool triggerSeek)
 {
     var clamped = double.IsNaN(value) ? 0 : Math.Clamp(value, 0, 1);
@@ -545,6 +550,7 @@ private void UpdateSeekFraction(double value, bool triggerSeek)
         FireAndForget(() => _replayController.SeekAsync(newPosition), "Failed to seek to requested position.");
     }
 }
+#endif
 
 private void OnReplayStateChanged(ReplayState state)
 {
@@ -662,6 +668,23 @@ private void OnReplayStateChanged(ReplayState state)
             }
 
             source.Dispose();
+        }
+    }
+
+    private void ExecuteOnDispatcher(Action action)
+    {
+        if (action is null)
+        {
+            return;
+        }
+
+        if (_dispatcher.CheckAccess())
+        {
+            action();
+        }
+        else
+        {
+            _dispatcher.Post(action);
         }
     }
 

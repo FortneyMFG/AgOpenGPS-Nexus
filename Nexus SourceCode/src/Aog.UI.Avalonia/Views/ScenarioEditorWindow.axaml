@@ -8,8 +8,7 @@
         Title="Scenario editor"
         Width="840"
         Height="560"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance vm:ScenarioEditorViewModel}">
+        mc:Ignorable="d">
   <Grid RowDefinitions="Auto,*,Auto" RowSpacing="16" Margin="20">
     <TextBlock Text="Scenario editor" FontSize="24" FontWeight="Bold"/>
 

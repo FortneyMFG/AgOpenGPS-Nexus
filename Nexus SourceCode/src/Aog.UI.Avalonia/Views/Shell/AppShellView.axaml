@@ -8,8 +8,7 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
              x:DataType="vm:MainWindowViewModel"
-             mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
+             mc:Ignorable="d">
 
   <DockPanel>
     <Border DockPanel.Dock="Top"
@@ -1134,7 +1133,7 @@
 
                         <ItemsControl ItemsSource="{Binding Steps}" Margin="0,4,0,0">
                           <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:RadioProvisioningStepViewModel">
+                            <DataTemplate x:DataType="vm:RadioProvisioningGuideStepViewModel">
                               <StackPanel Margin="0,4" Spacing="4">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                   <TextBlock Text="•" FontWeight="Bold" VerticalAlignment="Top"/>

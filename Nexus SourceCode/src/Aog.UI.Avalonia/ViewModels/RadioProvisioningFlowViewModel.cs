@@ -50,7 +50,7 @@ public sealed class RadioProvisioningFlowViewModel
             new(
                 "Prepare the workstation",
                 "Confirm the provisioning kit prerequisites are satisfied before minting device profiles.",
-                new List<RadioProvisioningStepViewModel>
+                new List<RadioProvisioningGuideStepViewModel>
                 {
                     new("Install the .NET 8.0 SDK on the provisioning workstation."),
                     new(
@@ -62,20 +62,22 @@ public sealed class RadioProvisioningFlowViewModel
             new(
                 "Generate a provisioning profile",
                 "Use the RadioBridge tooling to mint the per-device JSON profile that stores identifiers, capabilities, and keys.",
-                new List<RadioProvisioningStepViewModel>
+                new List<RadioProvisioningGuideStepViewModel>
                 {
                     new(
                         "Run the provisioning command for the device you are onboarding.",
                         "Override --output to write directly to a secure share or omit it to stream the JSON to stdout.",
-                        "dotnet run -- provision \\
-    --device-id bridge.lora.alpha \\
-    --label \"LoRa Bridge Alpha\" \\
-    --radio-kind lora \\
-    --capability radio \\
-    --capability bridge \\
-    --capability lora \\
-    --key-bytes 16 \\
-    --output /secure-share/radio/bridge.lora.alpha.json"),
+                        """
+                        dotnet run -- provision \
+                            --device-id bridge.lora.alpha \
+                            --label "LoRa Bridge Alpha" \
+                            --radio-kind lora \
+                            --capability radio \
+                            --capability bridge \
+                            --capability lora \
+                            --key-bytes 16 \
+                            --output /secure-share/radio/bridge.lora.alpha.json
+                        """.Trim()),
                     new(
                         "Deterministic keys are supported for lab fixtures via --key 0123456789ABCDEF when needed."),
                     new(
@@ -84,7 +86,7 @@ public sealed class RadioProvisioningFlowViewModel
             new(
                 "Configure the AGiO host",
                 "Copy the profile onto the device running Aog.Agio and wire it into the RadioBridge adapter options.",
-                new List<RadioProvisioningStepViewModel>
+                new List<RadioProvisioningGuideStepViewModel>
                 {
                     new(
                         "Place the provisioning profile on the host, for example /opt/nexus/radio/bridge.lora.alpha.json, with restricted permissions."),
@@ -98,7 +100,7 @@ public sealed class RadioProvisioningFlowViewModel
             new(
                 "Validate the deployment",
                 "Run through the validation checklist to confirm the bridge negotiates correctly with the mesh.",
-                new List<RadioProvisioningStepViewModel>
+                new List<RadioProvisioningGuideStepViewModel>
                 {
                     new(
                         "Execute the RadioBridge transport tests to verify retry logic and Hamming decoding remain healthy.",
@@ -139,7 +141,7 @@ public sealed class RadioProvisioningStageViewModel
     public RadioProvisioningStageViewModel(
         string title,
         string description,
-        IReadOnlyList<RadioProvisioningStepViewModel> steps,
+        IReadOnlyList<RadioProvisioningGuideStepViewModel> steps,
         string? callout = null)
     {
         Title = title ?? throw new ArgumentNullException(nameof(title));
@@ -158,7 +160,7 @@ public sealed class RadioProvisioningStageViewModel
     public string? Callout { get; }
 
     /// <summary>Gets the step collection belonging to the stage.</summary>
-    public IReadOnlyList<RadioProvisioningStepViewModel> Steps { get; }
+    public IReadOnlyList<RadioProvisioningGuideStepViewModel> Steps { get; }
 
     /// <summary>Gets a value indicating whether the stage exposes a callout.</summary>
     public bool HasCallout => !string.IsNullOrWhiteSpace(Callout);
@@ -167,9 +169,9 @@ public sealed class RadioProvisioningStageViewModel
 /// <summary>
 /// Represents a single provisioning step surfaced in the UI.
 /// </summary>
-public sealed class RadioProvisioningStepViewModel
+public sealed class RadioProvisioningGuideStepViewModel
 {
-    public RadioProvisioningStepViewModel(string primaryText, string? secondaryText = null, string? command = null)
+    public RadioProvisioningGuideStepViewModel(string primaryText, string? secondaryText = null, string? command = null)
     {
         PrimaryText = primaryText ?? throw new ArgumentNullException(nameof(primaryText));
         SecondaryText = secondaryText;

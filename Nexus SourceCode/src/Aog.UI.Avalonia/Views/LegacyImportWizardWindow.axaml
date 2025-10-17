@@ -8,8 +8,7 @@
         Title="Legacy guidance import"
         Width="720"
         Height="520"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance vm:LegacyImportWizardViewModel}">
+        mc:Ignorable="d">
   <Grid Margin="24" RowDefinitions="Auto,*,Auto" RowSpacing="20">
     <StackPanel Spacing="8">
       <TextBlock Text="Legacy guidance import" FontSize="26" FontWeight="Bold"/>

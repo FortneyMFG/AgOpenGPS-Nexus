@@ -14,24 +14,20 @@ public sealed class Sparkline : Control
 {
     /// <summary>Identifies the <see cref="Values"/> property.</summary>
     public static readonly StyledProperty<IReadOnlyList<double>> ValuesProperty =
-        AvaloniaProperty.Register<Sparkline, IReadOnlyList<double>>(nameof(Values), Array.Empty<double>(),
-            notifying: static (sparkline, _) => sparkline.InvalidateVisual());
+        AvaloniaProperty.Register<Sparkline, IReadOnlyList<double>>(nameof(Values), Array.Empty<double>());
 
     /// <summary>Identifies the <see cref="Stroke"/> property.</summary>
     public static readonly StyledProperty<IBrush> StrokeProperty =
-        AvaloniaProperty.Register<Sparkline, IBrush>(nameof(Stroke), Brushes.LimeGreen,
-            notifying: static (sparkline, _) => sparkline.InvalidateVisual());
+        AvaloniaProperty.Register<Sparkline, IBrush>(nameof(Stroke), Brushes.LimeGreen);
 
     /// <summary>Identifies the <see cref="Fill"/> property.</summary>
     public static readonly StyledProperty<IBrush?> FillProperty =
         AvaloniaProperty.Register<Sparkline, IBrush?>(nameof(Fill),
-            new SolidColorBrush(Color.FromArgb(64, 50, 205, 50)),
-            notifying: static (sparkline, _) => sparkline.InvalidateVisual());
+            new SolidColorBrush(Color.FromArgb(64, 50, 205, 50)));
 
     /// <summary>Identifies the <see cref="StrokeThickness"/> property.</summary>
     public static readonly StyledProperty<double> StrokeThicknessProperty =
-        AvaloniaProperty.Register<Sparkline, double>(nameof(StrokeThickness), 2.0,
-            notifying: static (sparkline, _) => sparkline.InvalidateVisual());
+        AvaloniaProperty.Register<Sparkline, double>(nameof(StrokeThickness), 2.0);
 
     /// <summary>Gets or sets the values rendered by the sparkline.</summary>
     public IReadOnlyList<double> Values
@@ -59,6 +55,20 @@ public sealed class Sparkline : Control
     {
         get => GetValue(StrokeThicknessProperty);
         set => SetValue(StrokeThicknessProperty, value);
+    }
+
+    /// <inheritdoc />
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == ValuesProperty ||
+            change.Property == StrokeProperty ||
+            change.Property == FillProperty ||
+            change.Property == StrokeThicknessProperty)
+        {
+            InvalidateVisual();
+        }
     }
 
     /// <inheritdoc />

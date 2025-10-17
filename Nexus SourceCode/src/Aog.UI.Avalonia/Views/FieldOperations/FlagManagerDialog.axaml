@@ -10,8 +10,7 @@
         Height="560"
         MinWidth="680"
         MinHeight="480"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance vm:FlagManagerDialogViewModel, IsDesignTimeCreatable=True}">
+        mc:Ignorable="d">
   <Grid Margin="20" RowDefinitions="Auto,*" RowSpacing="16">
     <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
       <StackPanel>

@@ -9,7 +9,6 @@
         Title="{Binding Title}"
         Width="1000"
         Height="700"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
+        mc:Ignorable="d">
   <views:AppShellView/>
 </Window>

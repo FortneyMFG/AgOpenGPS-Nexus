@@ -186,6 +186,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-171 Official Telemetry Logging plugin GA _(Done)_
 - [x] NX-172 Official File IO plugin GA _(Done)_
 - [x] NX-1110 Telemetry log manifest cleanup _(Done)_ — Remove redundant usings flagged by analyzers
+- [ ] NX-1114 Capability registry XML documentation cleanup — Add XML docs for capability registry and weather snapshot models
 - [ ] NX-910 Job manifest cross-drive fallback fix
 - [x] NX-1017 Job Tasks orchestrator analyzer cleanup — Remove redundant Channel using directive
 - [x] NX-1018 Core nullability warning cleanup — Season aggregator, capability registry, job orchestrator, report builder adjustments

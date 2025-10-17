@@ -1,3 +1,7 @@
+using System;
+using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -29,23 +33,23 @@ public sealed class WindowsNmeaBackgroundService : BackgroundService
         {
             try
             {
-                var result = await _scanner.ScanAsync(stoppingToken);
+                var result = await _scanner.ScanAsync(stoppingToken).ConfigureAwait(false);
                 if (result is null)
                 {
                     _logger.LogWarning("No NMEA-capable COM ports detected. Retrying in {Delay}.", RetryDelay);
-                    await Task.Delay(RetryDelay, stoppingToken);
+                    await Task.Delay(RetryDelay, stoppingToken).ConfigureAwait(false);
                     continue;
                 }
 
                 _logger.LogInformation(
-                    "NMEA stream detected on {PortName} at {BaudRate} baud. Lat={Latitude:F6}, Lon={Longitude:F6}, Alt={Altitude:F1}m, Speed={Speed:F2}km/h, Course={Course:F1}°.",
+                    "NMEA stream detected on {PortName} at {BaudRate} baud. Lat={Latitude}, Lon={Longitude}, Alt={Altitude}m, Speed={Speed}km/h, Course={Course}°.",
                     result.PortName,
                     result.BaudRate,
-                    result.Gga.LatitudeDegrees,
-                    result.Gga.LongitudeDegrees,
-                    result.Gga.AltitudeMeters,
-                    result.Vtg.SpeedKilometersPerHour,
-                    result.Vtg.TrueCourseDegrees);
+                    FormatNullable(result.Gga.LatitudeDegrees, "F6"),
+                    FormatNullable(result.Gga.LongitudeDegrees, "F6"),
+                    FormatNullable(result.Gga.AltitudeMeters, "F1"),
+                    FormatNullable(result.Vtg.SpeedKilometersPerHour, "F2"),
+                    FormatNullable(result.Vtg.TrueCourseDegrees, "F1"));
 
                 // TODO(NX-022): Wire the parsed stream into the GNSS gRPC service once defined.
                 await MonitorActiveStreamAsync(result, stoppingToken).ConfigureAwait(false);
@@ -57,7 +61,7 @@ public sealed class WindowsNmeaBackgroundService : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during NMEA COM scan. Retrying in {Delay}.", RetryDelay);
-                await Task.Delay(RetryDelay, stoppingToken);
+                await Task.Delay(RetryDelay, stoppingToken).ConfigureAwait(false);
             }
         }
     }
@@ -98,4 +102,7 @@ public sealed class WindowsNmeaBackgroundService : BackgroundService
             activePort = verificationResult;
         }
     }
+
+    private static string FormatNullable(double? value, string format) =>
+        value?.ToString(format, CultureInfo.InvariantCulture) ?? "n/a";
 }

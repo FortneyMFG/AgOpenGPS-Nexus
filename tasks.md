@@ -147,6 +147,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-953 SocketCAN burst tolerance for transient backpressure
 - [x] NX-967 Linux serial enumerator canonical dedupe
 - [ ] NX-971 Linux NMEA VTG null speed log fix
+- [x] NX-988 TimeProvider registration for NMEA auto scanner
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling
@@ -258,6 +259,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-303 Genetics picker & barcode UI _(Done)_ — ADR-046 genetics UX
 - [x] NX-304 Yield overlay UX updates _(Done)_ — ADR-049 yield visualization
 - [x] NX-305 Profit heatmap & analytics UI _(Done)_ — ADR-050 profit visualization
+- [ ] NX-987 Simulation bar playback rate label multiplier — Format selected rate using multiplier notation
 - [x] NX-306 Field health severity UX _(Done)_ — ADR-052 field health visualization
 - [x] NX-307 Weather timeline & overlay UX _(Done)_ — ADR-053 weather visualization
 - [x] NX-308 Report builder preview & share UI _(Done)_ — ADR-051 report builder UI
@@ -277,6 +279,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-418 Documentation, QA, and release readiness _(Done)_ — Aligns with artifacts/ui-screenshots/README.md
 - [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
 - [x] NX-941 Simulation bar playback rate reset _(Done)_ — Reset configuration default when reverting routes
+- [x] NX-988 Simulation bar cancellation logging suppression _(Done)_ — Ignore replay controller cancellations in transport bar
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory

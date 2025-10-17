@@ -1,0 +1,21 @@
+{
+  "id": "T06_overspeed",
+  "description": "Curvature-driven speed cap scenario",
+  "field": {
+    "origin_llh": [47.0000, -122.0000, 100.0],
+    "enu_epoch": "2025-01-01T00:00:00Z",
+    "outer": [[0.0, 0.0], [500.0, 0.0], [500.0, 500.0], [0.0, 500.0]],
+    "holes": []
+  },
+  "equipment": {
+    "width_nom": 9.0,
+    "min_turn_radius": 10.0
+  },
+  "planner": {
+    "headlands": {"count": 1, "width": 9.0, "smoothing": 1.5, "max_curv_per_m": 0.12},
+    "swaths": {"spacing": 9.0, "smoothing": 1.0, "max_curv_per_m": 0.1, "straightness_bias": 0.4},
+    "orientation": {"mode": "OPTIMAL"}
+  },
+  "simulated_speed_mps": 6.0,
+  "seeds": {"planner_seed": "1337", "sequencer_seed": "4242"}
+}

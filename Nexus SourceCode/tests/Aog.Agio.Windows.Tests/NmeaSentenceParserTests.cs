@@ -85,4 +85,17 @@ public sealed class NmeaSentenceParserTests
         Assert.Null(parsed);
         Assert.Null(error);
     }
+
+    [Fact]
+    public void TryParse_GgaSentenceWithEmptyLatitudeHemisphere_TreatsAsPositive()
+    {
+        const string sentence = "$GPGGA,123519,4807.038,,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*09";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var gga = Assert.IsType<NmeaGgaSentence>(parsed);
+        Assert.Equal(48.1173, Math.Round(gga.LatitudeDegrees!.Value, 4));
+    }
 }

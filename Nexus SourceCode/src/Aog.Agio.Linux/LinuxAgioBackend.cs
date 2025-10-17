@@ -26,10 +26,14 @@ public sealed class LinuxAgioBackend : IAgioBackend
         }
 
         services.AddOptions<NmeaSerialPortScanOptions>();
-        services.AddOptions<LinuxSerialPortEnumeratorOptions>();
+        services
+            .AddOptions<LinuxSerialPortEnumeratorOptions>()
+            .BindConfiguration("AgioHost:Linux:Serial");
+
         services
             .AddOptions<GpsdClientOptions>()
             .BindConfiguration("AgioHost:Linux:Gpsd");
+
         services.AddOptions<SocketCanOptions>();
 
         services.AddSingleton<NmeaSentenceParser>();

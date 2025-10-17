@@ -1,3 +1,5 @@
+using System;
+
 namespace Aog.Agio.Linux.Serial;
 
 /// <summary>
@@ -21,6 +23,22 @@ public sealed class LinuxSerialPortEnumeratorOptions
     public string[] DevicePrefixes
     {
         get => _devicePrefixes;
-        set => _devicePrefixes = value is { Length: > 0 } ? value : _devicePrefixes;
+        set
+        {
+            if (value is null)
+            {
+                return;
+            }
+
+            if (value.Length == 0)
+            {
+                _devicePrefixes = Array.Empty<string>();
+                return;
+            }
+
+            var clone = new string[value.Length];
+            Array.Copy(value, clone, value.Length);
+            _devicePrefixes = clone;
+        }
     }
 }

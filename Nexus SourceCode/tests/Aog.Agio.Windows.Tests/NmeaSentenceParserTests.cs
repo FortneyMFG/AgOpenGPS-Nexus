@@ -63,6 +63,26 @@ public sealed class NmeaSentenceParserTests
     }
 
     [Fact]
+    public void TryParse_VtgRmcSequence_WithMissingLongitudeHemisphere_Succeeds()
+    {
+        const string vtgSentence = "$GPVTG,360.0,T,,M,000.0,N,000.0,K*65";
+        const string rmcSentence = "$GPRMC,181908,A,3723.2475,N,12158.3416,,000.0,360.0,130998,015.5,E*3A";
+
+        var vtgSuccess = _parser.TryParse(vtgSentence, out var vtgParsed, out var vtgError);
+
+        Assert.True(vtgSuccess);
+        Assert.Null(vtgError);
+        Assert.IsType<NmeaVtgSentence>(vtgParsed);
+
+        var rmcSuccess = _parser.TryParse(rmcSentence, out var rmcParsed, out var rmcError);
+
+        Assert.True(rmcSuccess);
+        Assert.Null(rmcError);
+        var rmc = Assert.IsType<NmeaRmcSentence>(rmcParsed);
+        Assert.Null(rmc.LongitudeDegrees);
+    }
+
+    [Fact]
     public void TryParse_InvalidChecksum_ReturnsFalse()
     {
         const string sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*00";

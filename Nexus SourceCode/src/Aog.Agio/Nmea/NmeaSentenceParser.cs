@@ -259,6 +259,11 @@ public sealed class NmeaSentenceParser
 
     private static double? TryParseLongitude(string value, string hemisphere)
     {
+        if (string.IsNullOrWhiteSpace(value) || string.IsNullOrWhiteSpace(hemisphere))
+        {
+            return null;
+        }
+
         return TryParseCoordinate(value, hemisphere, 3);
     }
 

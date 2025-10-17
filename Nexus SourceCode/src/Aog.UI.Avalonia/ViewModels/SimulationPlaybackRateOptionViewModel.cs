@@ -25,8 +25,9 @@ public sealed class SimulationPlaybackRateOptionViewModel : ObservableObject
         Label = string.IsNullOrWhiteSpace(label)
             ? $"{rate:0.##}×"
             : label;
-        _onSelected = onSelected ?? throw new ArgumentNullException(nameof(onSelected));
-        SelectCommand = new DelegateCommand(_ => _onSelected(this));
+        ArgumentNullException.ThrowIfNull(onSelected);
+        _onSelected = onSelected;
+        SelectCommand = new DelegateCommand(_ => RequestSelection());
     }
 
     /// <summary>
@@ -69,5 +70,10 @@ public sealed class SimulationPlaybackRateOptionViewModel : ObservableObject
         {
             _onSelected(this);
         }
+    }
+
+    private void RequestSelection()
+    {
+        _onSelected(this);
     }
 }

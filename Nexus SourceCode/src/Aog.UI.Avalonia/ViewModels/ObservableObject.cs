@@ -27,6 +27,16 @@ public abstract class ObservableObject : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Alias for <see cref="OnPropertyChanged"/> used by view-models that prefer
+    /// "Raise" terminology when notifying bindings of updates.
+    /// </summary>
+    /// <param name="propertyName">Name of the property that changed.</param>
+    protected void RaisePropertyChanged(string propertyName)
+    {
+        OnPropertyChanged(propertyName);
+    }
+
+    /// <summary>
     /// Sets the backing field to the provided value if it differs from the current value.
     /// </summary>
     /// <typeparam name="T">Type of the backing field.</typeparam>

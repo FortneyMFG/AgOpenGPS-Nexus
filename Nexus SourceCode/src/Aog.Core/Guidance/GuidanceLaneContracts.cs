@@ -373,9 +373,9 @@ public static class GuidanceLaneContractsExtensions
     {
         var template = metadata.Template switch
         {
-            LaneTemplate.LaneTemplateStraight => GuidanceLaneTemplate.Straight,
-            LaneTemplate.LaneTemplateCurve => GuidanceLaneTemplate.Curve,
-            LaneTemplate.LaneTemplateAdaptive => GuidanceLaneTemplate.Adaptive,
+            LaneTemplate.Straight => GuidanceLaneTemplate.Straight,
+            LaneTemplate.Curve => GuidanceLaneTemplate.Curve,
+            LaneTemplate.Adaptive => GuidanceLaneTemplate.Adaptive,
             _ => throw new InvalidOperationException($"Unsupported lane template '{metadata.Template}'.")
         };
 
@@ -389,9 +389,9 @@ public static class GuidanceLaneContractsExtensions
             LaneId = metadata.LaneId,
             Template = metadata.Template switch
             {
-                GuidanceLaneTemplate.Straight => LaneTemplate.LaneTemplateStraight,
-                GuidanceLaneTemplate.Curve => LaneTemplate.LaneTemplateCurve,
-                GuidanceLaneTemplate.Adaptive => LaneTemplate.LaneTemplateAdaptive,
+                GuidanceLaneTemplate.Straight => LaneTemplate.Straight,
+                GuidanceLaneTemplate.Curve => LaneTemplate.Curve,
+                GuidanceLaneTemplate.Adaptive => LaneTemplate.Adaptive,
                 _ => throw new InvalidOperationException($"Unsupported lane template '{metadata.Template}'.")
             },
             Label = metadata.Label

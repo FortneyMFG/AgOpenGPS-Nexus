@@ -1,7 +1,6 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace Aog.Agio.Linux.Gpsd;
@@ -12,8 +11,6 @@ namespace Aog.Agio.Linux.Gpsd;
 public sealed class GpsdClient
 {
     private const string WatchCommand = "?WATCH={\"enable\":true,\"json\":true}";
-
-    private static readonly Encoding Utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
     private readonly IGpsdConnectionFactory _connectionFactory;
     private readonly ILogger<GpsdClient> _logger;
@@ -54,19 +51,11 @@ public sealed class GpsdClient
             throw new GpsdSocketUnavailableException("gpsd socket is unavailable.");
         }
 
-        await using var stream = connection;
-
-        using var reader = new StreamReader(stream, Utf8NoBom, detectEncodingFromByteOrderMarks: false, bufferSize: 1024, leaveOpen: true);
-        using var writer = new StreamWriter(stream, Utf8NoBom, bufferSize: 1024, leaveOpen: true)
-        {
-            NewLine = "\n",
-            AutoFlush = true,
-        };
+        await using var session = new GpsdStreamSession(connection, _logger);
 
         try
         {
-            await writer.WriteLineAsync(WatchCommand, cancellationToken).ConfigureAwait(false);
-            await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+            await session.SendAsync(WatchCommand, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is IOException or ObjectDisposedException)
         {
@@ -78,7 +67,7 @@ public sealed class GpsdClient
             string? line;
             try
             {
-                line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                line = await session.ReadLineAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {

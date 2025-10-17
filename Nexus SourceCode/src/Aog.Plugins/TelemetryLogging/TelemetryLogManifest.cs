@@ -1,6 +1,4 @@
-using System.IO;
 using System.Text.Json.Serialization;
-using Aog.Core.Replay;
 
 namespace Aog.Plugins.TelemetryLogging;
 
@@ -115,17 +113,17 @@ public sealed record TelemetryLogManifest
             throw new ArgumentException("Root directory must be provided.", nameof(rootDirectory));
         }
 
-        return Path.GetFullPath(Path.Combine(rootDirectory, Directory ?? string.Empty));
+        return System.IO.Path.GetFullPath(System.IO.Path.Combine(rootDirectory, Directory ?? string.Empty));
     }
 
     /// <summary>
-    /// Creates <see cref="TelemetryReplayOptions"/> that reference the recorded files.
+    /// Creates <see cref="Aog.Core.Replay.TelemetryReplayOptions"/> that reference the recorded files.
     /// </summary>
     /// <param name="rootDirectory">Root directory configured for telemetry logging.</param>
-    public TelemetryReplayOptions CreateReplayOptions(string rootDirectory)
+    public Aog.Core.Replay.TelemetryReplayOptions CreateReplayOptions(string rootDirectory)
     {
         var inputDirectory = ResolveSessionDirectory(rootDirectory);
-        return new TelemetryReplayOptions
+        return new Aog.Core.Replay.TelemetryReplayOptions
         {
             InputDirectory = inputDirectory,
             PoseFileName = Files.Pose,

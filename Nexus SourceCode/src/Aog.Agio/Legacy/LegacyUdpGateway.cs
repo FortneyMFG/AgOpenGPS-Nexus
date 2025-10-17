@@ -28,11 +28,13 @@ public sealed class LegacyUdpGateway
     private readonly ILegacyMeshPresencePublisher _meshPresencePublisher;
     private readonly TimeProvider _timeProvider;
     private readonly IActuatorFailsafeService _actuatorFailsafe;
+    private readonly object _stateLock = new();
     private long _sequence;
     private long _steerCommandSequence;
     private long _steerStateSequence;
     private long _sectionSequence;
     private SteerCmd? _lastFilteredSteerCommand;
+    private readonly SectionMask _sectionSnapshot = new();
 
     public LegacyUdpGateway(
         LegacyPoseCodec poseCodec,
@@ -98,7 +100,6 @@ public sealed class LegacyUdpGateway
 
         var filteredCommand = _actuatorFailsafe.FilterSteerCommand(command);
         var filteredSnapshot = filteredCommand.Clone();
-        Volatile.Write(ref _lastFilteredSteerCommand, filteredSnapshot);
         SectionMask? filteredSections = null;
 
         if (sections is not null)
@@ -106,7 +107,33 @@ public sealed class LegacyUdpGateway
             filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
         }
 
-        var frame = _steerCodec.EncodeSteerCommand(filteredSnapshot, filteredSections, metadata);
+        SectionMask? encodeSections;
+
+        lock (_stateLock)
+        {
+            Volatile.Write(ref _lastFilteredSteerCommand, filteredSnapshot);
+
+            if (filteredSections is not null)
+            {
+                _sectionSnapshot.SectionCount = filteredSections.SectionCount;
+                _sectionSnapshot.Mask = filteredSections.Mask;
+                encodeSections = filteredSections;
+            }
+            else if (_sectionSnapshot.SectionCount != 0)
+            {
+                encodeSections = new SectionMask
+                {
+                    SectionCount = _sectionSnapshot.SectionCount,
+                    Mask = _sectionSnapshot.Mask,
+                };
+            }
+            else
+            {
+                encodeSections = null;
+            }
+        }
+
+        var frame = _steerCodec.EncodeSteerCommand(filteredSnapshot, encodeSections, metadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 
@@ -136,9 +163,21 @@ public sealed class LegacyUdpGateway
 
         var refreshedCommand = _actuatorFailsafe.FilterSteerCommand(filteredCommand);
         var refreshedSnapshot = refreshedCommand.Clone();
-        Volatile.Write(ref _lastFilteredSteerCommand, refreshedSnapshot);
+        SectionMask? encodeSections;
 
-        var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, filteredSections, metadata);
+        lock (_stateLock)
+        {
+            Volatile.Write(ref _lastFilteredSteerCommand, refreshedSnapshot);
+            _sectionSnapshot.SectionCount = filteredSections.SectionCount;
+            _sectionSnapshot.Mask = filteredSections.Mask;
+            encodeSections = new SectionMask
+            {
+                SectionCount = _sectionSnapshot.SectionCount,
+                Mask = _sectionSnapshot.Mask,
+            };
+        }
+
+        var frame = _steerCodec.EncodeSteerCommand(refreshedSnapshot, encodeSections, metadata);
         await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
     }
 

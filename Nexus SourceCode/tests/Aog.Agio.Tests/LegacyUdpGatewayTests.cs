@@ -302,6 +302,80 @@ public sealed class LegacyUdpGatewayTests
     }
 
     [Fact]
+    public async Task PublishSteerCommandAsync_UsesUpdatedSectionWidthAfterMaskUpdate()
+    {
+        var poseCodec = new LegacyPoseCodec();
+        var discoveryCodec = new LegacyDiscoveryCodec();
+        var steerCodec = new LegacySteerCodec();
+        var transport = new RecordingTransport();
+        var poseObserver = new RecordingObserver();
+        var discoveryObserver = new RecordingDiscoveryObserver();
+        var steerCommandObserver = new RecordingSteerCommandObserver();
+        var steerStateObserver = new RecordingSteerStateObserver();
+        var sectionObserver = new RecordingSectionObserver();
+        var failsafe = new RecordingFailsafeService();
+
+        var gateway = new LegacyUdpGateway(
+            poseCodec,
+            discoveryCodec,
+            steerCodec,
+            transport,
+            poseObserver,
+            discoveryObserver,
+            steerCommandObserver,
+            steerStateObserver,
+            sectionObserver,
+            NullLegacyMeshPresencePublisher.Instance,
+            new FixedTimeProvider(DateTimeOffset.UtcNow),
+            failsafe);
+
+        var initialCommand = new SteerCmd
+        {
+            Enable = true,
+            TargetWheelAngleDeg = 8.5,
+            FeedForward = 0.05,
+            ControllerOutput = 0.2,
+        };
+
+        var initialSections = new SectionMask
+        {
+            SectionCount = 8,
+            Mask = 0x00FF,
+        };
+
+        await gateway.PublishSteerCommandAsync(initialCommand, initialSections).ConfigureAwait(false);
+
+        transport.Frames.Clear();
+
+        var updatedSections = new SectionMask
+        {
+            SectionCount = 4,
+            Mask = 0x000F,
+        };
+
+        await gateway.PublishSectionMaskAsync(updatedSections).ConfigureAwait(false);
+
+        transport.Frames.Clear();
+
+        var refreshedCommand = new SteerCmd
+        {
+            Enable = true,
+            TargetWheelAngleDeg = -3.25,
+            FeedForward = 0.12,
+            ControllerOutput = -0.45,
+        };
+
+        await gateway.PublishSteerCommandAsync(refreshedCommand).ConfigureAwait(false);
+
+        var frame = Assert.Single(transport.Frames);
+        Assert.True(steerCodec.TryDecodeSteerCommand(frame.Span, out var decodedCommand, out _, out var decodedSections));
+        Assert.Equal(refreshedCommand.Enable, decodedCommand.Enable);
+        Assert.Equal(updatedSections.Mask, decodedSections.Mask);
+        var allowedMask = (1u << updatedSections.SectionCount) - 1u;
+        Assert.Equal(decodedSections.Mask, decodedSections.Mask & allowedMask);
+    }
+
+    [Fact]
     public async Task HandleDatagramAsync_ForwardsPoseToObserver()
     {
         var poseCodec = new LegacyPoseCodec();

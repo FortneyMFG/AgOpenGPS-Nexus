@@ -340,11 +340,23 @@ public sealed class NmeaSentenceParser
             return null;
         }
 
-        var result = parsed.Value;
-        if (string.Equals(sign, "W", StringComparison.OrdinalIgnoreCase) || string.Equals(sign, "S", StringComparison.OrdinalIgnoreCase))
+var result = parsed.Value;
+
+if (!string.IsNullOrWhiteSpace(sign))
+{
+    var normalized = sign.Trim();
+    if (normalized.Length > 0)
+    {
+        var indicator = normalized[0];
+        if (indicator is 'W' or 'w' or 'S' or 's')
         {
-            result *= -1.0;
+            result = -result;
         }
+    }
+}
+
+parsed = result;
+
 
         return result;
     }

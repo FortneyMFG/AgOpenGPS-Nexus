@@ -45,23 +45,40 @@ public sealed class NmeaSentenceParserTests
         Assert.Equal(new DateTimeOffset(1994, 3, 23, 12, 35, 19, TimeSpan.Zero), rmc.Timestamp);
     }
 
-    [Fact]
-    public void TryParse_GgaSentenceWithBlankNumericFields_AllowsNulls()
-    {
-        const string sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,,,M,,M,,*5B";
+[Fact]
+public void TryParse_RmcSentenceWithSouthLatitude_IsNegative()
+{
+    const string sentence = "$GPRMC,123520,A,3723.2475,S,12158.3416,W,000.0,000.0,230394,000.0,E*7F";
 
-        var success = _parser.TryParse(sentence, out var parsed, out var error);
+    var success = _parser.TryParse(sentence, out var parsed, out var error);
 
-        Assert.True(success);
-        Assert.Null(error);
-        var gga = Assert.IsType<NmeaGgaSentence>(parsed);
-        Assert.Equal("GP", gga.TalkerId);
-        Assert.Equal(NmeaFixQuality.Gps, gga.FixQuality);
-        Assert.Equal(8, gga.SatelliteCount);
-        Assert.Null(gga.HorizontalDilution);
-        Assert.Null(gga.AltitudeMeters);
-        Assert.Null(gga.GeoidSeparationMeters);
-    }
+    Assert.True(success);
+    Assert.Null(error);
+    var rmc = Assert.IsType<NmeaRmcSentence>(parsed);
+    Assert.True(rmc.LatitudeDegrees.HasValue);
+    Assert.True(rmc.LongitudeDegrees.HasValue);
+    Assert.Equal(-37.3875, Math.Round(rmc.LatitudeDegrees!.Value, 4));
+    Assert.Equal(-121.9724, Math.Round(rmc.LongitudeDegrees!.Value, 4));
+}
+
+[Fact]
+public void TryParse_GgaSentenceWithBlankNumericFields_AllowsNulls()
+{
+    const string sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,,,M,,M,,*5B";
+
+    var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+    Assert.True(success);
+    Assert.Null(error);
+    var gga = Assert.IsType<NmeaGgaSentence>(parsed);
+    Assert.Equal("GP", gga.TalkerId);
+    Assert.Equal(NmeaFixQuality.Gps, gga.FixQuality);
+    Assert.Equal(8, gga.SatelliteCount);
+    Assert.Null(gga.HorizontalDilution);
+    Assert.Null(gga.AltitudeMeters);
+    Assert.Null(gga.GeoidSeparationMeters);
+}
+
 
     [Fact]
     public void TryParse_VtgSentence_ReturnsExpectedValues()

@@ -46,6 +46,22 @@ public sealed class NmeaSentenceParserTests
     }
 
     [Fact]
+    public void TryParse_RmcSentenceWithSouthLatitude_IsNegative()
+    {
+        const string sentence = "$GPRMC,123520,A,3723.2475,S,12158.3416,W,000.0,000.0,230394,000.0,E*7F";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var rmc = Assert.IsType<NmeaRmcSentence>(parsed);
+        Assert.True(rmc.LatitudeDegrees.HasValue);
+        Assert.True(rmc.LongitudeDegrees.HasValue);
+        Assert.Equal(-37.3875, Math.Round(rmc.LatitudeDegrees!.Value, 4));
+        Assert.Equal(-121.9724, Math.Round(rmc.LongitudeDegrees!.Value, 4));
+    }
+
+    [Fact]
     public void TryParse_VtgSentence_ReturnsExpectedValues()
     {
         const string sentence = "$GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*48";

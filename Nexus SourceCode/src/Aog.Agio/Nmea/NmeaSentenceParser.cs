@@ -329,9 +329,17 @@ public sealed class NmeaSentenceParser
             return null;
         }
 
-        if (string.Equals(sign, "W", StringComparison.OrdinalIgnoreCase) || string.Equals(sign, "S", StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrWhiteSpace(sign))
         {
-            result *= -1.0;
+            var normalized = sign.Trim();
+            if (normalized.Length > 0)
+            {
+                var indicator = normalized[0];
+                if (indicator is 'W' or 'w' or 'S' or 's')
+                {
+                    result *= -1.0;
+                }
+            }
         }
 
         return result;

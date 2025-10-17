@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using Aog.Agio.Legacy;
 using Aog.Core.V1;
 using Xunit;
@@ -123,6 +124,38 @@ public sealed class LegacyPoseCodecTests
         Assert.False(codec.TryDecodePose(frame, out var decodedPose, out var metadata));
         Assert.NotNull(decodedPose);
         Assert.NotNull(metadata);
+    }
+
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    public void EncodePose_NormalizesNonFiniteInputs(double invalidValue)
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = 0,
+            LongitudeDeg = 0,
+            HeadingRad = invalidValue,
+            SpeedMps = invalidValue,
+            RollRad = invalidValue,
+            AltitudeM = invalidValue,
+            PitchRad = invalidValue,
+            YawRateRadps = invalidValue,
+        };
+
+        var frame = codec.EncodePose(pose);
+        var payload = frame.AsSpan(5, LegacyPoseCodec.MainAntennaPayloadLength);
+
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(16, 4)));
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(20, 4)));
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(24, 4)));
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(28, 4)));
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(32, 4)));
+        Assert.Equal(0, BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(43, 2)));
+        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(45, 2)));
+        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(47, 2)));
+        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(49, 2)));
     }
 
     private static byte ComputeChecksum(ReadOnlySpan<byte> frame)

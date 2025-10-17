@@ -115,7 +115,11 @@ public sealed class LegacySteerCodec
         BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(5, 2), speedTenths);
 
         var status = metadata.GuidanceStatus;
-        if (status == 0 && command.Enable)
+        if (!command.Enable)
+        {
+            status = 0;
+        }
+        else if (status == 0)
         {
             status = 1;
         }

@@ -374,6 +374,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-095 Dealer support escalation process
 - [x] NX-096 Community preview program
 - [x] NX-097 1.0 launch readiness review
+- [ ] NX-938 Legacy steer command guidance status disable fix
 
 - [x] NX-333 Legacy zone importer & converter _(Done)_ — ADR-027 zone interop
 - [x] NX-334 Legacy job migration tooling _(Done)_ — ADR-040/041 season/session migration
@@ -741,6 +742,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-095 | Dealer support escalation process and SLA tracking | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Runbook + contacts |
 | NX-096 | Community preview program with opt-in builds and survey loop | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Capture structured feedback |
 | NX-097 | 1.0 launch readiness review and sign-off checklist | Done |  | — | [SRS §1.4 Release Management](docs/SRS/NOTES.md#srs-14-release-management) | Cross-team go/no-go |
+| NX-938 | Legacy steer command guidance status disable fix | Planned |  | — | — | Ensure disabled steer commands encode status zero |
 
 ## Legend
 

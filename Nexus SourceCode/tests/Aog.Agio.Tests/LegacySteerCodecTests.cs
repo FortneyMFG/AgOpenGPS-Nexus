@@ -51,6 +51,22 @@ public sealed class LegacySteerCodecTests
     }
 
     [Fact]
+    public void EncodeSteerCommand_DisabledCommandForcesStatusZero()
+    {
+        var codec = new LegacySteerCodec();
+        var command = new SteerCmd { TargetWheelAngleDeg = 1.25, Enable = false };
+        var metadata = new LegacySteerCommandMetadata
+        {
+            GuidanceStatus = 3,
+            SpeedKph = 4.2,
+        };
+
+        var frame = codec.EncodeSteerCommand(command, metadata: metadata);
+
+        Assert.Equal(0, frame[7]);
+    }
+
+    [Fact]
     public void EncodeAndDecodeSteerState_RoundTrips()
     {
         var codec = new LegacySteerCodec();

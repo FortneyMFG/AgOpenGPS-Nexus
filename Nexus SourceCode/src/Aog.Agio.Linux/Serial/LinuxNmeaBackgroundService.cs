@@ -88,10 +88,19 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
             {
                 throw;
             }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation(
+                    "Monitoring for NMEA stream on {Device} was canceled. Resuming auto-scan.",
+                    activePort.PortName);
+                return;
+            }
 
             if (verificationResult is null)
             {
-                _logger.LogWarning("NMEA stream on {Device} stopped. Resuming auto-scan.", activePort.PortName);
+                _logger.LogInformation(
+                    "NMEA stream on {Device} stopped producing sentences. Resuming auto-scan.",
+                    activePort.PortName);
                 return;
             }
 

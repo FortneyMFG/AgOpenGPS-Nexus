@@ -136,11 +136,12 @@ public sealed class PluginManifestLoader
             }
         }
 
-        foreach (var transport in manifest.RequiredTransports)
+        for (var i = 0; i < manifest.RequiredTransports.Count; i++)
         {
-            if (string.IsNullOrWhiteSpace(transport))
+            if (string.IsNullOrWhiteSpace(manifest.RequiredTransports[i]))
             {
-                throw new InvalidDataException("Required transport names must be non-empty.");
+                throw new InvalidDataException(
+                    $"Required transport names must be non-empty (invalid entry at index {i}).");
             }
         }
 

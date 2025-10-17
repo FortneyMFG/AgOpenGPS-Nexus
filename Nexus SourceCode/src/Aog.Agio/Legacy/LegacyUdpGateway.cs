@@ -32,6 +32,7 @@ public sealed class LegacyUdpGateway
     private long _steerCommandSequence;
     private long _steerStateSequence;
     private long _sectionSequence;
+    private SteerCmd? _lastFilteredSteerCommand;
 
     public LegacyUdpGateway(
         LegacyPoseCodec poseCodec,
@@ -96,11 +97,41 @@ public sealed class LegacyUdpGateway
         _actuatorFailsafe.ReportHeartbeat();
 
         var filteredCommand = _actuatorFailsafe.FilterSteerCommand(command);
+        var filteredSnapshot = filteredCommand.Clone();
+        Volatile.Write(ref _lastFilteredSteerCommand, filteredSnapshot);
         SectionMask? filteredSections = null;
 
         if (sections is not null)
         {
             filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
+        }
+
+        var frame = _steerCodec.EncodeSteerCommand(filteredSnapshot, filteredSections, metadata);
+        await _transport.SendAsync(frame, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Encodes the last filtered steering command with a new section mask and transmits it.
+    /// </summary>
+    /// <param name="sections">Section mask to encode with the last steering command snapshot.</param>
+    /// <param name="metadata">Optional legacy metadata overrides.</param>
+    /// <param name="cancellationToken">Cancellation token for the send operation.</param>
+    public async ValueTask PublishSectionMaskAsync(
+        SectionMask sections,
+        LegacySteerCommandMetadata? metadata = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (sections is null)
+        {
+            throw new ArgumentNullException(nameof(sections));
+        }
+
+        var filteredSections = _actuatorFailsafe.FilterSectionMask(sections);
+        var filteredCommand = Volatile.Read(ref _lastFilteredSteerCommand);
+
+        if (filteredCommand is null)
+        {
+            throw new InvalidOperationException("A steering command must be published before section updates.");
         }
 
         var frame = _steerCodec.EncodeSteerCommand(filteredCommand, filteredSections, metadata);

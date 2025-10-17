@@ -156,6 +156,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-990 TimeProvider registration for NMEA auto scanner
 - [x] NX-1003 AGiO host configuration namespace cleanup _(Done)_ — Remove redundant configuration using to silence IDE0005
 - [x] NX-1015 AogLinkBridge protobuf helper import cleanup — Remove redundant Google.Protobuf using directive from bridge serializer
+- [ ] NX-1136 Core XML documentation warning cleanup — Resolve CS1572/CS1573 parameter comment mismatches in layer runtime and job snapshots
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling

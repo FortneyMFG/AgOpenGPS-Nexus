@@ -14,6 +14,7 @@ namespace Aog.Plugins.JobTasks;
 /// <param name="Assets">Optional asset catalogue references.</param>
 /// <param name="Stats">Aggregated statistics derived from session history.</param>
 /// <param name="Extensions">Plugin-defined extensions stored alongside the job.</param>
+/// <param name="Equipment">Equipment bindings captured for the job.</param>
 public sealed record class JobSnapshot(
     JobMetadata Metadata,
     JobStoreLayout Layout,

@@ -18,6 +18,7 @@ public sealed class LayerControllerRuntime
     /// </summary>
     /// <param name="descriptors">Descriptors describing the controllers managed by the runtime.</param>
     /// <param name="timeProvider">Optional time provider used when scheduling emissions.</param>
+    /// <param name="bufferPool">Optional buffer pool supplying snapshot accumulators.</param>
     public LayerControllerRuntime(
         IEnumerable<LayerControllerDescriptor> descriptors,
         TimeProvider? timeProvider = null,

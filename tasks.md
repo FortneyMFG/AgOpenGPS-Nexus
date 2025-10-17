@@ -118,6 +118,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-118 gRPC ⇄ AOG-Link translator _(Done)_
 - [x] NX-119 AOG-Link ⇄ PGN compatibility bridge _(Done)_
 - [x] NX-120 AOG-Link Ethernet/UDP driver _(Done)_
+- [ ] NX-1015 NTRIP client logging cleanup for implicit usings — Remove redundant using directives flagged by analyzers
 - [x] NX-121 AOG-Link RS-485/serial driver _(Done)_
 - [x] NX-122 AOG-Link CAN/CAN-FD driver _(Done)_
 

@@ -1,0 +1,50 @@
+{
+  "$id": "aog://schemas/guidance-orchestrator/steer_targets.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Guidance SteerTargets",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "preview_point_xy",
+    "ref_heading_rad",
+    "desired_curvature_per_m",
+    "cross_track_m",
+    "heading_err_rad",
+    "speed_mps",
+    "engaged",
+    "plan_id",
+    "path_id",
+    "ts_utc"
+  ],
+  "properties": {
+    "preview_point_xy": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "number" },
+        { "type": "number" }
+      ],
+      "items": false,
+      "description": "Vehicle-frame ENU meters (x, y)."
+    },
+    "ref_heading_rad": { "type": "number" },
+    "ref_curvature_per_m": { "type": ["number", "null"] },
+    "ref_curvature_1pm": {
+      "type": ["number", "null"],
+      "description": "Legacy alias; use ref_curvature_per_m."
+    },
+    "desired_curvature_per_m": { "type": "number" },
+    "desired_curvature_1pm": {
+      "type": ["number", "null"],
+      "description": "Legacy alias; use desired_curvature_per_m."
+    },
+    "cross_track_m": { "type": "number" },
+    "heading_err_rad": { "type": "number" },
+    "speed_mps": { "type": "number" },
+    "speed_cap_mps": { "type": "number" },
+    "row_bias_m": { "type": "number" },
+    "engaged": { "type": "boolean" },
+    "plan_id": { "type": "string", "minLength": 1 },
+    "path_id": { "type": "string", "minLength": 1 },
+    "ts_utc": { "type": "string", "format": "date-time" }
+  }
+}

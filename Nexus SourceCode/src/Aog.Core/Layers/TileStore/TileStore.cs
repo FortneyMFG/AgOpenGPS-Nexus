@@ -63,7 +63,7 @@ public sealed class TileStore : ILayerControllerTileSink, IDisposable
         _timeProvider = options.TimeProvider ?? TimeProvider.System;
         _storePath = options.Path;
         Directory.CreateDirectory(_storePath);
-        _manifestPath = Path.Combine(_storePath, ManifestFileName);
+        _manifestPath = System.IO.Path.Combine(_storePath, ManifestFileName);
         _serializerOptions = CreateSerializerOptions();
 
         _manifest = ReadManifest();

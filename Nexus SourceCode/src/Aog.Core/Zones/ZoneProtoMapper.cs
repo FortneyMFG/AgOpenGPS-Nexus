@@ -1,23 +1,30 @@
 using System;
 using System.Linq;
-using Aog.Core.V1;
 using Google.Protobuf.WellKnownTypes;
+using ProtoZone = Aog.Core.V1.Zone;
+using ProtoZoneBuffers = Aog.Core.V1.ZoneBuffers;
+using ProtoZoneCoordinate = Aog.Core.V1.ZoneCoordinate;
+using ProtoZoneLinearRing = Aog.Core.V1.ZoneLinearRing;
+using ProtoZonePolygon = Aog.Core.V1.ZonePolygon;
+using ProtoZoneProvenance = Aog.Core.V1.ZoneProvenance;
+using ProtoZoneType = Aog.Core.V1.ZoneType;
+using ProtoZoneValidWhen = Aog.Core.V1.ZoneValidWhen;
 
 namespace Aog.Core.Zones;
 
 /// <summary>
 /// Converts zone domain models to gRPC contract representations.
 /// </summary>
-internal static class ZoneProtoMapper
+public static class ZoneProtoMapper
 {
-    public static Zone ToProto(ZoneDefinition definition)
+    public static ProtoZone ToProto(ZoneDefinition definition)
     {
         if (definition is null)
         {
             throw new ArgumentNullException(nameof(definition));
         }
 
-        var zone = new Zone
+        var zone = new ProtoZone
         {
             ZoneId = definition.ZoneId,
             Type = MapZoneType(definition.Type),
@@ -41,41 +48,36 @@ internal static class ZoneProtoMapper
         return zone;
     }
 
-    public static ZonePolygon ToProto(ZonePolygon polygon)
+    public static ProtoZonePolygon ToProto(ZonePolygon polygon)
     {
         if (polygon is null)
         {
             throw new ArgumentNullException(nameof(polygon));
         }
 
-        var proto = new ZonePolygon
+        var proto = new ProtoZonePolygon
         {
             Exterior = ToProto(polygon.Exterior),
         };
-
-        proto.Holes.AddRange(polygon.Holes.Select(ToProto));
+        proto.Holes.Add(polygon.Holes.Select(ToProto));
         return proto;
     }
 
-    private static ZoneLinearRing ToProto(ZoneLinearRing ring)
+    private static ProtoZoneLinearRing ToProto(ZoneLinearRing ring)
     {
         if (ring is null)
         {
             throw new ArgumentNullException(nameof(ring));
         }
 
-        var proto = new ZoneLinearRing();
-        foreach (var vertex in ring.Vertices)
-        {
-            proto.Vertices.Add(ToProto(vertex));
-        }
-
+        var proto = new ProtoZoneLinearRing();
+        proto.Vertices.Add(ring.Vertices.Select(ToProto));
         return proto;
     }
 
-    private static ZoneCoordinate ToProto(ZoneCoordinate coordinate)
+    private static ProtoZoneCoordinate ToProto(ZoneCoordinate coordinate)
     {
-        var proto = new ZoneCoordinate
+        var proto = new ProtoZoneCoordinate
         {
             LongitudeDeg = coordinate.Longitude,
             LatitudeDeg = coordinate.Latitude,
@@ -89,28 +91,28 @@ internal static class ZoneProtoMapper
         return proto;
     }
 
-    private static ZoneBuffers ToProto(ZoneBuffers buffers)
+    private static ProtoZoneBuffers ToProto(ZoneBuffers buffers)
     {
         if (buffers is null)
         {
             throw new ArgumentNullException(nameof(buffers));
         }
 
-        return new ZoneBuffers
+        return new ProtoZoneBuffers
         {
             DriveM = buffers.DriveMeters,
             WorkM = buffers.WorkMeters,
         };
     }
 
-    private static ZoneValidWhen ToProto(ZoneValidWhen validWhen)
+    private static ProtoZoneValidWhen ToProto(ZoneValidWhen validWhen)
     {
         if (validWhen is null)
         {
             throw new ArgumentNullException(nameof(validWhen));
         }
 
-        var proto = new ZoneValidWhen();
+        var proto = new ProtoZoneValidWhen();
 
         if (!string.IsNullOrWhiteSpace(validWhen.Crop))
         {
@@ -126,14 +128,14 @@ internal static class ZoneProtoMapper
         return proto;
     }
 
-    private static ZoneProvenance ToProto(ZoneProvenance provenance)
+    private static ProtoZoneProvenance ToProto(ZoneProvenance provenance)
     {
         if (provenance is null)
         {
             throw new ArgumentNullException(nameof(provenance));
         }
 
-        var proto = new ZoneProvenance();
+        var proto = new ProtoZoneProvenance();
 
         if (!string.IsNullOrWhiteSpace(provenance.Source))
         {
@@ -153,13 +155,13 @@ internal static class ZoneProtoMapper
         return proto;
     }
 
-    private static Aog.Core.V1.ZoneType MapZoneType(ZoneType zoneType) => zoneType switch
+    private static ProtoZoneType MapZoneType(ZoneType zoneType) => zoneType switch
     {
-        ZoneType.Unspecified => Aog.Core.V1.ZoneType.ZoneTypeUnspecified,
-        ZoneType.Boundary => Aog.Core.V1.ZoneType.ZoneTypeBoundary,
-        ZoneType.Headland => Aog.Core.V1.ZoneType.ZoneTypeHeadland,
-        ZoneType.KeepOut => Aog.Core.V1.ZoneType.ZoneTypeKeepOut,
-        ZoneType.WorkDisabled => Aog.Core.V1.ZoneType.ZoneTypeWorkDisabled,
+        ZoneType.Unspecified => ProtoZoneType.Unspecified,
+        ZoneType.Boundary => ProtoZoneType.Boundary,
+        ZoneType.Headland => ProtoZoneType.Headland,
+        ZoneType.KeepOut => ProtoZoneType.KeepOut,
+        ZoneType.WorkDisabled => ProtoZoneType.WorkDisabled,
         _ => throw new ArgumentOutOfRangeException(nameof(zoneType), zoneType, "Unknown zone type."),
     };
 }

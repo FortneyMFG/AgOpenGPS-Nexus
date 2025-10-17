@@ -1,0 +1,109 @@
+{
+  "$id": "aog://schemas/guidance-orchestrator/catalog.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Guidance Path Catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "paths", "order"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan_id", "field_rev", "source", "created_utc", "orientation_source"],
+      "properties": {
+        "plan_id": { "type": "string", "minLength": 1 },
+        "field_rev": { "type": "integer", "minimum": 0 },
+        "source": { "type": "string", "enum": ["f2c", "fallback"] },
+        "created_utc": { "type": "string", "format": "date-time" },
+        "orientation_source": {
+          "type": "string",
+          "enum": ["ab_operator", "ab_profile", "optimal_f2c", "inherited"]
+        },
+        "bearing_rad": { "type": "number" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "orientation_reason": { "type": "string" }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["meta", "spline"],
+        "properties": {
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "family", "index", "length_m", "peak_curv_per_m", "est_coverage_m2", "legal", "quality"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "family": { "type": "string", "enum": ["Headland", "Swath", "WorkEdge", "Contour"] },
+              "index": { "type": "integer" },
+              "length_m": { "type": "number", "minimum": 0 },
+              "peak_curv_per_m": { "type": "number" },
+              "peak_curv_1pm": {
+                "type": ["number", "null"],
+                "description": "Legacy alias; use peak_curv_per_m."
+              },
+              "est_coverage_m2": { "type": "number", "minimum": 0 },
+              "legal": { "type": "boolean" },
+              "quality": { "type": "number", "minimum": 0, "maximum": 1 },
+              "source": { "enum": ["f2c", "fallback", null] },
+              "f2c_version": { "type": "string" },
+              "f2c_license": { "type": "string" }
+            }
+          },
+          "spline": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                { "type": "number" },
+                { "type": "number" }
+              ],
+              "items": false
+            }
+          },
+          "knots": {
+            "type": "array",
+            "items": { "type": "number" }
+          }
+        }
+      }
+    },
+    "order": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "connectors": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/path" }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kept": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "evicted": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meta", "spline"],
+      "properties": {
+        "meta": { "$ref": "#/properties/paths/additionalProperties/properties/meta" },
+        "spline": { "$ref": "#/properties/paths/additionalProperties/properties/spline" },
+        "knots": { "$ref": "#/properties/paths/additionalProperties/properties/knots" }
+      }
+    }
+  }
+}

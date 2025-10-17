@@ -195,7 +195,7 @@ public sealed class AgronomicLayerDocument
         Units = units;
         CreatedAt = createdAt;
         CreatedBy = string.IsNullOrWhiteSpace(createdBy) ? "system:nexus" : createdBy;
-        Cells = new ReadOnlyCollection<AgronomicLayerCell>(cells ?? Array.Empty<AgronomicLayerCell>());
+        Cells = new ReadOnlyCollection<AgronomicLayerCell>((cells ?? Array.Empty<AgronomicLayerCell>()).ToList());
         Provenance = provenance ?? throw new ArgumentNullException(nameof(provenance));
     }
 

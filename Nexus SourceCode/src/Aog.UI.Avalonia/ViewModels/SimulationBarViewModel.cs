@@ -26,6 +26,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     private readonly List<SimulationPlaybackRateOptionViewModel> _playbackRates = new();
     private readonly EventHandler<ReplayStateChangedEventArgs>? _stateChangedHandler;
 
+    private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRateOption;
     private bool _disposed;
     private bool _isPlaying;
     private bool _isUpdatingFromController;
@@ -316,11 +317,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         }
 
         var option = EnsurePlaybackRateOption(rate);
-
-        foreach (var candidate in _playbackRates)
-        {
-            candidate.SetSelected(candidate == option, suppressCallback: true);
-        }
+        UpdateSelectedPlaybackRateOption(option);
 
         SelectedPlaybackRate = rate;
 
@@ -352,11 +349,36 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         _playbackRates.Sort((left, right) => left.Rate.CompareTo(right.Rate));
     }
 
-    private void NotifyPlaybackRateProperties()
+// Call this when a playback rate option is chosen (e.g., from the UI).
+private void UpdateSelectedPlaybackRateOption(SimulationPlaybackRateOptionViewModel option)
+{
+    if (option is null)
+        return;
+
+    if (_selectedPlaybackRateOption == option)
     {
-        RaisePropertyChanged(nameof(SelectedPlaybackRate));
-        RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
+        // Ensure visual state is correct without re-firing callbacks.
+        option.SetSelected(true, suppressCallback: true);
+        // Still notify in case dependent bindings read through properties.
+        NotifyPlaybackRateProperties();
+        return;
     }
+
+    _selectedPlaybackRateOption?.SetSelected(false, suppressCallback: true);
+    option.SetSelected(true, suppressCallback: true);
+    _selectedPlaybackRateOption = option;
+
+    NotifyPlaybackRateProperties();
+}
+
+// Centralized place to notify anything bound to the selected rate/label/option.
+private void NotifyPlaybackRateProperties()
+{
+    RaisePropertyChanged(nameof(SelectedPlaybackRate));
+    RaisePropertyChanged(nameof(SelectedPlaybackRateLabel));
+    RaisePropertyChanged(nameof(SelectedPlaybackRateOption));
+}
+
 
     private void UpdateSeekFraction(double value, bool triggerSeek)
     {
@@ -398,10 +420,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
             SelectedPlaybackRate = state.PlaybackRate;
 
             var option = EnsurePlaybackRateOption(state.PlaybackRate);
-            foreach (var candidate in _playbackRates)
-            {
-                candidate.SetSelected(candidate == option, suppressCallback: true);
-            }
+            UpdateSelectedPlaybackRateOption(option);
         }
         finally
         {

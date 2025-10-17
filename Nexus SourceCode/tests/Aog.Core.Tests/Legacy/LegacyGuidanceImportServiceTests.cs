@@ -117,22 +117,95 @@ public sealed class LegacyGuidanceImportServiceTests
             Math.Abs(coordinate.LongitudeDeg - holeVertex.Lon) < 1e-9);
     }
 
+    [Fact]
+    public void Import_WithMultiplePolygonRecords_CombinesPerimeters()
+    {
+        using var temp = new TemporaryDirectory();
+        var shapefilePath = System.IO.Path.Combine(temp.Path, "multi-record.shp");
+
+        var firstRecordRing = new List<(double Lon, double Lat)>
+        {
+            (-114.0020, 51.0040),
+            (-114.0020, 51.0050),
+            (-114.0010, 51.0050),
+            (-114.0010, 51.0040),
+            (-114.0020, 51.0040),
+        };
+
+        var secondRecordRing = new List<(double Lon, double Lat)>
+        {
+            (-114.0000, 51.0000),
+            (-114.0000, 51.0010),
+            (-113.9990, 51.0010),
+            (-113.9990, 51.0000),
+            (-114.0000, 51.0000),
+        };
+
+        IReadOnlyList<IReadOnlyList<(double Lon, double Lat)>> firstRecord = new[] { firstRecordRing };
+        IReadOnlyList<IReadOnlyList<(double Lon, double Lat)>> secondRecord = new[] { secondRecordRing };
+
+        WritePolygonShapefile(shapefilePath, new[] { firstRecord, secondRecord });
+
+        using var csvStream = new MemoryStream();
+        var service = new LegacyGuidanceImportService();
+
+        var result = service.Import("MultiRecord", csvStream, shapefilePath);
+
+        var expected = firstRecordRing.Take(firstRecordRing.Count - 1)
+            .Concat(secondRecordRing.Take(secondRecordRing.Count - 1))
+            .Select(p => new GeographicCoordinate(p.Lat, p.Lon))
+            .ToList();
+
+        Assert.Equal(expected.Count, result.Boundary.Count);
+
+        for (var i = 0; i < expected.Count; i++)
+        {
+            Assert.Equal(expected[i].LatitudeDeg, result.Boundary[i].LatitudeDeg, 9);
+            Assert.Equal(expected[i].LongitudeDeg, result.Boundary[i].LongitudeDeg, 9);
+        }
+
+        var secondRecordFirstVertex = secondRecordRing[0];
+        var indexOfSecondRecord = result.Boundary.FindIndex(coordinate =>
+            Math.Abs(coordinate.LatitudeDeg - secondRecordFirstVertex.Lat) < 1e-9 &&
+            Math.Abs(coordinate.LongitudeDeg - secondRecordFirstVertex.Lon) < 1e-9);
+
+        Assert.InRange(indexOfSecondRecord, firstRecordRing.Count - 1, result.Boundary.Count - secondRecordRing.Count + 1);
+    }
+
     private static void WritePolygonShapefile(string path, IReadOnlyList<IReadOnlyList<(double Lon, double Lat)>> parts)
+    {
+        WritePolygonShapefile(path, new[] { parts });
+    }
+
+    private static void WritePolygonShapefile(string path, IReadOnlyList<IReadOnlyList<(double Lon, double Lat)>>[] records)
     {
         Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path)!);
 
         using var stream = File.Create(path);
         using var writer = new BinaryWriter(stream);
 
-        var allPoints = parts.SelectMany(p => p).ToArray();
+        var allPoints = records.SelectMany(record => record.SelectMany(part => part)).ToArray();
+        if (allPoints.Length == 0)
+        {
+            throw new InvalidOperationException("Shapefile must contain at least one point.");
+        }
+
         var xs = allPoints.Select(p => p.Lon).ToArray();
         var ys = allPoints.Select(p => p.Lat).ToArray();
-        var numPoints = allPoints.Length;
-        var numParts = parts.Count;
 
-        var recordContentBytes = 4 + 32 + 4 + 4 + (4 * numParts) + (16 * numPoints);
-        var totalBytes = 100 + 8 + recordContentBytes;
-        var fileLengthWords = totalBytes / 2;
+        var recordContentBytes = new int[records.Length];
+        var totalRecordBytes = 0;
+
+        for (var i = 0; i < records.Length; i++)
+        {
+            var parts = records[i];
+            var numParts = parts.Count;
+            var numPoints = parts.Sum(part => part.Count);
+            recordContentBytes[i] = 4 + 32 + 4 + 4 + (4 * numParts) + (16 * numPoints);
+            totalRecordBytes += 8 + recordContentBytes[i];
+        }
+
+        var fileLengthWords = (100 + totalRecordBytes) / 2;
 
         WriteBigEndian(writer, 9994);
         for (var i = 0; i < 5; i++)
@@ -153,30 +226,40 @@ public sealed class LegacyGuidanceImportServiceTests
         writer.Write(0.0); // M min
         writer.Write(0.0); // M max
 
-        WriteBigEndian(writer, 1); // Record number
-        WriteBigEndian(writer, recordContentBytes / 2);
-        writer.Write(5); // Polygon type
-
-        writer.Write(xs.Min());
-        writer.Write(ys.Min());
-        writer.Write(xs.Max());
-        writer.Write(ys.Max());
-        writer.Write(numParts);
-        writer.Write(numPoints);
-
-        var pointOffset = 0;
-        foreach (var part in parts)
+        for (var recordIndex = 0; recordIndex < records.Length; recordIndex++)
         {
-            writer.Write(pointOffset);
-            pointOffset += part.Count;
-        }
+            var parts = records[recordIndex];
+            var points = parts.SelectMany(part => part).ToArray();
+            var recordXs = points.Select(p => p.Lon).ToArray();
+            var recordYs = points.Select(p => p.Lat).ToArray();
+            var numParts = parts.Count;
+            var numPoints = points.Length;
 
-        foreach (var part in parts)
-        {
-            foreach (var point in part)
+            WriteBigEndian(writer, recordIndex + 1);
+            WriteBigEndian(writer, recordContentBytes[recordIndex] / 2);
+            writer.Write(5); // Polygon type
+
+            writer.Write(recordXs.Min());
+            writer.Write(recordYs.Min());
+            writer.Write(recordXs.Max());
+            writer.Write(recordYs.Max());
+            writer.Write(numParts);
+            writer.Write(numPoints);
+
+            var pointOffset = 0;
+            foreach (var part in parts)
             {
-                writer.Write(point.Lon);
-                writer.Write(point.Lat);
+                writer.Write(pointOffset);
+                pointOffset += part.Count;
+            }
+
+            foreach (var part in parts)
+            {
+                foreach (var point in part)
+                {
+                    writer.Write(point.Lon);
+                    writer.Write(point.Lat);
+                }
             }
         }
     }

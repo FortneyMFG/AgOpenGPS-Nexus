@@ -3,7 +3,7 @@ namespace Aog.Agio.Legacy;
 /// <summary>
 /// Supplemental steering metadata used when encoding legacy steering PGNs.
 /// </summary>
-public sealed class LegacySteerMetadata
+public class LegacySteerMetadata
 {
     /// <summary>
     /// Raw guidance status flags to merge into the legacy GuidanceStatus byte.

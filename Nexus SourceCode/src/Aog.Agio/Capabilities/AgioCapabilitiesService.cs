@@ -40,7 +40,7 @@ public sealed class AgioCapabilitiesService : CapabilitiesService.CapabilitiesSe
         {
             SessionId = request.SessionId,
             NodeId = _nodeId,
-            Role = CapabilityRole.CapabilityRoleAgio,
+            Role = CapabilityRole.Agio,
         };
 
         // Deduplicate request names while preserving first occurrence semantics

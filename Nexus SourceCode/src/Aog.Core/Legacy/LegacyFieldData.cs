@@ -26,10 +26,10 @@ public sealed class LegacyFieldData
         Boundaries = boundaries ?? throw new ArgumentNullException(nameof(boundaries));
 
         Overview = overview;
-        Flags = new ReadOnlyCollection<LegacyFlag>(flags ?? Array.Empty<LegacyFlag>());
+        Flags = new ReadOnlyCollection<LegacyFlag>((flags ?? Array.Empty<LegacyFlag>()).ToList());
         Contour = contour ?? LegacyContourResume.Empty;
-        RecordedPaths = new ReadOnlyCollection<LegacyRecordedPath>(recordedPaths ?? Array.Empty<LegacyRecordedPath>());
-        TramTemplates = new ReadOnlyCollection<LegacyTramTemplate>(tramTemplates ?? Array.Empty<LegacyTramTemplate>());
+        RecordedPaths = new ReadOnlyCollection<LegacyRecordedPath>((recordedPaths ?? Array.Empty<LegacyRecordedPath>()).ToList());
+        TramTemplates = new ReadOnlyCollection<LegacyTramTemplate>((tramTemplates ?? Array.Empty<LegacyTramTemplate>()).ToList());
         WorkedArea = workedArea ?? LegacyWorkedAreaHistory.Empty;
 
         BackgroundImagery = backgroundImagery;
@@ -103,7 +103,7 @@ public sealed class GuidanceTrackDefinition
         NudgeDistance = nudgeDistance;
         Mode = mode;
         IsVisible = isVisible;
-        CurvePoints = new ReadOnlyCollection<GuidanceCurvePoint>(curvePoints ?? Array.Empty<GuidanceCurvePoint>());
+        CurvePoints = new ReadOnlyCollection<GuidanceCurvePoint>((curvePoints ?? Array.Empty<GuidanceCurvePoint>()).ToList());
     }
 
     public string Name { get; }
@@ -150,8 +150,8 @@ public sealed class FieldBoundary
     public FieldBoundary(bool isDriveThrough, IReadOnlyList<BoundaryVertex> perimeter, IReadOnlyList<HeadlandRing> headlands)
     {
         IsDriveThrough = isDriveThrough;
-        Perimeter = new ReadOnlyCollection<BoundaryVertex>(perimeter ?? Array.Empty<BoundaryVertex>());
-        Headlands = new ReadOnlyCollection<HeadlandRing>(headlands ?? Array.Empty<HeadlandRing>());
+        Perimeter = new ReadOnlyCollection<BoundaryVertex>((perimeter ?? Array.Empty<BoundaryVertex>()).ToList());
+        Headlands = new ReadOnlyCollection<HeadlandRing>((headlands ?? Array.Empty<HeadlandRing>()).ToList());
     }
 
     public bool IsDriveThrough { get; }
@@ -173,7 +173,7 @@ public sealed class HeadlandRing
 {
     public HeadlandRing(IReadOnlyList<BoundaryVertex> vertices)
     {
-        Vertices = new ReadOnlyCollection<BoundaryVertex>(vertices ?? Array.Empty<BoundaryVertex>());
+        Vertices = new ReadOnlyCollection<BoundaryVertex>((vertices ?? Array.Empty<BoundaryVertex>()).ToList());
     }
 
     public IReadOnlyList<BoundaryVertex> Vertices { get; }
@@ -276,7 +276,7 @@ public sealed class LegacyContourResume
     public LegacyContourResume(bool isRecording, IReadOnlyList<LegacyContourStrip> savedStrips, LegacyContourStrip? pendingStrip)
     {
         IsRecording = isRecording;
-        SavedStrips = new ReadOnlyCollection<LegacyContourStrip>(savedStrips ?? Array.Empty<LegacyContourStrip>());
+        SavedStrips = new ReadOnlyCollection<LegacyContourStrip>((savedStrips ?? Array.Empty<LegacyContourStrip>()).ToList());
         PendingStrip = pendingStrip;
     }
 
@@ -297,7 +297,7 @@ public sealed class LegacyContourStrip
 {
     public LegacyContourStrip(IReadOnlyList<PlanarPoint> vertices)
     {
-        Vertices = new ReadOnlyCollection<PlanarPoint>(vertices ?? Array.Empty<PlanarPoint>());
+        Vertices = new ReadOnlyCollection<PlanarPoint>((vertices ?? Array.Empty<PlanarPoint>()).ToList());
     }
 
     /// <summary>Gets the vertices defining the contour strip.</summary>
@@ -312,7 +312,7 @@ public sealed class LegacyRecordedPath
     public LegacyRecordedPath(string name, IReadOnlyList<LegacyRecordedPathPoint> samples)
     {
         Name = string.IsNullOrWhiteSpace(name) ? "Recorded Path" : name.Trim();
-        Samples = new ReadOnlyCollection<LegacyRecordedPathPoint>(samples ?? Array.Empty<LegacyRecordedPathPoint>());
+        Samples = new ReadOnlyCollection<LegacyRecordedPathPoint>((samples ?? Array.Empty<LegacyRecordedPathPoint>()).ToList());
     }
 
     /// <summary>Gets the friendly path name.</summary>
@@ -340,9 +340,9 @@ public sealed class LegacyTramTemplate
     {
         Name = string.IsNullOrWhiteSpace(name) ? "Tram Template" : name.Trim();
         SpacingMeters = spacingMeters;
-        OuterBoundary = new ReadOnlyCollection<PlanarPoint>(outerBoundary ?? Array.Empty<PlanarPoint>());
+        OuterBoundary = new ReadOnlyCollection<PlanarPoint>((outerBoundary ?? Array.Empty<PlanarPoint>()).ToList());
         var normalizedPasses = (passes ?? Array.Empty<IReadOnlyList<PlanarPoint>>())
-            .Select(pass => (IReadOnlyList<PlanarPoint>)new ReadOnlyCollection<PlanarPoint>(pass ?? Array.Empty<PlanarPoint>()))
+            .Select(pass => (IReadOnlyList<PlanarPoint>)new ReadOnlyCollection<PlanarPoint>((pass ?? Array.Empty<PlanarPoint>()).ToList()))
             .ToList();
 
         Passes = new ReadOnlyCollection<IReadOnlyList<PlanarPoint>>(normalizedPasses);
@@ -375,8 +375,8 @@ public sealed class LegacyWorkedAreaHistory
         string? layerId)
     {
         CellSizeMeters = cellSizeMeters;
-        SavedCells = new ReadOnlyCollection<LegacyWorkedAreaCell>(savedCells ?? Array.Empty<LegacyWorkedAreaCell>());
-        PendingCells = new ReadOnlyCollection<LegacyWorkedAreaCell>(pendingCells ?? Array.Empty<LegacyWorkedAreaCell>());
+        SavedCells = new ReadOnlyCollection<LegacyWorkedAreaCell>((savedCells ?? Array.Empty<LegacyWorkedAreaCell>()).ToList());
+        PendingCells = new ReadOnlyCollection<LegacyWorkedAreaCell>((pendingCells ?? Array.Empty<LegacyWorkedAreaCell>()).ToList());
         LayerId = string.IsNullOrWhiteSpace(layerId) ? null : layerId;
     }
 

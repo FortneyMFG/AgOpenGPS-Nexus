@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Aog.Core\Aog.Core.csproj" />
+    <ProjectReference Include="..\Aog.Agio\Aog.Agio.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseLocalAogAbstractions)' == 'true'">

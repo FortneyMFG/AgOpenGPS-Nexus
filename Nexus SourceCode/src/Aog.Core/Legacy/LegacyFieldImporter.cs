@@ -47,6 +47,192 @@ public sealed class LegacyFieldImporter
             backgroundImagery);
     }
 
+    private static IReadOnlyList<GuidanceTrackDefinition> LoadTracks(string directory)
+    {
+        var path = Path.Combine(directory, "TrackLines.txt");
+        if (!File.Exists(path))
+        {
+            return Array.Empty<GuidanceTrackDefinition>();
+        }
+
+        var tracks = new List<GuidanceTrackDefinition>();
+        using var reader = new StreamReader(path);
+
+        while (true)
+        {
+            var nameLine = ReadTrimmedLine(reader);
+            while (nameLine is not null && (nameLine.Length == 0 || nameLine.StartsWith("$", StringComparison.Ordinal) || nameLine.StartsWith("#", StringComparison.Ordinal)))
+            {
+                nameLine = ReadTrimmedLine(reader);
+            }
+
+            if (nameLine is null)
+            {
+                break;
+            }
+
+            var headingLine = ReadNextDataLine(reader);
+            if (headingLine is null)
+            {
+                break;
+            }
+
+            var pointALine = ReadNextDataLine(reader);
+            var pointBLine = ReadNextDataLine(reader);
+            if (pointALine is null || pointBLine is null)
+            {
+                break;
+            }
+
+            var nudgeLine = ReadNextDataLine(reader);
+            if (nudgeLine is null)
+            {
+                break;
+            }
+
+            var modeLine = ReadNextDataLine(reader);
+            if (modeLine is null)
+            {
+                break;
+            }
+
+            var visibilityLine = ReadNextDataLine(reader);
+            if (visibilityLine is null)
+            {
+                break;
+            }
+
+            var curveCountLine = ReadNextDataLine(reader);
+            if (curveCountLine is null)
+            {
+                break;
+            }
+
+            var heading = double.TryParse(headingLine.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedHeading)
+                ? parsedHeading
+                : 0;
+            var pointA = ParsePoint(pointALine);
+            var pointB = ParsePoint(pointBLine);
+            var nudge = double.TryParse(nudgeLine.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedNudge)
+                ? parsedNudge
+                : 0;
+            var modeValue = int.TryParse(modeLine.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedMode)
+                ? parsedMode
+                : 0;
+            var mode = Enum.IsDefined(typeof(LegacyTrackMode), modeValue)
+                ? (LegacyTrackMode)modeValue
+                : LegacyTrackMode.None;
+            var isVisible = bool.TryParse(visibilityLine.Trim(), out var parsedVisible) && parsedVisible;
+            var curveCount = int.TryParse(curveCountLine.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedCurveCount)
+                ? Math.Max(parsedCurveCount, 0)
+                : 0;
+
+            var curvePoints = new List<GuidanceCurvePoint>(curveCount);
+            for (var i = 0; i < curveCount; i++)
+            {
+                var curveLine = reader.ReadLine();
+                if (curveLine is null)
+                {
+                    throw new InvalidDataException("Unexpected EOF reading curve points.");
+                }
+
+                if (string.IsNullOrWhiteSpace(curveLine))
+                {
+                    i--;
+                    continue;
+                }
+
+                curvePoints.Add(ParseCurvePoint(curveLine));
+            }
+
+            tracks.Add(new GuidanceTrackDefinition(
+                nameLine,
+                heading,
+                pointA,
+                pointB,
+                nudge,
+                mode,
+                isVisible,
+                curvePoints));
+        }
+
+        return tracks;
+    }
+
+    private static IReadOnlyList<FieldBoundary> LoadBoundaries(string directory)
+    {
+        var path = Path.Combine(directory, "Boundary.txt");
+        if (!File.Exists(path))
+        {
+            return Array.Empty<FieldBoundary>();
+        }
+
+        var boundaries = new List<FieldBoundary>();
+        using var reader = new StreamReader(path);
+
+        while (true)
+        {
+            var driveThroughLine = ReadTrimmedLine(reader);
+            while (driveThroughLine is not null && (driveThroughLine.Length == 0 || driveThroughLine.StartsWith("$", StringComparison.Ordinal) || driveThroughLine.StartsWith("#", StringComparison.Ordinal)))
+            {
+                driveThroughLine = ReadTrimmedLine(reader);
+            }
+
+            if (driveThroughLine is null)
+            {
+                break;
+            }
+
+            if (!bool.TryParse(driveThroughLine, out var isDriveThrough))
+            {
+                continue;
+            }
+
+            var countCandidate = ReadNextDataLine(reader);
+            if (countCandidate is null)
+            {
+                break;
+            }
+
+            if (bool.TryParse(countCandidate.Trim(), out _))
+            {
+                countCandidate = ReadNextDataLine(reader);
+                if (countCandidate is null)
+                {
+                    break;
+                }
+            }
+
+            if (!int.TryParse(countCandidate.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var vertexCount) || vertexCount <= 0)
+            {
+                throw new InvalidDataException("Boundary.txt missing vertex count.");
+            }
+
+            var vertices = new List<BoundaryVertex>(vertexCount);
+            for (var i = 0; i < vertexCount; i++)
+            {
+                var vertexLine = reader.ReadLine();
+                if (vertexLine is null)
+                {
+                    throw new InvalidDataException("Unexpected EOF reading boundary vertices.");
+                }
+
+                if (string.IsNullOrWhiteSpace(vertexLine))
+                {
+                    i--;
+                    continue;
+                }
+
+                vertices.Add(ParseBoundaryVertex(vertexLine));
+            }
+
+            boundaries.Add(new FieldBoundary(isDriveThrough, vertices, Array.Empty<HeadlandRing>()));
+        }
+
+        AttachHeadlands(directory, boundaries);
+        return boundaries;
+    }
+
     private static LegacyFieldOverview? LoadOverview(string directory)
     {
         var path = Path.Combine(directory, "Field.txt");

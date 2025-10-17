@@ -42,6 +42,33 @@ public sealed class GpsdClientTests
         Assert.Contains(GpsdClientTestHelpers.WatchCommand, factory.WrittenLines);
     }
 
+    [Theory]
+    [InlineData(91.0, 11.5167)]
+    [InlineData(-91.0, 11.5167)]
+    [InlineData(48.1173, 181.0)]
+    [InlineData(48.1173, -181.0)]
+    public async Task WatchAsync_SkipsOutOfRangeCoordinates(double latitude, double longitude)
+    {
+        var feed = new[]
+        {
+            "{\"class\":\"VERSION\",\"release\":\"3.23\"}",
+            "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
+            $"{{\\"class\\":\\"TPV\\",\\"mode\\":3,\\"lat\\":{latitude},\\"lon\\":{longitude},\\"alt\\":545.4,\\"speed\\":0.514,\\"track\\":84.4,\\"time\\":\\"2024-01-01T12:35:19.000Z\\"}}",
+        };
+
+        var factory = new FakeGpsdConnectionFactory(feed);
+        var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
+
+        var reports = new List<GpsdTpvReport>();
+        await foreach (var report in client.WatchAsync(CancellationToken.None))
+        {
+            reports.Add(report);
+        }
+
+        Assert.Empty(reports);
+        Assert.Contains(GpsdClientTestHelpers.WatchCommand, factory.WrittenLines);
+    }
+
     [Fact]
     public async Task BackgroundService_Continues_WhenSpeedAndTrackMissing()
     {

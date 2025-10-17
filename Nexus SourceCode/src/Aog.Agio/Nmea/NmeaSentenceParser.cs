@@ -254,6 +254,11 @@ public sealed class NmeaSentenceParser
 
     private static double? TryParseLatitude(string value, string hemisphere)
     {
+        if (string.IsNullOrWhiteSpace(hemisphere))
+        {
+            return TryParseCoordinate(value, null, 2);
+        }
+
         return TryParseCoordinate(value, hemisphere, 2);
     }
 
@@ -262,7 +267,7 @@ public sealed class NmeaSentenceParser
         return TryParseCoordinate(value, hemisphere, 3);
     }
 
-    private static double? TryParseCoordinate(string value, string hemisphere, int degreeDigits)
+    private static double? TryParseCoordinate(string value, string? hemisphere, int degreeDigits)
     {
         if (string.IsNullOrWhiteSpace(value) || value.Length < degreeDigits + 2)
         {
@@ -279,7 +284,7 @@ public sealed class NmeaSentenceParser
         var decimalDegrees = degrees + (minutes / 60.0);
 
         if (!string.IsNullOrWhiteSpace(hemisphere) &&
-            (hemisphere.Equals("S", StringComparison.OrdinalIgnoreCase) || hemisphere.Equals("W", StringComparison.OrdinalIgnoreCase)))
+            (string.Equals(hemisphere, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(hemisphere, "W", StringComparison.OrdinalIgnoreCase)))
         {
             decimalDegrees *= -1.0;
         }

@@ -705,6 +705,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-341 | GitHub Actions release packaging (Win/Linux zips) | Done | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Produce zipped release artifacts for Windows and Linux builds |
 | NX-342 | Developer setup quick start doc | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/howto/developer-setup.md |
 | NX-343 | UI modernization AI prompt bundle | Done | AI | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | docs/templates/ui-modernization-ai-prompts.md |
+| NX-947 | NuGet dependency alignment for .NET restore | In Progress | AI | — | [SRS §2.7 Packaging & DevEx](docs/SRS/NOTES.md#srs-27-packaging--devex) | Update pinned versions to published packages |
 
 ### Section H — Safety & QA
 

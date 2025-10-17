@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Aog.Core.Simulation.Configuration;
 using Aog.UI.Avalonia.ViewModels;
@@ -39,11 +40,21 @@ public sealed class SimulationBarViewModelTests
     {
         var viewModel = CreateViewModel();
 
-        var doubleRate = viewModel.PlaybackRates.Single(rate => rate.Label == "2×");
+        var doubleRate = viewModel.PlaybackRates.Single(rate => Math.Abs(rate.Rate - 2.0) < 1e-6);
         doubleRate.SelectCommand.Execute(null);
 
         viewModel.SelectedPlaybackRate.Should().Be(2.0);
         doubleRate.IsSelected.Should().BeTrue();
+    }
+
+    [Fact]
+    public void PlaybackRates_ExposeFormattedLabels()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.PlaybackRates.Select(option => option.Label)
+            .Should()
+            .ContainInOrder("50%", "100%", "200%");
     }
 
     [Fact]

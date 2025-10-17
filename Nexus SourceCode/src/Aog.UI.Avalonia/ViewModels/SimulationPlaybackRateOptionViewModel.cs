@@ -11,7 +11,10 @@ public sealed class SimulationPlaybackRateOptionViewModel : ObservableObject
     private readonly Action<SimulationPlaybackRateOptionViewModel> _onSelected;
     private bool _isSelected;
 
-    public SimulationPlaybackRateOptionViewModel(double rate, Action<SimulationPlaybackRateOptionViewModel> onSelected)
+    public SimulationPlaybackRateOptionViewModel(
+        double rate,
+        Action<SimulationPlaybackRateOptionViewModel> onSelected,
+        string? label = null)
     {
         if (rate <= 0)
         {
@@ -19,7 +22,9 @@ public sealed class SimulationPlaybackRateOptionViewModel : ObservableObject
         }
 
         Rate = rate;
-        Label = $"{rate:0.##}×";
+        Label = string.IsNullOrWhiteSpace(label)
+            ? $"{rate:0.##}×"
+            : label;
         _onSelected = onSelected ?? throw new ArgumentNullException(nameof(onSelected));
         SelectCommand = new DelegateCommand(_ => _onSelected(this));
     }

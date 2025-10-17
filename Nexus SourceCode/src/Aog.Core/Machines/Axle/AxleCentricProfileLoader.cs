@@ -271,13 +271,19 @@ public sealed class AxleCentricProfileLoader
                 continue;
             }
 
-            if (!modeObject.TryGetProperty("curvatureLimit", out var curvatureValue) || !curvatureValue.TryGetValue<double>(out var curvature) || curvature <= 0)
+            if (!modeObject.TryGetProperty("curvatureLimit", out var curvatureNode) ||
+                curvatureNode is not JsonValue curvatureValue ||
+                !curvatureValue.TryGetValue<double>(out var curvature) ||
+                curvature <= 0)
             {
                 messages.Add(new AxleIngestionMessage("KIN-042", AxleIngestionSeverity.Error, $"Mode '{key}' must specify a positive curvature limit."));
                 continue;
             }
 
-            if (!modeObject.TryGetProperty("slipLimit", out var slipValue) || !slipValue.TryGetValue<double>(out var slip) || slip < 0)
+            if (!modeObject.TryGetProperty("slipLimit", out var slipNode) ||
+                slipNode is not JsonValue slipValue ||
+                !slipValue.TryGetValue<double>(out var slip) ||
+                slip < 0)
             {
                 messages.Add(new AxleIngestionMessage("KIN-043", AxleIngestionSeverity.Error, $"Mode '{key}' must specify a non-negative slip limit."));
                 continue;
@@ -302,7 +308,9 @@ public sealed class AxleCentricProfileLoader
         {
             var allow = obj["allowLateMeasurements"]?.GetValue<bool>() ?? false;
             double latency = 0;
-            if (obj.TryGetProperty("maximumLatencyMilliseconds", out var latencyValue) && latencyValue.TryGetValue<double>(out var parsedLatency))
+            if (obj.TryGetProperty("maximumLatencyMilliseconds", out var latencyNode) &&
+                latencyNode is JsonValue latencyValue &&
+                latencyValue.TryGetValue<double>(out var parsedLatency))
             {
                 if (parsedLatency < 0)
                 {
@@ -444,7 +452,9 @@ public sealed class AxleCentricProfileLoader
             return options.DeterministicSeedOverride.Value;
         }
 
-        if (root.TryGetProperty("deterministicSeed", out var seedNode) && seedNode.TryGetValue<int>(out var declaredSeed))
+        if (root.TryGetProperty("deterministicSeed", out var seedNode) &&
+            seedNode is JsonValue seedValue &&
+            seedValue.TryGetValue<int>(out var declaredSeed))
         {
             return declaredSeed;
         }

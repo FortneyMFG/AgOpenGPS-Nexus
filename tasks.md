@@ -148,6 +148,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-967 Linux serial enumerator canonical dedupe
 - [x] NX-997 Linux NMEA stream switch logging
 - [ ] NX-971 Linux NMEA VTG null speed log fix
+- [ ] NX-988 Parquet.Net v5 compatibility fixes
 - [ ] NX-988 SocketCAN pump cancellation regression fix
 - [x] NX-988 TimeProvider registration for NMEA auto scanner
 

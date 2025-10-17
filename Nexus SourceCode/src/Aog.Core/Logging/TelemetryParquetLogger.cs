@@ -220,7 +220,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
 
         public static async Task<ParquetTopicWriter<T>> CreateAsync(
             string path,
-            Schema schema,
+            ParquetSchema schema,
             Func<T, DataColumn[]> columnFactory,
             CancellationToken cancellationToken)
         {

@@ -413,7 +413,7 @@ public sealed class ZoneStore
     private sealed record ZoneRecord(
         ZoneDefinition Definition,
         Geometry Geometry,
-        PreparedGeometry PreparedGeometry,
+        IPreparedGeometry PreparedGeometry,
         Envelope Envelope);
 }
 

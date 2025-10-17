@@ -11,7 +11,7 @@ public sealed class FieldFeedbackAggregator
     public static JsonSerializerOptions SerializerOptions { get; } = new()
     {
         PropertyNameCaseInsensitive = true,
-        WriteIndented = true,
+        WriteIndented = false,
     };
 
     public FieldFeedbackReport Aggregate(string inputDirectory, int? windowDays, DateTimeOffset? now)

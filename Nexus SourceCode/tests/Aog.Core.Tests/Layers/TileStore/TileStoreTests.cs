@@ -63,7 +63,7 @@ public sealed class TileStoreTests
         statusBefore.Segments.Should().HaveCountGreaterThan(1);
 
         var result = store.Compact();
-        result.Compacted.Should().BeTrue();
+        result.WasCompacted.Should().BeTrue();
         result.LiveRecords.Should().Be(result.TotalRecords);
 
         var statusAfter = store.GetCompactionStatus();

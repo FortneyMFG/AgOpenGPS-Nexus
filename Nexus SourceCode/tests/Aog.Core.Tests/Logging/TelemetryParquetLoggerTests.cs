@@ -12,6 +12,7 @@ using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Parquet;
 using Parquet.Data;
+using Parquet.Schema;
 using Xunit;
 using TelemetryParquetLoggerOptions = Aog.Core.Logging.TelemetryParquetLogger.TelemetryParquetLoggerOptions;
 
@@ -196,7 +197,7 @@ public class TelemetryParquetLoggerTests
         }
 
         using var stream = File.OpenRead(Path.Combine(options.OutputDirectory, options.PoseFileName));
-        using var reader = ParquetReader.Create(stream);
+        using var reader = OpenReader(stream);
         using var rowGroup = reader.OpenRowGroupReader(0);
 
         ReadColumn<string?>(reader.Schema, rowGroup, "job_id")[0].Should().Be("job:fallback");
@@ -207,7 +208,7 @@ public class TelemetryParquetLoggerTests
     private static void AssertPose(TelemetryParquetLoggerOptions options, Timestamp expectedTimestamp)
     {
         using var stream = File.OpenRead(Path.Combine(options.OutputDirectory, options.PoseFileName));
-        using var reader = ParquetReader.Create(stream);
+        using var reader = OpenReader(stream);
         reader.RowGroupCount.Should().Be(1);
 
         using var rowGroup = reader.OpenRowGroupReader(0);
@@ -232,7 +233,7 @@ public class TelemetryParquetLoggerTests
     private static void AssertImu(TelemetryParquetLoggerOptions options, Timestamp expectedTimestamp)
     {
         using var stream = File.OpenRead(Path.Combine(options.OutputDirectory, options.ImuFileName));
-        using var reader = ParquetReader.Create(stream);
+        using var reader = OpenReader(stream);
         reader.RowGroupCount.Should().Be(1);
 
         using var rowGroup = reader.OpenRowGroupReader(0);
@@ -259,7 +260,7 @@ public class TelemetryParquetLoggerTests
     private static void AssertCan(TelemetryParquetLoggerOptions options, Timestamp expectedTimestamp)
     {
         using var stream = File.OpenRead(Path.Combine(options.OutputDirectory, options.CanFileName));
-        using var reader = ParquetReader.Create(stream);
+        using var reader = OpenReader(stream);
         reader.RowGroupCount.Should().Be(1);
 
         using var rowGroup = reader.OpenRowGroupReader(0);
@@ -282,7 +283,7 @@ public class TelemetryParquetLoggerTests
     private static void AssertIo(TelemetryParquetLoggerOptions options, Timestamp expectedTimestamp)
     {
         using var stream = File.OpenRead(Path.Combine(options.OutputDirectory, options.IoFileName));
-        using var reader = ParquetReader.Create(stream);
+        using var reader = OpenReader(stream);
         reader.RowGroupCount.Should().Be(1);
 
         using var rowGroup = reader.OpenRowGroupReader(0);
@@ -301,7 +302,7 @@ public class TelemetryParquetLoggerTests
     private static void AssertPlugin(TelemetryParquetLoggerOptions options, Timestamp expectedTimestamp)
     {
         using var stream = File.OpenRead(Path.Combine(options.OutputDirectory, options.PluginFileName));
-        using var reader = ParquetReader.Create(stream);
+        using var reader = OpenReader(stream);
         reader.RowGroupCount.Should().Be(1);
 
         using var rowGroup = reader.OpenRowGroupReader(0);
@@ -322,7 +323,7 @@ public class TelemetryParquetLoggerTests
     private static void AssertMesh(TelemetryParquetLoggerOptions options, DateTimeOffset publishedAt)
     {
         using var stream = File.OpenRead(Path.Combine(options.OutputDirectory, options.MeshFileName));
-        using var reader = ParquetReader.Create(stream);
+        using var reader = OpenReader(stream);
         reader.RowGroupCount.Should().Be(1);
 
         using var rowGroup = reader.OpenRowGroupReader(0);
@@ -349,10 +350,19 @@ public class TelemetryParquetLoggerTests
         presenceJson.Should().BeNull();
     }
 
-    private static T[] ReadColumn<T>(Schema schema, ParquetRowGroupReader reader, string columnName)
+    private static T[] ReadColumn<T>(ParquetSchema schema, ParquetRowGroupReader reader, string columnName)
     {
         var field = (DataField)schema.DataFields.Single(
             f => string.Equals(f.Name, columnName, StringComparison.OrdinalIgnoreCase));
         return (T[])reader.ReadColumn(field).Data;
+    }
+
+    private static ParquetReader OpenReader(Stream stream)
+    {
+        return ParquetReader
+            .CreateAsync(stream)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
     }
 }

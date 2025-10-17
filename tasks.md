@@ -188,6 +188,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-1110 Telemetry log manifest cleanup _(Done)_ — Remove redundant usings flagged by analyzers
 - [ ] NX-910 Job manifest cross-drive fallback fix
 - [x] NX-1017 Job Tasks orchestrator analyzer cleanup — Remove redundant Channel using directive
+- [ ] NX-1112 Legacy bridge & Linux adapter dependency alignment — Restore build after upstream API changes
 
 - [x] NX-247 Crop plugin layer ingestion pipeline _(Done)_ — ADR-045 crop type plugin
 - [x] NX-248 Crop analytics API surface _(Done)_ — ADR-045 rotation analytics

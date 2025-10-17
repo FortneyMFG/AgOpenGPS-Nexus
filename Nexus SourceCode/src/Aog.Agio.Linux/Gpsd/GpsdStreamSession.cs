@@ -39,7 +39,7 @@ internal sealed class GpsdStreamSession : IAsyncDisposable
         }
 
         _logger.LogDebug("Sending gpsd command: {Command}", command);
-        await _writer.WriteLineAsync(command, cancellationToken).ConfigureAwait(false);
+        await _writer.WriteLineAsync(command.AsMemory(), cancellationToken).ConfigureAwait(false);
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 

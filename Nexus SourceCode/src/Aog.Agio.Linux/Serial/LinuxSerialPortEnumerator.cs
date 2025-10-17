@@ -45,9 +45,10 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
                 continue;
             }
 
-            if (prefix.EndsWith('/', StringComparison.Ordinal))
+            if (prefix.AsSpan().EndsWith("/", StringComparison.Ordinal))
             {
-                EnumerateDirectory(prefix.TrimEnd('/'), resultsByCanonicalPath);
+                var directory = prefix.AsSpan().TrimEnd('/').ToString();
+                EnumerateDirectory(directory, resultsByCanonicalPath);
             }
             else
             {

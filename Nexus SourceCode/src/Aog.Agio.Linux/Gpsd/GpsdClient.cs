@@ -45,6 +45,7 @@ public sealed class GpsdClient
         try
         {
             await writer.WriteLineAsync(WatchCommand, cancellationToken).ConfigureAwait(false);
+            await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is IOException or ObjectDisposedException)
         {

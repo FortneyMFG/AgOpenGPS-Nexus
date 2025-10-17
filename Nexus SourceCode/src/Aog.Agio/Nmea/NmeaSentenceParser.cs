@@ -108,40 +108,48 @@ public sealed class NmeaSentenceParser
         return true;
     }
 
-    private static bool TryParseRmc(string talkerId, string[] fields, out NmeaSentence? parsed, out string? error)
+private static bool TryParseRmc(string talkerId, string[] fields, out NmeaSentence? parsed, out string? error)
+{
+    parsed = null;
+    error = null;
+
+    if (fields.Length < 12)
     {
-        parsed = null;
-        error = null;
-
-        if (fields.Length < 12)
-        {
-            error = "RMC sentence is truncated.";
-            return false;
-        }
-
-        var status = fields[2].Equals("A", StringComparison.OrdinalIgnoreCase) ? NmeaFixStatus.Active : NmeaFixStatus.Void;
-        var time = TryParseTime(fields[1]);
-        var latitude = TryParseLatitude(fields[3], fields[4]);
-        var longitude = TryParseLongitude(fields[5], fields[6]);
-        var speedKnots = TryParseDouble(fields[7]);
-        var trackTrue = TryParseDouble(fields[8]);
-        var date = TryParseDate(fields[9], time);
-        var magneticVariation = TryParseSignedDouble(fields[10], fields.Length > 11 ? fields[11] : null);
-        var mode = fields.Length > 12 && fields[12].Length > 0 ? fields[12][0] : (char?)null;
-
-        parsed = new NmeaRmcSentence(
-            talkerId,
-            status,
-            date,
-            latitude,
-            longitude,
-            speedKnots,
-            trackTrue,
-            magneticVariation,
-            mode);
-
-        return true;
+        error = "RMC sentence is truncated.";
+        return false;
     }
+
+    var status = fields[2].Equals("A", StringComparison.OrdinalIgnoreCase) ? NmeaFixStatus.Active : NmeaFixStatus.Void;
+    var time = TryParseTime(fields[1]);
+    var latitude = TryParseLatitude(fields[3], fields[4]);
+    var longitude = TryParseLongitude(fields[5], fields[6]);
+    var speedKnots = TryParseDouble(fields[7]);
+    var trackTrue = TryParseDouble(fields[8]);
+
+    // Only compute timestamp if time is valid; otherwise keep it null
+    DateTimeOffset? timestamp = null;
+    if (time.HasValue)
+    {
+        timestamp = TryParseDate(fields[9], time);
+    }
+
+    var magneticVariation = TryParseSignedDouble(fields[10], fields.Length > 11 ? fields[11] : null);
+    var mode = fields.Length > 12 && fields[12].Length > 0 ? fields[12][0] : (char?)null;
+
+    parsed = new NmeaRmcSentence(
+        talkerId,
+        status,
+        timestamp,
+        latitude,
+        longitude,
+        speedKnots,
+        trackTrue,
+        magneticVariation,
+        mode);
+
+    return true;
+}
+
 
     private static bool TryParseVtg(string talkerId, string[] fields, out NmeaSentence? parsed, out string? error)
     {
@@ -187,39 +195,56 @@ public sealed class NmeaSentenceParser
         return checksum;
     }
 
-    private static TimeOnly? TryParseTime(string value)
+private static TimeOnly? TryParseTime(string value)
+{
+    if (string.IsNullOrWhiteSpace(value) || value.Length < 6)
     {
-        if (string.IsNullOrWhiteSpace(value) || value.Length < 6)
-        {
-            return null;
-        }
-
-        var hours = SafeParseInt(value[..2]);
-        var minutes = SafeParseInt(value.Substring(2, 2));
-        var secondsComponent = value[4..];
-
-        if (hours is not int hourValue || minutes is not int minuteValue)
-        {
-            return null;
-        }
-
-        if (!double.TryParse(secondsComponent, NumberStyles.Float, Invariant, out var secondsDouble))
-        {
-            return null;
-        }
-
-        var totalSeconds = (hourValue * 60 + minuteValue) * 60 + secondsDouble;
-        var ticks = (long)Math.Round(totalSeconds * TimeSpan.TicksPerSecond);
-
-        try
-        {
-            return TimeOnly.FromTimeSpan(TimeSpan.FromTicks(ticks));
-        }
-        catch
-        {
-            return null;
-        }
+        return null;
     }
+
+    var hours = SafeParseInt(value[..2]);
+    var minutes = SafeParseInt(value.Substring(2, 2));
+    var secondsComponent = value[4..];
+
+    if (hours is not int hourValue || minutes is not int minuteValue)
+    {
+        return null;
+    }
+
+    if (hourValue is < 0 or > 23) return null;
+    if (minuteValue is < 0 or > 59) return null;
+
+    if (!double.TryParse(secondsComponent, NumberStyles.Float, Invariant, out var secondsDouble))
+    {
+        return null;
+    }
+
+    // Strict range checks for seconds and overall ticks-in-day
+    if (double.IsNaN(secondsDouble) || double.IsInfinity(secondsDouble) || secondsDouble < 0 || secondsDouble >= 60)
+    {
+        return null;
+    }
+
+    var totalTicks =
+        (hourValue * TimeSpan.TicksPerHour) +
+        (minuteValue * TimeSpan.TicksPerMinute) +
+        (long)Math.Round(secondsDouble * TimeSpan.TicksPerSecond);
+
+    if (totalTicks < 0 || totalTicks >= TimeSpan.TicksPerDay)
+    {
+        return null;
+    }
+
+    try
+    {
+        return TimeOnly.FromTimeSpan(TimeSpan.FromTicks(totalTicks));
+    }
+    catch
+    {
+        return null;
+    }
+}
+
 
     private static DateTimeOffset? TryParseDate(string value, TimeOnly? time)
     {

@@ -108,6 +108,19 @@ public void TryParse_GgaSentenceWithBlankNumericFields_AllowsNulls()
     }
 
     [Fact]
+    public void TryParse_RmcSentenceWithInvalidTime_ReturnsNullTimestamp()
+    {
+        const string sentence = "$GPRMC,256000,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*66";
+
+        var success = _parser.TryParse(sentence, out var parsed, out var error);
+
+        Assert.True(success);
+        Assert.Null(error);
+        var rmc = Assert.IsType<NmeaRmcSentence>(parsed);
+        Assert.Null(rmc.Timestamp);
+    }
+
+    [Fact]
     public void TryParse_VtgSentence_ReturnsExpectedValues()
     {
         const string sentence = "$GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*48";

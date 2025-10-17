@@ -76,7 +76,8 @@ public sealed class LegacyCompatibilityBridge
         if (_steerCodec.TryDecodeSteerCommand(datagram, out var steerCmd, out var steerCommandMetadata, out var sectionMask))
         {
             StampHeader(steerCmd, "legacy/pgn/steer_cmd", "vehicle");
-            steerCmd.Enable = steerCommandMetadata.GuidanceStatus != 0;
+            const byte EngagedBit = 0x01;
+            steerCmd.Enable = (steerCommandMetadata.GuidanceStatus & EngagedBit) != 0;
 
             envelope.Header = BuildCommandHeader(MessageType.LinkMessageTypeCommandSteer, steerCmd.CalculateSize(), needsAck: true);
             envelope.SteerCommand = steerCmd;

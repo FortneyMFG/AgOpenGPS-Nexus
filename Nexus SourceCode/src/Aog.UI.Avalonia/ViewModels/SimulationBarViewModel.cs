@@ -253,6 +253,9 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
     {
         ArgumentNullException.ThrowIfNull(result);
         ApplyScenario(result.Scenario);
+
+        SortPlaybackRates();
+        OnPropertyChanged(nameof(PlaybackRates));
     }
 
     /// <summary>

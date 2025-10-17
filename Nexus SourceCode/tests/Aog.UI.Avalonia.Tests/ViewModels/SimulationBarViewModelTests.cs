@@ -259,7 +259,7 @@ public sealed class SimulationBarViewModelTests
             {
                 new SimulationRouteConfiguration("pose", "sim.vehicle.bicycle", "simulation")
             },
-            new SimulationOptionsConfiguration(null, 0.5));
+            new SimulationOptionsConfiguration(null, 0.75));
 
         var result = new LegacyGuidanceImportResult(
             "Field A",
@@ -286,8 +286,11 @@ public sealed class SimulationBarViewModelTests
 
         viewModel.ApplyLegacyImport(result);
 
-        viewModel.SelectedPlaybackRate.Should().Be(0.5);
-        viewModel.ActiveScenarioOptions.Should().Contain("timeScale=0.5");
+        viewModel.SelectedPlaybackRate.Should().Be(0.75);
+        viewModel.PlaybackRates.Select(option => option.Rate)
+            .Should()
+            .Equal(0.5, 0.75, 1.0, 2.0);
+        viewModel.ActiveScenarioOptions.Should().Contain("timeScale=0.75");
     }
 
     [Fact]

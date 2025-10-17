@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -53,6 +54,19 @@ public sealed class SimulationBarViewModelTests
 
         viewModel.SelectedPlaybackRate.Should().Be(2.0);
         doubleRate.IsSelected.Should().BeTrue();
+    }
+
+    [Fact]
+    public void PlaybackRates_DisallowExternalMutation()
+    {
+        using var viewModel = CreateViewModel();
+
+        var readOnlyRates = viewModel.PlaybackRates;
+        var attempt = () => ((IList<SimulationPlaybackRateOptionViewModel>)readOnlyRates)
+            .Add(new SimulationPlaybackRateOptionViewModel(3.0, _ => { }));
+
+        attempt.Should().Throw<NotSupportedException>();
+        readOnlyRates.Should().HaveCount(3);
     }
 
     [Fact]

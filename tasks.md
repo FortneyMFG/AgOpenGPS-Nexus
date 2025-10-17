@@ -216,6 +216,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-278 Guidance lane publishing contracts _(Done)_ — ADR-033 guidance planner
 - [x] NX-279 Turn planner integration in guidance plugin _(Done)_ — ADR-033 guidance planner
 - [x] NX-280 Guidance plugin regression suite _(Done)_ — ADR-033 QA coverage
+- [ ] NX-998 Guidance Orchestrator plugin SRS/ADR scaffolding — ADR-069 Guidance Orchestrator
 - [x] NX-281 Mapping plugin zone overlay updates _(Done)_ — ADR-027 zones + ADR-029 mapping kernel
 - [x] NX-282 Variable rate plugin zone gating _(Done)_ — ADR-027 gating semantics
 - [x] NX-283 Device Manager plugin capability surfacing _(Done)_ — ADR-031 compatibility dashboard

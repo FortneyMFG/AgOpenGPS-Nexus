@@ -129,6 +129,30 @@ public sealed class GpsdClientTests
     }
 
     [Fact]
+    public async Task GpsdStreamSession_SendAsyncHonorsCancellation()
+    {
+        var blockingStream = new BlockingGpsdStream();
+
+        await using var session = new GpsdStreamSession(blockingStream, NullLogger.Instance);
+
+        using var cts = new CancellationTokenSource();
+
+        var sendTask = session.SendAsync("?WATCH=1", cts.Token);
+
+        await blockingStream.WaitForWriteStartAsync().WaitAsync(TimeSpan.FromSeconds(1));
+
+        cts.Cancel();
+
+        var completedTask = await Task.WhenAny(sendTask, Task.Delay(TimeSpan.FromSeconds(1)));
+        blockingStream.Release();
+
+        Assert.Same(sendTask, completedTask);
+        await Assert.ThrowsAsync<OperationCanceledException>(async () => await sendTask);
+        Assert.True(blockingStream.ObservedWriteCancellationToken.CanBeCanceled);
+        Assert.True(blockingStream.ObservedWriteCancellationToken.IsCancellationRequested);
+    }
+
+    [Fact]
     public async Task WatchAsync_CancellationDuringSendAsyncTerminatesPromptly()
     {
         var blockingStream = new BlockingGpsdStream();

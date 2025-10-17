@@ -74,6 +74,31 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
     }
 
     [Fact]
+    public void GetPortNames_IgnoresDirectoryEntries()
+    {
+        var devDir = CreateSubDirectory("dev");
+        var device = CreateDevice(devDir, "ttyUSB0");
+        var directoryEntry = CreateSubDirectory(Path.Combine("dev", "ttyUSB1"));
+
+        var options = Options.Create(new LinuxSerialPortEnumeratorOptions
+        {
+            DevicePrefixes = new[]
+            {
+                devDir.TrimEnd('/', '\\') + "/",
+            },
+        });
+
+        var logger = new ListLogger<LinuxSerialPortEnumerator>();
+        var enumerator = new LinuxSerialPortEnumerator(logger, options);
+
+        var ports = enumerator.GetPortNames().ToArray();
+
+        Assert.Single(ports);
+        Assert.Equal(device, ports[0]);
+        Assert.Contains(logger.Entries, entry => entry.Level == LogLevel.Debug && entry.Message.Contains(directoryEntry));
+    }
+
+    [Fact]
     public void GetPortNames_NoPrefixesConfigured_ReturnsEmptyAndLogs()
     {
         var options = Options.Create(new LinuxSerialPortEnumeratorOptions
@@ -125,6 +150,48 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
         prefixes[0] = "/dev/mutated";
 
         Assert.Equal("/dev/original", options.DevicePrefixes[0]);
+    }
+
+    [Fact]
+    public void GetPortNames_SymlinkAndCanonicalPath_CollapsesToSingleEntry()
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            return;
+        }
+
+        var devDir = CreateSubDirectory("dev");
+        var byIdDir = CreateSubDirectory(Path.Combine("dev", "serial", "by-id"));
+        var device = CreateDevice(devDir, "ttyACM0");
+
+        var symlinkPath = Path.Combine(byIdDir, "gnss-device");
+        if (File.Exists(symlinkPath))
+        {
+            File.Delete(symlinkPath);
+        }
+
+        File.CreateSymbolicLink(symlinkPath, device);
+
+        var logger = new ListLogger<LinuxSerialPortEnumerator>();
+        var options = Options.Create(new LinuxSerialPortEnumeratorOptions
+        {
+            DevicePrefixes = new[]
+            {
+                Path.Combine(devDir, "ttyACM"),
+                byIdDir + "/",
+            },
+        });
+
+        var enumerator = new LinuxSerialPortEnumerator(logger, options);
+
+        var ports = enumerator.GetPortNames().ToArray();
+
+        Assert.Single(ports);
+        var symlinkFullPath = Path.GetFullPath(symlinkPath);
+        Assert.Contains(ports[0], new[] { device, symlinkFullPath });
+        Assert.Contains(
+            logger.Entries,
+            entry => entry.Level == LogLevel.Debug && entry.Message.Contains(symlinkFullPath, StringComparison.Ordinal));
     }
 
     public void Dispose()

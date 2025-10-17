@@ -19,6 +19,7 @@ public sealed class GpsdClientTests
             "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
             "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1173,\"lon\":11.5167,\"alt\":545.4,\"speed\":0.514,\"track\":84.4,\"time\":\"2024-01-01T12:35:19.000Z\"}",
             "{\"class\":\"TPV\",\"mode\":2,\"lat\":48.1174,\"lon\":11.5168,\"speed\":0.420,\"track\":83.0}",
+            "{\"class\":\"TPV\",\"mode\":99,\"lat\":48.1175,\"lon\":11.5169,\"speed\":0.400,\"track\":82.5}",
         };
 
         var factory = new FakeGpsdConnectionFactory(feed);
@@ -28,10 +29,6 @@ public sealed class GpsdClientTests
         await foreach (var report in client.WatchAsync(CancellationToken.None))
         {
             reports.Add(report);
-            if (reports.Count >= 2)
-            {
-                break;
-            }
         }
 
         Assert.Equal(2, reports.Count);
@@ -42,6 +39,33 @@ public sealed class GpsdClientTests
         Assert.Equal(84.4, reports[0].TrackDegrees);
         Assert.Equal(3, reports[0].Mode);
         Assert.Equal(2, reports[1].Mode);
+        Assert.Contains(GpsdClientTestHelpers.WatchCommand, factory.WrittenLines);
+    }
+
+    [Theory]
+    [InlineData(91.0, 11.5167)]
+    [InlineData(-91.0, 11.5167)]
+    [InlineData(48.1173, 181.0)]
+    [InlineData(48.1173, -181.0)]
+    public async Task WatchAsync_SkipsOutOfRangeCoordinates(double latitude, double longitude)
+    {
+        var feed = new[]
+        {
+            "{\"class\":\"VERSION\",\"release\":\"3.23\"}",
+            "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
+            $"{{\\"class\\":\\"TPV\\",\\"mode\\":3,\\"lat\\":{latitude},\\"lon\\":{longitude},\\"alt\\":545.4,\\"speed\\":0.514,\\"track\\":84.4,\\"time\\":\\"2024-01-01T12:35:19.000Z\\"}}",
+        };
+
+        var factory = new FakeGpsdConnectionFactory(feed);
+        var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
+
+        var reports = new List<GpsdTpvReport>();
+        await foreach (var report in client.WatchAsync(CancellationToken.None))
+        {
+            reports.Add(report);
+        }
+
+        Assert.Empty(reports);
         Assert.Contains(GpsdClientTestHelpers.WatchCommand, factory.WrittenLines);
     }
 
@@ -119,10 +143,13 @@ public sealed class GpsdClientTests
         var factory = new FakeGpsdConnectionFactory(Array.Empty<string>());
         var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
 
-        await foreach (var _ in client.WatchAsync(CancellationToken.None))
+        await Assert.ThrowsAsync<GpsdSocketUnavailableException>(async () =>
         {
-            // drain the async enumerable to ensure the command is written before exit
-        }
+            await foreach (var _ in client.WatchAsync(CancellationToken.None))
+            {
+                // drain the async enumerable to ensure the command is written before exit
+            }
+        });
 
         Assert.Single(factory.WrittenLines, GpsdClientTestHelpers.WatchCommand);
     }

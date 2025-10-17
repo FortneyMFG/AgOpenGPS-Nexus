@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Aog.Agio.Linux.Serial;
 
@@ -18,7 +19,8 @@ public sealed class LinuxSerialPortEnumeratorOptions
 
     /// <summary>
     /// Gets or sets the absolute path prefixes that should be probed for serial devices.
-    /// Entries ending with <c>/</c> are treated as directories whose children will be returned verbatim.
+    /// Entries may optionally end with <c>/</c> to treat them as directories whose children will be returned verbatim.
+    /// Values are normalized by trimming surrounding whitespace and discarding any paths that are not rooted.
     /// </summary>
     public string[] DevicePrefixes
     {
@@ -36,9 +38,28 @@ public sealed class LinuxSerialPortEnumeratorOptions
                 return;
             }
 
-            var clone = new string[value.Length];
-            Array.Copy(value, clone, value.Length);
-            _devicePrefixes = clone;
+            var normalized = new List<string>(value.Length);
+
+            foreach (var prefix in value)
+            {
+                if (string.IsNullOrWhiteSpace(prefix))
+                {
+                    continue;
+                }
+
+                var trimmed = prefix.Trim();
+
+                if (!trimmed.StartsWith("/", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                normalized.Add(trimmed);
+            }
+
+            _devicePrefixes = normalized.Count == 0
+                ? Array.Empty<string>()
+                : normalized.ToArray();
         }
     }
 }

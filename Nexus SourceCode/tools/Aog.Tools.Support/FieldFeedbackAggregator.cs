@@ -132,34 +132,26 @@ public sealed class FieldFeedbackAggregator
 
     private static IReadOnlyList<FieldFeedbackEvent> ReadJsonLines(string path)
     {
-        var bytes = File.ReadAllBytes(path);
-        if (bytes.Length == 0)
-        {
-            return Array.Empty<FieldFeedbackEvent>();
-        }
-
-        var reader = new Utf8JsonReader(bytes, new JsonReaderOptions { AllowTrailingCommas = true });
         var events = new List<FieldFeedbackEvent>();
-        while (reader.Read())
+
+        foreach (var line in File.ReadLines(path))
         {
-            if (reader.TokenType != JsonTokenType.StartObject)
+            if (string.IsNullOrWhiteSpace(line))
             {
                 continue;
             }
 
-            FieldFeedbackEvent? evt = null;
             try
             {
-                evt = JsonSerializer.Deserialize<FieldFeedbackEvent>(ref reader, SerializerOptions);
+                var evt = JsonSerializer.Deserialize<FieldFeedbackEvent>(line, SerializerOptions);
+                if (evt is not null)
+                {
+                    events.Add(evt);
+                }
             }
             catch (JsonException)
             {
                 // Skip malformed payloads so a single bad upload does not break aggregation.
-            }
-
-            if (evt is not null)
-            {
-                events.Add(evt);
             }
         }
 

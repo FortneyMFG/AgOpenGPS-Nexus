@@ -1,11 +1,11 @@
 using System;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Globalization; // if you use any CultureInfo formatting helpers
 
 namespace Aog.Agio.Linux.Serial;
 
@@ -20,6 +20,7 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
     private readonly NmeaAutoScanner _scanner;
     private readonly ILogger<LinuxNmeaBackgroundService> _logger;
     private readonly IDisposable _optionsReloadToken;
+
     private NmeaSerialPortScanOptions _options;
     private CancellationTokenSource? _reloadTokenSource = new();
 
@@ -30,10 +31,7 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
     {
         _scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        if (options is null) throw new ArgumentNullException(nameof(options));
 
         _options = options.CurrentValue ?? throw new ArgumentException("Options are required.", nameof(options));
         _optionsReloadToken = options.OnChange(OnOptionsChanged);
@@ -46,7 +44,8 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            using var iterationCancellation = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, GetReloadToken());
+            using var iterationCancellation =
+                CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, GetReloadToken());
             var iterationToken = iterationCancellation.Token;
 
             try
@@ -55,7 +54,7 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
             }
             catch (OperationCanceledException) when (iterationToken.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
             {
-                // configuration changed; restart loop with updated options
+                // Configuration changed; loop restarts with updated options.
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -82,11 +81,11 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
                     "NMEA stream detected on {Device} at {BaudRate} baud. Lat={Latitude}, Lon={Longitude}, Alt={Altitude}m, Speed={Speed}km/h, Course={Course}°.",
                     result.PortName,
                     result.BaudRate,
-                    FormatNullable(result.Gga.LatitudeDegrees, "F6"),
-                    FormatNullable(result.Gga.LongitudeDegrees, "F6"),
-                    FormatNullable(result.Gga.AltitudeMeters, "F1"),
-                    FormatNullable(result.Vtg.SpeedKilometersPerHour, "F2"),
-                    FormatNullable(result.Vtg.TrueCourseDegrees, "F1"));
+                    FormatHelpers.FormatDouble(result.Gga.LatitudeDegrees, "F6"),
+                    FormatHelpers.FormatDouble(result.Gga.LongitudeDegrees, "F6"),
+                    FormatHelpers.FormatDouble(result.Gga.AltitudeMeters, "F1"),
+                    FormatHelpers.FormatDouble(result.Vtg.SpeedKilometersPerHour, "F2"),
+                    FormatHelpers.FormatDouble(result.Vtg.TrueCourseDegrees, "F1"));
 
                 await MonitorActiveStreamAsync(result, iterationToken).ConfigureAwait(false);
             }
@@ -124,10 +123,19 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
             {
                 throw;
             }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation(
+                    "Monitoring for NMEA stream on {Device} was canceled. Resuming auto-scan.",
+                    activePort.PortName);
+                return;
+            }
 
             if (verificationResult is null)
             {
-                _logger.LogWarning("NMEA stream on {Device} stopped. Resuming auto-scan.", activePort.PortName);
+                _logger.LogInformation(
+                    "NMEA stream on {Device} stopped producing sentences. Resuming auto-scan.",
+                    activePort.PortName);
                 return;
             }
 
@@ -135,10 +143,7 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
         }
     }
 
-    private static string FormatNullable(double? value, string format)
-    {
-        return value?.ToString(format, CultureInfo.InvariantCulture) ?? "n/a";
-    }
+    // ----- Options change + reload wiring -----
 
     private void OnOptionsChanged(NmeaSerialPortScanOptions options, string? name)
     {
@@ -154,7 +159,7 @@ public sealed class LinuxNmeaBackgroundService : BackgroundService
             options.ProbeDuration,
             options.ReadTimeout,
             options.MaxReadAttemptsPerPort,
-            string.Join(", ", options.BaudRates));
+            string.Join(", ", options.BaudRates ?? Array.Empty<int>()));
 
         SignalReload();
     }

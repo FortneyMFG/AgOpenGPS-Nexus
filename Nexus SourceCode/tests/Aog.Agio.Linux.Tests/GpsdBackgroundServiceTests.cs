@@ -77,6 +77,34 @@ public sealed class GpsdBackgroundServiceTests
         await task.WaitAsync(TimeSpan.FromSeconds(5));
     }
 
+    [Fact]
+    public async Task ExecuteAsync_Retries_WhenStreamEnds()
+    {
+        var options = new TestOptionsMonitor<GpsdClientOptions>(new GpsdClientOptions
+        {
+            SocketPath = "/tmp/gpsd.sock",
+            ReconnectDelay = TimeSpan.FromMilliseconds(10),
+        });
+        var factory = new RecordingGpsdConnectionFactory();
+        var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
+        var service = new GpsdBackgroundService(client, NullLogger<GpsdBackgroundService>.Instance, options);
+
+        var executeAsync = typeof(GpsdBackgroundService).GetMethod(
+            "ExecuteAsync",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(executeAsync);
+
+        using var cts = new CancellationTokenSource();
+        var task = (Task)executeAsync!.Invoke(service, new object[] { cts.Token })!;
+
+        await WaitForConditionAsync(() => factory.ConnectCount >= 2, TimeSpan.FromSeconds(2));
+
+        Assert.True(factory.ConnectCount >= 2);
+
+        cts.Cancel();
+        await task.WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
     private sealed class ThrowingConnectionFactory : IGpsdConnectionFactory
     {
         public Task<Stream?> ConnectAsync(CancellationToken cancellationToken)

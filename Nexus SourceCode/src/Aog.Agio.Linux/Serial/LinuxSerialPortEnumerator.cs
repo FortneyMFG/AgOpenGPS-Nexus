@@ -130,6 +130,25 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
             return;
         }
 
+        // Quick attribute check to skip directories early (device files should not be directories).
+        try
+        {
+            var attributes = File.GetAttributes(displayPath);
+            if ((attributes & FileAttributes.Directory) != 0)
+            {
+                _logger.LogDebug(
+                    "Skipping serial device candidate {Path} because its attributes ({Attributes}) indicate it is a directory.",
+                    displayPath,
+                    attributes);
+                return;
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException)
+        {
+            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its attributes could not be read.", displayPath);
+            return;
+        }
+
         string canonicalPath;
         try
         {
@@ -137,11 +156,11 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         }
         catch (Exception ex)
         {
-            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its full path could not be resolved.", path);
+            _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its canonical path could not be resolved.", displayPath);
             return;
         }
 
-        // Skip directories; legit serials are device files (char devices) not directories.
+        // Skip directories even after canonicalization (e.g., if a symlink pointed at a directory).
         try
         {
             if (Directory.Exists(canonicalPath))

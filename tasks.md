@@ -506,6 +506,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-245 | Mesh-aware legacy UDP gateway updates | Done |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 presence integration |
 | NX-246 | GNSS correction services bootstrap | Done |  | — | [ADR-066](docs/ADR/ADR-roadmap.md) | ADR-066 GNSS correction services |
 | NX-742 | SocketCAN channel backpressure guardrails | Done | AI | — | — | Drop stalled subscribers and stress fast consumers |
+| NX-931 | Linux serial scan configuration binding | Done | AI | — | — | Bind `AgioHost:Linux:Serial:Scan` options, document overrides, add tests |
 
 ### Section D — Plugins (Logic + Sim Providers)
 

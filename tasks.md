@@ -133,6 +133,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-246 GNSS correction services bootstrap _(Done)_ — ADR-066 GNSS correction services
 - [x] NX-671 gpsd disable toggle for Linux backend _(Done)_ — Allows operators to opt out of gpsd monitoring when the daemon is not present
 - [x] NX-701 SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
+- [x] NX-673 Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests
 
 ### Section D — Plugins (Logic + Sim Providers)
 - [x] NX-030 Plugin loader & manifest handling

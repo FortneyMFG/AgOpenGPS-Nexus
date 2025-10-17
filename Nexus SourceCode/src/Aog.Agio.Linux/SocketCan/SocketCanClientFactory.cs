@@ -65,15 +65,21 @@ public sealed class SocketCanClientFactory : ISocketCanClientFactory
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        var interfaceName = options.InterfaceName;
+        if (string.IsNullOrWhiteSpace(interfaceName))
+        {
+            throw new InvalidOperationException("SocketCAN interface is not configured.");
+        }
+
         var interfaces = _interfaceProvider.GetAll(options.IncludeVirtualInterfaces);
         var selected = interfaces.FirstOrDefault(iface => string.Equals(
             iface?.Name,
-            options.InterfaceName,
+            interfaceName,
             StringComparison.OrdinalIgnoreCase));
 
         if (selected is null)
         {
-            throw new SocketCanInterfaceNotFoundException(options.InterfaceName);
+            throw new SocketCanInterfaceNotFoundException(interfaceName);
         }
 
         var socket = new RawCanSocket();

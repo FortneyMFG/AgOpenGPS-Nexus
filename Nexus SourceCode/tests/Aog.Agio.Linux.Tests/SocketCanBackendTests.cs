@@ -365,7 +365,7 @@ public async Task FrameChannel_DropsSlowSubscribersAndKeepsFastOnesLive()
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            CreatedInterfaces.Add(options.InterfaceName);
+            CreatedInterfaces.Add(options.InterfaceName ?? string.Empty);
             return new ValueTask<ISocketCanClient>(_factory(options));
         }
     }

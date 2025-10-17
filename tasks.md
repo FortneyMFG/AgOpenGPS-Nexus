@@ -761,6 +761,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-937 | Legacy pose codec non-finite guard | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Normalize NaN/∞ pose fields before encoding |
 | NX-938 | Legacy steer command guidance status disable fix | Planned |  | — | — | Ensure disabled steer commands encode status zero |
 | NX-939 | Legacy pose lat/lon sanitization | In Progress |  | — | — | Clamp invalid coordinates before encoding |
+| NX-940 | Legacy frame checksum length guard | In Progress |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Guard short frames before validating checksum |
 | NX-940 | Legacy steer angle saturation clamp | In Progress |  | — | — | Limit steer command payload to ±3276 hundredths |
 
 ## Legend

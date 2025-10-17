@@ -320,6 +320,19 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         return new LegacyImportWizardViewModel(service, result =>
         {
             SimulationBar.ApplyLegacyImport(result);
+            var scenario = result.Scenario;
+            var existingIndex = _scenarioDefinitions.FindIndex(
+                definition => string.Equals(definition.ScenarioId, scenario.ScenarioId, StringComparison.Ordinal));
+
+            if (existingIndex >= 0)
+            {
+                _scenarioDefinitions[existingIndex] = scenario;
+            }
+            else
+            {
+                _scenarioDefinitions.Add(scenario);
+            }
+
             return true;
         });
     }

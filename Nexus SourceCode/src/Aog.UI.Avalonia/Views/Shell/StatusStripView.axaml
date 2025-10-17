@@ -26,7 +26,7 @@
               </Style>
             </TextBlock.Styles>
             <TextBlock.ToolTip>
-              <ToolTip Content="{Binding Description}"/>
+              <ToolTip Content="{Binding Tooltip}"/>
             </TextBlock.ToolTip>
           </TextBlock>
         </StackPanel>

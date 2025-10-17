@@ -89,9 +89,14 @@ public sealed class LegacyPoseCodec
         var imuPitchHundredths = BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(47, 2));
         var imuYawRateHundredths = BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(49, 2));
 
-        var headingRadians = double.IsFinite(headingDualDeg) && !float.IsNaN(headingDualDeg)
-            ? DegreesToRadians(headingDualDeg)
-            : DegreesToRadians(headingDeg);
+        var headingDualValid = double.IsFinite(headingDualDeg) && !float.IsNaN(headingDualDeg);
+        var headingSecondaryValid = double.IsFinite(headingDeg) && !float.IsNaN(headingDeg);
+        var headingDegrees = headingDualValid
+            ? headingDualDeg
+            : headingSecondaryValid
+                ? headingDeg
+                : 0f;
+        var headingRadians = DegreesToRadians(headingDegrees);
 
         pose = new Pose
         {

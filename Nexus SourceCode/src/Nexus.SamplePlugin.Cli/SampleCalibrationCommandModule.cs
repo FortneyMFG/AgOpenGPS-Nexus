@@ -1,8 +1,8 @@
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using System.Linq;
 using System.Text.Json;
 using Nexus.Plugin.Cli.Abstractions;
+using CliInvocationContext = System.CommandLine.Invocation.InvocationContext;
 
 namespace Nexus.SamplePlugin.Cli;
 
@@ -46,7 +46,7 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
         command.AddOption(gainOption);
         command.AddOption(dryRunOption);
 
-        command.SetHandler((InvocationContext invocationContext) =>
+        command.SetHandler(invocationContext =>
         {
             var offset = invocationContext.ParseResult.GetValueForOption(offsetOption);
             var gain = invocationContext.ParseResult.GetValueForOption(gainOption);
@@ -107,7 +107,7 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
         command.AddOption(durationOption);
         command.AddOption(outputOption);
 
-        command.SetHandler((InvocationContext invocationContext) =>
+        command.SetHandler(invocationContext =>
         {
             var duration = invocationContext.ParseResult.GetValueForOption(durationOption);
             var file = invocationContext.ParseResult.GetValueForOption(outputOption);
@@ -120,7 +120,7 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
         return command;
     }
 
-    private static string ResolveOutputMode(CommandModuleContext context, InvocationContext invocationContext)
+    private static string ResolveOutputMode(CommandModuleContext context, CliInvocationContext invocationContext)
     {
         if (context.OutputOption is null)
         {

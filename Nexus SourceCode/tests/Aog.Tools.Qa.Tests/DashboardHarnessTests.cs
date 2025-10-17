@@ -69,7 +69,7 @@ public static class DashboardHarnessTests
         var written = JsonSerializer.Deserialize<QaMetricSet>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         written.Should().NotBeNull();
         written!.Scenario.Should().Be("Override Scenario");
-        written.Source.Should().Be("dashboard-harness");
+        written.Source.Should().Be("ui-automation");
     }
 
     private static string Resolve(string relativePath)

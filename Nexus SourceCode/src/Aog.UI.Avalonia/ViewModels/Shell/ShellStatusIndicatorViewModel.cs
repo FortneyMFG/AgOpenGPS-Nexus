@@ -38,6 +38,9 @@ public sealed class ShellStatusIndicatorViewModel : ObservableObject
 
     /// <summary>Gets an optional description shown in the tooltip.</summary>
     public string? Description { get; }
+
+    /// <summary>Gets the tooltip text displayed for the indicator.</summary>
+    public string Tooltip => Description ?? string.Empty;
 }
 
 /// <summary>

@@ -119,10 +119,12 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
             return;
         }
 
-        string fullPath;
+        var fullPath = Path.GetFullPath(path);
+
+        string canonicalPath;
         try
         {
-            fullPath = Path.GetFullPath(path);
+            canonicalPath = CanonicalizePath(fullPath);
         }
         catch (Exception ex)
         {
@@ -130,35 +132,13 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
             return;
         }
 
-        // Resolve canonical path (follows symlinks when possible) to de-dupe entries
-        var canonicalPath = ResolveCanonicalPath(fullPath);
-
-        // Skip directories (and reparse points that target directories). Legit serials are device files.
+        // Skip directories; legit serials are device files (char devices) not directories.
         try
         {
-            var attrs = File.GetAttributes(canonicalPath);
-            if ((attrs & FileAttributes.Directory) != 0)
+            if (Directory.Exists(canonicalPath))
             {
-                _logger.LogDebug("Skipping serial device candidate {Path} because it points to a directory.", canonicalPath);
+                _logger.LogDebug("Skipping serial device candidate {Path} because it is a directory.", canonicalPath);
                 return;
-            }
-
-            if ((attrs & FileAttributes.ReparsePoint) != 0)
-            {
-                // If the reparse/ link ultimately lands on a directory, skip it.
-                try
-                {
-                    if (Directory.Exists(canonicalPath))
-                    {
-                        _logger.LogDebug("Skipping serial device candidate {Path} because it targets a directory reparse point.", canonicalPath);
-                        return;
-                    }
-                }
-                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-                {
-                    _logger.LogDebug(ex, "Skipping serial device candidate {Path} because its reparse target could not be inspected.", canonicalPath);
-                    return;
-                }
             }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -169,7 +149,7 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
 
         if (seen.Add(canonicalPath))
         {
-            // Keep the discovered (possibly non-canonical) path for operator familiarity, but de-dupe on canonical.
+            // Keep the discovered (possibly symlinked) path for operator familiarity; de-dupe by canonical.
             results.Add(fullPath);
         }
         else
@@ -181,44 +161,49 @@ public sealed class LinuxSerialPortEnumerator : ISerialPortEnumerator
         }
     }
 
-    private static string ResolveCanonicalPath(string fullPath)
+    private static string CanonicalizePath(string path)
     {
+        var fullPath = Path.GetFullPath(path);
+
         try
         {
-            var info = Directory.Exists(fullPath)
-                ? new DirectoryInfo(fullPath)
-                : new FileInfo(fullPath);
+            var info = GetFileSystemInfo(fullPath);
 
-            try
+            if (string.IsNullOrEmpty(info.LinkTarget))
             {
-                var target = info.ResolveLinkTarget(returnFinalTarget: true);
-                if (target is not null)
-                {
-                    return Path.GetFullPath(target.FullName);
-                }
-            }
-            catch (IOException)
-            {
-                // Ignore and fall back.
-            }
-            catch (UnauthorizedAccessException)
-            {
-                // Ignore and fall back.
-            }
-            catch (PlatformNotSupportedException)
-            {
-                // Ignore and fall back.
-            }
-            catch (NotSupportedException)
-            {
-                // Ignore and fall back.
+                return fullPath;
             }
 
-            return info.FullName;
+            var targetInfo = info.ResolveLinkTarget(returnFinalTarget: true);
+            if (targetInfo is null)
+            {
+                return fullPath;
+            }
+
+            var targetPath = targetInfo.FullName;
+            if (!Path.IsPathFullyQualified(targetPath))
+            {
+                var basePath = Path.GetDirectoryName(fullPath);
+                targetPath = basePath is not null
+                    ? Path.GetFullPath(targetPath, basePath)
+                    : Path.GetFullPath(targetPath);
+            }
+
+            return Path.GetFullPath(targetPath);
         }
-        catch
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException or PlatformNotSupportedException)
         {
             return fullPath;
         }
+    }
+
+    private static FileSystemInfo GetFileSystemInfo(string fullPath)
+    {
+        if (Directory.Exists(fullPath))
+        {
+            return new DirectoryInfo(fullPath);
+        }
+
+        return new FileInfo(fullPath);
     }
 }

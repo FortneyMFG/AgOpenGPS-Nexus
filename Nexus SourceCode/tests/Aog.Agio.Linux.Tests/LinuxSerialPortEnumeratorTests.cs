@@ -61,7 +61,7 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
         {
             DevicePrefixes = new[]
             {
-                Path.Combine(_root, "serial/by-id/")
+                Path.Combine(_root, "serial/by-id/"),
             },
         });
 
@@ -95,7 +95,7 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
 
         Assert.Single(ports);
         Assert.Equal(device, ports[0]);
-        Assert.Contains(logger.Entries, entry => entry.Level == LogLevel.Debug && entry.Message.Contains(directoryEntry));
+        Assert.Contains(logger.Entries, entry => entry.Level == LogLevel.Debug && entry.Message.Contains(directoryEntry, StringComparison.Ordinal));
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
         var ports = enumerator.GetPortNames().ToArray();
 
         Assert.Empty(ports);
-        Assert.Contains(logger.Entries, entry => entry.Level == LogLevel.Information && entry.Message.Contains("no device prefixes"));
+        Assert.Contains(logger.Entries, entry => entry.Level == LogLevel.Information && entry.Message.Contains("no device prefixes", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -170,6 +170,7 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
             File.Delete(symlinkPath);
         }
 
+        // Create symlink pointing to the real device
         File.CreateSymbolicLink(symlinkPath, device);
 
         var logger = new ListLogger<LinuxSerialPortEnumerator>();
@@ -188,7 +189,11 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
 
         Assert.Single(ports);
         var symlinkFullPath = Path.GetFullPath(symlinkPath);
+
+        // The enumerator returns the discovered (operator-friendly) path but de-dupes on canonical.
         Assert.Contains(ports[0], new[] { device, symlinkFullPath });
+
+        // We expect a debug log mentioning the symlink path when the duplicate is skipped.
         Assert.Contains(
             logger.Entries,
             entry => entry.Level == LogLevel.Debug && entry.Message.Contains(symlinkFullPath, StringComparison.Ordinal));
@@ -228,10 +233,7 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
         private sealed class Scope : IDisposable
         {
             public static Scope Instance { get; } = new();
-
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
         }
 
         public List<(LogLevel Level, string Message)> Entries { get; } = new();
@@ -240,7 +242,12 @@ public sealed class LinuxSerialPortEnumeratorTests : IDisposable
 
         public bool IsEnabled(LogLevel logLevel) => true;
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
         {
             Entries.Add((logLevel, formatter(state, exception)));
         }

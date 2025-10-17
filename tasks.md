@@ -145,6 +145,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-931 gpsd monitor restart on socket availability
 - [ ] NX-952 Aog.Agio.Windows targeting pack restore guard
 - [x] NX-953 SocketCAN burst tolerance for transient backpressure
+- [x] NX-967 Linux serial enumerator canonical dedupe
 - [ ] NX-971 Linux NMEA VTG null speed log fix
 
 ### Section D — Plugins (Logic + Sim Providers)
@@ -531,6 +532,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-931 | Linux serial scan configuration binding | Done | AI | — | — | Bind `AgioHost:Linux:Serial:Scan` options, document overrides, add tests |
 | NX-986 | Linux serial symlink deduplication fix | In Progress | AI | — | — | Collapse duplicate device nodes discovered via symlinks |
 | NX-952 | SocketCAN subscriber eviction reset | In Progress | AI | — | — | Ensure eviction clears backpressure and re-subscription regression test |
+| NX-967 | Linux serial enumerator canonical dedupe | Done | AI | — | — | Canonicalize enumerated device paths and dedupe results |
 
 ### Section D — Plugins (Logic + Sim Providers)
 

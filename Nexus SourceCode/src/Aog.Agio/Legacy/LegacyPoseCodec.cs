@@ -125,8 +125,14 @@ public sealed class LegacyPoseCodec
     /// Encodes a typed pose into the legacy UDP PGN representation.
     /// </summary>
     /// <param name="pose">Pose to encode.</param>
-    /// <param name="metadata">Legacy metadata describing additional fields.</param>
+    /// <param name="metadata">Legacy metadata describing additional fields. When omitted or when
+    /// <see cref="LegacyPoseMetadata.SourceAddress"/> is zero, the header defaults to
+    /// <see cref="MainAntennaSourceAddress"/>.</param>
     /// <returns>Byte array ready to send over UDP.</returns>
+    /// <remarks>
+    /// Non-finite pose values (for example <see cref="double.NaN"/> or infinities) are coerced to zero to
+    /// maintain compatibility with legacy decoders that expect numeric fields to be finite.
+    /// </remarks>
     public byte[] EncodePose(Pose pose, LegacyPoseMetadata? metadata = null)
     {
         if (pose is null)
@@ -134,22 +140,28 @@ public sealed class LegacyPoseCodec
             throw new ArgumentNullException(nameof(pose));
         }
 
-        metadata ??= new LegacyPoseMetadata();
-
         var buffer = new byte[MainAntennaFrameLength];
         buffer[0] = Sync0;
         buffer[1] = Sync1;
-        buffer[2] = metadata.SourceAddress;
+        metadata ??= new LegacyPoseMetadata();
+        var sourceAddress = metadata.SourceAddress != 0
+            ? metadata.SourceAddress
+            : MainAntennaSourceAddress;
+        buffer[2] = sourceAddress;
         buffer[3] = MainAntennaPosePgn;
         buffer[4] = MainAntennaPayloadLength;
 
         var payload = buffer.AsSpan(5, MainAntennaPayloadLength);
 
-        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(0, 8), pose.LongitudeDeg);
-        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(8, 8), pose.LatitudeDeg);
+        var longitude = SanitizeLongitude(pose.LongitudeDeg);
+        var latitude = SanitizeLatitude(pose.LatitudeDeg);
 
-        var headingDeg = (float)RadiansToDegrees(pose.HeadingRad);
-        if (float.IsNaN(headingDeg) || float.IsInfinity(headingDeg))
+        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(0, 8), longitude);
+        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(8, 8), latitude);
+
+        var headingRad = double.IsFinite(pose.HeadingRad) ? pose.HeadingRad : 0d;
+        var headingDeg = (float)RadiansToDegrees(headingRad);
+        if (!float.IsFinite(headingDeg))
         {
             headingDeg = 0f;
         }
@@ -157,13 +169,29 @@ public sealed class LegacyPoseCodec
         BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(16, 4), headingDeg);
         BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(20, 4), headingDeg);
 
-        var speedKph = (float)(pose.SpeedMps * 3.6);
+        var speedMps = double.IsFinite(pose.SpeedMps) ? pose.SpeedMps : 0d;
+        var speedKph = (float)(speedMps * 3.6);
+        if (!float.IsFinite(speedKph))
+        {
+            speedKph = 0f;
+        }
         BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(24, 4), speedKph);
 
-        var rollDeg = (float)RadiansToDegrees(pose.RollRad);
+        var rollRad = double.IsFinite(pose.RollRad) ? pose.RollRad : 0d;
+        var rollDeg = (float)RadiansToDegrees(rollRad);
+        if (!float.IsFinite(rollDeg))
+        {
+            rollDeg = 0f;
+        }
         BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(28, 4), rollDeg);
 
-        BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(32, 4), (float)pose.AltitudeM);
+        var altitudeM = double.IsFinite(pose.AltitudeM) ? pose.AltitudeM : 0d;
+        var altitudeFloat = (float)altitudeM;
+        if (!float.IsFinite(altitudeFloat))
+        {
+            altitudeFloat = 0f;
+        }
+        BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(32, 4), altitudeFloat);
 
         BinaryPrimitives.WriteUInt16LittleEndian(payload.Slice(36, 2), metadata.SatellitesTracked);
         payload[38] = metadata.FixQuality;
@@ -171,27 +199,29 @@ public sealed class LegacyPoseCodec
         BinaryPrimitives.WriteUInt16LittleEndian(payload.Slice(41, 2), metadata.AgeOfCorrectionsTimes100);
 
         var imuHeading = metadata.ImuHeadingHundredths;
-        if (imuHeading == 0 && pose.HeadingRad is not 0d)
+        if (imuHeading == 0 && headingRad is not 0d)
         {
-            imuHeading = EncodeUnsignedAngleHundredths(pose.HeadingRad);
+            imuHeading = EncodeUnsignedAngleHundredths(headingRad);
         }
 
         var imuRoll = metadata.ImuRollHundredths;
-        if (imuRoll == 0 && pose.RollRad is not 0d)
+        if (imuRoll == 0 && rollRad is not 0d)
         {
-            imuRoll = EncodeSignedAngleHundredths(pose.RollRad);
+            imuRoll = EncodeSignedAngleHundredths(rollRad);
         }
 
+        var pitchRad = double.IsFinite(pose.PitchRad) ? pose.PitchRad : 0d;
         var imuPitch = metadata.ImuPitchHundredths;
-        if (imuPitch == 0 && pose.PitchRad is not 0d)
+        if (imuPitch == 0 && pitchRad is not 0d)
         {
-            imuPitch = EncodeSignedAngleHundredths(pose.PitchRad);
+            imuPitch = EncodeSignedAngleHundredths(pitchRad);
         }
 
+        var yawRateRadps = double.IsFinite(pose.YawRateRadps) ? pose.YawRateRadps : 0d;
         var imuYawRate = metadata.ImuYawRateHundredths;
-        if (imuYawRate == 0 && pose.YawRateRadps is not 0d)
+        if (imuYawRate == 0 && yawRateRadps is not 0d)
         {
-            imuYawRate = EncodeSignedAngleHundredths(pose.YawRateRadps);
+            imuYawRate = EncodeSignedAngleHundredths(yawRateRadps);
         }
 
         BinaryPrimitives.WriteUInt16LittleEndian(payload.Slice(43, 2), imuHeading);
@@ -208,6 +238,46 @@ public sealed class LegacyPoseCodec
     private static double RadiansToDegrees(double radians) => radians * 180d / Math.PI;
 
     private static double DegreesHundredthsToRadians(short hundredths) => DegreesToRadians(hundredths / 100d);
+
+    private static double SanitizeLongitude(double longitude)
+    {
+        if (!double.IsFinite(longitude))
+        {
+            return 0d;
+        }
+
+        if (longitude >= 180d)
+        {
+            return 180d;
+        }
+
+        if (longitude <= -180d)
+        {
+            return -180d;
+        }
+
+        return longitude;
+    }
+
+    private static double SanitizeLatitude(double latitude)
+    {
+        if (!double.IsFinite(latitude))
+        {
+            return 0d;
+        }
+
+        if (latitude >= 90d)
+        {
+            return 90d;
+        }
+
+        if (latitude <= -90d)
+        {
+            return -90d;
+        }
+
+        return latitude;
+    }
 
     private static short EncodeSignedAngleHundredths(double radians)
     {

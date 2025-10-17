@@ -3,18 +3,8 @@ namespace Aog.Agio.Legacy;
 /// <summary>
 /// Captures auxiliary fields transported alongside the legacy steering command PGN.
 /// </summary>
-public sealed class LegacySteerCommandMetadata
+public sealed class LegacySteerCommandMetadata : LegacySteerMetadata
 {
-    /// <summary>
-    /// Gets or sets the source address override when encoding the PGN.
-    /// </summary>
-    public byte SourceAddress { get; init; }
-
-    /// <summary>
-    /// Gets or sets the guidance controller status byte emitted by legacy clients.
-    /// </summary>
-    public byte GuidanceStatus { get; init; }
-
     /// <summary>
     /// Gets or sets the forward speed in kilometres per hour carried by the PGN.
     /// </summary>
@@ -39,6 +29,7 @@ public sealed class LegacySteerCommandMetadata
         SourceAddress = SourceAddress,
         GuidanceStatus = GuidanceStatus,
         SpeedKph = SpeedKph,
+        CurrentSpeedMps = CurrentSpeedMps,
         TramControl = TramControl,
     };
 }

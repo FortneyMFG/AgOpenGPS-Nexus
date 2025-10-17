@@ -17,12 +17,12 @@
             <TextBlock.Styles>
               <Style Selector="TextBlock">
                 <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                <DataTrigger Binding="{Binding Level}" Value="Warning">
+                <styling:DataTrigger Binding="{Binding Level}" Value="Warning">
                   <Setter Property="Foreground" Value="#F7B529"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Level}" Value="Critical">
+                </styling:DataTrigger>
+                <styling:DataTrigger Binding="{Binding Level}" Value="Critical">
                   <Setter Property="Foreground" Value="#E5484D"/>
-                </DataTrigger>
+                </styling:DataTrigger>
               </Style>
             </TextBlock.Styles>
             <TextBlock.ToolTip>

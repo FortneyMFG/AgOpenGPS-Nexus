@@ -10,11 +10,9 @@
   <ItemGroup>
     <None Remove="**/*.axaml" />
     <Page Remove="**/*.axaml" />
-    <AvaloniaXaml Remove="**/*.axaml" />
   </ItemGroup>
-
   <ItemGroup>
-    <AvaloniaResource Include="**/*.axaml" Exclude="$(BaseIntermediateOutputPath)**;$(BaseOutputPath)**" />
+    <AvaloniaXaml Include="**/*.axaml" Exclude="$(BaseIntermediateOutputPath)**;$(BaseOutputPath)**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +26,7 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.6" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6" />
     <PackageReference Include="Avalonia.Skia" Version="11.0.6" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.6" />
     <PackageReference Include="SkiaSharp" Version="2.88.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />

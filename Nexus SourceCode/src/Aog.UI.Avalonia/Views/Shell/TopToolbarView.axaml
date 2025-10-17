@@ -14,21 +14,13 @@
         <ToggleButton Content="{Binding DisplayName}"
                       Command="{Binding Command}"
                       IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                      MinWidth="110">
-          <ToggleButton.Styles>
-            <Style Selector="ToggleButton">
-              <Setter Property="Padding" Value="12,6"/>
-              <Setter Property="CornerRadius" Value="8"/>
-              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
-              <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
-              <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-              <Setter Property="FontWeight" Value="SemiBold"/>
-              <DataTrigger Binding="{Binding IsChecked}" Value="True">
-                <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}"/>
-                <Setter Property="Foreground" Value="White"/>
-              </DataTrigger>
-            </Style>
-          </ToggleButton.Styles>
+                      MinWidth="110"
+                      Padding="12,6"
+                      CornerRadius="8"
+                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                      Background="{DynamicResource ThemeBackgroundBrush}"
+                      Foreground="{DynamicResource ThemeForegroundBrush}"
+                      FontWeight="SemiBold">
           <ToggleButton.ToolTip>
             <ToolTip Content="{Binding Tooltip}"/>
           </ToggleButton.ToolTip>

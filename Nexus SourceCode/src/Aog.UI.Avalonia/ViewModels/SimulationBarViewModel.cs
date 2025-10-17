@@ -154,9 +154,6 @@ public class SimulationBarViewModel : ObservableObject, IDisposable
     /// <summary>Gets the available playback rates.</summary>
     public ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> PlaybackRates => _playbackRateView;
 
-    /// <summary>Gets the currently selected playback rate option when available.</summary>
-    public SimulationPlaybackRateOptionViewModel? SelectedPlaybackRateOption => _selectedPlaybackRateOption;
-
     /// <summary>
     /// Gets the currently selected playback rate multiplier. Values are clamped between
     /// <see cref="MinPlaybackRate"/> and <see cref="MaxPlaybackRate"/>.
@@ -407,9 +404,6 @@ private void SelectPlaybackRate(double rate, bool updateController)
 {
     var effectiveRate = ClampPlaybackRate(rate);
     var option = EnsurePlaybackRateOption(effectiveRate);
-
-    // Toggle selection using the unified helper (updates selection state & notifies bindings)
-    UpdateSelectedPlaybackRateOption(option);
 
     // Keep scalar + label properties in sync (handle null labels defensively)
     SelectedPlaybackRate = effectiveRate;

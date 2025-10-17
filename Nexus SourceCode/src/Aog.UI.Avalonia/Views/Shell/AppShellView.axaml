@@ -6,6 +6,7 @@
              xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
              xmlns:views="clr-namespace:Aog.UI.Avalonia.Views.Shell"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:styling="clr-namespace:Avalonia.Styling;assembly=Avalonia.Base"
              x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
              x:DataType="vm:MainWindowViewModel"
              mc:Ignorable="d">
@@ -143,10 +144,10 @@
                               <Style Selector="Button">
                                 <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
                                 <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <styling:DataTrigger Binding="{Binding IsSelected}" Value="True">
                                   <Setter Property="Background" Value="#FF2D5D9F"/>
                                   <Setter Property="Foreground" Value="White"/>
-                                </DataTrigger>
+                                </styling:DataTrigger>
                               </Style>
                             </Button.Styles>
                           </Button>
@@ -295,12 +296,12 @@
                               <TextBlock.Styles>
                                 <Style Selector="TextBlock">
                                   <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                                  <DataTrigger Binding="{Binding State}" Value="Warning">
+                                  <styling:DataTrigger Binding="{Binding State}" Value="Warning">
                                     <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
-                                  </DataTrigger>
-                                  <DataTrigger Binding="{Binding State}" Value="Blocked">
+                                  </styling:DataTrigger>
+                                  <styling:DataTrigger Binding="{Binding State}" Value="Blocked">
                                     <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                                  </DataTrigger>
+                                  </styling:DataTrigger>
                                 </Style>
                               </TextBlock.Styles>
                             </TextBlock>
@@ -364,9 +365,9 @@
                             <ItemsControl.Styles>
                               <Style Selector="ItemsControl">
                                 <Setter Property="IsVisible" Value="False"/>
-                                <DataTrigger Binding="{Binding HasIssues}" Value="True">
+                                <styling:DataTrigger Binding="{Binding HasIssues}" Value="True">
                                   <Setter Property="IsVisible" Value="True"/>
-                                </DataTrigger>
+                                </styling:DataTrigger>
                               </Style>
                             </ItemsControl.Styles>
                           </ItemsControl>
@@ -374,9 +375,9 @@
                             <TextBlock.Styles>
                               <Style Selector="TextBlock">
                                 <Setter Property="IsVisible" Value="False"/>
-                                <DataTrigger Binding="{Binding HasIssues}" Value="False">
+                                <styling:DataTrigger Binding="{Binding HasIssues}" Value="False">
                                   <Setter Property="IsVisible" Value="True"/>
-                                </DataTrigger>
+                                </styling:DataTrigger>
                               </Style>
                             </TextBlock.Styles>
                           </TextBlock>
@@ -452,12 +453,12 @@
                               BorderThickness="1">
                         <Border.Styles>
                           <Style Selector="Border">
-                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsChannelHealth.Degraded}">
+                            <styling:DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsChannelHealth.Degraded}">
                               <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsChannelHealth.Offline}">
+                            </styling:DataTrigger>
+                            <styling:DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsChannelHealth.Offline}">
                               <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
-                            </DataTrigger>
+                            </styling:DataTrigger>
                           </Style>
                         </Border.Styles>
                         <StackPanel Spacing="4">
@@ -494,12 +495,12 @@
                               BorderThickness="1">
                         <Border.Styles>
                           <Style Selector="Border">
-                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsLoopHealth.Warning}">
+                            <styling:DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsLoopHealth.Warning}">
                               <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsLoopHealth.Degraded}">
+                            </styling:DataTrigger>
+                            <styling:DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsLoopHealth.Degraded}">
                               <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
-                            </DataTrigger>
+                            </styling:DataTrigger>
                           </Style>
                         </Border.Styles>
                         <StackPanel Spacing="4">
@@ -531,9 +532,9 @@
                               BorderThickness="1">
                         <Border.Styles>
                           <Style Selector="Border">
-                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                            <styling:DataTrigger Binding="{Binding IsActive}" Value="True">
                               <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
-                            </DataTrigger>
+                            </styling:DataTrigger>
                           </Style>
                         </Border.Styles>
                         <StackPanel Spacing="4">
@@ -581,15 +582,15 @@
                               BorderThickness="1">
                         <Border.Styles>
                           <Style Selector="Border">
-                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Warning}">
+                            <styling:DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Warning}">
                               <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Error}">
+                            </styling:DataTrigger>
+                            <styling:DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Error}">
                               <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Critical}">
+                            </styling:DataTrigger>
+                            <styling:DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Critical}">
                               <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
-                            </DataTrigger>
+                            </styling:DataTrigger>
                           </Style>
                         </Border.Styles>
                         <StackPanel Spacing="4">
@@ -613,15 +614,15 @@
                             <TextBlock.Styles>
                               <Style Selector="TextBlock">
                                 <Setter Property="IsVisible" Value="True"/>
-                                <DataTrigger Binding="{Binding Remediation}" Value="">
+                                <styling:DataTrigger Binding="{Binding Remediation}" Value="">
                                   <Setter Property="IsVisible" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Remediation}" Value="{x:Null}">
+                                </styling:DataTrigger>
+                                <styling:DataTrigger Binding="{Binding Remediation}" Value="{x:Null}">
                                   <Setter Property="IsVisible" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Remediation}" Value="{x:Static sys:String.Empty}">
+                                </styling:DataTrigger>
+                                <styling:DataTrigger Binding="{Binding Remediation}" Value="{x:Static sys:String.Empty}">
                                   <Setter Property="IsVisible" Value="False"/>
-                                </DataTrigger>
+                                </styling:DataTrigger>
                               </Style>
                             </TextBlock.Styles>
                           </TextBlock>
@@ -828,9 +829,9 @@
                     <TextBlock.Styles>
                       <Style Selector="TextBlock">
                         <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                        <DataTrigger Binding="{Binding IsRollbackPending}" Value="True">
+                        <styling:DataTrigger Binding="{Binding IsRollbackPending}" Value="True">
                           <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                        </DataTrigger>
+                        </styling:DataTrigger>
                       </Style>
                     </TextBlock.Styles>
                   </TextBlock>
@@ -839,9 +840,9 @@
                     <TextBlock.Styles>
                       <Style Selector="TextBlock">
                         <Setter Property="IsVisible" Value="False"/>
-                        <DataTrigger Binding="{Binding HasBreakingChanges}" Value="True">
+                        <styling:DataTrigger Binding="{Binding HasBreakingChanges}" Value="True">
                           <Setter Property="IsVisible" Value="True"/>
-                        </DataTrigger>
+                        </styling:DataTrigger>
                       </Style>
                     </TextBlock.Styles>
                   </TextBlock>
@@ -849,9 +850,9 @@
                     <TextBlock.Styles>
                       <Style Selector="TextBlock">
                         <Setter Property="IsVisible" Value="False"/>
-                        <DataTrigger Binding="{Binding HasBreakingChanges}" Value="False">
+                        <styling:DataTrigger Binding="{Binding HasBreakingChanges}" Value="False">
                           <Setter Property="IsVisible" Value="True"/>
-                        </DataTrigger>
+                        </styling:DataTrigger>
                       </Style>
                     </TextBlock.Styles>
                   </TextBlock>
@@ -980,9 +981,9 @@
                               <TextBlock.Styles>
                                 <Style Selector="TextBlock">
                                   <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
-                                  <DataTrigger Binding="{Binding RequiresAttention}" Value="True">
+                                  <styling:DataTrigger Binding="{Binding RequiresAttention}" Value="True">
                                     <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                                  </DataTrigger>
+                                  </styling:DataTrigger>
                                 </Style>
                               </TextBlock.Styles>
                             </TextBlock>
@@ -1007,12 +1008,12 @@
                                         <TextBlock.Styles>
                                           <Style Selector="TextBlock">
                                             <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
-                                            <DataTrigger Binding="{Binding IsInProgress}" Value="True">
+                                            <styling:DataTrigger Binding="{Binding IsInProgress}" Value="True">
                                               <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsError}" Value="True">
+                                            </styling:DataTrigger>
+                                            <styling:DataTrigger Binding="{Binding IsError}" Value="True">
                                               <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                                            </DataTrigger>
+                                            </styling:DataTrigger>
                                           </Style>
                                         </TextBlock.Styles>
                                       </TextBlock>
@@ -1076,9 +1077,9 @@
                               <TextBlock.Styles>
                                 <Style Selector="TextBlock">
                                   <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
-                                  <DataTrigger Binding="{Binding IsWarning}" Value="True">
+                                  <styling:DataTrigger Binding="{Binding IsWarning}" Value="True">
                                     <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                                  </DataTrigger>
+                                  </styling:DataTrigger>
                                 </Style>
                               </TextBlock.Styles>
                             </TextBlock>
@@ -1124,9 +1125,9 @@
                           <TextBlock.Styles>
                             <Style Selector="TextBlock">
                               <Setter Property="IsVisible" Value="False"/>
-                              <DataTrigger Binding="{Binding HasCallout}" Value="True">
+                              <styling:DataTrigger Binding="{Binding HasCallout}" Value="True">
                                 <Setter Property="IsVisible" Value="True"/>
-                              </DataTrigger>
+                              </styling:DataTrigger>
                             </Style>
                           </TextBlock.Styles>
                         </TextBlock>
@@ -1143,9 +1144,9 @@
                                   <TextBlock.Styles>
                                     <Style Selector="TextBlock">
                                       <Setter Property="IsVisible" Value="False"/>
-                                      <DataTrigger Binding="{Binding HasSecondaryText}" Value="True">
+                                      <styling:DataTrigger Binding="{Binding HasSecondaryText}" Value="True">
                                         <Setter Property="IsVisible" Value="True"/>
-                                      </DataTrigger>
+                                      </styling:DataTrigger>
                                     </Style>
                                   </TextBlock.Styles>
                                 </TextBlock>
@@ -1158,9 +1159,9 @@
                                   <Border.Styles>
                                     <Style Selector="Border">
                                       <Setter Property="IsVisible" Value="False"/>
-                                      <DataTrigger Binding="{Binding HasCommand}" Value="True">
+                                      <styling:DataTrigger Binding="{Binding HasCommand}" Value="True">
                                         <Setter Property="IsVisible" Value="True"/>
-                                      </DataTrigger>
+                                      </styling:DataTrigger>
                                     </Style>
                                   </Border.Styles>
                                   <TextBlock Text="{Binding Command}"
@@ -1812,9 +1813,9 @@
                               <Border.Styles>
                                 <Style Selector="Border">
                                   <Setter Property="Background" Value="{Binding AccentBackgroundBrush}"/>
-                                  <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                  <styling:DataTrigger Binding="{Binding IsSelected}" Value="True">
                                     <Setter Property="Background" Value="{Binding AccentBrush}"/>
-                                  </DataTrigger>
+                                  </styling:DataTrigger>
                                 </Style>
                               </Border.Styles>
 
@@ -1827,9 +1828,9 @@
                                 <Button.Styles>
                                   <Style Selector="Button">
                                     <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <styling:DataTrigger Binding="{Binding IsSelected}" Value="True">
                                       <Setter Property="Foreground" Value="White"/>
-                                    </DataTrigger>
+                                    </styling:DataTrigger>
                                   </Style>
                                 </Button.Styles>
 
@@ -2241,9 +2242,9 @@
                   <TextBlock.Styles>
                     <Style Selector="TextBlock#StatusText">
                       <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                      <DataTrigger Binding="{Binding HasError}" Value="True">
+                      <styling:DataTrigger Binding="{Binding HasError}" Value="True">
                         <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                      </DataTrigger>
+                      </styling:DataTrigger>
                     </Style>
                   </TextBlock.Styles>
                 </TextBlock>

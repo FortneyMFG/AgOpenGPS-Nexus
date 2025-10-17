@@ -9,16 +9,21 @@
         Width="840"
         Height="560"
         mc:Ignorable="d">
-  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="16" Margin="20">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="20">
     <TextBlock Text="Scenario editor" FontSize="24" FontWeight="Bold"/>
 
-    <Grid Grid.Row="1" ColumnDefinitions="220,*" ColumnSpacing="16">
+    <Grid Grid.Row="1" ColumnDefinitions="220,*">
       <StackPanel>
         <TextBlock Text="Scenarios" FontWeight="SemiBold"/>
         <ListBox ItemsSource="{Binding Scenarios}"
                  SelectedItem="{Binding SelectedScenario, Mode=TwoWay}"
-                 DisplayMemberPath="DisplayName"
-                 Height="340"/>
+                 Height="340">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:ScenarioDefinitionViewModel">
+              <TextBlock Text="{Binding DisplayName}"/>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
           <Button Content="Add" Command="{Binding AddScenarioCommand}" MinWidth="80"/>
           <Button Content="Remove" Command="{Binding RemoveScenarioCommand}" MinWidth="80"/>
@@ -46,7 +51,7 @@
                     <ItemsControl ItemsSource="{Binding Routes}">
                       <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:SimulationStreamRouteViewModel">
-                          <Grid ColumnDefinitions="2*,2*,1*" ColumnSpacing="8" Margin="0,4">
+                          <Grid ColumnDefinitions="2*,2*,1*" Margin="0,4">
                             <TextBlock Text="{Binding Stream}" VerticalAlignment="Center"/>
                             <ComboBox Grid.Column="1"
                                       ItemsSource="{Binding AvailableSources}"
@@ -64,7 +69,7 @@
 
                   <StackPanel Spacing="4">
                     <TextBlock Text="Options" FontWeight="SemiBold"/>
-                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
                       <TextBlock Grid.Row="0" Grid.Column="0" Text="Seed" VerticalAlignment="Center"/>
                       <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Options.SeedText, Mode=TwoWay}"/>
                       <TextBlock Grid.Row="1" Grid.Column="0" Text="Time scale" VerticalAlignment="Center"/>
@@ -80,16 +85,8 @@
     </Grid>
 
     <Border Grid.Row="2" Padding="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
-      <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto">
         <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap">
-          <TextBlock.Styles>
-            <Style Selector="TextBlock">
-              <Setter Property="Foreground" Value="#FF201F1E"/>
-              <DataTrigger Binding="{Binding HasError}" Value="True">
-                <Setter Property="Foreground" Value="#D13438"/>
-              </DataTrigger>
-            </Style>
-          </TextBlock.Styles>
         </TextBlock>
 
         <Button Grid.Column="1" Content="Save..." Click="OnSaveScenario" MinWidth="100"/>

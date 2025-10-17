@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
+        xmlns:dataGrid="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
         x:Class="Aog.UI.Avalonia.Views.FieldOperations.FlagManagerDialog"
         x:DataType="vm:FlagManagerDialogViewModel"
         Title="Flag manager"
@@ -11,7 +12,7 @@
         MinWidth="680"
         MinHeight="480"
         mc:Ignorable="d">
-  <Grid Margin="20" RowDefinitions="Auto,*" RowSpacing="16">
+  <Grid Margin="20" RowDefinitions="Auto,*">
     <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
       <StackPanel>
         <TextBlock Text="Flag manager" FontSize="24" FontWeight="Bold"/>
@@ -20,7 +21,7 @@
       <Button Content="Add flag" Command="{Binding AddFlagCommand}" MinWidth="120" HorizontalAlignment="Left"/>
     </StackPanel>
 
-    <Grid Grid.Row="1" ColumnDefinitions="220,*" ColumnSpacing="16">
+    <Grid Grid.Row="1" ColumnDefinitions="220,*">
       <Border Padding="16" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="12">
         <StackPanel Spacing="12">
           <TextBlock Text="Filters" FontSize="18" FontWeight="SemiBold"/>
@@ -28,8 +29,8 @@
             <TextBlock Text="Category" FontWeight="SemiBold"/>
             <ComboBox ItemsSource="{Binding Categories}"
                       SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
-                      Watermark="All categories"
-                      IsEditable="False"/>
+                     
+                     />
           </StackPanel>
           <StackPanel Spacing="6">
             <TextBlock Text="Search" FontWeight="SemiBold"/>
@@ -46,44 +47,42 @@
       </Border>
 
       <Border Grid.Column="1" Padding="16" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="12">
-        <Grid RowDefinitions="*,Auto" RowSpacing="12">
-          <DataGrid ItemsSource="{Binding FilteredFlags}"
+        <Grid RowDefinitions="*,Auto">
+          <dataGrid:DataGrid ItemsSource="{Binding FilteredFlags}"
                     SelectedItem="{Binding SelectedFlag, Mode=TwoWay}"
                     AutoGenerateColumns="False"
                     GridLinesVisibility="Horizontal"
                     HeadersVisibility="Column"
-                    CanUserAddRows="False"
-                    CanUserDeleteRows="False"
                     RowHeight="44">
-            <DataGrid.Columns>
-              <DataGridTemplateColumn Header="" Width="48">
-                <DataGridTemplateColumn.CellTemplate>
+            <dataGrid:DataGrid.Columns>
+              <dataGrid:DataGridTemplateColumn Header="" Width="48">
+                <dataGrid:DataGridTemplateColumn.CellTemplate>
                   <DataTemplate x:DataType="vm:FlagEntryViewModel">
                     <Border Width="20" Height="20" CornerRadius="10" Background="{Binding Color}" HorizontalAlignment="Center"/>
                   </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTextColumn Header="Label" Binding="{Binding Label}" Width="2*"/>
-              <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="*"/>
-              <DataGridTemplateColumn Header="Location" Width="1.4*">
-                <DataGridTemplateColumn.CellTemplate>
+                </dataGrid:DataGridTemplateColumn.CellTemplate>
+              </dataGrid:DataGridTemplateColumn>
+              <dataGrid:DataGridTextColumn Header="Label" Binding="{Binding Label}" Width="2*"/>
+              <dataGrid:DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="*"/>
+              <dataGrid:DataGridTemplateColumn Header="Location" Width="1.4*">
+                <dataGrid:DataGridTemplateColumn.CellTemplate>
                   <DataTemplate x:DataType="vm:FlagEntryViewModel">
                     <StackPanel>
                       <TextBlock Text="{Binding Coordinate}" FontFamily="Consolas, Courier New, monospace" FontSize="12"/>
                       <TextBlock Text="{Binding Notes}" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                   </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTemplateColumn Header="Active" Width="80">
-                <DataGridTemplateColumn.CellTemplate>
+                </dataGrid:DataGridTemplateColumn.CellTemplate>
+              </dataGrid:DataGridTemplateColumn>
+              <dataGrid:DataGridTemplateColumn Header="Active" Width="80">
+                <dataGrid:DataGridTemplateColumn.CellTemplate>
                   <DataTemplate x:DataType="vm:FlagEntryViewModel">
                     <ToggleSwitch IsChecked="{Binding IsActive, Mode=TwoWay}" HorizontalAlignment="Center"/>
                   </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-            </DataGrid.Columns>
-          </DataGrid>
+                </dataGrid:DataGridTemplateColumn.CellTemplate>
+              </dataGrid:DataGridTemplateColumn>
+            </dataGrid:DataGrid.Columns>
+          </dataGrid:DataGrid>
 
           <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
             <Button Content="Jump to" Command="{Binding JumpToSelectedCommand}" MinWidth="100"/>

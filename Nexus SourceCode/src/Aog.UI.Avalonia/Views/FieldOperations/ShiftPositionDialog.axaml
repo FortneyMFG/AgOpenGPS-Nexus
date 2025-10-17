@@ -12,17 +12,17 @@
         MinWidth="460"
         MinHeight="360"
         mc:Ignorable="d">
-  <Grid Margin="20" RowDefinitions="Auto,*" RowSpacing="16">
+  <Grid Margin="20" RowDefinitions="Auto,*">
     <StackPanel>
       <TextBlock Text="Shift position" FontSize="24" FontWeight="Bold"/>
       <TextBlock Text="Manually offset the vehicle pose for alignment checks." Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
     </StackPanel>
 
-    <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="16">
+    <Grid Grid.Row="1" ColumnDefinitions="*,*">
       <Border Padding="16" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="12">
         <StackPanel Spacing="12">
           <TextBlock Text="Offsets" FontSize="18" FontWeight="SemiBold"/>
-          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="10">
+          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
             <TextBlock Grid.Row="0" Grid.Column="0" Text="East (m)" VerticalAlignment="Center"/>
             <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding OffsetEastMeters, Mode=TwoWay}" Increment="0.05" FormatString="F2"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Text="North (m)" VerticalAlignment="Center"/>
@@ -57,7 +57,7 @@
       <Border Grid.Column="1" Padding="16" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="12">
         <StackPanel Spacing="12">
           <TextBlock Text="Last applied" FontSize="18" FontWeight="SemiBold"/>
-          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
             <TextBlock Grid.Row="0" Grid.Column="0" Text="East (m)" FontWeight="SemiBold"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding AppliedEastMeters, StringFormat={}{0:F2}}"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Text="North (m)" FontWeight="SemiBold"/>

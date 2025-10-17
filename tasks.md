@@ -259,6 +259,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-416 Diagnostics & AgIO workspace port _(Done)_ — Aligns with artifacts/ui-core-spec.md
 - [x] NX-417 Simulation shell + companion parity automation _(Done)_ — Aligns with docs/reference/metadata-driven-ui-style-guide.md
 - [x] NX-418 Documentation, QA, and release readiness _(Done)_ — Aligns with artifacts/ui-screenshots/README.md
+- [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
 
 ### Section F — Porting from V6 (Algorithms)
 - [x] NX-050 V6 math inventory

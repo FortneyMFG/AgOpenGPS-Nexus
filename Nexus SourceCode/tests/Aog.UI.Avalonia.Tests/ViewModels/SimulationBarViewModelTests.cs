@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
 using Aog.UI.Avalonia.ViewModels;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Aog.UI.Avalonia.Tests.ViewModels;
@@ -151,6 +153,42 @@ public sealed class SimulationBarViewModelTests
         }
     }
 
+    [Fact]
+    public async Task TogglePlaybackCommand_WhenReplayControllerFails_LogsError()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        var logger = new TestLogger<SimulationBarViewModel>();
+        var replayController = new ReplayControllerStub(
+            playAsync: () => ValueTask.FromException(new InvalidOperationException("play failed")));
+
+        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+
+        viewModel.TogglePlaybackCommand.Execute(null);
+
+        await WaitForLogAsync(logger);
+
+        logger.Entries.Should().Contain(
+            entry => entry.Level == LogLevel.Error && entry.Message.Contains("start playback", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task SeekFraction_WhenReplayControllerFails_LogsError()
+    {
+        var configuration = CreateConfigurationWithScenario();
+        var logger = new TestLogger<SimulationBarViewModel>();
+        var replayController = new ReplayControllerStub(
+            seekAsync: _ => new ValueTask(Task.Run(() => throw new InvalidOperationException("seek failed"))));
+
+        using var viewModel = new SimulationBarViewModel(configuration, replayController, logger);
+
+        viewModel.SeekFraction = 0.5;
+
+        await WaitForLogAsync(logger);
+
+        logger.Entries.Should().Contain(
+            entry => entry.Level == LogLevel.Error && entry.Message.Contains("seek to", StringComparison.OrdinalIgnoreCase));
+    }
+
     private static SimulationBarViewModel CreateViewModel()
     {
         const string json = """
@@ -206,12 +244,28 @@ public sealed class SimulationBarViewModelTests
     private sealed class ReplayControllerStub : IReplayController
     {
         private EventHandler<ReplayStateChangedEventArgs>? _stateChanged;
+        private readonly Func<ValueTask>? _playAsync;
+        private readonly Func<ValueTask>? _pauseAsync;
+        private readonly Func<TimeSpan, ValueTask>? _seekAsync;
+        private readonly Func<double, ValueTask>? _setPlaybackRateAsync;
 
         public int SubscriptionCount { get; private set; }
 
         public int HandlerInvocationCount { get; private set; }
 
         public ReplayState State { get; private set; } = new(false, TimeSpan.Zero, TimeSpan.FromMinutes(5), 1.0);
+
+        public ReplayControllerStub(
+            Func<ValueTask>? playAsync = null,
+            Func<ValueTask>? pauseAsync = null,
+            Func<TimeSpan, ValueTask>? seekAsync = null,
+            Func<double, ValueTask>? setPlaybackRateAsync = null)
+        {
+            _playAsync = playAsync;
+            _pauseAsync = pauseAsync;
+            _seekAsync = seekAsync;
+            _setPlaybackRateAsync = setPlaybackRateAsync;
+        }
 
         public event EventHandler<ReplayStateChangedEventArgs>? StateChanged
         {
@@ -227,18 +281,46 @@ public sealed class SimulationBarViewModelTests
             }
         }
 
-        public ValueTask PlayAsync(CancellationToken cancellationToken = default) => ValueTask.CompletedTask;
+        public ValueTask PlayAsync(CancellationToken cancellationToken = default)
+        {
+            if (_playAsync is not null)
+            {
+                return _playAsync();
+            }
 
-        public ValueTask PauseAsync(CancellationToken cancellationToken = default) => ValueTask.CompletedTask;
+            State = State with { IsPlaying = true };
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask PauseAsync(CancellationToken cancellationToken = default)
+        {
+            if (_pauseAsync is not null)
+            {
+                return _pauseAsync();
+            }
+
+            State = State with { IsPlaying = false };
+            return ValueTask.CompletedTask;
+        }
 
         public ValueTask SeekAsync(TimeSpan position, CancellationToken cancellationToken = default)
         {
+            if (_seekAsync is not null)
+            {
+                return _seekAsync(position);
+            }
+
             State = State with { Position = position };
             return ValueTask.CompletedTask;
         }
 
         public ValueTask SetPlaybackRateAsync(double playbackRate, CancellationToken cancellationToken = default)
         {
+            if (_setPlaybackRateAsync is not null)
+            {
+                return _setPlaybackRateAsync(playbackRate);
+            }
+
             State = State with { PlaybackRate = playbackRate };
             return ValueTask.CompletedTask;
         }
@@ -256,6 +338,47 @@ public sealed class SimulationBarViewModelTests
 
             HandlerInvocationCount += handlers.GetInvocationList().Length;
             handlers.Invoke(this, new ReplayStateChangedEventArgs(state));
+        }
+    }
+
+    private static async Task WaitForLogAsync(TestLogger<SimulationBarViewModel> logger)
+    {
+        for (var attempt = 0; attempt < 10 && !logger.HasEntries; attempt++)
+        {
+            await Task.Delay(10);
+        }
+    }
+
+    private sealed class TestLogger<T> : ILogger<T>
+    {
+        private sealed class NullScope : IDisposable
+        {
+            public static readonly NullScope Instance = new();
+
+            public void Dispose()
+            {
+            }
+        }
+
+        private readonly ConcurrentQueue<(LogLevel Level, string Message)> _entries = new();
+
+        public IReadOnlyCollection<(LogLevel Level, string Message)> Entries => _entries.ToArray();
+
+        public bool HasEntries => !_entries.IsEmpty;
+
+        public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            if (formatter is null)
+            {
+                throw new ArgumentNullException(nameof(formatter));
+            }
+
+            var message = formatter(state, exception);
+            _entries.Enqueue((logLevel, message));
         }
     }
 }

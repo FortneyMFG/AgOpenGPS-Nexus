@@ -148,9 +148,28 @@ needed:
 
 | Subsystem | Default behavior | How to tweak or disable |
 | --- | --- | --- |
-| Serial NMEA auto-scanner | Enumerates `/dev/ttyUSB*`, `/dev/ttyACM*`, `/dev/ttyAMA*`, `/dev/ttyS*`, and `/dev/serial/by-id/` to locate GNSS receivers, then publishes the first stream that emits GGA/RMC/VTG sentences.【F:Nexus SourceCode/src/Aog.Agio.Linux/Serial/LinuxSerialPortEnumerator.cs†L17-L89】【F:Nexus SourceCode/src/Aog.Agio/Serial/NmeaAutoScanner.cs†L18-L118】 | Set `AgioHost:Linux:Serial:DevicePrefixes` to a narrower list (or an empty array) in `/etc/aog/agio/appsettings.json` or via `NEXUS_AGIOHOST__LINUX__SERIAL__DEVICEPREFIXES__0=...` overrides to skip specific ports.【F:Nexus SourceCode/src/Aog.Agio.Linux/Serial/LinuxSerialPortEnumeratorOptions.cs†L10-L37】 |
+| Serial NMEA auto-scanner | Enumerates `/dev/ttyUSB*`, `/dev/ttyACM*`, `/dev/ttyAMA*`, `/dev/ttyS*`, and `/dev/serial/by-id/` to locate GNSS receivers, then publishes the first stream that emits GGA/RMC/VTG sentences.【F:Nexus SourceCode/src/Aog.Agio.Linux/Serial/LinuxSerialPortEnumerator.cs†L17-L89】【F:Nexus SourceCode/src/Aog.Agio/Serial/NmeaAutoScanner.cs†L18-L118】 | Set `AgioHost:Linux:Serial:DevicePrefixes` to a narrower list (or an empty array) in `/etc/aog/agio/appsettings.json` or via `NEXUS_AGIOHOST__LINUX__SERIAL__DEVICEPREFIXES__0=...` overrides to skip specific ports, and use `AgioHost:Linux:Serial:Scan` to tune probe timing (`ProbeDuration`, `ReadTimeout`) and baud rate attempts (`BaudRates`, `MaxReadAttemptsPerPort`).【F:Nexus SourceCode/src/Aog.Agio.Linux/Serial/LinuxSerialPortEnumeratorOptions.cs†L10-L37】【F:Nexus SourceCode/src/Aog.Agio/Serial/NmeaSerialPortScanOptions.cs†L8-L44】 |
 | gpsd monitor | Connects to `/var/run/gpsd.sock`, logs TPV updates, and retries when the daemon is unavailable.【F:Nexus SourceCode/src/Aog.Agio.Linux/Gpsd/GpsdBackgroundService.cs†L27-L98】 | Leave the socket blank by exporting `NEXUS_AGIOHOST__LINUX__GPSD__SOCKETPATH=` (or setting the value to `null`/`""` in appsettings) to disable the worker entirely.【F:Nexus SourceCode/src/Aog.Agio.Linux/Gpsd/GpsdClientOptions.cs†L8-L36】 |
 | SocketCAN bridge | Opens `can0` (or another configured interface), republishes frames over gRPC, and exposes them through the `SocketCanBusService` stream.【F:Nexus SourceCode/src/Aog.Agio.Linux/SocketCan/SocketCanBackgroundService.cs†L19-L122】【F:Nexus SourceCode/src/Aog.Agio.Linux/SocketCan/SocketCanBusService.cs†L14-L84】 | Point `AgioHost:Linux:SocketCan:InterfaceName` at `vcan0`/`can1`, or set it to an empty string to pause the monitor until a non-empty value is provided.【F:Nexus SourceCode/src/Aog.Agio.Linux/SocketCan/SocketCanOptions.cs†L21-L70】 |
+
+Sample JSON for slowing the scan while trying only two baud rates:
+
+```json
+{
+  "AgioHost": {
+    "Linux": {
+      "Serial": {
+        "Scan": {
+          "ProbeDuration": "00:00:10",
+          "ReadTimeout": "00:00:02",
+          "BaudRates": [9600, 115200],
+          "MaxReadAttemptsPerPort": 5
+        }
+      }
+    }
+  }
+}
+```
 
 If you need the legacy single-port serial backend, pass explicit arguments instead of
 selecting the Linux bundle:

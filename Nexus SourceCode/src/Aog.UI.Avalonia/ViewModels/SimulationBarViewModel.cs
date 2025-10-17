@@ -445,7 +445,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
     private static string FormatPlaybackRateLabel(double rate)
     {
-        return FormattableString.Invariant($"{rate:0.##}×");
+        return string.Format(CultureInfo.CurrentUICulture, "{0:0.##}×", rate);
     }
 
     private static string DescribeOptions(SimulationOptionsConfiguration? options)

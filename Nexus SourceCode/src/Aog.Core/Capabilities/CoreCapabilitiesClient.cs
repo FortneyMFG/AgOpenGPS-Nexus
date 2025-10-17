@@ -11,6 +11,10 @@ public sealed class CoreCapabilitiesClient
 {
     private readonly CapabilityDescriptorFactory _factory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CoreCapabilitiesClient"/> class.
+    /// </summary>
+    /// <param name="factory">Factory used to materialize capability descriptors for handshake messages.</param>
     public CoreCapabilitiesClient(CapabilityDescriptorFactory factory)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
@@ -19,6 +23,10 @@ public sealed class CoreCapabilitiesClient
     /// <summary>
     /// Creates a handshake request that advertises the provided capabilities.
     /// </summary>
+    /// <param name="nodeId">Identifier assigned to the node emitting the handshake.</param>
+    /// <param name="capabilityNames">Canonical capability names that should be advertised to the Core host.</param>
+    /// <param name="sessionId">Identifier tying the handshake to the active session.</param>
+    /// <returns>A populated handshake request ready to dispatch to the Core host.</returns>
     public HandshakeRequest BuildHandshake(string nodeId, IEnumerable<string> capabilityNames, string sessionId)
     {
         if (string.IsNullOrWhiteSpace(nodeId))
@@ -59,6 +67,12 @@ public sealed class CapabilityDescriptorFactory
     private readonly string? _defaultSummary;
     private readonly IReadOnlyDictionary<string, string> _defaultAttributes;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CapabilityDescriptorFactory"/> class.
+    /// </summary>
+    /// <param name="defaultVersion">Fallback version applied when a capability definition omits one.</param>
+    /// <param name="defaultSummary">Fallback summary applied when a capability definition omits one.</param>
+    /// <param name="defaultAttributes">Fallback attribute set merged into each generated descriptor.</param>
     public CapabilityDescriptorFactory(
         string? defaultVersion = null,
         string? defaultSummary = null,
@@ -73,6 +87,8 @@ public sealed class CapabilityDescriptorFactory
     /// Generates descriptors for the provided capability names, skipping empty entries
     /// and de-duplicating on the canonical name.
     /// </summary>
+    /// <param name="capabilityNames">Capability names requested by the caller.</param>
+    /// <returns>An ordered sequence of capability descriptors suitable for publishing in a handshake.</returns>
     public IEnumerable<CapabilityDescriptor> Create(IEnumerable<string> capabilityNames)
     {
         if (capabilityNames is null)

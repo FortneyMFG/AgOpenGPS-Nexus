@@ -738,6 +738,15 @@
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- Layout diff viewer -->
+          <Border Padding="16" CornerRadius="12"
+                  Background="{DynamicResource ThemeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  BorderThickness="1"
                   DataContext="{Binding LayoutDiff}"
                   x:DataType="vm:LayoutDiffViewModel">
             <StackPanel Spacing="12">

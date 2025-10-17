@@ -44,11 +44,11 @@ public sealed class GpsdBackgroundService : BackgroundService
             {
                 await foreach (var report in _client.WatchAsync(stoppingToken).WithCancellation(stoppingToken))
                 {
-                    var latitude = FormatNullable(report.LatitudeDegrees, "F6");
-                    var longitude = FormatNullable(report.LongitudeDegrees, "F6");
-                    var altitude = FormatNullable(report.AltitudeMeters, "F1");
-                    var speed = FormatNullable(report.SpeedMetersPerSecond, "F2");
-                    var track = FormatNullable(report.TrackDegrees, "F1");
+                    var latitude = report.LatitudeDegrees?.ToString("F6", CultureInfo.InvariantCulture) ?? "n/a";
+                    var longitude = report.LongitudeDegrees?.ToString("F6", CultureInfo.InvariantCulture) ?? "n/a";
+                    var altitude = report.AltitudeMeters?.ToString("F1", CultureInfo.InvariantCulture) ?? "n/a";
+                    var speed = report.SpeedMetersPerSecond?.ToString("F2", CultureInfo.InvariantCulture) ?? "n/a";
+                    var track = report.TrackDegrees?.ToString("F1", CultureInfo.InvariantCulture) ?? "n/a";
                     var timestamp = report.Timestamp?.ToString("o", CultureInfo.InvariantCulture) ?? "n/a";
 
                     _logger.LogInformation(
@@ -89,11 +89,5 @@ public sealed class GpsdBackgroundService : BackgroundService
                 break;
             }
         }
-    }
-    private static string FormatNullable(double? value, string format)
-    {
-        return value.HasValue
-            ? value.Value.ToString(format, CultureInfo.InvariantCulture)
-            : "n/a";
     }
 }

@@ -1,6 +1,10 @@
+using System.Reflection;
 using Aog.Agio.Linux.Gpsd;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Aog.Agio.Linux.Tests;
 
@@ -39,6 +43,40 @@ public sealed class GpsdClientTests
         Assert.Equal(3, reports[0].Mode);
         Assert.Equal(2, reports[1].Mode);
         Assert.Contains(GpsdClientTestHelpers.WatchCommand, factory.WrittenLines);
+    }
+
+    [Fact]
+    public async Task BackgroundService_Continues_WhenSpeedAndTrackMissing()
+    {
+        var feed = new[]
+        {
+            "{\"class\":\"VERSION\",\"release\":\"3.23\"}",
+            "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
+            "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1173,\"lon\":11.5167,\"alt\":545.4}",
+            "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1174,\"lon\":11.5168,\"alt\":545.4,\"speed\":0.514,\"track\":84.4}",
+        };
+
+        var factory = new FakeGpsdConnectionFactory(feed);
+        var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
+        var options = Options.Create(new GpsdClientOptions
+        {
+            SocketPath = "/tmp/gpsd.sock",
+            ReconnectDelay = TimeSpan.FromSeconds(1),
+        });
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+        var logger = new ThrowingLogger<GpsdBackgroundService>();
+        var service = new GpsdBackgroundService(client, logger, options);
+
+        var executeAsync = typeof(GpsdBackgroundService).GetMethod(
+            "ExecuteAsync",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(executeAsync);
+
+        var task = (Task)executeAsync!.Invoke(service, new object[] { cts.Token })!;
+        await task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.Contains("?WATCH={\"enable\":true,\"json\":true}", factory.WrittenLines);
     }
 
     [Fact]
@@ -190,5 +228,30 @@ public sealed class GpsdClientTests
         public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
         public override void SetLength(long value) => throw new NotSupportedException();
+    }
+
+    private sealed class ThrowingLogger<T> : ILogger<T>
+    {
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+            where TState : notnull
+        {
+            if (logLevel >= LogLevel.Error)
+            {
+                throw new XunitException($"Unexpected {logLevel} log: {formatter(state, exception)}");
+            }
+        }
+
+        private sealed class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new();
+
+            public void Dispose()
+            {
+            }
+        }
     }
 }

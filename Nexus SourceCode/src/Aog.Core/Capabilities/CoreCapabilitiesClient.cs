@@ -40,7 +40,7 @@ public sealed class CoreCapabilitiesClient
         {
             SessionId = sessionId,
             NodeId = nodeId,
-            Role = CapabilityRole.CapabilityRoleCore
+            Role = CapabilityRole.Core
         };
 
         var descriptors = _factory.Create(capabilityNames);

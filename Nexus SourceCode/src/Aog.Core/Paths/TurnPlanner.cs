@@ -156,17 +156,17 @@ public sealed class TurnPlanner
         var localPoints = new List<(double X, double Y)> { (0, 0) };
         AddLinearSegment(localPoints, (leadIn, 0), sampleSpacing);
 
-        var arc1Center = (leadIn, turnSign * radius);
+        var arc1Center = (X: leadIn, Y: turnSign * radius);
         AddArcSegment(localPoints, arc1Center, radius, turnSign * Math.PI / 2, sampleSpacing);
 
         var straightTargetY = turnSign * (laneSpacing - radius);
-        var straightEnd = (leadIn - turnSign * radius, straightTargetY);
+        var straightEnd = (X: leadIn - turnSign * radius, Y: straightTargetY);
         AddLinearSegment(localPoints, straightEnd, sampleSpacing);
 
-        var arc2Center = (straightEnd.Item1 - turnSign * radius, straightEnd.Item2);
+        var arc2Center = (X: straightEnd.X - turnSign * radius, Y: straightEnd.Y);
         AddArcSegment(localPoints, arc2Center, radius, turnSign * Math.PI / 2, sampleSpacing);
 
-        var targetLocal = (targetLocalX, turnSign * laneSpacing);
+        var targetLocal = (X: targetLocalX, Y: turnSign * laneSpacing);
         AddLinearSegment(localPoints, targetLocal, sampleSpacing);
 
         if (_settings.ExitExtensionMeters > 1e-6)
@@ -176,8 +176,8 @@ public sealed class TurnPlanner
                 PlanarVector.Dot(targetHeading, leftNormal));
 
             var exitEnd = (
-                targetLocal.X + targetHeadingLocal.X * _settings.ExitExtensionMeters,
-                targetLocal.Y + targetHeadingLocal.Y * _settings.ExitExtensionMeters);
+                X: targetLocal.X + targetHeadingLocal.X * _settings.ExitExtensionMeters,
+                Y: targetLocal.Y + targetHeadingLocal.Y * _settings.ExitExtensionMeters);
             AddLinearSegment(localPoints, exitEnd, sampleSpacing);
         }
 

@@ -233,7 +233,12 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                 bufferSize: 4096,
                 FileOptions.Asynchronous | FileOptions.SequentialScan);
 
-            var writer = await ParquetWriter.CreateAsync(schema, stream).ConfigureAwait(false);
+            var writer = await ParquetWriter.CreateAsync(
+                schema,
+                stream,
+                formatOptions: null,
+                append: false,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
             return new ParquetTopicWriter<T>(columnFactory, stream, writer);
         }
 
@@ -246,7 +251,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
                 using var rowGroup = _writer.CreateRowGroup();
                 foreach (var column in _columnFactory(message))
                 {
-                    rowGroup.WriteColumn(column);
+                    await rowGroup.WriteColumnAsync(column, cancellationToken).ConfigureAwait(false);
                 }
             }
             finally
@@ -285,7 +290,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         internal static class Pose
         {
             public static readonly DataField<ulong> Sequence = new("sequence");
-            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, isAdjustedToUTC: true, isNullable: true);
             public static readonly DataField<string?> Frame = new("frame");
             public static readonly DataField<string?> Source = new("source");
             public static readonly DataField<string?> JobId = new("job_id");
@@ -320,7 +325,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         internal static class Imu
         {
             public static readonly DataField<ulong> Sequence = new("sequence");
-            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, isAdjustedToUTC: true, isNullable: true);
             public static readonly DataField<string?> Frame = new("frame");
             public static readonly DataField<string?> Source = new("source");
             public static readonly DataField<string?> JobId = new("job_id");
@@ -359,7 +364,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         internal static class Can
         {
             public static readonly DataField<ulong> Sequence = new("sequence");
-            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, isAdjustedToUTC: true, isNullable: true);
             public static readonly DataField<string?> Frame = new("frame");
             public static readonly DataField<string?> Source = new("source");
             public static readonly DataField<string?> JobId = new("job_id");
@@ -386,7 +391,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         internal static class Io
         {
             public static readonly DataField<ulong> Sequence = new("sequence");
-            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, isAdjustedToUTC: true, isNullable: true);
             public static readonly DataField<string?> Frame = new("frame");
             public static readonly DataField<string?> Source = new("source");
             public static readonly DataField<string?> JobId = new("job_id");
@@ -409,7 +414,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
         internal static class Plugin
         {
             public static readonly DataField<ulong> Sequence = new("sequence");
-            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+            public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, isAdjustedToUTC: true, isNullable: true);
             public static readonly DataField<string?> Source = new("source");
             public static readonly DataField<string?> JobId = new("job_id");
             public static readonly DataField<string?> SeasonId = new("season_id");
@@ -438,7 +443,7 @@ public sealed class TelemetryParquetLogger : IAsyncDisposable
             public static readonly DataField<string> JobId = new("job_id");
             public static readonly DataField<string> LayerNamespace = new("layer_namespace");
             public static readonly DataField<string> Tier = new("tier");
-            public static readonly DateTimeDataField PublishedAt = new("published_at_utc", DateTimeFormat.DateAndTime);
+            public static readonly DateTimeDataField PublishedAt = new("published_at_utc", DateTimeFormat.DateAndTime, isAdjustedToUTC: true);
             public static readonly DataField<byte[]?> Payload = new("payload");
             public static readonly DataField<string?> MetadataJson = new("metadata_json");
             public static readonly DataField<string?> PresenceJson = new("presence_json");

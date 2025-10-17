@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Aog.Tools.LegacyDataMigrator;
 using FluentAssertions;
@@ -50,8 +51,8 @@ public sealed class LegacyDataMigratorTests
             using var rowGroup = reader.OpenRowGroupReader(0);
             var latitudeField = (DataField<double>)schema.DataFields.Single(f => f.Name == "latitude_deg");
             var speedField = (DataField<double>)schema.DataFields.Single(f => f.Name == "speed_mps");
-            var latitudes = (double[])rowGroup.ReadColumn(latitudeField).Data;
-            var speeds = (double[])rowGroup.ReadColumn(speedField).Data;
+            var latitudes = (double[])ReadColumn(rowGroup, latitudeField);
+            var speeds = (double[])ReadColumn(rowGroup, speedField);
 
             latitudes.Should().ContainInOrder(45.123, 45.124);
             speeds.Should().Contain(new[] { 5.5, 5.6 });
@@ -64,7 +65,7 @@ public sealed class LegacyDataMigratorTests
             var schema = reader.Schema;
             using var rowGroup = reader.OpenRowGroupReader(0);
             var payloadField = (DataField<byte[]?>)schema.DataFields.Single(f => f.Name == "payload");
-            var payloads = (byte[]?[])rowGroup.ReadColumn(payloadField).Data;
+            var payloads = (byte[]?[])ReadColumn(rowGroup, payloadField);
             payloads.Should().HaveCount(1);
             payloads[0].Should().BeEquivalentTo(new byte[] { 0x0A, 0xFF });
         }
@@ -78,8 +79,8 @@ public sealed class LegacyDataMigratorTests
             using var rowGroup = reader.OpenRowGroupReader(0);
             var temperatureField = (DataField<double?>)schema.DataFields.Single(f => f.Name == "temperature_c");
             var rainfallField = (DataField<double?>)schema.DataFields.Single(f => f.Name == "rainfall_mm");
-            var temperatures = (double?[])rowGroup.ReadColumn(temperatureField).Data;
-            var rainfall = (double?[])rowGroup.ReadColumn(rainfallField).Data;
+            var temperatures = (double?[])ReadColumn(rowGroup, temperatureField);
+            var rainfall = (double?[])ReadColumn(rowGroup, rainfallField);
 
             temperatures.Should().Equal(new double?[] { 12.5, 13.1 });
             rainfall.Should().Equal(new double?[] { 0.3, 0.8 });
@@ -175,10 +176,20 @@ public sealed class LegacyDataMigratorTests
     private static ParquetReader OpenReader(string path)
     {
         return ParquetReader
-            .CreateAsync(path)
+            .CreateAsync(path, parquetOptions: null, cancellationToken: CancellationToken.None)
             .ConfigureAwait(false)
             .GetAwaiter()
             .GetResult();
+    }
+
+    private static Array ReadColumn(ParquetRowGroupReader rowGroup, DataField field)
+    {
+        return rowGroup
+            .ReadColumnAsync(field, CancellationToken.None)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult()
+            .Data;
     }
 
     private sealed class TempDirectory : IDisposable

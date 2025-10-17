@@ -10,7 +10,7 @@
                 Command="{Binding Command}"
                 IsEnabled="{Binding IsEnabled}">
         <MenuItem.ToolTip>
-          <ToolTip Content="{Binding Description}"/>
+          <ToolTip Content="{Binding Tooltip}"/>
         </MenuItem.ToolTip>
       </MenuItem>
     </HierarchicalDataTemplate>

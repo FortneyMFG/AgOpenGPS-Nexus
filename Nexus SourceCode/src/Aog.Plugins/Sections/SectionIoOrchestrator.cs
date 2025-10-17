@@ -81,6 +81,7 @@ public sealed class SectionIoOrchestrator
             {
                 mask = 0;
             }
+        }
 
         uint? previousMask = null;
         var maskUpdated = false;

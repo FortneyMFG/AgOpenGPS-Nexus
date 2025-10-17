@@ -14,6 +14,7 @@
 - [ADR-049 — Yield & Analytics Plugin](ADR/ADR-049_YieldPlugin.md)
 - [ADR-050 — Cost & Profit Plugin](ADR/ADR-050_CostProfitPlugin.md)
 - [ADR-051 — Report Builder & Export System](ADR/ADR-051_ReportBuilder.md)
+- [ADR-069 — Guidance Orchestrator plugin](ADR/ADR-069_GuidanceOrchestrator.md)
 
 ## System Requirements Specification
 
@@ -23,6 +24,17 @@
 - [§04 Mapping & Layer Governance](SRS/sections/04_MappingLayers.md)
 - [§05 Frontends](SRS/sections/05_Frontends.md)
 - [§09 Control & Automation](SRS/sections/09_Control_Automation.md)
+- [§19 Guidance Orchestrator Plugin](SRS/sections/19_Guidance_Orchestrator.md)
+
+## Guidance Orchestrator Delivery
+
+- [01 — Live Field Builder](guidance/01_live-field-builder.md)
+- [02 — Fields2Cover Planner Integration](guidance/02_fields2cover-orchestrator.md)
+- [03 — Path Catalog & Sequencer](guidance/03_path-catalog-and-sequencer.md)
+- [04 — Execution & Autosteer Contracts](guidance/04_execution-and-autosteer-contracts.md)
+- [05 — Refresh Policies & Hysteresis](guidance/05_refresh-policies-and-hysteresis.md)
+- [06 — Observability & Telemetry](guidance/06_observability-telemetry.md)
+- [99 — Glossary](guidance/99_glossary.md)
 
 ## Plugin Guides
 

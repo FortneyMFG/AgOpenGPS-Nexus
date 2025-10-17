@@ -1560,7 +1560,7 @@
                                    FontSize="11"
                                    Foreground="{DynamicResource ThemeForegroundLowBrush}"
                                    TextWrapping="Wrap"/>
-                        <ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" Height="6"/>
+                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding ExportProgressPercent}" Height="6"/>
                         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                           <TextBlock Text="{Binding StatusDisplay}"/>
                           <TextBlock Text="{Binding LastRunDisplay, StringFormat=Last run: {0}}"

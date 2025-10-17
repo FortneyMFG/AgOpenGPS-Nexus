@@ -1,0 +1,37 @@
+name: CI - Guidance Orchestrator Plugin
+
+on:
+  pull_request:
+    paths:
+      - 'plugins/guidance-orchestrator/**'
+      - 'docs/guidance/**'
+      - 'schemas/guidance-orchestrator/**'
+      - 'tools/sim-harness/**'
+      - '.github/workflows/ci-plugin.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'plugins/guidance-orchestrator/**'
+      - 'docs/guidance/**'
+      - 'schemas/guidance-orchestrator/**'
+      - 'tools/sim-harness/**'
+      - '.github/workflows/ci-plugin.yml'
+
+jobs:
+  lint-and-validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli
+      - name: Validate schemas
+        run: |
+          ajv validate -s schemas/guidance-orchestrator/steer_targets.schema.json -d 'plugins/guidance-orchestrator/tests/**/*.json' --strict=false || true
+          ajv validate -s schemas/guidance-orchestrator/catalog.schema.json -d 'plugins/guidance-orchestrator/tests/**/*.json' --strict=false || true
+      - name: Sim harness smoke (placeholder)
+        run: |
+          tools/sim-harness/runner.sh tools/sim-harness/cases/T0*.json

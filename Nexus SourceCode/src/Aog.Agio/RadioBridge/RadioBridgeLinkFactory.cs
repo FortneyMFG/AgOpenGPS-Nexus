@@ -1,8 +1,8 @@
 using System.Buffers.Binary;
-using System.IO;
 using System.IO.Ports;
 using System.Threading.Channels;
-using Aog.Core.Mesh.RadioBridge;
+
+using RadioBridgeLinkMetrics = Aog.Core.Mesh.RadioBridge.RadioBridgeLinkMetrics;
 
 namespace Aog.Agio.RadioBridge;
 
@@ -200,7 +200,7 @@ public sealed class RadioBridgeLinkFactory : IRadioBridgeLinkFactory
             }
         }
 
-        private static async Task ReadExactAsync(Stream stream, Memory<byte> buffer, CancellationToken cancellationToken)
+        private static async Task ReadExactAsync(System.IO.Stream stream, Memory<byte> buffer, CancellationToken cancellationToken)
         {
             var remaining = buffer.Length;
             var offset = 0;
@@ -209,7 +209,7 @@ public sealed class RadioBridgeLinkFactory : IRadioBridgeLinkFactory
                 var read = await stream.ReadAsync(buffer.Slice(offset, remaining), cancellationToken).ConfigureAwait(false);
                 if (read == 0)
                 {
-                    throw new EndOfStreamException("Unexpected end of stream while reading radio frame.");
+                    throw new System.IO.EndOfStreamException("Unexpected end of stream while reading radio frame.");
                 }
 
                 remaining -= read;

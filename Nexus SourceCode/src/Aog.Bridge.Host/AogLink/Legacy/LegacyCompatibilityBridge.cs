@@ -82,7 +82,7 @@ public sealed class LegacyCompatibilityBridge
             envelope.Header = BuildCommandHeader(MessageType.LinkMessageTypeCommandSteer, steerCmd.CalculateSize(), needsAck: true);
             envelope.SteerCommand = steerCmd;
 
-            if (sectionMask.SectionCount > 0)
+            if (sectionMask.Mask != 0)
             {
                 StampHeader(sectionMask, "legacy/pgn/sections", "implement");
                 envelope.SectionMask = sectionMask;

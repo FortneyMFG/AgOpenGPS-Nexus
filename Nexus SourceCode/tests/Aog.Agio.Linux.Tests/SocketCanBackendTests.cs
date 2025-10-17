@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -73,6 +74,55 @@ public sealed class SocketCanBackendTests
     }
 
     [Fact]
+    public async Task BackgroundService_PublishesFrameImmediatelyAfterTimeout()
+    {
+        var client = new FakeSocketCanClient("vcan0", Array.Empty<SocketCANSharp.CanFrame>());
+        var factory = new FakeSocketCanClientFactory(client);
+        var channel = new SocketCanFrameChannel();
+        var options = Options.Create(new SocketCanOptions
+        {
+            InterfaceName = "vcan0",
+            ReceiveTimeout = TimeSpan.FromMilliseconds(200),
+            ReconnectDelay = TimeSpan.FromMilliseconds(10),
+        });
+
+        var service = new SocketCanBackgroundService(
+            factory,
+            channel,
+            options,
+            new FixedTimeProvider(new DateTimeOffset(2024, 01, 01, 12, 00, 00, TimeSpan.Zero)),
+            NullLogger<SocketCanBackgroundService>.Instance);
+
+        await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        using var readCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        await using var enumerator = channel.ReadAllAsync(readCts.Token).GetAsyncEnumerator();
+        var moveNextTask = enumerator.MoveNextAsync().AsTask();
+
+        await WaitForAsync(() => client.TimeoutCount > 0, TimeSpan.FromSeconds(1));
+
+        var frame = new SocketCANSharp.CanFrame(
+            SocketCanUtils.CreateCanIdWithFlags(0x456, isEff: false, isRtr: false, isErr: false),
+            new byte[] { 0x0A, 0x0B });
+
+        var stopwatch = Stopwatch.StartNew();
+        client.EnqueueFrame(frame);
+
+        Assert.True(await moveNextTask.ConfigureAwait(false));
+        stopwatch.Stop();
+
+        Assert.True(
+            stopwatch.Elapsed < TimeSpan.FromMilliseconds(100),
+            $"Frame was delayed by {stopwatch.Elapsed.TotalMilliseconds}ms");
+
+        var published = enumerator.Current;
+        Assert.Equal(0x456u, published.ArbitrationId);
+        Assert.Equal(new byte[] { 0x0A, 0x0B }, published.Payload.ToByteArray());
+
+        await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
+    }
+
+    [Fact]
     public async Task SocketCanBusService_ForwardsFramesToSubscribers()
     {
         var channel = new SocketCanFrameChannel();
@@ -121,25 +171,31 @@ public sealed class SocketCanBackendTests
 
     private sealed class FakeSocketCanClient : ISocketCanClient
     {
-        private readonly Queue<SocketCANSharp.CanFrame> _frames;
+        private readonly ConcurrentQueue<SocketCANSharp.CanFrame> _frames;
+        private int _timeoutCount;
 
         public FakeSocketCanClient(string interfaceName, IEnumerable<SocketCANSharp.CanFrame> frames)
         {
             InterfaceName = interfaceName;
-            _frames = new Queue<SocketCANSharp.CanFrame>(frames);
+            _frames = new ConcurrentQueue<SocketCANSharp.CanFrame>(frames);
         }
 
         public string InterfaceName { get; }
 
+        public int TimeoutCount => Volatile.Read(ref _timeoutCount);
+
+        public void EnqueueFrame(SocketCANSharp.CanFrame frame) => _frames.Enqueue(frame);
+
         public SocketCanFrameReadResult ReadFrame(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (_frames.Count == 0)
+            if (_frames.TryDequeue(out var frame))
             {
-                return SocketCanFrameReadResult.Timeout();
+                return SocketCanFrameReadResult.FromFrame(frame);
             }
 
-            return SocketCanFrameReadResult.FromFrame(_frames.Dequeue());
+            Interlocked.Increment(ref _timeoutCount);
+            return SocketCanFrameReadResult.Timeout();
         }
 
         public void Dispose()

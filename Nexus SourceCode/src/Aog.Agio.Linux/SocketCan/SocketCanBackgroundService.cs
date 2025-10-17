@@ -19,7 +19,7 @@ public sealed class SocketCanBackgroundService : BackgroundService
 {
     private readonly ISocketCanClientFactory _clientFactory;
     private readonly ISocketCanFramePublisher _publisher;
-    private readonly IOptions<SocketCanOptions> _options;
+    private readonly IOptionsMonitor<SocketCanOptions> _options;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<SocketCanBackgroundService> _logger;
     private long _sequence;
@@ -27,7 +27,7 @@ public sealed class SocketCanBackgroundService : BackgroundService
     public SocketCanBackgroundService(
         ISocketCanClientFactory clientFactory,
         ISocketCanFramePublisher publisher,
-        IOptions<SocketCanOptions> options,
+        IOptionsMonitor<SocketCanOptions> options,
         TimeProvider timeProvider,
         ILogger<SocketCanBackgroundService> logger)
     {
@@ -41,16 +41,25 @@ public sealed class SocketCanBackgroundService : BackgroundService
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var options = _options.Value ?? new SocketCanOptions();
-
         while (!stoppingToken.IsCancellationRequested)
         {
+            var options = SnapshotOptions(_options.CurrentValue);
             ISocketCanClient? client = null;
+            var reconfigured = false;
+            using var reconfigureCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+            using var changeRegistration = _options.OnChange((updated, _) =>
+            {
+                if (!stoppingToken.IsCancellationRequested && RequiresRestart(options, updated))
+                {
+                    reconfigured = true;
+                    reconfigureCts.Cancel();
+                }
+            });
             try
             {
-                client = await _clientFactory.CreateAsync(options, stoppingToken).ConfigureAwait(false);
+                client = await _clientFactory.CreateAsync(options, reconfigureCts.Token).ConfigureAwait(false);
                 _logger.LogInformation("SocketCAN interface {Interface} connected.", client.InterfaceName);
-                await PumpAsync(client, options, stoppingToken).ConfigureAwait(false);
+                await PumpAsync(client, options, reconfigureCts.Token).ConfigureAwait(false);
             }
             catch (SocketCanInterfaceNotFoundException ex) when (!stoppingToken.IsCancellationRequested)
             {
@@ -67,6 +76,13 @@ public sealed class SocketCanBackgroundService : BackgroundService
             {
                 break;
             }
+            catch (OperationCanceledException) when (reconfigureCts.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
+            {
+                reconfigured = true;
+                _logger.LogInformation(
+                    "SocketCAN options changed. Reconfiguring interface {Interface}.",
+                    options.InterfaceName);
+            }
             catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogError(ex, "Unexpected SocketCAN failure on {Interface}.", options.InterfaceName);
@@ -76,7 +92,11 @@ public sealed class SocketCanBackgroundService : BackgroundService
                 client?.Dispose();
             }
 
-            await DelayAsync(options.ReconnectDelay, stoppingToken).ConfigureAwait(false);
+            if (!reconfigured)
+            {
+                using var delayCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, reconfigureCts.Token);
+                await DelayAsync(options.ReconnectDelay, delayCts.Token).ConfigureAwait(false);
+            }
         }
     }
 
@@ -88,6 +108,7 @@ public sealed class SocketCanBackgroundService : BackgroundService
 
         while (!cancellationToken.IsCancellationRequested)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var result = client.ReadFrame(cancellationToken);
             if (result.Status == SocketCanFrameReadStatus.Timeout)
             {
@@ -97,6 +118,39 @@ public sealed class SocketCanBackgroundService : BackgroundService
             var frame = TranslateFrame(result.Frame, sourceBase);
             await _publisher.PublishAsync(frame, cancellationToken).ConfigureAwait(false);
         }
+    }
+
+    private static SocketCanOptions SnapshotOptions(SocketCanOptions? source)
+    {
+        if (source is null)
+        {
+            return new SocketCanOptions();
+        }
+
+        return new SocketCanOptions
+        {
+            InterfaceName = source.InterfaceName,
+            IncludeVirtualInterfaces = source.IncludeVirtualInterfaces,
+            ReceiveOwnMessages = source.ReceiveOwnMessages,
+            ReceiveTimeout = source.ReceiveTimeout,
+            ReconnectDelay = source.ReconnectDelay,
+            SourcePrefix = source.SourcePrefix,
+        };
+    }
+
+    private static bool RequiresRestart(SocketCanOptions? current, SocketCanOptions? updated)
+    {
+        if (current is null || updated is null)
+        {
+            return true;
+        }
+
+        return !string.Equals(current.InterfaceName, updated.InterfaceName, StringComparison.Ordinal)
+            || current.IncludeVirtualInterfaces != updated.IncludeVirtualInterfaces
+            || current.ReceiveOwnMessages != updated.ReceiveOwnMessages
+            || current.ReceiveTimeout != updated.ReceiveTimeout
+            || current.ReconnectDelay != updated.ReconnectDelay
+            || !string.Equals(current.SourcePrefix, updated.SourcePrefix, StringComparison.Ordinal);
     }
 
     private CanFrame TranslateFrame(SocketCANSharp.CanFrame frame, string source)

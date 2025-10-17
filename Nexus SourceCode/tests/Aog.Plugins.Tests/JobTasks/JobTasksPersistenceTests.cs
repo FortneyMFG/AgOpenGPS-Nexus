@@ -114,6 +114,49 @@ public sealed class JobTasksPersistenceTests
             LayoutId: "layout:planter-dashboard"));
     }
 
+    [Fact]
+    public async Task LoadAsync_RebasesPathsAcrossVolumes()
+    {
+        using var temp = new TemporaryDirectory();
+        var jobRoot = Path.Combine(temp.DirectoryPath, "Jobs", "MixedDrive");
+        Directory.CreateDirectory(jobRoot);
+
+        var manifestPath = Path.Combine(jobRoot, "job.json");
+        var manifestJson = """
+        {
+            "schemaVersion": "1.0.0",
+            "jobId": "job:mixed",
+            "displayName": "Mixed Drive Job",
+            "slug": "mixed-drive-job",
+            "state": "active",
+            "createdAt": "2024-01-01T00:00:00Z",
+            "updatedAt": "2024-01-01T00:00:00Z",
+            "context": {
+                "farmId": "farm:alpha",
+                "fieldIds": ["field:one"]
+            },
+            "paths": {
+                "jobRoot": "C:\\Source\\MixedDrive",
+                "dataDir": "D:\\Archive\\MixedDrive\\data",
+                "resumeFile": "D:\\Archive\\MixedDrive\\Resume.txt",
+                "attachmentsDir": "D:\\Archive\\MixedDrive\\attachments"
+            },
+            "sessions": []
+        }
+        """;
+
+        await File.WriteAllTextAsync(manifestPath, manifestJson);
+
+        var persistence = new JobTasksPersistence();
+        var snapshot = await persistence.LoadAsync(jobRoot);
+
+        var expectedRoot = Path.GetFullPath(jobRoot);
+        snapshot.Layout.JobRoot.Should().Be(expectedRoot);
+        snapshot.Layout.DataDirectory.Should().Be(Path.Combine(expectedRoot, "data"));
+        snapshot.Layout.ResumeFile.Should().Be(Path.Combine(expectedRoot, "Resume.txt"));
+        snapshot.Layout.AttachmentsDirectory.Should().Be(Path.Combine(expectedRoot, "attachments"));
+    }
+
     private sealed class TemporaryDirectory : IDisposable
     {
         public string DirectoryPath { get; }

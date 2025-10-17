@@ -21,7 +21,9 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
     private readonly DelegateCommand _togglePlaybackCommand;
     private readonly IReplayController? _replayController;
-    private bool _isReplayStateSubscribed;
+    private readonly EventHandler<ReplayStateChangedEventArgs> _replayStateChangedHandler;
+    private readonly ReplayStateSubscription _replayStateSubscription;
+    private bool _disposed;
     private ReplayState _state;
     private double _selectedPlaybackRate;
     private TimeSpan _position;
@@ -48,6 +50,8 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         SyncPlaybackRateSelection(_selectedPlaybackRate);
 
         _replayController = replayController;
+        _replayStateChangedHandler = OnReplayStateChanged;
+        _replayStateSubscription = new ReplayStateSubscription(_replayController, _replayStateChangedHandler);
         InitializeReplayControllerState();
     }
 
@@ -257,16 +261,13 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (!disposing)
+        if (!disposing || _disposed)
         {
             return;
         }
 
-        if (_replayController is not null && _isReplayStateSubscribed)
-        {
-            _replayController.StateChanged -= OnReplayStateChanged;
-            _isReplayStateSubscribed = false;
-        }
+        _disposed = true;
+        _replayStateSubscription.Dispose();
     }
 
     private void TogglePlayback()
@@ -301,7 +302,7 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         _state = controllerState;
         SyncPlaybackRateSelection(controllerState.PlaybackRate);
         Position = controllerState.Position;
-        EnsureReplayControllerSubscription();
+        _replayStateSubscription.EnsureSubscribed();
     }
 
     private ReadOnlyCollection<SimulationPlaybackRateOptionViewModel> BuildPlaybackRateOptions()
@@ -317,17 +318,18 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
             OnPlaybackRateSelected(option.Rate);
         }
 
-        foreach (var optionDefinition in new (double Rate, string Label)[]
+        foreach (var rate in new[] { 0.5, 1.0, 2.0 })
         {
-            (0.5, "50%"),
-            (1.0, "100%"),
-            (2.0, "200%"),
-        })
-        {
-            options.Add(new SimulationPlaybackRateOptionViewModel(optionDefinition.Rate, SelectOption, optionDefinition.Label));
+            var label = FormatPlaybackRateLabel(rate);
+            options.Add(new SimulationPlaybackRateOptionViewModel(rate, SelectOption, label));
         }
 
         return new ReadOnlyCollection<SimulationPlaybackRateOptionViewModel>(options);
+    }
+
+    private static string FormatPlaybackRateLabel(double rate)
+    {
+        return $"{rate:0.#}×";
     }
 
     private void EnsureReplayControllerSubscription()
@@ -453,5 +455,40 @@ public sealed class SimulationBarViewModel : ObservableObject, IDisposable
         }
 
         return parts.Count == 0 ? "—" : string.Join(", ", parts);
+    }
+
+    private sealed class ReplayStateSubscription : IDisposable
+    {
+        private readonly IReplayController? _replayController;
+        private readonly EventHandler<ReplayStateChangedEventArgs> _handler;
+        private bool _isSubscribed;
+
+        public ReplayStateSubscription(IReplayController? replayController, EventHandler<ReplayStateChangedEventArgs> handler)
+        {
+            _replayController = replayController;
+            _handler = handler;
+        }
+
+        public void EnsureSubscribed()
+        {
+            if (_replayController is null || _isSubscribed)
+            {
+                return;
+            }
+
+            _replayController.StateChanged += _handler;
+            _isSubscribed = true;
+        }
+
+        public void Dispose()
+        {
+            if (_replayController is null || !_isSubscribed)
+            {
+                return;
+            }
+
+            _replayController.StateChanged -= _handler;
+            _isSubscribed = false;
+        }
     }
 }

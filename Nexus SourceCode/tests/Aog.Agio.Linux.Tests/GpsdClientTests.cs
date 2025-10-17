@@ -119,10 +119,13 @@ public sealed class GpsdClientTests
         var factory = new FakeGpsdConnectionFactory(Array.Empty<string>());
         var client = new GpsdClient(factory, NullLogger<GpsdClient>.Instance);
 
-        await foreach (var _ in client.WatchAsync(CancellationToken.None))
+        await Assert.ThrowsAsync<GpsdSocketUnavailableException>(async () =>
         {
-            // drain the async enumerable to ensure the command is written before exit
-        }
+            await foreach (var _ in client.WatchAsync(CancellationToken.None))
+            {
+                // drain the async enumerable to ensure the command is written before exit
+            }
+        });
 
         Assert.Single(factory.WrittenLines, GpsdClientTestHelpers.WatchCommand);
     }

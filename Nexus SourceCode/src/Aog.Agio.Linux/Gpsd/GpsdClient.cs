@@ -81,7 +81,7 @@ public sealed class GpsdClient
 
             if (line is null)
             {
-                yield break;
+                throw new GpsdSocketUnavailableException("gpsd stream ended unexpectedly.");
             }
 
             if (!GpsdTpvReport.TryParse(line, out var report) || report is null)

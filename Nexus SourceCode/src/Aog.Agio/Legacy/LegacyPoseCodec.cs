@@ -76,6 +76,8 @@ public sealed class LegacyPoseCodec
 
         var longitude = BinaryPrimitives.ReadDoubleLittleEndian(payload.Slice(0, 8));
         var latitude = BinaryPrimitives.ReadDoubleLittleEndian(payload.Slice(8, 8));
+        var sanitizedLongitude = SanitizeLongitude(longitude);
+        var sanitizedLatitude = SanitizeLatitude(latitude);
         var headingDualDeg = BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(16, 4));
         var headingDeg = BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(20, 4));
         var speedKph = BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(24, 4));
@@ -146,8 +148,8 @@ public sealed class LegacyPoseCodec
 
         pose = new Pose
         {
-            LongitudeDeg = longitude,
-            LatitudeDeg = latitude,
+            LongitudeDeg = sanitizedLongitude,
+            LatitudeDeg = sanitizedLatitude,
             AltitudeM = sanitizedAltitude,
             HeadingRad = headingRadians,
             SpeedMps = sanitizedSpeedMps,

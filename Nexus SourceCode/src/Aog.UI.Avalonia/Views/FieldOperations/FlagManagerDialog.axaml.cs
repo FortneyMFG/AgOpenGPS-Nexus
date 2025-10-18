@@ -1,21 +1,14 @@
-using System;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Aog.UI.Avalonia.ViewModels;
 
-namespace Aog.UI.Avalonia.Views.FieldOperations;
-
-public partial class FlagManagerDialog : Window
+namespace Aog.UI.Avalonia.Views.FieldOperations
 {
-    public FlagManagerDialog(FlagManagerDialogViewModel viewModel)
+    public partial class FlagManagerDialog : Window
     {
-        ArgumentNullException.ThrowIfNull(viewModel);
-        InitializeComponent();
-        DataContext = viewModel;
-    }
-
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
+        public FlagManagerDialog(FlagManagerDialogViewModel viewModel)
+        {
+            InitializeComponent();
+            DataContext = viewModel;
+        }
     }
 }

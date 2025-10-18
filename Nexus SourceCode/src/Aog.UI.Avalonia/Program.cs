@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Avalonia;
 using Aog.Abstractions.Runtime;
+using Aog.UI.Avalonia.App;
 using Aog.UI.Avalonia.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

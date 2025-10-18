@@ -1,21 +1,14 @@
-using System;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Aog.UI.Avalonia.ViewModels;
 
-namespace Aog.UI.Avalonia.Views.FieldOperations;
-
-public partial class ShiftPositionDialog : Window
+namespace Aog.UI.Avalonia.Views.FieldOperations
 {
-    public ShiftPositionDialog(ShiftPositionDialogViewModel viewModel)
+    public partial class ShiftPositionDialog : Window
     {
-        ArgumentNullException.ThrowIfNull(viewModel);
-        InitializeComponent();
-        DataContext = viewModel;
-    }
-
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
+        public ShiftPositionDialog(ShiftPositionDialogViewModel viewModel)
+        {
+            InitializeComponent();
+            DataContext = viewModel;
+        }
     }
 }

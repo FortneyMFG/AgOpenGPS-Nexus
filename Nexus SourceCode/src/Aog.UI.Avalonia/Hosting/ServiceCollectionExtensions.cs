@@ -1,9 +1,12 @@
 using System;
 using Aog.Core.Replay;
+using Aog.UI.Avalonia.App;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Telemetry;
 using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels;
+using Aog.UI.Avalonia.ViewModels.Shell;
+using Aog.UI.Avalonia.Views.Main;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -39,6 +42,7 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IReplayController, NullReplayController>();
         services.TryAddSingleton<MainWindow>();
         services.TryAddSingleton<MainWindowViewModel>();
+        services.TryAddSingleton<AppShellViewModel>();
         return services;
     }
 }

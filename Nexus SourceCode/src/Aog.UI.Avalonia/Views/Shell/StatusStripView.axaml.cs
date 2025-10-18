@@ -1,12 +1,12 @@
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
-namespace Aog.UI.Avalonia.Views.Shell;
-
-public partial class StatusStripView : UserControl
+namespace Aog.UI.Avalonia.Views.Shell
 {
-    public StatusStripView()
+    public partial class StatusStripView : UserControl
     {
-        AvaloniaXamlLoader.Load(this);
+        public StatusStripView()
+        {
+            InitializeComponent();
+        }
     }
 }

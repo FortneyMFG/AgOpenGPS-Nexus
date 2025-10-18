@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using Aog.UI.Avalonia.ViewModels;
 using Aog.UI.Avalonia.Views.FieldOperations;
+using Aog.UI.Avalonia.Views.Main;
 using Microsoft.Extensions.Logging;
 
 namespace Aog.UI.Avalonia.Hosting;
@@ -54,7 +55,7 @@ public sealed class FieldOperationsDialogHandler : IShellCommandHandler
         {
             Window? dialog = injectionPoint.ToLowerInvariant() switch
             {
-                "dialog.boundary" => new BoundaryToolDialog(_viewModel.CreateBoundaryToolViewModel()),
+                "dialog.boundary" => new Views.BoundaryWindow(_viewModel.CreateBoundaryToolViewModel()),
                 "dialog.flags" => new FlagManagerDialog(_viewModel.CreateFlagManagerDialogViewModel()),
                 "tools.offset" => new ShiftPositionDialog(_viewModel.CreateShiftPositionDialogViewModel()),
                 _ => null,
@@ -79,3 +80,4 @@ public sealed class FieldOperationsDialogHandler : IShellCommandHandler
         return true;
     }
 }
+

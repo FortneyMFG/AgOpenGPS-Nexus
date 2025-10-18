@@ -122,68 +122,11 @@
     </DataTemplate>
 
     <DataTemplate x:DataType="workspace:MainWindowViewModel">
-      <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Spacing="{DynamicResource ThemeSpacingMd}">
-          <TextBlock Text="System Summary"
-                     FontSize="{DynamicResource ThemeFontSizeMd}"
-                     FontWeight="Bold" />
-          <TextBlock Text="{Binding PlatformDescription}"
-                     TextWrapping="Wrap"
-                     Foreground="{DynamicResource ThemeAccentMutedBrush}" />
-
-          <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
-            <TextBlock Text="Map Layers"
-                       FontWeight="SemiBold" />
-            <ItemsControl ItemsSource="{Binding MapLayers}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="model:MapLayer">
-                  <Border BorderBrush="{DynamicResource ShellPanelBorderBrush}"
-                          BorderThickness="0,0,0,1"
-                          Padding="8,4">
-                    <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
-                      <TextBlock Text="{Binding DisplayName}"
-                                 FontWeight="SemiBold" />
-                      <TextBlock Text="{Binding Style.Units}"
-                                 FontSize="{DynamicResource ThemeFontSizeXs}"
-                                 Foreground="{DynamicResource ThemeAccentMutedBrush}" />
-                    </StackPanel>
-                  </Border>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </StackPanel>
-
-          <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
-            <TextBlock Text="Guidance Tracks"
-                       FontWeight="SemiBold" />
-            <ItemsControl ItemsSource="{Binding GuidanceTracks}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="model:GuidanceTrack">
-                  <Border BorderBrush="{DynamicResource ShellPanelBorderBrush}"
-                          BorderThickness="0,0,0,1"
-                          Padding="8,4">
-                    <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
-                      <TextBlock Text="{Binding Name}"
-                                 FontWeight="SemiBold" />
-                      <TextBlock Text="{Binding Thickness, StringFormat='Stroke: {0:0.0} px'}"
-                                 FontSize="{DynamicResource ThemeFontSizeXs}"
-                                 Foreground="{DynamicResource ThemeAccentMutedBrush}" />
-                    </StackPanel>
-                  </Border>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </StackPanel>
-
-          <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
-            <TextBlock Text="Themes"
-                       FontWeight="SemiBold" />
-            <ComboBox ItemsSource="{Binding AvailableThemes}"
-                      SelectedItem="{Binding SelectedTheme}"
-                      HorizontalAlignment="Stretch" />
-          </StackPanel>
-        </StackPanel>
-      </ScrollViewer>
+      <Border Padding="{DynamicResource ThemeSpacingLg}">
+        <TextBlock Text="Select a map tool from the sidebar or open Tools → System Summary to review the current configuration."
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+      </Border>
     </DataTemplate>
   </UserControl.DataTemplates>
 
@@ -209,6 +152,12 @@
           </MenuItem>
           <MenuItem Header="{Binding Host.ShellMenuBar.ToolsMenu.Header}"
                     ItemsSource="{Binding Host.ShellMenuBar.ToolsMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.SettingsMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.SettingsMenu.Items}">
             <MenuItem.ItemTemplate>
               <StaticResource ResourceKey="ShellMenuItemTemplate" />
             </MenuItem.ItemTemplate>

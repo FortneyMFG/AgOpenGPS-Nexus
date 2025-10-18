@@ -41,5 +41,7 @@ public static class ShellPluginSurfaces
 
     public static PluginSurfaceDescriptor ToolsMenu { get; } = new("tools_menu", "core.tools_menu.v1", "menu.tools");
 
+    public static PluginSurfaceDescriptor SettingsMenu { get; } = new("settings_menu", "core.settings_menu.v1", "menu.settings");
+
     public static PluginSurfaceDescriptor ServicesMenu { get; } = new("services_menu", "core.services_menu.v1", "services.backend");
 }

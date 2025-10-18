@@ -19,7 +19,11 @@ using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels.Shell;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
+using Avalonia.Threading;
+using Aog.UI.Avalonia.Views;
+using Aog.UI.Avalonia.Views.FieldOperations;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -334,7 +338,16 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     {
         return new[]
         {
+            new SidebarButtonViewModel(
+                "Map Tools",
+                new DelegateCommand(_ =>
+                {
+                    Shell.StatusText = "Opening map tools menu.";
+                    ShowMapToolsMenu();
+                }),
+                "Open boundary, headland, and flag tools."),
             CreateSidebarButton("Guidance", "Guidance tools coming soon."),
+            CreateSidebarButton("Equipment", "Open Settings → Equipment to adjust vehicle and implement presets."),
             CreateSidebarButton("Coverage", "Coverage layers are visible."),
             CreateSidebarButton("Hydraulics", "Hydraulic controls unavailable in design mode."),
             CreateSidebarButton("AB Lines", "AB line editor not yet connected."),
@@ -371,6 +384,90 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
             label,
             new DelegateCommand(_ => Shell.StatusText = statusMessage),
             statusMessage);
+    }
+
+    private void ShowMapToolsMenu()
+    {
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            MapToolsDialog? dialog = null;
+            var viewModel = new MapToolsDialogViewModel(
+                this,
+                () => dialog?.Close());
+            dialog = new MapToolsDialog(viewModel)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            };
+
+            var owner = TryGetMainWindow();
+            if (owner is not null)
+            {
+                _ = dialog.ShowDialog(owner);
+            }
+            else
+            {
+                dialog.Show();
+            }
+        });
+    }
+
+    internal void OpenBoundaryEditor()
+    {
+        Shell.StatusText = "Boundary editor opened.";
+        Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            var dialog = new BoundaryWindow(CreateBoundaryToolViewModel())
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            };
+
+            var owner = TryGetMainWindow();
+            if (owner is not null)
+            {
+                await dialog.ShowDialog(owner).ConfigureAwait(false);
+            }
+            else
+            {
+                dialog.Show();
+            }
+        });
+    }
+
+    internal void OpenFlagManager()
+    {
+        Shell.StatusText = "Flag manager opened.";
+        Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            var dialog = new FlagManagerDialog(CreateFlagManagerDialogViewModel())
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            };
+
+            var owner = TryGetMainWindow();
+            if (owner is not null)
+            {
+                await dialog.ShowDialog(owner).ConfigureAwait(false);
+            }
+            else
+            {
+                dialog.Show();
+            }
+        });
+    }
+
+    internal void ShowHeadlandPlannerNotice()
+    {
+        Shell.StatusText = "Headland planner integration is in progress.";
+    }
+
+    private static Window? TryGetMainWindow()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+        {
+            return lifetime.MainWindow;
+        }
+
+        return null;
     }
 
     /// <summary>

@@ -102,6 +102,12 @@ public sealed class ShellMenuBarViewModel
                     "core.tools.logViewer",
                     dispatcher,
                     description: "Review recent log entries and event history."),
+                ShellMenuItemViewModel.CreateCommand(
+                    "System Summary…",
+                    "menu.tools",
+                    "core.shell.systemSummary",
+                    dispatcher,
+                    description: "Show the current system summary, layers, and theme selections."),
                 ShellMenuItemViewModel.CreateContainer(
                     "Offset",
                     ShellMenuItemViewModel.CreateCommand(
@@ -109,7 +115,44 @@ public sealed class ShellMenuBarViewModel
                         "tools.offset",
                         "core.shift_position_dialog.open",
                         dispatcher,
-                        description: "Adjust the current vehicle position offsets.")),
+                    description: "Adjust the current vehicle position offsets.")),
+            });
+
+        SettingsMenu = new ShellMenuGroupViewModel(
+            ShellPluginSurfaces.SettingsMenu,
+            "Settings",
+            new[]
+            {
+                ShellMenuItemViewModel.CreateContainer(
+                    "Equipment",
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Section Settings",
+                        "menu.settings",
+                        "core.settings.sections",
+                        dispatcher,
+                        description: "Configure section widths, counts, and control delays."),
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Autosteer Settings",
+                        "menu.settings",
+                        "core.settings.autosteer",
+                        dispatcher,
+                        description: "Adjust autosteer controller and vehicle geometry parameters.")),
+                ShellMenuItemViewModel.CreateContainer(
+                    "Display",
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Colors",
+                        "menu.settings",
+                        "core.settings.display",
+                        dispatcher,
+                        description: "Customize display color palettes and map styling.")),
+                ShellMenuItemViewModel.CreateContainer(
+                    "Input",
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Hotkeys",
+                        "menu.settings",
+                        "core.settings.hotkeys",
+                        dispatcher,
+                        description: "Review and edit keyboard shortcuts.")),
             });
 
         ServicesMenu = new ShellMenuGroupViewModel(
@@ -165,6 +208,9 @@ public sealed class ShellMenuBarViewModel
     /// <summary>Gets the Tools menu group.</summary>
     public ShellMenuGroupViewModel ToolsMenu { get; }
 
+    /// <summary>Gets the Settings menu group.</summary>
+    public ShellMenuGroupViewModel SettingsMenu { get; }
+
     /// <summary>Gets the Services menu group.</summary>
     public ShellMenuGroupViewModel ServicesMenu { get; }
 
@@ -176,6 +222,7 @@ public sealed class ShellMenuBarViewModel
             yield return FileMenu;
             yield return FieldMenu;
             yield return ToolsMenu;
+            yield return SettingsMenu;
             yield return ServicesMenu;
         }
     }

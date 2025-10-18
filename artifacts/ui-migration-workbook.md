@@ -14,22 +14,22 @@ This workbook consolidates legacy UI assets, plugin surface contracts, and backl
 
 | Surface ID | Legacy intent | Plugin contract | Injection point | Backlog references | Provenance status |
 | --- | --- | --- | --- | --- | --- |
-| field_menu | Field Menu | core.field_menu.v1 | menu.field | [shell-and-navigation] Implement Field Menu UI, [shell-and-navigation] Implement Field Menu ViewModel, [shell-and-navigation] Implement Field Menu Tests | Legacy repositories archived locally but source files not present in repo snapshot. |
-| file_menu | File Menu | core.file_menu.v1 | menu.file | [shell-and-navigation] Implement File Menu UI, [shell-and-navigation] Implement File Menu ViewModel, [shell-and-navigation] Implement File Menu Tests | Legacy repositories archived locally but source files not present in repo snapshot. |
-| tools_menu | Tools Menu | core.tools_menu.v1 | menu.tools | [shell-and-navigation] Implement Tools Menu UI, [shell-and-navigation] Implement Tools Menu ViewModel, [shell-and-navigation] Implement Tools Menu Tests | Legacy repositories archived locally but source files not present in repo snapshot. |
+| field_menu | Field Menu | core.field_menu.v1 | menu.field | [shell-and-navigation] Implement Field Menu UI, [shell-and-navigation] Implement Field Menu ViewModel, [shell-and-navigation] Implement Field Menu Tests | Recreated in `Nexus SourceCode/src/Aog.UI.Avalonia/Views/Shell/AppShellView.axaml`; layout validated against V6 capture and styled with theme tokens. |
+| file_menu | File Menu | core.file_menu.v1 | menu.file | [shell-and-navigation] Implement File Menu UI, [shell-and-navigation] Implement File Menu ViewModel, [shell-and-navigation] Implement File Menu Tests | Recreated in `Nexus SourceCode/src/Aog.UI.Avalonia/Views/Shell/AppShellView.axaml`; bindings match plugin descriptor registry and theme token palette. |
+| tools_menu | Tools Menu | core.tools_menu.v1 | menu.tools | [shell-and-navigation] Implement Tools Menu UI, [shell-and-navigation] Implement Tools Menu ViewModel, [shell-and-navigation] Implement Tools Menu Tests | Recreated in `Nexus SourceCode/src/Aog.UI.Avalonia/Views/Shell/AppShellView.axaml`; toolbar affordances align with V6 baseline using shared resources. |
 
 ## Toolbar Surfaces
 
 | Surface ID | Legacy intent | Plugin contract | Injection point | Backlog references | Provenance status |
 | --- | --- | --- | --- | --- | --- |
-| top_toolbar | Top Command Toolbar | core.top_toolbar.v1 | toolbar.top | [shell-and-navigation] Implement Top Command Toolbar UI, [shell-and-navigation] Implement Top Command Toolbar ViewModel, [shell-and-navigation] Implement Top Command Toolbar Tests | Layout harvested from AgValonia prototypes (see artifacts/ui-inventory.json). |
+| top_toolbar | Top Command Toolbar | core.top_toolbar.v1 | toolbar.top | [shell-and-navigation] Implement Top Command Toolbar UI, [shell-and-navigation] Implement Top Command Toolbar ViewModel, [shell-and-navigation] Implement Top Command Toolbar Tests | Implemented in `Nexus SourceCode/src/Aog.UI.Avalonia/Views/Shell/AppShellView.axaml` + `ViewModels/Shell/TopToolbarViewModel.cs`; button states themed with `App/NexusLegacyShellTheme.axaml`. |
 
 ## Panels & Map Canvas
 
 | Surface ID | Legacy intent | Plugin contract | Injection point | Coverage assets | Provenance status |
 | --- | --- | --- | --- | --- | --- |
-| app_shell | Main Field View | core.app_shell.v1 | shell.main | Hosts shell composites (menus, toolbar, status strip). | Legacy forms referenced in docs/aog-v6-mapping-brief.md; raw WinForms source absent in snapshot. |
-| map_canvas | OpenGL Map Canvas | core.map_canvas.v1 | shell.map | Refer to docs/aog-v6-mapping-brief.md for overlay breakdown. | Legacy forms referenced in docs/aog-v6-mapping-brief.md; raw WinForms source absent in snapshot. |
+| app_shell | Main Field View | core.app_shell.v1 | shell.main | Hosts shell composites (menus, toolbar, status strip). | Ported into Avalonia (`Views/Shell/AppShellView.axaml`); theme parity achieved with `App/NexusLegacyShellTheme.axaml`, awaiting live map host wiring. |
+| map_canvas | OpenGL Map Canvas | core.map_canvas.v1 | shell.map | Refer to docs/aog-v6-mapping-brief.md for overlay breakdown. | Placeholder host remains; map canvas wiring tracked under NX-412 follow-up. |
 
 ## Dialog Surfaces
 
@@ -62,7 +62,7 @@ This workbook consolidates legacy UI assets, plugin surface contracts, and backl
 
 ## Theme Token Snapshot
 
-Theme tokens extracted from `artifacts/ui-theme-tokens.json` to enforce parity between legacy and Nexus styling.
+Theme tokens extracted from `artifacts/ui-theme-tokens.json` to enforce parity between legacy and Nexus styling. `App/NexusLegacyShellTheme.axaml` now materializes these values into Avalonia resources consumed by the shell UI.
 
 ### Typography
 

@@ -11,18 +11,22 @@
     </ItemsControl.ItemsPanel>
     <ItemsControl.ItemTemplate>
       <DataTemplate x:DataType="vm:ShellStatusIndicatorViewModel">
-        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+        <StackPanel Orientation="Horizontal"
+                    Spacing="{DynamicResource ThemeSpacingSm}"
+                    VerticalAlignment="Center">
+          <TextBlock Text="{Binding Label}"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource ThemeForegroundBrush}"/>
           <TextBlock Text="{Binding Value}">
             <TextBlock.Styles>
               <Style Selector="TextBlock">
                 <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
               </Style>
               <Style Selector="TextBlock.Warning">
-                <Setter Property="Foreground" Value="#F7B529"/>
+                <Setter Property="Foreground" Value="{DynamicResource ThemeWarningBrush}"/>
               </Style>
               <Style Selector="TextBlock.Critical">
-                <Setter Property="Foreground" Value="#E5484D"/>
+                <Setter Property="Foreground" Value="{DynamicResource ThemeDangerBrush}"/>
               </Style>
             </TextBlock.Styles>
             <ToolTip.Tip>

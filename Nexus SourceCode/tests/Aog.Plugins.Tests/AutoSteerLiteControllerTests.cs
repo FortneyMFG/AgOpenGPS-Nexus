@@ -50,8 +50,8 @@ namespace Aog.Plugins.Tests
             for (var i = 0; i < 300; i++)
             {
                 var steering = controller.ComputeSteeringAngle(state, path);
-                steering.Should().BeLessOrEqualTo(controller.Settings.SteeringAngleLimitRadians + 1e-6);
-                steering.Should().BeGreaterOrEqualTo(-controller.Settings.SteeringAngleLimitRadians - 1e-6);
+                steering.Should().BeLessThanOrEqualTo(controller.Settings.SteeringAngleLimitRadians + 1e-6);
+                steering.Should().BeGreaterThanOrEqualTo(-controller.Settings.SteeringAngleLimitRadians - 1e-6);
                 state = state.Advance(steering, dt);
             }
 

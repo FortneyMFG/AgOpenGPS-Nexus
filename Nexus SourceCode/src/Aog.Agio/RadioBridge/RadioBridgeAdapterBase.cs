@@ -419,9 +419,11 @@ public abstract class RadioBridgeAdapterBase<TOptions> : IHostedService, IDispos
         var registration = new MeshDeviceRegistration(
             _options.DeviceId,
             _options.DeviceLabel,
-            capabilities,
-            new MeshShareProfile(shareGrants),
-            new MeshSubscribeProfile(subscribeGrants));
+            shareProfile: new MeshShareProfile(shareGrants),
+            subscribeProfile: new MeshSubscribeProfile(subscribeGrants))
+        {
+            Capabilities = capabilities
+        };
 
         await _meshService.RegisterOrUpdateDeviceAsync(registration, cancellationToken).ConfigureAwait(false);
     }

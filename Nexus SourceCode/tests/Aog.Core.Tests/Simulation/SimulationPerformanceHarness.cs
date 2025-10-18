@@ -102,7 +102,7 @@ internal sealed class SimulationPerformanceHarness
 
     private record struct SimPayload(string ProviderId, int Tick, double Value);
 
-    private sealed class HarnessAccumulator
+    private class HarnessAccumulator
     {
         private double _checksum;
 

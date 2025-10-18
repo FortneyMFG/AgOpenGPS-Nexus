@@ -18,7 +18,7 @@ public sealed class LegacyCompatibilityBridgeTests
         var frame = poseCodec.EncodePose(pose);
 
         Assert.True(bridge.TryConvertLegacyFrame(frame, out var envelope));
-        Assert.Equal(MessageType.LinkMessageTypeTelemetryPose, envelope.Header.MessageType);
+        Assert.Equal(MessageType.TelemetryPose, envelope.Header.MessageType);
         Assert.NotNull(envelope.Pose);
         Assert.Equal(pose.LatitudeDeg, envelope.Pose.LatitudeDeg);
         Assert.Equal(pose.LongitudeDeg, envelope.Pose.LongitudeDeg);
@@ -42,7 +42,7 @@ public sealed class LegacyCompatibilityBridgeTests
             });
 
         Assert.True(bridge.TryConvertLegacyFrame(frame, out var envelope));
-        Assert.Equal(MessageType.LinkMessageTypeCommandSteer, envelope.Header.MessageType);
+        Assert.Equal(MessageType.CommandSteer, envelope.Header.MessageType);
         Assert.NotNull(envelope.SteerCommand);
         Assert.Null(envelope.SectionMask);
     }
@@ -62,7 +62,7 @@ public sealed class LegacyCompatibilityBridgeTests
         var frame = steerCodec.EncodeSteerCommand(command, expectedMask);
 
         Assert.True(bridge.TryConvertLegacyFrame(frame, out var envelope));
-        Assert.Equal(MessageType.LinkMessageTypeCommandSteer, envelope.Header.MessageType);
+        Assert.Equal(MessageType.CommandSteer, envelope.Header.MessageType);
         Assert.NotNull(envelope.SteerCommand);
         Assert.NotNull(envelope.SectionMask);
         Assert.Equal(expectedMask.Mask, envelope.SectionMask.Mask);
@@ -87,7 +87,7 @@ public sealed class LegacyCompatibilityBridgeTests
         var frame = steerCodec.EncodeSteerCommand(command, metadata: metadata);
 
         Assert.True(bridge.TryConvertLegacyFrame(frame, out var envelope));
-        Assert.Equal(MessageType.LinkMessageTypeCommandSteer, envelope.Header.MessageType);
+        Assert.Equal(MessageType.CommandSteer, envelope.Header.MessageType);
         Assert.NotNull(envelope.SteerCommand);
         Assert.False(envelope.SteerCommand.Enable);
     }
@@ -108,7 +108,7 @@ public sealed class LegacyCompatibilityBridgeTests
         var frame = steerCodec.EncodeSteerCommand(command, metadata: metadata);
 
         Assert.True(bridge.TryConvertLegacyFrame(frame, out var envelope));
-        Assert.Equal(MessageType.LinkMessageTypeCommandSteer, envelope.Header.MessageType);
+        Assert.Equal(MessageType.CommandSteer, envelope.Header.MessageType);
         Assert.NotNull(envelope.SteerCommand);
         Assert.True(envelope.SteerCommand.Enable);
     }
@@ -131,7 +131,7 @@ public sealed class LegacyCompatibilityBridgeTests
         Assert.True(bridge.TryConvertLegacyFrame(frame, out var envelope));
         var steerState = Assert.IsType<Aog.Core.V1.SteerState>(envelope.SteerState);
 
-        Assert.Equal(MessageType.LinkMessageTypeTelemetrySteerState, envelope.Header.MessageType);
+        Assert.Equal(MessageType.TelemetrySteerState, envelope.Header.MessageType);
         Assert.Equal(0, steerState.HeadingErrorRad);
         Assert.True(steerState.TryGetLegacyHeadingDegrees(out var heading));
         Assert.Equal(metadata.HeadingDeg, heading, 3);

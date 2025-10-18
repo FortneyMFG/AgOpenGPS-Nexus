@@ -140,7 +140,22 @@ internal static class Program
         };
         options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 
-        await using var destination = ResolveOutputStream(outputPath);
+        if (string.IsNullOrWhiteSpace(outputPath))
+        {
+            await using var stdout = Console.OpenStandardOutput();
+            await JsonSerializer.SerializeAsync(stdout, entries, options).ConfigureAwait(false);
+            await stdout.FlushAsync().ConfigureAwait(false);
+            return;
+        }
+
+        var fullPath = Path.GetFullPath(outputPath);
+        var directory = Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        await using var destination = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true);
         await JsonSerializer.SerializeAsync(destination, entries, options).ConfigureAwait(false);
         await destination.FlushAsync().ConfigureAwait(false);
     }
@@ -178,23 +193,6 @@ internal static class Program
 
             File.WriteAllText(resolved, text + Environment.NewLine);
         }
-    }
-
-    private static Stream ResolveOutputStream(string? outputPath)
-    {
-        if (string.IsNullOrWhiteSpace(outputPath))
-        {
-            return Console.OpenStandardOutput();
-        }
-
-        var fullPath = Path.GetFullPath(outputPath);
-        var directory = Path.GetDirectoryName(fullPath);
-        if (!string.IsNullOrEmpty(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        return new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None);
     }
 
     private static string ResolveOptionPath(ICollection<string> parameters, string repoRoot, string optionName, string defaultPath)

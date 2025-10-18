@@ -184,9 +184,7 @@ internal sealed class SocketCanClient : ISocketCanClient
 
         try
         {
-            CanFrame frame;
-            var bytesRead = _socket.Read(out frame);
-            if (bytesRead <= 0)
+            if (!_socket.Read(out var frame))
             {
                 return SocketCanFrameReadResult.Timeout();
             }

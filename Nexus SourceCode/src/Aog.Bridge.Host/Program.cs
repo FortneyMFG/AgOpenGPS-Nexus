@@ -67,7 +67,7 @@ public static class Program
                     return new AogLinkNodeIdentity(
                         options.NodeId,
                         options.FirmwareVersion,
-                        NodeRole.NodeRoleHost,
+                        NodeRole.Host,
                         NodePriority.High);
                 });
 

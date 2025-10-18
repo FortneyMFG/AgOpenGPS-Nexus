@@ -100,7 +100,7 @@ internal sealed class SimulationPerformanceHarness
             budgetSnapshot);
     }
 
-    private sealed record struct SimPayload(string ProviderId, int Tick, double Value);
+    private record struct SimPayload(string ProviderId, int Tick, double Value);
 
     private sealed class HarnessAccumulator
     {

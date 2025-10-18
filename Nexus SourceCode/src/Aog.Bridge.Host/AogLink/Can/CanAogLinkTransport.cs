@@ -144,8 +144,8 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
 
         if (!fragmented && frame.Data.Length >= 6)
         {
-            var payload = frame.Data.AsSpan(5);
-            var envelope = LinkEnvelope.Parser.ParseFrom(payload.ToArray());
+            var payload = frame.Data[5..];
+            var envelope = LinkEnvelope.Parser.ParseFrom(payload);
             envelope.Header = ApplyHeaderFromIdentifier(frame.Identifier, envelope.Header);
             await _inbound.Writer.WriteAsync(envelope, cancellationToken).ConfigureAwait(false);
             return;
@@ -153,10 +153,9 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
 
         var fragmentCount = frame.Data[3];
         var fragmentIndex = frame.Data[4];
-        var payloadSlice = frame.Data.AsSpan(6);
 
         var collector = _fragments.GetOrAdd(sequence, _ => new FragmentCollector(fragmentCount));
-        collector.Add(fragmentIndex, payloadSlice);
+        collector.Add(fragmentIndex, frame.Data[6..]);
 
         if (!collector.IsComplete)
         {
@@ -165,9 +164,9 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
 
         _fragments.TryRemove(sequence, out _);
         var combined = collector.Combine();
-        var envelope = LinkEnvelope.Parser.ParseFrom(combined);
-        envelope.Header = ApplyHeaderFromIdentifier(frame.Identifier, envelope.Header);
-        await _inbound.Writer.WriteAsync(envelope, cancellationToken).ConfigureAwait(false);
+        var reassembledEnvelope = LinkEnvelope.Parser.ParseFrom(combined);
+        reassembledEnvelope.Header = ApplyHeaderFromIdentifier(frame.Identifier, reassembledEnvelope.Header);
+        await _inbound.Writer.WriteAsync(reassembledEnvelope, cancellationToken).ConfigureAwait(false);
     }
 
     private static AogCanFrame BuildSingleFrame(FrameHeader? header, byte[] payload, uint identifier)
@@ -177,7 +176,7 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
         var sequence = header?.Sequence ?? 0;
         buffer[1] = (byte)(sequence >> 8);
         buffer[2] = (byte)(sequence & 0xFF);
-        var length = (ushort)(header?.PayloadLength ?? payload.Length);
+        var length = (ushort)(header?.PayloadLength ?? (uint)payload.Length);
         buffer[3] = (byte)(length >> 8);
         buffer[4] = (byte)(length & 0xFF);
         buffer[5] = ConvertFlags(header?.Flags, fragmented: false);
@@ -204,7 +203,7 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
             value |= 0x40;
         }
 
-        var priority = (byte)(flags?.Priority ?? NodePriority.NodePriorityDefault);
+        var priority = (byte)(flags?.Priority ?? NodePriority.Default);
         value |= (byte)(priority << 3);
         return value;
     }
@@ -216,7 +215,7 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
             return 0;
         }
 
-        var priority = (uint)(header.Flags?.Priority ?? NodePriority.NodePriorityDefault) & 0x07;
+        var priority = (uint)(header.Flags?.Priority ?? NodePriority.Default) & 0x07;
         var cls = (uint)header.MessageClass & 0x03;
         var type = (uint)header.MessageType & 0x3FF;
         var destination = (uint)(header.Destination & 0x7F);

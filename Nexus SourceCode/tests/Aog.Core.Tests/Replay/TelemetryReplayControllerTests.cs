@@ -108,7 +108,7 @@ public sealed class TelemetryReplayControllerTests
         var can = cans[0];
         can.Header.Sequence.Should().Be(scenario.CanFrameSample.Header.Sequence);
         can.ArbitrationId.Should().Be(scenario.CanFrameSample.ArbitrationId);
-        can.Payload.ToByteArray().Should().Equal(scenario.CanFrameSample.Payload.ToByteArray());
+        can.Payload.ToArray().Should().Equal(scenario.CanFrameSample.Payload.ToByteArray());
 
         var section = sections[0];
         section.Header.Sequence.Should().Be(scenario.SectionSample.Header.Sequence);
@@ -119,7 +119,7 @@ public sealed class TelemetryReplayControllerTests
             var plugin = plugins.Single(p => string.Equals(p.PluginId, command.PluginId, StringComparison.Ordinal));
             plugin.Header?.Sequence.Should().Be(command.Sequence);
             plugin.Topic.Should().Be(command.Topic);
-            Encoding.UTF8.GetString(plugin.Payload.ToByteArray()).Should().Be(command.PayloadJson);
+            Encoding.UTF8.GetString(plugin.Payload.Span).Should().Be(command.PayloadJson);
         }
     }
 

@@ -57,7 +57,7 @@ public sealed class LegacyCompatibilityBridge
                 .ToCapabilityDescriptors()
                 .Select(descriptor => descriptor.Name));
 
-            envelope.Header = BuildSystemHeader(MessageType.DiscoveryAnnounce, announce.CalculateSize());
+            envelope.Header = BuildSystemHeader(MessageType.LinkMessageTypeDiscoveryAnnounce, announce.CalculateSize());
             envelope.DiscoveryAnnounce = announce;
             return true;
         }
@@ -69,7 +69,7 @@ public sealed class LegacyCompatibilityBridge
             steerState.LateralErrorM = 0;
             steerState.HeadingErrorRad = 0;
 
-            envelope.Header = BuildTelemetryHeader(MessageType.TelemetrySteerState, steerState.CalculateSize());
+            envelope.Header = BuildTelemetryHeader(MessageType.LinkMessageTypeTelemetrySteerState, steerState.CalculateSize());
             envelope.SteerState = steerState;
             return true;
         }
@@ -80,7 +80,7 @@ public sealed class LegacyCompatibilityBridge
             const byte EngagedBit = 0x01;
             steerCmd.Enable = (steerCommandMetadata.GuidanceStatus & EngagedBit) != 0;
 
-            envelope.Header = BuildCommandHeader(MessageType.CommandSteer, steerCmd.CalculateSize(), needsAck: true);
+            envelope.Header = BuildCommandHeader(MessageType.LinkMessageTypeCommandSteer, steerCmd.CalculateSize(), needsAck: true);
             envelope.SteerCommand = steerCmd;
 
             if (sectionMask.Mask != 0)
@@ -96,7 +96,7 @@ public sealed class LegacyCompatibilityBridge
         {
             StampHeader(pose, "legacy/pgn/gps", "earth");
 
-            envelope.Header = BuildTelemetryHeader(MessageType.TelemetryPose, pose.CalculateSize());
+            envelope.Header = BuildTelemetryHeader(MessageType.LinkMessageTypeTelemetryPose, pose.CalculateSize());
             envelope.Pose = pose;
             return true;
         }
@@ -116,19 +116,19 @@ public sealed class LegacyCompatibilityBridge
 
         switch (envelope.Header?.MessageType)
         {
-            case MessageType.TelemetryPose when envelope.Pose is not null:
+            case MessageType.LinkMessageTypeTelemetryPose when envelope.Pose is not null:
                 datagram = _poseCodec.EncodePose(envelope.Pose, new LegacyPoseMetadata());
                 return true;
-            case MessageType.TelemetrySteerState when envelope.SteerState is not null:
+            case MessageType.LinkMessageTypeTelemetrySteerState when envelope.SteerState is not null:
                 datagram = _steerCodec.EncodeSteerState(envelope.SteerState, new LegacySteerStateMetadata());
                 return true;
-            case MessageType.CommandSteer when envelope.SteerCommand is not null:
+            case MessageType.LinkMessageTypeCommandSteer when envelope.SteerCommand is not null:
                 datagram = _steerCodec.EncodeSteerCommand(
                     envelope.SteerCommand,
                     envelope.SectionMask,
                     new LegacySteerCommandMetadata());
                 return true;
-            case MessageType.DiscoveryAnnounce:
+            case MessageType.LinkMessageTypeDiscoveryAnnounce:
                 // The bridge originates discovery responses on behalf of the legacy devices; announcements are relayed as-is.
                 _logger.LogDebug("Ignoring attempt to emit discovery announce back onto legacy PGNs.");
                 return false;

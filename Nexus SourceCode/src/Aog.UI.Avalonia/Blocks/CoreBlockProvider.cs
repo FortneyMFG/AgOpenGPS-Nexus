@@ -87,7 +87,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Cmd.AutoSteerToggle"),
             Kind = BlockKind.CommandButton,
             Label = "Autosteer",
-            IconKey = "AutoSteerOff",
+            IconKey = "autosteer",
             PreferredDock = BlockRegion.Right,
             Placement = PlacementPolicy.MenuScoped,
             ContainerId = "AutosteerControls",
@@ -99,7 +99,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Cmd.ABLineCycle"),
             Kind = BlockKind.CommandButton,
             Label = "Cycle AB Line",
-            IconKey = "ABLine",
+            IconKey = "ab-lines",
             PreferredDock = BlockRegion.Right,
             Placement = PlacementPolicy.MenuScoped,
             ContainerId = "AutosteerControls",
@@ -111,7 +111,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Cmd.UTurnToggle"),
             Kind = BlockKind.CommandButton,
             Label = "U-Turn",
-            IconKey = "UTurn",
+            IconKey = "uturn",
             PreferredDock = BlockRegion.Right,
             Placement = PlacementPolicy.MenuScoped,
             ContainerId = "AutosteerControls",
@@ -123,7 +123,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Cmd.SectionMaster"),
             Kind = BlockKind.CommandButton,
             Label = "Sections",
-            IconKey = "SectionMaster",
+            IconKey = "sections",
             PreferredDock = BlockRegion.Right,
             Placement = PlacementPolicy.MenuScoped,
             ContainerId = "SectionControls",
@@ -135,7 +135,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Cmd.Start"),
             Kind = BlockKind.CommandButton,
             Label = "Start",
-            IconKey = "Start",
+            IconKey = "start",
             PreferredDock = BlockRegion.Bottom,
             Placement = PlacementPolicy.Free,
             CommandKey = "Host.StartGuidance",
@@ -146,7 +146,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Cmd.Pause"),
             Kind = BlockKind.CommandButton,
             Label = "Pause",
-            IconKey = "Pause",
+            IconKey = "pause",
             PreferredDock = BlockRegion.Bottom,
             Placement = PlacementPolicy.Free,
             CommandKey = "Host.PauseGuidance",
@@ -157,7 +157,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Cmd.Stop"),
             Kind = BlockKind.CommandButton,
             Label = "Stop",
-            IconKey = "Stop",
+            IconKey = "stop",
             PreferredDock = BlockRegion.Bottom,
             Placement = PlacementPolicy.Free,
             CommandKey = "Host.StopGuidance",
@@ -168,7 +168,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Cmd.NudgeLeft"),
             Kind = BlockKind.CommandButton,
             Label = "Nudge L",
-            IconKey = "NudgeLeft",
+            IconKey = "nudge-left",
             PreferredDock = BlockRegion.Bottom,
             Placement = PlacementPolicy.Free,
             CommandKey = "Host.NudgeLeft",
@@ -179,7 +179,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Cmd.NudgeRight"),
             Kind = BlockKind.CommandButton,
             Label = "Nudge R",
-            IconKey = "NudgeRight",
+            IconKey = "nudge-right",
             PreferredDock = BlockRegion.Bottom,
             Placement = PlacementPolicy.Free,
             CommandKey = "Host.NudgeRight",
@@ -190,11 +190,72 @@ public sealed class CoreBlockProvider : IBlockProvider
             Id = new BlockDefinitionId("Tel.Speed"),
             Kind = BlockKind.Telemetry,
             Label = "Speed",
+            IconKey = "speed",
             PreferredDock = BlockRegion.Top,
             Placement = PlacementPolicy.Free,
             SupportsHalfHeight = true,
             TelemetrySmallViewKey = "Telemetry/SpeedSmall",
             TelemetryLargeViewKey = "Telemetry/SpeedLarge",
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Cmd.MapTools"),
+            Kind = BlockKind.CommandButton,
+            Label = "Map Tools",
+            IconKey = "map-tools",
+            PreferredDock = BlockRegion.Left,
+            Placement = PlacementPolicy.Free,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Cmd.Guidance"),
+            Kind = BlockKind.CommandButton,
+            Label = "Guidance",
+            IconKey = "guidance",
+            PreferredDock = BlockRegion.Left,
+            Placement = PlacementPolicy.Free,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Cmd.Equipment"),
+            Kind = BlockKind.CommandButton,
+            Label = "Equipment",
+            IconKey = "equipment",
+            PreferredDock = BlockRegion.Left,
+            Placement = PlacementPolicy.Free,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Cmd.Coverage"),
+            Kind = BlockKind.CommandButton,
+            Label = "Coverage",
+            IconKey = "coverage",
+            PreferredDock = BlockRegion.Left,
+            Placement = PlacementPolicy.Free,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Cmd.Hydraulics"),
+            Kind = BlockKind.CommandButton,
+            Label = "Hydraulics",
+            IconKey = "hydraulics",
+            PreferredDock = BlockRegion.Left,
+            Placement = PlacementPolicy.Free,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Cmd.AbLines"),
+            Kind = BlockKind.CommandButton,
+            Label = "AB Lines",
+            IconKey = "ab-lines",
+            PreferredDock = BlockRegion.Left,
+            Placement = PlacementPolicy.Free,
         };
     }
 }

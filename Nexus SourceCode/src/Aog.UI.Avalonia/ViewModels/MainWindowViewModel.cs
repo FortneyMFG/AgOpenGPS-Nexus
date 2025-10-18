@@ -40,10 +40,6 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private readonly SimulationConfiguration? _simulationConfiguration;
     private readonly IUiPreferencesService _preferencesService;
     private readonly IThemeManager _themeManager;
-    private readonly IBlockLayoutStore _blockLayoutStore;
-    private readonly IBlockCatalog _blockCatalog;
-    private readonly IReadOnlyList<BlockInstance> _blockInstances;
-    private readonly BlockSidebarBuilder _blockSidebarBuilder;
     private readonly ShellLayoutPreferences _shellLayout;
     private readonly TimeProvider _timeProvider;
     private bool _disposed;
@@ -73,8 +69,6 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         IUiPreferencesService preferencesService,
         IThemeManager themeManager,
         IShellCommandDispatcher commandDispatcher,
-        IBlockLayoutStore blockLayoutStore,
-        IBlockCatalog blockCatalog,
         AppShellViewModel shell,
         TelemetryPrivacyViewModel telemetryPrivacy,
         TimeProvider timeProvider)
@@ -83,8 +77,6 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         ArgumentNullException.ThrowIfNull(preferencesService);
         ArgumentNullException.ThrowIfNull(themeManager);
         ArgumentNullException.ThrowIfNull(commandDispatcher);
-        ArgumentNullException.ThrowIfNull(blockLayoutStore);
-        ArgumentNullException.ThrowIfNull(blockCatalog);
         ArgumentNullException.ThrowIfNull(shell);
         ArgumentNullException.ThrowIfNull(telemetryPrivacy);
         ArgumentNullException.ThrowIfNull(timeProvider);
@@ -94,10 +86,6 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _themeManager = themeManager;
         _timeProvider = timeProvider;
         Shell = shell;
-        _blockLayoutStore = blockLayoutStore;
-        _blockCatalog = blockCatalog;
-        _blockInstances = _blockLayoutStore.Load().OrderBy(instance => instance.Order).ToList();
-        _blockSidebarBuilder = new BlockSidebarBuilder(_blockCatalog, UpdateStatusText);
 
         TelemetryPrivacy = telemetryPrivacy;
 
@@ -160,14 +148,12 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         ShellMenuBar = new ShellMenuBarViewModel(commandDispatcher);
         TopToolbar = new TopToolbarViewModel(commandDispatcher);
         StatusStrip = BuildStatusStrip();
-        LeftSidebarButtons = BuildLeftSidebar();
-        RightSidebarButtons = BuildRightSidebar();
-        BottomShortcutButtons = BuildBottomStrip();
         Shell.StatusStrip = StatusStrip;
         Shell.Host = this;
         Shell.MainContent = BoundaryTool;
         Shell.CurrentView = BoundaryTool;
         Shell.StatusText = Title;
+        Shell.Layout.SetCommandInterceptor(HandleBlockCommand);
     }
 
     /// <summary>Raised when a property value changes.</summary>
@@ -187,15 +173,6 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     /// <summary>Gets the status strip view-model providing runtime indicators.</summary>
     public StatusStripViewModel StatusStrip { get; }
-
-    /// <summary>Gets the left sidebar button collection.</summary>
-    public IReadOnlyList<SidebarButtonViewModel> LeftSidebarButtons { get; }
-
-    /// <summary>Gets the right sidebar button collection.</summary>
-    public IReadOnlyList<SidebarButtonViewModel> RightSidebarButtons { get; }
-
-    /// <summary>Gets the bottom shortcut button strip.</summary>
-    public IReadOnlyList<SidebarButtonViewModel> BottomShortcutButtons { get; }
 
     /// <summary>Gets a sample vehicle pose used to seed the map view.</summary>
     public VehiclePose VehiclePose { get; } = new(10, 15, 45);
@@ -347,84 +324,37 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>Gets the diagnostics workspace view-model surfaced in the sidebar.</summary>
     public DiagnosticsWorkspaceViewModel DiagnosticsWorkspace { get; }
 
-    private IReadOnlyList<SidebarButtonViewModel> BuildLeftSidebar()
+    private bool HandleBlockCommand(BlockDefinition definition)
     {
-        return BuildButtonsForRegion(BlockRegion.Left, BuildLegacyLeftSidebar);
-    }
-
-    private IReadOnlyList<SidebarButtonViewModel> BuildRightSidebar()
-    {
-        return BuildButtonsForRegion(BlockRegion.Right, BuildLegacyRightSidebar);
-    }
-
-    private IReadOnlyList<SidebarButtonViewModel> BuildBottomStrip()
-    {
-        return BuildButtonsForRegion(BlockRegion.Bottom, BuildLegacyBottomStrip);
-    }
-
-    private IReadOnlyList<SidebarButtonViewModel> BuildLegacyLeftSidebar()
-    {
-        return new[]
+        if (definition is null)
         {
-            new SidebarButtonViewModel(
-                "Map Tools",
-                new DelegateCommand(_ =>
-                {
-                    Shell.StatusText = "Opening map tools menu.";
-                    ShowMapToolsMenu();
-                }),
-                "Open boundary, headland, and flag tools."),
-            CreateSidebarButton("Guidance", "Guidance tools coming soon."),
-            CreateSidebarButton("Equipment", "Open Settings → Equipment to adjust vehicle and implement presets."),
-            CreateSidebarButton("Coverage", "Coverage layers are visible."),
-            CreateSidebarButton("Hydraulics", "Hydraulic controls unavailable in design mode."),
-            CreateSidebarButton("AB Lines", "AB line editor not yet connected."),
-        };
-    }
+            return false;
+        }
 
-    private IReadOnlyList<SidebarButtonViewModel> BuildLegacyRightSidebar()
-    {
-        return new[]
+        switch (definition.Id.Value)
         {
-            CreateSidebarButton("Legend", "Toggled field legend visibility."),
-            CreateSidebarButton("Diagnostics", "Diagnostics workspace will open here."),
-            CreateSidebarButton("Telemetry", "Telemetry logging currently enabled."),
-            CreateSidebarButton("Mesh", "Mesh presence broadcasting (mock)."),
-        };
-    }
-
-    private IReadOnlyList<SidebarButtonViewModel> BuildLegacyBottomStrip()
-    {
-        return new[]
-        {
-            CreateSidebarButton("Start", "Starting autoguidance sequence (mock)."),
-            CreateSidebarButton("Pause", "Autoguidance paused."),
-            CreateSidebarButton("Resume", "Autoguidance resumed."),
-            CreateSidebarButton("Nudge L", "Nudged guidance line left by 2 cm."),
-            CreateSidebarButton("Nudge R", "Nudged guidance line right by 2 cm."),
-            CreateSidebarButton("Stop", "Stopped autoguidance."),
-        };
-    }
-
-    private IReadOnlyList<SidebarButtonViewModel> BuildButtonsForRegion(
-        BlockRegion region,
-        Func<IReadOnlyList<SidebarButtonViewModel>> legacyFactory)
-    {
-        var buttons = _blockSidebarBuilder.Build(region, _blockInstances);
-        return buttons.Count > 0 ? buttons : legacyFactory();
-    }
-
-    private void UpdateStatusText(string message)
-    {
-        Shell.StatusText = string.IsNullOrWhiteSpace(message) ? "Command executed." : message;
-    }
-
-    private SidebarButtonViewModel CreateSidebarButton(string label, string statusMessage)
-    {
-        return new SidebarButtonViewModel(
-            label,
-            new DelegateCommand(_ => Shell.StatusText = statusMessage),
-            statusMessage);
+            case "Cmd.MapTools":
+                ShowMapToolsMenu();
+                Shell.StatusText = "Opening map tools menu.";
+                return true;
+            case "Cmd.Guidance":
+                Shell.StatusText = "Guidance tools coming soon.";
+                return true;
+            case "Cmd.Equipment":
+                Shell.StatusText = "Equipment presets live under Settings -> Equipment.";
+                return true;
+            case "Cmd.Coverage":
+                Shell.StatusText = "Coverage layers currently visible.";
+                return true;
+            case "Cmd.Hydraulics":
+                Shell.StatusText = "Hydraulic controls locked in design mode.";
+                return true;
+            case "Cmd.AbLines":
+                Shell.StatusText = "AB line editor integration in progress.";
+                return true;
+            default:
+                return false;
+        }
     }
 
     private void ShowMapToolsMenu()
@@ -899,3 +829,5 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
+
+

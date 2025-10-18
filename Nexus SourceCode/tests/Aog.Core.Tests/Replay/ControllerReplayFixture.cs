@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
@@ -88,7 +89,7 @@ internal static class ControllerReplayFixture
             Header = CreateHeader(sequence++, "controller", "sim", startTimestamp + TimeSpan.FromSeconds(4)),
             PluginId = "controllers.guidance",
             Topic = "command",
-            Payload = ByteString.CopyFromUtf8(guidancePayload)
+            Payload = Encoding.UTF8.GetBytes(guidancePayload)
         };
         await bus.PublishAsync(guidanceCommand).ConfigureAwait(false);
 
@@ -98,7 +99,7 @@ internal static class ControllerReplayFixture
             Header = CreateHeader(sequence++, "controller", "sim", startTimestamp + TimeSpan.FromSeconds(5)),
             PluginId = "controllers.sections",
             Topic = "state",
-            Payload = ByteString.CopyFromUtf8(sectionsPayload)
+            Payload = Encoding.UTF8.GetBytes(sectionsPayload)
         };
         await bus.PublishAsync(sectionsCommand).ConfigureAwait(false);
 

@@ -23,7 +23,7 @@ public sealed class ScenarioLibrarySamplesTests
         configuration.Scenarios.Select(s => s.ScenarioId)
             .Should().Contain(new[] { "baseline-guidance", "headland-training", "replay-overlay" });
         configuration.Scenarios.Should().OnlyContain(s => s.Routes.Count > 0);
-        configuration.Scenarios.Should().OnlyContain(s => s.Options is not null);
+        configuration.Scenarios.Should().OnlyContain(s => s.Options != null);
     }
 
     private static string GetRepositoryRoot()

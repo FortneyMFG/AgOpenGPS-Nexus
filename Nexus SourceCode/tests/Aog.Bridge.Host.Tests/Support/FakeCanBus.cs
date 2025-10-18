@@ -20,5 +20,5 @@ internal sealed class FakeCanBus : ICanBus
 
     public IAsyncEnumerable<AogCanFrame> ReadAsync(CancellationToken cancellationToken) => _incoming.Reader.ReadAllAsync(cancellationToken);
 
-    public ValueTask InjectAsync(AogCanFrame frame) => _incoming.Writer.WriteAsync(frame).AsValueTask();
+    public ValueTask InjectAsync(AogCanFrame frame) => _incoming.Writer.WriteAsync(frame);
 }

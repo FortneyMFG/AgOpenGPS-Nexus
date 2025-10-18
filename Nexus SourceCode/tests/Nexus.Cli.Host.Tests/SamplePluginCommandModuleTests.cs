@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
@@ -30,8 +31,8 @@ public sealed class SamplePluginCommandModuleTests
 
         module.Configure(context);
 
-        var sampleCommand = root.Children.Should().ContainSingle(c => c.Name == "sample").Subject;
-        sampleCommand.Children.Should().Contain(c => c.Name == "calibrate");
-        sampleCommand.Children.Should().Contain(c => c.Name == "sniff");
+        var sampleCommand = root.Children.OfType<Command>().Should().ContainSingle(c => c.Name == "sample").Subject;
+        sampleCommand.Children.OfType<Command>().Should().Contain(c => c.Name == "calibrate");
+        sampleCommand.Children.OfType<Command>().Should().Contain(c => c.Name == "sniff");
     }
 }

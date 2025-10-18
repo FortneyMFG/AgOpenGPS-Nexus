@@ -36,7 +36,7 @@ public sealed class HostInfoPresenter
 
     private static void RenderHuman(HostInfo hostInfo, IAnsiConsole console)
     {
-        console.Write(new Rule("[bold green]Nexus CLI host diagnostics[/]") { Alignment = Justify.Left });
+        console.Write(new Rule("[bold green]Nexus CLI host diagnostics[/]") { Justification = Justify.Left });
 
         var runtimeTable = new Table().Border(TableBorder.Rounded).Expand();
         runtimeTable.AddColumn("[steelblue1]Runtime[/]");

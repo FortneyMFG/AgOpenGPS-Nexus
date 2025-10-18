@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Aog.Core.Legacy;
-using Aog.Core.Paths;
+using CoveragePlanarPoint = Aog.Core.Coverage.PlanarPoint;
 using Xunit;
 
 namespace Aog.Core.Tests.Legacy;
@@ -46,6 +46,17 @@ public sealed class LegacyGuidanceImportServiceTests
         var origin = result.Origin;
         Assert.Equal(51.0000, origin.LatitudeDeg, 6);
         Assert.Equal(-114.0005, origin.LongitudeDeg, 6);
+
+        var expectedPlanar = boundaryPoints
+            .Take(boundaryPoints.Count - 1)
+            .Select(point => ToPlanar(point.Lat, point.Lon, origin))
+            .ToList();
+
+        for (var i = 0; i < expectedPlanar.Count; i++)
+        {
+            Assert.Equal(expectedPlanar[i].Easting, result.Boundary[i].Easting, 3);
+            Assert.Equal(expectedPlanar[i].Northing, result.Boundary[i].Northing, 3);
+        }
 
         var firstLine = result.AbLines[0];
         Assert.Equal("Alpha", firstLine.Name);
@@ -100,21 +111,19 @@ public sealed class LegacyGuidanceImportServiceTests
 
         var expected = outerOne.Take(outerOne.Count - 1)
             .Concat(outerTwo.Take(outerTwo.Count - 1))
-            .Select(p => new GeographicCoordinate(p.Lat, p.Lon))
+            .Select(p => ToPlanar(p.Lat, p.Lon, result.Origin))
             .ToList();
 
         Assert.Equal(expected.Count, result.Boundary.Count);
 
         for (var i = 0; i < expected.Count; i++)
         {
-            Assert.Equal(expected[i].LatitudeDeg, result.Boundary[i].LatitudeDeg, 9);
-            Assert.Equal(expected[i].LongitudeDeg, result.Boundary[i].LongitudeDeg, 9);
+            Assert.Equal(expected[i].Easting, result.Boundary[i].Easting, 3);
+            Assert.Equal(expected[i].Northing, result.Boundary[i].Northing, 3);
         }
 
-        var holeVertex = innerHole[0];
-        Assert.DoesNotContain(result.Boundary, coordinate =>
-            Math.Abs(coordinate.LatitudeDeg - holeVertex.Lat) < 1e-9 &&
-            Math.Abs(coordinate.LongitudeDeg - holeVertex.Lon) < 1e-9);
+        var holePlanar = ToPlanar(innerHole[0].Lat, innerHole[0].Lon, result.Origin);
+        Assert.DoesNotContain(result.Boundary, coordinate => NearlyEquals(coordinate, holePlanar));
     }
 
     [Fact]
@@ -153,23 +162,44 @@ public sealed class LegacyGuidanceImportServiceTests
 
         var expected = firstRecordRing.Take(firstRecordRing.Count - 1)
             .Concat(secondRecordRing.Take(secondRecordRing.Count - 1))
-            .Select(p => new GeographicCoordinate(p.Lat, p.Lon))
+            .Select(p => ToPlanar(p.Lat, p.Lon, result.Origin))
             .ToList();
 
-        Assert.Equal(expected.Count, result.Boundary.Count);
+        var boundary = result.Boundary.ToList();
+        Assert.Equal(expected.Count, boundary.Count);
 
         for (var i = 0; i < expected.Count; i++)
         {
-            Assert.Equal(expected[i].LatitudeDeg, result.Boundary[i].LatitudeDeg, 9);
-            Assert.Equal(expected[i].LongitudeDeg, result.Boundary[i].LongitudeDeg, 9);
+            Assert.Equal(expected[i].Easting, boundary[i].Easting, 3);
+            Assert.Equal(expected[i].Northing, boundary[i].Northing, 3);
         }
 
         var secondRecordFirstVertex = secondRecordRing[0];
-        var indexOfSecondRecord = result.Boundary.FindIndex(coordinate =>
-            Math.Abs(coordinate.LatitudeDeg - secondRecordFirstVertex.Lat) < 1e-9 &&
-            Math.Abs(coordinate.LongitudeDeg - secondRecordFirstVertex.Lon) < 1e-9);
+        var secondRecordPlanar = ToPlanar(secondRecordFirstVertex.Lat, secondRecordFirstVertex.Lon, result.Origin);
+        var indexOfSecondRecord = boundary.FindIndex(point => NearlyEquals(point, secondRecordPlanar));
 
-        Assert.InRange(indexOfSecondRecord, firstRecordRing.Count - 1, result.Boundary.Count - secondRecordRing.Count + 1);
+        Assert.InRange(indexOfSecondRecord, firstRecordRing.Count - 1, boundary.Count - secondRecordRing.Count + 1);
+    }
+
+    private static CoveragePlanarPoint ToPlanar(double latitudeDeg, double longitudeDeg, GeographicCoordinate origin)
+    {
+        const double EarthRadiusMeters = 6_378_137.0;
+        var latRad = DegreesToRadians(latitudeDeg);
+        var lonRad = DegreesToRadians(longitudeDeg);
+        var originLatRad = DegreesToRadians(origin.LatitudeDeg);
+        var originLonRad = DegreesToRadians(origin.LongitudeDeg);
+
+        var easting = (lonRad - originLonRad) * Math.Cos((latRad + originLatRad) / 2.0) * EarthRadiusMeters;
+        var northing = (latRad - originLatRad) * EarthRadiusMeters;
+        return new CoveragePlanarPoint(easting, northing);
+    }
+
+    private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180.0;
+
+    private static bool NearlyEquals(CoveragePlanarPoint left, CoveragePlanarPoint right, double toleranceMeters = 0.01)
+    {
+        return Math.Abs(left.Easting - right.Easting) <= toleranceMeters &&
+               Math.Abs(left.Northing - right.Northing) <= toleranceMeters;
     }
 
     private static void WritePolygonShapefile(string path, IReadOnlyList<IReadOnlyList<(double Lon, double Lat)>> parts)

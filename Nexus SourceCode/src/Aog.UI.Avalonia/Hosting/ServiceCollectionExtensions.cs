@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IBlockCatalog, BlockCatalog>();
         services.TryAddSingleton<IBlockLayoutStore, BlockLayoutStore>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IBlockProvider, CoreBlockProvider>());
+        services.TryAddSingleton<BlockLayoutViewModel>();
         services.TryAddSingleton<IThemeManager, ThemeManager>();
         services.TryAddSingleton<ICrashTelemetryService, CrashTelemetryService>();
         services.TryAddSingleton<IShellCommandDispatcher, ShellCommandDispatcher>();

@@ -16,10 +16,7 @@ internal sealed class TestTimeProvider : TimeProvider
 
     public override long GetTimestamp() => _timestamp;
 
-    public override TimeSpan GetElapsedTime(long startingTimestamp, long endingTimestamp)
-    {
-        return TimeSpan.FromMilliseconds(endingTimestamp - startingTimestamp);
-    }
+    public override long TimestampFrequency => 1000;
 
     public void Advance(TimeSpan delta)
     {

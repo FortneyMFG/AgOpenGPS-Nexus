@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Aog.Core.V1;
 using Google.Protobuf;
@@ -12,6 +13,10 @@ namespace Aog.Bridge.Host.AogLink.Legacy;
 public static class LegacySteerStateExtensions
 {
     private const int LegacyHeadingFieldNumber = 65000;
+
+    private static readonly FieldInfo UnknownFieldsField =
+        typeof(SteerState).GetField("_unknownFields", BindingFlags.NonPublic | BindingFlags.Instance)
+        ?? throw new MissingFieldException(typeof(SteerState).FullName, "_unknownFields");
 
     private sealed class LegacySteerStateMetadataHolder
     {
@@ -33,7 +38,9 @@ public static class LegacySteerStateExtensions
         var holder = Metadata.GetOrCreateValue(state);
         holder.HeadingDegrees = headingDegrees;
 
-        state.UnknownFields = PersistLegacyHeading(state.UnknownFields, headingDegrees);
+        var existingFields = GetUnknownFields(state);
+        var persisted = PersistLegacyHeading(existingFields, headingDegrees);
+        SetUnknownFields(state, persisted);
     }
 
     /// <summary>
@@ -53,8 +60,9 @@ public static class LegacySteerStateExtensions
             return true;
         }
 
-        if (state.UnknownFields is not null
-            && TryReadLegacyHeadingFromUnknownFields(state.UnknownFields, out var persistedHeading))
+        var unknownFields = GetUnknownFields(state);
+        if (unknownFields is not null
+            && TryReadLegacyHeadingFromUnknownFields(unknownFields, out var persistedHeading))
         {
             Metadata.GetOrCreateValue(state).HeadingDegrees = persistedHeading;
             headingDegrees = persistedHeading;
@@ -77,8 +85,16 @@ public static class LegacySteerStateExtensions
 
         Metadata.Remove(state);
 
-        state.UnknownFields = RemoveLegacyHeadingField(state.UnknownFields);
+        var current = GetUnknownFields(state);
+        var cleaned = RemoveLegacyHeadingField(current);
+        SetUnknownFields(state, cleaned);
     }
+
+    private static UnknownFieldSet? GetUnknownFields(SteerState state) =>
+        (UnknownFieldSet?)UnknownFieldsField.GetValue(state);
+
+    private static void SetUnknownFields(SteerState state, UnknownFieldSet? fields) =>
+        UnknownFieldsField.SetValue(state, fields);
 
     private static UnknownFieldSet? PersistLegacyHeading(UnknownFieldSet? existingFields, double headingDegrees)
     {

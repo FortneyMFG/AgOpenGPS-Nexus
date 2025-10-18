@@ -26,7 +26,7 @@ public sealed class AogLinkMeshBridgeTests
             {
                 Source = 42,
                 MessageClass = LinkClass.System,
-                MessageType = MessageType.DiscoveryAnnounce,
+                MessageType = MessageType.LinkMessageTypeDiscoveryAnnounce,
             },
             DiscoveryAnnounce = new DiscoveryAnnounce
             {
@@ -86,7 +86,7 @@ public sealed class AogLinkMeshBridgeTests
             {
                 Source = 7,
                 MessageClass = LinkClass.Telemetry,
-                MessageType = MessageType.TelemetryPose,
+                MessageType = MessageType.LinkMessageTypeTelemetryPose,
             },
             Pose = pose,
         };
@@ -135,7 +135,7 @@ public sealed class AogLinkMeshBridgeTests
 
         public IAsyncEnumerable<MeshPublication> SubscribeAsync(MeshSubscriptionRequest request, CancellationToken cancellationToken = default)
         {
-            return AsyncEnumerable.Empty<MeshPublication>();
+            return System.Linq.AsyncEnumerable.Empty<MeshPublication>();
         }
 
         public ValueTask UpdatePresenceAsync(MeshPresenceUpdate update, CancellationToken cancellationToken = default)
@@ -147,6 +147,17 @@ public sealed class AogLinkMeshBridgeTests
         public IReadOnlyList<MeshPresenceSnapshot> ListPresence(string? seasonId = null, string? jobId = null)
         {
             return Array.Empty<MeshPresenceSnapshot>();
+        }
+
+        public MeshDiagnosticsSnapshot GetDiagnostics()
+        {
+            return new MeshDiagnosticsSnapshot(
+                DateTimeOffset.UtcNow,
+                Registrations.Count,
+                0,
+                PresenceUpdates.Count,
+                new MeshDiagnosticsAclSnapshot(0, 0, 0, 0, 0, 0),
+                new MeshDiagnosticsTrafficSnapshot(0, 0, 0, 0, 0, 0));
         }
     }
 }

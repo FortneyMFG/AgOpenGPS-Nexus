@@ -17,7 +17,7 @@ public sealed class ArmingStateMachineTests
         machine.CanEmitOutputs.Should().BeFalse();
 
         var gate = machine.EvaluateOutputs();
-        gate.Allowed.Should().BeFalse();
+        gate.IsAllowed.Should().BeFalse();
         gate.Reason.Should().Contain("disarmed");
     }
 
@@ -91,7 +91,7 @@ public sealed class ArmingStateMachineTests
         machine.CanEmitOutputs.Should().BeFalse();
 
         var gate = machine.EvaluateOutputs();
-        gate.Allowed.Should().BeFalse();
+        gate.IsAllowed.Should().BeFalse();
         gate.Reason.Should().Contain("profile");
     }
 

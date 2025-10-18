@@ -16,13 +16,11 @@ public sealed class NxApplication
 
     public Task<int> InvokeAsync(string[] args, CancellationToken cancellationToken)
     {
-        if (args is null)
-        {
-            throw new ArgumentNullException(nameof(args));
-        }
+        ArgumentNullException.ThrowIfNull(args);
+        cancellationToken.ThrowIfCancellationRequested();
 
         var parser = _parser ??= BuildParser();
-        return parser.InvokeAsync(args, cancellationToken);
+        return parser.InvokeAsync(args, console: null);
     }
 
     private Parser BuildParser()

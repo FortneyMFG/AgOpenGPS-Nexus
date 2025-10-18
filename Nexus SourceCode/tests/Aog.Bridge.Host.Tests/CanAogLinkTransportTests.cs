@@ -47,7 +47,7 @@ public sealed class CanAogLinkTransportTests
         var enumerator = transport.ReadAsync(CancellationToken.None).GetAsyncEnumerator();
         Assert.True(await enumerator.MoveNextAsync());
         var decoded = enumerator.Current;
-        Assert.Equal(MessageType.DiscoveryAnnounce, decoded.Header.MessageType);
+        Assert.Equal(MessageType.LinkMessageTypeDiscoveryAnnounce, decoded.Header.MessageType);
 
         await transport.StopAsync(CancellationToken.None);
     }
@@ -71,7 +71,7 @@ public sealed class CanAogLinkTransportTests
             {
                 Version = 1,
                 MessageClass = LinkClass.System,
-                MessageType = MessageType.DiscoveryAnnounce,
+                MessageType = MessageType.LinkMessageTypeDiscoveryAnnounce,
                 Sequence = 42,
                 Source = 7,
                 Destination = 0,

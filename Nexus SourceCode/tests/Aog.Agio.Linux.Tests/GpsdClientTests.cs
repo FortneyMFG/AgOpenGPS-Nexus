@@ -6,7 +6,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Aog.Agio.Linux.Tests;
+namespace Aog.Agio.Linux.Tests
+{
 
 public sealed class GpsdClientTests
 {
@@ -291,10 +292,6 @@ private sealed class AccessDeniedConnectionFactory : IGpsdConnectionFactory
         throw new SocketException((int)SocketError.AccessDenied);
     }
 }
-
-        }
-    }
-
     private sealed class FakeGpsdStream : Stream
     {
         private readonly byte[] _readBuffer;
@@ -492,7 +489,5 @@ private sealed class ThrowingLogger<T> : ILogger<T>
         public void Dispose() { }
     }
 }
-
-        }
-    }
+}
 }

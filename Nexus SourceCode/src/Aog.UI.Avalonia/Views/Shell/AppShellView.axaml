@@ -7,6 +7,7 @@
              xmlns:views="clr-namespace:Aog.UI.Avalonia.Views.Shell"
              xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
              xmlns:model="clr-namespace:Aog.UI.Avalonia.Models"
+             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
              x:DataType="vm:AppShellViewModel"
@@ -14,6 +15,10 @@
              d:DesignHeight="720">
   <UserControl.Resources>
     <ResourceDictionary>
+      <rendering:IconKeyToBitmapConverter x:Key="BlockIconConverter" />
+      <rendering:LockStateToBitmapConverter x:Key="LockStateIconConverter" />
+      <rendering:LockStateToTextConverter x:Key="LockTooltipConverter" />
+
       <DataTemplate x:Key="ShellMenuItemTemplate"
                     x:DataType="workspace:ShellMenuItemViewModel">
         <MenuItem Header="{Binding Header}"
@@ -38,27 +43,68 @@
         </Button>
       </DataTemplate>
 
-      <DataTemplate x:Key="SidebarButtonTemplate"
-                    x:DataType="workspace:SidebarButtonViewModel">
-        <Button Command="{Binding Command}"
-                ToolTip.Tip="{Binding Description}"
+      <DataTemplate x:Key="VerticalBlockTemplate"
+                    x:DataType="vm:BlockItemViewModel">
+        <Button Command="{Binding InvokeCommand}"
+                ToolTip.Tip="{Binding Label}"
                 Classes.sidebar="True"
                 Classes.vertical="True">
-          <TextBlock Text="{Binding Label}"
-                     TextWrapping="Wrap"
-                     TextAlignment="Center" />
+          <Button.ContextMenu>
+            <ContextMenu>
+              <MenuItem Header="Move up" Command="{Binding MoveUpCommand}" />
+              <MenuItem Header="Move down" Command="{Binding MoveDownCommand}" />
+              <Separator />
+              <MenuItem Header="Move to left" Command="{Binding MoveToLeftCommand}" />
+              <MenuItem Header="Move to right" Command="{Binding MoveToRightCommand}" />
+              <MenuItem Header="Move to top" Command="{Binding MoveToTopCommand}" />
+              <MenuItem Header="Move to bottom" Command="{Binding MoveToBottomCommand}" />
+              <Separator />
+              <MenuItem Header="Delete" Command="{Binding DeleteCommand}" />
+            </ContextMenu>
+          </Button.ContextMenu>
+          <StackPanel HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Spacing="4">
+            <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
+                   Width="32"
+                   Height="32"
+                   Stretch="Uniform" />
+            <TextBlock Text="{Binding Label}"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center" />
+          </StackPanel>
         </Button>
       </DataTemplate>
 
-      <DataTemplate x:Key="BottomStripButtonTemplate"
-                    x:DataType="workspace:SidebarButtonViewModel">
-        <Button Command="{Binding Command}"
-                ToolTip.Tip="{Binding Description}"
+      <DataTemplate x:Key="HorizontalBlockTemplate"
+                    x:DataType="vm:BlockItemViewModel">
+        <Button Command="{Binding InvokeCommand}"
+                ToolTip.Tip="{Binding Label}"
                 Classes.sidebar="True"
                 Classes.bottom="True">
-          <TextBlock Text="{Binding Label}"
-                     TextWrapping="Wrap"
-                     TextAlignment="Center" />
+          <Button.ContextMenu>
+            <ContextMenu>
+              <MenuItem Header="Move left" Command="{Binding MoveToLeftCommand}" />
+              <MenuItem Header="Move right" Command="{Binding MoveToRightCommand}" />
+              <MenuItem Header="Move to top" Command="{Binding MoveToTopCommand}" />
+              <MenuItem Header="Move to bottom" Command="{Binding MoveToBottomCommand}" />
+              <Separator />
+              <MenuItem Header="Move up" Command="{Binding MoveUpCommand}" />
+              <MenuItem Header="Move down" Command="{Binding MoveDownCommand}" />
+              <Separator />
+              <MenuItem Header="Delete" Command="{Binding DeleteCommand}" />
+            </ContextMenu>
+          </Button.ContextMenu>
+          <StackPanel Orientation="Horizontal"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Spacing="8">
+            <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
+                   Width="28"
+                   Height="28"
+                   Stretch="Uniform" />
+            <TextBlock Text="{Binding Label}" />
+          </StackPanel>
         </Button>
       </DataTemplate>
     </ResourceDictionary>
@@ -114,6 +160,33 @@
     <Style Selector="Button.sidebar.bottom">
       <Setter Property="Margin" Value="0" />
     </Style>
+
+    <Style Selector="ToggleButton.layout-lock">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="Focusable" Value="False" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock:hover">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentMutedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentMutedBrush}" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock:checked">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock Image">
+      <Setter Property="Width" Value="20" />
+      <Setter Property="Height" Value="20" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock:checked Image">
+      <Setter Property="Opacity" Value="0.9" />
+    </Style>
   </UserControl.Styles>
 
   <UserControl.DataTemplates>
@@ -123,7 +196,7 @@
 
     <DataTemplate x:DataType="workspace:MainWindowViewModel">
     <Border Padding="{DynamicResource ThemeSpacingLgThickness}">
-        <TextBlock Text="Select a map tool from the sidebar or open Tools → System Summary to review the current configuration."
+        <TextBlock Text="Select a map tool from the sidebar or open Tools -> System Summary to review the current configuration."
                    TextWrapping="Wrap"
                    Foreground="{DynamicResource ThemeAccentMutedBrush}" />
       </Border>
@@ -205,12 +278,38 @@
             </ItemsControl.ItemsPanel>
           </ItemsControl>
 
-          <TextBlock Grid.Column="2"
-                     Text="{Binding StatusText}"
-                     Foreground="{DynamicResource ThemeAccentMutedBrush}"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Right" />
+          <StackPanel Grid.Column="2"
+                      Orientation="Horizontal"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      Spacing="8">
+            <ToggleButton Classes="layout-lock"
+                          IsChecked="{Binding Layout.IsLocked}"
+                          ToolTip.Tip="{Binding Layout.IsLocked, Converter={StaticResource LockTooltipConverter}}">
+              <Image Source="{Binding Layout.IsLocked, Converter={StaticResource LockStateIconConverter}}"
+                     Width="20"
+                     Height="20"
+                     Stretch="Uniform" />
+            </ToggleButton>
+            <TextBlock Text="{Binding StatusText}"
+                       Foreground="{DynamicResource ThemeAccentMutedBrush}"
+                       VerticalAlignment="Center" />
+          </StackPanel>
         </Grid>
+        <ItemsControl x:Name="TopBlocksControl"
+                      ItemsSource="{Binding Layout.TopBlocks}"
+                      ItemTemplate="{StaticResource HorizontalBlockTemplate}"
+                      Margin="0,8,0,0"
+                      HorizontalAlignment="Center"
+                      DragDrop.AllowDrop="True">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal"
+                          HorizontalAlignment="Center"
+                          Spacing="{DynamicResource ThemeSpacingSm}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
       </StackPanel>
     </Border>
 
@@ -224,11 +323,13 @@
         <views:StatusStripView DataContext="{Binding StatusStrip}"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Center" />
-        <ItemsControl Grid.Column="1"
-                      ItemsSource="{Binding Host.BottomShortcutButtons}"
-                      ItemTemplate="{StaticResource BottomStripButtonTemplate}"
+        <ItemsControl x:Name="BottomBlocksControl"
+                      Grid.Column="1"
+                      ItemsSource="{Binding Layout.BottomBlocks}"
+                      ItemTemplate="{StaticResource HorizontalBlockTemplate}"
                       HorizontalAlignment="Right"
-                      VerticalAlignment="Center">
+                      VerticalAlignment="Center"
+                      DragDrop.AllowDrop="True">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <StackPanel Orientation="Horizontal"
@@ -260,11 +361,13 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
-          <ItemsControl Grid.Row="1"
-                        ItemsSource="{Binding Host.LeftSidebarButtons}"
-                        ItemTemplate="{StaticResource SidebarButtonTemplate}"
+          <ItemsControl x:Name="LeftBlocksControl"
+                        Grid.Row="1"
+                        ItemsSource="{Binding Layout.LeftBlocks}"
+                        ItemTemplate="{StaticResource VerticalBlockTemplate}"
                         HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom">
+                        VerticalAlignment="Bottom"
+                        DragDrop.AllowDrop="True">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <StackPanel Orientation="Vertical"
@@ -314,11 +417,13 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
               </Grid.RowDefinitions>
-              <ItemsControl Grid.Row="1"
-                            ItemsSource="{Binding Host.RightSidebarButtons}"
-                            ItemTemplate="{StaticResource SidebarButtonTemplate}"
+              <ItemsControl x:Name="RightBlocksControl"
+                            Grid.Row="1"
+                            ItemsSource="{Binding Layout.RightBlocks}"
+                            ItemTemplate="{StaticResource VerticalBlockTemplate}"
                             HorizontalAlignment="Center"
-                            VerticalAlignment="Bottom">
+                            VerticalAlignment="Bottom"
+                            DragDrop.AllowDrop="True">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
                     <StackPanel Orientation="Vertical"
@@ -334,3 +439,6 @@
     </Grid>
   </DockPanel>
 </UserControl>
+
+
+

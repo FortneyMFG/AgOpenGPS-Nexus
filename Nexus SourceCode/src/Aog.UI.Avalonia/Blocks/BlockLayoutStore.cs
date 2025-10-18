@@ -39,9 +39,11 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         var layout = preferences.ShellLayout;
         EnsureInstanceList(layout);
 
-        if (layout.Instances.Count == 0)
+        var changed = EnsureMenuScopedCanonicals(layout);
+        changed |= EnsureDefaultClones(layout);
+
+        if (changed)
         {
-            SeedDefaultLayout(layout);
             _preferencesService.UpdateShellLayout(layout);
         }
 
@@ -68,9 +70,15 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         }
     }
 
-    private void SeedDefaultLayout(ShellLayoutPreferences layout)
+    private bool EnsureMenuScopedCanonicals(ShellLayoutPreferences layout)
     {
-        var order = 0;
+        var changed = false;
+        var nextOrder = layout.Instances
+            .Where(i => i.Origin == BlockOrigin.Canonical && i.Region == BlockRegion.Floating)
+            .Select(i => i.Order)
+            .DefaultIfEmpty(-1)
+            .Max() + 1;
+
         foreach (var definition in _catalog.All())
         {
             if (definition.Placement != PlacementPolicy.MenuScoped || string.IsNullOrWhiteSpace(definition.ContainerId))
@@ -87,34 +95,48 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
             {
                 DefinitionId = definition.Id,
                 Region = BlockRegion.Floating,
-                Order = order++,
+                Order = nextOrder++,
                 Origin = BlockOrigin.Canonical,
                 ContainerId = definition.ContainerId,
             });
+            changed = true;
         }
 
-        SeedClone(layout, "Cmd.AutoSteerToggle", BlockRegion.Right, 0);
-        SeedClone(layout, "Cmd.UTurnToggle", BlockRegion.Right, 1);
-        SeedClone(layout, "Cmd.SectionMaster", BlockRegion.Right, 2);
-        SeedClone(layout, "Cmd.Start", BlockRegion.Bottom, 0);
-        SeedClone(layout, "Cmd.Pause", BlockRegion.Bottom, 1);
-        SeedClone(layout, "Cmd.Stop", BlockRegion.Bottom, 2);
-        SeedClone(layout, "Cmd.NudgeLeft", BlockRegion.Bottom, 3);
-        SeedClone(layout, "Cmd.NudgeRight", BlockRegion.Bottom, 4);
-        SeedClone(layout, "Tel.Speed", BlockRegion.Top, 0);
+        return changed;
     }
 
-    private void SeedClone(ShellLayoutPreferences layout, string definitionId, BlockRegion region, int order)
+    private bool EnsureDefaultClones(ShellLayoutPreferences layout)
+    {
+        var changed = false;
+        changed |= EnsureClone(layout, "Cmd.MapTools", BlockRegion.Left, 0);
+        changed |= EnsureClone(layout, "Cmd.Guidance", BlockRegion.Left, 1);
+        changed |= EnsureClone(layout, "Cmd.Equipment", BlockRegion.Left, 2);
+        changed |= EnsureClone(layout, "Cmd.Coverage", BlockRegion.Left, 3);
+        changed |= EnsureClone(layout, "Cmd.Hydraulics", BlockRegion.Left, 4);
+        changed |= EnsureClone(layout, "Cmd.AbLines", BlockRegion.Left, 5);
+        changed |= EnsureClone(layout, "Cmd.AutoSteerToggle", BlockRegion.Right, 0);
+        changed |= EnsureClone(layout, "Cmd.UTurnToggle", BlockRegion.Right, 1);
+        changed |= EnsureClone(layout, "Cmd.SectionMaster", BlockRegion.Right, 2);
+        changed |= EnsureClone(layout, "Cmd.Start", BlockRegion.Bottom, 0);
+        changed |= EnsureClone(layout, "Cmd.Pause", BlockRegion.Bottom, 1);
+        changed |= EnsureClone(layout, "Cmd.Stop", BlockRegion.Bottom, 2);
+        changed |= EnsureClone(layout, "Cmd.NudgeLeft", BlockRegion.Bottom, 3);
+        changed |= EnsureClone(layout, "Cmd.NudgeRight", BlockRegion.Bottom, 4);
+        changed |= EnsureClone(layout, "Tel.Speed", BlockRegion.Top, 0);
+        return changed;
+    }
+
+    private bool EnsureClone(ShellLayoutPreferences layout, string definitionId, BlockRegion region, int order)
     {
         var id = new BlockDefinitionId(definitionId);
         if (_catalog.Get(id) is null)
         {
-            return;
+            return false;
         }
 
-        if (layout.Instances.Any(i => i.DefinitionId == id && i.Origin == BlockOrigin.Clone && i.Region == region))
+        if (layout.Instances.Any(i => i.DefinitionId == id))
         {
-            return;
+            return false;
         }
 
         layout.Instances.Add(new BlockInstance
@@ -124,5 +146,7 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
             Order = order,
             Origin = BlockOrigin.Clone,
         });
+        return true;
     }
 }
+

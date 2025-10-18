@@ -97,34 +97,34 @@ public sealed class CapabilityReportGeneratorTests : IDisposable
 
     private static string CreateManifest(string id, string name, string capability, string mode, int timeout, string recovery)
     {
-        return $"""
-        {{
+        return $$"""
+        {
           "schemaVersion": "1.0.0",
-          "id": "{id}",
-          "name": "{name}",
+          "id": "{{id}}",
+          "name": "{{name}}",
           "version": "1.0.0",
-          "requiredApis": {{
+          "requiredApis": {
             "core": ">=1.0.0"
-          }},
-          "supportedCapabilities": ["{capability}"],
+          },
+          "supportedCapabilities": ["{{capability}}"],
           "requiredTransports": ["core://sample"],
           "minimumRuntimeVersion": "1.0.0",
           "simProviders": [
-            {{
-              "providerId": "{capability}.provider",
+            {
+              "providerId": "{{capability}}.provider",
               "type": "Aog.Plugins.Sample.Provider",
-              "topics": ["{capability}"]
-            }}
+              "topics": ["{{capability}}"]
+            }
           ],
           "leases": [
-            {{
-              "capability": "{capability}",
-              "mode": "{mode}",
-              "timeoutSeconds": {timeout},
-              "recovery": "{recovery}"
-            }}
+            {
+              "capability": "{{capability}}",
+              "mode": "{{mode}}",
+              "timeoutSeconds": {{timeout}},
+              "recovery": "{{recovery}}"
+            }
           ]
-        }}
+        }
         """;
     }
 

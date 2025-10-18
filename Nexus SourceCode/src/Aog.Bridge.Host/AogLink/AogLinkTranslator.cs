@@ -18,6 +18,7 @@ public sealed class AogLinkTranslator
     private readonly TimeProvider _timeProvider;
     private readonly AogLinkNodeIdentity _identity;
     private readonly ConcurrentDictionary<uint, PendingCommand> _pendingCommands = new();
+    private readonly long _startupTimestamp;
     private uint _sequence;
 
     public AogLinkTranslator(AogLinkNodeIdentity identity, TimeProvider timeProvider, ILogger<AogLinkTranslator> logger)
@@ -25,6 +26,7 @@ public sealed class AogLinkTranslator
         _identity = identity ?? throw new ArgumentNullException(nameof(identity));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _startupTimestamp = _timeProvider.GetTimestamp();
     }
 
     /// <summary>
@@ -50,7 +52,7 @@ public sealed class AogLinkTranslator
             payload: response,
             destination: announce.Identity?.NodeId ?? 0,
             needsAck: false,
-            priority: NodePriority.NodePriorityDefault);
+            priority: NodePriority.Default);
     }
 
     /// <summary>
@@ -58,12 +60,12 @@ public sealed class AogLinkTranslator
     /// </summary>
     public LinkEnvelope CreateHeartbeat(uint destination = 0)
     {
-        var uptime = (ulong)_timeProvider.GetElapsedTime(TimeSpan.Zero, _timeProvider.GetTimestamp());
+        var uptime = _timeProvider.GetElapsedTime(_startupTimestamp, _timeProvider.GetTimestamp());
 
         var heartbeat = new Heartbeat
         {
             Identity = _identity.ToProto(),
-            UptimeMs = uptime,
+            UptimeMs = (ulong)uptime.TotalMilliseconds,
             StaleSequenceThreshold = 3,
         };
 
@@ -84,10 +86,12 @@ public sealed class AogLinkTranslator
         var now = _timeProvider.GetUtcNow();
         var monotonic = _timeProvider.GetTimestamp();
 
+        var elapsed = _timeProvider.GetElapsedTime(_startupTimestamp, monotonic);
+
         var timeSync = new TimeSync
         {
             CurrentTime = Timestamp.FromDateTimeOffset(now),
-            MonotonicTimeMs = (ulong)_timeProvider.GetElapsedTime(TimeSpan.Zero, monotonic).TotalMilliseconds,
+            MonotonicTimeMs = (ulong)elapsed.TotalMilliseconds,
         };
 
         return CreateEnvelope(
@@ -137,7 +141,7 @@ public sealed class AogLinkTranslator
         if (command is null)
             throw new ArgumentNullException(nameof(command));
 
-        return CreateCommandEnvelope(MessageType.LinkMessageTypeCommandSteer, command, destination, priority: NodePriority.NodePriorityHigh);
+        return CreateCommandEnvelope(MessageType.LinkMessageTypeCommandSteer, command, destination, priority: NodePriority.High);
     }
 
     /// <summary>
@@ -148,7 +152,7 @@ public sealed class AogLinkTranslator
         if (mask is null)
             throw new ArgumentNullException(nameof(mask));
 
-        return CreateCommandEnvelope(MessageType.LinkMessageTypeCommandSectionMask, mask, destination, priority: NodePriority.NodePriorityDefault);
+        return CreateCommandEnvelope(MessageType.LinkMessageTypeCommandSectionMask, mask, destination, priority: NodePriority.Default);
     }
 
     /// <summary>
@@ -229,7 +233,7 @@ public sealed class AogLinkTranslator
             throw new ArgumentException("Command envelope must include a header.", nameof(command));
 
         var sequence = command.Header.Sequence;
-        var pending = new PendingCommand(command.Clone(), _timeProvider.GetUtcNow(), attempt: 1);
+        var pending = new PendingCommand(command.Clone(), _timeProvider.GetUtcNow(), Attempt: 1);
         _pendingCommands[sequence] = pending;
     }
 

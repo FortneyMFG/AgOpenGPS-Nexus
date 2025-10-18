@@ -68,7 +68,7 @@ public static class Program
                         options.NodeId,
                         options.FirmwareVersion,
                         NodeRole.NodeRoleHost,
-                        NodePriority.NodePriorityHigh);
+                        NodePriority.High);
                 });
 
                 services.AddSingleton<AogLinkTranslator>();

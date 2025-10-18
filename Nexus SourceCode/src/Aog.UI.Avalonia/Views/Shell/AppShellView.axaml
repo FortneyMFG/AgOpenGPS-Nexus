@@ -37,6 +37,30 @@
           <TextBlock Text="{Binding DisplayName}" />
         </Button>
       </DataTemplate>
+
+      <DataTemplate x:Key="SidebarButtonTemplate"
+                    x:DataType="workspace:SidebarButtonViewModel">
+        <Button Command="{Binding Command}"
+                ToolTip.Tip="{Binding Description}"
+                Classes.sidebar="True"
+                Classes.vertical="True">
+          <TextBlock Text="{Binding Label}"
+                     TextWrapping="Wrap"
+                     TextAlignment="Center" />
+        </Button>
+      </DataTemplate>
+
+      <DataTemplate x:Key="BottomStripButtonTemplate"
+                    x:DataType="workspace:SidebarButtonViewModel">
+        <Button Command="{Binding Command}"
+                ToolTip.Tip="{Binding Description}"
+                Classes.sidebar="True"
+                Classes.bottom="True">
+          <TextBlock Text="{Binding Label}"
+                     TextWrapping="Wrap"
+                     TextAlignment="Center" />
+        </Button>
+      </DataTemplate>
     </ResourceDictionary>
   </UserControl.Resources>
 
@@ -59,6 +83,36 @@
     <Style Selector="Button.toolbar.active">
       <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
       <Setter Property="Foreground" Value="#FFFFFFFF" />
+    </Style>
+
+    <Style Selector="Button.sidebar">
+      <Setter Property="Width" Value="104" />
+      <Setter Property="Height" Value="80" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="Background" Value="{DynamicResource ShellChromeBackgroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusSm}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="Button.sidebar:hover">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentMutedBrush}" />
+      <Setter Property="Foreground" Value="#FFFFFFFF" />
+    </Style>
+
+    <Style Selector="Button.sidebar:pressed">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
+      <Setter Property="Foreground" Value="#FFFFFFFF" />
+    </Style>
+
+    <Style Selector="Button.sidebar.vertical">
+      <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <Style Selector="Button.sidebar.bottom">
+      <Setter Property="Margin" Value="0" />
     </Style>
   </UserControl.Styles>
 
@@ -136,6 +190,8 @@
   <DockPanel LastChildFill="True">
     <Border DockPanel.Dock="Top"
             Background="{DynamicResource ShellChromeBackgroundBrush}"
+            BorderBrush="{DynamicResource ShellChromeBorderBrush}"
+            BorderThickness="0,0,0,1"
             Padding="{DynamicResource ShellChromePadding}">
       <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
         <Menu Background="Transparent">
@@ -165,29 +221,47 @@
           </MenuItem>
         </Menu>
 
-        <StackPanel Orientation="Horizontal"
-                    Spacing="12"
-                    VerticalAlignment="Center">
-          <TextBlock Text="AgOpenGPS Nexus"
-                     FontWeight="Bold"
-                     Foreground="{DynamicResource ThemeForegroundBrush}"
-                     FontSize="{DynamicResource ThemeFontSizeLg}"
-                     Margin="0,0,16,0"
-                     VerticalAlignment="Center" />
-          <ItemsControl ItemsSource="{Binding Host.TopToolbar.Items}"
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="{DynamicResource ThemeSpacingLg}"
+              VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal"
+                      Spacing="{DynamicResource ThemeSpacingSm}"
+                      VerticalAlignment="Center">
+            <Border Background="{DynamicResource ThemeSurfaceBrush}"
+                    BorderBrush="{DynamicResource ShellChromeBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource ThemeRadiusSm}"
+                    Padding="8,4">
+              <TextBlock Text="AgOpenGPS"
+                         FontWeight="Bold"
+                         Foreground="{DynamicResource ThemeForegroundBrush}"
+                         FontSize="{DynamicResource ThemeFontSizeLg}" />
+            </Border>
+            <TextBlock Text="Nexus"
+                       FontSize="{DynamicResource ThemeFontSizeLg}"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+          </StackPanel>
+
+          <ItemsControl Grid.Column="1"
+                        ItemsSource="{Binding Host.TopToolbar.Items}"
                         ItemTemplate="{StaticResource ToolbarItemTemplate}">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
                             Spacing="{DynamicResource ThemeSpacingSm}" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>
-          <TextBlock Text="{Binding StatusText}"
+
+          <TextBlock Grid.Column="2"
+                     Text="{Binding StatusText}"
                      Foreground="{DynamicResource ThemeAccentMutedBrush}"
-                     Margin="16,0,0,0"
-                     VerticalAlignment="Center" />
-        </StackPanel>
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Right" />
+        </Grid>
       </StackPanel>
     </Border>
 
@@ -195,20 +269,62 @@
             Background="{DynamicResource ShellChromeBackgroundBrush}"
             BorderBrush="{DynamicResource ShellChromeBorderBrush}"
             BorderThickness="0,1,0,0"
-            Padding="8,4">
-      <views:StatusStripView DataContext="{Binding StatusStrip}" />
+            Padding="8,6">
+      <Grid ColumnDefinitions="*,Auto"
+            ColumnSpacing="{DynamicResource ThemeSpacingMd}">
+        <views:StatusStripView DataContext="{Binding StatusStrip}"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Center" />
+        <ItemsControl Grid.Column="1"
+                      ItemsSource="{Binding Host.BottomShortcutButtons}"
+                      ItemTemplate="{StaticResource BottomStripButtonTemplate}"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal"
+                          HorizontalAlignment="Right"
+                          Spacing="{DynamicResource ThemeSpacingSm}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </Grid>
     </Border>
 
-    <Grid Margin="12"
-          RowDefinitions="*"
-          ColumnDefinitions="*,340">
-      <Border Background="{DynamicResource ShellPanelBackgroundBrush}"
-              BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+    <Grid Margin="12,12,12,8">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="{Binding Host.RightSidebarColumnWidth}" />
+      </Grid.ColumnDefinitions>
+
+      <Border Grid.Column="0"
+              Background="{DynamicResource ShellChromeBackgroundBrush}"
+              BorderBrush="{DynamicResource ShellChromeBorderBrush}"
               BorderThickness="1"
               CornerRadius="{DynamicResource ThemeRadiusMd}"
-              Padding="16"
-              Margin="0,0,12,0">
-        <ContentControl Content="{Binding MainContent}" />
+              Padding="8"
+              Margin="0,0,12,0"
+              Width="120">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <ItemsControl Grid.Row="1"
+                        ItemsSource="{Binding Host.LeftSidebarButtons}"
+                        ItemTemplate="{StaticResource SidebarButtonTemplate}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"
+                            HorizontalAlignment="Center"
+                            Spacing="{DynamicResource ThemeSpacingSm}" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </Grid>
       </Border>
 
       <Border Grid.Column="1"
@@ -216,8 +332,55 @@
               BorderBrush="{DynamicResource ShellPanelBorderBrush}"
               BorderThickness="1"
               CornerRadius="{DynamicResource ThemeRadiusMd}"
-              Padding="16">
-        <ContentControl Content="{Binding Host}" />
+              Padding="0"
+              Margin="0,0,12,0">
+        <Grid>
+          <Border Background="{DynamicResource ThemeSurfaceAltBrush}"
+                  CornerRadius="{DynamicResource ThemeRadiusMd}" />
+          <ContentControl Margin="16"
+                          Content="{Binding MainContent}" />
+        </Grid>
+      </Border>
+
+      <Border Grid.Column="2"
+              Background="{DynamicResource ShellPanelBackgroundBrush}"
+              BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource ThemeRadiusMd}"
+              Padding="0"
+              IsVisible="{Binding Host.IsRightSidebarVisible}">
+        <Grid ColumnDefinitions="*,Auto">
+          <ContentControl Grid.Column="0"
+                          Margin="16"
+                          Content="{Binding Host}" />
+
+          <Border Grid.Column="1"
+                  Width="120"
+                  Background="{DynamicResource ShellChromeBackgroundBrush}"
+                  BorderBrush="{DynamicResource ShellChromeBorderBrush}"
+                  BorderThickness="1,0,0,0"
+                  Padding="8">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <ItemsControl Grid.Row="1"
+                            ItemsSource="{Binding Host.RightSidebarButtons}"
+                            ItemTemplate="{StaticResource SidebarButtonTemplate}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical"
+                                HorizontalAlignment="Center"
+                                Spacing="{DynamicResource ThemeSpacingSm}" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+            </Grid>
+          </Border>
+        </Grid>
       </Border>
     </Grid>
   </DockPanel>

@@ -267,6 +267,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [ ] NX-948 MainWindow deterministic dashboard seeding
 - [ ] NX-995 Simulation bar design-time view model compile fix — Unseal view-model for design-time designer usage
 - [ ] NX-990 Shell menu tooltip timezone clarification
+- [ ] NX-1116 Legacy shell layout parity pass — Mirror V6 header and side strips in Avalonia shell
 
 - [x] NX-291 Zone editor toolbar integration _(Done)_ — ADR-044 zone drawing framework
 - [x] NX-292 Zone override toggles & policy UX _(Done)_ — ADR-027 constraint UX
@@ -695,6 +696,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-416 | Diagnostics & AgIO workspace port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port diagnostics dialogs aligning with UI core spec |
 | NX-417 | Simulation shell + companion parity automation | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Wire simulator dialog + metadata snapshot harness |
 | NX-418 | Documentation, QA, and release readiness | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Update docs/tests per plan |
+| NX-1116 | Legacy shell layout parity pass | In Progress |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Mirror V6 header and side strips in Avalonia shell |
 | NX-946 | Planter panel row index overflow guard | In Progress |  | — | [SRS §3.8 Planter Monitor](docs/SRS/NOTES.md#srs-38-planter-monitor) | Guard invalid planter row indexes in UI summary |
 
 ### Section F — Porting from V6 (Algorithms)

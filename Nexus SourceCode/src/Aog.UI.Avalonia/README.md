@@ -1,5 +1,13 @@
 # Aog.UI.Avalonia
 
+## Legacy shell layout parity (NX-1116)
+
+The main window shell now mirrors the V6 WPF layout, including the chrome header, left/right
+button strips, and bottom quick actions. `AppShellView` integrates `SidebarButtonViewModel`
+collections exposed by `MainWindowViewModel` so Avalonia renders the same legacy-inspired
+menus and strip buttons while retaining Nexus theming. The central workspace continues to host
+the boundary tool sample while the right-hand column preserves the diagnostics/summary panel.
+
 ## Zone editor toolbar (NX-291)
 
 The main window now hosts a sample toolbar that exercises the zone drawing framework defined in

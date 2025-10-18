@@ -232,12 +232,11 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     }
 
     /// <summary>Gets the grid length applied to the main workspace column.</summary>
-    public GridLength MainWorkspaceColumnWidth =>
-        IsRightSidebarVisible ? new GridLength(3, GridUnitType.Star) : new GridLength(1, GridUnitType.Star);
+    public GridLength MainWorkspaceColumnWidth => new GridLength(1, GridUnitType.Star);
 
     /// <summary>Gets the grid length applied to the right sidebar column.</summary>
     public GridLength RightSidebarColumnWidth =>
-        IsRightSidebarVisible ? new GridLength(2, GridUnitType.Star) : new GridLength(0);
+        IsRightSidebarVisible ? new GridLength(420) : new GridLength(0);
 
     /// <summary>Gets a summary of the embedded simulation configuration.</summary>
     public string SimulationGraphSummary { get; }

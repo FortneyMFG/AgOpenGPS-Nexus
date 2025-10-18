@@ -22,15 +22,17 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             " device:alpha ",
             "  Harvester  ",
-            new[] { "presence", "Presence" },
-            new MeshShareProfile(new[]
+            shareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant(" season:2025 ", " job:123 ", MeshDataTier.Presence, new[] { "presence" })
             }),
-            new MeshSubscribeProfile(new[]
+            subscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("*", "*", MeshDataTier.Presence)
-            })),
+            }))
+        {
+            Capabilities = new[] { "presence", "Presence" }
+        },
             CancellationToken.None);
 
         await service.UpdatePresenceAsync(new MeshPresenceUpdate(

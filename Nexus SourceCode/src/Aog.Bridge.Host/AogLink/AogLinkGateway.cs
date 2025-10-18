@@ -162,7 +162,7 @@ public sealed class AogLinkGateway : IAogLinkGateway
 
     private async Task RespondToDiscoveryAsync(DiscoveryAnnounce announce, CancellationToken cancellationToken)
     {
-        var response = _translator.CreateDiscoveryResponse(announce, Array.Empty<CapabilityDescriptor>());
+        var response = _translator.CreateDiscoveryResponse(announce, Enumerable.Empty<CapabilityDescriptor>());
         await SendAsync(response, cancellationToken).ConfigureAwait(false);
     }
 

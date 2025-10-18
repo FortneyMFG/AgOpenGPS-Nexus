@@ -40,9 +40,11 @@ public sealed class RadioBridgeElrsAdapterTests
             await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
                 "publisher",
                 "Publisher",
-                new[] { "test" },
-                new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
-                new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) })), CancellationToken.None);
+                shareProfile: new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
+                subscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) }))
+            {
+                Capabilities = new[] { "test" }
+            }, CancellationToken.None);
 
             var payload = new byte[] { 0x10, 0x20 };
             await mesh.PublishAsync(new MeshPublishRequest(
@@ -98,9 +100,11 @@ public sealed class RadioBridgeElrsAdapterTests
             await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
                 "inspector",
                 "Inspector",
-                Array.Empty<string>(),
-                new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
-                new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) })), CancellationToken.None);
+                shareProfile: new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
+                subscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) }))
+            {
+                Capabilities = Array.Empty<string>()
+            }, CancellationToken.None);
 
             var subscription = mesh.SubscribeAsync(new MeshSubscriptionRequest("inspector"));
             var firmware = new RadioBridgeFirmwareStub("firmware.elrs");
@@ -163,9 +167,11 @@ public sealed class RadioBridgeElrsAdapterTests
             await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
                 "observer",
                 "Observer",
-                Array.Empty<string>(),
-                new MeshShareProfile(new[] { new MeshShareGrant("system", "radio", MeshDataTier.All) }),
-                new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("system", "radio", MeshDataTier.All) })), CancellationToken.None);
+                shareProfile: new MeshShareProfile(new[] { new MeshShareGrant("system", "radio", MeshDataTier.All) }),
+                subscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("system", "radio", MeshDataTier.All) }))
+            {
+                Capabilities = Array.Empty<string>()
+            }, CancellationToken.None);
 
             var diagnostics = mesh.SubscribeAsync(new MeshSubscriptionRequest("observer", "system", "radio"));
 

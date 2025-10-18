@@ -25,7 +25,7 @@ public sealed class DiagnosticsWorkspaceViewModelTests
         workspace.Telemetry.Should().Be(telemetry);
         workspace.DeviceManager.Should().Be(deviceManager);
         workspace.Gps.FixQuality.Should().Be("RTK Fixed");
-        workspace.Gps.SatelliteCount.Should().BeGreaterOrEqualTo(10);
+        workspace.Gps.SatelliteCount.Should().BeGreaterThanOrEqualTo(10);
         workspace.NetworkChannels.Should().NotBeEmpty();
         workspace.SerialProfiles.Should().NotBeEmpty();
         workspace.Loops.Should().NotBeEmpty();

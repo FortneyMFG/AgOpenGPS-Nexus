@@ -7,6 +7,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
+using PluginJobSessionState = Aog.Plugins.JobTasks.JobSessionState;
+
 namespace Aog.Plugins.Tests.JobTasks;
 
 public sealed class JobSeasonSessionOrchestratorTests
@@ -32,7 +34,7 @@ public sealed class JobSeasonSessionOrchestratorTests
 
         session.SessionId.Should().Be("session:1");
         session.Name.Should().Be("Morning Run");
-        session.State.Should().Be(JobSessionState.Active);
+        session.State.Should().Be(PluginJobSessionState.Active);
         session.StartedAt.Should().Be(time.GetUtcNow());
         session.LastModifiedAt.Should().Be(time.GetUtcNow());
         session.WorkOrderId.Should().Be("work:123");
@@ -70,14 +72,14 @@ public sealed class JobSeasonSessionOrchestratorTests
         time.Advance(TimeSpan.FromMinutes(30));
         var completed = await orchestrator.CompleteSessionAsync("job:alpha", session.SessionId, "Done", CancellationToken.None);
 
-        paused.State.Should().Be(JobSessionState.Paused);
-        resumed.State.Should().Be(JobSessionState.Active);
-        completed.State.Should().Be(JobSessionState.Completed);
+        paused.State.Should().Be(PluginJobSessionState.Paused);
+        resumed.State.Should().Be(PluginJobSessionState.Active);
+        completed.State.Should().Be(PluginJobSessionState.Completed);
         completed.EndedAt.Should().Be(time.GetUtcNow());
 
         var sessions = await orchestrator.ListSessionsAsync("job:alpha");
         sessions.Should().ContainSingle();
-        sessions[0].State.Should().Be(JobSessionState.Completed);
+        sessions[0].State.Should().Be(PluginJobSessionState.Completed);
 
         Assert.True(await watcher.MoveNextAsync());
         watcher.Current.EventType.Should().Be(JobSessionEventType.Started);
@@ -158,7 +160,7 @@ public sealed class JobSeasonSessionOrchestratorTests
         await orchestrator.TrackJobAsync(CreateJobMetadata());
         var session = await orchestrator.StartSessionAsync("job:alpha", new JobSessionStartRequest(), CancellationToken.None);
 
-        var action = () => orchestrator.ResumeSessionAsync("job:alpha", session.SessionId, CancellationToken.None);
+        var action = () => orchestrator.ResumeSessionAsync("job:alpha", session.SessionId, cancellationToken: CancellationToken.None);
         await action.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*cannot be resumed*");
     }

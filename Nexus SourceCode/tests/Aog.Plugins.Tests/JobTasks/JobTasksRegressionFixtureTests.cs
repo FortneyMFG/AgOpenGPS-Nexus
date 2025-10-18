@@ -7,6 +7,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
+using PluginJobSessionState = Aog.Plugins.JobTasks.JobSessionState;
+
 namespace Aog.Plugins.Tests.JobTasks;
 
 public sealed class JobTasksRegressionFixtureTests
@@ -67,7 +69,7 @@ public sealed class JobTasksRegressionFixtureTests
         });
 
         var completed = fixture.Sessions.Single();
-        completed.State.Should().Be(JobSessionState.Completed);
+        completed.State.Should().Be(PluginJobSessionState.Completed);
         completed.LastModifiedAt.Should().Be(clock.GetUtcNow());
         fixture.Job.ActiveSessionId.Should().Be("session:fixture-1");
     }

@@ -80,7 +80,7 @@ public sealed class FirmwareInLoopStabilityTests
         headingErrorHistory.Skip(40).Max().Should().BeLessThan(0.2);
 
         var minLookAhead = lookAheadHistory.Min();
-        minLookAhead.Should().BeGreaterOrEqualTo(settings.MinimumLookAheadMeters - 1e-6);
+        minLookAhead.Should().BeGreaterThanOrEqualTo(settings.MinimumLookAheadMeters - 1e-6);
 
         var baselineAverage = lookAheadHistory.Take(80).Average();
         var headlandAverage = lookAheadHistory.Skip(100).Take(40).Average();
@@ -97,7 +97,7 @@ public sealed class FirmwareInLoopStabilityTests
         {
             var distance = constraintDistanceHistory[index];
             distance.Should().NotBeNull();
-            lookAheadHistory[index].Should().BeLessOrEqualTo(distance!.Value - settings.ConstraintDistanceMarginMeters + 1e-6);
+            lookAheadHistory[index].Should().BeLessThanOrEqualTo(distance!.Value - settings.ConstraintDistanceMarginMeters + 1e-6);
         }
 
         var finalContext = DetermineConstraintContext(steps - 1);

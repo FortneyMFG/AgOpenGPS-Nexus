@@ -163,13 +163,13 @@ public sealed class CrossTrackReplayHarnessTests
         }
     }
 
-    private readonly record struct CrossTrackScenario(
+    public readonly record struct CrossTrackScenario(
         GeoCoordinate Start,
         GeoCoordinate End,
         int SampleCount,
         DateTime StartTimestamp);
 
-    private readonly record struct GeoCoordinate(double LatitudeDeg, double LongitudeDeg);
+    public readonly record struct GeoCoordinate(double LatitudeDeg, double LongitudeDeg);
 
     private sealed class CrossTrackReplayHarness : IDisposable
     {
@@ -282,9 +282,9 @@ public sealed class CrossTrackReplayHarnessTests
             return Math.Atan2(east, north);
         }
 
-        private readonly record struct CrossTrackSample(TimeSpan Offset, double ErrorMeters);
+        public readonly record struct CrossTrackSample(TimeSpan Offset, double ErrorMeters);
 
-        private readonly record struct CrossTrackSummary(
+        public readonly record struct CrossTrackSummary(
             CrossTrackSample[] Samples,
             double MaxAbsoluteError,
             double FinalAbsoluteError,

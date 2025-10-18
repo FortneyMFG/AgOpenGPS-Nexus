@@ -160,13 +160,13 @@
         </Menu>
 
         <StackPanel Orientation="Horizontal"
-                    Spacing="{DynamicResource ThemeSpacingLg}"
+                    Spacing="12"
                     VerticalAlignment="Center">
           <TextBlock Text="AgOpenGPS Nexus"
                      FontWeight="Bold"
                      Foreground="{DynamicResource ThemeForegroundBrush}"
                      FontSize="{DynamicResource ThemeFontSizeLg}"
-                     Margin="0,0,{DynamicResource ThemeSpacingLg},0"
+                     Margin="0,0,16,0"
                      VerticalAlignment="Center" />
           <ItemsControl ItemsSource="{Binding Host.TopToolbar.Items}"
                         ItemTemplate="{StaticResource ToolbarItemTemplate}">
@@ -179,7 +179,7 @@
           </ItemsControl>
           <TextBlock Text="{Binding StatusText}"
                      Foreground="{DynamicResource ThemeAccentMutedBrush}"
-                     Margin="{DynamicResource ThemeSpacingLg},0,0,0"
+                     Margin="16,0,0,0"
                      VerticalAlignment="Center" />
         </StackPanel>
       </StackPanel>
@@ -189,19 +189,19 @@
             Background="{DynamicResource ShellChromeBackgroundBrush}"
             BorderBrush="{DynamicResource ShellChromeBorderBrush}"
             BorderThickness="0,1,0,0"
-            Padding="{DynamicResource ThemeSpacingSm},{DynamicResource ThemeSpacingXs}">
+            Padding="8,4">
       <views:StatusStripView DataContext="{Binding StatusStrip}" />
     </Border>
 
-    <Grid Margin="{DynamicResource ThemeSpacingMd}"
+    <Grid Margin="12"
           RowDefinitions="*"
           ColumnDefinitions="*,340">
       <Border Background="{DynamicResource ShellPanelBackgroundBrush}"
               BorderBrush="{DynamicResource ShellPanelBorderBrush}"
               BorderThickness="1"
               CornerRadius="{DynamicResource ThemeRadiusMd}"
-              Padding="{DynamicResource ThemeSpacingLg}"
-              Margin="0,0,{DynamicResource ThemeSpacingMd},0">
+              Padding="16"
+              Margin="0,0,12,0">
         <ContentControl Content="{Binding MainContent}" />
       </Border>
 
@@ -210,7 +210,7 @@
               BorderBrush="{DynamicResource ShellPanelBorderBrush}"
               BorderThickness="1"
               CornerRadius="{DynamicResource ThemeRadiusMd}"
-              Padding="{DynamicResource ThemeSpacingLg}">
+              Padding="16">
         <ContentControl Content="{Binding Host}" />
       </Border>
     </Grid>

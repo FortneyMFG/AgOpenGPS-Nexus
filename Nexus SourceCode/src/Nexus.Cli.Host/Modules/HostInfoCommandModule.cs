@@ -3,12 +3,13 @@ using System.CommandLine.Invocation;
 using Microsoft.Extensions.DependencyInjection;
 using Nexus.Cli.Host.Host;
 using Nexus.Cli.Host.Output;
-using Nexus.Plugin.Cli.Abstractions;
+using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
+using CliCommandHandler = Nexus.Plugin.Cli.Abstractions.ICommandHandler;
 using Spectre.Console;
 
 namespace Nexus.Cli.Host.Modules;
 
-public sealed class HostInfoCommandModule : ICommandModule
+public sealed class HostInfoCommandModule : CliCommandHandler
 {
     private readonly IHostInfoProvider _infoProvider;
     private readonly HostInfoPresenter _presenter;
@@ -19,7 +20,7 @@ public sealed class HostInfoCommandModule : ICommandModule
         _presenter = presenter ?? throw new ArgumentNullException(nameof(presenter));
     }
 
-    public void Configure(CommandModuleContext context)
+    public void Configure(CliCommandContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

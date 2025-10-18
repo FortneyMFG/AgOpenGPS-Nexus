@@ -3,19 +3,20 @@ using System.Threading;
 using Nexus.Cli.Host.Modules;
 using Nexus.Cli.Host.Output;
 using Nexus.Cli.Host.Plugins;
-using Nexus.Plugin.Cli.Abstractions;
+using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
+using CliCommandHandler = Nexus.Plugin.Cli.Abstractions.ICommandHandler;
 
 namespace Nexus.Cli.Host.Host;
 
 public sealed class RootCommandFactory
 {
     private readonly IServiceProvider _services;
-    private readonly IEnumerable<ICommandModule> _modules;
+    private readonly IEnumerable<CliCommandHandler> _modules;
     private readonly IPluginCommandModuleLoader _pluginModuleLoader;
 
     public RootCommandFactory(
         IServiceProvider services,
-        IEnumerable<ICommandModule> modules,
+        IEnumerable<CliCommandHandler> modules,
         IPluginCommandModuleLoader pluginModuleLoader)
     {
         _services = services ?? throw new ArgumentNullException(nameof(services));
@@ -33,7 +34,7 @@ public sealed class RootCommandFactory
 
         rootCommand.AddGlobalOption(OutputOptions.ModeOption);
 
-        var context = new CommandModuleContext(rootCommand, _services, OutputOptions.ModeOption);
+        var context = new CliCommandContext(rootCommand, _services, OutputOptions.ModeOption);
 
         foreach (var module in _modules)
         {

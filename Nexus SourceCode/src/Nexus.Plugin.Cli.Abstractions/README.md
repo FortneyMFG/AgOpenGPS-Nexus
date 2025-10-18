@@ -1,15 +1,15 @@
 # AgOpenGPS.Nexus.Plugin.Cli.Abstractions
 
 `AgOpenGPS.Nexus.Plugin.Cli.Abstractions` provides the contracts required to build
-command modules that plug into the unified `nx` CLI host. Plugin teams reference
+command handlers that plug into the unified `nx` CLI host. Plugin teams reference
 this package to contribute verbs without re-implementing host plumbing or
 service discovery.
 
 ## Features
 
-- `ICommandModule` interface used by the host to discover and configure plugin
+- `ICommandHandler` interface used by the host to discover and configure plugin
   verbs.
-- `CommandModuleContext` wrapper exposing the root `System.CommandLine`
+- `CommandContext` wrapper exposing the root `System.CommandLine`
   structure, dependency injection container, and shared output options.
 - `PluginCommandModuleDescriptor` metadata supplied for adapter diagnostics and
   manifest correlation.
@@ -18,15 +18,15 @@ service discovery.
 ## Getting started
 
 Install the package from the local artifacts feed or GitHub Packages and
-register your command modules in the plugin manifest:
+register your command handlers in the plugin manifest:
 
 ```bash
 # From your plugin project
  dotnet add package AgOpenGPS.Nexus.Plugin.Cli.Abstractions --version 0.1.*
 ```
 
-Implement the `ICommandModule` interface and use the provided
-`CommandModuleContext` to attach commands to the CLI host. For guidance on
+Implement the `ICommandHandler` interface and use the provided
+`CommandContext` to attach command trees to the CLI host. For guidance on
 wiring adapters into plugin manifests, see `docs/plugins/CLIExtensions.md`.
 
 ## Local development

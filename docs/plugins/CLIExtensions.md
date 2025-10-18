@@ -25,7 +25,7 @@ packaging instructions.
   discovery end-to-end.
 - **Adapter assemblies (`*.Cli.dll`)** implement `Nexus.Plugin.Cli.Abstractions`.
   Drop the assembly beside your plugin package and export one or more
-  `ICommandModule` types. The host will instantiate each module via dependency
+  `ICommandHandler` types. The host will instantiate each handler via dependency
   injection and mount its commands under `nx <plugin-id> …` when the plugin is
   installed locally.【F:docs/ADR/ADR-054_NexusCliHost.md†L20-L56】
 - **Reflection services** let remote-only plugins expose verbs without shipping a

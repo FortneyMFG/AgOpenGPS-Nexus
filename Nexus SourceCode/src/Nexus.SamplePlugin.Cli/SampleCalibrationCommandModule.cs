@@ -2,7 +2,9 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Linq;
 using System.Text.Json;
-using Nexus.Plugin.Cli.Abstractions;
+using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
+using CliCommandHandler = Nexus.Plugin.Cli.Abstractions.ICommandHandler;
+using PluginCommandModuleDescriptor = Nexus.Plugin.Cli.Abstractions.PluginCommandModuleDescriptor;
 using CliInvocationContext = System.CommandLine.Invocation.InvocationContext;
 
 namespace Nexus.SamplePlugin.Cli;
@@ -10,10 +12,10 @@ namespace Nexus.SamplePlugin.Cli;
 /// <summary>
 /// Provides sample <c>nx sample</c> verbs for calibration and sniff workflows.
 /// </summary>
-public sealed class SampleCalibrationCommandModule : ICommandModule
+public sealed class SampleCalibrationCommandModule : CliCommandHandler
 {
     /// <inheritdoc />
-    public void Configure(CommandModuleContext context)
+    public void Configure(CliCommandContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -29,7 +31,7 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
         context.RootCommand.AddCommand(pluginCommand);
     }
 
-    private static Command CreateCalibrateCommand(CommandModuleContext context)
+    private static Command CreateCalibrateCommand(CliCommandContext context)
     {
         var command = new Command("calibrate", "Calibrate the sample grain flow sensor using static weight checks.");
 
@@ -121,7 +123,7 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
         return command;
     }
 
-    private static string ResolveOutputMode(CommandModuleContext context, CliInvocationContext invocationContext)
+    private static string ResolveOutputMode(CliCommandContext context, CliInvocationContext invocationContext)
     {
         if (context.OutputOption is null)
         {

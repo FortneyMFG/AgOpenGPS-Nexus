@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Nexus.Cli.Host.Modules;
 using Nexus.Cli.Host.Output;
 using Nexus.Cli.Host.Plugins.Reflection;
-using Nexus.Plugin.Cli.Abstractions;
+using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
 using Spectre.Console.Testing;
 using Xunit;
 
@@ -35,7 +35,7 @@ public sealed class PluginReflectionCommandModuleTests
         await using var provider = services.BuildServiceProvider();
 
         var root = new RootCommand();
-        var context = new CommandModuleContext(root, provider, OutputOptions.ModeOption);
+        var context = new CliCommandContext(root, provider, OutputOptions.ModeOption);
         var module = new PluginReflectionCommandModule(client, console);
         module.Configure(context);
 
@@ -60,7 +60,7 @@ public sealed class PluginReflectionCommandModuleTests
 
         var root = new RootCommand();
         root.AddGlobalOption(OutputOptions.ModeOption);
-        var context = new CommandModuleContext(root, provider, OutputOptions.ModeOption);
+        var context = new CliCommandContext(root, provider, OutputOptions.ModeOption);
         var module = new PluginReflectionCommandModule(client, console);
         module.Configure(context);
 

@@ -1,7 +1,8 @@
 using System.CommandLine;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Nexus.Plugin.Cli.Abstractions;
+using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
+using PluginCommandModuleDescriptor = Nexus.Plugin.Cli.Abstractions.PluginCommandModuleDescriptor;
 using Nexus.SamplePlugin.Cli;
 using Xunit;
 
@@ -24,7 +25,7 @@ public sealed class SamplePluginCommandModuleTests
         using var provider = services.BuildServiceProvider();
 
         var root = new RootCommand();
-        var context = new CommandModuleContext(root, provider, null);
+        var context = new CliCommandContext(root, provider, null);
         var module = new SampleCalibrationCommandModule();
 
         module.Configure(context);

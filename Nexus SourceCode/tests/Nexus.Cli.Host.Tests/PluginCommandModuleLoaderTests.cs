@@ -11,7 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Aog.Plugins;
 using Nexus.Cli.Host.Plugins;
 using Nexus.Cli.Host.Runtime;
-using Nexus.Plugin.Cli.Abstractions;
+using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
+using PluginCommandModuleDescriptor = Nexus.Plugin.Cli.Abstractions.PluginCommandModuleDescriptor;
 using Spectre.Console;
 using Spectre.Console.Testing;
 using Xunit;
@@ -54,7 +55,7 @@ public sealed class PluginCommandModuleLoaderTests : IDisposable
         modules.Should().HaveCount(1);
 
         var rootCommand = new RootCommand();
-        var context = new CommandModuleContext(rootCommand, _serviceProvider);
+        var context = new CliCommandContext(rootCommand, _serviceProvider);
         modules[0].Configure(context);
 
         rootCommand.Children.Should().ContainSingle();
@@ -144,9 +145,9 @@ public sealed class PluginCommandModuleLoaderTests : IDisposable
         using System.CommandLine;
         using Nexus.Plugin.Cli.Abstractions;
 
-        public sealed class SampleModule : ICommandModule
+        public sealed class SampleModule : ICommandHandler
         {
-            public void Configure(CommandModuleContext context)
+            public void Configure(CommandContext context)
             {
                 var descriptor = (PluginCommandModuleDescriptor?)context.Services.GetService(typeof(PluginCommandModuleDescriptor));
                 var name = descriptor?.PluginName ?? "Sample";
@@ -164,7 +165,7 @@ public sealed class PluginCommandModuleLoaderTests : IDisposable
             MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(Command).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(CommandModuleContext).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(CliCommandContext).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(PluginCommandModuleDescriptor).Assembly.Location),
         };
 

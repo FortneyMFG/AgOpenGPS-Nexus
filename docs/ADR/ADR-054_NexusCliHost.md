@@ -21,7 +21,7 @@ Ship a single `.NET 8` CLI host named `nx` that boots plugin verbs dynamically
 and operates in offline or live modes:
 
 - Discover installed plugins via the manifest registry and load optional
-  `Nexus.Plugin.Cli.Abstractions` adapters (`ICommandModule`) located beside each
+  `Nexus.Plugin.Cli.Abstractions` adapters (`ICommandHandler`) located beside each
   plugin. When a plugin lacks a local adapter, query its Core-hosted CLI
   reflection gRPC service to surface verbs and argument metadata.
 - Resolve Core endpoints automatically by checking for a running Core process on

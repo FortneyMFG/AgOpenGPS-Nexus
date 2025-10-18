@@ -7,13 +7,15 @@ using System.Threading;
 using Aog.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using Nexus.Cli.Host.Runtime;
-using Nexus.Plugin.Cli.Abstractions;
 using Spectre.Console;
+using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
+using CliCommandHandler = Nexus.Plugin.Cli.Abstractions.ICommandHandler;
+using PluginCommandModuleDescriptor = Nexus.Plugin.Cli.Abstractions.PluginCommandModuleDescriptor;
 
 namespace Nexus.Cli.Host.Plugins;
 
 /// <summary>
-/// Discovers plugin manifests and loads CLI adapter assemblies that implement <see cref="ICommandModule"/>.
+/// Discovers plugin manifests and loads CLI adapter assemblies that implement <see cref="CliCommandHandler"/>.
 /// </summary>
 public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
 {
@@ -25,7 +27,7 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
     private readonly IAnsiConsole _console;
     private readonly ConcurrentDictionary<string, bool> _loggedWarnings = new(StringComparer.OrdinalIgnoreCase);
 
-    private IReadOnlyList<ICommandModule>? _cachedModules;
+    private IReadOnlyList<CliCommandHandler>? _cachedModules;
 
     public PluginCommandModuleLoader(
         INexusEnvironment environment,
@@ -40,14 +42,14 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<ICommandModule>> LoadModulesAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<CliCommandHandler>> LoadModulesAsync(CancellationToken cancellationToken)
     {
         if (_cachedModules is { } cached)
         {
             return cached;
         }
 
-        var modules = new List<ICommandModule>();
+        var modules = new List<CliCommandHandler>();
         foreach (var manifestPath in DiscoverManifestPaths())
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -158,7 +160,7 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
         }
     }
 
-    private IEnumerable<ICommandModule> LoadModulesFromAssembly(
+    private IEnumerable<CliCommandHandler> LoadModulesFromAssembly(
         string assemblyPath,
         PluginCommandModuleDescriptor descriptor,
         PluginManifest manifest)
@@ -181,7 +183,7 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
         var moduleTypes = GetModuleTypes(assembly);
         if (moduleTypes.Count == 0)
         {
-            ReportWarning($"No ICommandModule implementations were found in '{assemblyPath}'.");
+            ReportWarning($"No ICommandHandler implementations were found in '{assemblyPath}'.");
             context.Dispose();
             yield break;
         }
@@ -189,12 +191,12 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
         foreach (var type in moduleTypes)
         {
             IServiceProvider? pluginProvider = null;
-            ICommandModule? instance = null;
+            CliCommandHandler? instance = null;
 
             try
             {
                 pluginProvider = CreatePluginServiceProvider(descriptor, manifest);
-                instance = (ICommandModule)ActivatorUtilities.CreateInstance(
+                instance = (CliCommandHandler)ActivatorUtilities.CreateInstance(
                     new CompositeServiceProvider(_hostServices, pluginProvider),
                     type);
             }
@@ -211,7 +213,7 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
 
             if (instance is not null)
             {
-                yield return new PluginCommandModuleAdapter(instance, context, pluginProvider);
+                yield return new PluginCommandHandlerAdapter(instance, context, pluginProvider);
             }
         }
     }
@@ -222,13 +224,13 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
         {
             return assembly
                 .GetTypes()
-                .Where(type => type is { IsAbstract: false, IsClass: true } && typeof(ICommandModule).IsAssignableFrom(type))
+                .Where(type => type is { IsAbstract: false, IsClass: true } && typeof(CliCommandHandler).IsAssignableFrom(type))
                 .ToList();
         }
         catch (ReflectionTypeLoadException ex)
         {
             return ex.Types
-                .Where(type => type is { IsAbstract: false, IsClass: true } && typeof(ICommandModule).IsAssignableFrom(type))
+                .Where(type => type is { IsAbstract: false, IsClass: true } && typeof(CliCommandHandler).IsAssignableFrom(type))
                 .Cast<Type>()
                 .ToList();
         }
@@ -299,23 +301,23 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
         }
     }
 
-    private sealed class PluginCommandModuleAdapter : ICommandModule
+    private sealed class PluginCommandHandlerAdapter : CliCommandHandler
     {
-        private readonly ICommandModule _module;
+        private readonly CliCommandHandler _module;
         private readonly PluginAssemblyLoadContext _context;
         private readonly IServiceProvider _pluginProvider;
 
-        public PluginCommandModuleAdapter(ICommandModule module, PluginAssemblyLoadContext context, IServiceProvider pluginProvider)
+        public PluginCommandHandlerAdapter(CliCommandHandler module, PluginAssemblyLoadContext context, IServiceProvider pluginProvider)
         {
             _module = module;
             _context = context;
             _pluginProvider = pluginProvider;
         }
 
-        public void Configure(CommandModuleContext context)
+        public void Configure(CliCommandContext context)
         {
             var services = new CompositeServiceProvider(context.Services, _pluginProvider);
-            var pluginContext = new CommandModuleContext(context.RootCommand, services, context.OutputOption);
+            var pluginContext = new CliCommandContext(context.RootCommand, services, context.OutputOption);
             _module.Configure(pluginContext);
         }
     }
@@ -333,7 +335,7 @@ public sealed class PluginCommandModuleLoader : IPluginCommandModuleLoader
 
         protected override Assembly? Load(AssemblyName assemblyName)
         {
-            if (assemblyName.Name == typeof(ICommandModule).Assembly.GetName().Name)
+            if (assemblyName.Name == typeof(CliCommandHandler).Assembly.GetName().Name)
             {
                 return Assembly.Load(assemblyName);
             }

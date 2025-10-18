@@ -4,16 +4,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Nexus.Cli.Host.Core.Endpoints;
 using Nexus.Cli.Host.Core.Status;
 using Nexus.Cli.Host.Output;
-using Nexus.Plugin.Cli.Abstractions;
+using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
+using CliCommandHandler = Nexus.Plugin.Cli.Abstractions.ICommandHandler;
 using Spectre.Console;
 
 namespace Nexus.Cli.Host.Modules;
 
-public sealed class CoreCommandModule : ICommandModule
+public sealed class CoreCommandModule : CliCommandHandler
 {
     private static readonly Option<string?> EndpointOption = CreateEndpointOption();
 
-    public void Configure(CommandModuleContext context)
+    public void Configure(CliCommandContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

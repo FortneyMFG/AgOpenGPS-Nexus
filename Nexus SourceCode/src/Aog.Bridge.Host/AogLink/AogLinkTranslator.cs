@@ -25,6 +25,7 @@ public sealed class AogLinkTranslator
     {
         _identity = identity ?? throw new ArgumentNullException(nameof(identity));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        _startupTimestamp = _timeProvider.GetTimestamp();
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _startupTimestamp = _timeProvider.GetTimestamp();
     }
@@ -60,6 +61,9 @@ public sealed class AogLinkTranslator
     /// </summary>
     public LinkEnvelope CreateHeartbeat(uint destination = 0)
     {
+        var uptime = (ulong)_timeProvider
+            .GetElapsedTime(_startupTimestamp, _timeProvider.GetTimestamp())
+            .TotalMilliseconds;
         var uptime = _timeProvider.GetElapsedTime(_startupTimestamp, _timeProvider.GetTimestamp());
 
         var heartbeat = new Heartbeat
@@ -91,6 +95,9 @@ public sealed class AogLinkTranslator
         var timeSync = new TimeSync
         {
             CurrentTime = Timestamp.FromDateTimeOffset(now),
+            MonotonicTimeMs = (ulong)_timeProvider
+                .GetElapsedTime(_startupTimestamp, monotonic)
+                .TotalMilliseconds,
             MonotonicTimeMs = (ulong)elapsed.TotalMilliseconds,
         };
 
@@ -233,6 +240,10 @@ public sealed class AogLinkTranslator
             throw new ArgumentException("Command envelope must include a header.", nameof(command));
 
         var sequence = command.Header.Sequence;
+        var pending = new PendingCommand(
+            Command: command.Clone(),
+            LastAttempt: _timeProvider.GetUtcNow(),
+            Attempt: 1);
         var pending = new PendingCommand(command.Clone(), _timeProvider.GetUtcNow(), Attempt: 1);
         _pendingCommands[sequence] = pending;
     }

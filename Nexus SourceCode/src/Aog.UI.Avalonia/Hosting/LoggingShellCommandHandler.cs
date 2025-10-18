@@ -15,6 +15,7 @@ public sealed class LoggingShellCommandHandler : IShellCommandHandler
     {
         "menu.file",
         "menu.tools",
+        "menu.settings",
         "menu.field",
         "toolbar.top",
         "shell.main",

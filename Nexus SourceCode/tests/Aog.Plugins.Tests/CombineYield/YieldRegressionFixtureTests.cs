@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Aog.Core.Eventing;
+using Aog.Core.Layers;
 using Aog.Core.V1;
 using Aog.Plugins.CombineYield;
 using FluentAssertions;

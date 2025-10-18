@@ -18,6 +18,7 @@ public sealed class ShellMenuBarViewModel
         ArgumentNullException.ThrowIfNull(dispatcher);
 
         FileMenu = new ShellMenuGroupViewModel(
+            ShellPluginSurfaces.FileMenu,
             "File",
             new[]
             {
@@ -42,6 +43,7 @@ public sealed class ShellMenuBarViewModel
             });
 
         FieldMenu = new ShellMenuGroupViewModel(
+            ShellPluginSurfaces.FieldMenu,
             "Field",
             new[]
             {
@@ -66,6 +68,7 @@ public sealed class ShellMenuBarViewModel
             });
 
         ToolsMenu = new ShellMenuGroupViewModel(
+            ShellPluginSurfaces.ToolsMenu,
             "Tools",
             new[]
             {

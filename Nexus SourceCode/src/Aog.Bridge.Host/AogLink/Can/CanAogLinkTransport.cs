@@ -148,11 +148,15 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
             var envelope = LinkEnvelope.Parser.ParseFrom(payload);
             envelope.Header = ApplyHeaderFromIdentifier(frame.Identifier, envelope.Header);
             await _inbound.Writer.WriteAsync(envelope, cancellationToken).ConfigureAwait(false);
+            var decodedEnvelope = LinkEnvelope.Parser.ParseFrom(payload);
+            decodedEnvelope.Header = ApplyHeaderFromIdentifier(frame.Identifier, decodedEnvelope.Header);
+            await _inbound.Writer.WriteAsync(decodedEnvelope, cancellationToken).ConfigureAwait(false);
             return;
         }
 
         var fragmentCount = frame.Data[3];
         var fragmentIndex = frame.Data[4];
+        var payloadSlice = frame.Data.Length > 6 ? frame.Data[6..] : Array.Empty<byte>();
 
         var collector = _fragments.GetOrAdd(sequence, _ => new FragmentCollector(fragmentCount));
         collector.Add(fragmentIndex, frame.Data[6..]);
@@ -167,6 +171,9 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
         var reassembledEnvelope = LinkEnvelope.Parser.ParseFrom(combined);
         reassembledEnvelope.Header = ApplyHeaderFromIdentifier(frame.Identifier, reassembledEnvelope.Header);
         await _inbound.Writer.WriteAsync(reassembledEnvelope, cancellationToken).ConfigureAwait(false);
+        var decoded = LinkEnvelope.Parser.ParseFrom(combined);
+        decoded.Header = ApplyHeaderFromIdentifier(frame.Identifier, decoded.Header);
+        await _inbound.Writer.WriteAsync(decoded, cancellationToken).ConfigureAwait(false);
     }
 
     private static AogCanFrame BuildSingleFrame(FrameHeader? header, byte[] payload, uint identifier)

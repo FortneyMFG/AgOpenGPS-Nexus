@@ -27,6 +27,7 @@ public sealed class AogLinkTranslator
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _startupTimestamp = _timeProvider.GetTimestamp();
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _startupTimestamp = _timeProvider.GetTimestamp();
     }
 
     /// <summary>
@@ -63,11 +64,12 @@ public sealed class AogLinkTranslator
         var uptime = (ulong)_timeProvider
             .GetElapsedTime(_startupTimestamp, _timeProvider.GetTimestamp())
             .TotalMilliseconds;
+        var uptime = _timeProvider.GetElapsedTime(_startupTimestamp, _timeProvider.GetTimestamp());
 
         var heartbeat = new Heartbeat
         {
             Identity = _identity.ToProto(),
-            UptimeMs = uptime,
+            UptimeMs = (ulong)uptime.TotalMilliseconds,
             StaleSequenceThreshold = 3,
         };
 
@@ -88,12 +90,15 @@ public sealed class AogLinkTranslator
         var now = _timeProvider.GetUtcNow();
         var monotonic = _timeProvider.GetTimestamp();
 
+        var elapsed = _timeProvider.GetElapsedTime(_startupTimestamp, monotonic);
+
         var timeSync = new TimeSync
         {
             CurrentTime = Timestamp.FromDateTimeOffset(now),
             MonotonicTimeMs = (ulong)_timeProvider
                 .GetElapsedTime(_startupTimestamp, monotonic)
                 .TotalMilliseconds,
+            MonotonicTimeMs = (ulong)elapsed.TotalMilliseconds,
         };
 
         return CreateEnvelope(
@@ -239,6 +244,7 @@ public sealed class AogLinkTranslator
             Command: command.Clone(),
             LastAttempt: _timeProvider.GetUtcNow(),
             Attempt: 1);
+        var pending = new PendingCommand(command.Clone(), _timeProvider.GetUtcNow(), Attempt: 1);
         _pendingCommands[sequence] = pending;
     }
 

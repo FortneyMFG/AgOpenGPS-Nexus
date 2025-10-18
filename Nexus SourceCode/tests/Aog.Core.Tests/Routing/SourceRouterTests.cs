@@ -14,7 +14,7 @@ public class SourceRouterTests
     {
         var bus = new InMemoryEventBus();
         var events = new List<TopicRouteChanged>();
-        bus.Subscribe<TopicRouteChanged>(message =>
+        bus.Subscribe<TopicRouteChanged>((message, _) =>
         {
             events.Add(message);
             return ValueTask.CompletedTask;

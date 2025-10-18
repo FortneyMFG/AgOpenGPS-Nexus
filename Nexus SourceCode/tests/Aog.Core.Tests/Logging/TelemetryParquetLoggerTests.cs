@@ -9,7 +9,6 @@ using Aog.Core.Logging;
 using Aog.Core.Mesh;
 using Aog.Core.V1;
 using FluentAssertions;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Parquet;
 using Parquet.Data;
@@ -99,7 +98,7 @@ public class TelemetryParquetLoggerTests
                     SessionId = SessionId
                 },
                 ArbitrationId = 0x18FF50,
-                Payload = ByteString.CopyFrom(new byte[] { 0xAA, 0xBB, 0xCC }),
+                Payload = new byte[] { 0xAA, 0xBB, 0xCC },
                 IsExtendedId = true,
                 IsRemoteRequest = false
             });

@@ -108,7 +108,7 @@ public sealed class TelemetryReplayControllerTests
         var can = cans[0];
         can.Header.Sequence.Should().Be(scenario.CanFrameSample.Header.Sequence);
         can.ArbitrationId.Should().Be(scenario.CanFrameSample.ArbitrationId);
-        can.Payload.ToArray().Should().Equal(scenario.CanFrameSample.Payload.ToByteArray());
+        can.Payload.ToArray().Should().Equal(scenario.CanFrameSample.Payload.ToArray());
 
         var section = sections[0];
         section.Header.Sequence.Should().Be(scenario.SectionSample.Header.Sequence);

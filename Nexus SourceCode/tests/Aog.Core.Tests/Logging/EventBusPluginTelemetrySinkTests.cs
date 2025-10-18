@@ -17,7 +17,7 @@ public class EventBusPluginTelemetrySinkTests
         var bus = new InMemoryEventBus();
         var sink = new EventBusPluginTelemetrySink(bus);
         PluginTelemetryEvent? captured = null;
-        using var subscription = bus.Subscribe<PluginTelemetryEvent>(message =>
+        using var subscription = bus.Subscribe<PluginTelemetryEvent>((message, _) =>
         {
             captured = message;
             return ValueTask.CompletedTask;

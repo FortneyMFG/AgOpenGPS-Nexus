@@ -24,7 +24,7 @@ public static class Program
         builder.Configuration.AddEnvironmentVariables(prefix: "NEXUS_");
         builder.Configuration.AddCommandLine(args, new Dictionary<string, string>
         {
-            ["runMode"] = "Avalonia:RunMode"
+            ["--runMode"] = "Avalonia:RunMode"
         });
 
         builder.Services

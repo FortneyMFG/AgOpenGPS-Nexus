@@ -8,6 +8,8 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
 {
     public class AppShellViewModel : ReactiveObject
     {
+        public PluginSurfaceDescriptor SurfaceDescriptor => ShellPluginSurfaces.AppShell;
+
         [Reactive]
         public string StatusText { get; set; } = "Ready";
 

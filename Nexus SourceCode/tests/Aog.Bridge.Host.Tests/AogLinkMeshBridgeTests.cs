@@ -26,7 +26,7 @@ public sealed class AogLinkMeshBridgeTests
             {
                 Source = 42,
                 MessageClass = LinkClass.System,
-                MessageType = MessageType.LinkMessageTypeDiscoveryAnnounce,
+                MessageType = MessageType.DiscoveryAnnounce,
             },
             DiscoveryAnnounce = new DiscoveryAnnounce
             {
@@ -86,7 +86,7 @@ public sealed class AogLinkMeshBridgeTests
             {
                 Source = 7,
                 MessageClass = LinkClass.Telemetry,
-                MessageType = MessageType.LinkMessageTypeTelemetryPose,
+                MessageType = MessageType.TelemetryPose,
             },
             Pose = pose,
         };

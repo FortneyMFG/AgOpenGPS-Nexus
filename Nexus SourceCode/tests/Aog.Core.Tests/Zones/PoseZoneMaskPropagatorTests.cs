@@ -4,6 +4,7 @@ using Aog.Core.V1;
 using Aog.Core.Zones;
 using FluentAssertions;
 using Xunit;
+using CoreZones = Aog.Core.Zones;
 
 namespace Aog.Core.Tests.Zones;
 
@@ -15,10 +16,10 @@ public sealed class PoseZoneMaskPropagatorTests
         var store = new ZoneStore(4326);
         store.MountZones(new[]
         {
-            CreateZone("zone:boundary", ZoneType.Boundary, priority: 10),
-            CreateZone("zone:headland", ZoneType.Headland, priority: 30),
-            CreateZone("zone:work", ZoneType.WorkDisabled, priority: 20),
-            CreateZone("zone:keepout", ZoneType.KeepOut, priority: 40),
+            CreateZone("zone:boundary", CoreZones.ZoneType.Boundary, priority: 10),
+            CreateZone("zone:headland", CoreZones.ZoneType.Headland, priority: 30),
+            CreateZone("zone:work", CoreZones.ZoneType.WorkDisabled, priority: 20),
+            CreateZone("zone:keepout", CoreZones.ZoneType.KeepOut, priority: 40),
         });
 
         var bus = new InMemoryEventBus();
@@ -56,7 +57,7 @@ public sealed class PoseZoneMaskPropagatorTests
         var store = new ZoneStore(4326);
         store.MountZones(new[]
         {
-            CreateZone("zone:boundary", ZoneType.Boundary, priority: 10),
+            CreateZone("zone:boundary", CoreZones.ZoneType.Boundary, priority: 10),
         });
 
         var bus = new InMemoryEventBus();
@@ -83,7 +84,7 @@ public sealed class PoseZoneMaskPropagatorTests
     public async Task PublishPose_ShouldReflectUpdatedRegistryHash()
     {
         var store = new ZoneStore(4326);
-        var original = CreateZone("zone:boundary", ZoneType.Boundary, priority: 10);
+        var original = CreateZone("zone:boundary", CoreZones.ZoneType.Boundary, priority: 10);
         store.MountZones(new[] { original });
 
         var bus = new InMemoryEventBus();
@@ -93,7 +94,7 @@ public sealed class PoseZoneMaskPropagatorTests
         await bus.PublishAsync(pose);
         var initialHash = pose.ZoneMask.ZoneRegistryHash;
 
-        var newZone = CreateZone("zone:keepout", ZoneType.KeepOut, priority: 50);
+        var newZone = CreateZone("zone:keepout", CoreZones.ZoneType.KeepOut, priority: 50);
         var delta = store.Upsert(newZone);
         await bus.PublishAsync(new ZoneRegistryDeltaEvent(delta));
 
@@ -104,7 +105,7 @@ public sealed class PoseZoneMaskPropagatorTests
         updatedPose.ZoneMask.ActiveZoneIds.Should().Contain(newZone.ZoneId);
     }
 
-    private static ZoneDefinition CreateZone(string id, ZoneType type, uint priority)
+    private static ZoneDefinition CreateZone(string id, CoreZones.ZoneType type, uint priority)
     {
         var ring = new[]
         {

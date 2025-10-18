@@ -102,6 +102,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-462 Linux Core service packaging & systemd units _(Done)_ — SRS option O-BACKEND-6
 - [x] NX-463 Linux Core operations & observability playbook _(Done)_ — ADR-068 diagnostics + SRS §10 Telemetry
 - [x] NX-464 Headless Core + AGiO integration validation _(Done)_ — ADR-068 replay + O-BACKEND-6 smoke
+- [x] NX-1209 Tools & tests stream compatibility fix _(Done)_ — Align plugin compliance stream handling with updated API and repair cross-track/zone test scaffolding
 
 ### Section C — AGiO & Backends
 - [x] NX-020 AGiO host skeleton + backend loader

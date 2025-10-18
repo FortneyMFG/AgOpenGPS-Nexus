@@ -11,6 +11,9 @@ public sealed class TopToolbarViewModel
 {
     private readonly ReadOnlyObservableCollection<TopToolbarItemViewModel> _items;
 
+    /// <summary>Gets the plugin surface descriptor describing the toolbar.</summary>
+    public PluginSurfaceDescriptor Descriptor => ShellPluginSurfaces.TopToolbar;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="TopToolbarViewModel"/> class.
     /// </summary>

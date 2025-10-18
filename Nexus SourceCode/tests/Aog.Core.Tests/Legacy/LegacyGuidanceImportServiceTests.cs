@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Aog.Core.Legacy;
-using CoveragePlanarPoint = Aog.Core.Coverage.PlanarPoint;
+using PlanarPoint = Aog.Core.Paths.PlanarPoint;
 using Xunit;
 
 namespace Aog.Core.Tests.Legacy;
@@ -181,7 +181,7 @@ public sealed class LegacyGuidanceImportServiceTests
         Assert.InRange(indexOfSecondRecord, firstRecordRing.Count - 1, boundary.Count - secondRecordRing.Count + 1);
     }
 
-    private static CoveragePlanarPoint ToPlanar(double latitudeDeg, double longitudeDeg, GeographicCoordinate origin)
+    private static PlanarPoint ToPlanar(double latitudeDeg, double longitudeDeg, GeographicCoordinate origin)
     {
         const double EarthRadiusMeters = 6_378_137.0;
         var latRad = DegreesToRadians(latitudeDeg);
@@ -191,12 +191,12 @@ public sealed class LegacyGuidanceImportServiceTests
 
         var easting = (lonRad - originLonRad) * Math.Cos((latRad + originLatRad) / 2.0) * EarthRadiusMeters;
         var northing = (latRad - originLatRad) * EarthRadiusMeters;
-        return new CoveragePlanarPoint(easting, northing);
+        return new PlanarPoint(easting, northing);
     }
 
     private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180.0;
 
-    private static bool NearlyEquals(CoveragePlanarPoint left, CoveragePlanarPoint right, double toleranceMeters = 0.01)
+    private static bool NearlyEquals(PlanarPoint left, PlanarPoint right, double toleranceMeters = 0.01)
     {
         return Math.Abs(left.Easting - right.Easting) <= toleranceMeters &&
                Math.Abs(left.Northing - right.Northing) <= toleranceMeters;

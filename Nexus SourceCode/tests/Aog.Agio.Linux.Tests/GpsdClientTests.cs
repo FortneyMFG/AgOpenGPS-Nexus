@@ -6,8 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Aog.Agio.Linux.Tests
-{
+namespace Aog.Agio.Linux.Tests;
 
 public sealed class GpsdClientTests
 {
@@ -263,35 +262,36 @@ public sealed class GpsdClientTests
         public Task<Stream?> ConnectAsync(CancellationToken cancellationToken) => Task.FromResult<Stream?>(null);
     }
 
-private sealed class BlockingGpsdConnectionFactory : IGpsdConnectionFactory
-{
-    private readonly BlockingGpsdStream _stream;
-    private bool _connected;
-
-    public BlockingGpsdConnectionFactory(BlockingGpsdStream stream)
+    private sealed class BlockingGpsdConnectionFactory : IGpsdConnectionFactory
     {
-        _stream = stream;
-    }
+        private readonly BlockingGpsdStream _stream;
+        private bool _connected;
 
-    public Task<Stream?> ConnectAsync(CancellationToken cancellationToken)
-    {
-        if (_connected)
+        public BlockingGpsdConnectionFactory(BlockingGpsdStream stream)
         {
-            return Task.FromResult<Stream?>(null);
+            _stream = stream;
         }
 
-        _connected = true;
-        return Task.FromResult<Stream?>(_stream);
-    }
-}
+        public Task<Stream?> ConnectAsync(CancellationToken cancellationToken)
+        {
+            if (_connected)
+            {
+                return Task.FromResult<Stream?>(null);
+            }
 
-private sealed class AccessDeniedConnectionFactory : IGpsdConnectionFactory
-{
-    public Task<Stream?> ConnectAsync(CancellationToken cancellationToken)
-    {
-        throw new SocketException((int)SocketError.AccessDenied);
+            _connected = true;
+            return Task.FromResult<Stream?>(_stream);
+        }
     }
-}
+
+    private sealed class AccessDeniedConnectionFactory : IGpsdConnectionFactory
+    {
+        public Task<Stream?> ConnectAsync(CancellationToken cancellationToken)
+        {
+            throw new SocketException((int)SocketError.AccessDenied);
+        }
+    }
+
     private sealed class FakeGpsdStream : Stream
     {
         private readonly byte[] _readBuffer;
@@ -384,110 +384,113 @@ private sealed class AccessDeniedConnectionFactory : IGpsdConnectionFactory
         public override void SetLength(long value) => throw new NotSupportedException();
     }
 
-private sealed class BlockingGpsdStream : Stream
-{
-    private readonly TaskCompletionSource<bool> _writeStarted = new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private readonly CancellationTokenSource _releaseCts = new();
-
-    public CancellationToken ObservedWriteCancellationToken { get; private set; }
-
-    public Task WaitForWriteStartAsync() => _writeStarted.Task;
-
-    public void Release() => _releaseCts.Cancel();
-
-    public override bool CanRead => true;
-    public override bool CanSeek => false;
-    public override bool CanWrite => true;
-    public override long Length => 0;
-    public override long Position
+    private sealed class BlockingGpsdStream : Stream
     {
-        get => 0;
-        set => throw new NotSupportedException();
-    }
+        private readonly TaskCompletionSource<bool> _writeStarted = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly CancellationTokenSource _releaseCts = new();
 
-    public override void Flush() { }
+        public CancellationToken ObservedWriteCancellationToken { get; private set; }
 
-    public override Task FlushAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task WaitForWriteStartAsync() => _writeStarted.Task;
 
-    public override int Read(byte[] buffer, int offset, int count) => 0;
+        public void Release() => _releaseCts.Cancel();
 
-    public override int Read(Span<byte> buffer) => 0;
-
-    public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
-        => new(0);
-
-    public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        => Task.FromResult(0);
-
-    public override void Write(byte[] buffer, int offset, int count)
-        => throw new NotSupportedException("Synchronous writes are not supported by the blocking test stream.");
-
-    public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        => WaitForReleaseAsync(cancellationToken);
-
-    public override Task WriteAsync(byte[] buffer, int offset, int count)
-        => WaitForReleaseAsync(CancellationToken.None);
-
-    public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
-        => new(WaitForReleaseAsync(cancellationToken));
-
-    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
-
-    public override void SetLength(long value) => throw new NotSupportedException();
-
-    private Task WaitForReleaseAsync(CancellationToken cancellationToken)
-    {
-        ObservedWriteCancellationToken = cancellationToken;
-        _writeStarted.TrySetResult(true);
-        return WaitForCancellationAsync(cancellationToken);
-    }
-
-    private async Task WaitForCancellationAsync(CancellationToken cancellationToken)
-    {
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _releaseCts.Token);
-        try
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => true;
+        public override long Length => 0;
+        public override long Position
         {
-            await Task.Delay(Timeout.Infinite, linkedCts.Token).ConfigureAwait(false);
-        }
-        finally
-        {
-            linkedCts.Cancel();
-        }
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _releaseCts.Cancel();
-            _releaseCts.Dispose();
+            get => 0;
+            set => throw new NotSupportedException();
         }
 
-        base.Dispose(disposing);
-    }
-}
-
-private sealed class ThrowingLogger<T> : ILogger<T>
-{
-    public IDisposable BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
-
-    public bool IsEnabled(LogLevel logLevel) => true;
-
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-        where TState : notnull
-    {
-        if (logLevel >= LogLevel.Error)
+        public override void Flush()
         {
-            throw new XunitException($"Unexpected {logLevel} log: {formatter(state, exception)}");
+        }
+
+        public override Task FlushAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public override int Read(byte[] buffer, int offset, int count) => 0;
+
+        public override int Read(Span<byte> buffer) => 0;
+
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+            => new(0);
+
+        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            => Task.FromResult(0);
+
+        public override void Write(byte[] buffer, int offset, int count)
+            => throw new NotSupportedException("Synchronous writes are not supported by the blocking test stream.");
+
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            => WaitForReleaseAsync(cancellationToken);
+
+        public override Task WriteAsync(byte[] buffer, int offset, int count)
+            => WaitForReleaseAsync(CancellationToken.None);
+
+        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+            => new(WaitForReleaseAsync(cancellationToken));
+
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+
+        public override void SetLength(long value) => throw new NotSupportedException();
+
+        private Task WaitForReleaseAsync(CancellationToken cancellationToken)
+        {
+            ObservedWriteCancellationToken = cancellationToken;
+            _writeStarted.TrySetResult(true);
+            return WaitForCancellationAsync(cancellationToken);
+        }
+
+        private async Task WaitForCancellationAsync(CancellationToken cancellationToken)
+        {
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _releaseCts.Token);
+            try
+            {
+                await Task.Delay(Timeout.Infinite, linkedCts.Token).ConfigureAwait(false);
+            }
+            finally
+            {
+                linkedCts.Cancel();
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _releaseCts.Cancel();
+                _releaseCts.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
     }
 
-    private sealed class NullScope : IDisposable
+    private sealed class ThrowingLogger<T> : ILogger<T>
     {
-        public static NullScope Instance { get; } = new();
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
 
-        public void Dispose() { }
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+            where TState : notnull
+        {
+            if (logLevel >= LogLevel.Error)
+            {
+                throw new XunitException($"Unexpected {logLevel} log: {formatter(state, exception)}");
+            }
+        }
+
+        private sealed class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new();
+
+            public void Dispose()
+            {
+            }
+        }
     }
-}
-}
 }

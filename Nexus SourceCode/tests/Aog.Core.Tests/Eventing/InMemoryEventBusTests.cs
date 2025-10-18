@@ -77,11 +77,11 @@ public class InMemoryEventBusTests
         var callCount = 0;
         var tcs = new TaskCompletionSource<bool>();
 
-        bus.Subscribe<int>(async (_, token) =>
+        bus.Subscribe<int>((_, token) =>
         {
             callCount++;
             tcs.TrySetResult(true);
-            await Task.Delay(TimeSpan.FromSeconds(10), token);
+            return new ValueTask(Task.Delay(TimeSpan.FromSeconds(10), token));
         });
 
         bus.Subscribe<int>((_, _) =>

@@ -282,7 +282,7 @@ public sealed class CrossTrackReplayHarnessTests
             return Math.Atan2(east, north);
         }
 
-        private readonly record struct CrossTrackSample(TimeSpan Offset, double ErrorMeters);
+        public readonly record struct CrossTrackSample(TimeSpan Offset, double ErrorMeters);
 
         public readonly record struct CrossTrackSummary(
             CrossTrackSample[] Samples,

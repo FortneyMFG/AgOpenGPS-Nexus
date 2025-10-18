@@ -180,7 +180,7 @@ internal static class Program
         }
     }
 
-    private static FileStream ResolveOutputStream(string? outputPath)
+    private static Stream ResolveOutputStream(string? outputPath)
     {
         if (string.IsNullOrWhiteSpace(outputPath))
         {

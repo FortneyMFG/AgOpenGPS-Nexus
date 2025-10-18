@@ -159,6 +159,9 @@ public sealed class AutoSteerLiteControllerTests
 
         steering.Should().Be(0);
         controller.LastLookAheadDistance.Should().Be(0);
+    }
+
+    [Fact]
     public void TuningState_HeadlandConstraintReducesLookAhead()
     {
         var profile = new AutoSteerLiteTuningProfile

@@ -143,6 +143,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         ShellMenuBar = new ShellMenuBarViewModel(commandDispatcher);
         TopToolbar = new TopToolbarViewModel(commandDispatcher);
         StatusStrip = BuildStatusStrip();
+        LeftSidebarButtons = BuildLeftSidebar();
+        RightSidebarButtons = BuildRightSidebar();
+        BottomShortcutButtons = BuildBottomStrip();
         Shell.StatusStrip = StatusStrip;
         Shell.Host = this;
         Shell.MainContent = BoundaryTool;
@@ -167,6 +170,15 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     /// <summary>Gets the status strip view-model providing runtime indicators.</summary>
     public StatusStripViewModel StatusStrip { get; }
+
+    /// <summary>Gets the left sidebar button collection.</summary>
+    public IReadOnlyList<SidebarButtonViewModel> LeftSidebarButtons { get; }
+
+    /// <summary>Gets the right sidebar button collection.</summary>
+    public IReadOnlyList<SidebarButtonViewModel> RightSidebarButtons { get; }
+
+    /// <summary>Gets the bottom shortcut button strip.</summary>
+    public IReadOnlyList<SidebarButtonViewModel> BottomShortcutButtons { get; }
 
     /// <summary>Gets a sample vehicle pose used to seed the map view.</summary>
     public VehiclePose VehiclePose { get; } = new(10, 15, 45);
@@ -318,6 +330,49 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     public RadioProvisioningFlowViewModel RadioProvisioning { get; }
     /// <summary>Gets the diagnostics workspace view-model surfaced in the sidebar.</summary>
     public DiagnosticsWorkspaceViewModel DiagnosticsWorkspace { get; }
+
+    private IReadOnlyList<SidebarButtonViewModel> BuildLeftSidebar()
+    {
+        return new[]
+        {
+            CreateSidebarButton("Guidance", "Guidance tools coming soon."),
+            CreateSidebarButton("Coverage", "Coverage layers are visible."),
+            CreateSidebarButton("Hydraulics", "Hydraulic controls unavailable in design mode."),
+            CreateSidebarButton("AB Lines", "AB line editor not yet connected."),
+        };
+    }
+
+    private IReadOnlyList<SidebarButtonViewModel> BuildRightSidebar()
+    {
+        return new[]
+        {
+            CreateSidebarButton("Legend", "Toggled field legend visibility."),
+            CreateSidebarButton("Diagnostics", "Diagnostics workspace will open here."),
+            CreateSidebarButton("Telemetry", "Telemetry logging currently enabled."),
+            CreateSidebarButton("Mesh", "Mesh presence broadcasting (mock)."),
+        };
+    }
+
+    private IReadOnlyList<SidebarButtonViewModel> BuildBottomStrip()
+    {
+        return new[]
+        {
+            CreateSidebarButton("Start", "Starting autoguidance sequence (mock)."),
+            CreateSidebarButton("Pause", "Autoguidance paused."),
+            CreateSidebarButton("Resume", "Autoguidance resumed."),
+            CreateSidebarButton("Nudge L", "Nudged guidance line left by 2 cm."),
+            CreateSidebarButton("Nudge R", "Nudged guidance line right by 2 cm."),
+            CreateSidebarButton("Stop", "Stopped autoguidance."),
+        };
+    }
+
+    private SidebarButtonViewModel CreateSidebarButton(string label, string statusMessage)
+    {
+        return new SidebarButtonViewModel(
+            label,
+            new DelegateCommand(_ => Shell.StatusText = statusMessage),
+            statusMessage);
+    }
 
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.

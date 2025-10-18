@@ -85,7 +85,7 @@
                 <DataTemplate x:DataType="model:MapLayer">
                   <Border BorderBrush="{DynamicResource ShellPanelBorderBrush}"
                           BorderThickness="0,0,0,1"
-                          Padding="{DynamicResource ThemeSpacingSm},{DynamicResource ThemeSpacingXs}">
+                          Padding="8,4">
                     <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
                       <TextBlock Text="{Binding DisplayName}"
                                  FontWeight="SemiBold" />
@@ -107,7 +107,7 @@
                 <DataTemplate x:DataType="model:GuidanceTrack">
                   <Border BorderBrush="{DynamicResource ShellPanelBorderBrush}"
                           BorderThickness="0,0,0,1"
-                          Padding="{DynamicResource ThemeSpacingSm},{DynamicResource ThemeSpacingXs}">
+                          Padding="8,4">
                     <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
                       <TextBlock Text="{Binding Name}"
                                  FontWeight="SemiBold" />
@@ -153,6 +153,12 @@
           </MenuItem>
           <MenuItem Header="{Binding Host.ShellMenuBar.ToolsMenu.Header}"
                     ItemsSource="{Binding Host.ShellMenuBar.ToolsMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.ServicesMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.ServicesMenu.Items}">
             <MenuItem.ItemTemplate>
               <StaticResource ResourceKey="ShellMenuItemTemplate" />
             </MenuItem.ItemTemplate>

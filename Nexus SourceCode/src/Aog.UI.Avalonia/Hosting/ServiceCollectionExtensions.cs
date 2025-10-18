@@ -36,6 +36,8 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, FieldOperationsDialogHandler>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, LoggingShellCommandHandler>());
+        services.TryAddSingleton<BackendServiceManager>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, BackendServiceCommandHandler>());
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddSingleton<ConnectionSettingsViewModel>();
         services.TryAddSingleton<TelemetryPrivacyViewModel>();

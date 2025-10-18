@@ -111,6 +111,49 @@ public sealed class ShellMenuBarViewModel
                         dispatcher,
                         description: "Adjust the current vehicle position offsets.")),
             });
+
+        ServicesMenu = new ShellMenuGroupViewModel(
+            ShellPluginSurfaces.ServicesMenu,
+            "Services",
+            new[]
+            {
+                ShellMenuItemViewModel.CreateCommand(
+                    "Start Core Host",
+                    "services.backend",
+                    "services.core.start",
+                    dispatcher,
+                    description: "Launch the background core host the UI communicates with."),
+                ShellMenuItemViewModel.CreateCommand(
+                    "Stop Core Host",
+                    "services.backend",
+                    "services.core.stop",
+                    dispatcher,
+                    description: "Terminate the running core host process."),
+                ShellMenuItemViewModel.CreateCommand(
+                    "Start AgIO (Windows)",
+                    "services.backend",
+                    "services.agio.windows.start",
+                    dispatcher,
+                    description: "Start the Windows AgIO bridge.") ,
+                ShellMenuItemViewModel.CreateCommand(
+                    "Stop AgIO (Windows)",
+                    "services.backend",
+                    "services.agio.windows.stop",
+                    dispatcher,
+                    description: "Stop the Windows AgIO bridge."),
+                ShellMenuItemViewModel.CreateCommand(
+                    "Start AgIO Simulator",
+                    "services.backend",
+                    "services.agio.sim.start",
+                    dispatcher,
+                    description: "Launch the AgIO simulator backend."),
+                ShellMenuItemViewModel.CreateCommand(
+                    "Stop AgIO Simulator",
+                    "services.backend",
+                    "services.agio.sim.stop",
+                    dispatcher,
+                    description: "Terminate the AgIO simulator backend."),
+            });
     }
 
     /// <summary>Gets the File menu group.</summary>
@@ -122,6 +165,9 @@ public sealed class ShellMenuBarViewModel
     /// <summary>Gets the Tools menu group.</summary>
     public ShellMenuGroupViewModel ToolsMenu { get; }
 
+    /// <summary>Gets the Services menu group.</summary>
+    public ShellMenuGroupViewModel ServicesMenu { get; }
+
     /// <summary>Enumerates all menu groups.</summary>
     public IEnumerable<ShellMenuGroupViewModel> AllMenus
     {
@@ -130,6 +176,7 @@ public sealed class ShellMenuBarViewModel
             yield return FileMenu;
             yield return FieldMenu;
             yield return ToolsMenu;
+            yield return ServicesMenu;
         }
     }
 }

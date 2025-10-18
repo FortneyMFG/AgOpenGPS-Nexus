@@ -697,6 +697,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-417 | Simulation shell + companion parity automation | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Wire simulator dialog + metadata snapshot harness |
 | NX-418 | Documentation, QA, and release readiness | Done |  | — | [SRS §2.8 Documentation](docs/SRS/NOTES.md#srs-28-documentation) | Update docs/tests per plan |
 | NX-1116 | Legacy shell layout parity pass | In Progress |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Mirror V6 header and side strips in Avalonia shell |
+| NX-1212 | Block layout contracts & persistence scaffolding | In Progress | AI | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Block catalog, layout seeding, and shell preferences migration |
 | NX-946 | Planter panel row index overflow guard | In Progress |  | — | [SRS §3.8 Planter Monitor](docs/SRS/NOTES.md#srs-38-planter-monitor) | Guard invalid planter row indexes in UI summary |
 
 ### Section F — Porting from V6 (Algorithms)

@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using Aog.UI.Avalonia.Blocks;
+
 namespace Aog.UI.Avalonia.Settings;
 
 /// <summary>
@@ -6,19 +10,55 @@ namespace Aog.UI.Avalonia.Settings;
 public sealed class ShellLayoutPreferences
 {
     /// <summary>Gets or sets whether the top toolbar is visible.</summary>
-    public bool IsTopToolbarVisible { get; set; } = true;
+    public bool ShowTopToolbar { get; set; } = true;
 
     /// <summary>Gets or sets whether the right sidebar panels are visible.</summary>
-    public bool IsRightSidebarVisible { get; set; } = true;
+    public bool ShowRightSidebar { get; set; } = true;
 
     /// <summary>Gets or sets the last active workspace identifier.</summary>
     public string ActiveWorkspaceId { get; set; } = "workspace.main";
 
-    /// <summary>Creates a deep copy of the layout preferences.</summary>
-    public ShellLayoutPreferences Clone() => new()
+    /// <summary>Gets or sets the persisted block layout instances.</summary>
+    public List<BlockInstance> Instances { get; set; } = new();
+
+    /// <summary>
+    /// Legacy alias maintained for compatibility with existing bindings.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsTopToolbarVisible
     {
-        IsTopToolbarVisible = IsTopToolbarVisible,
-        IsRightSidebarVisible = IsRightSidebarVisible,
-        ActiveWorkspaceId = ActiveWorkspaceId,
-    };
+        get => ShowTopToolbar;
+        set => ShowTopToolbar = value;
+    }
+
+    /// <summary>
+    /// Legacy alias maintained for compatibility with existing bindings.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsRightSidebarVisible
+    {
+        get => ShowRightSidebar;
+        set => ShowRightSidebar = value;
+    }
+
+    /// <summary>Creates a deep copy of the layout preferences.</summary>
+    public ShellLayoutPreferences Clone()
+    {
+        var clone = new ShellLayoutPreferences
+        {
+            ShowTopToolbar = ShowTopToolbar,
+            ShowRightSidebar = ShowRightSidebar,
+            ActiveWorkspaceId = ActiveWorkspaceId,
+        };
+
+        if (Instances.Count > 0)
+        {
+            foreach (var instance in Instances)
+            {
+                clone.Instances.Add(instance.Clone());
+            }
+        }
+
+        return clone;
+    }
 }

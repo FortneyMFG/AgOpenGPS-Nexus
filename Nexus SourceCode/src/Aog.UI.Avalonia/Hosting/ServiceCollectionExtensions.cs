@@ -1,6 +1,7 @@
 using System;
 using Aog.Core.Replay;
 using Aog.UI.Avalonia.App;
+using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Telemetry;
 using Aog.UI.Avalonia.Theming;
@@ -30,6 +31,9 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IConnectionSettingsStore, JsonConnectionSettingsStore>();
         services.TryAddSingleton<IUiPreferencesStore, JsonUiPreferencesStore>();
         services.TryAddSingleton<IUiPreferencesService, UiPreferencesService>();
+        services.TryAddSingleton<IBlockCatalog, BlockCatalog>();
+        services.TryAddSingleton<IBlockLayoutStore, BlockLayoutStore>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IBlockProvider, CoreBlockProvider>());
         services.TryAddSingleton<IThemeManager, ThemeManager>();
         services.TryAddSingleton<ICrashTelemetryService, CrashTelemetryService>();
         services.TryAddSingleton<IShellCommandDispatcher, ShellCommandDispatcher>();

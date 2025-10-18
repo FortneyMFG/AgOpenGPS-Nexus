@@ -139,8 +139,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         AvailableThemes = Enum.GetValues<UiTheme>();
         var preferences = _preferencesService.GetPreferences();
         _shellLayout = preferences.ShellLayout.Clone();
-        _isTopToolbarVisible = _shellLayout.IsTopToolbarVisible;
-        _isRightSidebarVisible = _shellLayout.IsRightSidebarVisible;
+        _isTopToolbarVisible = _shellLayout.ShowTopToolbar;
+        _isRightSidebarVisible = _shellLayout.ShowRightSidebar;
         _selectedTheme = preferences.Theme;
         _themeManager.ApplyTheme(_selectedTheme);
 
@@ -210,7 +210,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
             _isTopToolbarVisible = value;
             OnPropertyChanged();
-            _shellLayout.IsTopToolbarVisible = value;
+            _shellLayout.ShowTopToolbar = value;
             PersistShellLayout();
         }
     }
@@ -228,7 +228,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
             _isRightSidebarVisible = value;
             OnPropertyChanged();
-            _shellLayout.IsRightSidebarVisible = value;
+            _shellLayout.ShowRightSidebar = value;
             PersistShellLayout();
             OnPropertyChanged(nameof(MainWorkspaceColumnWidth));
             OnPropertyChanged(nameof(RightSidebarColumnWidth));

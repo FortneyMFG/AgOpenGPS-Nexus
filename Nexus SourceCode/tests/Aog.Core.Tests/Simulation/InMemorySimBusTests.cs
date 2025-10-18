@@ -16,16 +16,16 @@ public static class InMemorySimBusTests
         var bus = new InMemorySimBus();
         var received = new List<string>();
 
-        bus.Subscribe<int>("pose", async (message, _) =>
+        bus.Subscribe<int>("pose", (message, _) =>
         {
             received.Add($"first:{message.Payload}");
-            await ValueTask.CompletedTask;
+            return ValueTask.CompletedTask;
         });
 
-        bus.Subscribe<int>("pose", async (message, _) =>
+        bus.Subscribe<int>("pose", (message, _) =>
         {
             received.Add($"second:{message.Payload}");
-            await ValueTask.CompletedTask;
+            return ValueTask.CompletedTask;
         });
 
         var time = SimTime.FromTick(0, TimeSpan.FromMilliseconds(10));
@@ -40,10 +40,10 @@ public static class InMemorySimBusTests
         var bus = new InMemorySimBus();
         var count = 0;
 
-        var subscription = bus.Subscribe<int>("pose", async (_, _) =>
+        var subscription = bus.Subscribe<int>("pose", (_, _) =>
         {
             count++;
-            await ValueTask.CompletedTask;
+            return ValueTask.CompletedTask;
         });
 
         var time = SimTime.FromTick(0, TimeSpan.FromMilliseconds(1));

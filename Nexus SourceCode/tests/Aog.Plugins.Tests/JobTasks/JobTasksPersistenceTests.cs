@@ -8,6 +8,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
+using PluginJobSessionState = Aog.Plugins.JobTasks.JobSessionState;
+
 namespace Aog.Plugins.Tests.JobTasks;
 
 public sealed class JobTasksPersistenceTests
@@ -44,7 +46,7 @@ public sealed class JobTasksPersistenceTests
 
         var session = new JobSessionSnapshot(
             "session:1",
-            JobSessionState.Active,
+            PluginJobSessionState.Active,
             createdAt.AddMinutes(5),
             updatedAt,
             "Morning session",

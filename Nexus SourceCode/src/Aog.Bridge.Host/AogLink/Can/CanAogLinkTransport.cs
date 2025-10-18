@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -83,8 +82,6 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
         {
             var offset = index * CanFdPayloadBytes;
             var length = Math.Min(CanFdPayloadBytes, payload.Length - offset);
-            var slice = payload.AsSpan(offset, length);
-
             var buffer = new byte[length + 6];
             buffer[0] = envelope.Header?.Version is { } version ? (byte)version : (byte)1;
             buffer[1] = (byte)(sequence >> 8);
@@ -92,7 +89,7 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
             buffer[3] = (byte)fragmentCount;
             buffer[4] = (byte)index;
             buffer[5] = ConvertFlags(envelope.Header?.Flags, fragmented: true);
-            slice.CopyTo(buffer.AsSpan(6));
+            payload.AsSpan(offset, length).CopyTo(buffer.AsSpan(6));
 
             await _bus.SendAsync(new AogCanFrame(identifier, buffer), cancellationToken).ConfigureAwait(false);
         }
@@ -156,8 +153,6 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
 
         var fragmentCount = frame.Data[3];
         var fragmentIndex = frame.Data[4];
-        var payloadSlice = frame.Data.Length > 6 ? frame.Data[6..] : Array.Empty<byte>();
-
         var collector = _fragments.GetOrAdd(sequence, _ => new FragmentCollector(fragmentCount));
         collector.Add(fragmentIndex, frame.Data[6..]);
 

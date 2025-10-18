@@ -48,7 +48,7 @@ public sealed class LegacyCompatibilityBridge
                     FirmwareVersion = announcement.FirmwareVersion,
                     HardwareModel = ((LegacyDeviceMcu)announcement.McuId).ToString(),
                     Priority = NodePriority.Default,
-                    Role = NodeRole.NodeRoleController,
+                    Role = NodeRole.Controller,
                 },
                 SessionId = 0,
             };

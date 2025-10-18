@@ -35,7 +35,7 @@ public sealed class AogLinkMeshBridgeTests
                     NodeId = 42,
                     HardwareModel = "AGIO-MCU",
                     FirmwareVersion = "1.2.3",
-                    Role = NodeRole.NodeRoleController,
+                    Role = NodeRole.Controller,
                     Priority = NodePriority.Default,
                 },
             },

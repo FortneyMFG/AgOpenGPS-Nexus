@@ -104,6 +104,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-464 Headless Core + AGiO integration validation _(Done)_ — ADR-068 replay + O-BACKEND-6 smoke
 - [x] NX-1209 Tools & tests stream compatibility fix _(Done)_ — Align plugin compliance stream handling with updated API and repair cross-track/zone test scaffolding
 - [ ] NX-1210 Cross-track harness and yield regression test compilation fix — Resolve nested harness accessibility and missing provenance imports
+- [x] NX-1211 Plugin compliance CLI stream guard _(Done)_ — Handle stdout output without assuming FileStream and repair manifest test template serialization
 
 ### Section C — AGiO & Backends
 - [x] NX-020 AGiO host skeleton + backend loader

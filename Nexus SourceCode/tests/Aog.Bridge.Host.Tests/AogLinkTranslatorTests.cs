@@ -35,7 +35,7 @@ public sealed class AogLinkTranslatorTests
         var ack = new CommandAck
         {
             AcknowledgedSequence = envelope.Header.Sequence,
-            Status = AckStatus.AckStatusOk,
+            Status = AckStatus.Ok,
         };
 
         Assert.True(translator.TryHandleAck(ack, out var acknowledged));

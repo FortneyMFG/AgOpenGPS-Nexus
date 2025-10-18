@@ -48,7 +48,7 @@ public sealed class AogLinkTranslator
 
         return CreateEnvelope(
             LinkClass.System,
-            MessageType.LinkMessageTypeDiscoveryResponse,
+            MessageType.DiscoveryResponse,
             payload: response,
             destination: announce.Identity?.NodeId ?? 0,
             needsAck: false,
@@ -71,7 +71,7 @@ public sealed class AogLinkTranslator
 
         return CreateEnvelope(
             LinkClass.System,
-            MessageType.LinkMessageTypeHeartbeat,
+            MessageType.Heartbeat,
             heartbeat,
             destination,
             needsAck: false,
@@ -96,7 +96,7 @@ public sealed class AogLinkTranslator
 
         return CreateEnvelope(
             LinkClass.System,
-            MessageType.LinkMessageTypeTimesync,
+            MessageType.Timesync,
             timeSync,
             destination,
             needsAck: false,
@@ -107,31 +107,31 @@ public sealed class AogLinkTranslator
     /// Creates a telemetry frame wrapping a <see cref="Pose"/> payload.
     /// </summary>
     public LinkEnvelope CreatePoseTelemetry(Pose pose, uint destination = 0) =>
-        CreateTelemetryEnvelope(MessageType.LinkMessageTypeTelemetryPose, pose, destination);
+        CreateTelemetryEnvelope(MessageType.TelemetryPose, pose, destination);
 
     /// <summary>
     /// Creates a telemetry frame wrapping an <see cref="Imu"/> payload.
     /// </summary>
     public LinkEnvelope CreateImuTelemetry(Imu imu, uint destination = 0) =>
-        CreateTelemetryEnvelope(MessageType.LinkMessageTypeTelemetryImu, imu, destination);
+        CreateTelemetryEnvelope(MessageType.TelemetryImu, imu, destination);
 
     /// <summary>
     /// Creates a telemetry frame carrying a <see cref="SectionMask"/> payload.
     /// </summary>
     public LinkEnvelope CreateSectionTelemetry(SectionMask mask, uint destination = 0) =>
-        CreateTelemetryEnvelope(MessageType.LinkMessageTypeTelemetrySectionMask, mask, destination);
+        CreateTelemetryEnvelope(MessageType.TelemetrySectionMask, mask, destination);
 
     /// <summary>
     /// Creates a telemetry frame carrying a <see cref="SteerState"/> payload.
     /// </summary>
     public LinkEnvelope CreateSteerStateTelemetry(SteerState state, uint destination = 0) =>
-        CreateTelemetryEnvelope(MessageType.LinkMessageTypeTelemetrySteerState, state, destination);
+        CreateTelemetryEnvelope(MessageType.TelemetrySteerState, state, destination);
 
     /// <summary>
     /// Creates a telemetry frame carrying a <see cref="TimingCaps"/> payload.
     /// </summary>
     public LinkEnvelope CreateTimingTelemetry(TimingCaps timing, uint destination = 0) =>
-        CreateTelemetryEnvelope(MessageType.LinkMessageTypeTelemetryTiming, timing, destination);
+        CreateTelemetryEnvelope(MessageType.TelemetryTiming, timing, destination);
 
     /// <summary>
     /// Creates a steering command frame and tracks it for acknowledgement handling.
@@ -142,7 +142,7 @@ public sealed class AogLinkTranslator
             throw new ArgumentNullException(nameof(command));
 
         return CreateCommandEnvelope(
-            MessageType.LinkMessageTypeCommandSteer,
+            MessageType.CommandSteer,
             command,
             destination,
             priority: NodePriority.High);
@@ -157,7 +157,7 @@ public sealed class AogLinkTranslator
             throw new ArgumentNullException(nameof(mask));
 
         return CreateCommandEnvelope(
-            MessageType.LinkMessageTypeCommandSectionMask,
+            MessageType.CommandSectionMask,
             mask,
             destination,
             priority: NodePriority.Default);
@@ -180,43 +180,43 @@ public sealed class AogLinkTranslator
 
         switch (envelope.Header?.MessageType)
         {
-            case MessageType.LinkMessageTypeTelemetryPose:
+            case MessageType.TelemetryPose:
                 message = envelope.Pose?.Clone();
                 kind = AogLinkMessageKind.Pose;
                 break;
-            case MessageType.LinkMessageTypeTelemetryImu:
+            case MessageType.TelemetryImu:
                 message = envelope.Imu?.Clone();
                 kind = AogLinkMessageKind.Imu;
                 break;
-            case MessageType.LinkMessageTypeTelemetrySectionMask:
+            case MessageType.TelemetrySectionMask:
                 message = envelope.SectionMask?.Clone();
                 kind = AogLinkMessageKind.SectionMask;
                 break;
-            case MessageType.LinkMessageTypeTelemetrySteerState:
+            case MessageType.TelemetrySteerState:
                 message = envelope.SteerState?.Clone();
                 kind = AogLinkMessageKind.SteerState;
                 break;
-            case MessageType.LinkMessageTypeTelemetryTiming:
+            case MessageType.TelemetryTiming:
                 message = envelope.Timing?.Clone();
                 kind = AogLinkMessageKind.Timing;
                 break;
-            case MessageType.LinkMessageTypeCommandAck:
+            case MessageType.CommandAck:
                 message = envelope.CommandAck?.Clone();
                 kind = AogLinkMessageKind.CommandAck;
                 break;
-            case MessageType.LinkMessageTypeDiscoveryAnnounce:
+            case MessageType.DiscoveryAnnounce:
                 message = envelope.DiscoveryAnnounce?.Clone();
                 kind = AogLinkMessageKind.DiscoveryAnnounce;
                 break;
-            case MessageType.LinkMessageTypeDiscoveryResponse:
+            case MessageType.DiscoveryResponse:
                 message = envelope.DiscoveryResponse?.Clone();
                 kind = AogLinkMessageKind.DiscoveryResponse;
                 break;
-            case MessageType.LinkMessageTypeHeartbeat:
+            case MessageType.Heartbeat:
                 message = envelope.Heartbeat?.Clone();
                 kind = AogLinkMessageKind.Heartbeat;
                 break;
-            case MessageType.LinkMessageTypeTimesync:
+            case MessageType.Timesync:
                 message = envelope.TimeSync?.Clone();
                 kind = AogLinkMessageKind.TimeSync;
                 break;

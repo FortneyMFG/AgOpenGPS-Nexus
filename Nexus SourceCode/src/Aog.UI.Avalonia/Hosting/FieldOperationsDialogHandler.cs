@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using Aog.UI.Avalonia.ViewModels;
 using Aog.UI.Avalonia.Views.FieldOperations;
 using Aog.UI.Avalonia.Views.Main;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Aog.UI.Avalonia.Hosting;
@@ -23,17 +24,15 @@ public sealed class FieldOperationsDialogHandler : IShellCommandHandler
         "tools.offset",
     };
 
-    private readonly MainWindow _mainWindow;
-    private readonly MainWindowViewModel _viewModel;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<FieldOperationsDialogHandler> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FieldOperationsDialogHandler"/> class.
     /// </summary>
-    public FieldOperationsDialogHandler(MainWindow mainWindow, MainWindowViewModel viewModel, ILogger<FieldOperationsDialogHandler> logger)
+    public FieldOperationsDialogHandler(IServiceProvider serviceProvider, ILogger<FieldOperationsDialogHandler> logger)
     {
-        _mainWindow = mainWindow ?? throw new ArgumentNullException(nameof(mainWindow));
-        _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -53,11 +52,12 @@ public sealed class FieldOperationsDialogHandler : IShellCommandHandler
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
+            var viewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
             Window? dialog = injectionPoint.ToLowerInvariant() switch
             {
-                "dialog.boundary" => new Views.BoundaryWindow(_viewModel.CreateBoundaryToolViewModel()),
-                "dialog.flags" => new FlagManagerDialog(_viewModel.CreateFlagManagerDialogViewModel()),
-                "tools.offset" => new ShiftPositionDialog(_viewModel.CreateShiftPositionDialogViewModel()),
+                "dialog.boundary" => new Views.BoundaryWindow(viewModel.CreateBoundaryToolViewModel()),
+                "dialog.flags" => new FlagManagerDialog(viewModel.CreateFlagManagerDialogViewModel()),
+                "tools.offset" => new ShiftPositionDialog(viewModel.CreateShiftPositionDialogViewModel()),
                 _ => null,
             };
 
@@ -67,8 +67,9 @@ public sealed class FieldOperationsDialogHandler : IShellCommandHandler
                 return;
             }
 
+            var owner = _serviceProvider.GetRequiredService<MainWindow>();
             handled = true;
-            dialogTask = dialog.ShowDialog(_mainWindow);
+            dialogTask = dialog.ShowDialog(owner);
         });
 
         if (!handled || dialogTask is null)

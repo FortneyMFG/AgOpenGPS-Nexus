@@ -16,6 +16,7 @@ using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Models;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Theming;
+using Aog.UI.Avalonia.ViewModels.Shell;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -45,6 +46,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private bool _isTopToolbarVisible;
     private bool _isRightSidebarVisible;
 
+    /// <summary>Gets the shell view-model that drives the surface layout.</summary>
+    public AppShellViewModel Shell { get; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="MainWindowViewModel"/> class.
     /// </summary>
@@ -60,6 +64,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         IUiPreferencesService preferencesService,
         IThemeManager themeManager,
         IShellCommandDispatcher commandDispatcher,
+        AppShellViewModel shell,
         TelemetryPrivacyViewModel telemetryPrivacy,
         TimeProvider timeProvider)
     {
@@ -67,6 +72,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         ArgumentNullException.ThrowIfNull(preferencesService);
         ArgumentNullException.ThrowIfNull(themeManager);
         ArgumentNullException.ThrowIfNull(commandDispatcher);
+        ArgumentNullException.ThrowIfNull(shell);
         ArgumentNullException.ThrowIfNull(telemetryPrivacy);
         ArgumentNullException.ThrowIfNull(timeProvider);
 
@@ -74,6 +80,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _preferencesService = preferencesService;
         _themeManager = themeManager;
         _timeProvider = timeProvider;
+        Shell = shell;
 
         TelemetryPrivacy = telemetryPrivacy;
 
@@ -136,6 +143,11 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         ShellMenuBar = new ShellMenuBarViewModel(commandDispatcher);
         TopToolbar = new TopToolbarViewModel(commandDispatcher);
         StatusStrip = BuildStatusStrip();
+        Shell.StatusStrip = StatusStrip;
+        Shell.Host = this;
+        Shell.MainContent = BoundaryTool;
+        Shell.CurrentView = BoundaryTool;
+        Shell.StatusText = Title;
     }
 
     /// <summary>Raised when a property value changes.</summary>
@@ -273,6 +285,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     /// <summary>Gets the guidance tracks rendered on the map.</summary>
     public IReadOnlyList<GuidanceTrack> GuidanceTracks => _guidanceTracks;
+
+    /// <summary>Gets the sample boundary tool view-model surfaced in the shell workspace.</summary>
+    public BoundaryToolViewModel BoundaryTool { get; } = BoundaryToolViewModel.CreateSample();
 
     /// <summary>Gets the zone editor toolbar view-model powering map editing affordances.</summary>
     public ZoneEditorToolbarViewModel ZoneEditorToolbar { get; }

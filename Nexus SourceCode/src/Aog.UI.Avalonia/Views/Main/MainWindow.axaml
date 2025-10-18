@@ -1,11 +1,14 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:shell="clr-namespace:Aog.UI.Avalonia.Views.Shell"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
+        mc:Ignorable="d"
+        d:DesignWidth="1280"
+        d:DesignHeight="720"
         x:Class="Aog.UI.Avalonia.Views.Main.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
         Title="AgOpenGPS Nexus">
-    <Grid>
-        <TextBlock Text="Hello, World!" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-    </Grid>
+  <shell:AppShellView DataContext="{Binding Shell}" />
 </Window>

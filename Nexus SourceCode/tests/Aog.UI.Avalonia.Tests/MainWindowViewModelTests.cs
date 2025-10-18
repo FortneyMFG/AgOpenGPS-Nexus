@@ -9,6 +9,7 @@ using Aog.Core.Legacy;
 using Aog.Core.Paths;
 using Aog.Core.Simulation.Configuration;
 using Aog.Core.V1;
+using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Telemetry;
@@ -343,6 +344,8 @@ public sealed class MainWindowViewModelTests
         var connection = new ConnectionSettingsViewModel(connectionStore, runModeService);
         var preferencesStore = new InMemoryUiPreferencesStore();
         var preferencesService = new UiPreferencesService(preferencesStore);
+        var catalog = new BlockCatalog(new IBlockProvider[] { new CoreBlockProvider() });
+        var layoutStore = new BlockLayoutStore(preferencesService, catalog);
         var themeManager = new TestThemeManager();
         var telemetryService = new TestCrashTelemetryService();
         var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
@@ -358,6 +361,8 @@ public sealed class MainWindowViewModelTests
             preferencesService,
             themeManager,
             dispatcher,
+            layoutStore,
+            catalog,
             shell,
             telemetryViewModel,
             timeProvider);

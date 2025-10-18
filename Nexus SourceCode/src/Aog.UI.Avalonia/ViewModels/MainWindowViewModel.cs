@@ -12,6 +12,7 @@ using Aog.Core.Replay;
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
 using Aog.Core.V1;
+using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Models;
 using Aog.UI.Avalonia.Settings;
@@ -39,6 +40,10 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private readonly SimulationConfiguration? _simulationConfiguration;
     private readonly IUiPreferencesService _preferencesService;
     private readonly IThemeManager _themeManager;
+    private readonly IBlockLayoutStore _blockLayoutStore;
+    private readonly IBlockCatalog _blockCatalog;
+    private readonly IReadOnlyList<BlockInstance> _blockInstances;
+    private readonly BlockSidebarBuilder _blockSidebarBuilder;
     private readonly ShellLayoutPreferences _shellLayout;
     private readonly TimeProvider _timeProvider;
     private bool _disposed;
@@ -68,6 +73,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         IUiPreferencesService preferencesService,
         IThemeManager themeManager,
         IShellCommandDispatcher commandDispatcher,
+        IBlockLayoutStore blockLayoutStore,
+        IBlockCatalog blockCatalog,
         AppShellViewModel shell,
         TelemetryPrivacyViewModel telemetryPrivacy,
         TimeProvider timeProvider)
@@ -76,6 +83,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         ArgumentNullException.ThrowIfNull(preferencesService);
         ArgumentNullException.ThrowIfNull(themeManager);
         ArgumentNullException.ThrowIfNull(commandDispatcher);
+        ArgumentNullException.ThrowIfNull(blockLayoutStore);
+        ArgumentNullException.ThrowIfNull(blockCatalog);
         ArgumentNullException.ThrowIfNull(shell);
         ArgumentNullException.ThrowIfNull(telemetryPrivacy);
         ArgumentNullException.ThrowIfNull(timeProvider);
@@ -85,6 +94,10 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _themeManager = themeManager;
         _timeProvider = timeProvider;
         Shell = shell;
+        _blockLayoutStore = blockLayoutStore;
+        _blockCatalog = blockCatalog;
+        _blockInstances = _blockLayoutStore.Load().OrderBy(instance => instance.Order).ToList();
+        _blockSidebarBuilder = new BlockSidebarBuilder(_blockCatalog, UpdateStatusText);
 
         TelemetryPrivacy = telemetryPrivacy;
 
@@ -336,6 +349,21 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     private IReadOnlyList<SidebarButtonViewModel> BuildLeftSidebar()
     {
+        return BuildButtonsForRegion(BlockRegion.Left, BuildLegacyLeftSidebar);
+    }
+
+    private IReadOnlyList<SidebarButtonViewModel> BuildRightSidebar()
+    {
+        return BuildButtonsForRegion(BlockRegion.Right, BuildLegacyRightSidebar);
+    }
+
+    private IReadOnlyList<SidebarButtonViewModel> BuildBottomStrip()
+    {
+        return BuildButtonsForRegion(BlockRegion.Bottom, BuildLegacyBottomStrip);
+    }
+
+    private IReadOnlyList<SidebarButtonViewModel> BuildLegacyLeftSidebar()
+    {
         return new[]
         {
             new SidebarButtonViewModel(
@@ -354,7 +382,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         };
     }
 
-    private IReadOnlyList<SidebarButtonViewModel> BuildRightSidebar()
+    private IReadOnlyList<SidebarButtonViewModel> BuildLegacyRightSidebar()
     {
         return new[]
         {
@@ -365,7 +393,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         };
     }
 
-    private IReadOnlyList<SidebarButtonViewModel> BuildBottomStrip()
+    private IReadOnlyList<SidebarButtonViewModel> BuildLegacyBottomStrip()
     {
         return new[]
         {
@@ -376,6 +404,19 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
             CreateSidebarButton("Nudge R", "Nudged guidance line right by 2 cm."),
             CreateSidebarButton("Stop", "Stopped autoguidance."),
         };
+    }
+
+    private IReadOnlyList<SidebarButtonViewModel> BuildButtonsForRegion(
+        BlockRegion region,
+        Func<IReadOnlyList<SidebarButtonViewModel>> legacyFactory)
+    {
+        var buttons = _blockSidebarBuilder.Build(region, _blockInstances);
+        return buttons.Count > 0 ? buttons : legacyFactory();
+    }
+
+    private void UpdateStatusText(string message)
+    {
+        Shell.StatusText = string.IsNullOrWhiteSpace(message) ? "Command executed." : message;
     }
 
     private SidebarButtonViewModel CreateSidebarButton(string label, string statusMessage)

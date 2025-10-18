@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Aog.Plugins.CombineYield;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace Aog.Plugins.Tests;

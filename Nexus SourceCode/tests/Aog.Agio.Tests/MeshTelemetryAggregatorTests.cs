@@ -26,7 +26,7 @@ public sealed class MeshTelemetryAggregatorTests
         await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "subscriber",
             "Test Subscriber",
-            subscribeProfile: new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("season-2025", "job-42", MeshDataTier.Presence | MeshDataTier.Trails, new[] { "presence", "trail" })
             })), CancellationToken.None);
@@ -125,7 +125,7 @@ public sealed class MeshTelemetryAggregatorTests
         await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "watcher",
             "Watcher",
-            subscribeProfile: new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("season", "job", MeshDataTier.Presence | MeshDataTier.Trails, new[] { "presence", "trail" })
             })), CancellationToken.None);

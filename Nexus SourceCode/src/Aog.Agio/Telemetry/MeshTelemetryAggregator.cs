@@ -151,8 +151,8 @@ public sealed class MeshTelemetryAggregator : ILegacyPoseObserver
         var registration = new MeshDeviceRegistration(
             _options.DeviceId,
             _options.DeviceLabel,
-            shareProfile: profile,
-            subscribeProfile: MeshSubscribeProfile.Empty)
+            ShareProfile: profile,
+            SubscribeProfile: MeshSubscribeProfile.Empty)
         {
             Capabilities = _capabilities.Length == 0 ? null : _capabilities
         };

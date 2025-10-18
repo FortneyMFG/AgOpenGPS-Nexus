@@ -22,11 +22,11 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             " device:alpha ",
             "  Harvester  ",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant(" season:2025 ", " job:123 ", MeshDataTier.Presence, new[] { "presence" })
             }),
-            subscribeProfile: new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("*", "*", MeshDataTier.Presence)
             }))
@@ -63,7 +63,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "device:beta",
             "Sprayer",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence, new[] { "presence" })
             })),
@@ -87,7 +87,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "publisher",
             "Combine",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence | MeshDataTier.Coverage, new[] { "presence", "coverage" })
             })),
@@ -96,7 +96,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "subscriber",
             "Scout",
-            subscribeProfile: new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("season:2025", "job:alpha", MeshDataTier.Coverage, new[] { "coverage" })
             })),
@@ -138,7 +138,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "device:gamma",
             "Tractor",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:beta", MeshDataTier.Presence, new[] { "presence" })
             })),
@@ -175,7 +175,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "device:alpha",
             "Combine",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence, new[] { "presence" })
             })),
@@ -255,7 +255,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "publisher",
             "Combine",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence | MeshDataTier.Coverage, new[] { "presence", "coverage" })
             })),
@@ -264,7 +264,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "subscriber",
             "Scout",
-            subscribeProfile: new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("season:2025", "job:alpha", MeshDataTier.Coverage, new[] { "coverage" })
             })),

@@ -64,8 +64,8 @@ public sealed class AogLinkMeshBridge
         var registration = new MeshDeviceRegistration(
             deviceId,
             label,
-            shareProfile: PresenceShareProfile,
-            subscribeProfile: MeshSubscribeProfile.Empty)
+            ShareProfile: PresenceShareProfile,
+            SubscribeProfile: MeshSubscribeProfile.Empty)
         {
             Capabilities = capabilities.Length == 0 ? null : capabilities
         };
@@ -141,8 +141,8 @@ public sealed class AogLinkMeshBridge
         var registration = new MeshDeviceRegistration(
             deviceId,
             label,
-            shareProfile: PresenceShareProfile,
-            subscribeProfile: MeshSubscribeProfile.Empty);
+            ShareProfile: PresenceShareProfile,
+            SubscribeProfile: MeshSubscribeProfile.Empty);
 
         await _meshService.RegisterOrUpdateDeviceAsync(registration, cancellationToken).ConfigureAwait(false);
 

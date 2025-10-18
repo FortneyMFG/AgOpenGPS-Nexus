@@ -200,8 +200,8 @@ public sealed class JobTasksPersistenceTests
         snapshot.Layout.DataDirectory.Should().Be(Path.Combine(expectedRoot, "data"));
         snapshot.Layout.ResumeFile.Should().Be(Path.Combine(expectedRoot, "Resume.txt"));
         snapshot.Layout.AttachmentsDirectory.Should().Be(Path.Combine(expectedRoot, "attachments"));
-        snapshot.Layout.ResumeFile.Should().StartWith(expectedRoot, StringComparison.Ordinal);
-        snapshot.Layout.AttachmentsDirectory.Should().StartWith(expectedRoot, StringComparison.Ordinal);
+        snapshot.Layout.ResumeFile.StartsWith(expectedRoot, StringComparison.Ordinal).Should().BeTrue();
+        snapshot.Layout.AttachmentsDirectory.StartsWith(expectedRoot, StringComparison.Ordinal).Should().BeTrue();
     }
 
     private sealed class TemporaryDirectory : IDisposable

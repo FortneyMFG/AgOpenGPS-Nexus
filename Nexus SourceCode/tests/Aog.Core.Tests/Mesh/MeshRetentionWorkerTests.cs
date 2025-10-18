@@ -32,7 +32,7 @@ public sealed class MeshRetentionWorkerTests
         await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "publisher",
             "Combine",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Coverage, new[] { "coverage" })
             })),

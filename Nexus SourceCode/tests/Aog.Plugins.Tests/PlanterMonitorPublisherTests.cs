@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Aog.Core.Eventing;
 using Aog.Core.V1;
 using Aog.Plugins.PlanterMonitor;
+using Microsoft.Extensions.Time.Testing;
 using FluentAssertions;
 using Xunit;
 
@@ -99,7 +100,7 @@ public sealed class PlanterMonitorPublisherTests
         var bus = new InMemoryEventBus();
         var publisher = new PlanterMonitorPublisher(bus, CreateOptions(), new FakeTimeProvider());
 
-        var act = () => publisher.PublishAsync(new RowPopulationMeasurement(32, 10.0, 10.0));
+        Func<Task> act = () => publisher.PublishAsync(new RowPopulationMeasurement(32, 10.0, 10.0)).AsTask();
 
         await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
     }

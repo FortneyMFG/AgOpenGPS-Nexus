@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Aog.Core.Paths;
 using Aog.Plugins.CostProfit;
+using Microsoft.Extensions.Time.Testing;
 using FluentAssertions;
 using Xunit;
 

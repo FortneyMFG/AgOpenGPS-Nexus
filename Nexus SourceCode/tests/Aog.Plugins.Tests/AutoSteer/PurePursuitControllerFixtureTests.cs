@@ -68,7 +68,7 @@ public sealed class PurePursuitControllerFixtureTests
             PropertyNameCaseInsensitive = true
         });
 
-        return fixtures ?? Array.Empty<PurePursuitFixture>();
+        return fixtures?.ToArray() ?? Array.Empty<PurePursuitFixture>();
     }
 
     private static double DegreesToRadians(double degrees) => Math.PI / 180d * degrees;

@@ -66,8 +66,8 @@ public sealed class MeshRetentionWorker : IAsyncDisposable
         var registration = new MeshDeviceRegistration(
             _options.DeviceId,
             _options.DeviceLabel,
-            shareProfile: MeshShareProfile.Empty,
-            subscribeProfile: subscribeProfile)
+            ShareProfile: MeshShareProfile.Empty,
+            SubscribeProfile: subscribeProfile)
         {
             Capabilities = _options.Capabilities is { Count: > 0 } capabilities ? capabilities : null
         };

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Aog.Core.V1;
 using Aog.Plugins.PlanterMonitor;
+using Microsoft.Extensions.Time.Testing;
 using FluentAssertions;
 using Xunit;
 
@@ -9,9 +10,9 @@ namespace Aog.Plugins.Tests;
 
 public sealed class PlanterMonitorAnalyticsAggregatorTests
 {
-    private static PlanterMonitorOptions CreateOptions() => new()
+    private static PlanterMonitorOptions CreateOptions(int rowCount = 8) => new()
     {
-        RowCount = 8,
+        RowCount = rowCount,
         SkipThreshold = 0.25,
         DoubleThreshold = 0.25,
         Frame = "vehicle",
@@ -129,7 +130,7 @@ public sealed class PlanterMonitorAnalyticsAggregatorTests
     [Fact]
     public void Ingest_RowBeyondConfiguredCount_Throws()
     {
-        var options = CreateOptions() with { RowCount = 2 };
+        var options = CreateOptions(rowCount: 2);
         var aggregator = new PlanterMonitorAnalyticsAggregator(options, new FakeTimeProvider());
 
         var act = () => aggregator.Ingest(new RowPopulationMeasurement(5, 10.0, 10.0));

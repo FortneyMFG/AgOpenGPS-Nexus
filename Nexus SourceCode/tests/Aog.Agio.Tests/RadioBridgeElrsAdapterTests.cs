@@ -40,8 +40,8 @@ public sealed class RadioBridgeElrsAdapterTests
             await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
                 "publisher",
                 "Publisher",
-                shareProfile: new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
-                subscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) }))
+                ShareProfile: new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
+                SubscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) }))
             {
                 Capabilities = new[] { "test" }
             }, CancellationToken.None);
@@ -100,8 +100,8 @@ public sealed class RadioBridgeElrsAdapterTests
             await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
                 "inspector",
                 "Inspector",
-                shareProfile: new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
-                subscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) }))
+                ShareProfile: new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
+                SubscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) }))
             {
                 Capabilities = Array.Empty<string>()
             }, CancellationToken.None);
@@ -167,8 +167,8 @@ public sealed class RadioBridgeElrsAdapterTests
             await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
                 "observer",
                 "Observer",
-                shareProfile: new MeshShareProfile(new[] { new MeshShareGrant("system", "radio", MeshDataTier.All) }),
-                subscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("system", "radio", MeshDataTier.All) }))
+                ShareProfile: new MeshShareProfile(new[] { new MeshShareGrant("system", "radio", MeshDataTier.All) }),
+                SubscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("system", "radio", MeshDataTier.All) }))
             {
                 Capabilities = Array.Empty<string>()
             }, CancellationToken.None);

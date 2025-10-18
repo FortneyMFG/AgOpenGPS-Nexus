@@ -321,9 +321,9 @@ public sealed class PluginCompatibilityEvaluatorTests
                 ["core.runtime"] = ">=1.0.0",
             },
             requiredTransports: Array.Empty<string>(),
+            version: "3.2.1",
             configure: manifest =>
             {
-                manifest.Version = "3.2.1";
                 manifest.Requires.Replaces.Add(new PluginRelationshipRequirement
                 {
                     Id = "org.agopengps.plugins.mapping",
@@ -361,9 +361,9 @@ public sealed class PluginCompatibilityEvaluatorTests
                 ["core.runtime"] = ">=1.0.0",
             },
             requiredTransports: Array.Empty<string>(),
+            version: "1.4.0",
             configure: manifest =>
             {
-                manifest.Version = "1.4.0";
                 manifest.Requires.Replaces.Add(new PluginRelationshipRequirement
                 {
                     Id = "org.agopengps.plugins.mapping",
@@ -399,6 +399,7 @@ public sealed class PluginCompatibilityEvaluatorTests
         string capability,
         IDictionary<string, string> requiredApis,
         IEnumerable<string> requiredTransports,
+        string version = "1.0.0",
         PluginLeaseMode leaseMode = PluginLeaseMode.Exclusive,
         Action<PluginManifest>? configure = null)
     {
@@ -409,7 +410,7 @@ public sealed class PluginCompatibilityEvaluatorTests
             SchemaVersion = "1.0.0",
             Id = id,
             Name = name,
-            Version = "1.0.0",
+            Version = version,
             MinimumRuntimeVersion = "1.0.0",
             RequiredApis = new Dictionary<string, string>(requiredApis, StringComparer.OrdinalIgnoreCase),
             RequiredTransports = requiredTransports.ToList(),

@@ -17,7 +17,7 @@ public sealed class ProfitAnalyticsRollupServiceTests
         var scope = CreateScope();
         ledger.RecordCost(new CostRecord("cost-1", scope, CostCategory.Seed, 200m, "USD", DateTimeOffset.UtcNow, "ops"));
         ledger.RecordCost(new CostRecord("cost-2", scope, CostCategory.Fuel, 50m, "USD", DateTimeOffset.UtcNow, "ops"));
-        ledger.RecordCost(new CostRecord("cost-3", scope, CostCategory.Misc, 75m, "CAD", DateTimeOffset.UtcNow, "ops"));
+        ledger.RecordCost(new CostRecord("cost-3", scope, CostCategory.Miscellaneous, 75m, "CAD", DateTimeOffset.UtcNow, "ops"));
 
         var revenue = new List<RevenueContribution>
         {
@@ -46,7 +46,7 @@ public sealed class ProfitAnalyticsRollupServiceTests
     {
         var ledger = new CostLedger();
         var scope = CreateScope();
-        ledger.RecordCost(new CostRecord("cost-1", scope, CostCategory.Misc, 100m, "USD", DateTimeOffset.UtcNow, "ops"));
+        ledger.RecordCost(new CostRecord("cost-1", scope, CostCategory.Miscellaneous, 100m, "USD", DateTimeOffset.UtcNow, "ops"));
 
         var service = new ProfitAnalyticsRollupService(ledger);
         var rollup = service.CreateRollup(new CostScopeFilter { FarmId = "farm-1" }, Array.Empty<RevenueContribution>());

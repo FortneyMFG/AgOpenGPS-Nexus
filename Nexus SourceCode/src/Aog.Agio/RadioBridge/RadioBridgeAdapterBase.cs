@@ -419,8 +419,8 @@ public abstract class RadioBridgeAdapterBase<TOptions> : IHostedService, IDispos
         var registration = new MeshDeviceRegistration(
             _options.DeviceId,
             _options.DeviceLabel,
-            shareProfile: new MeshShareProfile(shareGrants),
-            subscribeProfile: new MeshSubscribeProfile(subscribeGrants))
+            ShareProfile: new MeshShareProfile(shareGrants),
+            SubscribeProfile: new MeshSubscribeProfile(subscribeGrants))
         {
             Capabilities = capabilities
         };

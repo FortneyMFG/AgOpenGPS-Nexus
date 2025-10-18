@@ -187,13 +187,13 @@ public sealed class JobSeasonSessionOrchestratorTests
             JobLifecycleState.Mounted,
             DateTimeOffset.Parse("2025-05-05T07:00:00Z"),
             DateTimeOffset.Parse("2025-05-05T07:00:00Z"),
-            activeSessionId: null,
+            null,
             new JobContext(
                 "farm:alpha",
                 new[] { "field:north" },
                 seasonId,
-                workOrderId: null,
-                notes: null),
+                null,
+                null),
             Array.Empty<string>());
     }
 }

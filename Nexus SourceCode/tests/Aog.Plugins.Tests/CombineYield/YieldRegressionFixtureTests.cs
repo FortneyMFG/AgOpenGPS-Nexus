@@ -131,7 +131,7 @@ public sealed class YieldRegressionFixtureTests
 
         metadata.Aggregation.Basis.Should().Be(expected.Aggregation.Basis, scenarioName);
         metadata.Aggregation.Scopes.Should().Equal(expected.Aggregation.Scopes, scenarioName);
-        metadata.Aggregation.Timestamp.Should().Be(expected.Aggregation.Timestamp, scenarioName);
+        metadata.Aggregation.UpdatedAt.Should().Be(expected.Aggregation.Timestamp, scenarioName);
 
         metadata.Aggregation.Bins.Should().NotBeNull(scenarioName);
         metadata.Aggregation.Bins.Scheme.Should().Be(expected.Aggregation.Bins.Scheme, scenarioName);

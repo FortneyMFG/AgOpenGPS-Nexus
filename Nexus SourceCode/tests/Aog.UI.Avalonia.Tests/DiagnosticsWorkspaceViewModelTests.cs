@@ -76,7 +76,7 @@ public sealed class DiagnosticsWorkspaceViewModelTests
         {
             _mode = mode;
             ModeChanged?.Invoke(this, new AvaloniaRunModeChangedEventArgs(mode));
-            return Task.FromResult(new RunModeChangeResult(mode, requiresRestart: false));
+            return Task.FromResult(new RunModeChangeResult(mode, false));
         }
     }
 

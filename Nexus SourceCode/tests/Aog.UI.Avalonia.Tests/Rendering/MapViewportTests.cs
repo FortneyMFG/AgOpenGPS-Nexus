@@ -1,6 +1,7 @@
 using Aog.UI.Avalonia.Rendering;
 using Avalonia;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using Xunit;
 
@@ -80,16 +81,27 @@ public class MapViewportTests
 
 internal static class PointAssertionsExtensions
 {
-    public static AndConstraint<ObjectAssertions<Point>> BeApproximately(
-        this ObjectAssertions<Point> assertions,
+    public static AndConstraint<ObjectAssertions> BeApproximately(
+        this ObjectAssertions assertions,
         Point expected,
         double precision)
     {
-        var subject = assertions.Subject;
+        Point subject;
+
+        if (assertions.Subject is Point point)
+        {
+            subject = point;
+        }
+        else
+        {
+            Execute.Assertion
+                .FailWith("Expected {context:Point} to be {0} but found {1}.", expected, assertions.Subject);
+            return new AndConstraint<ObjectAssertions>(assertions);
+        }
 
         subject.X.Should().BeApproximately(expected.X, precision);
         subject.Y.Should().BeApproximately(expected.Y, precision);
 
-        return new AndConstraint<ObjectAssertions<Point>>(assertions);
+        return new AndConstraint<ObjectAssertions>(assertions);
     }
 }

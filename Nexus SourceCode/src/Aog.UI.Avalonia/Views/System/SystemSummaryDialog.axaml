@@ -2,16 +2,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels;assembly=Aog.UI.Avalonia"
         xmlns:model="clr-namespace:Aog.UI.Avalonia.Models"
         mc:Ignorable="d"
         x:Class="Aog.UI.Avalonia.Views.System.SystemSummaryDialog"
+        x:DataType="vm:MainWindowViewModel"
         Title="System Summary"
         Width="520"
         Height="600">
   <ScrollViewer VerticalScrollBarVisibility="Auto">
     <StackPanel Spacing="{DynamicResource ThemeSpacingMd}"
-                Margin="{DynamicResource ThemeSpacingLg}">
+                Margin="{DynamicResource ThemeSpacingLgThickness}">
       <TextBlock Text="System Summary"
                  FontSize="{DynamicResource ThemeFontSizeLg}"
                  FontWeight="Bold" />

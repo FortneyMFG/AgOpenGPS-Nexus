@@ -59,6 +59,11 @@
   <x:Double x:Key="ThemeSpacingLg">16</x:Double>
   <x:Double x:Key="ThemeSpacingXl">24</x:Double>
 
+  <Thickness x:Key="ThemeSpacingSmThickness">8</Thickness>
+  <Thickness x:Key="ThemeSpacingMdThickness">12</Thickness>
+  <Thickness x:Key="ThemeSpacingLgThickness">16</Thickness>
+  <Thickness x:Key="ThemeSpacingXlThickness">24</Thickness>
+
   <CornerRadius x:Key="ThemeRadiusSm">4</CornerRadius>
   <CornerRadius x:Key="ThemeRadiusMd">8</CornerRadius>
   <CornerRadius x:Key="ThemeRadiusLg">12</CornerRadius>

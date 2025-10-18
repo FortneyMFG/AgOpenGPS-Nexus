@@ -16,7 +16,7 @@ public sealed class DashboardsViewModelTests
     {
         var viewModel = new SteerDashboardViewModel();
         var crossTrack = Enumerable.Range(0, 10).Select(i => i * 0.1);
-        var angles = Enumerable.Range(0, 10).Select(i => -5 + i);
+        var angles = Enumerable.Range(0, 10).Select(i => -5.0 + i);
         var outputs = Enumerable.Range(0, 10).Select(i => Math.Sin(i));
 
         viewModel.ApplyHistoricalSamples(crossTrack, angles, outputs);
@@ -61,25 +61,25 @@ public sealed class DashboardsViewModelTests
         viewModel.SpeedSamples.Should().HaveCount(2);
     }
 
- [Fact]
-        public void ReplayTimeline_BookmarksAreReadOnly()
+    [Fact]
+    public void ReplayTimeline_BookmarksAreReadOnly()
+    {
+        var viewModel = new ReplayTimelineViewModel();
+        var bookmarks = new[]
         {
-            var viewModel = new ReplayTimelineViewModel();
-            var bookmarks = new[]
-            {
-                new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(10), "Test", "Note"),
-            };
+            new ReplayTimelineBookmarkViewModel(TimeSpan.FromSeconds(10), "Test", "Note"),
+        };
 
-            viewModel.ApplySampleData(Array.Empty<double>(), Array.Empty<double>(), bookmarks);
+        viewModel.ApplySampleData(Array.Empty<double>(), Array.Empty<double>(), bookmarks);
 
-            var observableCollectionCast = viewModel.Bookmarks as ObservableCollection<ReplayTimelineBookmarkViewModel>;
-            observableCollectionCast.Should().BeNull();
+        viewModel.Bookmarks.Should()
+            .NotBeAssignableTo<ObservableCollection<ReplayTimelineBookmarkViewModel>>();
 
-            var modifyingAction = () => ((ICollection<ReplayTimelineBookmarkViewModel>)viewModel.Bookmarks)
-                .Add(new ReplayTimelineBookmarkViewModel(TimeSpan.Zero, "Injected", "Should fail"));
+        var modifyingAction = () => ((ICollection<ReplayTimelineBookmarkViewModel>)viewModel.Bookmarks)
+            .Add(new ReplayTimelineBookmarkViewModel(TimeSpan.Zero, "Injected", "Should fail"));
 
-            modifyingAction.Should().Throw<NotSupportedException>();
-        }
+        modifyingAction.Should().Throw<NotSupportedException>();
+    }
 
         [Fact]
         public void ReplayTimelineBookmarks_DisplayInvariantTimestamps()
@@ -132,14 +132,21 @@ public sealed class DashboardsViewModelTests
     private sealed class FixedTimeProvider : TimeProvider
     {
         private readonly DateTimeOffset _localNow;
+        private readonly TimeZoneInfo _timeZone;
 
         public FixedTimeProvider(DateTimeOffset localNow)
         {
             _localNow = localNow;
+            var offset = localNow.Offset;
+            _timeZone = TimeZoneInfo.CreateCustomTimeZone(
+                $"FixedOffset_{offset.Ticks}",
+                offset,
+                "Fixed offset",
+                "Fixed offset");
         }
 
         public override DateTimeOffset GetUtcNow() => _localNow.ToUniversalTime();
 
-        public override DateTimeOffset GetLocalNow() => _localNow;
+        public override TimeZoneInfo LocalTimeZone => _timeZone;
     }
 }

@@ -14,6 +14,7 @@ using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Telemetry;
 using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels;
+using Aog.UI.Avalonia.ViewModels.Shell;
 using Avalonia.Media;
 using FluentAssertions;
 using Xunit;
@@ -137,7 +138,7 @@ public sealed class MainWindowViewModelTests
         var viewModel = CreateViewModel();
 
         viewModel.FieldHealthSeverity.Should().NotBeNull();
-        viewModel.FieldHealthSeverity.LayerDisplayName.Should().Contain("Flood", StringComparison.OrdinalIgnoreCase);
+        viewModel.FieldHealthSeverity.LayerDisplayName.Should().ContainEquivalentOf("Flood");
         viewModel.FieldHealthSeverity.Entries.Should().HaveCountGreaterThan(3);
         viewModel.FieldHealthSeverity.Entries.Select(entry => entry.Severity)
             .Should().Contain(new[] { "Critical", "High", "Moderate", "Low", "None" });
@@ -346,6 +347,7 @@ public sealed class MainWindowViewModelTests
         var telemetryService = new TestCrashTelemetryService();
         var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
         dispatcher = new RecordingShellCommandDispatcher();
+        var shell = new AppShellViewModel();
 
         // Deterministic time for tests that assert relative timestamps.
         var timeProvider = new FixedTimeProvider(SeedTimestamp);
@@ -356,6 +358,7 @@ public sealed class MainWindowViewModelTests
             preferencesService,
             themeManager,
             dispatcher,
+            shell,
             telemetryViewModel,
             timeProvider);
     }
@@ -455,7 +458,7 @@ public sealed class MainWindowViewModelTests
         {
             _mode = mode;
             ModeChanged?.Invoke(this, new AvaloniaRunModeChangedEventArgs(mode));
-            return Task.FromResult(new RunModeChangeResult(mode, requiresRestart: false));
+            return Task.FromResult(new RunModeChangeResult(mode, false));
         }
     }
 

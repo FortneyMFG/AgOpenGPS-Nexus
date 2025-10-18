@@ -75,6 +75,11 @@ public sealed class AvaloniaRunModeServiceTests
             LastSavedRunMode = mode;
             _preferences.RunMode = mode;
         }
+
+        public void UpdateShellLayout(ShellLayoutPreferences layout)
+        {
+            _preferences.ShellLayout = layout.Clone();
+        }
     }
 
     private sealed class TestPlatform : IRunModePlatform

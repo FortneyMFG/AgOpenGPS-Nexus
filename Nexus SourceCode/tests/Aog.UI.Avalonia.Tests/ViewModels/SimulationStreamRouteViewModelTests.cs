@@ -16,7 +16,7 @@ public sealed class SimulationStreamRouteViewModelTests
         var viewModel = new SimulationStreamRouteViewModel(
             stream: "pose",
             selectedSource: "sim.vehicle.bicycle",
-            selectedMode: "simulation",
+            mode: "simulation",
             availableSources: availableSources,
             availableModes: availableModes);
 
@@ -31,7 +31,7 @@ public sealed class SimulationStreamRouteViewModelTests
         var viewModel = new SimulationStreamRouteViewModel(
             stream: "nmea",
             selectedSource: "MockProvider",
-            selectedMode: "Live",
+            mode: "Live",
             availableSources: new List<string> { "MockProvider", "ReplayProvider" },
             availableModes: new List<string> { "Live" });
 
@@ -46,7 +46,7 @@ public sealed class SimulationStreamRouteViewModelTests
         var vm = new SimulationStreamRouteViewModel(
             stream: "pose",
             selectedSource: "sim.vehicle.bicycle",
-            selectedMode: "simulation",
+            mode: "simulation",
             availableSources: new List<string> { "sim.vehicle.bicycle" },
             availableModes: new List<string> { "simulation", "replay" });
 

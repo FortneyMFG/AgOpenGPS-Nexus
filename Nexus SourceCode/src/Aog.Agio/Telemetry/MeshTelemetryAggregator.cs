@@ -151,9 +151,11 @@ public sealed class MeshTelemetryAggregator : ILegacyPoseObserver
         var registration = new MeshDeviceRegistration(
             _options.DeviceId,
             _options.DeviceLabel,
-            _capabilities.Length == 0 ? null : _capabilities,
-            profile,
-            MeshSubscribeProfile.Empty);
+            shareProfile: profile,
+            subscribeProfile: MeshSubscribeProfile.Empty)
+        {
+            Capabilities = _capabilities.Length == 0 ? null : _capabilities
+        };
 
         await _meshService.RegisterOrUpdateDeviceAsync(registration, cancellationToken).ConfigureAwait(false);
     }
@@ -278,6 +280,11 @@ public sealed class MeshTelemetryAggregator : ILegacyPoseObserver
         map["imuRollDeg"] = (metadata.ImuRollHundredths / 100.0).ToString("F2", CultureInfo.InvariantCulture);
         map["imuPitchDeg"] = (metadata.ImuPitchHundredths / 100.0).ToString("F2", CultureInfo.InvariantCulture);
         map["imuYawRateDegPerSec"] = (metadata.ImuYawRateHundredths / 100.0).ToString("F2", CultureInfo.InvariantCulture);
+
+        if (_capabilities.Length > 0)
+        {
+            map["capabilities"] = string.Join(',', _capabilities);
+        }
 
         return map;
     }

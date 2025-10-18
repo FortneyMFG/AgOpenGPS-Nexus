@@ -64,12 +64,19 @@ public sealed class LegacyMeshPresencePublisher : ILegacyMeshPresencePublisher, 
         _registration = new MeshDeviceRegistration(
             _deviceId,
             _deviceLabel,
-            _capabilities,
-            new MeshShareProfile(new[]
+            shareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant(_shareSeasonId, _shareJobId, MeshDataTier.Presence)
             }),
-            MeshSubscribeProfile.Empty);
+            subscribeProfile: MeshSubscribeProfile.Empty)
+        {
+            Capabilities = _capabilities
+        };
+
+        if (_capabilities.Count > 0)
+        {
+            _staticMetadata["legacy.capabilities"] = string.Join(',', _capabilities);
+        }
     }
 
     /// <inheritdoc />

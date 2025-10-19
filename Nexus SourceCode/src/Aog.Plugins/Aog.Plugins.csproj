@@ -8,6 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.7" />
+    <PackageReference Include="Avalonia.OpenGL" Version="11.3.7" />
+    <PackageReference Include="OpenTK" Version="4.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aog.Abstractions\Aog.Abstractions.csproj" />
     <ProjectReference Include="..\Aog.Core\Aog.Core.csproj" />
   </ItemGroup>
 </Project>

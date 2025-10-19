@@ -123,6 +123,9 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         changed |= EnsureClone(layout, "Cmd.NudgeLeft", BlockRegion.Bottom, 3);
         changed |= EnsureClone(layout, "Cmd.NudgeRight", BlockRegion.Bottom, 4);
         changed |= EnsureClone(layout, "Tel.Speed", BlockRegion.Top, 0, BlockSize.Tile1xHalf);
+        changed |= EnsureClone(layout, "Tel.Gps", BlockRegion.Top, 1, BlockSize.Tile1xHalf);
+        changed |= EnsureClone(layout, "Tel.Sections", BlockRegion.Top, 2, BlockSize.Tile1xHalf);
+        changed |= EnsureClone(layout, "Tel.Radio", BlockRegion.Top, 3, BlockSize.Tile1xHalf);
         return changed;
     }
 

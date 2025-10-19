@@ -87,7 +87,7 @@ public sealed class SidebarLayoutSettings
             BlockColumns = 6d,
             HeightMode = LayoutDimensionMode.Fixed,
             BlockRows = 0.5d,
-            BlockSize = 56d,
+            BlockSize = 112d,
             Spacing = 8d,
         };
     }

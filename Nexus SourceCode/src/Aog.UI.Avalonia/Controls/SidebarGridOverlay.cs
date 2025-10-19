@@ -78,17 +78,27 @@ public sealed class SidebarGridOverlay : Control
 
         context.DrawRectangle(BackgroundBrush, null, bounds);
 
-        var offset = spacing / 2d;
-        var maxX = bounds.Width - offset;
-        var maxY = bounds.Height - offset;
-        if (maxX <= offset || maxY <= offset)
+        var columnCount = Math.Max(1, (int)Math.Floor((bounds.Width + spacing) / step));
+        var rowCount = Math.Max(1, (int)Math.Floor((bounds.Height + spacing) / step));
+
+        var usableWidth = Math.Min(bounds.Width, (columnCount * blockSize) + Math.Max(0, columnCount - 1) * spacing);
+        var usableHeight = Math.Min(bounds.Height, (rowCount * blockSize) + Math.Max(0, rowCount - 1) * spacing);
+
+        var startX = (bounds.Width - usableWidth) / 2d;
+        var startY = (bounds.Height - usableHeight) / 2d;
+
+        var offsetX = startX + (spacing / 2d);
+        var offsetY = startY + (spacing / 2d);
+        var maxX = startX + usableWidth - (spacing / 2d);
+        var maxY = startY + usableHeight - (spacing / 2d);
+        if (maxX <= offsetX || maxY <= offsetY)
         {
             return;
         }
 
         var minCell = Math.Max(2, blockSize / 2d);
 
-        for (var x = offset; x <= maxX - minCell; x += step)
+        for (var x = offsetX; x <= maxX - minCell; x += step)
         {
             var cellWidth = Math.Min(blockSize, maxX - x);
             if (cellWidth < minCell)
@@ -96,7 +106,7 @@ public sealed class SidebarGridOverlay : Control
                 continue;
             }
 
-            for (var y = offset; y <= maxY - minCell; y += step)
+            for (var y = offsetY; y <= maxY - minCell; y += step)
             {
                 var cellHeight = Math.Min(blockSize, maxY - y);
                 if (cellHeight < minCell)

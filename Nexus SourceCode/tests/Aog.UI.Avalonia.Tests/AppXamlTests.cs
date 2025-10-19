@@ -9,14 +9,15 @@ namespace Aog.UI.Avalonia.Tests;
 
 public sealed class AppXamlTests
 {
-    private static readonly string SrcDirectory = Path.GetFullPath(
-        Path.Combine(AppContext.BaseDirectory, "../../../../src/Aog.UI.Avalonia"));
+    private static readonly string SrcDirectory = Path.GetFullPath(Path.Join(
+        Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(
+            AppContext.BaseDirectory!))!))!, "src", "Aog.UI.Avalonia"));
 
     [Fact]
     public void AppAxaml_ShouldContainSingleApplicationDefinition()
     {
-        var appXamlPath = Path.Combine(SrcDirectory, "App.axaml");
-        Assert.True(File.Exists(appXamlPath), $"Could not find App.axaml at '{appXamlPath}'.");
+        var appXamlPath = Path.Combine(SrcDirectory, "App", "NexusApp.axaml");
+        Assert.True(File.Exists(appXamlPath), $"Could not find NexusApp.axaml at '{appXamlPath}'.");
 
         var document = XDocument.Load(appXamlPath);
         var root = document.Root;
@@ -26,7 +27,7 @@ public sealed class AppXamlTests
         XNamespace xamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml";
         var xClass = root.Attribute(xamlNamespace + "Class");
         Assert.NotNull(xClass);
-        Assert.Equal("Aog.UI.Avalonia.App", xClass!.Value);
+        Assert.Equal("Aog.UI.Avalonia.App.NexusApp", xClass!.Value);
 
         var nestedApplications = root
             .Descendants()

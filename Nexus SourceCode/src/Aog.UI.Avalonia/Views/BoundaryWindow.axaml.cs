@@ -19,13 +19,7 @@ namespace Aog.UI.Avalonia.Views
             InitializeComponent();
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BoundaryWindow"/> class.
-        /// </summary>
-        public BoundaryWindow()
-            : this(CreateDefaultViewModel())
-        {
-        }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BoundaryWindow"/> class.

@@ -34,7 +34,7 @@ public sealed class KinematicsProfileEditorViewModel : ObservableObject
         _clock = clock ?? (() => DateTimeOffset.UtcNow);
         _profileId = "profile.default";
         _schemaVersion = AxleCentricProfileLoader.SupportedSchemaVersion;
-        _compatibilityMinimumCoreVersion = "1.0";
+    _compatibilityMinimumCoreVersion = "1.2";
         _compatibilitySchemaVersion = AxleCentricProfileLoader.SupportedSchemaVersion;
         _validationMessages = Array.Empty<AxleIngestionMessage>();
 

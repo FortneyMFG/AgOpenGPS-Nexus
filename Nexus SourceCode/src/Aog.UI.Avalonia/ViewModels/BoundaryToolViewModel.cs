@@ -228,7 +228,7 @@ public sealed class BoundaryToolViewModel : ObservableObject
         }
 
         var removedVertices = SelectedPolygon.Simplify();
-        RecordOperation("Simplify", SelectedPolygon.DisplayName, $"Removed {removedVertices} vertices.");
+        RecordOperation("Simplified", SelectedPolygon.DisplayName, $"Removed {removedVertices} vertices.");
         StatusMessage = removedVertices > 0
             ? $"Simplified '{SelectedPolygon.DisplayName}' (removed {removedVertices} vertices)."
             : $"'{SelectedPolygon.DisplayName}' already optimal.";
@@ -277,7 +277,7 @@ public sealed class BoundaryToolViewModel : ObservableObject
         SelectedPolygon.MergeWith(partner);
         _polygons.Remove(partner);
 
-        RecordOperation("Merge", SelectedPolygon.DisplayName, $"Merged with '{partner.DisplayName}'.");
+        RecordOperation("Merged", SelectedPolygon.DisplayName, $"Merged with '{partner.DisplayName}'.");
         StatusMessage = $"Merged '{SelectedPolygon.DisplayName}' with '{partner.DisplayName}'.";
         UpdateCommandStates();
     }

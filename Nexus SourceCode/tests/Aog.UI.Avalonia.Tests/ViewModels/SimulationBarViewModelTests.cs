@@ -144,7 +144,7 @@ public sealed class SimulationBarViewModelTests
 
         var customRate = viewModel.PlaybackRates.Single(option => Math.Abs(option.Rate - 0.75) < 1e-6);
         customRate.IsSelected.Should().BeTrue();
-        customRate.Label.Should().Be($"{0.75:0.#}×");
+    customRate.Label.Should().Be("0.75×");
         viewModel.PlaybackRates.Count(option => option.IsSelected).Should().Be(1);
     }
 

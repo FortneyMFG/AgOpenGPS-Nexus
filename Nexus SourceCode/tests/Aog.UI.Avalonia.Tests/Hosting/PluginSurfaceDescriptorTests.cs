@@ -14,6 +14,30 @@ namespace Aog.UI.Avalonia.Tests.Hosting;
 
 public sealed class PluginSurfaceDescriptorTests
 {
+    private sealed class FakePreferencesService : IUiPreferencesService
+    {
+        private readonly UiPreferences _preferences;
+
+        public FakePreferencesService(UiPreferences preferences)
+        {
+            _preferences = preferences;
+        }
+
+        public UiPreferences GetPreferences() => _preferences.Clone();
+
+        public void UpdateTheme(UiTheme theme) { }
+
+        public void UpdateWindowPlacement(WindowPlacement placement) { }
+
+        public void UpdateTelemetryOptIn(bool isOptedIn) { }
+
+        public void UpdateRunMode(AvaloniaRunMode mode) { }
+
+        public void UpdateShellLayout(ShellLayoutPreferences layout)
+        {
+            _preferences.ShellLayout = layout.Clone();
+        }
+    }
     private readonly IReadOnlyDictionary<string, (string Contract, string InjectionPoint)> _surfaceMetadata;
 
     public PluginSurfaceDescriptorTests()
@@ -34,7 +58,9 @@ public sealed class PluginSurfaceDescriptorTests
     {
         AssertSurfaceMatches(ShellPluginSurfaces.FileMenu);
         using var dispatcher = new NoOpShellCommandDispatcher();
-        var menuBar = CreateShellMenuBar(dispatcher);
+        var registry = new PluginRegistry();
+        var host = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
+        var menuBar = new ShellMenuBarViewModel(dispatcher, registry, host);
         Assert.Equal(ShellPluginSurfaces.FileMenu, menuBar.FileMenu.Descriptor);
     }
 
@@ -43,7 +69,9 @@ public sealed class PluginSurfaceDescriptorTests
     {
         AssertSurfaceMatches(ShellPluginSurfaces.FieldMenu);
         using var dispatcher = new NoOpShellCommandDispatcher();
-        var menuBar = CreateShellMenuBar(dispatcher);
+        var registry = new PluginRegistry();
+        var host = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
+        var menuBar = new ShellMenuBarViewModel(dispatcher, registry, host);
         Assert.Equal(ShellPluginSurfaces.FieldMenu, menuBar.FieldMenu.Descriptor);
     }
 
@@ -52,7 +80,9 @@ public sealed class PluginSurfaceDescriptorTests
     {
         AssertSurfaceMatches(ShellPluginSurfaces.ToolsMenu);
         using var dispatcher = new NoOpShellCommandDispatcher();
-        var menuBar = CreateShellMenuBar(dispatcher);
+        var registry = new PluginRegistry();
+        var host = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
+        var menuBar = new ShellMenuBarViewModel(dispatcher, registry, host);
         Assert.Equal(ShellPluginSurfaces.ToolsMenu, menuBar.ToolsMenu.Descriptor);
     }
 
@@ -61,8 +91,12 @@ public sealed class PluginSurfaceDescriptorTests
     {
         AssertSurfaceMatches(ShellPluginSurfaces.AppShell);
         using var dispatcher = new NoOpShellCommandDispatcher();
+        var catalog = new BlockCatalog(new IBlockProvider[] { new CoreBlockProvider() });
+        var preferencesService = new FakePreferencesService(new UiPreferences());
         var layout = CreateBlockLayout(dispatcher);
-        var viewModel = new AppShellViewModel(layout);
+        var store = new BlockLayoutStore(preferencesService, catalog);
+        var blockLayoutVM = new BlockLayoutViewModel(store, catalog, dispatcher, preferencesService);
+        var viewModel = new AppShellViewModel(blockLayoutVM);
         Assert.Equal(ShellPluginSurfaces.AppShell, viewModel.SurfaceDescriptor);
     }
 

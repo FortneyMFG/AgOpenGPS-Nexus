@@ -405,6 +405,12 @@ private void SelectPlaybackRate(double rate, bool updateController)
     var effectiveRate = ClampPlaybackRate(rate);
     var option = EnsurePlaybackRateOption(effectiveRate);
 
+    // Update selection state of all options
+    foreach (var r in _playbackRates)
+    {
+        r.IsSelected = Math.Abs(r.Rate - effectiveRate) < PlaybackRateComparisonTolerance;
+    }
+
     // Keep scalar + label properties in sync (handle null labels defensively)
     SelectedPlaybackRate = effectiveRate;
     SelectedPlaybackRateLabel = option?.Label ?? $"{effectiveRate:0.##}x";

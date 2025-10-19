@@ -276,7 +276,7 @@ public sealed class MainWindowViewModelTests
             tooltip.Should().Contain("Last invoked");
 
             var offset = TimeZoneInfo.Local.GetUtcOffset(DateTimeOffset.UtcNow);
-            var expectedOffset = offset.ToString(@"+hh\:mm;-hh\:mm", CultureInfo.InvariantCulture);
+            var expectedOffset = string.Format(CultureInfo.InvariantCulture, "{0:+00\\:00;-00\\:00}", offset);
             tooltip.Should().Contain(expectedOffset);
         }
         finally
@@ -337,7 +337,38 @@ public sealed class MainWindowViewModelTests
             .Should().Be(1);
     }
 
-    private static MainWindowViewModel CreateViewModel() => CreateViewModel(out _);
+    private static MainWindowViewModel CreateViewModel() 
+    {
+        var connectionStore = new InMemoryConnectionSettingsStore();
+        var runModeService = new TestRunModeService();
+        var connection = new ConnectionSettingsViewModel(connectionStore, runModeService);
+        var preferencesStore = new InMemoryUiPreferencesStore();
+        var preferencesService = new UiPreferencesService(preferencesStore);
+        var catalog = new BlockCatalog(new IBlockProvider[] { new CoreBlockProvider() });
+        var layoutStore = new BlockLayoutStore(preferencesService, catalog);
+        var themeManager = new TestThemeManager();
+        var telemetryService = new TestCrashTelemetryService();
+        var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
+        var dispatcher = new RecordingShellCommandDispatcher();
+        var layout = new BlockLayoutViewModel(layoutStore, catalog, dispatcher, preferencesService);
+        var shell = new AppShellViewModel(layout);
+        var pluginRegistry = new PluginRegistry();
+        var pluginHost = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
+        var timeProvider = new FixedTimeProvider(SeedTimestamp);
+
+        return new MainWindowViewModel(
+            connection,
+            null,
+            preferencesService,
+            themeManager,
+            dispatcher,
+            pluginRegistry,
+            pluginHost,
+            shell,
+            telemetryViewModel,
+            timeProvider,
+            NullLogger<MainWindowViewModel>.Instance);
+    }
 
     private static MainWindowViewModel CreateViewModel(out RecordingShellCommandDispatcher dispatcher)
     {
@@ -393,6 +424,31 @@ public sealed class MainWindowViewModelTests
         public void Save(ConnectionSettings settings)
         {
             _settings = settings.Clone();
+        }
+    }
+
+    private class FakePreferencesService : IUiPreferencesService
+    {
+        private readonly UiPreferences _preferences;
+
+        public FakePreferencesService(UiPreferences preferences)
+        {
+            _preferences = preferences;
+        }
+
+        public UiPreferences GetPreferences() => _preferences.Clone();
+
+        public void UpdateTheme(UiTheme theme) { }
+
+        public void UpdateWindowPlacement(WindowPlacement placement) { }
+
+        public void UpdateTelemetryOptIn(bool isOptedIn) { }
+
+        public void UpdateRunMode(AvaloniaRunMode mode) { }
+
+        public void UpdateShellLayout(ShellLayoutPreferences layout)
+        {
+            _preferences.ShellLayout = layout.Clone();
         }
     }
 

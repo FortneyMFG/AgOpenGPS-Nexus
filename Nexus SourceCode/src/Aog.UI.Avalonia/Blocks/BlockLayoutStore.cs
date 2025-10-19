@@ -139,7 +139,7 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
             return false;
         }
 
-        if (layout.Instances.Any(i => i.DefinitionId == id))
+        if (layout.Instances.Any(i => i.DefinitionId == id && i.Origin == BlockOrigin.Clone))
         {
             return false;
         }

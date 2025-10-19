@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using Aog.UI.Avalonia.Mapping.Core;
 using Avalonia.OpenGL;
-using OpenTK.Graphics.OpenGL;
 
 namespace Aog.UI.Avalonia.Mapping.Vector;
 
@@ -74,13 +73,9 @@ public sealed class VectorLayer : IMapLayer
                 ? fillColor.Value.W
                 : Fill is null ? 1f : Fill.Opacity * fillColor.Value.W;
 
-            GL.Color4(fillColor.Value.X, fillColor.Value.Y, fillColor.Value.Z, fillOpacity);
-            GL.Begin(PrimitiveType.TriangleFan);
-            foreach (var vertex in feature.Vertices)
-            {
-                SubmitVertex(ctx, vertex);
-            }
-            GL.End();
+            var fillVector = new Vector4(fillColor.Value.X, fillColor.Value.Y, fillColor.Value.Z, fillOpacity);
+            var fanVertices = ToNdc(ctx, feature.Vertices);
+            ctx.Batch.DrawTriangleFan(fanVertices, fillVector);
         }
 
         foreach (var feature in _cache)
@@ -96,27 +91,21 @@ public sealed class VectorLayer : IMapLayer
                 ? lineColor.Value.W
                 : Line is null ? 1f : Line.Opacity * lineColor.Value.W;
 
-            GL.Color4(lineColor.Value.X, lineColor.Value.Y, lineColor.Value.Z, opacity);
-            GL.LineWidth(MathF.Max(1f, widthMeters / ctx.MetersPerPixel));
+            var lineVector = new Vector4(lineColor.Value.X, lineColor.Value.Y, lineColor.Value.Z, opacity);
+            var ndcVertices = ToNdc(ctx, feature.Vertices);
 
-            var mode = feature.Type switch
+            switch (feature.Type)
             {
-                VectorFeatureType.Point => PrimitiveType.Points,
-                _ => PrimitiveType.LineStrip
-            };
-
-            GL.Begin(mode);
-            foreach (var vertex in feature.Vertices)
-            {
-                SubmitVertex(ctx, vertex);
+                case VectorFeatureType.Point:
+                    ctx.Batch.DrawPoints(ndcVertices, lineVector, MathF.Max(3f, widthMeters / ctx.MetersPerPixel));
+                    break;
+                case VectorFeatureType.Polygon:
+                    ctx.Batch.DrawLines(ndcVertices, lineVector, MathF.Max(1f, widthMeters / ctx.MetersPerPixel), loop: true);
+                    break;
+                default:
+                    ctx.Batch.DrawLines(ndcVertices, lineVector, MathF.Max(1f, widthMeters / ctx.MetersPerPixel));
+                    break;
             }
-
-            if (feature.Type == VectorFeatureType.Polygon && feature.Vertices.Count > 0)
-            {
-                SubmitVertex(ctx, feature.Vertices[0]);
-            }
-
-            GL.End();
         }
     }
 
@@ -125,20 +114,15 @@ public sealed class VectorLayer : IMapLayer
         // Nothing to dispose yet.
     }
 
-    private static void SubmitVertex(in FrameCtx ctx, Double3 world)
+    private static Vector2[] ToNdc(in FrameCtx ctx, IReadOnlyList<Double3> worldVertices)
     {
-        var local = new Vector3(
-            (float)(world.X - ctx.AnchorWorld.X),
-            (float)(world.Y - ctx.AnchorWorld.Y),
-            (float)(world.Z - ctx.AnchorWorld.Z));
-
-        var vector = Vector4.Transform(new Vector4(local, 1f), ctx.ViewProjection);
-        if (Math.Abs(vector.W) < float.Epsilon)
+        var result = new Vector2[worldVertices.Count];
+        for (var i = 0; i < worldVertices.Count; i++)
         {
-            return;
+            var ndc = ctx.WorldToNdc(worldVertices[i]);
+            result[i] = new Vector2(ndc.X, ndc.Y);
         }
 
-        var ndc = vector / vector.W;
-        GL.Vertex3(ndc.X, ndc.Y, ndc.Z);
+        return result;
     }
 }

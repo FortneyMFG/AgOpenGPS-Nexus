@@ -6,6 +6,7 @@
     <UseWPF>false</UseWPF>
     <UseWindowsForms>false</UseWindowsForms>
     <AvaloniaVersion>11.3.7</AvaloniaVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

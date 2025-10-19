@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 using Aog.UI.Avalonia.Mapping.Input;
+using Aog.UI.Avalonia.Mapping.Rendering;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.OpenGL;
@@ -25,6 +26,8 @@ public sealed class MapView : OpenGlControlBase
     private GlInterface? _currentGl;
     private bool _glReady;
     private bool _bindingsLoaded;
+    private bool _isGles;
+    private PrimitiveBatch2D? _primitiveBatch;
 
     public MapView()
     {
@@ -77,8 +80,19 @@ public sealed class MapView : OpenGlControlBase
         {
             GL.LoadBindings(new AvaloniaBindingsContext(gl));
             _bindingsLoaded = true;
-            GL.Disable(EnableCap.DepthTest);
-            GL.Disable(EnableCap.CullFace);
+        }
+
+        GL.Disable(EnableCap.DepthTest);
+        GL.Disable(EnableCap.CullFace);
+        GL.Disable(EnableCap.ScissorTest);
+        GL.Enable(EnableCap.Blend);
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+        if (_primitiveBatch is null)
+        {
+            var version = GL.GetString(StringName.Version) ?? string.Empty;
+            _isGles = version.Contains("OpenGL ES", StringComparison.OrdinalIgnoreCase);
+            _primitiveBatch = new PrimitiveBatch2D(_isGles);
         }
 
         _currentGl = gl;
@@ -100,6 +114,9 @@ public sealed class MapView : OpenGlControlBase
         {
             layer.Dispose();
         }
+
+        _primitiveBatch?.Dispose();
+        _primitiveBatch = null;
     }
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)
@@ -109,6 +126,11 @@ public sealed class MapView : OpenGlControlBase
         var pixelHeight = Math.Max(1, (int)Math.Round(Bounds.Height * renderScale));
 
         GL.Viewport(0, 0, pixelWidth, pixelHeight);
+        GL.MatrixMode(MatrixMode.Projection);
+        GL.LoadIdentity();
+        GL.MatrixMode(MatrixMode.Modelview);
+        GL.LoadIdentity();
+
         GL.ClearColor(0.08f, 0.1f, 0.13f, 1f);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -125,12 +147,14 @@ public sealed class MapView : OpenGlControlBase
             cameraLocal,
             _clock.Elapsed.TotalSeconds,
             _camera.MetersPerPixel,
-            IsGles(gl),
+            _isGles,
             _camera.ViewportPixels,
-            anchor);
+            anchor,
+            _primitiveBatch ?? throw new InvalidOperationException("Primitive batch not initialised"));
 
         _scene.Render(gl, ctx);
         RequestNextFrameRendering();
+        GL.Flush();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -140,17 +164,15 @@ public sealed class MapView : OpenGlControlBase
         _gestureAdapter = null;
     }
 
-    private static bool IsGles(GlInterface gl) => false;
-}
-
-file sealed class AvaloniaBindingsContext : IBindingsContext
-{
-    private readonly GlInterface _gl;
-
-    public AvaloniaBindingsContext(GlInterface gl)
+    private sealed class AvaloniaBindingsContext : IBindingsContext
     {
-        _gl = gl;
-    }
+        private readonly GlInterface _gl;
 
-    public IntPtr GetProcAddress(string procName) => _gl.GetProcAddress(procName);
+        public AvaloniaBindingsContext(GlInterface gl)
+        {
+            _gl = gl;
+        }
+
+        public IntPtr GetProcAddress(string procName) => _gl.GetProcAddress(procName);
+    }
 }

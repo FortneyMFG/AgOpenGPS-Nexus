@@ -3,7 +3,6 @@ using System.Numerics;
 using Aog.UI.Avalonia.Mapping.Core;
 using Aog.UI.Avalonia.Models;
 using Avalonia.OpenGL;
-using OpenTK.Graphics.OpenGL;
 
 namespace Aog.UI.Avalonia.Mapping.Rendering;
 
@@ -74,20 +73,15 @@ public sealed class VehiclePassLayer : IMapLayer
             rear.Y - (_bodyWidth * 0.5 * cos),
             0);
 
-        GL.Color4(0.16f, 0.58f, 0.98f, 0.9f);
-        GL.Begin(PrimitiveType.Triangles);
-        SubmitVertex(ctx, tip);
-        SubmitVertex(ctx, left);
-        SubmitVertex(ctx, right);
-        GL.End();
+        var fan = new[]
+        {
+            ToVec2(ctx.WorldToNdc(tip)),
+            ToVec2(ctx.WorldToNdc(left)),
+            ToVec2(ctx.WorldToNdc(right)),
+        };
 
-        GL.Color4(0.07f, 0.25f, 0.48f, 1f);
-        GL.LineWidth(2f);
-        GL.Begin(PrimitiveType.LineLoop);
-        SubmitVertex(ctx, tip);
-        SubmitVertex(ctx, left);
-        SubmitVertex(ctx, right);
-        GL.End();
+        ctx.Batch.DrawTriangleFan(fan, new Vector4(0.16f, 0.58f, 0.98f, 0.9f));
+        ctx.Batch.DrawLines(fan, new Vector4(0.07f, 0.25f, 0.48f, 1f), 2f, loop: true);
     }
 
     public void Dispose()
@@ -95,20 +89,5 @@ public sealed class VehiclePassLayer : IMapLayer
         // Nothing to dispose.
     }
 
-    private static void SubmitVertex(in FrameCtx ctx, Double3 world)
-    {
-        var local = new Vector3(
-            (float)(world.X - ctx.AnchorWorld.X),
-            (float)(world.Y - ctx.AnchorWorld.Y),
-            0);
-
-        var vector = Vector4.Transform(new Vector4(local, 1f), ctx.ViewProjection);
-        if (Math.Abs(vector.W) < float.Epsilon)
-        {
-            return;
-        }
-
-        var ndc = vector / vector.W;
-        GL.Vertex3(ndc.X, ndc.Y, ndc.Z);
-    }
+    private static Vector2 ToVec2(Vector3 ndc) => new(ndc.X, ndc.Y);
 }

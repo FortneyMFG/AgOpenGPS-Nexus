@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -23,6 +25,13 @@ public partial class MappingWorkspaceView : UserControl
 
     private MapScene? _scene;
     private VehiclePassLayer? _vehicleLayer;
+    private CameraRig? _camera;
+    private Localizer? _localizer;
+    private IDisposable? _boundsSubscription;
+    private Double3? _pendingBoundsMin;
+    private Double3? _pendingBoundsMax;
+    private bool _needsFrame;
+    private MappingWorkspaceViewModel? _workspace;
 
     public MappingWorkspaceView()
     {
@@ -35,6 +44,12 @@ public partial class MappingWorkspaceView : UserControl
         };
         PointerPressed += (_, _) => Focus();
         DataContextChanged += (_, _) => RefreshScene();
+
+        if (MapViewport is not null)
+        {
+            _boundsSubscription = MapViewport.GetObservable(BoundsProperty)
+                .Subscribe(_ => ApplyPendingFrame());
+        }
     }
 
     private void InitializeComponent()
@@ -54,22 +69,71 @@ public partial class MappingWorkspaceView : UserControl
             return;
         }
 
+        if (!ReferenceEquals(_workspace, workspace))
+        {
+            if (_workspace is not null)
+            {
+                _workspace.PropertyChanged -= WorkspaceOnPropertyChanged;
+            }
+
+            _workspace = workspace;
+            _workspace.PropertyChanged += WorkspaceOnPropertyChanged;
+        }
+
         var scene = new MapScene();
         var camera = new CameraRig();
         var localizer = new Localizer();
         MapViewport.Attach(scene, camera, localizer);
 
+        _camera = camera;
+        _localizer = localizer;
         scene.Add(new GridPassLayer
         {
             ZIndex = 0
         });
+
+        var min = new Double3(double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity);
+        var max = new Double3(double.NegativeInfinity, double.NegativeInfinity, double.NegativeInfinity);
+
+        void Include(Double3 point)
+        {
+            min = new Double3(
+                Math.Min(min.X, point.X),
+                Math.Min(min.Y, point.Y),
+                Math.Min(min.Z, point.Z));
+            max = new Double3(
+                Math.Max(max.X, point.X),
+                Math.Max(max.Y, point.Y),
+                Math.Max(max.Z, point.Z));
+        }
 
         foreach (var layer in workspace.Layers)
         {
             var featureZ = new List<VectorFeature>();
             foreach (var cell in layer.Cells)
             {
-                featureZ.Add(CreateCellFeature(layer, cell));
+                var half = cell.SizeMeters / 2.0;
+                var corners = new[]
+                {
+                    new Double3(cell.Center.X - half, cell.Center.Y - half, 0),
+                    new Double3(cell.Center.X + half, cell.Center.Y - half, 0),
+                    new Double3(cell.Center.X + half, cell.Center.Y + half, 0),
+                    new Double3(cell.Center.X - half, cell.Center.Y + half, 0)
+                };
+
+                foreach (var corner in corners)
+                {
+                    Include(corner);
+                }
+
+                var fillColor = layer.Style.Evaluate(cell.Value);
+                var outline = layer.Style.OutlineColor;
+                featureZ.Add(new VectorFeature(
+                    VectorFeatureType.Polygon,
+                    corners,
+                    fillColor: ToVector(fillColor, fillColor.A / 255f),
+                    lineColor: outline.A > 0 ? ToVector(outline, outline.A / 255f) : null,
+                    lineWidthMeters: 0.5f));
             }
 
             if (featureZ.Count == 0)
@@ -79,7 +143,8 @@ public partial class MappingWorkspaceView : UserControl
 
             scene.Add(new VectorLayer(new InMemoryVectorSource(featureZ))
             {
-                ZIndex = 100
+                ZIndex = 100,
+                Visible = layer.IsVisible
             });
         }
 
@@ -89,6 +154,11 @@ public partial class MappingWorkspaceView : UserControl
             if (points.Length == 0)
             {
                 continue;
+            }
+
+            foreach (var point in points)
+            {
+                Include(point);
             }
 
             var feature = new VectorFeature(
@@ -109,29 +179,19 @@ public partial class MappingWorkspaceView : UserControl
         };
         scene.Add(_vehicleLayer);
 
-        _scene = scene;
-    }
+        var posePoint = new Double3(workspace.VehiclePose.X, workspace.VehiclePose.Y, 0);
+        Include(posePoint);
 
-    private static VectorFeature CreateCellFeature(MapLayer layer, MapLayerCell cell)
-    {
-        var half = cell.SizeMeters / 2.0;
-        var corners = new[]
+        if (!double.IsInfinity(min.X) && !double.IsInfinity(min.Y) &&
+            !double.IsInfinity(max.X) && !double.IsInfinity(max.Y))
         {
-            new Double3(cell.Center.X - half, cell.Center.Y - half, 0),
-            new Double3(cell.Center.X + half, cell.Center.Y - half, 0),
-            new Double3(cell.Center.X + half, cell.Center.Y + half, 0),
-            new Double3(cell.Center.X - half, cell.Center.Y + half, 0)
-        };
+            _pendingBoundsMin = min;
+            _pendingBoundsMax = max;
+            _needsFrame = true;
+            ApplyPendingFrame();
+        }
 
-        var fillColor = layer.Style.Evaluate(cell.Value);
-        var outlineColor = layer.Style.OutlineColor;
-
-        return new VectorFeature(
-            VectorFeatureType.Polygon,
-            corners,
-            fillColor: ToVector(fillColor, fillColor.A / 255f),
-            lineColor: outlineColor.A > 0 ? ToVector(outlineColor, outlineColor.A / 255f) : null,
-            lineWidthMeters: 0.5f);
+        _scene = scene;
     }
 
     private static Vector4 ToVector(Color color, float alphaOverride)
@@ -173,6 +233,50 @@ public partial class MappingWorkspaceView : UserControl
                 workspace.ResetPose();
                 e.Handled = true;
                 break;
+        }
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        _boundsSubscription?.Dispose();
+        _boundsSubscription = null;
+        if (_workspace is not null)
+        {
+            _workspace.PropertyChanged -= WorkspaceOnPropertyChanged;
+            _workspace = null;
+        }
+    }
+
+    private void ApplyPendingFrame()
+    {
+        if (!_needsFrame || _camera is null || _localizer is null || MapViewport is null)
+        {
+            return;
+        }
+
+        if (_camera.ViewportPixels.X <= 1 || _camera.ViewportPixels.Y <= 1)
+        {
+            return;
+        }
+
+        if (_pendingBoundsMin is null || _pendingBoundsMax is null)
+        {
+            return;
+        }
+
+        _camera.FrameBounds(_pendingBoundsMin.Value, _pendingBoundsMax.Value, 12f);
+        var center = _camera.Center;
+        _localizer.ForceAnchor(new Double3(center.X, center.Y, 0));
+        _needsFrame = false;
+    }
+
+    private void WorkspaceOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(MappingWorkspaceViewModel.Layers) or
+            nameof(MappingWorkspaceViewModel.GuidanceTracks))
+        {
+            RefreshScene();
         }
     }
 }

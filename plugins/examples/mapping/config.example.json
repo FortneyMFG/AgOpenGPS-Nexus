@@ -1,0 +1,40 @@
+{
+  "mapping": {
+    "raster": {
+      "layers": [
+        {
+          "name": "OpenStreetMap",
+          "type": "xyz",
+          "template": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          "subdomains": ["a", "b", "c"],
+          "minZoom": 0,
+          "maxZoom": 19,
+          "opacity": 1.0,
+          "zIndex": 100
+        },
+        {
+          "name": "LocalFarm2025",
+          "type": "mbtiles",
+          "path": "${NEXUS_DATA}/maps/LocalFarm2025.mbtiles",
+          "minZoom": 12,
+          "maxZoom": 19,
+          "opacity": 0.8,
+          "zIndex": 110
+        }
+      ]
+    },
+    "vector": {
+      "snapToFieldProjection": true,
+      "simplifyThreshold": 1.0,
+      "keepoutFillColor": "#FF0000",
+      "keepoutLineColor": "#FF0000",
+      "boundaryFillColor": "#FFFF00",
+      "boundaryLineColor": "#FFFF00"
+    },
+    "cache": {
+      "rasterMemoryMB": 256,
+      "rasterDiskGB": 4,
+      "maxConcurrentFetches": 6
+    }
+  }
+}

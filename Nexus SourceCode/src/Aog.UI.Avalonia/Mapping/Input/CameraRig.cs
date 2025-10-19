@@ -53,6 +53,12 @@ public sealed class CameraRig
 
     public Double3 PositionWorld => new(_centerMeters.X, _centerMeters.Y, _heightMeters);
 
+    public Vector2 Center
+    {
+        get => _centerMeters;
+        set => _centerMeters = value;
+    }
+
     public void Resize(float widthPixels, float heightPixels)
     {
         _viewportPixels = new Vector2(Math.Max(widthPixels, 1), Math.Max(heightPixels, 1));
@@ -95,6 +101,32 @@ public sealed class CameraRig
             (offset.X / MetersPerPixel) + (_viewportPixels.X * 0.5f),
             (_viewportPixels.Y * 0.5f) - (offset.Y / MetersPerPixel));
         return pixels;
+    }
+
+    public void FrameBounds(Double3 min, Double3 max, float paddingMeters = 10f)
+    {
+        var width = (float)(max.X - min.X + (paddingMeters * 2));
+        var height = (float)(max.Y - min.Y + (paddingMeters * 2));
+        var center = new Vector2(
+            (float)((min.X + max.X) / 2.0),
+            (float)((min.Y + max.Y) / 2.0));
+
+        FrameBounds(width, height, center);
+    }
+
+    public void FrameBounds(float widthMeters, float heightMeters, Vector2 center)
+    {
+        _centerMeters = center;
+
+        if (_viewportPixels.X <= 0 || _viewportPixels.Y <= 0)
+        {
+            return;
+        }
+
+        var zoomX = widthMeters <= 0 ? _zoom : _viewportPixels.X / widthMeters;
+        var zoomY = heightMeters <= 0 ? _zoom : _viewportPixels.Y / heightMeters;
+        var targetZoom = Math.Clamp(Math.Min(zoomX, zoomY), _minZoom, _maxZoom);
+        _zoom = targetZoom;
     }
 
     private Vector2 ScreenToWorldOffset(Vector2 screenPoint)

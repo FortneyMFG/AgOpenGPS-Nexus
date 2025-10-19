@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Aog.UI.Avalonia.Mapping.Core;
 using Avalonia.OpenGL;
-using OpenTK.Graphics.OpenGL;
 
 namespace Aog.UI.Avalonia.Mapping.Rendering;
 
@@ -53,23 +53,26 @@ public sealed class GridPassLayer : IMapLayer
         var startX = Math.Floor(minX / spacing) * spacing;
         var startY = Math.Floor(minY / spacing) * spacing;
 
-        GL.LineWidth(1f);
-        GL.Color4(0.25f, 0.32f, 0.38f, 0.6f);
-        GL.Begin(PrimitiveType.Lines);
+        var vertices = new List<Vector2>();
 
         for (var x = startX; x <= maxX; x += spacing)
         {
-            SubmitVertex(ctx, x, minY);
-            SubmitVertex(ctx, x, maxY);
+            var start = ctx.WorldToNdc(x, minY);
+            var end = ctx.WorldToNdc(x, maxY);
+            vertices.Add(new Vector2(start.X, start.Y));
+            vertices.Add(new Vector2(end.X, end.Y));
         }
 
         for (var y = startY; y <= maxY; y += spacing)
         {
-            SubmitVertex(ctx, minX, y);
-            SubmitVertex(ctx, maxX, y);
+            var start = ctx.WorldToNdc(minX, y);
+            var end = ctx.WorldToNdc(maxX, y);
+            vertices.Add(new Vector2(start.X, start.Y));
+            vertices.Add(new Vector2(end.X, end.Y));
         }
 
-        GL.End();
+        var color = new Vector4(0.25f, 0.32f, 0.38f, 0.6f);
+        ctx.Batch.DrawLineSegments(vertices.ToArray(), color, 1f);
     }
 
     public void Dispose()
@@ -77,19 +80,4 @@ public sealed class GridPassLayer : IMapLayer
         // Nothing to dispose yet.
     }
 
-    private static void SubmitVertex(in FrameCtx ctx, double worldX, double worldY)
-    {
-        var local = new Vector3(
-            (float)(worldX - ctx.AnchorWorld.X),
-            (float)(worldY - ctx.AnchorWorld.Y),
-            0);
-        var vector = Vector4.Transform(new Vector4(local, 1f), ctx.ViewProjection);
-        if (Math.Abs(vector.W) < float.Epsilon)
-        {
-            return;
-        }
-
-        var ndc = vector / vector.W;
-        GL.Vertex3(ndc.X, ndc.Y, ndc.Z);
-    }
 }

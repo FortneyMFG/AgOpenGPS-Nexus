@@ -21,5 +21,6 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.59.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.59.0" />
     <PackageReference Include="Grpc.Tools" Version="2.59.0" PrivateAssets="All" />
+    <PackageReference Include="Avalonia" Version="11.3.7" />
   </ItemGroup>
 </Project>

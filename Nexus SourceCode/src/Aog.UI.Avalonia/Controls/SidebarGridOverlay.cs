@@ -86,13 +86,20 @@ public sealed class SidebarGridOverlay : Control
             return;
         }
 
-        for (var x = offset; x <= maxX - blockSize + 0.5; x += step)
+        var minCell = Math.Max(2, blockSize / 2d);
+
+        for (var x = offset; x <= maxX - minCell; x += step)
         {
             var cellWidth = Math.Min(blockSize, maxX - x);
-            for (var y = offset; y <= maxY - blockSize + 0.5; y += step)
+            if (cellWidth < minCell)
+            {
+                continue;
+            }
+
+            for (var y = offset; y <= maxY - minCell; y += step)
             {
                 var cellHeight = Math.Min(blockSize, maxY - y);
-                if (cellWidth <= 0 || cellHeight <= 0)
+                if (cellHeight < minCell)
                 {
                     continue;
                 }

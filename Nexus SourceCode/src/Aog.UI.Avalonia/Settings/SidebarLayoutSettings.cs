@@ -20,19 +20,19 @@ public sealed class SidebarLayoutSettings
     public LayoutDimensionMode WidthMode { get; set; } = LayoutDimensionMode.Fixed;
 
     /// <summary>Gets or sets the number of block columns when the width is fixed.</summary>
-    public int BlockColumns { get; set; } = 1;
+    public double BlockColumns { get; set; } = 1d;
 
     /// <summary>Gets or sets the mode controlling the sidebar height.</summary>
     public LayoutDimensionMode HeightMode { get; set; } = LayoutDimensionMode.Dynamic;
 
     /// <summary>Gets or sets the number of block rows when the height is fixed.</summary>
-    public int BlockRows { get; set; } = 0;
+    public double BlockRows { get; set; } = 0d;
 
     /// <summary>Gets or sets the base size of a full block tile in pixels.</summary>
-    public double BlockSize { get; set; } = 104;
+    public double BlockSize { get; set; } = 112d;
 
     /// <summary>Gets or sets the spacing between tiles in pixels.</summary>
-    public double Spacing { get; set; } = 8;
+    public double Spacing { get; set; } = 8d;
 
     /// <summary>
     /// Creates a deep copy of the settings instance.
@@ -56,11 +56,11 @@ public sealed class SidebarLayoutSettings
         return new SidebarLayoutSettings
         {
             WidthMode = LayoutDimensionMode.Fixed,
-            BlockColumns = 1,
+            BlockColumns = 1d,
             HeightMode = LayoutDimensionMode.Dynamic,
-            BlockRows = 0,
-            BlockSize = 104,
-            Spacing = 8,
+            BlockRows = 10d,
+            BlockSize = 112d,
+            Spacing = 8d,
         };
     }
 
@@ -70,11 +70,11 @@ public sealed class SidebarLayoutSettings
         return new SidebarLayoutSettings
         {
             WidthMode = LayoutDimensionMode.Dynamic,
-            BlockColumns = 6,
+            BlockColumns = 8d,
             HeightMode = LayoutDimensionMode.Fixed,
-            BlockRows = 1,
-            BlockSize = 96,
-            Spacing = 8,
+            BlockRows = 1d,
+            BlockSize = 112d,
+            Spacing = 8d,
         };
     }
 
@@ -84,11 +84,11 @@ public sealed class SidebarLayoutSettings
         return new SidebarLayoutSettings
         {
             WidthMode = LayoutDimensionMode.Dynamic,
-            BlockColumns = 4,
+            BlockColumns = 6d,
             HeightMode = LayoutDimensionMode.Fixed,
-            BlockRows = 1,
-            BlockSize = 52,
-            Spacing = 8,
+            BlockRows = 0.5d,
+            BlockSize = 56d,
+            Spacing = 8d,
         };
     }
 }

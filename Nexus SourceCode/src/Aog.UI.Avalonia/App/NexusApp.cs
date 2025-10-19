@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Aog.UI.Avalonia.Views.Main;
+using Aog.UI.Avalonia.Hosting;
 
 namespace Aog.UI.Avalonia.App;
 
@@ -11,6 +12,13 @@ public partial class NexusApp : Application
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<NexusApp> _logger;
+
+    public NexusApp()
+        : this(
+            AvaloniaServiceProviderAccessor.Current,
+            AvaloniaServiceProviderAccessor.GetRequiredService<ILogger<NexusApp>>())
+    {
+    }
 
     public NexusApp(IServiceProvider serviceProvider, ILogger<NexusApp> logger)
     {

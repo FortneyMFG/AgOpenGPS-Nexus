@@ -12,9 +12,9 @@ public sealed class MapToolsDialogViewModel
     private readonly ReadOnlyObservableCollection<MapToolOptionViewModel> _tools;
 
     /// <summary>Initializes a new instance of the <see cref="MapToolsDialogViewModel"/> class.</summary>
-    /// <param name="host">The main window view-model powering field operations.</param>
+    /// <param name="host">The coordinator responsible for launching field operation dialogs.</param>
     /// <param name="closeAction">Action invoked to close the owning dialog.</param>
-    public MapToolsDialogViewModel(MainWindowViewModel host, Action closeAction)
+    public MapToolsDialogViewModel(IFieldOperationsDialogHost host, Action closeAction)
     {
         ArgumentNullException.ThrowIfNull(host);
         ArgumentNullException.ThrowIfNull(closeAction);
@@ -52,6 +52,26 @@ public sealed class MapToolsDialogViewModel
 
     /// <summary>Gets the collection of map tool options rendered in the dialog.</summary>
     public ReadOnlyObservableCollection<MapToolOptionViewModel> Tools => _tools;
+
+    /// <summary>
+    /// Creates a design-time sample view-model instance.
+    /// </summary>
+    public static MapToolsDialogViewModel CreateDesignSample() => new(new DesignHost(), () => { });
+
+    private sealed class DesignHost : IFieldOperationsDialogHost
+    {
+        public void OpenBoundaryEditor()
+        {
+        }
+
+        public void OpenFlagManager()
+        {
+        }
+
+        public void ShowHeadlandPlannerNotice()
+        {
+        }
+    }
 }
 
 /// <summary>

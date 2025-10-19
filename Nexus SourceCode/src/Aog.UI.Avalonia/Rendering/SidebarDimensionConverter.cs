@@ -30,14 +30,15 @@ public sealed class SidebarDimensionConverter : IValueConverter
         throw new NotSupportedException();
     }
 
-    private static double Calculate(LayoutDimensionMode mode, int blocks, double blockSize, double spacing)
+    private static double Calculate(LayoutDimensionMode mode, double blocks, double blockSize, double spacing)
     {
         if (mode == LayoutDimensionMode.Dynamic || blocks <= 0)
         {
             return double.NaN;
         }
 
-        var span = Math.Max(1, blocks);
-        return (blockSize * span) + (Math.Max(0, span - 1) * spacing);
+        var span = Math.Max(1d, blocks);
+        var spacingSegments = Math.Max(0d, span - 1d);
+        return (blockSize * span) + (spacingSegments * spacing);
     }
 }

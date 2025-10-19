@@ -7,6 +7,7 @@
              xmlns:views="clr-namespace:Aog.UI.Avalonia.Views.Shell"
              xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
              xmlns:model="clr-namespace:Aog.UI.Avalonia.Models"
+             xmlns:mapping="clr-namespace:Aog.UI.Avalonia.Views.Mapping"
              xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
@@ -109,6 +110,11 @@
       </DataTemplate>
     </ResourceDictionary>
   </UserControl.Resources>
+  <UserControl.DataTemplates>
+    <DataTemplate x:DataType="workspace:MappingWorkspaceViewModel">
+      <mapping:MappingWorkspaceView />
+    </DataTemplate>
+  </UserControl.DataTemplates>
 
   <UserControl.Styles>
     <Style Selector="Button.toolbar">
@@ -195,7 +201,7 @@
     </DataTemplate>
 
     <DataTemplate x:DataType="workspace:MainWindowViewModel">
-    <Border Padding="{DynamicResource ThemeSpacingLgThickness}">
+      <Border Padding="{DynamicResource ThemeSpacingLgThickness}">
         <TextBlock Text="Select a map tool from the sidebar or open Tools -> System Summary to review the current configuration."
                    TextWrapping="Wrap"
                    Foreground="{DynamicResource ThemeAccentMutedBrush}" />
@@ -237,6 +243,12 @@
           </MenuItem>
           <MenuItem Header="{Binding Host.ShellMenuBar.ServicesMenu.Header}"
                     ItemsSource="{Binding Host.ShellMenuBar.ServicesMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.PluginsMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.PluginsMenu.Items}">
             <MenuItem.ItemTemplate>
               <StaticResource ResourceKey="ShellMenuItemTemplate" />
             </MenuItem.ItemTemplate>

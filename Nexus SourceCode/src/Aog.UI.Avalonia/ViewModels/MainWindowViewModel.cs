@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Aog.Core.Layers;
 using Aog.Core.Legacy;
+using Aog.Core.Machines.Axle;
 using Aog.Core.Replay;
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
@@ -18,6 +19,7 @@ using Aog.UI.Avalonia.Models;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels.Shell;
+using Aog.UI.Avalonia.Plugins;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -25,6 +27,8 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Aog.UI.Avalonia.Views;
 using Aog.UI.Avalonia.Views.FieldOperations;
+using Avalonia.Platform;
+using Microsoft.Extensions.Logging;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -42,6 +46,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private readonly IThemeManager _themeManager;
     private readonly ShellLayoutPreferences _shellLayout;
     private readonly TimeProvider _timeProvider;
+    private readonly ILogger<MainWindowViewModel> _logger;
     private bool _disposed;
 
     private UiTheme _selectedTheme;
@@ -69,9 +74,12 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         IUiPreferencesService preferencesService,
         IThemeManager themeManager,
         IShellCommandDispatcher commandDispatcher,
+        Plugins.PluginRegistry pluginRegistry,
+        Plugins.PluginHost pluginHost,
         AppShellViewModel shell,
         TelemetryPrivacyViewModel telemetryPrivacy,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        ILogger<MainWindowViewModel> logger)
     {
         ArgumentNullException.ThrowIfNull(connectionSettings);
         ArgumentNullException.ThrowIfNull(preferencesService);
@@ -80,11 +88,13 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         ArgumentNullException.ThrowIfNull(shell);
         ArgumentNullException.ThrowIfNull(telemetryPrivacy);
         ArgumentNullException.ThrowIfNull(timeProvider);
+        ArgumentNullException.ThrowIfNull(logger);
 
         _connectionSettings = connectionSettings;
         _preferencesService = preferencesService;
         _themeManager = themeManager;
         _timeProvider = timeProvider;
+        _logger = logger;
         Shell = shell;
 
         TelemetryPrivacy = telemetryPrivacy;
@@ -118,6 +128,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _mapLayers = BuildSampleLayers();
         _guidanceTracks = BuildSampleGuidance();
         LayerLegend = LayerLegendViewModel.FromLayers(_mapLayers);
+        DefaultEquipmentProfile = LoadDefaultEquipmentProfile();
+        MappingWorkspace = new MappingWorkspaceViewModel(_mapLayers, _guidanceTracks, VehiclePose, LayerLegend, DefaultEquipmentProfile);
         LayerInspector = BuildSampleInspector(_mapLayers);
         MeshSharePanel = MeshSharePanelViewModel.CreateSample();
         FieldHealthSeverity = FieldHealthSeverityPanelViewModel.CreateSample();
@@ -145,14 +157,23 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _selectedTheme = preferences.Theme;
         _themeManager.ApplyTheme(_selectedTheme);
 
-        ShellMenuBar = new ShellMenuBarViewModel(commandDispatcher);
+        ArgumentNullException.ThrowIfNull(pluginRegistry);
+        ArgumentNullException.ThrowIfNull(pluginHost);
+
+        ShellMenuBar = new ShellMenuBarViewModel(commandDispatcher, pluginRegistry, pluginHost);
         TopToolbar = new TopToolbarViewModel(commandDispatcher);
         StatusStrip = BuildStatusStrip();
         Shell.StatusStrip = StatusStrip;
         Shell.Host = this;
-        Shell.MainContent = BoundaryTool;
-        Shell.CurrentView = BoundaryTool;
-        Shell.StatusText = Title;
+        if (Shell.MainContent is null)
+        {
+            Shell.MainContent = MappingWorkspace;
+            Shell.CurrentView = MappingWorkspace;
+        }
+        if (string.IsNullOrWhiteSpace(Shell.StatusText) || Shell.StatusText == "Ready")
+        {
+            Shell.StatusText = Title;
+        }
         Shell.Layout.SetCommandInterceptor(HandleBlockCommand);
     }
 
@@ -176,6 +197,12 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     /// <summary>Gets a sample vehicle pose used to seed the map view.</summary>
     public VehiclePose VehiclePose { get; } = new(10, 15, 45);
+
+    /// <summary>Gets the primary mapping workspace view-model.</summary>
+    public MappingWorkspaceViewModel MappingWorkspace { get; }
+
+    /// <summary>Gets the default equipment profile applied when the UI boots.</summary>
+    public AxleCentricProfile? DefaultEquipmentProfile { get; }
 
     /// <summary>Gets the connection settings view-model.</summary>
     public ConnectionSettingsViewModel Connection => _connectionSettings;
@@ -826,8 +853,50 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         return inspector;
     }
 
+    private AxleCentricProfile? LoadDefaultEquipmentProfile()
+    {
+        try
+        {
+            var assetUri = new Uri("avares://Aog.UI.Avalonia/Resources/Kinematics/default-tractor.v1.json");
+            using var stream = AssetLoader.Open(assetUri);
+            using var reader = new StreamReader(stream);
+            var json = reader.ReadToEnd();
+
+            var loader = new AxleCentricProfileLoader();
+            var result = loader.Load(json);
+            var hasErrors = false;
+
+            foreach (var message in result.Messages)
+            {
+                switch (message.Severity)
+                {
+                    case AxleIngestionSeverity.Error:
+                        hasErrors = true;
+                        _logger.LogWarning("Default equipment profile validation error {Code}: {Message}", message.Code, message.Message);
+                        break;
+                    case AxleIngestionSeverity.Warning:
+                        _logger.LogInformation("Default equipment profile warning {Code}: {Message}", message.Code, message.Message);
+                        break;
+                    default:
+                        _logger.LogDebug("Default equipment profile note {Code}: {Message}", message.Code, message.Message);
+                        break;
+                }
+            }
+
+            if (hasErrors || result.Profile is null)
+            {
+                return null;
+            }
+
+            return result.Profile;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load default tractor equipment profile.");
+            return null;
+        }
+    }
+
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
-
-

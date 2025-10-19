@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources/*.json" />
+    <EmbeddedResource Include="Resources\**\*.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,5 +45,8 @@
   <ItemGroup>
     <ProjectReference Include="../Aog.Core/Aog.Core.csproj" />
     <ProjectReference Include="../Aog.Plugins/Aog.Plugins.csproj" />
+    <ProjectReference Include="../Nexus.Sdk.Core/Nexus.Sdk.Core.csproj" />
+    <ProjectReference Include="../Nexus.Sdk.UI.Avalonia/Nexus.Sdk.UI.Avalonia.csproj" />
+    <ProjectReference Include="../Nexus.Plugin.Manifest/Nexus.Plugin.Manifest.csproj" />
   </ItemGroup>
 </Project>

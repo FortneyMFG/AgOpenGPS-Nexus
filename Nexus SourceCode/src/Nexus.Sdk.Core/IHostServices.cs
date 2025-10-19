@@ -23,6 +23,16 @@ public interface IHostServices
     ILoggerFactory LoggerFactory { get; }
 
     /// <summary>
+    /// Gets metadata about the plugin and host runtime.
+    /// </summary>
+    IPluginEnvironment Environment { get; }
+
+    /// <summary>
+    /// Gets the path helper scoped to the plugin.
+    /// </summary>
+    IPluginPaths Paths { get; }
+
+    /// <summary>
     /// Gets the host event bus abstraction.
     /// </summary>
     IEventBus EventBus { get; }
@@ -43,9 +53,10 @@ public interface IHostServices
     ITelemetry Telemetry { get; }
 
     /// <summary>
-    /// Resolves a storage path for the plugin within the host data directory.
+    /// Attempts to resolve an optional feature contract exposed by the host (for example, UI surfaces).
     /// </summary>
-    /// <param name="relativePath">Relative path requested by the plugin.</param>
-    /// <returns>A fully qualified storage path owned by the plugin.</returns>
-    string GetStoragePath(string relativePath);
+    /// <typeparam name="TFeature">Feature contract requested.</typeparam>
+    /// <returns>The resolved feature instance or <c>null</c> when not available.</returns>
+    TFeature? GetFeature<TFeature>()
+        where TFeature : class;
 }

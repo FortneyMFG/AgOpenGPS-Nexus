@@ -1,0 +1,17 @@
+{
+  "id": "org.agopengps.mapping",
+  "name": "Mapping UI",
+  "version": "1.0.0",
+  "sdkVersion": "1.0.0",
+  "entrypoints": {
+    "core": null,
+    "ui": "MappingPlugin.MappingUiEntrypoint",
+    "agio": null
+  },
+  "capabilities": [
+    "map.surface"
+  ],
+  "requires": [],
+  "assets": {},
+  "permissions": {}
+}

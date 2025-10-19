@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
+        x:Class="Aog.UI.Avalonia.Views.PluginManagerWindow"
+        x:DataType="vm:PluginManagerViewModel"
+        mc:Ignorable="d"
+        d:DesignWidth="800"
+        d:DesignHeight="520"
+        Title="Plugin Manager">
+  <Grid RowDefinitions="Auto,*"
+        Margin="16"
+        RowSpacing="12">
+    <TextBox Watermark="Search plugins..."
+             Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+    <Border Grid.Row="1"
+            BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="{DynamicResource ThemeRadiusSm}">
+      <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding Plugins}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:PluginListItemViewModel">
+              <Border BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+                      BorderThickness="0,0,0,1"
+                      Padding="8">
+                <Grid ColumnDefinitions="2*,*,Auto,Auto"
+                      ColumnSpacing="12">
+                  <StackPanel>
+                    <TextBlock Text="{Binding Name}"
+                               FontWeight="SemiBold"
+                               FontSize="14" />
+                    <TextBlock Text="{Binding Id}"
+                               FontSize="12"
+                               Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+                  </StackPanel>
+                  <TextBlock Grid.Column="1"
+                             Text="{Binding Version}"
+                             VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2"
+                             Text="{Binding Status}"
+                             VerticalAlignment="Center"
+                             FontWeight="SemiBold" />
+                  <TextBlock Grid.Column="3"
+                             Text="{Binding Source}"
+                             VerticalAlignment="Center"
+                             Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</Window>
+

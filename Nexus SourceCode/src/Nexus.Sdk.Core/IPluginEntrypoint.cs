@@ -1,3 +1,6 @@
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Nexus.Sdk.Core;
 
 /// <summary>
@@ -24,3 +27,18 @@ public interface IPluginEntrypoint
 public interface ICoreEntrypoint : IPluginEntrypoint
 {
 }
+
+/// <summary>
+/// UI plugins extend the Avalonia shell with additional surfaces and controls.
+/// </summary>
+public interface IUiEntrypoint : IPluginEntrypoint
+{
+}
+
+/// <summary>
+/// AgIO plugins extend hardware transport capabilities.
+/// </summary>
+public interface IAgIoEntrypoint : IPluginEntrypoint
+{
+}
+

@@ -4,15 +4,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>1.0.0</Version>
-    <PackageId>AgOpenGPS.Nexus.Plugin.Manifest</PackageId>
-    <Authors>AgOpenGPS</Authors>
-    <Description>Plugin manifest contracts and schema generation for the Nexus host.</Description>
-    <PackageTags>AgOpenGPS;Nexus;Plugins;Manifest</PackageTags>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <RootNamespace>Nexus.Plugin</RootNamespace>
+    <PackageId>Nexus.Plugin.Manifest</PackageId>
+    <Description>Plugin manifest models and validation helpers for Nexus zip plugins.</Description>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../Nexus.Sdk.Core/Nexus.Sdk.Core.csproj" />
+    <ProjectReference Include="..\Nexus.Sdk.Core\Nexus.Sdk.Core.csproj" />
   </ItemGroup>
 </Project>

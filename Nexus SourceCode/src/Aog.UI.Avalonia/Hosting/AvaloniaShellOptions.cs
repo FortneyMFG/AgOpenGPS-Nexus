@@ -11,5 +11,5 @@ public sealed class AvaloniaShellOptions
     /// Gets or sets the requested run mode.
     /// </summary>
     [Required]
-    public AvaloniaRunMode RunMode { get; set; } = AvaloniaRunMode.CompanionRemote;
+    public AvaloniaRunMode RunMode { get; set; } = AvaloniaRunMode.LocalInProc;
 }

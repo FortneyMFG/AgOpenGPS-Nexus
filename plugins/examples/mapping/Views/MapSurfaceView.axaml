@@ -1,0 +1,8 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:MappingPlugin.Controls"
+             x:Class="MappingPlugin.Views.MapSurfaceView">
+  <Grid>
+    <controls:MapView Layers="{Binding MapLayers}" VehiclePose="{Binding VehiclePose}" />
+  </Grid>
+</UserControl>

@@ -119,6 +119,9 @@ public sealed class LayerLegendEntryViewModel
     /// <summary>Gets a brush representing the colour ramp for the legend swatch.</summary>
     public IBrush GradientBrush { get; }
 
+    /// <summary>Gets a value indicating whether a description is available.</summary>
+    public bool HasDescription => !string.IsNullOrWhiteSpace(Description);
+
     /// <summary>
     /// Builds a user-friendly representation of the numeric range, including units.
     /// </summary>

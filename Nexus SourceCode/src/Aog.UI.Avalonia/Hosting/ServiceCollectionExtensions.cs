@@ -7,6 +7,7 @@ using Aog.UI.Avalonia.Telemetry;
 using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels;
 using Aog.UI.Avalonia.ViewModels.Shell;
+using Aog.UI.Avalonia.Views;
 using Aog.UI.Avalonia.Views.Main;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -42,6 +43,7 @@ public static class ServiceCollectionExtensions
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, FieldOperationsDialogHandler>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, LoggingShellCommandHandler>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, SystemSummaryDialogHandler>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, PluginManagerDialogHandler>());
         services.TryAddSingleton<BackendServiceManager>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, BackendServiceCommandHandler>());
         services.TryAddSingleton(TimeProvider.System);
@@ -51,6 +53,20 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<MainWindow>();
         services.TryAddSingleton<MainWindowViewModel>();
         services.TryAddSingleton<AppShellViewModel>();
+        services.TryAddSingleton<PluginManagerViewModel>();
+        services.AddTransient<PluginManagerWindow>();
+        services.TryAddSingleton<Plugins.PluginRegistry>();
+        services.TryAddSingleton<Plugins.PluginPathProvider>();
+        services.TryAddSingleton<Plugins.PluginHost>();
+        services.TryAddSingleton<Plugins.PluginBootstrapper>();
         return services;
     }
 }
+
+
+
+
+
+
+
+

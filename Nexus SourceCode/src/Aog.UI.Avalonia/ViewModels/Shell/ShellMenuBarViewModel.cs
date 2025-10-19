@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Aog.UI.Avalonia.Hosting;
 
 namespace Aog.UI.Avalonia.ViewModels;
@@ -9,13 +10,21 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// </summary>
 public sealed class ShellMenuBarViewModel
 {
+    private readonly Plugins.PluginRegistry _registry;
+    private readonly Plugins.PluginHost _host;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ShellMenuBarViewModel"/> class.
     /// </summary>
     /// <param name="dispatcher">Dispatcher used to route commands.</param>
-    public ShellMenuBarViewModel(IShellCommandDispatcher dispatcher)
+    public ShellMenuBarViewModel(
+        IShellCommandDispatcher dispatcher,
+        Plugins.PluginRegistry registry,
+        Plugins.PluginHost host)
     {
         ArgumentNullException.ThrowIfNull(dispatcher);
+        _registry = registry ?? throw new ArgumentNullException(nameof(registry));
+        _host = host ?? throw new ArgumentNullException(nameof(host));
 
         FileMenu = new ShellMenuGroupViewModel(
             ShellPluginSurfaces.FileMenu,
@@ -197,6 +206,11 @@ public sealed class ShellMenuBarViewModel
                     dispatcher,
                     description: "Terminate the AgIO simulator backend."),
             });
+
+        PluginsMenu = new ShellMenuGroupViewModel(
+            ShellPluginSurfaces.PluginsMenu,
+            "Plugins",
+            BuildPluginMenuItems(dispatcher));
     }
 
     /// <summary>Gets the File menu group.</summary>
@@ -214,6 +228,9 @@ public sealed class ShellMenuBarViewModel
     /// <summary>Gets the Services menu group.</summary>
     public ShellMenuGroupViewModel ServicesMenu { get; }
 
+    /// <summary>Gets the Plugins menu group.</summary>
+    public ShellMenuGroupViewModel PluginsMenu { get; }
+
     /// <summary>Enumerates all menu groups.</summary>
     public IEnumerable<ShellMenuGroupViewModel> AllMenus
     {
@@ -224,6 +241,41 @@ public sealed class ShellMenuBarViewModel
             yield return ToolsMenu;
             yield return SettingsMenu;
             yield return ServicesMenu;
+            yield return PluginsMenu;
         }
     }
+
+    private IList<ShellMenuItemViewModel> BuildPluginMenuItems(IShellCommandDispatcher dispatcher)
+    {
+        var items = new List<ShellMenuItemViewModel>();
+        foreach (var descriptor in _registry.GetDescriptors()
+                     .OrderBy(d => d.Manifest.Name ?? d.Id, StringComparer.OrdinalIgnoreCase))
+        {
+            var status = _host.GetLoadedPlugins().Any(p => string.Equals(p.Descriptor.Id, descriptor.Id, StringComparison.OrdinalIgnoreCase))
+                ? "Loaded"
+                : "Installed";
+            var source = descriptor.RootPath.StartsWith(AppContext.BaseDirectory, StringComparison.OrdinalIgnoreCase)
+                ? "Bundled"
+                : "User";
+            var header = FormattableString.Invariant($"{descriptor.Manifest.Name} ({status} - {source})");
+            items.Add(ShellMenuItemViewModel.CreateContainer(header));
+        }
+
+        if (items.Count > 0)
+        {
+            items.Add(ShellMenuItemViewModel.CreateContainer("-"));
+        }
+
+        items.Add(ShellMenuItemViewModel.CreateCommand(
+            "Plugin Manager...",
+            "menu.plugins",
+            "core.plugins.manager",
+            dispatcher,
+            description: "Open the plugin manager to view installed plugins, status, and updates."));
+
+        return items;
+    }
 }
+
+
+

@@ -64,9 +64,9 @@
 ## Testing & Validation
 - Add unit tests in `Aog.UI.Avalonia.Tests` covering dialog view-model validation, selection flows, and service error handling.
 - Extend simulator smoke scripts to mount jobs, edit fields, and verify dialog open/close flows without runtime exceptions.
-- Capture golden screenshots for docs per `docs/reference/metadata-driven-ui-style-guide.md` once layouts stabilize.
+- Capture golden screenshots for docs per [metadata-driven UI style guide](metadata-driven-ui-style-guide.md) once layouts stabilize.
 
 ## Deliverables
 - Avalonia XAML and view-model implementations for all dialogs listed above.
-- Updated documentation (`docs/reference/ui-session-lifecycle.md`) describing new operator flows and any new sample helpers.
+- Updated documentation ([UI session lifecycle guide](ui-session-lifecycle.md)) describing new operator flows and any new sample helpers.
 - Backlog linkage updates ensuring completion toggles for relevant entries in `artifacts/ui-backlog.json` during rollout.

@@ -299,14 +299,14 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-311 Radio provisioning UI flows _(Done)_ — ADR-048 provisioning UX
 - [x] NX-312 Companion metadata-driven parity pass _(Done)_ — ADR-034 remote parity
 - [x] NX-931 SimulationBar replay subscription cleanup _(Done)_ — Remove legacy EnsureReplayControllerSubscription helper
-- [x] NX-410 Legacy UI asset migration workbook _(Done)_ — See docs/plans/ui-shell-and-plugin-integration.md
+- [x] NX-410 Legacy UI asset migration workbook _(Done)_ — See docs/ui/ui-shell-and-plugin-integration.md
 - [x] NX-411 Shell & navigation port from V6/AgValonia _(Done)_ — Aligns with artifacts/ui-core-spec.md
 - [x] NX-412 Map canvas & field operations UI port _(Done)_ — Aligns with artifacts/ui-inventory.json
 - [x] NX-413 Job & field lifecycle dialogs port _(Done)_ — Aligns with artifacts/ui-backlog.json
 - [x] NX-419 Settings, hotkeys, and appearance consolidation _(Done)_ — Aligns with artifacts/ui-theme-tokens.json
 - [x] NX-415 Plugin UI surfaces (guidance, device, analytics, video) _(Done)_ — Aligns with artifacts/ui-to-plugin.yaml
 - [x] NX-416 Diagnostics & AgIO workspace port _(Done)_ — Aligns with artifacts/ui-core-spec.md
-- [x] NX-417 Simulation shell + companion parity automation _(Done)_ — Aligns with docs/reference/metadata-driven-ui-style-guide.md
+- [x] NX-417 Simulation shell + companion parity automation _(Done)_ — Aligns with docs/ui/metadata-driven-ui-style-guide.md
 - [x] NX-418 Documentation, QA, and release readiness _(Done)_ — Aligns with artifacts/ui-screenshots/README.md
 - [x] NX-923 Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
 - [x] NX-941 Simulation bar playback rate reset _(Done)_ — Reset configuration default when reverting routes
@@ -688,7 +688,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-310 | Mesh share/subscribe UI | Done |  | — | [ADR-047](docs/ADR/ADR-047_LiveTelemetryMesh.md) | ADR-047 live mesh UX |
 | NX-311 | Radio provisioning UI flows | Done |  | — | [ADR-048](docs/ADR/ADR-048_RadioBridge.md) | ADR-048 provisioning UX |
 | NX-312 | Companion metadata-driven parity pass | Done |  | — | [ADR-034](docs/ADR/ADR-034-metadata-driven-dashboards.md) | Snapshot export keeps CompanionRemote dashboards, legends, and inspector metadata aligned. |
-| NX-410 | Legacy UI asset migration workbook | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Inventory V6/Dev/AgValonia components per docs/plans/ui-shell-and-plugin-integration.md |
+| NX-410 | Legacy UI asset migration workbook | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Inventory V6/Dev/AgValonia components per docs/ui/ui-shell-and-plugin-integration.md |
 | NX-411 | Shell & navigation port from V6/AgValonia | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port menus/toolbars per artifacts/ui-core-spec.md |
 | NX-412 | Map canvas & field operations UI port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Integrate map canvas + boundary/flag dialogs per plan |
 | NX-413 | Job & field lifecycle dialogs port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Rebuild job/field dialogs aligned with artifacts/ui-backlog.json |

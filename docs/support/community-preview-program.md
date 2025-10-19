@@ -11,7 +11,7 @@ stay on the correct release ring when you stage media for offline fleets.
 - **Opt-in portal** — Dealers and advanced operators enrol through the dealer toolkit, selecting
   machines eligible for preview updates and agreeing to telemetry sharing for regression analysis.
   Fleet coordinators should also review the
-  [multi-machine sync workflow](../howto/multi-machine-sync.md) to keep preview rigs aligned
+  [multi-machine sync workflow](../Core/multi-machine-sync.md) to keep preview rigs aligned
   with the anchor manifest when swapping identities.
 - **Eligibility checks** — Only hardware that meets baseline requirements (stable power, remote
   support connectivity, rollback support) is approved. The toolkit runs automated checks mirroring
@@ -33,7 +33,7 @@ stay on the correct release ring when you stage media for offline fleets.
 - **Weekly survey** — Participants receive a short survey summarising changes and capturing
   qualitative impressions. Responses are linked to telemetry uploads for context and should
   note the latest sync archive timestamp recorded in the
-  [multi-machine synchronization workflow](../howto/multi-machine-sync.md).
+  [multi-machine synchronization workflow](../Core/multi-machine-sync.md).
 - **Preview review** — During the dealer escalation huddle, include a standing agenda item to
   review preview metrics, survey sentiment, and outstanding issues before promoting a build.
 - **Exit criteria** — Builds graduate when telemetry shows no critical regressions for seven days

@@ -14,7 +14,7 @@ public sealed class CapabilityRegistryDocumentationTests
     public void CapabilityRegistryEntriesRequireDocumentationFreeze()
     {
         var repoRoot = FindRepositoryRoot();
-        var documentationPath = Path.Combine(repoRoot, "docs", "reference", "capability-registry.md");
+        var documentationPath = Path.Combine(repoRoot, "docs", "Core", "capability-registry.md");
         Assert.True(File.Exists(documentationPath), $"Capability registry reference not found at '{documentationPath}'.");
 
         var documentedCapabilities = ParseDocumentedCapabilities(documentationPath);
@@ -29,7 +29,7 @@ public sealed class CapabilityRegistryDocumentationTests
 
         Assert.True(
             missing.Length == 0,
-            $"Missing capability documentation entries for: {string.Join(", ", missing)}. Update docs/reference/capability-registry.md under the contracts freeze process before merging.");
+            $"Missing capability documentation entries for: {string.Join(", ", missing)}. Update docs/Core/capability-registry.md under the contracts freeze process before merging.");
     }
 
     private static ISet<string> ParseDocumentedCapabilities(string documentationPath)

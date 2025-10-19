@@ -26,7 +26,7 @@ Operators should watch for the following annunciators:
 
 The Avalonia shell mirrors these states via the Zone Constraint Policy panel so operators can
 acknowledge overrides and review the history of manual actions.【F:Nexus SourceCode/src/Aog.UI.Avalonia/ViewModels/ZoneConstraintPolicyViewModel.cs†L132-L205】 See the
-[metadata-driven UI style guide](../reference/metadata-driven-ui-style-guide.md) for the
+[metadata-driven UI style guide](../ui/metadata-driven-ui-style-guide.md) for the
 canonical annunciator layout shared across desktop and companion shells.
 
 ## Responding to gate events

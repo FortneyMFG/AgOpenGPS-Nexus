@@ -41,5 +41,5 @@ simulation bus with the `InstrumentedSimBus` and aggregates publish timings via
 `SimulationPerformanceBudgetRecorder`. The resulting budget snapshot enforces
 CPU-oriented thresholds (messages per second, max publish duration) so ADR-026
 performance budgets stay measurable in CI. Update both the scenario presets and the
-[performance budget dashboards](../howto/performance-budget-telemetry-dashboards.md) when
+[performance budget dashboards](../Core/performance-budget-telemetry-dashboards.md) when
 topic coverage or provider mixes change.

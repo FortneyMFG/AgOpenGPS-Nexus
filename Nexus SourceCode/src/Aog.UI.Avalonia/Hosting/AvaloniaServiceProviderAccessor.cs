@@ -33,8 +33,10 @@ internal static class AvaloniaServiceProviderAccessor
     /// <returns><c>true</c> when the provider has been initialized; otherwise <c>false</c>.</returns>
     public static bool TryGetServiceProvider(out IServiceProvider serviceProvider)
     {
-        serviceProvider = _serviceProvider!;
-        return _serviceProvider is not null;
+        var provider = Volatile.Read(ref _serviceProvider);
+
+        serviceProvider = provider!;
+        return provider is not null;
     }
 
     /// <summary>

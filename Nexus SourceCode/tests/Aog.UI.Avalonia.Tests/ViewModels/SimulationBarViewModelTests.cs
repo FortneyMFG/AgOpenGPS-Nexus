@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Legacy;
@@ -553,22 +552,7 @@ public void ToggleAutoResumeCommand_WithNoSession_DoesNotChangeState()
 
 private static SimulationPlaybackRateOptionViewModel CreatePlaybackRateOptionWithoutLabel(double rate)
 {
-    var option = (SimulationPlaybackRateOptionViewModel)FormatterServices.GetUninitializedObject(
-        typeof(SimulationPlaybackRateOptionViewModel));
-
-    SetField(option, "<Rate>k__BackingField", rate);
-    SetField(option, "<Label>k__BackingField", null);
-    SetField(option, "_onSelected", new Action<SimulationPlaybackRateOptionViewModel>(_ => { }));
-    SetField(option, "<SelectCommand>k__BackingField", new DelegateCommand(_ => { }));
-
-    return option;
-}
-
-private static void SetField(object target, string fieldName, object? value)
-{
-    var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)
-               ?? throw new InvalidOperationException($"Field '{fieldName}' not found.");
-    field.SetValue(target, value);
+    return new SimulationPlaybackRateOptionViewModel(rate, _ => { }, label: null);
 }
 
 
@@ -905,7 +889,11 @@ private static void SetField(object target, string fieldName, object? value)
 
         public bool HasEntries => !_entries.IsEmpty;
 
-        public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
+        public IDisposable BeginScope<TState>(TState state)
+            where TState : notnull
+        {
+            return NullScope.Instance;
+        }
 
         public bool IsEnabled(LogLevel logLevel) => true;
 

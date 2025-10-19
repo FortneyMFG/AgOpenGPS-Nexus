@@ -27,4 +27,29 @@ public interface IMapHostServices
     /// Gets the plugin configuration accessor.
     /// </summary>
     IConfig Config { get; }
+
+    /// <summary>
+    /// Gets the authoritative layer registry published by Core.
+    /// </summary>
+    ILayerRegistry LayerRegistry { get; }
+
+    /// <summary>
+    /// Gets the command surface for layer mutations.
+    /// </summary>
+    ILayerCommands LayerCommands { get; }
+
+    /// <summary>
+    /// Gets the CRS conversion service.
+    /// </summary>
+    ICrsService CrsService { get; }
+
+    /// <summary>
+    /// Gets the catalog of tile sources produced by Core.
+    /// </summary>
+    ITileCatalog TileCatalog { get; }
+
+    /// <summary>
+    /// Gets the store for user style profile overrides.
+    /// </summary>
+    IStyleProfileStore StyleProfiles { get; }
 }

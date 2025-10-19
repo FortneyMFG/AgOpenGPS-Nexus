@@ -18,17 +18,32 @@ public sealed class MapHostServicesAdapter : IMapHostServices
     private readonly IObservable<FieldContext> _fieldContext;
     private readonly IStorage _storage;
     private readonly IConfig _config;
+    private readonly ILayerRegistry _layerRegistry;
+    private readonly ILayerCommands _layerCommands;
+    private readonly ICrsService _crsService;
+    private readonly ITileCatalog _tileCatalog;
+    private readonly IStyleProfileStore _styleProfiles;
 
     public MapHostServicesAdapter(
         Func<CancellationToken, IAsyncEnumerable<PoseSample>> poseStreamFactory,
         IObservable<FieldContext> fieldContext,
         IStorage storage,
-        IConfig config)
+        IConfig config,
+        ILayerRegistry layerRegistry,
+        ILayerCommands layerCommands,
+        ICrsService crsService,
+        ITileCatalog tileCatalog,
+        IStyleProfileStore styleProfiles)
     {
         _poseStreamFactory = poseStreamFactory ?? throw new ArgumentNullException(nameof(poseStreamFactory));
         _fieldContext = fieldContext ?? throw new ArgumentNullException(nameof(fieldContext));
         _storage = storage ?? throw new ArgumentNullException(nameof(storage));
         _config = config ?? throw new ArgumentNullException(nameof(config));
+        _layerRegistry = layerRegistry ?? throw new ArgumentNullException(nameof(layerRegistry));
+        _layerCommands = layerCommands ?? throw new ArgumentNullException(nameof(layerCommands));
+        _crsService = crsService ?? throw new ArgumentNullException(nameof(crsService));
+        _tileCatalog = tileCatalog ?? throw new ArgumentNullException(nameof(tileCatalog));
+        _styleProfiles = styleProfiles ?? throw new ArgumentNullException(nameof(styleProfiles));
     }
 
     public static MapHostServicesAdapter CreateDefault(IConfiguration configuration, string storageRoot, PoseSample? seedPose = null, FieldContext? seedField = null)
@@ -50,7 +65,12 @@ public sealed class MapHostServicesAdapter : IMapHostServices
             ct => SinglePoseStream(initialPose, ct),
             new StaticObservable<FieldContext>(initialField),
             new FileSystemStorage(storageRoot),
-            new ConfigurationAdapter(configuration));
+            new ConfigurationAdapter(configuration),
+            EmptyLayerRegistry.Instance,
+            NoOpLayerCommands.Instance,
+            PassthroughCrsService.Instance,
+            EmptyTileCatalog.Instance,
+            NullStyleProfileStore.Instance);
     }
 
     public IAsyncEnumerable<PoseSample> PoseStream(CancellationToken cancellationToken)
@@ -61,6 +81,16 @@ public sealed class MapHostServicesAdapter : IMapHostServices
     public IStorage Storage => _storage;
 
     public IConfig Config => _config;
+
+    public ILayerRegistry LayerRegistry => _layerRegistry;
+
+    public ILayerCommands LayerCommands => _layerCommands;
+
+    public ICrsService CrsService => _crsService;
+
+    public ITileCatalog TileCatalog => _tileCatalog;
+
+    public IStyleProfileStore StyleProfiles => _styleProfiles;
 
     private static async IAsyncEnumerable<PoseSample> SinglePoseStream(
         PoseSample pose,
@@ -200,5 +230,85 @@ public sealed class MapHostServicesAdapter : IMapHostServices
 
             return ValueTask.CompletedTask;
         }
+    }
+
+    private sealed class EmptyLayerRegistry : ILayerRegistry
+    {
+        public static readonly EmptyLayerRegistry Instance = new();
+
+        public IReadOnlyList<LayerDescriptor> GetLayers() => Array.Empty<LayerDescriptor>();
+
+        public ILayerStream<LayerChange> Watch(string layerId, CancellationToken cancellationToken = default)
+            => EmptyLayerStream<LayerChange>.Instance;
+    }
+
+    private sealed class EmptyLayerStream<T> : ILayerStream<T>
+    {
+        public static readonly EmptyLayerStream<T> Instance = new();
+
+        public async IAsyncEnumerable<T> ReadAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            await Task.CompletedTask;
+            yield break;
+        }
+    }
+
+    private sealed class NoOpLayerCommands : ILayerCommands
+    {
+        public static readonly NoOpLayerCommands Instance = new();
+
+        public ValueTask AppendEditsAsync(string layerId, LayerEditBatch edits, CancellationToken cancellationToken = default)
+            => ValueTask.CompletedTask;
+
+        public ValueTask<string> CreateAsync(LayerCreateRequest request, CancellationToken cancellationToken = default)
+            => ValueTask.FromResult(string.Empty);
+
+        public ValueTask DeleteAsync(string layerId, CancellationToken cancellationToken = default)
+            => ValueTask.CompletedTask;
+
+        public ValueTask SetMetadataAsync(string layerId, LayerMetadataUpdate update, CancellationToken cancellationToken = default)
+            => ValueTask.CompletedTask;
+    }
+
+    private sealed class PassthroughCrsService : ICrsService
+    {
+        public static readonly PassthroughCrsService Instance = new();
+
+        public ValueTask<GeoCoordinate> FromWgs84Async(GeoCoordinate coordinate, string targetCrs, CancellationToken cancellationToken = default)
+            => ValueTask.FromResult(coordinate);
+
+        public ValueTask<GeoCoordinate> ToWgs84Async(GeoCoordinate coordinate, string sourceCrs, CancellationToken cancellationToken = default)
+            => ValueTask.FromResult(coordinate);
+
+        public ValueTask<EnuCoordinate> ToEnuAsync(GeoCoordinate coordinate, GeoCoordinate origin, CancellationToken cancellationToken = default)
+            => ValueTask.FromResult(new EnuCoordinate(0, 0, 0));
+    }
+
+    private sealed class EmptyTileCatalog : ITileCatalog
+    {
+        public static readonly EmptyTileCatalog Instance = new();
+
+        public async IAsyncEnumerable<TileSource> ListAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            await Task.CompletedTask;
+            yield break;
+        }
+
+        public ValueTask<TileSource?> ResolveAsync(string layerId, CancellationToken cancellationToken = default)
+            => ValueTask.FromResult<TileSource?>(null);
+    }
+
+    private sealed class NullStyleProfileStore : IStyleProfileStore
+    {
+        public static readonly NullStyleProfileStore Instance = new();
+
+        public ValueTask ClearAsync(string layerId, CancellationToken cancellationToken = default)
+            => ValueTask.CompletedTask;
+
+        public ValueTask<LayerStyleProfile?> GetAsync(string layerId, CancellationToken cancellationToken = default)
+            => ValueTask.FromResult<LayerStyleProfile?>(null);
+
+        public ValueTask SetAsync(string layerId, LayerStyleProfile profile, CancellationToken cancellationToken = default)
+            => ValueTask.CompletedTask;
     }
 }

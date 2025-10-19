@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Aog.UI.Avalonia.ViewModels"
-             xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
+             xmlns:controls="clr-namespace:Aog.UI.Avalonia.Mapping.Core"
              x:Class="Aog.UI.Avalonia.Views.Mapping.MappingWorkspaceView"
              x:CompileBindings="True"
              x:DataType="vm:MappingWorkspaceViewModel"
@@ -12,10 +12,7 @@
              Focusable="True"
              mc:Ignorable="d">
   <Grid>
-    <controls:MapSurface MapLayers="{Binding Layers}"
-                         GuidanceTracks="{Binding GuidanceTracks}"
-                         VehiclePose="{Binding VehiclePose}"
-                         EquipmentProfile="{Binding EquipmentProfile}" />
+    <controls:MapView x:Name="MapViewport" />
 
     <Border HorizontalAlignment="Left"
             VerticalAlignment="Top"
@@ -96,13 +93,17 @@
       </StackPanel>
     </Border>
 
-    <TextBlock Text="No layers are currently available."
-               FontSize="18"
-               FontWeight="SemiBold"
-               Foreground="#CCFFFFFF"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               IsVisible="{Binding IsEmpty}" />
+    <Border HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Background="#CC1F2933"
+            CornerRadius="12"
+            Padding="24"
+            IsVisible="{Binding IsEmpty}">
+      <TextBlock Text="No layers are currently available."
+                 FontSize="18"
+                 FontWeight="SemiBold"
+                 Foreground="#E6FFFFFF" />
+    </Border>
 
     <Border HorizontalAlignment="Left"
             VerticalAlignment="Bottom"

@@ -19,6 +19,9 @@
       <rendering:IconKeyToBitmapConverter x:Key="BlockIconConverter" />
       <rendering:LockStateToBitmapConverter x:Key="LockStateIconConverter" />
       <rendering:LockStateToTextConverter x:Key="LockTooltipConverter" />
+      <rendering:BlockTileSizeConverter x:Key="BlockTileSizeConverter" />
+      <rendering:SidebarDimensionConverter x:Key="SidebarDimensionConverter" />
+      <rendering:BlockTileMarginConverter x:Key="BlockTileMarginConverter" />
 
       <DataTemplate x:Key="ShellMenuItemTemplate"
                     x:DataType="workspace:ShellMenuItemViewModel">
@@ -50,6 +53,27 @@
                 ToolTip.Tip="{Binding Label}"
                 Classes.sidebar="True"
                 Classes.vertical="True">
+          <Button.Width>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.Width>
+          <Button.Height>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}" ConverterParameter="Height">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.Height>
+          <Button.Margin>
+            <MultiBinding Converter="{StaticResource BlockTileMarginConverter}">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.Margin>
           <Button.ContextMenu>
             <ContextMenu>
               <MenuItem Header="Move up" Command="{Binding MoveUpCommand}" />
@@ -83,6 +107,27 @@
                 ToolTip.Tip="{Binding Label}"
                 Classes.sidebar="True"
                 Classes.bottom="True">
+          <Button.Width>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.Width>
+          <Button.Height>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}" ConverterParameter="Height">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.Height>
+          <Button.Margin>
+            <MultiBinding Converter="{StaticResource BlockTileMarginConverter}">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.Margin>
           <Button.ContextMenu>
             <ContextMenu>
               <MenuItem Header="Move left" Command="{Binding MoveToLeftCommand}" />
@@ -138,15 +183,15 @@
     </Style>
 
     <Style Selector="Button.sidebar">
-      <Setter Property="Width" Value="104" />
-      <Setter Property="Height" Value="80" />
-      <Setter Property="Margin" Value="0" />
       <Setter Property="Background" Value="{DynamicResource ShellChromeBackgroundBrush}" />
       <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusSm}" />
       <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="8" />
     </Style>
 
     <Style Selector="Button.sidebar:hover">
@@ -200,13 +245,6 @@
       <controls:BoundaryViewControl />
     </DataTemplate>
 
-    <DataTemplate x:DataType="workspace:MainWindowViewModel">
-      <Border Padding="{DynamicResource ThemeSpacingLgThickness}">
-        <TextBlock Text="Select a map tool from the sidebar or open Tools -> System Summary to review the current configuration."
-                   TextWrapping="Wrap"
-                   Foreground="{DynamicResource ThemeAccentMutedBrush}" />
-      </Border>
-    </DataTemplate>
   </UserControl.DataTemplates>
 
   <DockPanel LastChildFill="True">
@@ -312,13 +350,14 @@
                       ItemsSource="{Binding Layout.TopBlocks}"
                       ItemTemplate="{StaticResource HorizontalBlockTemplate}"
                       Margin="0,8,0,0"
+                      Tag="{Binding Layout.TopSidebarSettings}"
                       HorizontalAlignment="Center"
+                      Height="{Binding Layout.TopSidebarSettings, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Height}"
                       DragDrop.AllowDrop="True">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
-              <StackPanel Orientation="Horizontal"
-                          HorizontalAlignment="Center"
-                          Spacing="{DynamicResource ThemeSpacingSm}" />
+              <WrapPanel Orientation="Horizontal"
+                         HorizontalAlignment="Center" />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
         </ItemsControl>
@@ -329,7 +368,8 @@
             Background="{DynamicResource ShellChromeBackgroundBrush}"
             BorderBrush="{DynamicResource ShellChromeBorderBrush}"
             BorderThickness="0,1,0,0"
-            Padding="8,6">
+            Padding="8,6"
+            Height="{Binding Layout.BottomSidebarSettings, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Height}">
       <Grid ColumnDefinitions="*,Auto"
             ColumnSpacing="{DynamicResource ThemeSpacingMd}">
         <views:StatusStripView DataContext="{Binding StatusStrip}"
@@ -339,14 +379,14 @@
                       Grid.Column="1"
                       ItemsSource="{Binding Layout.BottomBlocks}"
                       ItemTemplate="{StaticResource HorizontalBlockTemplate}"
+                      Tag="{Binding Layout.BottomSidebarSettings}"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Center"
                       DragDrop.AllowDrop="True">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
-              <StackPanel Orientation="Horizontal"
-                          HorizontalAlignment="Right"
-                          Spacing="{DynamicResource ThemeSpacingSm}" />
+              <WrapPanel Orientation="Horizontal"
+                         HorizontalAlignment="Right" />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
         </ItemsControl>
@@ -357,7 +397,7 @@
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="{Binding Host.RightSidebarColumnWidth}" />
+        <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
 
       <Border Grid.Column="0"
@@ -367,7 +407,8 @@
               CornerRadius="{DynamicResource ThemeRadiusMd}"
               Padding="8"
               Margin="0,0,12,0"
-              Width="120">
+              MinWidth="96"
+              Width="{Binding Layout.LeftSidebarSettings, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -377,14 +418,14 @@
                         Grid.Row="1"
                         ItemsSource="{Binding Layout.LeftBlocks}"
                         ItemTemplate="{StaticResource VerticalBlockTemplate}"
+                        Tag="{Binding Layout.LeftSidebarSettings}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
                         DragDrop.AllowDrop="True">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
-                <StackPanel Orientation="Vertical"
-                            HorizontalAlignment="Center"
-                            Spacing="{DynamicResource ThemeSpacingSm}" />
+                <WrapPanel Orientation="Vertical"
+                           HorizontalAlignment="Center" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>
@@ -407,46 +448,29 @@
       </Border>
 
       <Border Grid.Column="2"
-              Background="{DynamicResource ShellPanelBackgroundBrush}"
-              BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+              Background="{DynamicResource ShellChromeBackgroundBrush}"
+              BorderBrush="{DynamicResource ShellChromeBorderBrush}"
               BorderThickness="1"
               CornerRadius="{DynamicResource ThemeRadiusMd}"
-              Padding="0"
+              Padding="8"
+              Margin="12,0,0,0"
+              MinWidth="96"
+              Width="{Binding Layout.RightSidebarSettings, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
               IsVisible="{Binding Host.IsRightSidebarVisible}">
-        <Grid ColumnDefinitions="*,Auto">
-          <ContentControl Grid.Column="0"
-                          Margin="16"
-                          Content="{Binding Host}" />
-
-          <Border Grid.Column="1"
-                  Width="120"
-                  Background="{DynamicResource ShellChromeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ShellChromeBorderBrush}"
-                  BorderThickness="1,0,0,0"
-                  Padding="8">
-            <Grid>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
-              <ItemsControl x:Name="RightBlocksControl"
-                            Grid.Row="1"
-                            ItemsSource="{Binding Layout.RightBlocks}"
-                            ItemTemplate="{StaticResource VerticalBlockTemplate}"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Bottom"
-                            DragDrop.AllowDrop="True">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <StackPanel Orientation="Vertical"
-                                HorizontalAlignment="Center"
-                                Spacing="{DynamicResource ThemeSpacingSm}" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-              </ItemsControl>
-            </Grid>
-          </Border>
-        </Grid>
+        <ItemsControl x:Name="RightBlocksControl"
+                      ItemsSource="{Binding Layout.RightBlocks}"
+                      ItemTemplate="{StaticResource VerticalBlockTemplate}"
+                      Tag="{Binding Layout.RightSidebarSettings}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Bottom"
+                      DragDrop.AllowDrop="True">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Vertical"
+                         HorizontalAlignment="Center" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
       </Border>
     </Grid>
   </DockPanel>

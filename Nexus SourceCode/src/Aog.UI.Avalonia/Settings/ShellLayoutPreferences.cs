@@ -21,6 +21,18 @@ public sealed class ShellLayoutPreferences
     /// <summary>Gets or sets the persisted block layout instances.</summary>
     public List<BlockInstance> Instances { get; set; } = new();
 
+    /// <summary>Gets or sets the layout metrics for the left sidebar.</summary>
+    public SidebarLayoutSettings LeftSidebar { get; set; } = SidebarLayoutSettings.CreateVerticalDefaults();
+
+    /// <summary>Gets or sets the layout metrics for the right sidebar.</summary>
+    public SidebarLayoutSettings RightSidebar { get; set; } = SidebarLayoutSettings.CreateVerticalDefaults();
+
+    /// <summary>Gets or sets the layout metrics for the bottom toolbar.</summary>
+    public SidebarLayoutSettings BottomSidebar { get; set; } = SidebarLayoutSettings.CreateBottomDefaults();
+
+    /// <summary>Gets or sets the layout metrics for the top telemetry strip.</summary>
+    public SidebarLayoutSettings TopSidebar { get; set; } = SidebarLayoutSettings.CreateTopDefaults();
+
     /// <summary>
     /// Legacy alias maintained for compatibility with existing bindings.
     /// </summary>
@@ -49,6 +61,10 @@ public sealed class ShellLayoutPreferences
             ShowTopToolbar = ShowTopToolbar,
             ShowRightSidebar = ShowRightSidebar,
             ActiveWorkspaceId = ActiveWorkspaceId,
+            LeftSidebar = (LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
+            RightSidebar = (RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
+            BottomSidebar = (BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone(),
+            TopSidebar = (TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone(),
         };
 
         if (Instances.Count > 0)

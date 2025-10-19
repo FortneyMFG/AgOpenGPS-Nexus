@@ -122,11 +122,16 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         changed |= EnsureClone(layout, "Cmd.Stop", BlockRegion.Bottom, 2);
         changed |= EnsureClone(layout, "Cmd.NudgeLeft", BlockRegion.Bottom, 3);
         changed |= EnsureClone(layout, "Cmd.NudgeRight", BlockRegion.Bottom, 4);
-        changed |= EnsureClone(layout, "Tel.Speed", BlockRegion.Top, 0);
+        changed |= EnsureClone(layout, "Tel.Speed", BlockRegion.Top, 0, BlockSize.Tile1xHalf);
         return changed;
     }
 
-    private bool EnsureClone(ShellLayoutPreferences layout, string definitionId, BlockRegion region, int order)
+    private bool EnsureClone(
+        ShellLayoutPreferences layout,
+        string definitionId,
+        BlockRegion region,
+        int order,
+        BlockSize? sizeOverride = null)
     {
         var id = new BlockDefinitionId(definitionId);
         if (_catalog.Get(id) is null)
@@ -145,6 +150,7 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
             Region = region,
             Order = order,
             Origin = BlockOrigin.Clone,
+            SizeOverride = sizeOverride,
         });
         return true;
     }

@@ -15,12 +15,13 @@ namespace Aog.UI.Avalonia.Views.Main
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly IUiPreferencesService _preferencesService;
+        private readonly IUiPreferencesService? _preferencesService;
         private Size _lastNormalSize;
         private PixelPoint? _lastNormalPosition;
         private IDisposable? _clientSizeSubscription;
         private IDisposable? _windowStateSubscription;
 
+        // DI-friendly default ctor
         public MainWindow()
             : this(
                 AvaloniaServiceProviderAccessor.GetRequiredService<MainWindowViewModel>(),
@@ -28,12 +29,14 @@ namespace Aog.UI.Avalonia.Views.Main
         {
         }
 
+        // Primary ctor: initialize and wire everything up
         public MainWindow(MainWindowViewModel viewModel, IUiPreferencesService preferencesService)
         {
             ArgumentNullException.ThrowIfNull(viewModel);
             ArgumentNullException.ThrowIfNull(preferencesService);
 
             InitializeComponent();
+
             _preferencesService = preferencesService;
 
             var preferences = _preferencesService.GetPreferences();
@@ -95,6 +98,11 @@ namespace Aog.UI.Avalonia.Views.Main
 
         private void OnClosing(object? sender, WindowClosingEventArgs e)
         {
+            if (_preferencesService is null)
+            {
+                return;
+            }
+
             var placement = new WindowPlacement
             {
                 WindowState = WindowState,

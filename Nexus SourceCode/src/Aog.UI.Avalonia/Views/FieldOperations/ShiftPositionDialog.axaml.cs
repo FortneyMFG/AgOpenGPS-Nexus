@@ -7,11 +7,13 @@ namespace Aog.UI.Avalonia.Views.FieldOperations
 {
     public partial class ShiftPositionDialog : Window
     {
+        // Default ctor: resolve/synthesize VM then delegate.
         public ShiftPositionDialog()
             : this(CreateDefaultViewModel())
         {
         }
 
+        // Main ctor: initialize and bind VM.
         public ShiftPositionDialog(ShiftPositionDialogViewModel viewModel)
         {
             InitializeComponent();
@@ -29,6 +31,7 @@ namespace Aog.UI.Avalonia.Views.FieldOperations
                 }
             }
 
+            // Design-time / fallback
             return ShiftPositionDialogViewModel.CreateSample();
         }
     }

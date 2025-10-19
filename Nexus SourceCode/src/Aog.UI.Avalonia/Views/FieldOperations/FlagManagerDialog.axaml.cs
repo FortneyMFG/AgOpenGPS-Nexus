@@ -7,11 +7,13 @@ namespace Aog.UI.Avalonia.Views.FieldOperations
 {
     public partial class FlagManagerDialog : Window
     {
+        // Default: resolve or synthesize a VM, then delegate.
         public FlagManagerDialog()
             : this(CreateDefaultViewModel())
         {
         }
 
+        // Main ctor: initialize and bind the VM.
         public FlagManagerDialog(FlagManagerDialogViewModel viewModel)
         {
             InitializeComponent();
@@ -29,6 +31,7 @@ namespace Aog.UI.Avalonia.Views.FieldOperations
                 }
             }
 
+            // Fallback for design-time or missing DI.
             return FlagManagerDialogViewModel.CreateSample();
         }
     }

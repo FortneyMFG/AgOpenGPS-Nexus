@@ -13,29 +13,42 @@ namespace Aog.UI.Avalonia.Views.System;
 
 public partial class SystemSummaryDialog : Window
 {
+    // Default ctor: resolve/synthesize VM, then delegate.
     public SystemSummaryDialog()
         : this(ResolveViewModel())
     {
     }
 
+    // Primary ctor: initialize and bind VM exactly once.
     public SystemSummaryDialog(ISystemSummaryViewModel viewModel)
     {
         InitializeComponent();
         DataContext = viewModel;
     }
 
+    // Back-compat overload: allow callers passing MainWindowViewModel.
+    public SystemSummaryDialog(MainWindowViewModel viewModel)
+        : this(viewModel as ISystemSummaryViewModel ?? ResolveViewModel())
+    {
+    }
+
     private static ISystemSummaryViewModel ResolveViewModel()
     {
         if (AvaloniaServiceProviderAccessor.TryGetServiceProvider(out var services))
         {
-            var summary = services.GetService<ISystemSummaryViewModel>() ??
-                          services.GetService<MainWindowViewModel>() as ISystemSummaryViewModel;
+            // Prefer a direct registration of ISystemSummaryViewModel
+            var summary = services.GetService<ISystemSummaryViewModel>();
+
+            // Fallback: if MainWindowViewModel implements the interface, use that
+            summary ??= services.GetService<MainWindowViewModel>() as ISystemSummaryViewModel;
+
             if (summary is not null)
             {
                 return summary;
             }
         }
 
+        // Design-time / no-DI fallback
         return DesignSystemSummaryViewModel.Instance;
     }
 
@@ -53,13 +66,9 @@ public partial class SystemSummaryDialog : Window
         }
 
         public string PlatformDescription { get; }
-
         public IReadOnlyList<MapLayer> MapLayers { get; }
-
         public IReadOnlyList<GuidanceTrack> GuidanceTracks { get; }
-
         public IReadOnlyList<UiTheme> AvailableThemes { get; }
-
         public UiTheme SelectedTheme { get; set; }
 
         private static IReadOnlyList<MapLayer> CreateSampleLayers()

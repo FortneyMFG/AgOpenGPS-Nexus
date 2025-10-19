@@ -7,11 +7,13 @@ namespace Aog.UI.Avalonia.Views.FieldOperations;
 
 public partial class MapToolsDialog : Window
 {
+    // Default ctor: resolve/synthesize VM and delegate.
     public MapToolsDialog()
         : this(CreateDefaultViewModel())
     {
     }
 
+    // Main ctor: initialize and bind VM.
     public MapToolsDialog(MapToolsDialogViewModel viewModel)
     {
         InitializeComponent();
@@ -30,6 +32,7 @@ public partial class MapToolsDialog : Window
             }
         }
 
+        // Design-time / fallback
         return MapToolsDialogViewModel.CreateDesignSample();
     }
 }

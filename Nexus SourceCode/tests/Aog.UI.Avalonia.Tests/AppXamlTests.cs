@@ -62,12 +62,10 @@ public sealed class AppXamlTests
             var className = xClass.Value;
             if (seen.TryGetValue(className, out var existingPath))
             {
-                Assert.True(false, $"Duplicate x:Class '{className}' discovered in '{existingPath}' and '{path}'.");
+                Assert.Fail($"Duplicate x:Class '{className}' discovered in '{existingPath}' and '{path}'.");
             }
-            else
-            {
-                seen[className] = path;
-            }
+
+            seen[className] = path;
         }
     }
 }

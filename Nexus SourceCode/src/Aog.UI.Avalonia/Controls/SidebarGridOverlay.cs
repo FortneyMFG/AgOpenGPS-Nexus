@@ -64,12 +64,6 @@ public sealed class SidebarGridOverlay : Control
         }
 
         var spacing = Math.Max(0, settings.Spacing);
-        var step = blockSize + spacing;
-        if (step <= 0.01)
-        {
-            return;
-        }
-
         var bounds = new Rect(Bounds.Size);
         if (bounds.Width <= 0 || bounds.Height <= 0)
         {
@@ -78,45 +72,103 @@ public sealed class SidebarGridOverlay : Control
 
         context.DrawRectangle(BackgroundBrush, null, bounds);
 
-        var columnCount = Math.Max(1, (int)Math.Floor((bounds.Width + spacing) / step));
-        var rowCount = Math.Max(1, (int)Math.Floor((bounds.Height + spacing) / step));
+        var (columnCount, cellWidth) = CalculateSlots(
+            bounds.Width,
+            blockSize,
+            spacing,
+            settings.WidthMode,
+            settings.BlockColumns);
 
-        var usableWidth = Math.Min(bounds.Width, (columnCount * blockSize) + Math.Max(0, columnCount - 1) * spacing);
-        var usableHeight = Math.Min(bounds.Height, (rowCount * blockSize) + Math.Max(0, rowCount - 1) * spacing);
+        var (rowCount, cellHeight) = CalculateSlots(
+            bounds.Height,
+            blockSize,
+            spacing,
+            settings.HeightMode,
+            settings.BlockRows);
 
-        var startX = (bounds.Width - usableWidth) / 2d;
-        var startY = (bounds.Height - usableHeight) / 2d;
-
-        var offsetX = startX + (spacing / 2d);
-        var offsetY = startY + (spacing / 2d);
-        var maxX = startX + usableWidth - (spacing / 2d);
-        var maxY = startY + usableHeight - (spacing / 2d);
-        if (maxX <= offsetX || maxY <= offsetY)
+        if (columnCount <= 0 || rowCount <= 0 || cellWidth <= 0 || cellHeight <= 0)
         {
             return;
         }
 
-        var minCell = Math.Max(2, blockSize / 2d);
+        var totalWidth = (columnCount * cellWidth) + Math.Max(0, columnCount - 1) * spacing;
+        var totalHeight = (rowCount * cellHeight) + Math.Max(0, rowCount - 1) * spacing;
 
-        for (var x = offsetX; x <= maxX - minCell; x += step)
+        var startX = Math.Max(0, (bounds.Width - totalWidth) / 2d);
+        var startY = Math.Max(0, (bounds.Height - totalHeight) / 2d);
+
+        for (var column = 0; column < columnCount; column++)
         {
-            var cellWidth = Math.Min(blockSize, maxX - x);
-            if (cellWidth < minCell)
+            var x = startX + column * (cellWidth + spacing);
+            if (x >= bounds.Width)
+            {
+                break;
+            }
+
+            var width = Math.Min(cellWidth, bounds.Width - x);
+            if (width <= 1)
             {
                 continue;
             }
 
-            for (var y = offsetY; y <= maxY - minCell; y += step)
+            for (var row = 0; row < rowCount; row++)
             {
-                var cellHeight = Math.Min(blockSize, maxY - y);
-                if (cellHeight < minCell)
+                var y = startY + row * (cellHeight + spacing);
+                if (y >= bounds.Height)
+                {
+                    break;
+                }
+
+                var height = Math.Min(cellHeight, bounds.Height - y);
+                if (height <= 1)
                 {
                     continue;
                 }
 
-                var rect = new Rect(x, y, cellWidth, cellHeight);
+                var rect = new Rect(x, y, width, height);
                 context.DrawRectangle(null, GridPen, rect);
             }
         }
+    }
+
+    private static (int Count, double Size) CalculateSlots(
+        double available,
+        double baseSize,
+        double spacing,
+        LayoutDimensionMode mode,
+        double configuredUnits)
+    {
+        if (baseSize <= 0)
+        {
+            return (0, 0);
+        }
+
+        spacing = Math.Max(0, spacing);
+
+        if (mode == LayoutDimensionMode.Fixed && configuredUnits > 0)
+        {
+            var units = Math.Max(configuredUnits, 0.25d);
+            var count = Math.Max(1, (int)Math.Ceiling(units));
+            var slot = (baseSize * units) / count;
+            return (count, Math.Max(2d, slot));
+        }
+
+        var step = baseSize + spacing;
+        if (step <= double.Epsilon)
+        {
+            return (0, 0);
+        }
+
+        var countDynamic = Math.Max(1, (int)Math.Floor((available + spacing) / step));
+        var totalSpacing = Math.Max(0, countDynamic - 1) * spacing;
+        var usable = Math.Max(0, available - totalSpacing);
+        var slotDynamic = countDynamic > 0 ? usable / countDynamic : 0;
+        if (slotDynamic <= 0)
+        {
+            slotDynamic = available > 0 ? Math.Min(baseSize, available / countDynamic) : 0;
+        }
+
+        slotDynamic = Math.Min(baseSize, slotDynamic);
+        return (countDynamic, Math.Max(2d, slotDynamic));
     }
 }

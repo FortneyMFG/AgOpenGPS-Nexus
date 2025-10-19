@@ -192,6 +192,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Label = "Speed",
             IconKey = "speed",
             PreferredDock = BlockRegion.Top,
+            PreferredSize = BlockSize.Tile1xHalf,
             Placement = PlacementPolicy.Free,
             SupportsHalfHeight = true,
             TelemetrySmallViewKey = "Telemetry/SpeedSmall",

@@ -26,6 +26,10 @@ public enum BlockSize
     Tile1x2,
     Tile2x1,
     Tile2x2,
+    TileHalfx1,
+    Tile1xHalf,
+    Tile2xHalf,
+    TileHalfx2,
 }
 
 /// <summary>

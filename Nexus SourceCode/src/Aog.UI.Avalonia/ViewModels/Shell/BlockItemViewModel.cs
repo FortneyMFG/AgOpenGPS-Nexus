@@ -48,6 +48,26 @@ public sealed class BlockItemViewModel
     /// <summary>Gets the optional icon asset key.</summary>
     public string? IconKey => Definition.IconKey;
 
+    /// <summary>Gets the effective block sizing configuration for layout calculations.</summary>
+    public BlockSize EffectiveSize => Instance.SizeOverride ?? Definition.PreferredSize;
+
+    /// <summary>Gets the width of the block in block units.</summary>
+    public double WidthUnits => EffectiveSize switch
+    {
+        BlockSize.Tile2x1 or BlockSize.Tile2x2 or BlockSize.Tile2xHalf => 2d,
+        BlockSize.TileHalfx1 or BlockSize.TileHalfx2 => 0.5d,
+        _ => 1d,
+    };
+
+    /// <summary>Gets the height of the block in block units.</summary>
+    public double HeightUnits => EffectiveSize switch
+    {
+        BlockSize.Tile1x2 or BlockSize.Tile2x2 => 2d,
+        BlockSize.Tile1xHalf or BlockSize.Tile2xHalf => 0.5d,
+        BlockSize.TileHalfx2 => 2d,
+        _ => 1d,
+    };
+
     /// <summary>Gets the command triggered when the block is activated.</summary>
     public ICommand InvokeCommand => _invokeCommand;
 

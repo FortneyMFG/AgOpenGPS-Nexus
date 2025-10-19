@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Hosting;
+using Aog.UI.Avalonia.Settings;
 
 namespace Aog.UI.Avalonia.ViewModels.Shell;
 
@@ -32,6 +33,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private readonly IBlockLayoutStore _layoutStore;
     private readonly IBlockCatalog _catalog;
     private readonly IShellCommandDispatcher _commandDispatcher;
+    private readonly Dictionary<BlockRegion, SidebarLayoutSettings> _sidebarSettings;
     private Action<string> _statusReporter;
     private readonly Dictionary<BlockRegion, ObservableCollection<BlockItemViewModel>> _regions;
     private readonly Dictionary<BlockInstanceId, BlockItemViewModel> _itemLookup;
@@ -46,11 +48,13 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         IBlockLayoutStore layoutStore,
         IBlockCatalog catalog,
         IShellCommandDispatcher commandDispatcher,
+        IUiPreferencesService preferencesService,
         Action<string>? statusReporter = null)
     {
         _layoutStore = layoutStore ?? throw new ArgumentNullException(nameof(layoutStore));
         _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
         _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
+        ArgumentNullException.ThrowIfNull(preferencesService);
         _statusReporter = statusReporter ?? (_ => { });
 
         _regions = new Dictionary<BlockRegion, ObservableCollection<BlockItemViewModel>>
@@ -62,6 +66,15 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         };
         _itemLookup = new Dictionary<BlockInstanceId, BlockItemViewModel>();
         _instances = _layoutStore.Load().ToList();
+
+        var preferences = preferencesService.GetPreferences().ShellLayout ?? new ShellLayoutPreferences();
+        _sidebarSettings = new Dictionary<BlockRegion, SidebarLayoutSettings>
+        {
+            [BlockRegion.Left] = (preferences.LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
+            [BlockRegion.Right] = (preferences.RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
+            [BlockRegion.Bottom] = (preferences.BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone(),
+            [BlockRegion.Top] = (preferences.TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone(),
+        };
 
         BuildInitialCollections();
     }
@@ -77,6 +90,18 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the blocks rendered in the top telemetry strip.</summary>
     public ObservableCollection<BlockItemViewModel> TopBlocks => _regions[BlockRegion.Top];
+
+    /// <summary>Gets the sizing settings for the left sidebar.</summary>
+    public SidebarLayoutSettings LeftSidebarSettings => _sidebarSettings[BlockRegion.Left];
+
+    /// <summary>Gets the sizing settings for the right sidebar.</summary>
+    public SidebarLayoutSettings RightSidebarSettings => _sidebarSettings[BlockRegion.Right];
+
+    /// <summary>Gets the sizing settings for the bottom strip.</summary>
+    public SidebarLayoutSettings BottomSidebarSettings => _sidebarSettings[BlockRegion.Bottom];
+
+    /// <summary>Gets the sizing settings for the top strip.</summary>
+    public SidebarLayoutSettings TopSidebarSettings => _sidebarSettings[BlockRegion.Top];
 
     /// <summary>Gets or sets a value indicating whether layout modifications are locked.</summary>
     public bool IsLocked

@@ -44,18 +44,25 @@
 
 ## Plugin Guides
 
-- [Mapping](plugins/Mapping.md)
-- [Variable Mapping / Prescription](plugins/VariableMapping.md)
-- [Rate Control](plugins/RateControl.md)
-- [Genetics](plugins/Genetics.md)
-- [Yield & Analytics](plugins/Yield.md)
-- [Profit](plugins/Profit.md)
-- [Multi-Machine](plugins/MultiMachine.md)
-- [ISOBUS Bridge](plugins/IsobusBridge.md)
-- [Telemetry Logging](plugins/TelemetryLogging.md)
-- [Replay](plugins/Replay.md)
-- [File I/O](plugins/FileIO.md)
-- Planned: [Soil & Lab Manager](plugins/SoilLab.md), [Map Composer & Print Studio](plugins/MapComposer.md), [3D Terrain & Drainage](plugins/Terrain3D.md)
+- **Architecture & SDK**
+  - [Zip Plugin Architecture](plugins/architecture.md)
+  - [Core Integration Guide](../Nexus SourceCode/src/Aog.Core/PLUGINS.md)
+  - [UI Integration Guide](../Nexus SourceCode/src/Aog.UI.Avalonia/PLUGINS.md)
+- **Official Plugin Cards**
+  - [Catalogue](plugins/official/README.md) — concise cards for AutoSteer, Sections, Telemetry Logging, Variable Mapping, and more.
+- **Legacy Briefs & Deep Dives**
+  - [Mapping](plugins/Mapping.md)
+  - [Variable Mapping / Prescription](plugins/VariableMapping.md)
+  - [Rate Control](plugins/RateControl.md)
+  - [Genetics](plugins/Genetics.md)
+  - [Yield & Analytics](plugins/Yield.md)
+  - [Profit](plugins/Profit.md)
+  - [Multi-Machine](plugins/MultiMachine.md)
+  - [ISOBUS Bridge](plugins/IsobusBridge.md)
+  - [Telemetry Logging](plugins/TelemetryLogging.md)
+  - [Replay](plugins/Replay.md)
+  - [File I/O](plugins/FileIO.md)
+  - Planned: [Soil & Lab Manager](plugins/SoilLab.md), [Map Composer & Print Studio](plugins/MapComposer.md), [3D Terrain & Drainage](plugins/Terrain3D.md)
 
 ## Schemas & Examples
 

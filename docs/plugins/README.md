@@ -1,23 +1,30 @@
-# Nexus Plugin Library Overview
+# Nexus Plugin Documentation Hub
 
-This index complements the detailed plugin briefs in this directory. Each entry links to the dedicated page that documents purpose, inputs/outputs, and configuration surfaces.
+Use this page as the launch pad for all plugin-related documentation. It links to the architectural references, SDK integration guides, and the catalogue of official plugins that ship with Nexus.
 
-## Hardware & Control Plugins
-- [Pumpkin Pi](pumpkin-pi.md) — CM5-local HAL + SHM fastpath for steer controllers.
+## Architecture & SDK
+- [Zip Plugin Architecture](architecture.md) — Authoritative description of the zip packaging model, manifest schema, and runtime lifecycle.
+- [Core Integration Guide](../../Nexus SourceCode/src/Aog.Core/PLUGINS.md) — Host services and capability leases exposed by the core runtime.
+- [UI Integration Guide](../../Nexus SourceCode/src/Aog.UI.Avalonia/PLUGINS.md) — Blocks, windows, tools, and map host extension points.
+- [Plugin Manifest Reference](../reference/plugin-manifest.md)
+- [Security Guidelines](security.md) and [Performance Budgets](performance.md)
+
+## Official Plugin Cards
+The official plugins maintained with Nexus each have a concise reference card:
+
+- Browse the catalogue: [docs/plugins/official/](official/README.md)
+- Quick links: [AutoSteer](official/AutoSteer.md) · [Sections Control](official/Sections.md) · [Telemetry Logging](official/TelemetryLogging.md) · [Variable Mapping](official/VariableMapping.md)
+
+## Legacy Briefs & Deep Dives
+Historical briefs predating the zip architecture remain available for context. They are gradually being refreshed to align with the new packaging model.
+
+- [Pumpkin Pi](pumpkin-pi.md) — CM5-local HAL + shared-memory fast path.
 - [Isobus Bridge](IsobusBridge.md)
 - [Device Manager](DeviceManager.md)
-
-## Guidance & Automation
-- [Guidance](Guidance.md)
 - [Automation Engine](AutomationEngine.md)
+- [Mapping](Mapping.md), [Telemetry Logging](TelemetryLogging.md), [Replay](Replay.md)
+- [CLI Extensions](CLIExtensions.md) and other tooling docs.
 
-## Mapping & Analytics
-- [Mapping](Mapping.md)
-- [Telemetry Logging](TelemetryLogging.md)
-- [Replay](Replay.md)
+> When updating an official plugin, refresh both the new card under `official/` and any legacy brief that still contains relevant history.
 
-## Tooling & Automation
-- [CLI Extensions](CLIExtensions.md)
-- [Nexus CLI Completions Kit](../howto/nx-cli-completions.md)
-
-Refer to `docs/INDEX.md` for additional guides, ADRs, and rollout plans.
+Refer to `docs/INDEX.md` for the complete documentation map, ADRs, and rollout plans.

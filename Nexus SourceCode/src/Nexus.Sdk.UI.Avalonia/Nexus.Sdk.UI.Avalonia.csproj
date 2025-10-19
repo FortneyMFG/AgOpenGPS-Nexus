@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version>1.0.0</Version>
+    <PackageId>AgOpenGPS.Nexus.Sdk.UI.Avalonia</PackageId>
+    <Authors>AgOpenGPS</Authors>
+    <Description>Avalonia UI extension interfaces for the Nexus plugin SDK.</Description>
+    <PackageTags>AgOpenGPS;Nexus;SDK;Plugins;Avalonia</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Nexus.Sdk.Core/Nexus.Sdk.Core.csproj" />
+  </ItemGroup>
+</Project>

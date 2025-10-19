@@ -201,6 +201,42 @@ public sealed class CoreBlockProvider : IBlockProvider
 
         yield return new BlockDefinition
         {
+            Id = new BlockDefinitionId("Tel.Gps"),
+            Kind = BlockKind.Telemetry,
+            Label = "GPS",
+            IconKey = "guidance",
+            PreferredDock = BlockRegion.Top,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Tel.Sections"),
+            Kind = BlockKind.Telemetry,
+            Label = "Sections",
+            IconKey = "sections",
+            PreferredDock = BlockRegion.Top,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Tel.Radio"),
+            Kind = BlockKind.Telemetry,
+            Label = "Radio",
+            IconKey = "coverage",
+            PreferredDock = BlockRegion.Top,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
             Id = new BlockDefinitionId("Cmd.MapTools"),
             Kind = BlockKind.CommandButton,
             Label = "Map Tools",

@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
              xmlns:workspace="clr-namespace:Aog.UI.Avalonia.ViewModels"
-             xmlns:views="clr-namespace:Aog.UI.Avalonia.Views.Shell"
              xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
              xmlns:model="clr-namespace:Aog.UI.Avalonia.Models"
              xmlns:mapping="clr-namespace:Aog.UI.Avalonia.Views.Mapping"
@@ -61,6 +60,20 @@
                        RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
             </MultiBinding>
           </Button.Width>
+          <Button.MinWidth>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.MinWidth>
+          <Button.MaxWidth>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.MaxWidth>
           <Button.Height>
             <MultiBinding Converter="{StaticResource BlockTileSizeConverter}" ConverterParameter="Height">
               <Binding />
@@ -68,6 +81,20 @@
                        RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
             </MultiBinding>
           </Button.Height>
+          <Button.MinHeight>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}" ConverterParameter="Height">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.MinHeight>
+          <Button.MaxHeight>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}" ConverterParameter="Height">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.MaxHeight>
           <Button.Margin>
             <MultiBinding Converter="{StaticResource BlockTileMarginConverter}">
               <Binding />
@@ -115,6 +142,20 @@
                        RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
             </MultiBinding>
           </Button.Width>
+          <Button.MinWidth>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.MinWidth>
+          <Button.MaxWidth>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.MaxWidth>
           <Button.Height>
             <MultiBinding Converter="{StaticResource BlockTileSizeConverter}" ConverterParameter="Height">
               <Binding />
@@ -122,6 +163,20 @@
                        RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
             </MultiBinding>
           </Button.Height>
+          <Button.MinHeight>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}" ConverterParameter="Height">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.MinHeight>
+          <Button.MaxHeight>
+            <MultiBinding Converter="{StaticResource BlockTileSizeConverter}" ConverterParameter="Height">
+              <Binding />
+              <Binding Path="Tag"
+                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+            </MultiBinding>
+          </Button.MaxHeight>
           <Button.Margin>
             <MultiBinding Converter="{StaticResource BlockTileMarginConverter}">
               <Binding />
@@ -359,7 +414,7 @@
                         ItemsSource="{Binding Layout.TopBlocks}"
                         ItemTemplate="{StaticResource HorizontalBlockTemplate}"
                         Tag="{Binding Layout.TopSidebarSettings}"
-                        HorizontalAlignment="Stretch"
+                        HorizontalAlignment="Center"
                         DragDrop.AllowDrop="True">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
@@ -378,34 +433,26 @@
             BorderThickness="0,1,0,0"
             Padding="8,6"
             Height="{Binding Layout.BottomSidebarSettings, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Height}">
-      <Grid ColumnDefinitions="*,Auto"
-            ColumnSpacing="{DynamicResource ThemeSpacingMd}">
-        <views:StatusStripView DataContext="{Binding StatusStrip}"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Center" />
-        <Grid Grid.Column="1"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Center">
-          <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.BottomSidebarSettings}"
-                                       IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
-                                       IsHitTestVisible="False"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch" />
-          <ItemsControl x:Name="BottomBlocksControl"
-                        ItemsSource="{Binding Layout.BottomBlocks}"
-                        ItemTemplate="{StaticResource HorizontalBlockTemplate}"
-                        Tag="{Binding Layout.BottomSidebarSettings}"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        DragDrop.AllowDrop="True">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <WrapPanel Orientation="Horizontal"
-                           HorizontalAlignment="Right" />
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-          </ItemsControl>
-        </Grid>
+      <Grid>
+        <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.BottomSidebarSettings}"
+                                     IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
+                                     IsHitTestVisible="False"
+                                     HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Stretch" />
+        <ItemsControl x:Name="BottomBlocksControl"
+                      ItemsSource="{Binding Layout.BottomBlocks}"
+                      ItemTemplate="{StaticResource HorizontalBlockTemplate}"
+                      Tag="{Binding Layout.BottomSidebarSettings}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      DragDrop.AllowDrop="True">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal"
+                         HorizontalAlignment="Center" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
       </Grid>
     </Border>
 

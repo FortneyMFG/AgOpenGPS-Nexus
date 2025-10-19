@@ -3,9 +3,14 @@
 The Release workflow publishes official plugins alongside Core, AgIO, and UI components. Use this guide to add, update, or validate plugins in your deployment.
 
 ## Plugin Packaging
-- Each plugin archive follows the pattern `Plugin-<Name>_v<VER>_<RUNTIME>.<ext>`.
+- Each plugin archive follows the pattern `Plugin-<Name>_v<VER>_<RUNTIME>.<ext>`;
+  cross-runtime bundles may instead use `<manifest-id>-<ver>-<rid>.zip` when
+  authored outside of MSBuild.
 - Archives contain a `plugins/<Name>/` directory with binaries, manifests, and sample configuration.
 - Bundles extract plugins into `<install-root>/plugins/<Name>/` based on manifest requirements in `bundles/*.bundle.json`.
+- Cross-runtime bundles (Pumpkin Pi HAL, Nexus CLI sample) are packaged via
+  `tools/ci/package-sidecar-plugins.ps1`, which emits manifest-first zip
+  archives matching the MSBuild `PackPlugin` layout.
 
 ## Installing Plugins
 1. Download the plugin archive for your runtime.

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.agio.pumpkinpi",
+  "name": "Pumpkin Pi HAL",
+  "version": "0.1.0",
+  "description": "CM5-local HAL and shared-memory fast path for steer control.",
+  "requiredApis": {
+    "core": ">=1.0.0"
+  },
+  "settings": {},
+  "supportedCapabilities": [],
+  "provides": {
+    "capabilities": [],
+    "profiles": []
+  },
+  "requires": {
+    "capabilities": [],
+    "profiles": [],
+    "peerOf": [],
+    "conflictsWith": [],
+    "replaces": [],
+    "extends": []
+  },
+  "requiredPermissions": [
+    "system.ipc",
+    "hardware.gpio",
+    "hardware.pwm",
+    "hardware.can"
+  ],
+  "requiredTransports": [
+    "unix",
+    "mqtt"
+  ],
+  "minimumRuntimeVersion": "0.1.0",
+  "simProviders": [],
+  "leases": []
+}

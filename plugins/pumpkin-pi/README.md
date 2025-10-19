@@ -8,11 +8,14 @@ Pumpkin Pi lets a CM5 act as its own controller:
 - AgIO Bridge stays on for external devices (UDP/Serial/CAN/MQTT-SN)
 
 ## Configure
-Copy `config/pumpkin.yaml.example` to `/etc/aog/pumpkin.yaml` and edit HAL backend.
-Optional: copy `config/bridge.yaml.example` to `/etc/aog/bridge.yaml` to keep external adapters online.
-Enable service:
+Extract `org.agopengps.agio.pumpkinpi-<ver>-linux-arm64.zip` into
+`<install-root>/plugins/org.agopengps.agio.pumpkinpi/<ver>/` so the runtime can
+load the manifest and assets. Copy `assets/config/pumpkin.yaml.example` to
+`/etc/aog/pumpkin.yaml` and edit HAL backend. Optional: copy
+`assets/config/bridge.yaml.example` to `/etc/aog/bridge.yaml` to keep external
+adapters online. Enable service:
 ```bash
-sudo cp systemd/pumpkin-pi.service /etc/systemd/system/
+sudo cp <install-root>/plugins/org.agopengps.agio.pumpkinpi/<ver>/assets/systemd/pumpkin-pi.service /etc/systemd/system/
 sudo systemctl enable --now pumpkin-pi
 ```
 

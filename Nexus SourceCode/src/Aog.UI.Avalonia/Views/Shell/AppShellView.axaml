@@ -348,16 +348,18 @@
           </StackPanel>
         </Grid>
         <Grid Margin="0,8,0,0"
-              HorizontalAlignment="Center"
+              HorizontalAlignment="Stretch"
               Height="{Binding Layout.TopSidebarSettings, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Height}">
           <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.TopSidebarSettings}"
                                        IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
-                                       IsHitTestVisible="False" />
+                                       IsHitTestVisible="False"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch" />
           <ItemsControl x:Name="TopBlocksControl"
                         ItemsSource="{Binding Layout.TopBlocks}"
                         ItemTemplate="{StaticResource HorizontalBlockTemplate}"
                         Tag="{Binding Layout.TopSidebarSettings}"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Stretch"
                         DragDrop.AllowDrop="True">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
@@ -382,17 +384,19 @@
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Center" />
         <Grid Grid.Column="1"
-              HorizontalAlignment="Right"
+              HorizontalAlignment="Stretch"
               VerticalAlignment="Center">
           <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.BottomSidebarSettings}"
                                        IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
-                                       IsHitTestVisible="False" />
+                                       IsHitTestVisible="False"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch" />
           <ItemsControl x:Name="BottomBlocksControl"
                         ItemsSource="{Binding Layout.BottomBlocks}"
                         ItemTemplate="{StaticResource HorizontalBlockTemplate}"
                         Tag="{Binding Layout.BottomSidebarSettings}"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
                         DragDrop.AllowDrop="True">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
@@ -423,26 +427,29 @@
               Width="{Binding Layout.LeftSidebarSettings, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}">
         <Grid>
           <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
           </Grid.RowDefinitions>
           <Grid Grid.Row="1"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Bottom">
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
             <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.LeftSidebarSettings}"
                                          IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
-                                         IsHitTestVisible="False" />
+                                         IsHitTestVisible="False"
+                                         HorizontalAlignment="Stretch"
+                                         VerticalAlignment="Stretch" />
             <ItemsControl x:Name="LeftBlocksControl"
                           ItemsSource="{Binding Layout.LeftBlocks}"
                           ItemTemplate="{StaticResource VerticalBlockTemplate}"
                           Tag="{Binding Layout.LeftSidebarSettings}"
                           HorizontalAlignment="Center"
-                          VerticalAlignment="Bottom"
+                          VerticalAlignment="Stretch"
                           DragDrop.AllowDrop="True">
               <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                   <WrapPanel Orientation="Vertical"
-                             HorizontalAlignment="Center" />
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Bottom" />
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
             </ItemsControl>
@@ -475,22 +482,25 @@
               MinWidth="96"
               Width="{Binding Layout.RightSidebarSettings, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
               IsVisible="{Binding Host.IsRightSidebarVisible}">
-        <Grid HorizontalAlignment="Center"
-              VerticalAlignment="Bottom">
+        <Grid HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
           <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.RightSidebarSettings}"
                                        IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
-                                       IsHitTestVisible="False" />
+                                       IsHitTestVisible="False"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch" />
           <ItemsControl x:Name="RightBlocksControl"
                         ItemsSource="{Binding Layout.RightBlocks}"
                         ItemTemplate="{StaticResource VerticalBlockTemplate}"
                         Tag="{Binding Layout.RightSidebarSettings}"
                         HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom"
+                        VerticalAlignment="Stretch"
                         DragDrop.AllowDrop="True">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel Orientation="Vertical"
-                           HorizontalAlignment="Center" />
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>

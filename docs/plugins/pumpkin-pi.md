@@ -73,6 +73,8 @@ flowchart TD
 - Pumpkin Pi should be scheduled with real-time priority (`CPUSchedulingPolicy=fifo`, priority ≥80) and lock memory (`mlockall`) to avoid jitter.
 
 ## Rollout Checklist
+- Extract `org.agopengps.agio.pumpkinpi-<ver>-linux-arm64.zip` to
+  `<install-root>/plugins/org.agopengps.agio.pumpkinpi/<ver>/`.
 - Install config at `/etc/aog/pumpkin.yaml`.
 - Enable systemd service `pumpkin-pi`.
 - Verify SHM ring version matches NAV/steer-ctrl build.

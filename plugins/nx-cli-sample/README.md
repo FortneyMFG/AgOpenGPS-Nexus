@@ -17,12 +17,16 @@ loaded alongside the plugin manifest.
 ## Layout
 
 ```
-sample-plugin/
-├── README.md
-├── plugin.json
-└── Adapters/
-    └── Nexus.SamplePlugin.Cli.dll (produced by package-nx-cli.ps1)
+org.agopengps.nx.sample-0.1.0.zip
+├── manifest.json
+├── assets/
+│   └── README.md
+└── lib/
+    ├── Nexus.SamplePlugin.Cli.dll
+    ├── Nexus.SamplePlugin.Cli.deps.json
+    └── Nexus.SamplePlugin.Cli.runtimeconfig.json
 ```
 
-Copy the directory into `~/.nexus/plugins/org.agopengps.nx.sample/0.1.0/` and
-rerun the CLI host to validate manifest discovery.
+Use `tools/ci/package-sidecar-plugins.ps1` to emit the archive and then expand
+it into `~/.nexus/plugins/org.agopengps.nx.sample/0.1.0/` before rerunning the
+CLI host to validate manifest discovery.

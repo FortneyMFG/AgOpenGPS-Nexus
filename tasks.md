@@ -19,6 +19,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-131 Field job session lifecycle ADR _(Done)_
 - [x] NX-152 .NET 8 runtime enforcement per ADR-001 _(Done)_
 - [x] NX-190 Comprehensive ADR portfolio review _(Done)_ — Backlog gaps captured in NX-610…NX-616
+- [ ] NX-1314 Zip plugin architecture foundations — Introduce SDK surface + manifest tooling for plugin packaging
 - [x] NX-153 gRPC contract governance rollout _(Done)_
 - [x] NX-154 Avalonia companion run-mode delivery _(Done)_
 - [x] NX-155 Composite simulation fabric GA _(Done)_

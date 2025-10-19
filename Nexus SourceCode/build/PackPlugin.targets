@@ -1,0 +1,81 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PluginManifest Condition="'$(PluginManifest)' == ''">$(MSBuildProjectDirectory)manifest.json</PluginManifest>
+    <PluginPackageIntermediate>$(IntermediateOutputPath)plugin\</PluginPackageIntermediate>
+  </PropertyGroup>
+
+  <UsingTask TaskName="ReadPluginManifest"
+             TaskFactory="CodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <ManifestPath ParameterType="System.String" Required="true" />
+      <PluginId ParameterType="System.String" Output="true" />
+      <PluginVersion ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Text.Json" />
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.Json" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        if (!File.Exists(ManifestPath))
+        {
+            Log.LogError($"Plugin manifest '{ManifestPath}' was not found.");
+            return false;
+        }
+
+        using var stream = File.OpenRead(ManifestPath);
+        using var document = JsonDocument.Parse(stream);
+        var root = document.RootElement;
+        if (!root.TryGetProperty("id", out var idProperty) || idProperty.ValueKind != JsonValueKind.String)
+        {
+            Log.LogError($"Manifest '{ManifestPath}' is missing the required 'id' property.");
+            return false;
+        }
+
+        if (!root.TryGetProperty("version", out var versionProperty) || versionProperty.ValueKind != JsonValueKind.String)
+        {
+            Log.LogError($"Manifest '{ManifestPath}' is missing the required 'version' property.");
+            return false;
+        }
+
+        PluginId = idProperty.GetString();
+        PluginVersion = versionProperty.GetString();
+        return true;
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="PackPlugin" DependsOnTargets="Build">
+    <ReadPluginManifest ManifestPath="$(PluginManifest)">
+      <Output TaskParameter="PluginId" PropertyName="PluginId" />
+      <Output TaskParameter="PluginVersion" PropertyName="PluginVersion" />
+    </ReadPluginManifest>
+
+    <Error Condition="'$(PluginId)' == ''" Text="Plugin id could not be determined from $(PluginManifest)." />
+    <Error Condition="'$(PluginVersion)' == ''" Text="Plugin version could not be determined from $(PluginManifest)." />
+
+    <RemoveDir Directories="$(PluginPackageIntermediate)" Condition="Exists('$(PluginPackageIntermediate)')" />
+    <MakeDir Directories="$(PluginPackageIntermediate)" />
+
+    <ItemGroup>
+      <_PluginFiles Include="$(TargetDir)**\*.*">
+        <RelativePath>lib\%(RecursiveDir)%(Filename)%(Extension)</RelativePath>
+      </_PluginFiles>
+      <_PluginFiles Include="$(PluginManifest)">
+        <RelativePath>manifest.json</RelativePath>
+      </_PluginFiles>
+      <_PluginFiles Include="@(PluginAsset)">
+        <RelativePath>%(PluginAsset.RelativePath)</RelativePath>
+      </_PluginFiles>
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_PluginFiles)"
+          DestinationFiles="@(_PluginFiles->'$(PluginPackageIntermediate)%(RelativePath)')" />
+
+    <ZipDirectory SourceDirectory="$(PluginPackageIntermediate)"
+                  DestinationFile="$(OutputPath)$(PluginId)-$(PluginVersion).zip" />
+  </Target>
+</Project>

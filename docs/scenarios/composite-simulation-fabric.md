@@ -5,7 +5,7 @@
 ## Fabric Components
 
 - **SimClock.** Provides deterministic time progression with pause/step controls. All providers subscribe to the shared clock.
-- **SimBus topics.** Canonical topics cover pose, guidance, section states, implement IO, GNSS, IMU, and telemetry logs. Providers publish/subscribe using strongly typed contracts documented in the [capability registry](../reference/capability-registry.md).
+- **SimBus topics.** Canonical topics cover pose, guidance, section states, implement IO, GNSS, IMU, and telemetry logs. Providers publish/subscribe using strongly typed contracts documented in the [capability registry](../Core/capability-registry.md).
 - **Provider bundles.** Core ships ground truth, GNSS/IMU noise, implement physics, and environment/weather providers with seeded random generators.
 - **Replay bridge.** Converts captured telemetry logs into SimBus events for regression comparison, complementing the [legacy auto-run scenario](legacy-auto-run/README.md) for UDP regression coverage.
 
@@ -19,7 +19,7 @@
 ## Validation Steps
 
 - **Determinism sweep.** Run the nightly determinism job to compare telemetry hashes across Windows x64 and Linux ARM64 agents.
-- **Plugin integration.** Execute the plugin regression suite (`dotnet test --filter Category=SimulationFabric`) to confirm plugin providers bind to the expected topics and surface metadata described in the [metadata-driven UI style guide](../reference/metadata-driven-ui-style-guide.md).
+- **Plugin integration.** Execute the plugin regression suite (`dotnet test --filter Category=SimulationFabric`) to confirm plugin providers bind to the expected topics and surface metadata described in the [metadata-driven UI style guide](../ui/metadata-driven-ui-style-guide.md).
 - **Replay parity.** Feed recorded field data through the replay bridge and compare outputs to live sim runs using the provided diff tooling. Use the [cross-track replay harness](../howto/cross-track-replay-harness.md) as a smoke slice before running full suites.
 - **Documentation review.** Ensure scenario guides reference current topic names and include any new providers introduced in the release, updating the [scenario library index](README.md) when presets change.
 

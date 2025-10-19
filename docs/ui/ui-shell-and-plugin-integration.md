@@ -3,7 +3,7 @@
 ## Objectives
 - Rebuild the Nexus desktop shell using the component inventory exported to [`artifacts/ui-inventory.json`](../../artifacts/ui-inventory.json) so every legacy workflow has a mapped host in Avalonia.
 - Reuse layouts, bindings, and assets from the legacy V6 WinForms shell, Dev branch experiments, and AgValonia prototypes wherever licensing allows, following the compliance checklist in [`artifacts/ui-license-checklist.md`](../../artifacts/ui-license-checklist.md).
-- Wire UI surfaces to plugin contracts enumerated in [`artifacts/ui-to-plugin.yaml`](../../artifacts/ui-to-plugin.yaml) and the component guidance in [`artifacts/ui-core-spec.md`](../../artifacts/ui-core-spec.md) while keeping metadata-driven styling aligned with [`docs/reference/metadata-driven-ui-style-guide.md`](../reference/metadata-driven-ui-style-guide.md).
+- Wire UI surfaces to plugin contracts enumerated in [`artifacts/ui-to-plugin.yaml`](../../artifacts/ui-to-plugin.yaml) and the component guidance in [`artifacts/ui-core-spec.md`](../../artifacts/ui-core-spec.md) while keeping metadata-driven styling aligned with [metadata-driven UI style guide](metadata-driven-ui-style-guide.md).
 - Preserve the theme tokens defined in [`artifacts/ui-theme-tokens.json`](../../artifacts/ui-theme-tokens.json) and extend the sample view-models described in [`Nexus SourceCode/src/Aog.UI.Avalonia/README.md`](../../Nexus%20SourceCode/src/Aog.UI.Avalonia/README.md) to power Storybook-style previews.
 
 ## Source Harvest & Compliance (Phase 0 — NX-410)
@@ -32,14 +32,14 @@
 2. Wire dialogs to JobsService APIs and the season/session view-models already present in `Aog.UI.Avalonia` to maintain lifecycle parity.
 3. Implement validation, sorting, and status tagging per backlog acceptance criteria and add golden screenshot narratives to docs.
 4. Deliverable: end-to-end job/field lifecycle flow operating inside the new shell.
-5. Reference plan: [`docs/plans/ui-phase3-job-field-lifecycle.md`](ui-phase3-job-field-lifecycle.md).
+5. Reference plan: [UI Phase 3 plan](ui-phase3-job-field-lifecycle.md).
 
 ## Settings, Hotkeys & Appearance (Phase 4 — NX-414)
 1. Rebuild display colour, hotkey manager, and help/about dialogs using AgValonia prototypes as layouts.
 2. Extend theme token binding coverage (typography, spacing, corner radius) to all dialogs and ensure accessibility metrics match the metadata-driven style guide.
 3. Add configuration persistence and import/export glue that mirrors V6 configuration file behaviour.
 4. Deliverable: complete settings hub with accessible theming and hotkey management.
-5. Reference plan: [`docs/plans/ui-phase4-settings-hotkeys.md`](ui-phase4-settings-hotkeys.md).
+5. Reference plan: [UI Phase 4 plan](ui-phase4-settings-hotkeys.md).
 
 ## Plugin-owned Surfaces (Phase 5 — NX-415)
 1. Host infrastructure: Stand up the plugin surface registry (`toolbar.*`, `workspace.*`, `dialog.*`) so Avalonia controls discovered from manifests can self-register, mirroring the plugin manifest metadata surfaced in [`artifacts/ui-to-plugin.yaml`](../../artifacts/ui-to-plugin.yaml).
@@ -57,7 +57,7 @@
    - Report Builder & Job Tasks: Restore report templating previews, task checklists, and automation toggles from the existing Avalonia prototypes.
 5. Companion/Video surfaces: Rebuild the video monitor dialog with device enumeration, feed selection, and layout docking while wiring Companion metadata snapshots so plugins can light up on the companion experience.
 6. Deliverable: plugin UI bundle covering guidance, sections/rate, device & transport, agronomic analytics, video/companion, and workflow automation plugins operating inside Nexus with manifest-driven registration.
-7. Reference plan: [`docs/plans/ui-phase5-plugin-surfaces.md`](ui-phase5-plugin-surfaces.md).
+7. Reference plan: [UI Phase 5 plan](ui-phase5-plugin-surfaces.md).
 
 ## Hardware & Diagnostics (Phase 6 — NX-416)
 1. Port GPS data, UDP status, AgIO loop/serial/advanced settings dialogs from legacy sources and align them with diagnostics injection points.

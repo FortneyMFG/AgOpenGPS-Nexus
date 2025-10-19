@@ -20,11 +20,11 @@ manages controller authority so legacy hardware can join without bespoke firmwar
   `aog/v1/ctrl/authority/{group}` with ≤150 ms acknowledgement so integrated CM5
   controllers and external MCUs can negotiate control safely. Controllers must ignore
   setpoints older than the negotiated TTL and fall back to safe outputs when no
-  authority holder is present.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L324-L347】【F:docs/getting-started/cm5.md†L34-L38】
+  authority holder is present.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L324-L347】【F:docs/AgIO/cm5.md†L34-L38】
 - R-CM5-003 (MUST, scheduling): Run steer-ctrl and Pumpkin Pi with real-time
   scheduling, isolated CPU affinity, and locked memory on PREEMPT_RT kernels to avoid
   jitter when AgIO or UI workloads spike. Document the required capabilities and
-  service configuration for CM5 images.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L330-L341】【F:docs/getting-started/cm5.md†L6-L33】
+  service configuration for CM5 images.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L330-L341】【F:docs/AgIO/cm5.md†L6-L33】
 - R-CM5-004 (SHOULD, MCU coexistence): Allow external MCUs to observe fast-path
   setpoints, subscribe via standard transports, and assume specific actuator groups
   without schema changes, relying on authority tokens for arbitration.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L308-L327】
@@ -33,7 +33,7 @@ manages controller authority so legacy hardware can join without bespoke firmwar
   outputs until NAV resumes publishing valid setpoints.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L338-L347】
 - R-CM5-006 (SHOULD, deployment): Ship reference configuration (`pumpkin.yaml`) and
   systemd units so CM5 images start the fast-path HAL automatically, verify shared
-  memory compatibility, and expose health logs for validation.【F:docs/plugins/pumpkin-pi.md†L57-L63】【F:docs/getting-started/cm5.md†L10-L33】
+  memory compatibility, and expose health logs for validation.【F:docs/plugins/pumpkin-pi.md†L57-L63】【F:docs/AgIO/cm5.md†L10-L33】
 
 ## Context and scope
 CM5 integrated mode targets arm64 deployments where NAV, steer-ctrl, the AgIO Bridge,
@@ -52,12 +52,12 @@ negotiation, and observability needed to keep mixed deployments interoperable.
   fast-path frames via AgIO adapters.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L300-L323】【F:docs/plugins/pumpkin-pi.md†L23-L44】
 - **Authority:** Retained MQTT tokens coordinate which node currently drives each
   actuator group. Default ownership remains with CM5 unless reassigned; Pumpkin Pi
-  must acknowledge or relinquish control promptly.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L324-L337】【F:docs/getting-started/cm5.md†L34-L38】
+  must acknowledge or relinquish control promptly.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L324-L337】【F:docs/AgIO/cm5.md†L34-L38】
 
 ## Operational guidance
 - Enable PREEMPT_RT kernels, grant `cap_sys_nice`, and pin steer-ctrl to dedicated
   cores to honour latency budgets. Maintain documentation for CM5 images describing
-  kernel, scheduler, and capability expectations.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L330-L341】【F:docs/getting-started/cm5.md†L6-L33】
+  kernel, scheduler, and capability expectations.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L330-L341】【F:docs/AgIO/cm5.md†L6-L33】
 - Keep `/dev/shm/aoglink_steer` versions matched between NAV and steer-ctrl builds;
   service start-up must fail fast when ABI versions diverge and log actionable
   remediation steps.【F:docs/plugins/pumpkin-pi.md†L57-L63】
@@ -75,9 +75,9 @@ negotiation, and observability needed to keep mixed deployments interoperable.
   controllers ignoring stale setpoints beyond negotiated TTLs.【F:docs/SRS/sections/03A_AOG_Link_v1.md†L334-L347】
 - Pumpkin Pi service starts automatically on CM5 images, validates shared memory
   compatibility, and exposes health logs through systemd and MQTT topics for
-  operators.【F:docs/plugins/pumpkin-pi.md†L57-L63】【F:docs/getting-started/cm5.md†L10-L33】
+  operators.【F:docs/plugins/pumpkin-pi.md†L57-L63】【F:docs/AgIO/cm5.md†L10-L33】
 
 ## Related ADRs and sections
 - [Section 03A — AOG Link v1](03A_AOG_Link_v1.md)
 - [Pumpkin Pi Plugin](../../plugins/pumpkin-pi.md)
-- [CM5 Integrated Controller setup](../../getting-started/cm5.md)
+- [CM5 Integrated Controller setup](../../AgIO/cm5.md)

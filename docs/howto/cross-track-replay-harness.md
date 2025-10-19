@@ -28,7 +28,7 @@ offset and then replays the samples through the `TelemetryReplayController`.
 
 Run the targeted unit test to regenerate the replay parquet fixtures and
 execute the slice. Running it after the [Avalonia run-mode smoke
-checklist](avalonia-run-modes.md) keeps interactive validation and headless
+checklist](../ui/avalonia-run-modes.md) keeps interactive validation and headless
 replay aligned:
 
 ```bash

@@ -1,5 +1,11 @@
 # Nexus Documentation Index
 
+## Platform Areas
+
+- [AgIO subsystem overview](AgIO/README.md) — bridge services, transport adapters, and CM5 deployment entry points.
+- [Core runtime overview](Core/README.md) — orchestration services, data flow, and operational guardrails.
+- [UI platform overview](ui/README.md) — Avalonia shells, modernization roadmap, and styling governance.
+
 ## Architecture Decisions
 
 - [ADR Roadmap](ADR/ADR-roadmap.md) — status, dependencies, and icebox items for the 2025 program.
@@ -66,7 +72,7 @@
   processing, and audit expectations per ADR-022.
 - [Official plugin bundle capability matrix](reference/official-bundle-capability-matrix.md) —
   lease posture and capability coverage for ADR-031 governance.
-- [Metadata-driven UI style guide](reference/metadata-driven-ui-style-guide.md) — layout and
+- [Metadata-driven UI style guide](ui/metadata-driven-ui-style-guide.md) — layout and
   theming guidance for ADR-034 dashboards, inspectors, and legends.
 - [Report template catalog](reference/report-template-catalog.md) —
   versioned manifests, section contributors, and export governance for ADR-051.
@@ -80,20 +86,20 @@
 ## Operational Playbooks & How-To Guides
 
 - [Runtime baseline enforcement](support/dotnet-runtime-baseline.md) — .NET 8 guardrails and review checklist.
-- [Avalonia run modes](howto/avalonia-run-modes.md) — CompanionRemote, LocalInProc, and LocalOutOfProc configuration.
+- [Avalonia run modes](ui/avalonia-run-modes.md) — CompanionRemote, LocalInProc, and LocalOutOfProc configuration.
 - [Companion metadata parity](howto/companion-metadata-parity.md) — snapshot contract powering ADR-034 remote clients.
 - [Guidance lane publishing contracts](howto/guidance-lane-contracts.md) — ADR-033 lane geometry and preview payloads.
-- [AOG-Link transport rollout](howto/aog-link-transport-rollout.md) — Ethernet, RS-485, and CAN staging guidance.
-- [AOG-Link bridge architecture](howto/aog-link-bridge-architecture-guide.md) — visual layer breakdown and operator-facing explainer.
+- [AOG-Link transport rollout](AgIO/aog-link-transport-rollout.md) — Ethernet, RS-485, and CAN staging guidance.
+- [AOG-Link bridge architecture](AgIO/aog-link-bridge-architecture-guide.md) — visual layer breakdown and operator-facing explainer.
 - [Stanley controller parity harness](howto/stanley-controller-parity.md) — deterministic regression checks for the ported controller.
 - [Firmware-in-loop stability validation](howto/firmware-in-loop-stability.md) — dynamic look-ahead and constraint regression slice.
-- [Performance budget telemetry dashboards](howto/performance-budget-telemetry-dashboards.md) — ADR-026 dashboard provisioning and guardrails.
+- [Performance budget telemetry dashboards](Core/performance-budget-telemetry-dashboards.md) — ADR-026 dashboard provisioning and guardrails.
 - [RadioBridge provisioning kit](howto/radio/radiobridge-provisioning.md) — provisioning workflow for ELRS/LoRa bridges (NX-244).
 - [Season/session migration playbook](howto/season-session-migration-playbook.md) — ADR-040/041 rollout playbook.
 - [Mesh provisioning runbook](howto/mesh-provisioning-runbook.md) — ADR-047/048 connectivity rollout.
 - [Mesh retention & privacy operations guide](howto/mesh-retention-privacy-operations-guide.md) — ADR-047 retention planner playbook.
 - [Global guardrail regression checks](howto/global-guardrails.md) — retention, performance, and crash acceptance automation.
-- [Linux Core operations & observability](howto/linux-core-operations-playbook.md) — NX-462/463 systemd packaging, health signals, and replay validation.
+- [Linux Core operations & observability](Core/linux-core-operations-playbook.md) — NX-462/463 systemd packaging, health signals, and replay validation.
 - [Composite simulation fabric GA](scenarios/composite-simulation-fabric.md) — SimClock/SimBus validation steps.
 - [gRPC contract governance](qa/grpc-contract-governance.md) — protobuf review and release gating.
 - [Plugin lease & manifest governance](plugins/plugin-lease-manifest-governance.md) — ADR-018 compliance checklist.

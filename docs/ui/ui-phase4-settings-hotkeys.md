@@ -3,7 +3,7 @@
 ## Objectives
 - Consolidate legacy settings dialogs into Avalonia experiences that align with [`artifacts/ui-theme-tokens.json`](../../artifacts/ui-theme-tokens.json) and [`artifacts/ui-backlog.json`](../../artifacts/ui-backlog.json).
 - Reuse metadata-driven configuration infrastructure for persistence, import/export, and validation parity with V6/Dev shells.
-- Ensure accessibility (contrast, focus order, keyboard navigation) matches guidance in [`docs/reference/metadata-driven-ui-style-guide.md`](../reference/metadata-driven-ui-style-guide.md).
+- Ensure accessibility (contrast, focus order, keyboard navigation) matches guidance in [metadata-driven UI style guide](metadata-driven-ui-style-guide.md).
 
 ## Settings Hub Composition
 

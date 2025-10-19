@@ -6,7 +6,7 @@
         xmlns:model="clr-namespace:Aog.UI.Avalonia.Models"
         mc:Ignorable="d"
         x:Class="Aog.UI.Avalonia.Views.System.SystemSummaryDialog"
-        x:DataType="vm:MainWindowViewModel"
+        x:DataType="vm:ISystemSummaryViewModel"
         Title="System Summary"
         Width="520"
         Height="600">

@@ -1,18 +1,38 @@
 using Avalonia.Controls;
+using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Aog.UI.Avalonia.Views.FieldOperations;
 
 public partial class MapToolsDialog : Window
 {
+    // Default ctor: resolve/synthesize VM and delegate.
     public MapToolsDialog()
+        : this(CreateDefaultViewModel())
     {
-        InitializeComponent();
     }
 
+    // Main ctor: initialize and bind VM.
     public MapToolsDialog(MapToolsDialogViewModel viewModel)
-        : this()
     {
+        InitializeComponent();
         DataContext = viewModel;
+    }
+
+    private static MapToolsDialogViewModel CreateDefaultViewModel()
+    {
+        if (AvaloniaServiceProviderAccessor.TryGetServiceProvider(out var services))
+        {
+            var host = services.GetService<IFieldOperationsDialogHost>() ??
+                       services.GetService<MainWindowViewModel>();
+            if (host is IFieldOperationsDialogHost coordinator)
+            {
+                return new MapToolsDialogViewModel(coordinator, () => { });
+            }
+        }
+
+        // Design-time / fallback
+        return MapToolsDialogViewModel.CreateDesignSample();
     }
 }

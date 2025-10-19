@@ -52,6 +52,8 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IReplayController, NullReplayController>();
         services.TryAddSingleton<MainWindow>();
         services.TryAddSingleton<MainWindowViewModel>();
+        services.TryAddSingleton<IFieldOperationsDialogHost>(sp => sp.GetRequiredService<MainWindowViewModel>());
+        services.TryAddSingleton<ISystemSummaryViewModel>(sp => sp.GetRequiredService<MainWindowViewModel>());
         services.TryAddSingleton<AppShellViewModel>();
         services.TryAddSingleton<PluginManagerViewModel>();
         services.AddTransient<PluginManagerWindow>();

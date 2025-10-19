@@ -2,8 +2,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Aog.UI.Avalonia.Views.Main
@@ -19,16 +21,21 @@ namespace Aog.UI.Avalonia.Views.Main
         private IDisposable? _clientSizeSubscription;
         private IDisposable? _windowStateSubscription;
 
+        // DI-friendly default ctor
         public MainWindow()
+            : this(
+                AvaloniaServiceProviderAccessor.GetRequiredService<MainWindowViewModel>(),
+                AvaloniaServiceProviderAccessor.GetRequiredService<IUiPreferencesService>())
         {
-            InitializeComponent();
         }
 
+        // Primary ctor: initialize and wire everything up
         public MainWindow(MainWindowViewModel viewModel, IUiPreferencesService preferencesService)
-            : this()
         {
             ArgumentNullException.ThrowIfNull(viewModel);
             ArgumentNullException.ThrowIfNull(preferencesService);
+
+            InitializeComponent();
 
             _preferencesService = preferencesService;
 

@@ -46,6 +46,7 @@ public static class Program
 
         using var host = builder.Build();
         _serviceProvider = host.Services;
+        AvaloniaServiceProviderAccessor.Initialize(host.Services);
         host.StartAsync(CancellationToken.None).GetAwaiter().GetResult();
         var pluginBootstrapper = host.Services.GetRequiredService<Aog.UI.Avalonia.Plugins.PluginBootstrapper>();
 

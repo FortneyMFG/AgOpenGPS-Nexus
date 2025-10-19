@@ -35,7 +35,7 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// <summary>
 /// Provides presentation data for the bootstrap shell window.
 /// </summary>
-public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
+public class MainWindowViewModel : INotifyPropertyChanged, IDisposable, IFieldOperationsDialogHost, ISystemSummaryViewModel
 {
     private const string SimulationResourceName = "Aog.UI.Avalonia.Resources.SimulationSample.json";
 
@@ -457,6 +457,12 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     {
         Shell.StatusText = "Headland planner integration is in progress.";
     }
+
+    void IFieldOperationsDialogHost.OpenBoundaryEditor() => OpenBoundaryEditor();
+
+    void IFieldOperationsDialogHost.OpenFlagManager() => OpenFlagManager();
+
+    void IFieldOperationsDialogHost.ShowHeadlandPlannerNotice() => ShowHeadlandPlannerNotice();
 
     private static Window? TryGetMainWindow()
     {

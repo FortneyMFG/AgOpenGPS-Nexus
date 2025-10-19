@@ -3,14 +3,20 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Aog.UI.Avalonia.Views.Main;
 
 namespace Aog.UI.Avalonia.App;
 
 public partial class NexusApp : Application
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider? _serviceProvider;
     private readonly ILogger<NexusApp> _logger;
+
+    public NexusApp()
+    {
+        _logger = NullLogger<NexusApp>.Instance;
+    }
 
     public NexusApp(IServiceProvider serviceProvider, ILogger<NexusApp> logger)
     {
@@ -28,8 +34,15 @@ public partial class NexusApp : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-            desktop.MainWindow = mainWindow;
+            if (_serviceProvider is not null)
+            {
+                var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+                desktop.MainWindow = mainWindow;
+            }
+            else
+            {
+                _logger.LogWarning("Service provider not available; skipping main window creation.");
+            }
         }
 
         base.OnFrameworkInitializationCompleted();

@@ -5,9 +5,14 @@ namespace Aog.UI.Avalonia.Views.FieldOperations
 {
     public partial class ShiftPositionDialog : Window
     {
-        public ShiftPositionDialog(ShiftPositionDialogViewModel viewModel)
+        public ShiftPositionDialog()
         {
             InitializeComponent();
+        }
+
+        public ShiftPositionDialog(ShiftPositionDialogViewModel viewModel)
+            : this()
+        {
             DataContext = viewModel;
         }
     }

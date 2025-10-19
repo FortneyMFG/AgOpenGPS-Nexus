@@ -5,9 +5,14 @@ namespace Aog.UI.Avalonia.Views.FieldOperations;
 
 public partial class MapToolsDialog : Window
 {
-    public MapToolsDialog(MapToolsDialogViewModel viewModel)
+    public MapToolsDialog()
     {
         InitializeComponent();
+    }
+
+    public MapToolsDialog(MapToolsDialogViewModel viewModel)
+        : this()
+    {
         DataContext = viewModel;
     }
 }

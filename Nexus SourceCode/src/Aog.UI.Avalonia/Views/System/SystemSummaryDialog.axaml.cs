@@ -5,9 +5,14 @@ namespace Aog.UI.Avalonia.Views.System;
 
 public partial class SystemSummaryDialog : Window
 {
-    public SystemSummaryDialog(MainWindowViewModel viewModel)
+    public SystemSummaryDialog()
     {
         InitializeComponent();
+    }
+
+    public SystemSummaryDialog(MainWindowViewModel viewModel)
+        : this()
+    {
         DataContext = viewModel;
     }
 }

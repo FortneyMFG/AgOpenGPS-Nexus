@@ -5,9 +5,14 @@ namespace Aog.UI.Avalonia.Views.FieldOperations
 {
     public partial class FlagManagerDialog : Window
     {
-        public FlagManagerDialog(FlagManagerDialogViewModel viewModel)
+        public FlagManagerDialog()
         {
             InitializeComponent();
+        }
+
+        public FlagManagerDialog(FlagManagerDialogViewModel viewModel)
+            : this()
+        {
             DataContext = viewModel;
         }
     }

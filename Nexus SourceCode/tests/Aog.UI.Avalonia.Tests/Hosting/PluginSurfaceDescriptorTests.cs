@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Hosting;
+using Aog.UI.Avalonia.Plugins;
+using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.ViewModels;
 using Aog.UI.Avalonia.ViewModels.Shell;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Aog.UI.Avalonia.Tests.Hosting;
@@ -30,7 +34,7 @@ public sealed class PluginSurfaceDescriptorTests
     {
         AssertSurfaceMatches(ShellPluginSurfaces.FileMenu);
         using var dispatcher = new NoOpShellCommandDispatcher();
-        var menuBar = new ShellMenuBarViewModel(dispatcher);
+        var menuBar = CreateShellMenuBar(dispatcher);
         Assert.Equal(ShellPluginSurfaces.FileMenu, menuBar.FileMenu.Descriptor);
     }
 
@@ -39,7 +43,7 @@ public sealed class PluginSurfaceDescriptorTests
     {
         AssertSurfaceMatches(ShellPluginSurfaces.FieldMenu);
         using var dispatcher = new NoOpShellCommandDispatcher();
-        var menuBar = new ShellMenuBarViewModel(dispatcher);
+        var menuBar = CreateShellMenuBar(dispatcher);
         Assert.Equal(ShellPluginSurfaces.FieldMenu, menuBar.FieldMenu.Descriptor);
     }
 
@@ -48,7 +52,7 @@ public sealed class PluginSurfaceDescriptorTests
     {
         AssertSurfaceMatches(ShellPluginSurfaces.ToolsMenu);
         using var dispatcher = new NoOpShellCommandDispatcher();
-        var menuBar = new ShellMenuBarViewModel(dispatcher);
+        var menuBar = CreateShellMenuBar(dispatcher);
         Assert.Equal(ShellPluginSurfaces.ToolsMenu, menuBar.ToolsMenu.Descriptor);
     }
 
@@ -56,7 +60,9 @@ public sealed class PluginSurfaceDescriptorTests
     public void AppShellDescriptorMatchesManifest()
     {
         AssertSurfaceMatches(ShellPluginSurfaces.AppShell);
-        var viewModel = new AppShellViewModel();
+        using var dispatcher = new NoOpShellCommandDispatcher();
+        var layout = CreateBlockLayout(dispatcher);
+        var viewModel = new AppShellViewModel(layout);
         Assert.Equal(ShellPluginSurfaces.AppShell, viewModel.SurfaceDescriptor);
     }
 
@@ -71,6 +77,21 @@ public sealed class PluginSurfaceDescriptorTests
     {
         var dispatcher = new NoOpShellCommandDispatcher();
         return new TopToolbarViewModel(dispatcher);
+    }
+
+    private static ShellMenuBarViewModel CreateShellMenuBar(IShellCommandDispatcher dispatcher)
+    {
+        var registry = new PluginRegistry();
+        var host = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
+        return new ShellMenuBarViewModel(dispatcher, registry, host);
+    }
+
+    private static BlockLayoutViewModel CreateBlockLayout(IShellCommandDispatcher dispatcher)
+    {
+        var preferences = new StubUiPreferencesService();
+        var catalog = new BlockCatalog(Array.Empty<IBlockProvider>());
+        var store = new StubBlockLayoutStore();
+        return new BlockLayoutViewModel(store, catalog, dispatcher, preferences);
     }
 
     private static IReadOnlyDictionary<string, (string Contract, string InjectionPoint)> LoadSurfaceMetadata()
@@ -154,5 +175,51 @@ public sealed class PluginSurfaceDescriptorTests
         public void Dispose()
         {
         }
+    }
+
+    private sealed class StubBlockLayoutStore : IBlockLayoutStore
+    {
+        public IReadOnlyList<BlockInstance> Load() => Array.Empty<BlockInstance>();
+
+        public void Save(IEnumerable<BlockInstance> instances)
+        {
+        }
+    }
+
+    private sealed class StubUiPreferencesService : IUiPreferencesService
+    {
+        private UiPreferences _preferences = new();
+
+        public UiPreferences GetPreferences() => _preferences;
+
+        public void UpdateTheme(UiTheme theme)
+        {
+            _preferences.Theme = theme;
+        }
+
+        public void UpdateWindowPlacement(WindowPlacement placement)
+        {
+            _preferences.Window = placement ?? new WindowPlacement();
+        }
+
+        public void UpdateTelemetryOptIn(bool isOptedIn)
+        {
+            _preferences.TelemetryOptIn = isOptedIn;
+        }
+
+        public void UpdateRunMode(AvaloniaRunMode mode)
+        {
+            _preferences.RunMode = mode;
+        }
+
+        public void UpdateShellLayout(ShellLayoutPreferences layout)
+        {
+            _preferences.ShellLayout = layout ?? new ShellLayoutPreferences();
+        }
+    }
+
+    private sealed class NullServiceProvider : IServiceProvider
+    {
+        public object? GetService(Type serviceType) => null;
     }
 }

@@ -16,8 +16,10 @@ using Aog.UI.Avalonia.Telemetry;
 using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels;
 using Aog.UI.Avalonia.ViewModels.Shell;
+using Aog.UI.Avalonia.Plugins;
 using Avalonia.Media;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Aog.UI.Avalonia.Tests;
@@ -350,7 +352,10 @@ public sealed class MainWindowViewModelTests
         var telemetryService = new TestCrashTelemetryService();
         var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
         dispatcher = new RecordingShellCommandDispatcher();
-        var shell = new AppShellViewModel();
+        var layout = new BlockLayoutViewModel(layoutStore, catalog, dispatcher, preferencesService);
+        var shell = new AppShellViewModel(layout);
+        var pluginRegistry = new PluginRegistry();
+        var pluginHost = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
 
         // Deterministic time for tests that assert relative timestamps.
         var timeProvider = new FixedTimeProvider(SeedTimestamp);
@@ -361,11 +366,12 @@ public sealed class MainWindowViewModelTests
             preferencesService,
             themeManager,
             dispatcher,
-            layoutStore,
-            catalog,
+            pluginRegistry,
+            pluginHost,
             shell,
             telemetryViewModel,
-            timeProvider);
+            timeProvider,
+            NullLogger<MainWindowViewModel>.Instance);
     }
 
     // Deterministic TimeProvider for stable tests.
@@ -523,5 +529,10 @@ public sealed class MainWindowViewModelTests
         }
 
         public IReadOnlyList<CrashReportSummary> UploadPendingReports() => Array.Empty<CrashReportSummary>();
+    }
+
+    private sealed class NullServiceProvider : IServiceProvider
+    {
+        public object? GetService(Type serviceType) => null;
     }
 }

@@ -20,7 +20,6 @@
       <rendering:LockStateToTextConverter x:Key="LockTooltipConverter" />
       <rendering:BlockTileSizeConverter x:Key="BlockTileSizeConverter" />
       <rendering:SidebarDimensionConverter x:Key="SidebarDimensionConverter" />
-      <rendering:BlockTileMarginConverter x:Key="BlockTileMarginConverter" />
       <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
 
       <DataTemplate x:Key="ShellMenuItemTemplate"
@@ -95,13 +94,6 @@
                        RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
             </MultiBinding>
           </Button.MaxHeight>
-          <Button.Margin>
-            <MultiBinding Converter="{StaticResource BlockTileMarginConverter}">
-              <Binding />
-              <Binding Path="Tag"
-                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
-            </MultiBinding>
-          </Button.Margin>
           <Button.ContextMenu>
             <ContextMenu>
               <MenuItem Header="Move up" Command="{Binding MoveUpCommand}" />
@@ -177,13 +169,6 @@
                        RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
             </MultiBinding>
           </Button.MaxHeight>
-          <Button.Margin>
-            <MultiBinding Converter="{StaticResource BlockTileMarginConverter}">
-              <Binding />
-              <Binding Path="Tag"
-                       RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
-            </MultiBinding>
-          </Button.Margin>
           <Button.ContextMenu>
             <ContextMenu>
               <MenuItem Header="Move left" Command="{Binding MoveToLeftCommand}" />
@@ -419,7 +404,8 @@
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel Orientation="Horizontal"
-                           HorizontalAlignment="Center" />
+                           HorizontalAlignment="Center"
+                           Spacing="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>
@@ -449,7 +435,8 @@
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <WrapPanel Orientation="Horizontal"
-                         HorizontalAlignment="Center" />
+                         HorizontalAlignment="Center"
+                         Spacing="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
         </ItemsControl>
@@ -496,7 +483,8 @@
                 <ItemsPanelTemplate>
                   <WrapPanel Orientation="Vertical"
                              HorizontalAlignment="Center"
-                             VerticalAlignment="Bottom" />
+                             VerticalAlignment="Bottom"
+                             Spacing="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
             </ItemsControl>
@@ -547,7 +535,8 @@
               <ItemsPanelTemplate>
                 <WrapPanel Orientation="Vertical"
                            HorizontalAlignment="Center"
-                           VerticalAlignment="Bottom" />
+                           VerticalAlignment="Bottom"
+                           Spacing="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>

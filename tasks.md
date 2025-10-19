@@ -244,6 +244,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-285 Telemetry logging plugin season/session updates _(Done)_ — ADR-040/041 lifecycle data
 - [x] NX-286 Telemetry logging mesh event capture _(Done)_ — ADR-047 live telemetry mesh
 - [x] NX-287 Telemetry export updates for new layers _(Done)_ — ADR-051 report builder + new layers
+- [x] NX-1320 Mapping plugin rendering stack duplication — Copy map engine components into plugin project and expose initial PoseStream wiring
 - [x] NX-288 Job Tasks plugin season/session orchestration _(Done)_ — ADR-030/040 lifecycle
 - [x] NX-289 Job Tasks plugin preset/task orchestration _(Done)_ — ADR-032 presets & layouts
 - [x] NX-290 Job Tasks plugin regression fixtures _(Done)_ — ADR-032 orchestration QA

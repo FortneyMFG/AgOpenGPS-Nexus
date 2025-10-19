@@ -37,7 +37,7 @@ public sealed class SidebarDimensionConverter : IValueConverter
             return double.NaN;
         }
 
-        var span = Math.Max(1d, blocks);
+        var span = blocks;
         var spacingSegments = Math.Max(0d, span - 1d);
         return (blockSize * span) + (spacingSegments * spacing);
     }

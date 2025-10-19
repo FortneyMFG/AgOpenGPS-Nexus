@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <Deterministic>true</Deterministic>
+    <AvaloniaVersion>11.3.7</AvaloniaVersion>
     <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' and '$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     <ContractsArtifactsDir>$(MSBuildThisFileDirectory)../artifacts/nuget</ContractsArtifactsDir>
     <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ContractsArtifactsDir)</RestoreAdditionalProjectSources>

@@ -5,12 +5,13 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.7" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.7" />
-    <PackageReference Include="Avalonia.OpenGL" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Native" Version="11.3.7" />
     <PackageReference Include="OpenTK" Version="4.8.2" />
   </ItemGroup>
 

@@ -5,7 +5,6 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <UseWPF>false</UseWPF>
     <UseWindowsForms>false</UseWindowsForms>
-    <AvaloniaVersion>11.3.7</AvaloniaVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -25,17 +24,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" Condition="'$(Configuration)' == 'Debug'" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.7" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Native" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Skia" Version="11.3.7" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="SkiaSharp" Version="2.88.9" />
-    <PackageReference Include="OpenTK" Version="4.8.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
   </ItemGroup>

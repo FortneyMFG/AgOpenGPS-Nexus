@@ -41,7 +41,7 @@ public sealed class MappingPlugin : IMappingPlugin
         vehicleLayer.UpdatePoseProvider(() => Volatile.Read(ref latestPose));
 
         var posePump = StartPosePump(hostServices, pose => Volatile.Write(ref latestPose, pose), cts.Token);
-        disposables.Add(hostServices.FieldContext.Subscribe(_ => { }));
+        disposables.Add(hostServices.FieldContext.Subscribe(new FieldContextObserver()));
 
         EventHandler<VisualTreeAttachmentEventArgs>? onAttached = null;
         EventHandler<VisualTreeAttachmentEventArgs>? onDetached = null;

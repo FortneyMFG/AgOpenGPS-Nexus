@@ -66,7 +66,7 @@ public class BlockLayoutStoreTests
 
         public void UpdateTelemetryOptIn(bool isOptedIn) => throw new System.NotImplementedException();
 
-        public void UpdateRunMode(Hosting.AvaloniaRunMode mode) => throw new System.NotImplementedException();
+        public void UpdateRunMode(Aog.UI.Avalonia.Hosting.AvaloniaRunMode mode) => throw new System.NotImplementedException();
 
         public void UpdateShellLayout(ShellLayoutPreferences layout)
         {

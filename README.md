@@ -17,7 +17,7 @@ Nexus is an experiment in how far a community guided by AI co-pilots can take Ag
 - **Composable everything.**  
   Every service is a replaceable block that communicates through efficient gRPC contracts, letting operators enable, disable, or swap plugins without rewriting the core.
 
-## Modular Architecture (Slightly Simplified)
+## Modular Software Architecture (Slightly Simplified)
 
 ```mermaid
 flowchart TD
@@ -71,7 +71,7 @@ Core coordinates the data model, kinematics, job/session orchestration, and rout
 
 ## AOG-Link Evolution
 
-The Nexus roadmap upgrades the legacy UDP PGN interface to **AOG-Link V1**, a nanopb-based contract with optional MQTT/MQTT-SN transport. The bridge maintains full compatibility with **AOG-Link V0**, allowing existing rigs and logging workflows to continue operating unchanged while unlocking richer diagnostics, higher throughput, and device identity.
+The Nexus roadmap upgrades the legacy UDP PGN (Coined AOG-Link V0) interface to **AOG-Link V1**, a nanopb-based contract with optional MQTT/MQTT-SN transport. The bridge maintains full compatibility with **AOG-Link V0**, allowing existing rigs and logging workflows to continue operating unchanged while unlocking richer diagnostics, higher throughput, and device identity.
 
 ## Plugin & Component Highlights
 

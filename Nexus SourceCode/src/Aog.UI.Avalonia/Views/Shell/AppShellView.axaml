@@ -400,7 +400,7 @@
                         ItemsSource="{Binding Layout.TopBlocks}"
                         ItemTemplate="{StaticResource HorizontalBlockTemplate}"
                         Tag="{Binding Layout.TopSidebarSettings}"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Stretch"
                         DragDrop.AllowDrop="True">
             <ItemsControl.Styles>
               <Style Selector="#TopBlocksControl > ContentPresenter">
@@ -411,7 +411,7 @@
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel Orientation="Horizontal"
-                           HorizontalAlignment="Center" />
+                           HorizontalAlignment="Left" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>
@@ -435,7 +435,7 @@
                       ItemsSource="{Binding Layout.BottomBlocks}"
                       ItemTemplate="{StaticResource HorizontalBlockTemplate}"
                       Tag="{Binding Layout.BottomSidebarSettings}"
-                      HorizontalAlignment="Center"
+                      HorizontalAlignment="Stretch"
                       VerticalAlignment="Center"
                       DragDrop.AllowDrop="True">
           <ItemsControl.Styles>
@@ -447,7 +447,7 @@
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <WrapPanel Orientation="Horizontal"
-                         HorizontalAlignment="Center" />
+                         HorizontalAlignment="Left" />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
         </ItemsControl>
@@ -487,7 +487,7 @@
                           ItemsSource="{Binding Layout.LeftBlocks}"
                           ItemTemplate="{StaticResource VerticalBlockTemplate}"
                           Tag="{Binding Layout.LeftSidebarSettings}"
-                          HorizontalAlignment="Center"
+                          HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           DragDrop.AllowDrop="True">
               <ItemsControl.Styles>
@@ -499,8 +499,8 @@
               <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                   <WrapPanel Orientation="Vertical"
-                             HorizontalAlignment="Center"
-                             VerticalAlignment="Bottom" />
+                             HorizontalAlignment="Left"
+                             VerticalAlignment="Top" />
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
             </ItemsControl>
@@ -518,6 +518,12 @@
         <Grid>
           <Border Background="{DynamicResource ThemeSurfaceAltBrush}"
                   CornerRadius="{DynamicResource ThemeRadiusMd}" />
+          <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.WorkspaceGridSettings}"
+                                       IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
+                                       IsHitTestVisible="False"
+                                       Margin="16"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch" />
           <ContentControl Margin="16"
                           Content="{Binding MainContent}" />
         </Grid>
@@ -544,7 +550,7 @@
                         ItemsSource="{Binding Layout.RightBlocks}"
                         ItemTemplate="{StaticResource VerticalBlockTemplate}"
                         Tag="{Binding Layout.RightSidebarSettings}"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         DragDrop.AllowDrop="True">
             <ItemsControl.Styles>
@@ -556,8 +562,8 @@
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel Orientation="Vertical"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Bottom" />
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>

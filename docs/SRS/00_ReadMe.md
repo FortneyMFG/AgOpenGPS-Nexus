@@ -74,7 +74,8 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 
 #### 8X — Guidance
 - [81 — Guidance Orchestrator](sections/8X_Guidance/81_Guidance_Orchestrator.md)
-- [82 — Planning & Autosteer Targets](sections/8X_Guidance/82_Planning_Autosteer_Targets.md)
+- [82 — Planning](sections/8X_Guidance/82_Planning.md)
+- [83 — Autosteer Target Models](sections/8X_Guidance/83_Autosteer_Target_Models.md)
 
 #### 9X — Frontends & Ops
 - [91 — UI Shell & Layout](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
@@ -129,7 +130,8 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 
 #### 8X — Guidance
 - [81 — Guidance Orchestrator](sections/8X/81_Guidance_Orchestrator.md)
-- [82 — Planning & Autosteer Targets](sections/8X/82_Planning_Autosteer_Targets.md)
+- [82 — Planning](sections/8X/82_Planning.md)
+- [83 — Autosteer Target Models](sections/8X/83_Autosteer_Target_Models.md)
 
 #### 9X — Frontends & Ops
 - [91 — UI Shell & Layout](sections/9X/91_UI_Shell_Layout.md)

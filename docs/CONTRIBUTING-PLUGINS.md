@@ -15,7 +15,11 @@
 ## Permissions & Safety
 
 - Declare capability requirements (pose.read, section.command, storage.write, etc.) in the manifest. Plugins attempting unauthorized actions are rejected by Core’s capability gate per ADR-018.
+<<<<<<< HEAD
+- Remote dashboards default to monitor-only; plugins must not escalate permissions without an operator-approved lease, aligning with SRS §09 safety posture.【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L33-L60】
+=======
 - Remote dashboards default to monitor-only; plugins must not escalate permissions without an operator-approved lease, aligning with SRS §09 safety posture.【F:docs/SRS/sections/6X/61_Kinematics_Pose_Fusion.md†L33-L60】
+>>>>>>> origin/develop
 - Multi-machine data sharing must respect share/subscribe profiles. Sensitive topics (layer edits, profitability) remain opt-in.【F:docs/plugins/MultiMachine.md†L1-L80】
 
 ## Submission Checklist

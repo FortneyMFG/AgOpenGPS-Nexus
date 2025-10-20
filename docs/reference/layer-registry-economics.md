@@ -27,4 +27,8 @@ traceability.
 
 ## References
 - [ADR-050 — Cost & Profit Plugin](../ADR/ADR-050_CostProfitPlugin.md)
+<<<<<<< HEAD
+- [Layer registry overview](../SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md)
+=======
 - [Layer registry overview](../SRS/sections/7X/71_Mapping_Kernel_Contracts.md)
+>>>>>>> origin/develop

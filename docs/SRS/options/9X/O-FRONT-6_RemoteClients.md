@@ -38,8 +38,13 @@ M (requires API scaffolding, UI rewrites, and sync features).
 
 ## References
 - Community discussions on headless deployments, kiosk mode, and remote displays (GitHub Discussions Feb 2024).
+<<<<<<< HEAD
+- [Section 91 — UI Shell & Layout](../sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [Section 41 — Inter-Application API](../sections/4X_Interprocess_Communications/41_Inter_Application_API.md)
+=======
 - [Section 91 — UI Shell & Layout](../sections/9X/91_UI_Shell_Layout.md)
 - [Section 41 — Inter-Application API](../sections/4X/41_Inter_Application_API.md)
+>>>>>>> origin/develop
 
 ## Related ADRs
 - [ADR-003 — Avalonia UI](../../ADR/ADR-003-avalonia-ui.md)

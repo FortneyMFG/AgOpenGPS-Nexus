@@ -36,8 +36,15 @@ Nexus requires a single authoritative timeline that carries tractor, implement, 
 - Forced clock skew of ±25 ms must not break monotonic SectionState sequencing when exercised in integration fault-injection tests.
 
 ## References
+<<<<<<< HEAD
+- [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+- [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
+- [Control & automation requirements](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+- [Extensibility & plugin requirements](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
+=======
 - [Communications & transports requirements](../SRS/sections/4X/42_Transports.md)
 - [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
 - [Control & automation requirements](../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
 - [Extensibility & plugin requirements](../SRS/sections/9X/94_Extensibility_Packaging_Updates.md)
+>>>>>>> origin/develop
 - [ADR-028: Stack boundaries](ADR-028-stack-boundaries.md)

@@ -64,9 +64,15 @@ overlays deterministically.
 
 ## SRS Impact
 
+<<<<<<< HEAD
+- Fulfils the multi-field hierarchy and envelope schema expectations in §02 Data Model, which document Season → Job → Session relationships and field membership constraints.【F:docs/SRS/sections/3X_Data_Storage/31_Domain_Data_Model.md†L22-L140】
+- Extends the mount/unmount lifecycle defined in §03 Job Lifecycle with deterministic `mountFields` events and per-field stat rollups.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L59-L112】
+- Aligns with §04 Mapping, Layer Governance & Multi-Field Envelopes by enforcing union envelope generation, R-tree maintenance, and per-field analytics exports for mounted fields.【F:docs/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L1-L44】
+=======
 - Fulfils the multi-field hierarchy and envelope schema expectations in §02 Data Model, which document Season → Job → Session relationships and field membership constraints.【F:docs/SRS/sections/3X/31_Domain_Data_Model.md†L22-L140】
 - Extends the mount/unmount lifecycle defined in §03 Job Lifecycle with deterministic `mountFields` events and per-field stat rollups.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L59-L112】
 - Aligns with §04 Mapping, Layer Governance & Multi-Field Envelopes by enforcing union envelope generation, R-tree maintenance, and per-field analytics exports for mounted fields.【F:docs/SRS/sections/7X/72_Mapping_Layers_Plugin.md†L1-L44】
+>>>>>>> origin/develop
 
 ## Consequences
 
@@ -100,7 +106,13 @@ metadata, bounding box/centroid hints, and the CRS used for the envelope. Plugin
 
 ## References
 
+<<<<<<< HEAD
+- [Section 31 — Domain Data Model](../SRS/sections/3X_Data_Storage/31_Domain_Data_Model.md)
+- [Section 62 — Job Lifecycle](../SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md)
+- [Section 72 — Mapping Layers Plugin](../SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
+=======
 - [Section 31 — Domain Data Model](../SRS/sections/3X/31_Domain_Data_Model.md)
 - [Section 62 — Job Lifecycle](../SRS/sections/6X/62_Job_Lifecycle.md)
 - [Section 72 — Mapping Layers Plugin](../SRS/sections/7X/72_Mapping_Layers_Plugin.md)
+>>>>>>> origin/develop
 - [ADR-040 — Season Organizers](ADR-040_SeasonOrganizers.md)

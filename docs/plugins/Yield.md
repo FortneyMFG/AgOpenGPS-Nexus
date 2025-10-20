@@ -6,9 +6,15 @@ Yield plugins ingest combine telemetry, imports, and external datasets to produc
 
 ## Runtime Contracts
 
+<<<<<<< HEAD
+- Subscribe to session events to bind telemetry to the active job/session and capture environment metadata for reporting.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】
+- Register layer definitions `yield.actual`, `yield.moisture`, and `yield.testWeight` in the Layer Registry. Ensure units, smoothing metadata, and provenance conform to ADR-049.【F:docs/ADR/ADR-049_YieldPlugin.md†L21-L59】【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】
+- Support data ingest from machine telemetry, ISOXML TaskData, and CSV/GeoTIFF imports. Normalize to registry expectations (CRS, units) per the NX-113 flow before writing layers.【F:docs/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L84-L106】【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】
+=======
 - Subscribe to session events to bind telemetry to the active job/session and capture environment metadata for reporting.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L18-L74】
 - Register layer definitions `yield.actual`, `yield.moisture`, and `yield.testWeight` in the Layer Registry. Ensure units, smoothing metadata, and provenance conform to ADR-049.【F:docs/ADR/ADR-049_YieldPlugin.md†L21-L59】【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】
 - Support data ingest from machine telemetry, ISOXML TaskData, and CSV/GeoTIFF imports. Normalize to registry expectations (CRS, units) per the NX-113 flow before writing layers.【F:docs/SRS/sections/7X/72_Mapping_Layers_Plugin.md†L84-L106】【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】
+>>>>>>> origin/develop
 - Emit per-field and per-zone aggregates, linking results to crop type and genetics context to enable cross-filter analytics.【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】
 
 ## Layer Metadata Expectations

@@ -36,8 +36,13 @@ Defines a set of CAN/UDP PGNs and sequencing rules that stream variable-rate lay
 M — Requires firmware updates, AgIO decoding changes, schema negotiation logic, and documentation but reuses the established transport stack.
 
 ## References
+<<<<<<< HEAD
+- [Section 51 — Sensor & Actuator Abstractions](../sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
+- [Section 61 — Kinematics & Pose Fusion](../sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+=======
 - [Section 51 — Sensor & Actuator Abstractions](../sections/5X/51_Sensor_Actuator_Abstractions.md)
 - [Section 61 — Kinematics & Pose Fusion](../sections/6X/61_Kinematics_Pose_Fusion.md)
+>>>>>>> origin/develop
 - [AgIO PGN baseline](../references/AgIO_PGN_Baseline.md)
 
 ## Related ADRs

@@ -40,8 +40,13 @@ Builds a deterministic replay and benchmarking suite that validates aggregation 
 M — Significant investment in replay assets, CI scripting, and documentation but amortizes risk for future layer additions.
 
 ## References
+<<<<<<< HEAD
+- [Section 72 — Mapping Layers Plugin](../sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
+- [Section 96 — Quality Engineering & Release](../sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md)
+=======
 - [Section 72 — Mapping Layers Plugin](../sections/7X/72_Mapping_Layers_Plugin.md)
 - [Section 96 — Quality Engineering & Release](../sections/9X/96_Quality_Engineering_Release.md)
+>>>>>>> origin/develop
 
 ## Related ADRs
 - [ADR-004 — Composite Simulation](../../ADR/ADR-004-composite-simulation.md)

@@ -1,6 +1,10 @@
 # Data Flow Architecture
 
+<<<<<<< HEAD
+This document describes how data flows through the Nexus system, as specified in [SRS Communications Requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md) and implemented through [ADR-002: gRPC Contracts](../ADR/ADR-002-grpc-contracts.md).
+=======
 This document describes how data flows through the Nexus system, as specified in [SRS Communications Requirements](../SRS/sections/4X/42_Transports.md) and implemented through [ADR-002: gRPC Contracts](../ADR/ADR-002-grpc-contracts.md).
+>>>>>>> origin/develop
 
 ## Core Data Streams
 
@@ -97,7 +101,13 @@ As defined in [ADR-026: Performance Budgets](../ADR/ADR-026-performance-budgets.
 
 ## Related Documentation
 
+<<<<<<< HEAD
+- [Communications Requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+- [Data Model Requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
+- [Threading, Scheduling & Timing requirements](../SRS/sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md)
+=======
 - [Communications Requirements](../SRS/sections/4X/42_Transports.md)
 - [Data Model Requirements](../SRS/sections/3X/32_Persistence_Formats.md)
 - [Threading, Scheduling & Timing requirements](../SRS/sections/2X/23_Threading_Scheduling_Timing.md)
+>>>>>>> origin/develop
 - [Protocol Specifications](../reference/protocols/INDEX.md)

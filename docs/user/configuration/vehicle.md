@@ -187,7 +187,12 @@ As defined in [ADR-033: Guidance & AutoSteer](../../ADR/ADR-033-guidance-planner
 
 ## Related Documentation
 
+<<<<<<< HEAD
+- [Equipment Requirements](../../SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
+- [Control Requirements](../../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+=======
 - [Equipment Requirements](../../SRS/sections/5X/51_Sensor_Actuator_Abstractions.md)
 - [Control Requirements](../../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
+>>>>>>> origin/develop
 - [Calibration Guide](../maintenance/calibration.md)
 - [Operation Manual](../operation/INDEX.md)

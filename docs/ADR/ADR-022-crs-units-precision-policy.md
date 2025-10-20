@@ -35,8 +35,13 @@ Consistent coordinate reference systems (CRS), units, and numeric precision are 
 - Reprojection audit hooks must emit structured telemetry for every transform, validated via automated import/export scenarios.
 
 ## References
+<<<<<<< HEAD
+- [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
+- [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+=======
 - [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
 - [Communications & transports requirements](../SRS/sections/4X/42_Transports.md)
+>>>>>>> origin/develop
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
 - [ADR-014: Interop for prescription and agronomic formats](ADR-014-interop-prescription-formats.md)
 - [ADR-029: Mapping plugin architecture](ADR-029-mapping-plugin-architecture.md)

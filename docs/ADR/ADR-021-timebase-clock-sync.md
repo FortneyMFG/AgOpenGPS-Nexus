@@ -31,9 +31,15 @@ Deterministic PoseStream sequencing, automation timing, and telemetry diagnostic
 - Diagnostics UI must surface end-to-end latency histograms updating at least once per second covering 95% of nodes.
 
 ## References
+<<<<<<< HEAD
+- [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+- [Control & automation requirements](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+- [Extensibility & plugin requirements](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
+=======
 - [Communications & transports requirements](../SRS/sections/4X/42_Transports.md)
 - [Control & automation requirements](../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
 - [Extensibility & plugin requirements](../SRS/sections/9X/94_Extensibility_Packaging_Updates.md)
+>>>>>>> origin/develop
 - [ADR-007: PoseStream and SectionState architecture](ADR-007-posestream-sectionstate-architecture.md)
 - [ADR-016: Firmware and transport for variable-rate layer PGNs](ADR-016-firmware-transport-variable-rate-pgns.md)
 - [ADR-020: Determinism, replay, and CI guardrails](ADR-020-determinism-replay-ci.md)

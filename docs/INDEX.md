@@ -24,6 +24,15 @@
 
 ## System Requirements Specification
 
+<<<<<<< HEAD
+- [§02 Data Model — Farm → Field & Season → Job → Session](SRS/sections/3X_Data_Storage/31_Domain_Data_Model.md)
+- [§03 Job Lifecycle & Session Management](SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md)
+- [§03 Communications & Transports](SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+- [§04 Mapping & Layer Governance](SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
+- [§05 Frontends](SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [§09 Control & Automation](SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+- [§19 Guidance Orchestrator Plugin](SRS/sections/8X_Guidance/81_Guidance_Orchestrator.md)
+=======
 - [§02 Data Model — Farm → Field & Season → Job → Session](SRS/sections/3X/31_Domain_Data_Model.md)
 - [§03 Job Lifecycle & Session Management](SRS/sections/6X/62_Job_Lifecycle.md)
 - [§03 Communications & Transports](SRS/sections/4X/42_Transports.md)
@@ -31,6 +40,7 @@
 - [§05 Frontends](SRS/sections/9X/91_UI_Shell_Layout.md)
 - [§09 Control & Automation](SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
 - [§19 Guidance Orchestrator Plugin](SRS/sections/8X/81_Guidance_Orchestrator.md)
+>>>>>>> origin/develop
 
 ## Guidance Orchestrator Delivery
 

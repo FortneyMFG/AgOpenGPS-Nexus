@@ -55,6 +55,6 @@ Establish Jobs as a first-class concept spanning Core, UI, and plugins with the 
 - Mirrors V6 behaviors without a centralized Jobs service or metadata schema; Drive-In relies on direct geofence scans of legacy folders.
 
 ## References
-- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
+- [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
 - [Plugin lifecycle](../ADR/ADR-018-plugin-api.md)
 - [Mapping & coverage responsibilities](../ADR/ADR-029-mapping-plugin-architecture.md)

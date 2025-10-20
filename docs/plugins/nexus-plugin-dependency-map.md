@@ -14,7 +14,7 @@
 ### Equivalency & Provider Selection
 
 - **Conformance profiles.** Plugins that implement `provides.profiles` must ship CI attestations proving the declared profile/feature matrix before the bundle treats them as eligible replacements.【F:docs/SRS/appendices/plugin_manifest.schema.json†L309-L332】【F:docs/ADR/ADR-031-official-plugin-bundle.md†L25-L74】
-- **Deterministic resolver.** Core evaluates `requires.capabilities`, `requires.profiles`, and relationship hints (`peerOf`, `conflictsWith`, `replaces`, `extends`) before selecting providers, quarantining conflicts, and surfacing downgrade states when only soft matches exist.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L24-L32】【F:docs/ADR/ADR-031-official-plugin-bundle.md†L49-L83】
+- **Deterministic resolver.** Core evaluates `requires.capabilities`, `requires.profiles`, and relationship hints (`peerOf`, `conflictsWith`, `replaces`, `extends`) before selecting providers, quarantining conflicts, and surfacing downgrade states when only soft matches exist.【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md†L24-L32】【F:docs/ADR/ADR-031-official-plugin-bundle.md†L49-L83】
 - **Policy overlays.** Administrators can pin preferred providers or enable multi-provider mode using a TOML DSL that flows with the manifest bundle:
 
 ```toml
@@ -23,7 +23,7 @@ prefer = ["vendor.mapping", "org.agopengps.plugins.mapping"]
 allowMultiple = false
 ```
 
-  Core records the winning provider and decision inputs in the dependency resolution report so support teams can audit field rigs.【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L7-L27】
+  Core records the winning provider and decision inputs in the dependency resolution report so support teams can audit field rigs.【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog†L7-L27】
 
 ## Top-Level Stack Relationships
 ```mermaid
@@ -241,7 +241,7 @@ Legend: `H` = Hard, `S` = Soft, `G` = Suggest. Types abbreviated (`rt` runtime, 
 
 ### variable-mapping
 - **Provides:** Prescription blending (`Aog.VariableMap.v1`), layer sampling API, blend events.
-- **Profiles:** Consumes `aog.mapping.v1/core@^1.2` and `mapping:vector` capability with `offlinePyramid` feature so attested third-party mapping plugins satisfy the hard dependency edges without aliasing.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L24-L32】
+- **Profiles:** Consumes `aog.mapping.v1/core@^1.2` and `mapping:vector` capability with `offlinePyramid` feature so attested third-party mapping plugins satisfy the hard dependency edges without aliasing.【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md†L24-L32】
 - **Hard dependencies:** Core runtime, Mapping geospatial context, File IO for ingest.
 - **Soft dependencies:** Job Tasks for job binding, Telemetry Logging for dataset provenance.
 - **Transports:** gRPC `core://variable-mapping`.

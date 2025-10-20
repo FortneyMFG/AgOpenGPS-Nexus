@@ -8,7 +8,7 @@ The report builder centralizes how Nexus assembles cross-plugin exports by loadi
 templates, invoking registered section renderers, and producing PDF/CSV/GeoJSON
 bundles for a chosen farm, season, job, or session scope.【F:docs/ADR/ADR-051_ReportBuilder.md†L16-L33】
 Versioned `ReportTemplate` manifests capture the metadata that keeps those exports
-deterministic and auditable across releases.【F:docs/SRS/sections/08_Data_Model_Storage.md†L37-L38】
+deterministic and auditable across releases.【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L37-L38】
 
 ## Catalog inventory
 
@@ -110,7 +110,7 @@ operators understand the trade-off of exporting early.【F:Nexus SourceCode/src/
 2. **Version diligently.** Bump the manifest version when section ordering,
    required data, or outputs change. Major versions accompany breaking changes;
    minor versions cover additive sections or cosmetic updates; patch versions
-   capture copy fixes or metadata tweaks.【F:docs/SRS/sections/08_Data_Model_Storage.md†L37-L38】
+   capture copy fixes or metadata tweaks.【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L37-L38】
 3. **Diff review.** Store manifests under source control so CI can diff template
    changes and ensure reviewers validate scope/output deltas. Pair template
    updates with automated tests that exercise `ReportBuilderService.ListTemplates()`
@@ -118,7 +118,7 @@ operators understand the trade-off of exporting early.【F:Nexus SourceCode/src/
 4. **UI preview contract.** Coordinate with the Avalonia UI to ensure previews and
    template selection flows stay synchronized with manifest metadata (`name`,
    outputs, readiness states) surfaced through `ListTemplates()` and
-   `TryGetTemplate()` APIs.【F:Nexus SourceCode/src/Aog.Core/Reporting/IReportBuilderService.cs†L15-L65】【F:Nexus SourceCode/tests/Aog.UI.Avalonia.Tests/Reporting/ReportPreviewViewModelTests.cs†L70-L115】【F:docs/SRS/sections/05_Frontends.md†L31-L32】
+   `TryGetTemplate()` APIs.【F:Nexus SourceCode/src/Aog.Core/Reporting/IReportBuilderService.cs†L15-L65】【F:Nexus SourceCode/tests/Aog.UI.Avalonia.Tests/Reporting/ReportPreviewViewModelTests.cs†L70-L115】【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L31-L32】
 5. **Export auditing.** Pair template changes with report export audit fixtures so
    QA can diff PDF/CSV/GeoJSON bundles when section logic evolves, paving the way
    for NX-331 automated export auditing.【F:Nexus SourceCode/tests/Aog.Core.Tests/Reporting/ReportExportAuditorTests.cs†L13-L120】【F:tasks.md†L313-L331】
@@ -131,11 +131,11 @@ discoverable via `ListTemplates()` for UI and CLI tooling.【F:Nexus SourceCode/
 - **Enterprise overrides:** Allow additional templates to be side-loaded as signed
   bundles (ZIP containing manifest + assets). Enterprises should stage them in the
   plugin catalog with the same signature policy used for manifests to preserve
-  provenance and traceability.【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L16-L27】
+  provenance and traceability.【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog†L16-L27】
 - **Offline updates:** Document override templates in release notes and provide
   checksum manifests so operators can verify authenticity before installing in
   air-gapped environments. Use the same workflow as plugin catalog side-loads to
-  minimize bespoke tooling.【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L10-L31】
+  minimize bespoke tooling.【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog†L10-L31】
 
 ## Operational checklist
 

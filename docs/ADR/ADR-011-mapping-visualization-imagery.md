@@ -32,7 +32,7 @@ Nexus must render PoseStream-derived ribbons, heatmaps, and telemetry overlays w
 - Attribution overlay must pass automated screenshot diffs across five basemap providers to ensure licensing accuracy.
 
 ## References
-- [Telemetry & health requirements](../SRS/sections/10_Telemetry_Health.md)
-- [Frontend requirements](../SRS/sections/05_Frontends.md)
+- [Telemetry & health requirements](../SRS/sections/6X/64_Telemetry_Health.md)
+- [Frontend requirements](../SRS/sections/9X/91_UI_Shell_Layout.md)
 - [ADR-029: Mapping plugin architecture](ADR-029-mapping-plugin-architecture.md)
 - [ADR-034: Metadata-driven dashboards and inspector surfaces](ADR-034-metadata-driven-dashboards.md)

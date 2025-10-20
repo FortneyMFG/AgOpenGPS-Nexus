@@ -187,7 +187,7 @@ As defined in [ADR-033: Guidance & AutoSteer](../../ADR/ADR-033-guidance-planner
 
 ## Related Documentation
 
-- [Equipment Requirements](../../SRS/sections/06_Equipment.md)
-- [Control Requirements](../../SRS/sections/09_Control_Automation.md)
+- [Equipment Requirements](../../SRS/sections/5X/51_Sensor_Actuator_Abstractions.md)
+- [Control Requirements](../../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
 - [Calibration Guide](../maintenance/calibration.md)
 - [Operation Manual](../operation/INDEX.md)

@@ -32,8 +32,8 @@ Nexus needs deterministic section control behavior that honors manual overrides,
 - Safety interlock tests must assert sections fail closed when heartbeat loss exceeds 300 ms, verified via integration harnesses.
 
 ## References
-- [Control & automation requirements](../SRS/sections/09_Control_Automation.md)
-- [Extensibility & plugin requirements](../SRS/sections/12_Extensibility_Plugins.md)
+- [Control & automation requirements](../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
+- [Extensibility & plugin requirements](../SRS/sections/9X/94_Extensibility_Packaging_Updates.md)
 - [ADR-008: Equipment hierarchy](ADR-008-equipment-hierarchy.md)
 - [ADR-007: PoseStream and SectionState architecture](ADR-007-posestream-sectionstate-architecture.md)
 - [ADR-018: Plugin API and capability discovery](ADR-018-plugin-api.md)

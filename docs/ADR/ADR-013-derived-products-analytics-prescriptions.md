@@ -39,8 +39,8 @@ Turning PoseStream-derived datasets (yield, soil, NDVI) into actionable prescrip
 - Recipe hashing must remain stable across platforms with zero mismatches detected in cross-platform regression runs.
 
 ## References
-- [Testing & CI requirements](../SRS/sections/11_Testing_CI_CDPipelines.md)
-- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
+- [Testing & CI requirements](../SRS/sections/9X/96_Quality_Engineering_Release.md)
+- [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
 - [ADR-012: Multi-session and multi-PoseStream fusion](ADR-012-multi-session-posestream-fusion.md)
 - [ADR-014: Interop for prescriptions and agronomic formats](ADR-014-interop-prescription-formats.md)
 - [ADR-019: Provenance, audit, and QA](ADR-019-provenance-audit-qa.md)

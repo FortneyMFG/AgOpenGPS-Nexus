@@ -22,7 +22,7 @@ source backlog section via the CLI options:
 
 ```bash
 python tools/scripts/generate-governance-telemetry.py \
-  --section "Section A — Foundations & Contracts" \
+  --section "Section 94 — Extensibility, Packaging & Updates" \
   --output-json custom/path/telemetry.json \
   --output-markdown custom/path/minutes.md
 ```
@@ -30,7 +30,7 @@ python tools/scripts/generate-governance-telemetry.py \
 ## Data sources
 
 1. **Program board** — Entries are parsed from `tasks.md`. By default the
-   generator focuses on `Section A — Foundations & Contracts`, which tracks the
+   generator focuses on `Section 94 — Extensibility, Packaging & Updates`, which tracks the
    ADR governance backlog. The JSON output records counts by state along with
    the individual tickets used to populate dashboards.
 2. **Dependency digest** — The script loads manifest metadata from

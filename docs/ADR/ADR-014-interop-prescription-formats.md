@@ -38,8 +38,8 @@ Nexus must import and export industry-standard agronomic formats—ISOXML TaskDa
 - Interop audit log must capture CRS transformations and unit conversions for every import/export, verified via automated scenarios.
 
 ## References
-- [Communications & transports requirements](../SRS/sections/03_Comm_Transports.md)
-- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
+- [Communications & transports requirements](../SRS/sections/4X/42_Transports.md)
+- [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
 - [ADR-013: Derived products and prescription analytics](ADR-013-derived-products-analytics-prescriptions.md)
 - [ADR-022: CRS, units, and precision policy](ADR-022-crs-units-precision-policy.md)

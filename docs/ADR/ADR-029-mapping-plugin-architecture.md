@@ -17,7 +17,7 @@ Guidance, section control, and variable-rate features all require spatial querie
 ## Decision
 Create a two-part architecture:
 
-1. **Core geospatial kernel (Aog.Core).** Embed CRS and unit conversion helpers, ENU tiling utilities, the monotonic timebase/frame counter, deterministic replay helpers, and null Pose/Mapping implementations so rigs without mapping still boot cleanly. Core also owns the frozen `Aog.Abstractions` protobuf contracts for pose, layers, mapping queries, and replay logs.【F:docs/ADR/ADR-002-grpc-contracts.md†L1-L28】【F:docs/SRS/sections/04_Backend_Services.md†L6-L20】
+1. **Core geospatial kernel (Aog.Core).** Embed CRS and unit conversion helpers, ENU tiling utilities, the monotonic timebase/frame counter, deterministic replay helpers, and null Pose/Mapping implementations so rigs without mapping still boot cleanly. Core also owns the frozen `Aog.Abstractions` protobuf contracts for pose, layers, mapping queries, and replay logs.【F:docs/ADR/ADR-002-grpc-contracts.md†L1-L28】【F:docs/SRS/sections/2X/21_System_Decomposition_Boundaries.md†L6-L20】
 2. **Mapping plugins (Aog.Plugins.Mapping.*).** Implement pose ingestion, raster/vector/interpolation engines, layer import/export, tile caching, and rate/coverage publishing behind the Core contracts. Plugins run out-of-process, subscribe to the PoseBus, and publish RateHint, SectionMask, CoverageUpdate, and diagnostics via Core’s event bus. Multiple mapping engines may coexist, and presets select which plugin bundle to load.
 
 ### Responsibilities & contracts
@@ -72,10 +72,10 @@ Services:
   dependency rules published in the manifest governance program.【F:docs/ADR/ADR-031-official-plugin-bundle.md†L17-L70】
 - CRS normalization, tiling utilities, and replay taps shipped in Core must continue
   to satisfy the precision budgets in the communications and data model SRS chapters
-  so controller pods can rely on deterministic pose/layer alignment.【F:docs/SRS/sections/03_Comm_Transports.md†L6-L28】【F:docs/SRS/sections/08_Data_Model_Storage.md†L10-L33】
+  so controller pods can rely on deterministic pose/layer alignment.【F:docs/SRS/sections/4X/42_Transports.md†L6-L28】【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L10-L33】
 - Mapping plugins that participate in spatial constraint enforcement remain bound to
   ADR-027 zone policies; capability gaps trigger degraded-mode messaging per the
-  operator UX guidance in Section 5 of the SRS.【F:docs/ADR/ADR-027-spatial-constraints.md†L11-L64】【F:docs/SRS/sections/05_Frontends.md†L44-L80】
+  operator UX guidance in Section 5 of the SRS.【F:docs/ADR/ADR-027-spatial-constraints.md†L11-L64】【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L44-L80】
 
 ### Degraded operation & operator messaging
 - **NullMapping UX:** When NullMapping is active, Core publishes a `mapping:offline` state with explicit operator-facing messaging in the Device Manager and Preset Switcher. Sections and rate controllers continue to run using headland-only constraints, and UI overlays display a "No map data" banner rather than empty tiles.
@@ -84,7 +84,7 @@ Services:
 
 ## Consequences
 - **Pros:** Optional mapping footprint for headless rigs, swappable engines for specialized workflows, isolated failures, and faster iteration on GIS features without Core releases.【F:docs/aog-v6-mapping-brief.md†L55-L97】
-- **Cons & mitigations:** IPC latency managed through shared monotonic timebase/frame IDs; protobuf version drift mitigated by contracts freeze/versioning; debugging supported by standardized replay taps; state fan-out handled via Core’s event bus and capability registry.【F:docs/SRS/sections/03_Comm_Transports.md†L6-L28】【F:docs/ADR/ADR-018-plugin-api.md†L12-L34】
+- **Cons & mitigations:** IPC latency managed through shared monotonic timebase/frame IDs; protobuf version drift mitigated by contracts freeze/versioning; debugging supported by standardized replay taps; state fan-out handled via Core’s event bus and capability registry.【F:docs/SRS/sections/4X/42_Transports.md†L6-L28】【F:docs/ADR/ADR-018-plugin-api.md†L12-L34】
 
 ## Follow-up work
 - Draft contract updates for `Pose`, `LayerQuery`, `LayerValue`, `RateHint`, `CoverageUpdate`, and related services under the contracts freeze process.

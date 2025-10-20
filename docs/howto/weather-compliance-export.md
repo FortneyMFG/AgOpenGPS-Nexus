@@ -10,11 +10,11 @@ and Regulatory plugin hooks.【F:docs/ADR/ADR-053_WeatherPlugin.md†L9-L48】�
 ## Prerequisites
 
 1. **Session weather snapshot coverage** — Ensure `Session.v1` documents capture the required weather sample fields and emit
-   updates when manual entries or ingest pipelines modify readings.【F:docs/SRS/sections/08_Data_Model_Storage.md†L29-L53】
+   updates when manual entries or ingest pipelines modify readings.【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L29-L53】
 2. **Overlay generation** — Confirm the Weather plugin is producing `weather.overlay` tiles aligned with the session timeline so
-   spatial context is available in the export bundle.【F:docs/ADR/ADR-053_WeatherPlugin.md†L21-L44】【F:docs/SRS/sections/08_Data_Model_Storage.md†L54-L74】
+   spatial context is available in the export bundle.【F:docs/ADR/ADR-053_WeatherPlugin.md†L21-L44】【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L54-L74】
 3. **Regulatory export registration** — The Regulatory plugin must subscribe to the weather compliance export type so it can sign
-   the JSON manifest and surface completion status on the compliance dashboard.【F:docs/plugins/Regulatory.md†L1-L32】【F:docs/SRS/sections/08_Data_Model_Storage.md†L74-L90】
+   the JSON manifest and surface completion status on the compliance dashboard.【F:docs/plugins/Regulatory.md†L1-L32】【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L74-L90】
 4. **Report Builder template deployment** — Publish the `weather-compliance.v1` template that renders the summary PDF referenced
    below. Templates follow the Report Builder governance defined in ADR-051.【F:docs/ADR/ADR-051_ReportBuilder.md†L9-L41】
 
@@ -34,10 +34,10 @@ Generated from the `weather-compliance.v1` template. Each section references the
 parity.【F:docs/ADR/ADR-051_ReportBuilder.md†L12-L40】 |
 | `session-weather.json` | Snapshot history extracted from `Session.v1` with the canonical weather fields captured at start and
 per subsequent update. | Weather plugin / Session store | Values follow `R-DATA-042` and include the source identifier for each
-sample so auditors can confirm instrumentation.【F:docs/SRS/sections/08_Data_Model_Storage.md†L29-L53】 |
+sample so auditors can confirm instrumentation.【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L29-L53】 |
 | `weather-overlay.geojson` | Spatial tiles (temperature, rainfall, wind vectors) covering the job envelope at the export time
 range. | Weather plugin tile cache | Down-sampled to the regulatory resolution while retaining quantization metadata noted in the
-manifest.【F:docs/ADR/ADR-053_WeatherPlugin.md†L21-L44】【F:docs/SRS/sections/08_Data_Model_Storage.md†L54-L74】 |
+manifest.【F:docs/ADR/ADR-053_WeatherPlugin.md†L21-L44】【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L54-L74】 |
 | `ingest-log.csv` | Chronological feed of ingest pipeline events: sensor heartbeats, API polling status, manual entries, and
 validation notices. | Weather ingest pipeline | Serves as traceability for downtime investigations and is optional when no errors or
 manual overrides occurred during the session.【F:docs/plugins/Weather.md†L9-L28】 |
@@ -48,7 +48,7 @@ The manifest extends the Regulatory plugin’s signed export format with weather
 `schemas/examples/WeatherComplianceExport.sample.json` for a validating example. Key sections include:
 
 - `weatherSnapshotHistory[]` — Ordered list of weather samples with timestamp, instrument source, and the fields mandated by
-  R-DATA-042 for compliance-ready reporting.【F:docs/SRS/sections/08_Data_Model_Storage.md†L29-L53】
+  R-DATA-042 for compliance-ready reporting.【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L29-L53】
 - `overlayArtifacts[]` — References to exported overlay files plus metadata describing grid resolution, coordinate reference
   system, interpolation confidence, and checksums for each payload.【F:docs/ADR/ADR-053_WeatherPlugin.md†L21-L44】
 - `thresholdEvaluations[]` — Summaries of regulatory thresholds (e.g., wind speed, delta T) evaluated across the session with

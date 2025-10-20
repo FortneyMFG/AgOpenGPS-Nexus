@@ -38,8 +38,8 @@ Nexus must relate jobs, sessions, PoseStreams, and derived artifacts so provenan
 - Provenance graph builder must emit DAGs validated against schema, rejecting cycles and invalid attachments in integration tests.
 
 ## References
-- [Backend services requirements](../SRS/sections/04_Backend_Services.md)
-- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
-- [Control & automation requirements](../SRS/sections/09_Control_Automation.md)
+- [Backend services requirements](../SRS/sections/2X/21_System_Decomposition_Boundaries.md)
+- [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
+- [Control & automation requirements](../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
 - [ADR-019: Provenance, audit, and QA governance](ADR-019-provenance-audit-qa.md)
 - [ADR-030: Field job sessions and lifecycle services](ADR-030-field-job-sessions.md)

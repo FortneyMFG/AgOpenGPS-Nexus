@@ -28,4 +28,4 @@ handshake.
 
 ## References
 - [ADR-052 — Field Health Plugin](../ADR/ADR-052_FieldHealthPlugin.md)
-- [Layer registry overview](../SRS/sections/04_Layers_and_APIs.md)
+- [Layer registry overview](../SRS/sections/7X/71_Mapping_Kernel_Contracts.md)

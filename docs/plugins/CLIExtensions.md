@@ -32,7 +32,7 @@ packaging instructions.
   local adapter. Implement the CLI reflection gRPC contract published by the
   Core team so the host can enumerate verbs and parameters dynamically. Use this
   path when your plugin runs out-of-process or must delegate execution to Core
-  services.【F:docs/SRS/sections/18_Command_Line_Interface.md†L24-L48】
+  services.【F:docs/SRS/sections/9X/93_Command_Line_Interface.md†L24-L48】
 
 The host now includes `nx plugin reflect` which calls the gRPC reflection
 endpoint and prints available verbs in human or JSON form. Point it at your
@@ -42,7 +42,7 @@ service during development to confirm option metadata before writing adapters.
 - **Output modes:** Support human-readable, `--json`, and `--ndjson` output to
   match the host’s scripting guarantees. JSON payloads should use the same DTOs
   your plugin already publishes via gRPC or manifest schemas to keep automation
-  stable.【F:docs/SRS/sections/18_Command_Line_Interface.md†L31-L38】
+  stable.【F:docs/SRS/sections/9X/93_Command_Line_Interface.md†L31-L38】
 - **Config discovery:** Respect the standard lookup order (`~/.nexus/`, repo
   `.nexus/`, environment variables) so CLI and UI edits remain consistent.
 - **Version gating:** Declare verb compatibility requirements in your plugin
@@ -52,7 +52,7 @@ service during development to confirm option metadata before writing adapters.
 ## Packaging & testing
 - Ship adapter binaries as part of your plugin archive so single-file CLI builds
   can load them without extra installers. Follow the same RID folder structure
-  the plugin manifest already uses for runtime assets.【F:docs/SRS/sections/16_Plugin_Packaging_Updates.md†L1-L60】 Run
+  the plugin manifest already uses for runtime assets.【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog†L1-L60】 Run
   `tools/ci/package-nx-cli.ps1` to generate dotnet tool + single-file artifacts
   alongside the sample plugin bundle for local validation.
 - Cover CLI verbs with deterministic tests that run via `nx --json` inside the

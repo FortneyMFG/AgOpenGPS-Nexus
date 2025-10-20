@@ -32,8 +32,8 @@ As Nexus orchestrates multi-layer analytics and prescriptions, the platform must
 - Audit pipeline must export signed JSON logs for 30-day retention with ≤ 5% size overhead relative to raw event streams.
 
 ## References
-- [Telemetry & health requirements](../SRS/sections/10_Telemetry_Health.md)
-- [Testing & CI requirements](../SRS/sections/11_Testing_CI_CDPipelines.md)
-- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
+- [Telemetry & health requirements](../SRS/sections/6X/64_Telemetry_Health.md)
+- [Testing & CI requirements](../SRS/sections/9X/96_Quality_Engineering_Release.md)
+- [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
 - [ADR-009: PoseStream vector logs and layer TileStore persistence](ADR-009-posestream-vector-tilestore-persistence.md)
 - [ADR-023: Session and job model](ADR-023-session-job-model.md)

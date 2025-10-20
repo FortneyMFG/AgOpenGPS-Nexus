@@ -29,19 +29,19 @@ These anchors map the task tracker sections to the evolving SRS outline so backl
 can link directly into requirements discussions. Update the references if the canonical SRS
 documents move or headings change.
 
-### SRS §2.1 Foundations & Contracts
+### SRS §21 System Decomposition & Boundaries
 - Covers repo scaffolding, ADRs, protobuf, JSON schemas, and capability discovery.
 
-### SRS §2.7 Packaging & DevEx
+### SRS §14 Build Environment & Tooling
 - Includes CI matrices, dev scripts, and packaging automation.
 
-### SRS §2.8 Documentation
+### SRS §96 Quality Engineering & Release
 - Tracks quick-start and how-to guides for early adopters.
 
-### SRS §3.1 Core Services
+### SRS §61 Core Domain Services
 - Details the headless host, configuration system, event bus, and sim primitives.
 
-### SRS §3.2 Capabilities Exchange
+### SRS §63 Layers Registry & Journal Contracts
 - Describes the Core ↔ AGiO capability negotiation contract.
 - Initial proto
   ([`proto/capabilities.proto`](../../Nexus%20SourceCode/proto/capabilities.proto)) defines
@@ -49,53 +49,53 @@ documents move or headings change.
   with node identity, session identifier, declared capabilities, and rejection metadata to
   unblock Core↔AGiO smoke tests.
 
-### SRS §3.3 AGiO Services
+### SRS §52 AgIO Service
 - Defines hardware backends, timing probes, and legacy gateways.
 
-### SRS §3.4 UI Shell
+### SRS §91 UI Shell & Layout
 - Covers the Avalonia shell, connection panels, scenario editor, and sim bar.
 
-### SRS §3.5 Simulation Providers
+### SRS §81 Guidance Orchestrator & Simulation
 - Registers plugin-provided simulators and shared simulation helpers.
 
-### SRS §3.6 AutoSteer
+### SRS §82 Planning & Autosteer Targets
 - Requirements for the AutoSteer-Lite plugin and controller integration.
 
-### SRS §3.7 Sections Control
+### SRS §73 Variable Mapping & Section Control
 - Requirements for the Sections plugin and coverage gating.
 
-### SRS §3.8 Planter Monitor
+### SRS §74 Monitoring Systems
 - Requirements for planter monitoring services and UI.
 
-### SRS §3.9 Replay Services
+### SRS §33 Offline-first, Sync & Replay
 - Requirements for replay providers and UI wiring.
 
-### SRS §4.2 Safety & QA
+### SRS §96 Quality Engineering & Release
 - Documents deterministic sim regression, heartbeats, and arming state machine.
 
-### SRS §4.3 Legacy Compatibility
+### SRS §53 AOG-Link Compatibility
 - Requirements for UDP discovery, PGN bridging, and UART framing.
 
-### SRS §5.1 V6 Porting Inventory
+### SRS §61 Core Domain Porting Inventory
 - Enumerates legacy algorithms slated for evaluation and porting.
 
-### SRS §5.2 Coverage Math
+### SRS §73 Coverage & Variable Rate Math
 - Specifies coverage computation parity targets.
 
-### SRS §5.3 Path Generation
+### SRS §82 Path Generation & Autosteer Targets
 - Specifies AB/curve/headland generation parity targets.
 
-### SRS §5.4 Controller Gains
+### SRS §61 Kinematics & Controller Gains
 - Specifies controller tuning expectations for AutoSteer-Lite.
 
-### SRS §5.8 Verification
+### SRS §96 Verification & Regression Harnesses
 - Captures parity datasets and tolerance guard-rails for ported coverage, section
   control, and AutoSteer math.
 - Reference: [`docs/porting/PortedMathVerification.md`](../porting/PortedMathVerification.md).
 
 ## 2024-xx-xx Bootstrap
 
-- The engineering plan outlined in [`options/O-STACK-1_DotNet8Avalonia.md`](options/O-STACK-1_DotNet8Avalonia.md)
+- The engineering plan outlined in [`options/1X/O-STACK-1_DotNet8Avalonia.md`](options/1X/O-STACK-1_DotNet8Avalonia.md)
   is now the active roadmap for Nexus development. All early-phase tasks (Waves 0–2) should
   align with this stack (C#/.NET 8 + Avalonia + gRPC contracts).
 - [`tasks.md`](../../tasks.md) tracks the NX-### backlog described in the Engineering Brief.

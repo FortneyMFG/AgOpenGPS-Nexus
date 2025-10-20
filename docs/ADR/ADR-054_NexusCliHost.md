@@ -78,7 +78,7 @@ lacks a cohesive CLI host. Each plugin team maintained bespoke utilities without
 shared transport logic or version negotiation.
 
 ## References
-- [SRS Section 18 – Command Line Interface](../SRS/sections/18_Command_Line_Interface.md)
-- [SRS Section 16 – Plugin Packaging, Updates, and Catalog](../SRS/sections/16_Plugin_Packaging_Updates.md)
+- [SRS Section 18 – Command Line Interface](../SRS/sections/9X/93_Command_Line_Interface.md)
+- [SRS Section 16 – Plugin Packaging, Updates, and Catalog](../SRS/sections/9X/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog)
 - [ADR-031 – Official plugin bundle](ADR-031-official-plugin-bundle.md)
 - [ADR-028 – Stack boundaries](ADR-028-stack-boundaries.md)

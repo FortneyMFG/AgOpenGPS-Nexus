@@ -24,13 +24,13 @@
 
 ## System Requirements Specification
 
-- [§02 Data Model — Farm → Field & Season → Job → Session](SRS/sections/02_DataModel.md)
-- [§03 Job Lifecycle & Session Management](SRS/sections/03_JobLifecycle.md)
-- [§03 Communications & Transports](SRS/sections/03_Comm_Transports.md)
-- [§04 Mapping & Layer Governance](SRS/sections/04_MappingLayers.md)
-- [§05 Frontends](SRS/sections/05_Frontends.md)
-- [§09 Control & Automation](SRS/sections/09_Control_Automation.md)
-- [§19 Guidance Orchestrator Plugin](SRS/sections/19_Guidance_Orchestrator.md)
+- [§02 Data Model — Farm → Field & Season → Job → Session](SRS/sections/3X/31_Domain_Data_Model.md)
+- [§03 Job Lifecycle & Session Management](SRS/sections/6X/62_Job_Lifecycle.md)
+- [§03 Communications & Transports](SRS/sections/4X/42_Transports.md)
+- [§04 Mapping & Layer Governance](SRS/sections/7X/72_Mapping_Layers_Plugin.md)
+- [§05 Frontends](SRS/sections/9X/91_UI_Shell_Layout.md)
+- [§09 Control & Automation](SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
+- [§19 Guidance Orchestrator Plugin](SRS/sections/8X/81_Guidance_Orchestrator.md)
 
 ## Guidance Orchestrator Delivery
 

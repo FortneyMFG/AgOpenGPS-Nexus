@@ -39,7 +39,7 @@ Variable-rate workflows, analytics, and dashboards require a canonical catalog o
 - Variable-rate normalization must process yield, as-applied, and prescription samples with ≤ 0.5% numeric drift and matching color ramps against design references.
 
 ## References
-- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
-- [Extensibility & plugin requirements](../SRS/sections/12_Extensibility_Plugins.md)
+- [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
+- [Extensibility & plugin requirements](../SRS/sections/9X/94_Extensibility_Packaging_Updates.md)
 - [ADR-009: PoseStream vector logs and layer TileStore persistence](ADR-009-posestream-vector-tilestore-persistence.md)
 - [ADR-031: Official plugin bundle governance](ADR-031-official-plugin-bundle.md)

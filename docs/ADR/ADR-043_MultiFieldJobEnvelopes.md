@@ -64,9 +64,9 @@ overlays deterministically.
 
 ## SRS Impact
 
-- Fulfils the multi-field hierarchy and envelope schema expectations in §02 Data Model, which document Season → Job → Session relationships and field membership constraints.【F:docs/SRS/sections/02_DataModel.md†L22-L140】
-- Extends the mount/unmount lifecycle defined in §03 Job Lifecycle with deterministic `mountFields` events and per-field stat rollups.【F:docs/SRS/sections/03_JobLifecycle.md†L59-L112】
-- Aligns with §04 Mapping, Layer Governance & Multi-Field Envelopes by enforcing union envelope generation, R-tree maintenance, and per-field analytics exports for mounted fields.【F:docs/SRS/sections/04_MappingLayers.md†L1-L44】
+- Fulfils the multi-field hierarchy and envelope schema expectations in §02 Data Model, which document Season → Job → Session relationships and field membership constraints.【F:docs/SRS/sections/3X/31_Domain_Data_Model.md†L22-L140】
+- Extends the mount/unmount lifecycle defined in §03 Job Lifecycle with deterministic `mountFields` events and per-field stat rollups.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L59-L112】
+- Aligns with §04 Mapping, Layer Governance & Multi-Field Envelopes by enforcing union envelope generation, R-tree maintenance, and per-field analytics exports for mounted fields.【F:docs/SRS/sections/7X/72_Mapping_Layers_Plugin.md†L1-L44】
 
 ## Consequences
 
@@ -100,7 +100,7 @@ metadata, bounding box/centroid hints, and the CRS used for the envelope. Plugin
 
 ## References
 
-- [Section 02 — Data Model](../SRS/sections/02_DataModel.md)
-- [Section 03 — Job Lifecycle](../SRS/sections/03_JobLifecycle.md)
-- [Section 04 — Mapping Layers](../SRS/sections/04_MappingLayers.md)
+- [Section 31 — Domain Data Model](../SRS/sections/3X/31_Domain_Data_Model.md)
+- [Section 62 — Job Lifecycle](../SRS/sections/6X/62_Job_Lifecycle.md)
+- [Section 72 — Mapping Layers Plugin](../SRS/sections/7X/72_Mapping_Layers_Plugin.md)
 - [ADR-040 — Season Organizers](ADR-040_SeasonOrganizers.md)

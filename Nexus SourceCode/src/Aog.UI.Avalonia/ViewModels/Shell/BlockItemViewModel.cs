@@ -1,6 +1,7 @@
 using System;
 using System.Windows.Input;
 using Aog.UI.Avalonia.Blocks;
+using Aog.UI.Avalonia.Layout;
 using Aog.UI.Avalonia.ViewModels;
 
 namespace Aog.UI.Avalonia.ViewModels.Shell;
@@ -12,27 +13,17 @@ public sealed class BlockItemViewModel
 {
     private readonly BlockLayoutViewModel _owner;
     private readonly DelegateCommand _invokeCommand;
-    private readonly DelegateCommand _moveUpCommand;
-    private readonly DelegateCommand _moveDownCommand;
     private readonly DelegateCommand _deleteCommand;
-    private readonly DelegateCommand _moveToLeftCommand;
-    private readonly DelegateCommand _moveToRightCommand;
-    private readonly DelegateCommand _moveToBottomCommand;
-    private readonly DelegateCommand _moveToTopCommand;
+    private readonly TileSpec _tile;
 
-    public BlockItemViewModel(BlockInstance instance, BlockDefinition definition, BlockLayoutViewModel owner)
+    public BlockItemViewModel(BlockInstance instance, BlockDefinition definition, BlockLayoutViewModel owner, TileSpec tile)
     {
         Instance = instance ?? throw new ArgumentNullException(nameof(instance));
         Definition = definition ?? throw new ArgumentNullException(nameof(definition));
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        _tile = tile ?? throw new ArgumentNullException(nameof(tile));
 
         _invokeCommand = new DelegateCommand(_ => _owner.Invoke(this), _ => _owner.CanInteract(this));
-        _moveUpCommand = new DelegateCommand(_ => _owner.MoveWithinRegionByOffset(this, -1), _ => _owner.CanReorder(this));
-        _moveDownCommand = new DelegateCommand(_ => _owner.MoveWithinRegionByOffset(this, +1), _ => _owner.CanReorder(this));
-        _moveToLeftCommand = new DelegateCommand(_ => _owner.MoveToRegion(this, BlockRegion.Left), _ => _owner.CanMoveTo(this, BlockRegion.Left));
-        _moveToRightCommand = new DelegateCommand(_ => _owner.MoveToRegion(this, BlockRegion.Right), _ => _owner.CanMoveTo(this, BlockRegion.Right));
-        _moveToBottomCommand = new DelegateCommand(_ => _owner.MoveToRegion(this, BlockRegion.Bottom), _ => _owner.CanMoveTo(this, BlockRegion.Bottom));
-        _moveToTopCommand = new DelegateCommand(_ => _owner.MoveToRegion(this, BlockRegion.Top), _ => _owner.CanMoveTo(this, BlockRegion.Top));
         _deleteCommand = new DelegateCommand(_ => _owner.Delete(this), _ => _owner.CanDelete(this));
     }
 
@@ -71,26 +62,14 @@ public sealed class BlockItemViewModel
     /// <summary>Gets the command triggered when the block is activated.</summary>
     public ICommand InvokeCommand => _invokeCommand;
 
-    /// <summary>Gets the command that moves the block earlier within its region.</summary>
-    public ICommand MoveUpCommand => _moveUpCommand;
-
-    /// <summary>Gets the command that moves the block later within its region.</summary>
-    public ICommand MoveDownCommand => _moveDownCommand;
-
     /// <summary>Gets the command that removes the block when permitted.</summary>
     public ICommand DeleteCommand => _deleteCommand;
 
-    /// <summary>Gets the command that moves the block into the left region.</summary>
-    public ICommand MoveToLeftCommand => _moveToLeftCommand;
+    /// <summary>Gets the tile identifier associated with the block within the global grid.</summary>
+    public string TileId => _tile.Id;
 
-    /// <summary>Gets the command that moves the block into the right region.</summary>
-    public ICommand MoveToRightCommand => _moveToRightCommand;
-
-    /// <summary>Gets the command that moves the block into the bottom region.</summary>
-    public ICommand MoveToBottomCommand => _moveToBottomCommand;
-
-    /// <summary>Gets the command that moves the block into the top region.</summary>
-    public ICommand MoveToTopCommand => _moveToTopCommand;
+    /// <summary>Gets the tile metadata used to position the block on the global grid.</summary>
+    public TileSpec Tile => _tile;
 
     /// <summary>Gets a value indicating whether the block originates from a canonical definition.</summary>
     public bool IsCanonical => Instance.Origin == BlockOrigin.Canonical;
@@ -110,12 +89,6 @@ public sealed class BlockItemViewModel
     internal void RefreshCommandStates()
     {
         _invokeCommand.RaiseCanExecuteChanged();
-        _moveUpCommand.RaiseCanExecuteChanged();
-        _moveDownCommand.RaiseCanExecuteChanged();
         _deleteCommand.RaiseCanExecuteChanged();
-        _moveToLeftCommand.RaiseCanExecuteChanged();
-        _moveToRightCommand.RaiseCanExecuteChanged();
-        _moveToBottomCommand.RaiseCanExecuteChanged();
-        _moveToTopCommand.RaiseCanExecuteChanged();
     }
 }

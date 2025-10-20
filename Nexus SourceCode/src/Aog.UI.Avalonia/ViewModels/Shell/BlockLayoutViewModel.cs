@@ -6,13 +6,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Aog.UI.Avalonia.Blocks;
-using Aog.UI.Avalonia.Hosting;
+using Aog.UI.Avalonia.Layout;
 using Aog.UI.Avalonia.Settings;
+using Avalonia;
 
 namespace Aog.UI.Avalonia.ViewModels.Shell;
 
 /// <summary>
-/// Provides a view-model facade over persisted block layout instances, supporting reordering and command dispatch.
+/// Provides a view-model facade over the global tiled shell layout.
 /// </summary>
 public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 {
@@ -33,17 +34,12 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private readonly IBlockLayoutStore _layoutStore;
     private readonly IBlockCatalog _catalog;
     private readonly IShellCommandDispatcher _commandDispatcher;
-    private readonly Dictionary<BlockRegion, SidebarLayoutSettings> _sidebarSettings;
-    private readonly SidebarLayoutSettings _workspaceGridSettings;
-    private Action<string> _statusReporter;
-    private readonly Dictionary<BlockRegion, ObservableCollection<BlockItemViewModel>> _regions;
-    private readonly Dictionary<BlockInstanceId, BlockItemViewModel> _itemLookup;
     private readonly List<BlockInstance> _instances;
     private Func<BlockDefinition, bool>? _commandInterceptor;
-
+    private Action<string> _statusReporter;
     private bool _isLocked = true;
-
-    public event PropertyChangedEventHandler? PropertyChanged;
+    private Size _viewport;
+    private PaneLayoutResult? _paneLayout;
 
     public BlockLayoutViewModel(
         IBlockLayoutStore layoutStore,
@@ -58,55 +54,24 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         ArgumentNullException.ThrowIfNull(preferencesService);
         _statusReporter = statusReporter ?? (_ => { });
 
-        _regions = new Dictionary<BlockRegion, ObservableCollection<BlockItemViewModel>>
-        {
-            [BlockRegion.Left] = new ObservableCollection<BlockItemViewModel>(),
-            [BlockRegion.Right] = new ObservableCollection<BlockItemViewModel>(),
-            [BlockRegion.Bottom] = new ObservableCollection<BlockItemViewModel>(),
-            [BlockRegion.Top] = new ObservableCollection<BlockItemViewModel>(),
-        };
-        _itemLookup = new Dictionary<BlockInstanceId, BlockItemViewModel>();
-        _instances = _layoutStore.Load().ToList();
+        var storedInstances = _layoutStore.Load().ToList();
+        _instances = storedInstances;
 
         var preferences = preferencesService.GetPreferences().ShellLayout ?? new ShellLayoutPreferences();
-        _sidebarSettings = new Dictionary<BlockRegion, SidebarLayoutSettings>
-        {
-            [BlockRegion.Left] = (preferences.LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
-            [BlockRegion.Right] = (preferences.RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
-            [BlockRegion.Bottom] = (preferences.BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone(),
-            [BlockRegion.Top] = (preferences.TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone(),
-        };
-        _workspaceGridSettings = (preferences.WorkspaceGrid ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone();
+        Grid = preferences.Grid ?? new ShellGridLayout();
 
+        Blocks = new ObservableCollection<BlockItemViewModel>();
         BuildInitialCollections();
+        PaneLayout = PaneLayoutCompiler.Compile(Grid);
     }
 
-    /// <summary>Gets the blocks rendered along the left side-bar.</summary>
-    public ObservableCollection<BlockItemViewModel> LeftBlocks => _regions[BlockRegion.Left];
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>Gets the blocks rendered along the right side-bar.</summary>
-    public ObservableCollection<BlockItemViewModel> RightBlocks => _regions[BlockRegion.Right];
+    /// <summary>Gets the observable block collection hosted on the global tiled panel.</summary>
+    public ObservableCollection<BlockItemViewModel> Blocks { get; }
 
-    /// <summary>Gets the blocks rendered along the bottom strip.</summary>
-    public ObservableCollection<BlockItemViewModel> BottomBlocks => _regions[BlockRegion.Bottom];
-
-    /// <summary>Gets the blocks rendered in the top telemetry strip.</summary>
-    public ObservableCollection<BlockItemViewModel> TopBlocks => _regions[BlockRegion.Top];
-
-    /// <summary>Gets the sizing settings for the left sidebar.</summary>
-    public SidebarLayoutSettings LeftSidebarSettings => _sidebarSettings[BlockRegion.Left];
-
-    /// <summary>Gets the sizing settings for the right sidebar.</summary>
-    public SidebarLayoutSettings RightSidebarSettings => _sidebarSettings[BlockRegion.Right];
-
-    /// <summary>Gets the sizing settings for the bottom strip.</summary>
-    public SidebarLayoutSettings BottomSidebarSettings => _sidebarSettings[BlockRegion.Bottom];
-
-    /// <summary>Gets the sizing settings for the top strip.</summary>
-    public SidebarLayoutSettings TopSidebarSettings => _sidebarSettings[BlockRegion.Top];
-
-    /// <summary>Gets the sizing settings for the central workspace grid.</summary>
-    public SidebarLayoutSettings WorkspaceGridSettings => _workspaceGridSettings;
+    /// <summary>Gets the global grid definition describing the tiled layout.</summary>
+    public ShellGridLayout Grid { get; }
 
     /// <summary>Gets or sets a value indicating whether layout modifications are locked.</summary>
     public bool IsLocked
@@ -125,34 +90,64 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         }
     }
 
-    /// <summary>Assigns the callback used to surface user-facing status text.</summary>
+    /// <summary>Gets the computed pane layout visual metadata.</summary>
+    public PaneLayoutResult? PaneLayout
+    {
+        get => _paneLayout;
+        private set
+        {
+            if (!ReferenceEquals(_paneLayout, value))
+            {
+                _paneLayout = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>Gets the last measured viewport size in device pixels.</summary>
+    public Size Viewport
+    {
+        get => _viewport;
+        private set
+        {
+            if (_viewport == value)
+            {
+                return;
+            }
+
+            _viewport = value;
+            OnPropertyChanged();
+        }
+    }
+
     public void SetStatusReporter(Action<string> reporter)
     {
         _statusReporter = reporter ?? (_ => { });
     }
 
-    /// <summary>Assigns a callback that can handle block activations before they are dispatched.</summary>
     public void SetCommandInterceptor(Func<BlockDefinition, bool>? interceptor)
     {
         _commandInterceptor = interceptor;
     }
 
-    internal bool CanInteract(BlockItemViewModel item) => item is not null;
-
-    internal bool CanDrag(BlockItemViewModel item) =>
-        item is not null && !IsLocked;
-
-    internal bool CanDrop(BlockItemViewModel item, BlockRegion targetRegion)
+    public void UpdateViewport(Size viewport)
     {
-        if (item is null || IsLocked)
+        Viewport = viewport;
+        if (viewport.Width <= 0 || viewport.Height <= 0)
         {
-            return false;
+            Grid.Columns = Math.Max(1, Grid.Columns);
+            Grid.Rows = Math.Max(1, Grid.Rows);
+            PaneLayout = PaneLayoutCompiler.Compile(Grid);
+            return;
         }
 
-        return item.Instance.Region == targetRegion
-            ? CanReorder(item)
-            : CanMoveTo(item, targetRegion);
+        var cell = Grid.CellPx + Grid.GutterPx;
+        Grid.Columns = Math.Max(1, (int)Math.Floor((viewport.Width + Grid.GutterPx) / cell));
+        Grid.Rows = Math.Max(1, (int)Math.Floor((viewport.Height + Grid.GutterPx) / cell));
+        PaneLayout = PaneLayoutCompiler.Compile(Grid);
     }
+
+    internal bool CanInteract(BlockItemViewModel item) => item is not null;
 
     internal async void Invoke(BlockItemViewModel item)
     {
@@ -180,183 +175,9 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         }
     }
 
-    internal bool CanReorder(BlockItemViewModel item)
-    {
-        if (item is null)
-        {
-            return false;
-        }
-
-        if (IsLocked)
-        {
-            return false;
-        }
-
-        return GetRegionCollection(item.Instance.Region).Count > 1;
-    }
-
-    internal void MoveWithinRegionByOffset(BlockItemViewModel item, int delta)
-    {
-        if (item is null || delta == 0 || IsLocked)
-        {
-            return;
-        }
-
-        var region = item.Instance.Region;
-        var collection = GetRegionCollection(region);
-        var index = collection.IndexOf(item);
-        var targetIndex = Math.Clamp(index + delta, 0, collection.Count - 1);
-        if (targetIndex == index)
-        {
-            return;
-        }
-
-        MoveWithinRegion(item, targetIndex);
-    }
-
-    internal bool MoveWithinRegion(BlockItemViewModel item, int newIndex)
-    {
-        if (item is null || IsLocked)
-        {
-            return false;
-        }
-
-        var region = item.Instance.Region;
-        var collection = GetRegionCollection(region);
-        var currentIndex = collection.IndexOf(item);
-        if (currentIndex < 0)
-        {
-            return false;
-        }
-
-        newIndex = Math.Clamp(newIndex, 0, collection.Count);
-        if (currentIndex == newIndex)
-        {
-            return false;
-        }
-
-        collection.RemoveAt(currentIndex);
-        if (currentIndex < newIndex)
-        {
-            newIndex--;
-        }
-        if (newIndex > collection.Count)
-        {
-            newIndex = collection.Count;
-        }
-        if (newIndex < 0)
-        {
-            newIndex = 0;
-        }
-
-        collection.Insert(newIndex, item);
-        ReindexRegion(region);
-        Persist();
-        RefreshCommandStates();
-        return true;
-    }
-
-    internal bool CanMoveTo(BlockItemViewModel item, BlockRegion region)
-    {
-        if (item is null)
-        {
-            return false;
-        }
-
-        if (IsLocked)
-        {
-            return false;
-        }
-
-        if (item.Instance.Region == region)
-        {
-            return false;
-        }
-
-        if (item.IsCanonical)
-        {
-            // Keep canonical instances anchored to their home regions.
-            return false;
-        }
-
-        return _regions.ContainsKey(region);
-    }
-
-    internal void MoveToRegion(BlockItemViewModel item, BlockRegion targetRegion)
-    {
-        if (!CanMoveTo(item, targetRegion))
-        {
-            return;
-        }
-
-        var targetCollection = GetRegionCollection(targetRegion);
-        MoveToRegion(item, targetRegion, targetCollection.Count);
-    }
-
-    internal bool MoveToRegion(BlockItemViewModel item, BlockRegion targetRegion, int targetIndex)
-    {
-        if (!CanMoveTo(item, targetRegion))
-        {
-            return false;
-        }
-
-        var sourceRegion = item.Instance.Region;
-        var sourceCollection = GetRegionCollection(sourceRegion);
-        var targetCollection = GetRegionCollection(targetRegion);
-
-        if (!sourceCollection.Remove(item))
-        {
-            return false;
-        }
-
-        targetIndex = Math.Clamp(targetIndex, 0, targetCollection.Count);
-
-        item.Instance.Region = targetRegion;
-
-        if (targetIndex >= targetCollection.Count)
-        {
-            targetCollection.Add(item);
-        }
-        else
-        {
-            targetCollection.Insert(targetIndex, item);
-        }
-
-        ReindexRegion(sourceRegion);
-        ReindexRegion(targetRegion);
-        Persist();
-        RefreshCommandStates();
-        return true;
-    }
-
-    internal bool HandleDrop(BlockItemViewModel item, BlockRegion targetRegion, int targetIndex)
-    {
-        if (!CanDrop(item, targetRegion))
-        {
-            return false;
-        }
-
-        if (item.Instance.Region == targetRegion)
-        {
-            return MoveWithinRegion(item, targetIndex);
-        }
-
-        return MoveToRegion(item, targetRegion, targetIndex);
-    }
-
     internal bool CanDelete(BlockItemViewModel item)
     {
-        if (item is null)
-        {
-            return false;
-        }
-
-        if (IsLocked)
-        {
-            return false;
-        }
-
-        return item.IsClone;
+        return item is not null && !IsLocked;
     }
 
     internal void Delete(BlockItemViewModel item)
@@ -366,149 +187,100 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             return;
         }
 
-        var region = item.Instance.Region;
-        var collection = GetRegionCollection(region);
-        if (!collection.Remove(item))
-        {
-            return;
-        }
-
-        _itemLookup.Remove(item.Instance.InstanceId);
-        _instances.RemoveAll(instance => instance.InstanceId.Value == item.Instance.InstanceId.Value);
-        ReindexRegion(region);
-        Persist();
-        RefreshCommandStates();
+        _instances.Remove(item.Instance);
+        Blocks.Remove(item);
+        Grid.Tiles.RemoveAll(tile => string.Equals(tile.Id, item.TileId, StringComparison.OrdinalIgnoreCase));
+        Save();
     }
 
     private void BuildInitialCollections()
     {
-        foreach (var pair in _regions)
+        if (_instances.Count == 0)
         {
-            pair.Value.Clear();
+            return;
         }
 
-        _itemLookup.Clear();
-
-        foreach (var instance in _instances.OrderBy(i => i.Order))
+        for (var i = 0; i < _instances.Count; i++)
         {
-            if (!_regions.ContainsKey(instance.Region))
+            var instance = _instances[i];
+            if (!_catalog.TryResolve(instance.DefinitionId, out var definition))
             {
                 continue;
             }
 
-            if (_catalog.Get(instance.DefinitionId) is not BlockDefinition definition)
-            {
-                continue;
-            }
-
-            var viewModel = new BlockItemViewModel(instance, definition, this);
-            _itemLookup[instance.InstanceId] = viewModel;
-            _regions[instance.Region].Add(viewModel);
+            var tile = EnsureTile(instance, i);
+            var item = new BlockItemViewModel(instance, definition, this, tile);
+            Blocks.Add(item);
         }
 
-        RefreshCommandStates();
+        TrimOrphanedTiles();
     }
 
-    private ObservableCollection<BlockItemViewModel> GetRegionCollection(BlockRegion region)
+    private TileSpec EnsureTile(BlockInstance instance, int index)
     {
-        if (!_regions.TryGetValue(region, out var collection))
+        var tileId = instance.InstanceId.Value.ToString();
+        var tile = Grid.Tiles.FirstOrDefault(t => string.Equals(t.Id, tileId, StringComparison.OrdinalIgnoreCase));
+        if (tile is not null)
         {
-            throw new InvalidOperationException($"Region '{region}' is not supported by the current shell host.");
+            return tile;
         }
 
-        return collection;
+        var row = index % Math.Max(1, Grid.Rows);
+        var column = (index / Math.Max(1, Grid.Rows)) * 2;
+        tile = new TileSpec
+        {
+            Id = tileId,
+            Row = row,
+            Col = column,
+        };
+        Grid.Tiles.Add(tile);
+        return tile;
     }
 
-    private static string GetStatusMessage(BlockDefinition definition)
+    private void TrimOrphanedTiles()
     {
-        if (!string.IsNullOrWhiteSpace(definition.CommandKey)
-            && DefaultStatusMessages.TryGetValue(definition.CommandKey, out var message))
+        var validIds = new HashSet<string>(Blocks.Select(b => b.TileId), StringComparer.OrdinalIgnoreCase);
+        Grid.Tiles.RemoveAll(tile => !validIds.Contains(tile.Id));
+    }
+
+    private void RefreshCommandStates()
+    {
+        foreach (var item in Blocks)
+        {
+            item.RefreshCommandStates();
+        }
+    }
+
+    private string GetStatusMessage(BlockDefinition definition)
+    {
+        if (definition is null)
+        {
+            return string.Empty;
+        }
+
+        if (!string.IsNullOrWhiteSpace(definition.CommandKey) &&
+            DefaultStatusMessages.TryGetValue(definition.CommandKey, out var message))
         {
             return message;
         }
 
         return string.IsNullOrWhiteSpace(definition.Label)
             ? "Command executed."
-            : $"{definition.Label} executed.";
+            : $"{definition.Label} activated.";
     }
 
-    private async Task DispatchCommandAsync(string commandKey)
+    private Task DispatchCommandAsync(string commandKey)
     {
-        try
-        {
-            await _commandDispatcher.DispatchAsync("shell.blocks", commandKey).ConfigureAwait(false);
-        }
-        catch
-        {
-            // Ignore dispatch failures for now – logging occurs inside the dispatcher.
-        }
+        return _commandDispatcher.DispatchAsync(commandKey);
     }
 
-    private void Persist()
+    private void Save()
     {
-        foreach (var instance in _instances)
-        {
-            if (_regions.TryGetValue(instance.Region, out var collection))
-            {
-                var index = collection.FindIndex(vm => vm.Instance.InstanceId.Value == instance.InstanceId.Value);
-                if (index >= 0)
-                {
-                    instance.Order = index;
-                }
-            }
-        }
-
         _layoutStore.Save(_instances);
     }
 
-    private void ReindexRegion(BlockRegion region)
+    private void OnPropertyChanged([CallerMemberName] string? name = null)
     {
-        if (!_regions.TryGetValue(region, out var collection))
-        {
-            return;
-        }
-
-        for (var i = 0; i < collection.Count; i++)
-        {
-            collection[i].Instance.Order = i;
-        }
-    }
-
-    private void RefreshCommandStates()
-    {
-        foreach (var item in _itemLookup.Values)
-        {
-            item.RefreshCommandStates();
-        }
-    }
-
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-}
-
-internal static class ObservableCollectionExtensions
-{
-    public static int FindIndex<T>(this ObservableCollection<T> source, Func<T, bool> predicate)
-    {
-        if (source is null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
-
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
-
-        for (var i = 0; i < source.Count; i++)
-        {
-            if (predicate(source[i]))
-            {
-                return i;
-            }
-        }
-
-        return -1;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
-

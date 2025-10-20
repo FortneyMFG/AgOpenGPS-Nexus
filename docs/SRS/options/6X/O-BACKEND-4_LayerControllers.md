@@ -38,15 +38,9 @@ Refactors the backend navigation/mapping services to manage per-section layer co
 L — Touches ingestion, mapping, rendering, and configuration code paths with new controller abstractions and replay harnesses.
 
 ## References
-<<<<<<< HEAD
 - [Section 72 — Mapping Layers Plugin](../sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
 - [Section 32 — Persistence & Formats](../sections/3X_Data_Storage/32_Persistence_Formats.md)
 - [Section 61 — Kinematics & Pose Fusion](../sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
-=======
-- [Section 72 — Mapping Layers Plugin](../sections/7X/72_Mapping_Layers_Plugin.md)
-- [Section 32 — Persistence & Formats](../sections/3X/32_Persistence_Formats.md)
-- [Section 61 — Kinematics & Pose Fusion](../sections/6X/61_Kinematics_Pose_Fusion.md)
->>>>>>> origin/develop
 
 ## Related ADRs
 - [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)

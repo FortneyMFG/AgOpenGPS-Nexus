@@ -53,11 +53,7 @@ Compatibility with firmware, tooling support, latency, schema governance, ease o
 - Bridging PGNs to typed APIs is viewed as the safest path toward Linux/Core pilots without stranding current firmware.【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】
 
 ## Upcoming ADR coverage
-<<<<<<<< HEAD:docs/SRS/sections/4X_Interprocess_Communications/41_Inter_Application_API.md
 - **ADR-008 Equipment hierarchy** will settle the canonical geometry/tree metadata, satisfying new requirements R-GEO-000 through R-GEO-002 and feeding the control semantics defined in Section 61.【F:docs/ADR/ADR-roadmap.md†L27-L33】【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L1-L80】
-========
-- **ADR-008 Equipment hierarchy** will settle the canonical geometry/tree metadata, satisfying new requirements R-GEO-000 through R-GEO-002 and feeding the control semantics defined in Section 61.【F:docs/ADR/ADR-roadmap.md†L27-L33】【F:docs/SRS/sections/6X/61_Kinematics_Pose_Fusion.md†L1-L80】
->>>>>>>> origin/develop:docs/SRS/sections/4X/41_Inter_Application_API.md
 - **ADR-017 Profiles & kinematics** will extend the manifest expectations with hitch linkages, pivot tongues, and sensor fusion priorities so pose outputs align with the PoseStream architecture (ADR-007).【F:docs/ADR/ADR-roadmap.md†L99-L105】
 
 ## Open questions

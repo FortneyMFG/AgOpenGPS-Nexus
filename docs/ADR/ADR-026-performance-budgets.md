@@ -31,17 +31,10 @@ As Nexus integrates PoseStream, controllers, and visualization pipelines, perfor
 - Alerting pipeline must page on-call when budgets exceed thresholds for two consecutive runs, verified through synthetic breach exercises.
 
 ## References
-<<<<<<< HEAD
 - [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
 - [Backend services requirements](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
 - [Telemetry & health requirements](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
 - [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
-=======
-- [Communications & transports requirements](../SRS/sections/4X/42_Transports.md)
-- [Backend services requirements](../SRS/sections/2X/21_System_Decomposition_Boundaries.md)
-- [Telemetry & health requirements](../SRS/sections/6X/64_Telemetry_Health.md)
-- [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
->>>>>>> origin/develop
 - [ADR-020: Determinism, replay, and CI guardrails](ADR-020-determinism-replay-ci.md)
 - [ADR-021: Timebase and clock synchronization](ADR-021-timebase-clock-sync.md)
 - [ADR-025: Data lifecycle and retention policy](ADR-025-data-lifecycle-retention.md)

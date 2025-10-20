@@ -32,11 +32,7 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - R-FE-077 (SHOULD, print studio): Provide a Print View mode with scale bars, legends, crop overlays, and template-driven layouts for landlord/compliance PDF exports powered by Map Composer. Operators must preview legends, layer visibility, and page metadata before export.【F:docs/plugins/MapComposer.md†L1-L160】
 - R-FE-090 (MUST, navigation update): Provide Season-first and Farm-first navigator modes, each surfacing breadcrumb trails and filters for Season → Farm → Job → Session transitions.【F:docs/ADR/ADR-040_SeasonOrganizers.md†L55-L73】【F:docs/ADR/ADR-041_JobSessions.md†L55-L73】
 - R-FE-091 (MUST, machines drawer): Implement a machine drawer that lists nearby devices, presence status, trail visibility presets, and stale indicators sourced from the multi-machine mesh.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L33-L62】
-<<<<<<<< HEAD:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md
 - R-FE-092 (MUST, session panel): Surface a session panel with environment snapshot, inputs, notes, and linked layers with provenance badges. Panel supports inline edits with autosave indicators and plugin badges (crop type, genetics, profit).【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L45-L74】
-========
-- R-FE-092 (MUST, session panel): Surface a session panel with environment snapshot, inputs, notes, and linked layers with provenance badges. Panel supports inline edits with autosave indicators and plugin badges (crop type, genetics, profit).【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L45-L74】
->>>>>>>> origin/develop:docs/SRS/sections/9X/91_UI_Shell_Layout.md
 - R-FE-093 (SHOULD, zone toolbar integration): Embed the Zone Tool toolbar and attribute panel defined in ADR-044, including edit locks, undo/redo stack, and collaborator presence chips.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
 - R-FE-060 (MUST, companion rollout): Ship a connection center that handles discovery (mDNS/manual), authentication, reconnect, and health states so Android/iOS tablets can attach to Core/AgIO over gRPC or gRPC-Web without bespoke builds.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L31】
 - R-FE-061 (SHOULD, offline resilience): Provide an offline cache for boundaries, guidance sets, and coverage so companion clients continue rendering field context while disconnected and resync when links return.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L31】
@@ -49,11 +45,7 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - R-FE-030 (MUST, plugin manifest UI): Load plugin-declared panels, config pages, and map overlays at runtime using declarative manifests so Core/UI updates do not require recompiling plugin visuals.
 - R-FE-031 (MUST, safety gating): Enforce capability-aware states (monitor vs. control) across plugin UI surfaces so panels that issue commands remain hidden or read-only when permissions are denied or connections degrade.
 - R-FE-032 (SHOULD, shared widgets): Provide a shared library of charts, tables, and map overlay primitives that plugin UI contributions can reference declaratively, preventing plugins from shipping bespoke rendering stacks.
-<<<<<<<< HEAD:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md
 - R-FE-033 (MUST, lifecycle hooks): Expose binding helpers for plugin UIs to subscribe to `onContextChanged`, `onSessionPause/Resume`, `onLayerStartEdit`, and mesh presence events without manual event-bus plumbing.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
-========
-- R-FE-033 (MUST, lifecycle hooks): Expose binding helpers for plugin UIs to subscribe to `onContextChanged`, `onSessionPause/Resume`, `onLayerStartEdit`, and mesh presence events without manual event-bus plumbing.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L18-L74】【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
->>>>>>>> origin/develop:docs/SRS/sections/9X/91_UI_Shell_Layout.md
 
 ## Options
 - O-FE-0: Status quo — Windows desktop suite (AgOpenGPS + AgIO + utilities).

@@ -84,12 +84,6 @@ device.
 
 ## References
 
-<<<<<<< HEAD
 - [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
 - [Section 91 — UI Shell & Layout](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
 - [Section 64 — Telemetry & Health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
-=======
-- [Section 42 — Transports](../SRS/sections/4X/42_Transports.md)
-- [Section 91 — UI Shell & Layout](../SRS/sections/9X/91_UI_Shell_Layout.md)
-- [Section 64 — Telemetry & Health](../SRS/sections/6X/64_Telemetry_Health.md)
->>>>>>> origin/develop

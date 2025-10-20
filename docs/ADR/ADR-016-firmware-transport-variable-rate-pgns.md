@@ -31,13 +31,8 @@ Delivering layer definitions and feedback between Core, AgIO, and implement firm
 - Heartbeat watchdog tests must prove sections fail closed after 300 ms of missed heartbeats and recover automatically when communication resumes.
 
 ## References
-<<<<<<< HEAD
 - [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
 - [Hardware I/O requirements](../SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
-=======
-- [Communications & transports requirements](../SRS/sections/4X/42_Transports.md)
-- [Hardware I/O requirements](../SRS/sections/5X/51_Sensor_Actuator_Abstractions.md)
->>>>>>> origin/develop
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
 - [ADR-015: Section control and grouping semantics](ADR-015-section-control-grouping-semantics.md)
 - [ADR-031: Official plugin bundle governance](ADR-031-official-plugin-bundle.md)

@@ -19,15 +19,9 @@ Operators need to configure articulated, multi-steer, and tracked machines witho
 
 ## SRS Impact
 
-<<<<<<< HEAD
 - Fulfils the multi-steer configurator blueprint captured in §06 Hardware I/O and option O-HW-7, establishing schema, calibration, and redundancy requirements for articulated rigs.【F:docs/SRS/options/5X/O-HW-7_MultiSteerConfigurator.md†L19-L446】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L1-L38】
 - Extends §09 Control & Automation by publishing curvature limits, drive-direction policies, and slip feedback the planners must honour across autosteer modes.【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L12-L60】
 - Provides telemetry and health contracts referenced in §10 Telemetry & Health for monitoring controller authority, calibration state, and fallback behaviour.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L6-L41】
-=======
-- Fulfils the multi-steer configurator blueprint captured in §06 Hardware I/O and option O-HW-7, establishing schema, calibration, and redundancy requirements for articulated rigs.【F:docs/SRS/options/5X/O-HW-7_MultiSteerConfigurator.md†L19-L446】【F:docs/SRS/sections/5X/51_Sensor_Actuator_Abstractions.md†L1-L38】
-- Extends §09 Control & Automation by publishing curvature limits, drive-direction policies, and slip feedback the planners must honour across autosteer modes.【F:docs/SRS/sections/6X/61_Kinematics_Pose_Fusion.md†L12-L60】
-- Provides telemetry and health contracts referenced in §10 Telemetry & Health for monitoring controller authority, calibration state, and fallback behaviour.【F:docs/SRS/sections/6X/64_Telemetry_Health.md†L6-L41】
->>>>>>> origin/develop
 
 ## Consequences
 - Guidance, section, and automation planners can rely on a uniform axle-centric model with explicit limits, reducing bespoke rig integrations and enabling deterministic simulation across articulated tractors, tracked drives, and steerable implements.

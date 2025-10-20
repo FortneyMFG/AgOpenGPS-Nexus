@@ -37,12 +37,7 @@ Legacy AOG configurations model implements as flat lists of sections with limite
 - Configuration editor UX must reject invalid overlap definitions and surface contextual guidance covered by automated UI tests.
 
 ## References
-<<<<<<< HEAD
 - [Interprocess API requirements](../SRS/sections/4X_Interprocess_Communications/41_Inter_Application_API.md)
 - [Control & automation requirements](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
-=======
-- [Interprocess API requirements](../SRS/sections/4X/41_Inter_Application_API.md)
-- [Control & automation requirements](../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
->>>>>>> origin/develop
 - [ADR-007: PoseStream and SectionState architecture](ADR-007-posestream-sectionstate-architecture.md)
 - [ADR-015: Section control & grouping semantics](ADR-015-section-control-grouping-semantics.md)

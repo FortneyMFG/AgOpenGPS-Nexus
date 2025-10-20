@@ -31,15 +31,9 @@ The Nexus guidance stack must reconcile legacy planners (AB, curve, turn) and co
 - Firmware loop-in-the-loop benches must demonstrate steady-state steering error ≤ 2° at 15 km/h using recorded PoseStream inputs.
 
 ## References
-<<<<<<< HEAD
 - [Control & automation requirements](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
 - [Interprocess API requirements](../SRS/sections/4X_Interprocess_Communications/41_Inter_Application_API.md)
 - [Extensibility & plugin requirements](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
-=======
-- [Control & automation requirements](../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
-- [Interprocess API requirements](../SRS/sections/4X/41_Inter_Application_API.md)
-- [Extensibility & plugin requirements](../SRS/sections/9X/94_Extensibility_Packaging_Updates.md)
->>>>>>> origin/develop
 - [ADR-027: Spatial constraints and zone policies](ADR-027-spatial-constraints.md)
 - [ADR-068: Layer controllers and aggregation runtime](ADR-068-layer-controllers-runtime.md)
 - [ADR-017: Equipment profiles and kinematics](ADR-017-profiles-kinematics.md)

@@ -41,11 +41,7 @@ Driver support, latency, deployability, developer velocity, end-user setup compl
 - Community leans to dual-first with a strict abstraction for hardware I/O, but nobody wants to drop Windows today.
 - The .NET 8 + Avalonia stack is emerging as the preferred path because it keeps Windows-first quick starts while unlocking Linux ARM64 deployments through shared AgIO backends.【F:docs/SRS/options/1X/O-STACK-1_DotNet8Avalonia.md†L1-L79】
 - Interest is growing in piloting the Linux Core packaging while validating PGN compatibility before committing to a broader migration.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L21-L44】【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
-<<<<<<<< HEAD:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md
 - The same Avalonia stack gives us a straight path to Android/iOS companions while delaying hardware integration until the run-mode strategy proves itself, keeping Windows/Linux rigs stable during the rollout.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L44】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L26-L72】
-========
-- The same Avalonia stack gives us a straight path to Android/iOS companions while delaying hardware integration until the run-mode strategy proves itself, keeping Windows/Linux rigs stable during the rollout.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L44】【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L26-L72】
->>>>>>>> origin/develop:docs/SRS/sections/1X/11_OS_Support.md
 
 ## Open questions
 - Which distros to support officially if we invest in Linux parity?

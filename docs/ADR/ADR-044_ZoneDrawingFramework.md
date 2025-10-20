@@ -101,13 +101,7 @@ validation and provenance entries.
 
 ## SRS Impact
 
-<<<<<<< HEAD
 - Fulfills R-DATA-040 and R-DATA-043 journal/schema expectations in §08 Data Model & Storage.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L28-L33】
 - Delivers shared toolbar and attribute panel experiences required by R-FE-070, R-FE-071, and R-FE-093 in §05 Frontends.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L22-L36】
 - Binds editing lifecycle hooks referenced by R-FE-033 and related job lifecycle events in §03 Job Lifecycle.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L48】【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L21-L35】
-=======
-- Fulfills R-DATA-040 and R-DATA-043 journal/schema expectations in §08 Data Model & Storage.【F:docs/SRS/sections/3X/32_Persistence_Formats.md†L28-L33】
-- Delivers shared toolbar and attribute panel experiences required by R-FE-070, R-FE-071, and R-FE-093 in §05 Frontends.【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L22-L36】
-- Binds editing lifecycle hooks referenced by R-FE-033 and related job lifecycle events in §03 Job Lifecycle.【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L48】【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L21-L35】
->>>>>>> origin/develop
 - Adds `LayerEditEvent.v1` schema under `/schemas` with examples for regression testing.

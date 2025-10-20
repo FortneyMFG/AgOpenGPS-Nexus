@@ -13,11 +13,7 @@ This section summarizes the planned gRPC surface area for Nexus Core along with 
 | `aog.job.SessionService` | Start/end sessions, append notes, inputs, and weather snapshots. | Drafting (ADR-041) | Session payload, lifecycle events, and metadata expectations documented in ADR-041 and backed by `Session.v1` schema.【F:docs/ADR/ADR-041_JobSessions.md†L1-L60】【F:schemas/Session.v1.json†L1-L84】 |
 | `aog.layer.LayerService` | Enumerate layer definitions, read/write layer metadata, and orchestrate provenance. | Drafting (ADR-010) | LayerDefinition governance, validator expectations, and provenance hashing live in ADR-010 and `Layer.v1`.【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L11-L40】【F:schemas/Layer.v1.json†L1-L73】 |
 | `aog.layer.TileStoreService` | Chunked binary tile upload/download aligned with ADR-009 persistence. | In Review (ADR-009) | TileStore chunking, transforms, and crash safety defined in ADR-009; service scaffolding aligns with those guarantees.【F:docs/ADR/ADR-009-posestream-vector-tilestore-persistence.md†L11-L45】 |
-<<<<<<<< HEAD:docs/SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md
 | `aog.telemetry.TelemetryService` | Publish GNSS/IMU/rate feeds and subscribe to diagnostics. | Drafting (Telemetry mesh ADRs) | Telemetry QoS, diagnostics, and mesh replication tracked in telemetry SRS and ADR-047 while gRPC contract is drafted.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L1-L44】【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L1-L66】 |
-========
-| `aog.telemetry.TelemetryService` | Publish GNSS/IMU/rate feeds and subscribe to diagnostics. | Drafting (Telemetry mesh ADRs) | Telemetry QoS, diagnostics, and mesh replication tracked in telemetry SRS and ADR-047 while gRPC contract is drafted.【F:docs/SRS/sections/6X/64_Telemetry_Health.md†L1-L44】【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L1-L66】 |
->>>>>>>> origin/develop:docs/SRS/sections/7X/71_Mapping_Kernel_Contracts.md
 | `aog.machine.DeviceService` | Enumerate connected implements, ECUs, and health reports. | Drafting (Capabilities/Device schemas) | Device schema anchors IDs and health payloads ahead of gRPC scaffolding.【F:schemas/Device.v1.json†L1-L80】 |
 | `aog.machine.MultiMachineService` | Coordinate presence and telemetry mesh participation across rigs. | Drafting (ADR-047) | Live telemetry mesh topics, QoS, and ACLs defined in ADR-047 inform this service.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L71】 |
 | `aog.analytics.AnalyticsService` | Run summaries/derivations (yield, profitability, VR QA). | Drafting (ADR-049/050) | Analytics APIs and rollup expectations live in ADR-049 (yield) and ADR-050 (profit).【F:docs/ADR/ADR-049_YieldPlugin.md†L1-L56】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L1-L56】 |
@@ -194,11 +190,7 @@ Guidance overlays and multi-field envelopes are handled in ADR-033 and ADR-043, 
 | `telemetry.error` | Autosteer deviation layer. | cm | Drafting (Telemetry SRS) |
 | `telemetry.hours` | Operating hours heatmap. | hours | Drafting (Telemetry SRS) |
 
-<<<<<<<< HEAD:docs/SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md
 Live telemetry mesh ADR-047 and telemetry SRS requirements capture the share/subscribe expectations for these overlays.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L71】【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L24-L44】
-========
-Live telemetry mesh ADR-047 and telemetry SRS requirements capture the share/subscribe expectations for these overlays.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L71】【F:docs/SRS/sections/6X/64_Telemetry_Health.md†L24-L44】
->>>>>>>> origin/develop:docs/SRS/sections/7X/71_Mapping_Kernel_Contracts.md
 
 ### Administrative & Meta
 
@@ -212,9 +204,5 @@ Notes and zone annotations tie into the zone framework, report polygons originat
 
 ## Relationships & Context Bus
 
-<<<<<<<< HEAD:docs/SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md
 Farm → Field → Season → Job → Session context is emitted over the lifecycle bus defined in ADR-040/041/043 and SRS §03 so plugins can subscribe once and receive deterministic updates when jobs or sessions change.【F:docs/ADR/ADR-040_SeasonOrganizers.md†L21-L44】【F:docs/ADR/ADR-041_JobSessions.md†L52-L72】【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L1-L53】 Layer provenance references `jobId` and `sessionId` through `Layer.v1`, ensuring analytics, reporting, and collaborative editing share consistent identifiers.【F:schemas/Layer.v1.json†L1-L73】
-========
-Farm → Field → Season → Job → Session context is emitted over the lifecycle bus defined in ADR-040/041/043 and SRS §03 so plugins can subscribe once and receive deterministic updates when jobs or sessions change.【F:docs/ADR/ADR-040_SeasonOrganizers.md†L21-L44】【F:docs/ADR/ADR-041_JobSessions.md†L52-L72】【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L1-L53】 Layer provenance references `jobId` and `sessionId` through `Layer.v1`, ensuring analytics, reporting, and collaborative editing share consistent identifiers.【F:schemas/Layer.v1.json†L1-L73】
->>>>>>>> origin/develop:docs/SRS/sections/7X/71_Mapping_Kernel_Contracts.md
 

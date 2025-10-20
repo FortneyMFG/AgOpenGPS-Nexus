@@ -1,0 +1,130 @@
+# [Section Number] — [Section Title] (Status: [drafting/review/final])
+
+## [X.1 Purpose]
+
+Briefly describe what this section defines and its purpose within the broader system. Explain the function, scope, and intended outcomes in concise, outcome-based language.
+
+---
+
+## [X.2 Legacy Comparison]
+
+Describe how AgOpenGPS (AOG) and its historical branches (e.g., **V6**, **Dev**, **ROC**, **AgValonia**) currently implement this capability. Include major behavioral differences between forks and note how those inform modernization.
+
+| Area                    | Current / Legacy Behavior                                                                   | Identified Limitation                                      | Modernization Opportunity                                               | Reference     |
+| ----------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------- | ------------- |
+| Architecture            | Direct linkage between planner and steering logic with minimal modularization.              | Tight coupling restricts plugin architecture.              | Introduce layered interfaces and standardized APIs.                     | AOG V6, SK21  |
+| Performance             | 10 Hz control loop using serial or UDP communication.                                       | Latency and jitter increase under high CPU load.           | Transition to asynchronous message streaming at 25–50 Hz.               | ROC Dev       |
+| Controller Logic        | Pure Pursuit algorithm implemented in UI or worker thread; variant PID tuners across forks. | Difficult to test and tune independently.                  | Modularize into configurable controller plugins with unified interface. | V6, AgValonia |
+| Telemetry & Diagnostics | Logs manually extracted from CSV or console output.                                         | Limited regression visibility and no structured telemetry. | Centralized telemetry with schema-defined metrics and dashboards.       | SK21, ROC     |
+
+**Purpose:** This section provides historical and contextual understanding of legacy implementations, referencing major AOG variants to guide migration. It is **informative** and not part of conformance criteria.
+
+---
+
+## [X.3 Requirements]
+
+| ID         | Priority | Category      | Summary                                      | Key Metrics                    |
+| ---------- | -------- | ------------- | -------------------------------------------- | ------------------------------ |
+| R-XXXX-000 | MUST     | Capability    | Define the essential capability or behavior. | Metric or verification method. |
+| R-XXXX-001 | SHOULD   | Performance   | Define timing or accuracy expectations.      | Quantitative target.           |
+| R-XXXX-002 | MAY      | Extensibility | Optional features or future considerations.  | Traceable reference.           |
+
+**Guidelines:**
+
+* Group related requirements by theme (capability, performance, telemetry, safety).
+* Each requirement should be **testable, measurable, and uniquely identified**.
+
+---
+
+## [X.4 Option Overview]
+
+This subsection is **informative** and enumerates alternative design or implementation options that could meet the above requirements.
+
+| Option ID | Status     | Favorite | Type   | Description                                     | Reference Document             |
+| --------- | ---------- | -------- | ------ | ----------------------------------------------- | ------------------------------ |
+| **X-O1**  | Draft      | ★        | [Type] | Short description of how it works and its role. | [X-O1-Title.md](X-O1-Title.md) |
+| **X-O2**  | Approved   | ☆        | [Type] | Brief design summary.                           | [X-O2-Title.md](X-O2-Title.md) |
+| **X-O3**  | Deprecated |          | [Type] | Informative note or placeholder.                | —                              |
+
+**Document naming convention:** Option specs use the pattern `X-OX-Title.md`. Leave the **Reference Document** field blank (—) when the document does not yet exist.
+
+---
+
+## [X.5 Comparison Matrix]
+
+Provide a high-level comparison of the available options, focusing on trade-offs and distinguishing characteristics.
+
+| Attribute          | X-O1                  | X-O2                 | X-O3                              |
+| ------------------ | --------------------- | -------------------- | --------------------------------- |
+| Core Approach      | Geometric             | Feedback             | Predictive                        |
+| Typical Complexity | Low                   | Medium               | High                              |
+| Strengths          | Simple, deterministic | Balanced performance | Handles constraints, anticipatory |
+| Limitations        | Ignores delay         | Needs tuning         | Computationally intensive         |
+| Primary Use Case   | Baseline fallback     | General control      | Advanced automation               |
+
+**Note:** Use this matrix to communicate at-a-glance differences—values are illustrative and may be replaced with domain-specific attributes.
+
+---
+
+## [X.6 Decision Matrix]
+
+Use this matrix to record and communicate the rationale behind selecting one or more options. Weight and score each criterion based on relevance to project goals.
+
+| Criterion                 | Weight | X-O1 | X-O2 | X-O3 |
+| ------------------------- | ------ | ---- | ---- | ---- |
+| Implementation Complexity | —      | —    | —    | —    |
+| Performance Potential     | —      | —    | —    | —    |
+| Maintainability           | —      | —    | —    | —    |
+| Maturity / Proven Use     | —      | —    | —    | —    |
+| Extensibility             | —      | —    | —    | —    |
+| **Weighted Total**        | 1.0    | —    | —    | —    |
+
+**Guidelines:** This table is **informative** and supports transparent decision-making. Weights and scores are context-dependent and determined by reviewers during design evaluation.
+
+---
+
+## [X.7 Evaluation & Verification]
+
+**Performance Benchmarks**
+
+* Define measurable metrics for timing, accuracy, and latency.
+* Establish thresholds for acceptable versus exceptional performance.
+
+**Test Procedure Summary**
+
+1. Describe standard simulation or field test workflows.
+2. Identify input data sets and verification methods.
+3. Define telemetry metrics collected during evaluation.
+
+**Acceptance Criteria**
+
+* Link all measurable outcomes to corresponding requirement IDs.
+* Specify thresholds that confirm requirement satisfaction.
+
+---
+
+## [X.8 Implementation Policy]
+
+* Define runtime configuration and interface expectations.
+* Ensure backward compatibility and integration with existing systems.
+* Outline registration or discovery mechanisms for optional extensions or plugins.
+
+---
+
+## [X.9 Community Sentiment]
+
+Summarize relevant community or contributor discussions influencing design direction. Include:
+
+* Agreed guiding principles or shared priorities.
+* Concerns, trade-offs, or lessons learned during development.
+* Long-term goals for openness, maintainability, and ecosystem support.
+
+---
+
+## Standards Context
+
+This template aligns with **IEEE/ISO/IEC 29148 — Software Requirements Specification (SRS)** conventions:
+
+* **Normative content** defines measurable, testable requirements (MUST/SHOULD/MAY).
+* **Informative content** provides context, examples, and design options.
+* **Traceability** ensures each requirement links to verification methods, tests, and implementation artifacts.

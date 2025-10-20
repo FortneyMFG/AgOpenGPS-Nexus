@@ -5,7 +5,6 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 ## Revision log
 | Date | Summary | Key slices |
 |------|---------|------------|
-| 2024-05-16 | Clarified status transitions, added dependency hints, baseline hardware envelopes, and refreshed requirements across sections/options. | Cross-SRS |
 
 ## How this SRS is organized
 - **Vision & Non-goals** capture what the next release aspires to solve and what is intentionally out-of-scope.

@@ -237,11 +237,7 @@ JSON Schemas SHALL target draft 2020-12 with `$id` values under `aog://schemas/g
 - **Direct Autosteer planner extension** — rejected to keep planner orchestration modular and align with plugin governance (ADR-031). The orchestrator remains a plugin to avoid tight coupling with Autosteer internals.
 
 ## References
-<<<<<<< HEAD
 - [SRS §19 Guidance Orchestrator Plugin](../SRS/sections/8X_Guidance/81_Guidance_Orchestrator.md)
-=======
-- [SRS §19 Guidance Orchestrator Plugin](../SRS/sections/8X/81_Guidance_Orchestrator.md)
->>>>>>> origin/develop
 - [ADR-033 Guidance planner & autosteer orchestration](ADR-033-guidance-planner-autosteer.md)
 - [ADR-027 Spatial constraints & zone policies](ADR-027-spatial-constraints.md)
 - [ADR-044 Zone & layer drawing framework](ADR-044_ZoneDrawingFramework.md)

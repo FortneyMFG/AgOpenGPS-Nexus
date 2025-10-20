@@ -54,21 +54,12 @@ This note captures the most meaningful differences between the legacy AgOpenGPS 
 ### Mobile companions and embedded expansion
 - **V6:** Ships no native mobile clients; any tablet workflow depends on remote desktop mirrors or web widgets with limited control fidelity.
 - **Legacy Dev:** Mirrors the same Windows-only expectation, so remote monitoring still requires external remote-desktop tooling and offers no pathway to run Core on-device.
-<<<<<<< HEAD
 - **Nexus direction:** Reuses the Avalonia codebase across Windows, Linux, Android, and iOS by introducing CompanionRemote, LocalInProc, and LocalOutOfProc run modes backed by DI-swappable transports, allowing the same app to start as a remote companion and later embed Core and AgIO on Android hardware while iOS stays remote-first over gRPC-Web.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L44】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L26-L72】
 
 ### Remote Displays, Metadata-Driven Panels, and Simulation Controls
 - **V6:** Keeps operators on the Windows desktop suite (AgOpenGPS + AgIO + utilities) with manual wiring for dashboards and simulation tools, limiting remote or declarative UI experiences.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L3-L24】【F:docs/ADR/ADR-004-composite-simulation.md†L29-L33】
 - **Legacy Dev:** Continues focusing on the same Windows suite, so remote display/control remains ad hoc and dashboards are still hand-crafted rather than metadata-driven.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L3-L33】
 - **Nexus direction:** Plans metadata-driven dashboards, remote clients that attach over the Core APIs, and a unified simulation bar tied to the authoritative SimClock so operators blend hardware, replay, and plugin scenarios without context switching.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L10-L34】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L38-L67】
-=======
-- **Nexus direction:** Reuses the Avalonia codebase across Windows, Linux, Android, and iOS by introducing CompanionRemote, LocalInProc, and LocalOutOfProc run modes backed by DI-swappable transports, allowing the same app to start as a remote companion and later embed Core and AgIO on Android hardware while iOS stays remote-first over gRPC-Web.【F:docs/ADR/ADR-003-avalonia-ui.md†L24-L44】【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L26-L72】
-
-### Remote Displays, Metadata-Driven Panels, and Simulation Controls
-- **V6:** Keeps operators on the Windows desktop suite (AgOpenGPS + AgIO + utilities) with manual wiring for dashboards and simulation tools, limiting remote or declarative UI experiences.【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L3-L24】【F:docs/ADR/ADR-004-composite-simulation.md†L29-L33】
-- **Legacy Dev:** Continues focusing on the same Windows suite, so remote display/control remains ad hoc and dashboards are still hand-crafted rather than metadata-driven.【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L3-L33】
-- **Nexus direction:** Plans metadata-driven dashboards, remote clients that attach over the Core APIs, and a unified simulation bar tied to the authoritative SimClock so operators blend hardware, replay, and plugin scenarios without context switching.【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L10-L34】【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L38-L67】
->>>>>>> origin/develop
 
 ### Plugin-Contributed UI and Safety Awareness
 - **V6:** Has no manifest or capability system, so any UI extension requires shipping new binaries and offers no built-in safety gating for control panels.【F:docs/ADR/ADR-018-plugin-api.md†L36-L38】
@@ -90,10 +81,6 @@ This note captures the most meaningful differences between the legacy AgOpenGPS 
 Across each area, Nexus couples the modernized runtime and UX with bridges that keep legacy deployments productive:
 - The Bridge service translates gRPC contracts to legacy PGNs and back, letting V6/Dev hardware coexist while Nexus services adopt typed APIs.【F:docs/ADR/ADR-002-grpc-contracts.md†L9-L22】
 - AOG-Link is designed to run alongside PGN devices during migration, supporting Ethernet, serial, and CAN transports without forcing immediate firmware rewrites.【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L7-L21】【F:docs/ADR/ADR-006-aog-link-mcu-communications.md†L29-L34】
-<<<<<<< HEAD
 - Metadata-driven UI contributions and plugin manifests allow gradual adoption—operators can continue using the Windows suite while Avalonia shells, remote clients, and declarative dashboards reach parity before becoming defaults.【F:docs/ADR/ADR-003-avalonia-ui.md†L6-L22】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L10-L67】
-=======
-- Metadata-driven UI contributions and plugin manifests allow gradual adoption—operators can continue using the Windows suite while Avalonia shells, remote clients, and declarative dashboards reach parity before becoming defaults.【F:docs/ADR/ADR-003-avalonia-ui.md†L6-L22】【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L10-L67】
->>>>>>> origin/develop
 
 These guardrails ensure Nexus addresses the structural and UX gaps between legacy V6 and Dev without stranding existing rigs.

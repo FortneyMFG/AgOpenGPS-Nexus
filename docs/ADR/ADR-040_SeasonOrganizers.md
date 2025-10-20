@@ -55,15 +55,9 @@ cached analytics and register interest in seasonal overlays before sessions begi
 
 ## SRS Impact
 
-<<<<<<< HEAD
 - Satisfies the season catalog hierarchy, payload, and synchronization notes captured in §02 Data Model for Season → Job → Session orchestration.【F:docs/SRS/sections/3X_Data_Storage/31_Domain_Data_Model.md†L1-L140】
 - Enables season-scoped navigation, analytics, and work planning flows described in §03 Job Lifecycle lifecycle state and event tables.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L1-L64】
 - Provides the context handle relied on by backend services to hydrate caches before sessions, addressing §04 Backend Services orchestration requirements.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L27】
-=======
-- Satisfies the season catalog hierarchy, payload, and synchronization notes captured in §02 Data Model for Season → Job → Session orchestration.【F:docs/SRS/sections/3X/31_Domain_Data_Model.md†L1-L140】
-- Enables season-scoped navigation, analytics, and work planning flows described in §03 Job Lifecycle lifecycle state and event tables.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L1-L64】
-- Provides the context handle relied on by backend services to hydrate caches before sessions, addressing §04 Backend Services orchestration requirements.【F:docs/SRS/sections/2X/21_System_Decomposition_Boundaries.md†L6-L27】
->>>>>>> origin/develop
 
 ## Consequences
 
@@ -97,13 +91,7 @@ cached analytics and register interest in seasonal overlays before sessions begi
 
 ## References
 
-<<<<<<< HEAD
 - [Section 31 — Domain Data Model](../SRS/sections/3X_Data_Storage/31_Domain_Data_Model.md)
 - [Section 62 — Job Lifecycle](../SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md)
 - [Section 21 — System Decomposition & Boundaries](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
-=======
-- [Section 31 — Domain Data Model](../SRS/sections/3X/31_Domain_Data_Model.md)
-- [Section 62 — Job Lifecycle](../SRS/sections/6X/62_Job_Lifecycle.md)
-- [Section 21 — System Decomposition & Boundaries](../SRS/sections/2X/21_System_Decomposition_Boundaries.md)
->>>>>>> origin/develop
 - [ADR-023 — Session & Job Model](ADR-023-session-job-model.md)

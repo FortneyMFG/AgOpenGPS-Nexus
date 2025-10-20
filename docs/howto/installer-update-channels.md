@@ -121,11 +121,7 @@ copy is corrupt.【F:tools/ci/release.ps1†L58-L110】
 ## Offline-first workflow
 
 Many rigs spend weeks offline, so plan updates around portable media in line with
-<<<<<<< HEAD
 the offline-first requirements captured in the SRS.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L1-L33】
-=======
-the offline-first requirements captured in the SRS.【F:docs/SRS/sections/3X/33_Offline_First_Sync.md†L1-L33】
->>>>>>> origin/develop
 
 1. On an Internet-connected machine, download the channel folder you intend to
    deploy (manifest + artifacts).
@@ -150,8 +146,4 @@ you can poll for updates without pulling the full bundle:
 
 This process preserves the manual ZIP workflow demanded by legacy users while
 introducing verifiable manifests and clear channel guidance so staged rollouts
-<<<<<<< HEAD
 stay predictable.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L1-L33】
-=======
-stay predictable.【F:docs/SRS/sections/3X/33_Offline_First_Sync.md†L1-L33】
->>>>>>> origin/develop

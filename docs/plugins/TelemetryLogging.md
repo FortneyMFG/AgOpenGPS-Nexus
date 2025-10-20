@@ -5,11 +5,7 @@ Telemetry logging plugins capture session-scoped data for replay, analytics, and
 
 ## Runtime Responsibilities
 
-<<<<<<< HEAD
 - Subscribe to session lifecycle events to open/close log files per session, capturing environment metadata, equipment profiles, and provenance references.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】【F:docs/ADR/ADR-017-profiles-kinematics.md†L33-L86】
-=======
-- Subscribe to session lifecycle events to open/close log files per session, capturing environment metadata, equipment profiles, and provenance references.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L18-L74】【F:docs/ADR/ADR-017-profiles-kinematics.md†L33-L86】
->>>>>>> origin/develop
 - Record telemetry topics (PoseStream, rate, section state, layer edits, mesh presence) using deterministic timestamping aligned with SimClock/SimBus expectations from ADR-004.【F:docs/ADR/ADR-004-composite-simulation.md†L21-L78】
 - Persist logs in an append-only format with integrity hashes and session IDs. Store metadata for quick indexing (start/end timestamps, job/field IDs, active plugins).
 - Stamp `jobId`, `sessionId`, and `seasonId` columns on every telemetry record so provenance survives export and replay boundaries per ADR-040/ADR-041.

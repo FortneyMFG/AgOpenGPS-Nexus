@@ -3,11 +3,7 @@
 ## Overview
 
 Mapping plugins render coverage, rate, and guidance layers while respecting farm/field geometry and job/session provenance.
-<<<<<<<< HEAD:docs/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md
 Multi-field job envelopes must provide continuous navigation across adjacent fields without breaking statistics or journaling. Core publishes lifecycle events (`onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, `onSessionStart`) so mapping engines can hydrate caches, consume job or session `extensions`, and expose plugin-authored overlays (crop type, profitability, genetics, field health, weather) alongside core coverage.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L64】 Zone editing flows reuse the shared LayerEditService contracts defined in ADR-044.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
-========
-Multi-field job envelopes must provide continuous navigation across adjacent fields without breaking statistics or journaling. Core publishes lifecycle events (`onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, `onSessionStart`) so mapping engines can hydrate caches, consume job or session `extensions`, and expose plugin-authored overlays (crop type, profitability, genetics, field health, weather) alongside core coverage.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L18-L64】 Zone editing flows reuse the shared LayerEditService contracts defined in ADR-044.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
->>>>>>>> origin/develop:docs/SRS/sections/7X/72_Mapping_Layers_Plugin.md
 
 ## Multi-Field Envelope Handling
 
@@ -20,11 +16,7 @@ Multi-field job envelopes must provide continuous navigation across adjacent fie
 
 ## Session Context & Layer Provenance
 
-<<<<<<<< HEAD:docs/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md
 - Mapping, rate, guidance, and analytics plugins receive `jobId`, `sessionId`, and `fieldIds[]` in context events. Outputs must attach provenance referencing the active session, inherit authoring metadata, and include `layerId` entries in `session.layerRefs[]` when persisted.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L66】【F:schemas/Session.v1.json†L1-L115】
-========
-- Mapping, rate, guidance, and analytics plugins receive `jobId`, `sessionId`, and `fieldIds[]` in context events. Outputs must attach provenance referencing the active session, inherit authoring metadata, and include `layerId` entries in `session.layerRefs[]` when persisted.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L18-L66】【F:schemas/Session.v1.json†L1-L115】
->>>>>>>> origin/develop:docs/SRS/sections/7X/72_Mapping_Layers_Plugin.md
 - Layer documents record `jobId`, optional `sessionId`, `units`, and a `provenance` block containing `source`, `transform`,
   `hash`, `createdAt`, and optional `actor`. Reused layers update `jobId`/`sessionId` while appending provenance history instead
   of duplicating payloads.【F:schemas/Layer.v1.json†L1-L117】
@@ -42,11 +34,7 @@ Multi-field job envelopes must provide continuous navigation across adjacent fie
 
 ## Storage & Journaling Expectations
 
-<<<<<<<< HEAD:docs/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md
 - Session autosave triggers flush coverage tiles, LayerEditEvent journals, and provenance updates before acknowledging `onSessionEnd` events.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L66-L92】
-========
-- Session autosave triggers flush coverage tiles, LayerEditEvent journals, and provenance updates before acknowledging `onSessionEnd` events.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L66-L92】
->>>>>>>> origin/develop:docs/SRS/sections/7X/72_Mapping_Layers_Plugin.md
 - Layers inherit the job’s folder layout (`/Jobs/<Job>/layers/<layerId>/`) with metadata stored in `Layer.v1` documents and tiles
   stored under `tiles/` with recommended cell sizes documented in layer-specific ADRs.
 - Journaling retains both planned and actual layers with timestamped provenance entries, enabling later audits to reconstruct the

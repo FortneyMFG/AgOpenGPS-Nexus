@@ -22,11 +22,7 @@ Detail how we observe system health, log events, and surface telemetry (packet r
 - R-TH-032 (SHOULD, edit history telemetry): Forward `LayerEditEvent` summaries to telemetry feeds so collaborative edits appear in health dashboards and reports.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
 - R-TH-033 (SHOULD, weather logging health): Track weather auto-logging cadence, API import status, and sensor availability to alert operators when environmental data falls behind schedule.【F:docs/ADR/ADR-053_WeatherPlugin.md†L33-L49】
 - R-TH-034 (MUST, equipment maintenance): Aggregate engine hours, hydraulic cycles, fault codes, and alert history from telemetry logs into `EquipmentHealthRecord` documents that drive maintenance schedules and predictive alerts surfaced in Device Manager dashboards.【F:docs/plugins/EquipmentHealth.md†L1-L160】
-<<<<<<<< HEAD:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md
 - R-TH-035 (SHOULD, maintenance workflow): Emit maintenance due/overdue events with recommended tasks, required parts, and linked work orders so TaskService can schedule service alongside field jobs.【F:docs/plugins/EquipmentHealth.md†L45-L160】【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L86-L109】
-========
-- R-TH-035 (SHOULD, maintenance workflow): Emit maintenance due/overdue events with recommended tasks, required parts, and linked work orders so TaskService can schedule service alongside field jobs.【F:docs/plugins/EquipmentHealth.md†L45-L160】【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L86-L109】
->>>>>>>> origin/develop:docs/SRS/sections/6X/64_Telemetry_Health.md
 - R-TH-036 (SHOULD, automation safety): Provide rule evaluation telemetry (ruleId, trigger state, action result) for the Automation Engine so operators can audit why actions fired or were suppressed during sessions.【F:docs/plugins/AutomationEngine.md†L1-L150】
 
 ## Options

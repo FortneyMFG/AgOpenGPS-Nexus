@@ -7,11 +7,7 @@ Accepted
 
 
 ## Context
-<<<<<<< HEAD
 The Nexus runtime needs a unified, typed inter-process API that Core, UI, plugins, and automation tools can share while remaining portable across Windows and Linux deployments. Options exploration highlights gRPC/protobuf surfaces published via `Aog.Abstractions` as the preferred evolution path because it isolates hardware integration details inside AgIO/Bridge services and lets higher-level processes communicate over a consistent contract surface.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L4-L58】【F:docs/SRS/options/1X/O-STACK-1_DotNet8Avalonia.md†L9-L36】 Contributors also want determinism, versioning, and compatibility bridges while introducing new transports.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L26-L60】【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】 The MCU communications stack is now defined separately by ADR-006 (AOG-Link) so this decision focuses strictly on intra-host service boundaries.
-=======
-The Nexus runtime needs a unified, typed inter-process API that Core, UI, plugins, and automation tools can share while remaining portable across Windows and Linux deployments. Options exploration highlights gRPC/protobuf surfaces published via `Aog.Abstractions` as the preferred evolution path because it isolates hardware integration details inside AgIO/Bridge services and lets higher-level processes communicate over a consistent contract surface.【F:docs/SRS/sections/4X/42_Transports.md†L4-L58】【F:docs/SRS/options/1X/O-STACK-1_DotNet8Avalonia.md†L9-L36】 Contributors also want determinism, versioning, and compatibility bridges while introducing new transports.【F:docs/SRS/sections/4X/42_Transports.md†L26-L60】【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】 The MCU communications stack is now defined separately by ADR-006 (AOG-Link) so this decision focuses strictly on intra-host service boundaries.
->>>>>>> origin/develop
 
 ## Decision
 Adopt gRPC with protobuf IDLs as the authoritative inter-process API for Nexus services. All Core, UI, plugin, and automation components consume generated clients from the `Aog.Abstractions` package. AgIO/Bridge services host the canonical gRPC endpoints, translating between gRPC contracts and the MCU-facing AOG-Link datagram protocol (ADR-006) and, where needed, bridging AOG-Link frames to legacy PGN transports.
@@ -30,11 +26,7 @@ Adopt gRPC with protobuf IDLs as the authoritative inter-process API for Nexus s
 
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
-<<<<<<< HEAD
 - Inter-process coordination is limited to serial and UDP PGN streams managed by AgIO and the WinForms host, leaving no typed API surface between components today.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L7-L15】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L24】
-=======
-- Inter-process coordination is limited to serial and UDP PGN streams managed by AgIO and the WinForms host, leaving no typed API surface between components today.【F:docs/SRS/sections/4X/42_Transports.md†L7-L15】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L24】
->>>>>>> origin/develop
 
 ### Legacy Dev Branch
 - The dev branch continues to lean on the same PGN transports while experimenting with SocketCAN and normalization inside bridge prototypes, rather than shipping a shared gRPC contract layer.【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L36】
@@ -45,11 +37,7 @@ Adopt gRPC with protobuf IDLs as the authoritative inter-process API for Nexus s
 - **Change-control checklist.** Plugin authors must attach: protobuf diff summary, golden round-trip logs, bridge regression report, and documentation updates. Release tooling blocks package publication until the checklist is complete.
 
 ## References
-<<<<<<< HEAD
 - [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-=======
-- [Section 42 — Transports](../SRS/sections/4X/42_Transports.md)
->>>>>>> origin/develop
 - [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/1X/O-STACK-1_DotNet8Avalonia.md)
 - [Option O-COMM-6 — PGN compatibility bridge](../SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md)
 - [ADR-006 — MCU communications over AOG-Link (nanopb)](ADR-006-aog-link-mcu-communications.md)

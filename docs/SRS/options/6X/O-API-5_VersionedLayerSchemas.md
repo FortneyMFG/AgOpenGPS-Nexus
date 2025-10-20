@@ -37,15 +37,9 @@ Extends interprocess contracts so JSON/protobuf definitions describe layer metad
 M — Requires schema design, serialization tooling, validation, and contributor education but largely builds on existing configuration exchange mechanisms.
 
 ## References
-<<<<<<< HEAD
 - [Section 31 — Domain Data Model](../sections/3X_Data_Storage/31_Domain_Data_Model.md)
 - [Section 32 — Persistence & Formats](../sections/3X_Data_Storage/32_Persistence_Formats.md)
 - [Section 94 — Extensibility, Packaging & Updates](../sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
-=======
-- [Section 31 — Domain Data Model](../sections/3X/31_Domain_Data_Model.md)
-- [Section 32 — Persistence & Formats](../sections/3X/32_Persistence_Formats.md)
-- [Section 94 — Extensibility, Packaging & Updates](../sections/9X/94_Extensibility_Packaging_Updates.md)
->>>>>>> origin/develop
 
 ## Related ADRs
 - [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)

@@ -77,8 +77,4 @@ and firmware PGN mapping as part of ADR-016.
 - [ADR-010: Layer registry and variable-rate framework](../ADR/ADR-010-layer-registry-variable-rate.md)
 - [ADR-027: Spatial constraints & zone policies](../ADR/ADR-027-spatial-constraints.md)
 - [ADR-068: Layer controllers & aggregation runtime](../ADR/ADR-068-layer-controllers-runtime.md)
-<<<<<<< HEAD
 - [SRS §03 — Communications & transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-=======
-- [SRS §03 — Communications & transports](../SRS/sections/4X/42_Transports.md)
->>>>>>> origin/develop

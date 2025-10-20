@@ -36,7 +36,8 @@ This index lists every active section in the SRS with quick links. Each section 
 | 75 | [Tiling & Rendering Services](sections/7X_Mapping_Geospatial/75_Tiling_Rendering_Services.md) | Tile storage, GPU upload, rendering budgets. | Depends on 32 persistence and 91 UI shells; performance covered in 96. |
 | 76 | [Geospatial Extensibility](sections/7X_Mapping_Geospatial/76_Geospatial_Extensibility.md) | Custom layer types, CRS, extensibility governance. | Requires 63 registries and 71/72 contracts; plugin discovery in 94. |
 | 81 | [Guidance Orchestrator](sections/8X_Guidance/81_Guidance_Orchestrator.md) | Boundary management, keep-outs, orchestrator UX. | Depends on 61 fusion, 73 rate policies, and 91 UI shell. |
-| 82 | [Planning & Autosteer Targets](sections/8X_Guidance/82_Planning_Autosteer_Targets.md) | Planner integration, steer target streaming, refresh policies. | Builds on 81 orchestrator, 23 timing, and 64 telemetry. |
+| 82 | [Planning](sections/8X_Guidance/82_Planning.md) | Planner integration, caching, and refresh policies. | Builds on 81 orchestrator, 23 timing, and 64 telemetry. |
+| 83 | [Autosteer Target Models](sections/8X_Guidance/83_Autosteer_Target_Models.md) | Controller models, fallback parity, and tuning workflows. | Depends on 61 pose fusion, 81 orchestrator, and 82 planning. |
 | 91 | [UI Shell & Layout](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) | Desktop/tablet shells, layout/docking, remote clients. | Consumes 11–13 foundations and 71 mapping contracts; depends on 95 security for remote control. |
 | 92 | [Gauges & Machine Panels](sections/9X_Frontends_Ops/92_Gauges_Machine_Panels.md) | Gauge layout, units, operator UX policies. | Depends on 74 monitoring data and 91 layout infrastructure. |
 | 93 | [Command Line Interface](sections/9X_Frontends_Ops/93_Command_Line_Interface.md) | Headless operations, scripting verbs, automation flows. | Builds on 41 APIs, 42 transports, and 94 plugin governance. |
@@ -75,7 +76,8 @@ This index lists every active section in the SRS with quick links. Each section 
 | 75 | [Tiling & Rendering Services](sections/7X/75_Tiling_Rendering_Services.md) | Tile storage, GPU upload, rendering budgets. | Depends on 32 persistence and 91 UI shells; performance covered in 96. |
 | 76 | [Geospatial Extensibility](sections/7X/76_Geospatial_Extensibility.md) | Custom layer types, CRS, extensibility governance. | Requires 63 registries and 71/72 contracts; plugin discovery in 94. |
 | 81 | [Guidance Orchestrator](sections/8X/81_Guidance_Orchestrator.md) | Boundary management, keep-outs, orchestrator UX. | Depends on 61 fusion, 73 rate policies, and 91 UI shell. |
-| 82 | [Planning & Autosteer Targets](sections/8X/82_Planning_Autosteer_Targets.md) | Planner integration, steer target streaming, refresh policies. | Builds on 81 orchestrator, 23 timing, and 64 telemetry. |
+| 82 | [Planning](sections/8X/82_Planning.md) | Planner integration, caching, and refresh policies. | Builds on 81 orchestrator, 23 timing, and 64 telemetry. |
+| 83 | [Autosteer Target Models](sections/8X/83_Autosteer_Target_Models.md) | Controller models, fallback parity, and tuning workflows. | Depends on 61 pose fusion, 81 orchestrator, and 82 planning. |
 | 91 | [UI Shell & Layout](sections/9X/91_UI_Shell_Layout.md) | Desktop/tablet shells, layout/docking, remote clients. | Consumes 11–13 foundations and 71 mapping contracts; depends on 95 security for remote control. |
 | 92 | [Gauges & Machine Panels](sections/9X/92_Gauges_Machine_Panels.md) | Gauge layout, units, operator UX policies. | Depends on 74 monitoring data and 91 layout infrastructure. |
 | 93 | [Command Line Interface](sections/9X/93_Command_Line_Interface.md) | Headless operations, scripting verbs, automation flows. | Builds on 41 APIs, 42 transports, and 94 plugin governance. |

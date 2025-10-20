@@ -58,8 +58,8 @@ documents move or headings change.
 ### SRS §81 Guidance Orchestrator & Simulation
 - Registers plugin-provided simulators and shared simulation helpers.
 
-### SRS §82 Planning & Autosteer Targets
-- Requirements for the AutoSteer-Lite plugin and controller integration.
+### SRS §82 Planning
+- Requirements for planner orchestration, catalog caching, and refresh policies.
 
 ### SRS §73 Variable Mapping & Section Control
 - Requirements for the Sections plugin and coverage gating.
@@ -82,8 +82,8 @@ documents move or headings change.
 ### SRS §73 Coverage & Variable Rate Math
 - Specifies coverage computation parity targets.
 
-### SRS §82 Path Generation & Autosteer Targets
-- Specifies AB/curve/headland generation parity targets.
+### SRS §83 Autosteer Target Models
+- Specifies controller coverage, fallback parity, and tuning interfaces.
 
 ### SRS §61 Kinematics & Controller Gains
 - Specifies controller tuning expectations for AutoSteer-Lite.

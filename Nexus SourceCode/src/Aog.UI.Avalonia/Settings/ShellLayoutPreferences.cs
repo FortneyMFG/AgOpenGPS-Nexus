@@ -33,6 +33,9 @@ public sealed class ShellLayoutPreferences
     /// <summary>Gets or sets the layout metrics for the top telemetry strip.</summary>
     public SidebarLayoutSettings TopSidebar { get; set; } = SidebarLayoutSettings.CreateTopDefaults();
 
+    /// <summary>Gets or sets the layout metrics for the central workspace grid.</summary>
+    public SidebarLayoutSettings WorkspaceGrid { get; set; } = SidebarLayoutSettings.CreateWorkspaceDefaults();
+
     /// <summary>
     /// Legacy alias maintained for compatibility with existing bindings.
     /// </summary>
@@ -65,6 +68,7 @@ public sealed class ShellLayoutPreferences
             RightSidebar = (RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
             BottomSidebar = (BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone(),
             TopSidebar = (TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone(),
+            WorkspaceGrid = (WorkspaceGrid ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone(),
         };
 
         if (Instances.Count > 0)

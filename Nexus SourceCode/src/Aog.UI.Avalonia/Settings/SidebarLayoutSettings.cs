@@ -91,4 +91,18 @@ public sealed class SidebarLayoutSettings
             Spacing = 8d,
         };
     }
+
+    /// <summary>Creates default settings for the central workspace grid.</summary>
+    public static SidebarLayoutSettings CreateWorkspaceDefaults()
+    {
+        return new SidebarLayoutSettings
+        {
+            WidthMode = LayoutDimensionMode.Dynamic,
+            BlockColumns = 6d,
+            HeightMode = LayoutDimensionMode.Dynamic,
+            BlockRows = 6d,
+            BlockSize = 112d,
+            Spacing = 8d,
+        };
+    }
 }

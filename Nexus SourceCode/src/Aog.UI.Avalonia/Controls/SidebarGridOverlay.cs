@@ -91,11 +91,8 @@ public sealed class SidebarGridOverlay : Control
             return;
         }
 
-        var totalWidth = (columnCount * cellWidth) + Math.Max(0, columnCount - 1) * spacing;
-        var totalHeight = (rowCount * cellHeight) + Math.Max(0, rowCount - 1) * spacing;
-
-        var startX = Math.Max(0, (bounds.Width - totalWidth) / 2d);
-        var startY = Math.Max(0, (bounds.Height - totalHeight) / 2d);
+        var startX = 0d;
+        var startY = 0d;
 
         for (var column = 0; column < columnCount; column++)
         {

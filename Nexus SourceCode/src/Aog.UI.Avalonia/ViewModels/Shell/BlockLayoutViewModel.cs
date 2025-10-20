@@ -34,6 +34,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private readonly IBlockCatalog _catalog;
     private readonly IShellCommandDispatcher _commandDispatcher;
     private readonly Dictionary<BlockRegion, SidebarLayoutSettings> _sidebarSettings;
+    private readonly SidebarLayoutSettings _workspaceGridSettings;
     private Action<string> _statusReporter;
     private readonly Dictionary<BlockRegion, ObservableCollection<BlockItemViewModel>> _regions;
     private readonly Dictionary<BlockInstanceId, BlockItemViewModel> _itemLookup;
@@ -75,6 +76,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             [BlockRegion.Bottom] = (preferences.BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone(),
             [BlockRegion.Top] = (preferences.TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone(),
         };
+        _workspaceGridSettings = (preferences.WorkspaceGrid ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone();
 
         BuildInitialCollections();
     }
@@ -102,6 +104,9 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the sizing settings for the top strip.</summary>
     public SidebarLayoutSettings TopSidebarSettings => _sidebarSettings[BlockRegion.Top];
+
+    /// <summary>Gets the sizing settings for the central workspace grid.</summary>
+    public SidebarLayoutSettings WorkspaceGridSettings => _workspaceGridSettings;
 
     /// <summary>Gets or sets a value indicating whether layout modifications are locked.</summary>
     public bool IsLocked

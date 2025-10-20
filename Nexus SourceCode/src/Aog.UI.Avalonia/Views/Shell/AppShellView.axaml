@@ -399,13 +399,13 @@
           <ItemsControl x:Name="TopBlocksControl"
                         ItemsSource="{Binding Layout.TopBlocks}"
                         ItemTemplate="{StaticResource HorizontalBlockTemplate}"
-                        Tag="{Binding Layout.TopSidebarSettings}"
+                        Tag="{Binding Layout.TopSidebarSettings.Spacing}"
                         HorizontalAlignment="Center"
                         DragDrop.AllowDrop="True">
             <ItemsControl.Styles>
               <Style Selector="#TopBlocksControl > ContentPresenter">
                 <Setter Property="Margin"
-                        Value="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+                        Value="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
               </Style>
             </ItemsControl.Styles>
             <ItemsControl.ItemsPanel>
@@ -434,14 +434,14 @@
         <ItemsControl x:Name="BottomBlocksControl"
                       ItemsSource="{Binding Layout.BottomBlocks}"
                       ItemTemplate="{StaticResource HorizontalBlockTemplate}"
-                      Tag="{Binding Layout.BottomSidebarSettings}"
+                      Tag="{Binding Layout.BottomSidebarSettings.Spacing}"
                       HorizontalAlignment="Center"
                       VerticalAlignment="Center"
                       DragDrop.AllowDrop="True">
           <ItemsControl.Styles>
             <Style Selector="#BottomBlocksControl > ContentPresenter">
               <Setter Property="Margin"
-                      Value="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+                      Value="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
             </Style>
           </ItemsControl.Styles>
           <ItemsControl.ItemsPanel>
@@ -486,14 +486,14 @@
             <ItemsControl x:Name="LeftBlocksControl"
                           ItemsSource="{Binding Layout.LeftBlocks}"
                           ItemTemplate="{StaticResource VerticalBlockTemplate}"
-                          Tag="{Binding Layout.LeftSidebarSettings}"
+                          Tag="{Binding Layout.LeftSidebarSettings.Spacing}"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Stretch"
                           DragDrop.AllowDrop="True">
               <ItemsControl.Styles>
                 <Style Selector="#LeftBlocksControl > ContentPresenter">
                   <Setter Property="Margin"
-                          Value="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+                          Value="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
                 </Style>
               </ItemsControl.Styles>
               <ItemsControl.ItemsPanel>
@@ -543,14 +543,14 @@
           <ItemsControl x:Name="RightBlocksControl"
                         ItemsSource="{Binding Layout.RightBlocks}"
                         ItemTemplate="{StaticResource VerticalBlockTemplate}"
-                        Tag="{Binding Layout.RightSidebarSettings}"
+                        Tag="{Binding Layout.RightSidebarSettings.Spacing}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Stretch"
                         DragDrop.AllowDrop="True">
             <ItemsControl.Styles>
               <Style Selector="#RightBlocksControl > ContentPresenter">
                 <Setter Property="Margin"
-                        Value="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+                        Value="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
               </Style>
             </ItemsControl.Styles>
             <ItemsControl.ItemsPanel>

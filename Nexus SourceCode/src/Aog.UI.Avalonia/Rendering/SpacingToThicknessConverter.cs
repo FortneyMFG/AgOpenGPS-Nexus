@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Data.Converters;
+using Aog.UI.Avalonia.Settings;
 
 namespace Aog.UI.Avalonia.Rendering;
 
@@ -13,6 +14,7 @@ public sealed class SpacingToThicknessConverter : IValueConverter
         {
             double d => d,
             float f => f,
+            SidebarLayoutSettings settings => settings.Spacing,
             _ => 0d
         };
 

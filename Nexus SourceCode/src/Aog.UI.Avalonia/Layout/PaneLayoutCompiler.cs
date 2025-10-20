@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Avalonia;
 using Avalonia.Layout;
+using AvaloniaRect = global::Avalonia.Rect;
 
 namespace Aog.UI.Avalonia.Layout;
 
@@ -153,23 +153,23 @@ public static class PaneLayoutCompiler
         return ratios;
     }
 
-    private static Avalonia.Rect CreateVerticalDivider(ShellGridLayout layout, int column, int row, int rowSpan)
+    private static AvaloniaRect CreateVerticalDivider(ShellGridLayout layout, int column, int row, int rowSpan)
     {
         var cell = layout.CellPx;
         var gutter = layout.GutterPx;
         var x = column * (cell + gutter) - gutter / 2;
         var y = row * (cell + gutter);
         var height = rowSpan * cell + Math.Max(0, rowSpan - 1) * gutter;
-        return new Avalonia.Rect(x, y, gutter, height);
+        return new AvaloniaRect(x, y, gutter, height);
     }
 
-    private static Avalonia.Rect CreateHorizontalDivider(ShellGridLayout layout, int column, int row, int colSpan)
+    private static AvaloniaRect CreateHorizontalDivider(ShellGridLayout layout, int column, int row, int colSpan)
     {
         var cell = layout.CellPx;
         var gutter = layout.GutterPx;
         var x = column * (cell + gutter);
         var y = row * (cell + gutter) - gutter / 2;
         var width = colSpan * cell + Math.Max(0, colSpan - 1) * gutter;
-        return new Avalonia.Rect(x, y, width, gutter);
+        return new AvaloniaRect(x, y, width, gutter);
     }
 }

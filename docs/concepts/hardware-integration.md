@@ -1,6 +1,10 @@
 # Hardware Integration Patterns
 
+<<<<<<< HEAD
 This document outlines the hardware integration patterns used in Nexus, mapping directly to the requirements specified in the [OS Support Requirements](../SRS/sections/1X_Platform_Foundations/11_OS_Support.md) and implemented through [ADR-006: AOG-Link MCU Communications](../ADR/ADR-006-aog-link-mcu-communications.md).
+=======
+This document outlines the hardware integration patterns used in Nexus, mapping directly to the requirements specified in the [OS Support Requirements](../SRS/sections/1X/11_OS_Support.md) and implemented through [ADR-006: AOG-Link MCU Communications](../ADR/ADR-006-aog-link-mcu-communications.md).
+>>>>>>> origin/develop
 
 ## Integration Models
 
@@ -95,7 +99,11 @@ graph TD
 
 ## Performance Requirements
 
+<<<<<<< HEAD
 As specified in [Threading, Scheduling & Timing requirements](../SRS/sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md):
+=======
+As specified in [Threading, Scheduling & Timing requirements](../SRS/sections/2X/23_Threading_Scheduling_Timing.md):
+>>>>>>> origin/develop
 
 - Maximum latency: 100ms
 - Minimum update rate: 10Hz
@@ -103,8 +111,13 @@ As specified in [Threading, Scheduling & Timing requirements](../SRS/sections/2X
 
 ## Related Documentation
 
+<<<<<<< HEAD
 - [OS Support Requirements](../SRS/sections/1X_Platform_Foundations/11_OS_Support.md)
 - [Communications Requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+=======
+- [OS Support Requirements](../SRS/sections/1X/11_OS_Support.md)
+- [Communications Requirements](../SRS/sections/4X/42_Transports.md)
+>>>>>>> origin/develop
 - [ADR-006: AOG-Link Protocol](../ADR/ADR-006-aog-link-mcu-communications.md)
 - [Deployment Guide](../deployment/INDEX.md)
 - [Hardware Compatibility List](../deployment/hardware/compatibility.md)

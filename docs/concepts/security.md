@@ -1,6 +1,10 @@
 # Security Model
 
+<<<<<<< HEAD
 This document outlines Nexus's security architecture and implementation, following the requirements specified in our [Security & Permissions requirements](../SRS/sections/9X_Frontends_Ops/95_Security_Permissions.md).
+=======
+This document outlines Nexus's security architecture and implementation, following the requirements specified in our [Security & Permissions requirements](../SRS/sections/9X/95_Security_Permissions.md).
+>>>>>>> origin/develop
 
 ## Core Security Principles
 
@@ -142,7 +146,11 @@ As specified in [ADR-019: Provenance & Audit](../ADR/ADR-019-provenance-audit-qa
 
 ## Related Documentation
 
+<<<<<<< HEAD
 - [Security & Permissions requirements](../SRS/sections/9X_Frontends_Ops/95_Security_Permissions.md)
+=======
+- [Security & Permissions requirements](../SRS/sections/9X/95_Security_Permissions.md)
+>>>>>>> origin/develop
 - [Plugin Security Guide](../plugins/security.md)
 - [Hardware Security](../deployment/security.md)
 - [Security Compliance](../reference/security-compliance.md)

@@ -32,9 +32,15 @@ Multiple controllers, plugins, and firmware nodes must discover each other, exch
 - Operator identity UI must support rename/retire flows covered by automated UI tests with telemetry for every change.
 
 ## References
+<<<<<<< HEAD
 - [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
 - [Hardware I/O requirements](../SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
 - [Extensibility & plugin requirements](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
+=======
+- [Communications & transports requirements](../SRS/sections/4X/42_Transports.md)
+- [Hardware I/O requirements](../SRS/sections/5X/51_Sensor_Actuator_Abstractions.md)
+- [Extensibility & plugin requirements](../SRS/sections/9X/94_Extensibility_Packaging_Updates.md)
+>>>>>>> origin/develop
 - [ADR-016: Firmware and transport for variable-rate layer PGNs](ADR-016-firmware-transport-variable-rate-pgns.md)
 - [ADR-018: Plugin API and capability discovery](ADR-018-plugin-api.md)
 - [ADR-031: Official plugin bundle governance](ADR-031-official-plugin-bundle.md)

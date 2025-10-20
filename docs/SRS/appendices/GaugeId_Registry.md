@@ -1,6 +1,10 @@
 # Gauge ID Registry
 
+<<<<<<< HEAD
 See [Section 15 – Engine & Machine Gauges](../sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md) for requirements, transport framing, and UI behaviors that rely on this registry.
+=======
+See [Section 15 – Engine & Machine Gauges](../sections/7X/74_Monitoring_Systems.md) for requirements, transport framing, and UI behaviors that rely on this registry.
+>>>>>>> origin/develop
 | gaugeId | Name | J1939 PGN / SPN | Units | Convert (raw → engineering) |
 |---|---|---|---|---|
 | 1 | EngineSpeed | 61444 / 190 | rpm | `raw * 0.125` |

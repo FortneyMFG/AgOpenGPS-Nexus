@@ -69,7 +69,11 @@ interpret gauge metadata (IDs, scaling, validity) supplied via JSON definitions.
 - **Medium:** Requires firmware updates (new PGNs + heartbeats), dashboard parsing/rendering, and registry/tooling support.
 
 ## References
+<<<<<<< HEAD
 - J1939/ISOBUS mappings in [Section 15 – Engine & Machine Gauges](../sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md).
+=======
+- J1939/ISOBUS mappings in [Section 15 – Engine & Machine Gauges](../sections/7X/74_Monitoring_Systems.md).
+>>>>>>> origin/develop
 - Current PGN framing documented in [AgIO PGN baseline](../references/AgIO_PGN_Baseline.md).
 
 ## Related ADRs

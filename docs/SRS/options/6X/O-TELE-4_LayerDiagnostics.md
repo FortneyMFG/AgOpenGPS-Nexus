@@ -34,8 +34,13 @@ Adds observability tooling that tracks packet rates, bad samples, and legend par
 M — Requires coordinated updates to diagnostics overlays, logging, and documentation plus shared libraries for decoding.
 
 ## References
+<<<<<<< HEAD
 - [Section 64 — Telemetry & Health](../sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
 - [Section 74 — Monitoring Systems](../sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md)
+=======
+- [Section 64 — Telemetry & Health](../sections/6X/64_Telemetry_Health.md)
+- [Section 74 — Monitoring Systems](../sections/7X/74_Monitoring_Systems.md)
+>>>>>>> origin/develop
 - [AgIO PGN baseline](../references/AgIO_PGN_Baseline.md)
 
 ## Related ADRs

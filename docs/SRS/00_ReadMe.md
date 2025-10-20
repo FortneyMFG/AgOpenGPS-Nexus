@@ -28,6 +28,7 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 
 ### Section catalog
 #### 1X — Platform Foundations
+<<<<<<< HEAD
 - [11 — OS Support](sections/1X_Platform_Foundations/11_OS_Support.md)
 - [12 — Development Language & Runtime](sections/1X_Platform_Foundations/12_Development_Language_Runtime.md)
 - [13 — UI Framework & UX Language](sections/1X_Platform_Foundations/13_UI_Framework_UX.md)
@@ -82,6 +83,62 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 - [94 — Extensibility, Packaging & Updates](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 - [95 — Security & Permissions](sections/9X_Frontends_Ops/95_Security_Permissions.md)
 - [96 — Quality Engineering & Release](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md)
+=======
+- [11 — OS Support](sections/1X/11_OS_Support.md)
+- [12 — Development Language & Runtime](sections/1X/12_Development_Language_Runtime.md)
+- [13 — UI Framework & UX Language](sections/1X/13_UI_Framework_UX.md)
+- [14 — Build Environment & Tooling](sections/1X/14_Build_Tooling.md)
+
+#### 2X — System Architecture
+- [21 — System Decomposition & Boundaries](sections/2X/21_System_Decomposition_Boundaries.md)
+- [22 — Process Model & Deployment Topologies](sections/2X/22_Process_Model_Deployment.md)
+- [23 — Threading, Scheduling & Timing](sections/2X/23_Threading_Scheduling_Timing.md)
+- [24 — Configuration & Environment](sections/2X/24_Configuration_Environment.md)
+
+#### 3X — Data & Storage
+- [31 — Domain Data Model](sections/3X/31_Domain_Data_Model.md)
+- [32 — Persistence & Formats](sections/3X/32_Persistence_Formats.md)
+- [33 — Offline-first & Sync](sections/3X/33_Offline_First_Sync.md)
+- [34 — Backup, Retention & Archival](sections/3X/34_Backup_Retention_Archival.md)
+
+#### 4X — Interprocess & Communications
+- [41 — Inter-Application API](sections/4X/41_Inter_Application_API.md)
+- [42 — Transports](sections/4X/42_Transports.md)
+- [43 — Channel Security](sections/4X/43_Channel_Security.md)
+
+#### 5X — Hardware I/O & Device Layer
+- [51 — Sensor & Actuator Abstractions](sections/5X/51_Sensor_Actuator_Abstractions.md)
+- [52 — AgIO Service](sections/5X/52_AgIO_Service.md)
+- [53 — AOG-Link Compatibility](sections/5X/53_AOG_Link_Compatibility.md)
+- [54 — CM5 Integrated Controller](sections/5X/54_CM5_Integrated_Controller.md)
+- [55 — Firmware Interfaces & Updates](sections/5X/55_Firmware_Interfaces_Updates.md)
+
+#### 6X — Core Domain Services
+- [61 — Kinematics & Pose Fusion](sections/6X/61_Kinematics_Pose_Fusion.md)
+- [62 — Job Lifecycle](sections/6X/62_Job_Lifecycle.md)
+- [63 — Layers Registry & Journal Contracts](sections/6X/63_Layers_Registry_Journal.md)
+- [64 — Telemetry & Health](sections/6X/64_Telemetry_Health.md)
+
+#### 7X — Mapping & Geospatial
+- [71 — Mapping Kernel Contracts](sections/7X/71_Mapping_Kernel_Contracts.md)
+- [72 — Mapping Layers Plugin](sections/7X/72_Mapping_Layers_Plugin.md)
+- [73 — Variable Mapping & Variable Rate Control](sections/7X/73_Variable_Mapping_Rate_Control.md)
+- [74 — Monitoring Systems](sections/7X/74_Monitoring_Systems.md)
+- [75 — Tiling & Rendering Services](sections/7X/75_Tiling_Rendering_Services.md)
+- [76 — Geospatial Extensibility](sections/7X/76_Geospatial_Extensibility.md)
+
+#### 8X — Guidance
+- [81 — Guidance Orchestrator](sections/8X/81_Guidance_Orchestrator.md)
+- [82 — Planning & Autosteer Targets](sections/8X/82_Planning_Autosteer_Targets.md)
+
+#### 9X — Frontends & Ops
+- [91 — UI Shell & Layout](sections/9X/91_UI_Shell_Layout.md)
+- [92 — Gauges & Machine Panels](sections/9X/92_Gauges_Machine_Panels.md)
+- [93 — Command Line Interface](sections/9X/93_Command_Line_Interface.md)
+- [94 — Extensibility, Packaging & Updates](sections/9X/94_Extensibility_Packaging_Updates.md)
+- [95 — Security & Permissions](sections/9X/95_Security_Permissions.md)
+- [96 — Quality Engineering & Release](sections/9X/96_Quality_Engineering_Release.md)
+>>>>>>> origin/develop
 
 ### Option catalog
 #### 1X — Platform Foundations
@@ -204,6 +261,7 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 - **Borrowables** highlight concrete code or assets from AgOpenGPS/AgIO or other projects that we can reuse.
 - **Linting ideas**: unique IDs, table formatting, and link validation can be automated in CI.
 
+<<<<<<< HEAD
 ## Traceability matrix
 _This matrix links every requirement (R-) to the options, references, and eventual ADR homes that will satisfy it. “TBD” ADRs signal where future decisions will land once validation gates are met._
 
@@ -428,6 +486,8 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-CLI-004…R-CLI-007 | O-CLI-0 | [CLI UX & config discovery notes](sections/9X_Frontends_Ops/93_Command_Line_Interface.md) | ADR-054 (TBD) |
 | R-CLI-008…R-CLI-010 | O-CLI-0 | [Versioning & packaging requirements](sections/9X_Frontends_Ops/93_Command_Line_Interface.md) | ADR-054 (TBD) |
 
+=======
+>>>>>>> origin/develop
 ## Glossary
 - **AgIO**: Companion I/O service that provides network, CAN, and serial connectivity for AgOpenGPS.
 - **ADR**: Architecture Decision Record capturing the context, choice, and consequences of an agreed solution.

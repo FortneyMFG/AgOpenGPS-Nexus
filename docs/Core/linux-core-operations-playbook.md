@@ -140,7 +140,11 @@ AGiO journal. Investigate persistent warnings before fielding builds on SBCs.
 
 - Use `journalctl --since "-1 day" -u aog-core -o json` to export structured
   health logs and attach them to support tickets, satisfying the telemetry
+<<<<<<< HEAD
   readiness goals in SRS §10.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L1-L37】
+=======
+  readiness goals in SRS §10.【F:docs/SRS/sections/6X/64_Telemetry_Health.md†L1-L37】
+>>>>>>> origin/develop
 - Mirror `/var/log/aog` and replay bundles from `/var/lib/aog` onto a support
   workstation when diagnosing issues offline. Packaging keeps permissions owned
   by `aogsvc` to preserve provenance when copying across systems.【F:tools/packaging/linux/build-packages.sh†L231-L269】

@@ -31,4 +31,8 @@ sync while the contracts mature.
 ## References
 - [ADR-011 — Mapping & Imagery Visualization](../ADR/ADR-011-mapping-visualization-imagery.md)
 - [ADR-053 — Weather Plugin](../ADR/ADR-053_WeatherPlugin.md)
+<<<<<<< HEAD
 - [Layer registry overview](../SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md)
+=======
+- [Layer registry overview](../SRS/sections/7X/71_Mapping_Kernel_Contracts.md)
+>>>>>>> origin/develop

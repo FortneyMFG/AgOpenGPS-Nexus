@@ -6,7 +6,11 @@ File I/O plugins handle import and export workflows for ISOXML, Shapefile, GeoJS
 
 ## Runtime Responsibilities
 
+<<<<<<< HEAD
 - Implement import pipelines for ISOXML TaskData, Shapefile/GeoJSON vectors, GeoTIFF/COG rasters, and CSV tabular data. Normalize CRS, units, and attribute schemas before writing layers or ledger entries, following the NX-113 ingest flow.【F:docs/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L84-L106】【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】
+=======
+- Implement import pipelines for ISOXML TaskData, Shapefile/GeoJSON vectors, GeoTIFF/COG rasters, and CSV tabular data. Normalize CRS, units, and attribute schemas before writing layers or ledger entries, following the NX-113 ingest flow.【F:docs/SRS/sections/7X/72_Mapping_Layers_Plugin.md†L84-L106】【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】
+>>>>>>> origin/develop
 - Validate incoming layers against Layer Registry definitions. Reject unregistered IDs with actionable diagnostics referencing expected schema hashes.【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】
 - Support export bundles for jobs (layers, ledger, notes, presets) with deterministic folder layouts per ADR-030. Provide integrity manifests (hashes, metadata) for auditing.【F:docs/ADR/ADR-030-field-job-sessions.md†L33-L86】
 - Coordinate with Telemetry Logging and Replay plugins to include log references in job bundles when requested.

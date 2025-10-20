@@ -7,7 +7,11 @@ Proposed
 
 
 ## Context
+<<<<<<< HEAD
 The Nexus roadmap requires a plugin model that keeps Core minimal while letting automation, visualization, and hardware bridges evolve independently. Contributors need out-of-process plugins that register over gRPC, declare capabilities, expose UI contributions, and operate under explicit permissions so headless rigs remain deterministic.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L20-L28】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L20-L23】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L23-L34】【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L16-L22】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L6-L28】 Core today hosts transport, storage, and control logic tightly coupled with built-in UIs and AgIO; introducing hot-pluggable services without governance risks safety regressions, drift in contracts, and incompatible UI extensions.
+=======
+The Nexus roadmap requires a plugin model that keeps Core minimal while letting automation, visualization, and hardware bridges evolve independently. Contributors need out-of-process plugins that register over gRPC, declare capabilities, expose UI contributions, and operate under explicit permissions so headless rigs remain deterministic.【F:docs/SRS/sections/4X/42_Transports.md†L20-L28】【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L20-L23】【F:docs/SRS/sections/5X/51_Sensor_Actuator_Abstractions.md†L23-L34】【F:docs/SRS/sections/6X/61_Kinematics_Pose_Fusion.md†L16-L22】【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md†L6-L28】 Core today hosts transport, storage, and control logic tightly coupled with built-in UIs and AgIO; introducing hot-pluggable services without governance risks safety regressions, drift in contracts, and incompatible UI extensions.
+>>>>>>> origin/develop
 
 ## Decision
 Establish a gRPC-first plugin architecture composed of:
@@ -28,8 +32,13 @@ Establish a gRPC-first plugin architecture composed of:
 ## Consequences
 - **Positive impacts**
   - Core stays minimal and deterministic while enabling rapid plugin innovation (automation, analytics, hardware bridges).
+<<<<<<< HEAD
   - UI shells render plugin contributions declaratively, keeping the desktop, headless, and remote experiences consistent.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L20-L23】
   - Permission gates and lease health checks provide safety boundaries for automation, addressing control requirements R-CTRL-003…R-CTRL-005 and hardware governance R-HW-020…R-HW-023.【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L20-L22】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L23-L34】
+=======
+  - UI shells render plugin contributions declaratively, keeping the desktop, headless, and remote experiences consistent.【F:docs/SRS/sections/9X/91_UI_Shell_Layout.md†L20-L23】
+  - Permission gates and lease health checks provide safety boundaries for automation, addressing control requirements R-CTRL-003…R-CTRL-005 and hardware governance R-HW-020…R-HW-023.【F:docs/SRS/sections/6X/61_Kinematics_Pose_Fusion.md†L20-L22】【F:docs/SRS/sections/5X/51_Sensor_Actuator_Abstractions.md†L23-L34】
+>>>>>>> origin/develop
   - AgIO evolves independently as an I/O plugin while still presenting hardware telemetry through Core.
 - **Negative/mitigated impacts**
   - Increased process count and gRPC connections add operational overhead; mitigated by shared hosting templates and instrumentation.
@@ -43,6 +52,7 @@ Establish a gRPC-first plugin architecture composed of:
 
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
+<<<<<<< HEAD
 - Extension today means editing the shared solution directly—AgOpenGPS, AgIO, and companion tools link common libraries but ship as monolithic executables without any manifest or permission boundary.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L6-L24】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L30-L41】
 
 ### Legacy Dev Branch
@@ -54,5 +64,18 @@ Establish a gRPC-first plugin architecture composed of:
 - [Section 51 — Sensor & Actuator Abstractions](../SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
 - [Section 61 — Kinematics & Pose Fusion](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
 - [Section 94 — Extensibility, Packaging & Updates](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
+=======
+- Extension today means editing the shared solution directly—AgOpenGPS, AgIO, and companion tools link common libraries but ship as monolithic executables without any manifest or permission boundary.【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md†L6-L24】【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md†L30-L41】
+
+### Legacy Dev Branch
+- The dev branch follows the same status-quo model (Option O-EXT-0), so contributors fork source to add features and must rebuild the entire suite, with no lifecycle governance or security gating around extensions.【F:docs/SRS/sections/9X/94_Extensibility_Packaging_Updates.md†L30-L56】
+
+## References
+- [Section 42 — Transports](../SRS/sections/4X/42_Transports.md)
+- [Section 91 — UI Shell & Layout](../SRS/sections/9X/91_UI_Shell_Layout.md)
+- [Section 51 — Sensor & Actuator Abstractions](../SRS/sections/5X/51_Sensor_Actuator_Abstractions.md)
+- [Section 61 — Kinematics & Pose Fusion](../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
+- [Section 94 — Extensibility, Packaging & Updates](../SRS/sections/9X/94_Extensibility_Packaging_Updates.md)
+>>>>>>> origin/develop
 - [ADR-002 — Expose Nexus services over gRPC/protobuf contracts](ADR-002-grpc-contracts.md)
 - [ADR-004 — Composite simulation fabric](ADR-004-composite-simulation.md)

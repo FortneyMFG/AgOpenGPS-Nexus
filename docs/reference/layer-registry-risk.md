@@ -28,4 +28,8 @@ handshake.
 
 ## References
 - [ADR-052 — Field Health Plugin](../ADR/ADR-052_FieldHealthPlugin.md)
+<<<<<<< HEAD
 - [Layer registry overview](../SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md)
+=======
+- [Layer registry overview](../SRS/sections/7X/71_Mapping_Kernel_Contracts.md)
+>>>>>>> origin/develop

@@ -32,8 +32,13 @@ Operations often blend PoseStreams from multiple machines and seasons (e.g., pla
 - Provenance tracker must persist complete lineage for merged layers and export JSON summaries with < 200 ms serialization for 10k-sample jobs.
 
 ## References
+<<<<<<< HEAD
 - [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
 - [Control & automation requirements](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+=======
+- [Data model & storage requirements](../SRS/sections/3X/32_Persistence_Formats.md)
+- [Control & automation requirements](../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
+>>>>>>> origin/develop
 - [ADR-009: PoseStream vector logs and layer TileStore persistence](ADR-009-posestream-vector-tilestore-persistence.md)
 - [ADR-022: CRS, units, and precision policy](ADR-022-crs-units-precision-policy.md)
 - [ADR-019: Provenance, audit, and QA](ADR-019-provenance-audit-qa.md)

@@ -36,9 +36,15 @@ Establishes a layer catalogue and storage model that preserves today’s binary 
 L — Introduces new schema definitions, persistence changes, configuration tooling, and export/replay utilities in addition to the runtime controllers.
 
 ## References
+<<<<<<< HEAD
 - [Section 31 — Domain Data Model](../sections/3X_Data_Storage/31_Domain_Data_Model.md)
 - [Section 72 — Mapping Layers Plugin](../sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
 - [Section 32 — Persistence & Formats](../sections/3X_Data_Storage/32_Persistence_Formats.md)
+=======
+- [Section 31 — Domain Data Model](../sections/3X/31_Domain_Data_Model.md)
+- [Section 72 — Mapping Layers Plugin](../sections/7X/72_Mapping_Layers_Plugin.md)
+- [Section 32 — Persistence & Formats](../sections/3X/32_Persistence_Formats.md)
+>>>>>>> origin/develop
 
 ## Related ADRs
 - [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)

@@ -37,7 +37,12 @@ Accurate guidance and control require kinematic models that describe tractor, im
 - Profile editor must enforce attachment constraints and export deterministic JSON validated via schema conformance tests.
 
 ## References
+<<<<<<< HEAD
 - [Interprocess API requirements](../SRS/sections/4X_Interprocess_Communications/41_Inter_Application_API.md)
 - [Control & automation requirements](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+=======
+- [Interprocess API requirements](../SRS/sections/4X/41_Inter_Application_API.md)
+- [Control & automation requirements](../SRS/sections/6X/61_Kinematics_Pose_Fusion.md)
+>>>>>>> origin/develop
 - [ADR-008: Equipment hierarchy](ADR-008-equipment-hierarchy.md)
 - [ADR-033: Guidance planner and autosteer orchestration](ADR-033-guidance-planner-autosteer.md)

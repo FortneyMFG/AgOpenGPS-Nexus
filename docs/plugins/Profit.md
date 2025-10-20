@@ -19,7 +19,11 @@ The Profit plugin aggregates cost records, yield-derived revenue, and profitabil
 ## Inventory & material ledger integration
 
 - Maintain stock ledgers per SKU/lot with quantity on hand, committed work order quantities, and cost basis so Profit analytics can model true margins and purchasing forecasts.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L15-L40】
+<<<<<<< HEAD
 - Support barcode/QR scanning for intake, transfers, and application reconciliation. When sessions close, the plugin posts `InventoryTransaction` entries keyed to `sessionId` and `workOrderId` to maintain traceability back to field work.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L86-L109】
+=======
+- Support barcode/QR scanning for intake, transfers, and application reconciliation. When sessions close, the plugin posts `InventoryTransaction` entries keyed to `sessionId` and `workOrderId` to maintain traceability back to field work.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L86-L109】
+>>>>>>> origin/develop
 - Expose dashboards highlighting low stock, expiring lots, and discrepancies between planned vs. as-applied quantities. Operators must be able to adjust counts with audit notes that flow into regulatory exports.【F:docs/plugins/Regulatory.md†L1-L140】
 
 ## UX Requirements

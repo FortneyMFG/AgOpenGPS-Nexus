@@ -1,6 +1,10 @@
 # CM5/Pi5 Quick Start Guide
 
+<<<<<<< HEAD
 This guide walks through setting up a Compute Module 5 or Raspberry Pi 5 deployment of Nexus. For detailed hardware requirements, see [OS Support Requirements](../../SRS/sections/1X_Platform_Foundations/11_OS_Support.md).
+=======
+This guide walks through setting up a Compute Module 5 or Raspberry Pi 5 deployment of Nexus. For detailed hardware requirements, see [OS Support Requirements](../../SRS/sections/1X/11_OS_Support.md).
+>>>>>>> origin/develop
 
 ## Hardware Requirements
 
@@ -173,7 +177,12 @@ As specified in [ADR-026: Performance Budgets](../../ADR/ADR-026-performance-bud
 
 ## Related Documentation
 
+<<<<<<< HEAD
 - [Hardware Requirements](../../SRS/sections/1X_Platform_Foundations/11_OS_Support.md)
 - [Threading, Scheduling & Timing requirements](../../SRS/sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md)
+=======
+- [Hardware Requirements](../../SRS/sections/1X/11_OS_Support.md)
+- [Threading, Scheduling & Timing requirements](../../SRS/sections/2X/23_Threading_Scheduling_Timing.md)
+>>>>>>> origin/develop
 - [Safety Guidelines](../../user/safety/INDEX.md)
 - [Maintenance Guide](../../user/maintenance/cm5.md)

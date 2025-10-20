@@ -11,11 +11,19 @@ context, and provenance expectations introduced by ADR-041 and ADR-043.
 
 ## Runtime Contracts
 
+<<<<<<< HEAD
 - Subscribe to `onFarmLoaded`, `onJobLoaded`, and `onSessionStart` to prime lookahead models with farm assets, mounted field geometry, and session metadata. Core broadcasts the active context (`farmId`, `fieldIds[]`, `seasonId?`, `jobId`, `sessionId`) plus plugin `extensions` for overlays.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L40】
 - Receive `jobId`, `sessionId`, and `fieldIds[]` in lifecycle events. Guidance calculations must adjust lookahead logic when the
   union envelope changes (e.g., crossing into an adjacent field).
 - Consume mapping plugin envelope updates to maintain accurate boundary awareness and prevent autosteer beyond mounted fields.
 - Emit telemetry tagged with `sessionId` so analytics can correlate steering performance with specific outings.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L59-L92】
+=======
+- Subscribe to `onFarmLoaded`, `onJobLoaded`, and `onSessionStart` to prime lookahead models with farm assets, mounted field geometry, and session metadata. Core broadcasts the active context (`farmId`, `fieldIds[]`, `seasonId?`, `jobId`, `sessionId`) plus plugin `extensions` for overlays.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L18-L40】
+- Receive `jobId`, `sessionId`, and `fieldIds[]` in lifecycle events. Guidance calculations must adjust lookahead logic when the
+  union envelope changes (e.g., crossing into an adjacent field).
+- Consume mapping plugin envelope updates to maintain accurate boundary awareness and prevent autosteer beyond mounted fields.
+- Emit telemetry tagged with `sessionId` so analytics can correlate steering performance with specific outings.【F:docs/SRS/sections/6X/62_Job_Lifecycle.md†L59-L92】
+>>>>>>> origin/develop
 - Leverage `session.extensions` for agronomic hints (crop type, growth stage) when adjusting lookahead speed or lane biasing, while leaving core session fields immutable.【F:schemas/Session.v1.json†L1-L99】
 
 ## Layer & Provenance Expectations

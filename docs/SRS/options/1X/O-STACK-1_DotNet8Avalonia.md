@@ -38,9 +38,15 @@ Leverage `Grpc.Net.Client`, `Grpc.AspNetCore`, `Google.Protobuf`, `Microsoft.Ext
 - Hardware vendors must provide .NET-friendly SDKs or gRPC shims to integrate with the AgIO abstraction layer.
 
 ## References
+<<<<<<< HEAD
 - [Section 11 — OS Support](../sections/1X_Platform_Foundations/11_OS_Support.md)
 - [Section 13 — UI Framework & UX Language](../sections/1X_Platform_Foundations/13_UI_Framework_UX.md)
 - [Section 41 — Inter-Application API](../sections/4X_Interprocess_Communications/41_Inter_Application_API.md)
+=======
+- [Section 11 — OS Support](../sections/1X/11_OS_Support.md)
+- [Section 13 — UI Framework & UX Language](../sections/1X/13_UI_Framework_UX.md)
+- [Section 41 — Inter-Application API](../sections/4X/41_Inter_Application_API.md)
+>>>>>>> origin/develop
 
 ## Related ADRs
 - [ADR-001 — Adopt .NET 8 C# Stack](../../ADR/ADR-001-dotnet8-runtime.md)

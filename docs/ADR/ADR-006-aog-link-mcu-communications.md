@@ -7,7 +7,11 @@ Accepted
 
 
 ## Context
+<<<<<<< HEAD
 Nexus needs a unified, typed, and lightweight transport for MCU communications that can operate over Ethernet, RS-485/serial, or CAN while coexisting with legacy PGN-based modules. The goal is to simplify firmware and host interfaces by standardizing on a single schema and message framing that’s portable across all MCU classes (ESP32, Teensy, STM32, etc.) and consistent with the protobuf contracts used in higher layers.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L60-L112】 Legacy UDP/PGN modules must remain functional, but new Nexus firmware will use a modern datagram approach leveraging the same protobuf definitions used in gRPC contracts, compiled via nanopb for embedded targets.
+=======
+Nexus needs a unified, typed, and lightweight transport for MCU communications that can operate over Ethernet, RS-485/serial, or CAN while coexisting with legacy PGN-based modules. The goal is to simplify firmware and host interfaces by standardizing on a single schema and message framing that’s portable across all MCU classes (ESP32, Teensy, STM32, etc.) and consistent with the protobuf contracts used in higher layers.【F:docs/SRS/sections/4X/42_Transports.md†L60-L112】 Legacy UDP/PGN modules must remain functional, but new Nexus firmware will use a modern datagram approach leveraging the same protobuf definitions used in gRPC contracts, compiled via nanopb for embedded targets.
+>>>>>>> origin/develop
 
 ## Decision
 Adopt AOG-Link v1, a compact protobuf/nanopb-based datagram protocol, as the standard MCU communications layer.
@@ -65,6 +69,10 @@ Adopt AOG-Link v1, a compact protobuf/nanopb-based datagram protocol, as the sta
 - Dev experiments focus on normalizing those same PGNs—including SocketCAN bridges—but still depend on the legacy framing rather than nanopb-based datagrams.【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L7-L36】
 
 ## References
+<<<<<<< HEAD
 - [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+=======
+- [Section 42 — Transports](../SRS/sections/4X/42_Transports.md)
+>>>>>>> origin/develop
 - [Option O-COMM-6 — PGN compatibility bridge](../SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md)
 - [ADR-002 — Expose Nexus services over gRPC/protobuf contracts](ADR-002-grpc-contracts.md)

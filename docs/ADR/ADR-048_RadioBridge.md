@@ -73,6 +73,12 @@ semantics.
 
 ## References
 
+<<<<<<< HEAD
 - [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
 - [Section 64 — Telemetry & Health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
 - [Section 94 — Extensibility, Packaging & Updates](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
+=======
+- [Section 42 — Transports](../SRS/sections/4X/42_Transports.md)
+- [Section 64 — Telemetry & Health](../SRS/sections/6X/64_Telemetry_Health.md)
+- [Section 94 — Extensibility, Packaging & Updates](../SRS/sections/9X/94_Extensibility_Packaging_Updates.md)
+>>>>>>> origin/develop

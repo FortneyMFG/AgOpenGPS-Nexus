@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Layout;
 using Aog.UI.Avalonia.Settings;
+using Aog.UI.Avalonia.Hosting;
 using Avalonia;
 
 namespace Aog.UI.Avalonia.ViewModels.Shell;

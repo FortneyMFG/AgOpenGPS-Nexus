@@ -16,7 +16,7 @@ public sealed class PaneLayoutResult
     public IReadOnlyList<PaneDividerVisual> Dividers { get; }
 }
 
-public sealed record PaneVisual(LeafPane Pane, Rect Bounds);
+public sealed record PaneVisual(LeafPane Pane, Avalonia.Rect Bounds);
 
 public enum PaneDividerOrientation
 {
@@ -24,4 +24,4 @@ public enum PaneDividerOrientation
     Vertical,
 }
 
-public sealed record PaneDividerVisual(PaneDividerOrientation Orientation, Rect Bounds);
+public sealed record PaneDividerVisual(PaneDividerOrientation Orientation, Avalonia.Rect Bounds);

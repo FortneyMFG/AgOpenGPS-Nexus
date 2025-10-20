@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Avalonia;
+using AvaloniaRect = global::Avalonia.Rect;
 
 namespace Aog.UI.Avalonia.Layout;
 
@@ -16,7 +16,7 @@ public sealed class PaneLayoutResult
     public IReadOnlyList<PaneDividerVisual> Dividers { get; }
 }
 
-public sealed record PaneVisual(LeafPane Pane, Avalonia.Rect Bounds);
+public sealed record PaneVisual(LeafPane Pane, AvaloniaRect Bounds);
 
 public enum PaneDividerOrientation
 {
@@ -24,4 +24,4 @@ public enum PaneDividerOrientation
     Vertical,
 }
 
-public sealed record PaneDividerVisual(PaneDividerOrientation Orientation, Avalonia.Rect Bounds);
+public sealed record PaneDividerVisual(PaneDividerOrientation Orientation, AvaloniaRect Bounds);

@@ -21,6 +21,7 @@
       <rendering:BlockTileSizeConverter x:Key="BlockTileSizeConverter" />
       <rendering:SidebarDimensionConverter x:Key="SidebarDimensionConverter" />
       <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
+      <rendering:SpacingToThicknessConverter x:Key="SpacingToThicknessConverter" />
 
       <DataTemplate x:Key="ShellMenuItemTemplate"
                     x:DataType="workspace:ShellMenuItemViewModel">
@@ -401,11 +402,16 @@
                         Tag="{Binding Layout.TopSidebarSettings}"
                         HorizontalAlignment="Center"
                         DragDrop.AllowDrop="True">
+            <ItemsControl.Styles>
+              <Style Selector="#TopBlocksControl > ContentPresenter">
+                <Setter Property="Margin"
+                        Value="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+              </Style>
+            </ItemsControl.Styles>
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel Orientation="Horizontal"
-                           HorizontalAlignment="Center"
-                           Spacing="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                           HorizontalAlignment="Center" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>
@@ -432,11 +438,16 @@
                       HorizontalAlignment="Center"
                       VerticalAlignment="Center"
                       DragDrop.AllowDrop="True">
+          <ItemsControl.Styles>
+            <Style Selector="#BottomBlocksControl > ContentPresenter">
+              <Setter Property="Margin"
+                      Value="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+            </Style>
+          </ItemsControl.Styles>
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <WrapPanel Orientation="Horizontal"
-                         HorizontalAlignment="Center"
-                         Spacing="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                         HorizontalAlignment="Center" />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
         </ItemsControl>
@@ -479,12 +490,17 @@
                           HorizontalAlignment="Center"
                           VerticalAlignment="Stretch"
                           DragDrop.AllowDrop="True">
+              <ItemsControl.Styles>
+                <Style Selector="#LeftBlocksControl > ContentPresenter">
+                  <Setter Property="Margin"
+                          Value="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+                </Style>
+              </ItemsControl.Styles>
               <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                   <WrapPanel Orientation="Vertical"
                              HorizontalAlignment="Center"
-                             VerticalAlignment="Bottom"
-                             Spacing="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                             VerticalAlignment="Bottom" />
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
             </ItemsControl>
@@ -531,12 +547,17 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Stretch"
                         DragDrop.AllowDrop="True">
+            <ItemsControl.Styles>
+              <Style Selector="#RightBlocksControl > ContentPresenter">
+                <Setter Property="Margin"
+                        Value="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+              </Style>
+            </ItemsControl.Styles>
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel Orientation="Vertical"
                            HorizontalAlignment="Center"
-                           VerticalAlignment="Bottom"
-                           Spacing="{Binding Tag.Spacing, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                           VerticalAlignment="Bottom" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>

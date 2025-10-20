@@ -1,0 +1,24 @@
+using System;
+using System.Globalization;
+using Avalonia;
+using Avalonia.Data.Converters;
+
+namespace Aog.UI.Avalonia.Rendering;
+
+public sealed class SpacingToThicknessConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var spacing = value switch
+        {
+            double d => d,
+            float f => f,
+            _ => 0d
+        };
+
+        var normalized = Math.Max(0d, spacing) / 2d;
+        return new Thickness(normalized);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
+}

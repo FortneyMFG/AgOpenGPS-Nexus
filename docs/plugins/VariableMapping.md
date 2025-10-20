@@ -8,13 +8,13 @@ Variable mapping plugins orchestrate the prescription engine defined in ADR-013 
 
 - **Recipe governance:** Accept YAML/JSON recipes that conform to ADR-013 schemas, verify manifest signatures, and compute SHA-256 hashes recorded alongside generated layers. Hash fingerprints must match Layer Registry entries for planned layers (`vr.planned.*`).【F:docs/ADR/ADR-013-derived-products-analytics-prescriptions.md†L12-L76】【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】
 - **ROI masks:** Treat zone masks sourced from the LayerEditService (ADR-044) as Region of Interest filters. Prescriptions must clip outputs to the selected zones and log provenance referencing the mask layer ID.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
-- **Planned vs. actual:** Publish planned layers under `vr.planned.*` IDs and reconcile them against as-applied `vr.actual.*` layers emitted by rate controllers. Provenance must include recipe hash, source layers, and session metadata.【F:docs/SRS/sections/04_MappingLayers.md†L65-L106】
+- **Planned vs. actual:** Publish planned layers under `vr.planned.*` IDs and reconcile them against as-applied `vr.actual.*` layers emitted by rate controllers. Provenance must include recipe hash, source layers, and session metadata.【F:docs/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L65-L106】
 - **QA harness:** Execute regression fixtures that compare generated outputs against golden datasets (≤4 minutes for a 160-acre field). Failures block promotion until variance and RMSE fall within ADR-013 tolerances.【F:docs/ADR/ADR-013-derived-products-analytics-prescriptions.md†L60-L71】
 - **Interop:** Coordinate with the ISOXML bridge so TaskData exports embed recipe hashes and layer IDs, ensuring round-trip fidelity for NX-165.【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】
 
 ## Session Integration
 
-- Subscribe to session lifecycle hooks to preload crop type, genetics, and profitability overlays before generating prescriptions. Session metadata supplies environment and operator context for audit logs.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L74】
+- Subscribe to session lifecycle hooks to preload crop type, genetics, and profitability overlays before generating prescriptions. Session metadata supplies environment and operator context for audit logs.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】
 - When prescriptions update mid-session, append the new layer ID to `session.layerRefs[]` and emit `onSessionMetadataChange` events so mapping and rate plugins refresh caches.
 
 ## Diagnostics & Reporting

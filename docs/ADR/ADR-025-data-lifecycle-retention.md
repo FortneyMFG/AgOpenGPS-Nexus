@@ -32,9 +32,9 @@ Field deployments accumulate large PoseStream, tile, and derived datasets that m
 - Privacy flag propagation must redact sensitive fields in exports with zero leakage verified via automated diff comparisons.
 
 ## References
-- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
-- [Backend services requirements](../SRS/sections/04_Backend_Services.md)
-- [Telemetry & health requirements](../SRS/sections/10_Telemetry_Health.md)
+- [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
+- [Backend services requirements](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
+- [Telemetry & health requirements](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
 - [ADR-009: PoseStream vector logs and layer TileStore persistence](ADR-009-posestream-vector-tilestore-persistence.md)
 - [ADR-019: Provenance, audit, and QA governance](ADR-019-provenance-audit-qa.md)
 - [ADR-020: Determinism, replay, and CI guardrails](ADR-020-determinism-replay-ci.md)

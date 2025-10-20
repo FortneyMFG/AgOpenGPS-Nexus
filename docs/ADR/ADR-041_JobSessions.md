@@ -110,9 +110,9 @@ explicitly orchestrated by Core, UI, and plugins.
 
 ## SRS Impact
 
-- Aligns the operational hierarchy and session payload requirements in §02 Data Model, ensuring Season → Job → Session orchestration has a canonical schema and journaling policy.【F:docs/SRS/sections/02_DataModel.md†L1-L160】
-- Implements the lifecycle states, events, and autosave expectations defined in §03 Job Lifecycle, replacing the implicit run model with deterministic session hooks.【F:docs/SRS/sections/03_JobLifecycle.md†L1-L120】
-- Provides backend services with the deterministic checkpoints and health metrics called out in §04 Backend Services for layer controllers, journaling, and automation coordination.【F:docs/SRS/sections/04_Backend_Services.md†L6-L40】
+- Aligns the operational hierarchy and session payload requirements in §02 Data Model, ensuring Season → Job → Session orchestration has a canonical schema and journaling policy.【F:docs/SRS/sections/3X_Data_Storage/31_Domain_Data_Model.md†L1-L160】
+- Implements the lifecycle states, events, and autosave expectations defined in §03 Job Lifecycle, replacing the implicit run model with deterministic session hooks.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L1-L120】
+- Provides backend services with the deterministic checkpoints and health metrics called out in §04 Backend Services for layer controllers, journaling, and automation coordination.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L40】
 
 ## Consequences
 
@@ -181,7 +181,7 @@ explicitly orchestrated by Core, UI, and plugins.
 
 - [Job lifecycle architecture](../ADR/ADR-030-field-job-sessions.md)
 - [Season organisers & context bus](../ADR/ADR-040_SeasonOrganizers.md)
-- [Job session schema requirements](../SRS/sections/03_JobLifecycle.md)
+- [Job session schema requirements](../SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md)
 - [Deterministic replay policy](../ADR/ADR-020-determinism-replay-ci.md)
 - [Spatial constraints & Drive-In](../ADR/ADR-027-spatial-constraints.md)
 - [Plugin lifecycle contracts](../ADR/ADR-018-plugin-api.md)

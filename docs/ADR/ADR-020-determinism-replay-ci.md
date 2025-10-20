@@ -31,8 +31,8 @@ Nexus relies on deterministic replays to validate PoseStream, TileStore, and con
 - CI pipeline must publish determinism trend reports (hash deltas, runtime budgets) for every merge to `main` with 30-day retention.
 
 ## References
-- [Testing & CI requirements](../SRS/sections/11_Testing_CI_CDPipelines.md)
-- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
+- [Testing & CI requirements](../SRS/sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md)
+- [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
 - [ADR-007: PoseStream and SectionState architecture](ADR-007-posestream-sectionstate-architecture.md)
 - [ADR-009: PoseStream vector logs and layer TileStore persistence](ADR-009-posestream-vector-tilestore-persistence.md)
 - [ADR-026: Performance budgets](ADR-026-performance-budgets.md)

@@ -7,7 +7,7 @@ Accepted
 
 
 ## Context
-Nexus must deliver a desktop experience that runs identically on Windows and Linux hosts while remaining touch-friendly and metadata-driven. The UI framework section documents the need for high-DPI scaling, multi-monitor layouts, and remote clients without abandoning existing operators.【F:docs/SRS/sections/02_Framework_UI.md†L1-L70】 Option O-STACK-1 describes Avalonia as the shared Windows/Linux UI toolkit aligned with the .NET 8 stack, and contributors favour it for reuse of C# expertise and deployability on Raspberry Pi-class hardware.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L1-L47】【F:docs/SRS/sections/02_Framework_UI.md†L72-L83】
+Nexus must deliver a desktop experience that runs identically on Windows and Linux hosts while remaining touch-friendly and metadata-driven. The UI framework section documents the need for high-DPI scaling, multi-monitor layouts, and remote clients without abandoning existing operators.【F:docs/SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md†L1-L70】 Option O-STACK-1 describes Avalonia as the shared Windows/Linux UI toolkit aligned with the .NET 8 stack, and contributors favour it for reuse of C# expertise and deployability on Raspberry Pi-class hardware.【F:docs/SRS/options/1X/O-STACK-1_DotNet8Avalonia.md†L1-L47】【F:docs/SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md†L72-L83】
 
 ## Decision
 Adopt Avalonia as the primary UI framework for the Nexus desktop shell. The Avalonia client consumes the shared gRPC contracts, supports Windows x64 and Linux (x64/ARM64), and becomes the foundation for metadata-driven dashboards, simulation controls, and remote-client wrappers. Optional host shells (WinUI/WPF) can embed the Avalonia client when Windows-native polish is required, but the Avalonia implementation remains the authoritative cross-platform UI.
@@ -15,11 +15,11 @@ Adopt Avalonia as the primary UI framework for the Nexus desktop shell. The Aval
 ## Mobile and companion roadmap
 The Avalonia footprint also unlocks native Android and iOS builds so the same codebase can ship as a remote companion now and later host Core + AgIO locally. We will structure the client around three dependency-injected run modes that swap the `ICoreTransport` implementation without rewriting views or view models:
 
-1. **CompanionRemote:** Ship the UI as-is on mobile and connect to Core/AgIO running on a Windows/Linux host over gRPC (Android) or gRPC-Web (iOS or restricted networks). A connection center handles discovery (mDNS/manual), reconnect, health, and authentication workflows so tablets and phones mirror desktop capabilities safely.【F:docs/SRS/sections/05_Frontends.md†L26-L29】【F:docs/SRS/sections/05_Frontends.md†L68-L69】
-2. **LocalInProc:** Package the Core runtime as a library and host it inside the Avalonia process. The UI swaps the transport to an in-process adapter, reuses the same view models, and exposes feature toggles so operators can run “lite” workflows on mobile hardware before adding hardware I/O.【F:docs/SRS/sections/05_Frontends.md†L28-L71】
-3. **LocalOutOfProc:** Bundle Core as a platform-specific binary and start it locally (e.g., Android foreground service) while the UI speaks loopback gRPC. This keeps crash isolation and matches how desktop shells talk to Core today, making it easier to reuse diagnostics, logging, and permission flows.【F:docs/SRS/sections/05_Frontends.md†L28-L72】
+1. **CompanionRemote:** Ship the UI as-is on mobile and connect to Core/AgIO running on a Windows/Linux host over gRPC (Android) or gRPC-Web (iOS or restricted networks). A connection center handles discovery (mDNS/manual), reconnect, health, and authentication workflows so tablets and phones mirror desktop capabilities safely.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L26-L29】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L68-L69】
+2. **LocalInProc:** Package the Core runtime as a library and host it inside the Avalonia process. The UI swaps the transport to an in-process adapter, reuses the same view models, and exposes feature toggles so operators can run “lite” workflows on mobile hardware before adding hardware I/O.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L28-L71】
+3. **LocalOutOfProc:** Bundle Core as a platform-specific binary and start it locally (e.g., Android foreground service) while the UI speaks loopback gRPC. This keeps crash isolation and matches how desktop shells talk to Core today, making it easier to reuse diagnostics, logging, and permission flows.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L28-L72】
 
-Connection policy, offline caches, and feature gating flow from shared configuration so the same Avalonia client can pivot between remote monitoring and fully embedded rigs without branching the UI stack. Platform hosts contribute only the glue for permissions (USB/BLE/notifications) and storage policies, keeping the app surface identical across Windows, Linux, Android, and iOS.【F:docs/SRS/sections/01_OS_Support.md†L14-L44】【F:docs/SRS/sections/02_Framework_UI.md†L15-L47】
+Connection policy, offline caches, and feature gating flow from shared configuration so the same Avalonia client can pivot between remote monitoring and fully embedded rigs without branching the UI stack. Platform hosts contribute only the glue for permissions (USB/BLE/notifications) and storage policies, keeping the app surface identical across Windows, Linux, Android, and iOS.【F:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md†L14-L44】【F:docs/SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md†L15-L47】
 
 ## Consequences
 - Positive impacts
@@ -40,11 +40,11 @@ Connection policy, offline caches, and feature gating flow from shared configura
 
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
-- Operators rely on the WinForms UI with selective WPF panels, so the legacy stack is confined to Windows desktops and lacks a cross-platform shell today.【F:docs/SRS/sections/02_Framework_UI.md†L6-L10】【F:docs/SRS/sections/05_Frontends.md†L7-L12】
+- Operators rely on the WinForms UI with selective WPF panels, so the legacy stack is confined to Windows desktops and lacks a cross-platform shell today.【F:docs/SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md†L6-L10】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L7-L12】
 
 ### Legacy Dev Branch
-- The dev branch follows the same pattern—WinForms remains primary with incremental WPF modernization—leaving remote or Linux clients unserved without remote desktop workarounds.【F:docs/SRS/sections/02_Framework_UI.md†L16-L29】【F:docs/SRS/sections/05_Frontends.md†L7-L17】
+- The dev branch follows the same pattern—WinForms remains primary with incremental WPF modernization—leaving remote or Linux clients unserved without remote desktop workarounds.【F:docs/SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md†L16-L29】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L7-L17】
 
 ## References
-- [Section 02 — UI Framework](../SRS/sections/02_Framework_UI.md)
-- [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/O-STACK-1_DotNet8Avalonia.md)
+- [Section 13 — UI Framework & UX Language](../SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md)
+- [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/1X/O-STACK-1_DotNet8Avalonia.md)

@@ -7,18 +7,18 @@ Proposed
 
 
 ## Context
-The Nexus stack now distributes guidance, mapping, rate/section control, IO bridges, telemetry, and UI surfaces as discrete plugins. While ADR-018 defined the plugin API, teams lacked a canonical register of hard/soft dependencies, manifest expectations, and compatibility ranges. Operators could unknowingly load incompatible versions or omit supporting services, leading to runtime faults or degraded functionality across Core, AgIO, and the Avalonia/Web frontends. The newly published plugin dependency map documents cross-domain relationships, but the decision to make that register authoritative and enforceable has not yet been ratified.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L99-L161】
+The Nexus stack now distributes guidance, mapping, rate/section control, IO bridges, telemetry, and UI surfaces as discrete plugins. While ADR-018 defined the plugin API, teams lacked a canonical register of hard/soft dependencies, manifest expectations, and compatibility ranges. Operators could unknowingly load incompatible versions or omit supporting services, leading to runtime faults or degraded functionality across Core, AgIO, and the Avalonia/Web frontends. The newly published plugin dependency map documents cross-domain relationships, but the decision to make that register authoritative and enforceable has not yet been ratified.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L99-L161】
 
 ## Decision
 Adopt the plugin dependency map as the authoritative specification for the first-party plugin bundle and pair it with automated governance:
 
 1. **Manifest compliance tooling** — The YAML schema in the dependency map becomes normative. All official plugins must ship manifests validated in CI; Core refuses to load manifests that fail schema or compatibility checks.【F:docs/plugins/nexus-plugin-dependency-map.md†L167-L421】
-2. **Dependency classification** — Hard/Soft/Suggest semantics are codified in Core’s loader. Hard dependencies block startup when missing or out of range; Soft dependencies emit warnings and disable associated features; Suggest dependencies surface UI nudges via the Device Manager and UI Shell.【F:docs/plugins/nexus-plugin-dependency-map.md†L19-L164】【F:docs/SRS/sections/05_Frontends.md†L20-L76】
-3. **Compatibility ranges** — Core, AgIO, and frontend version ranges in each manifest are enforced before activation, ensuring hardware transport and UI extension contracts remain within supported bounds.【F:docs/SRS/sections/06_Hardware_IO.md†L16-L54】【F:docs/plugins/nexus-plugin-dependency-map.md†L353-L421】
+2. **Dependency classification** — Hard/Soft/Suggest semantics are codified in Core’s loader. Hard dependencies block startup when missing or out of range; Soft dependencies emit warnings and disable associated features; Suggest dependencies surface UI nudges via the Device Manager and UI Shell.【F:docs/plugins/nexus-plugin-dependency-map.md†L19-L164】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L20-L76】
+3. **Compatibility ranges** — Core, AgIO, and frontend version ranges in each manifest are enforced before activation, ensuring hardware transport and UI extension contracts remain within supported bounds.【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L16-L54】【F:docs/plugins/nexus-plugin-dependency-map.md†L353-L421】
 4. **Lifecycle checks** — Device Manager and UI Shell surface dependency health badges using the matrix so operators know when required peers are absent or stale.【F:docs/plugins/nexus-plugin-dependency-map.md†L109-L205】
 5. **Roadmap integration** — ADR-031 becomes the umbrella decision covering ongoing manifest maintenance and CI validation tasks listed in the ADR roadmap.【F:docs/ADR/ADR-roadmap.md†L89-L111】
 6. **Equivalency via profiles** — Manifests must describe `provides.capabilities` feature matrices, `provides.profiles`, and CI-backed `attestations.conformance` entries so alternative providers can prove compatibility without hard-coded aliases.【F:docs/SRS/appendices/plugin_manifest.schema.json†L153-L332】【F:docs/plugins/nexus-plugin-dependency-map.md†L36-L86】
-7. **Deterministic resolver** — Core interprets `requires.capabilities`, `requires.profiles`, and new relationship types (`peerOf`, `conflictsWith`, `replaces`, `extends`) alongside policy overlays to pick providers, quarantine conflicts, and publish an auditable decision log.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L24-L32】【F:docs/plugins/nexus-plugin-dependency-map.md†L88-L205】
+7. **Deterministic resolver** — Core interprets `requires.capabilities`, `requires.profiles`, and new relationship types (`peerOf`, `conflictsWith`, `replaces`, `extends`) alongside policy overlays to pick providers, quarantine conflicts, and publish an auditable decision log.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L24-L32】【F:docs/plugins/nexus-plugin-dependency-map.md†L88-L205】
 
 ## Governance Updates
 - **Machine-readable digests.** Bundle releases publish signed dependency manifests that CI and operators can ingest to audit compatibility and provenance.
@@ -31,8 +31,8 @@ Adopt the plugin dependency map as the authoritative specification for the first
 ## Consequences
 - **Positive**
   - Prevents misconfigured deployments by failing fast when mandatory services are missing or incompatible.【F:docs/plugins/nexus-plugin-dependency-map.md†L19-L164】
-  - Provides a single source of truth for operators and integrators, reducing onboarding friction and documentation drift.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L99-L161】
-  - Enables UI surfaces to reflect dependency health consistently across Avalonia and Web shells.【F:docs/SRS/sections/05_Frontends.md†L20-L76】
+  - Provides a single source of truth for operators and integrators, reducing onboarding friction and documentation drift.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L99-L161】
+  - Enables UI surfaces to reflect dependency health consistently across Avalonia and Web shells.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L20-L76】
   - Lays groundwork for catalog governance by ensuring community plugins adhere to the same schema.
 - **Negative / mitigations**
   - Stricter loader enforcement could block legacy combinations; mitigated by allowing operators to acknowledge Soft dependency gaps and by publishing migration guides alongside manifest updates.【F:docs/plugins/nexus-plugin-dependency-map.md†L109-L205】
@@ -51,7 +51,7 @@ Adopt the plugin dependency map as the authoritative specification for the first
 
 ## References
 - [Nexus Plugin Dependency Map](../plugins/nexus-plugin-dependency-map.md)
-- [SRS §12 — Extensibility & Plugins](../SRS/sections/12_Extensibility_Plugins.md)
-- [SRS §05 — Frontends](../SRS/sections/05_Frontends.md)
-- [SRS §06 — Hardware I/O](../SRS/sections/06_Hardware_IO.md)
+- [SRS §12 — Extensibility & Plugins](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
+- [SRS §05 — Frontends](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [SRS §06 — Hardware I/O](../SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
 - [ADR Roadmap](ADR-roadmap.md)

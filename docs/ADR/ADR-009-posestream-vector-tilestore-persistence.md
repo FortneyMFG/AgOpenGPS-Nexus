@@ -32,7 +32,7 @@ To support deterministic replay, analytics, and long-term storage, Nexus needs a
 - Crash-safety harness must demonstrate zero data loss when power is interrupted mid-write, verified via fsync instrumentation.
 
 ## References
-- [Data model & storage requirements](../SRS/sections/08_Data_Model_Storage.md)
+- [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
 - [ADR-007: PoseStream and SectionState architecture](ADR-007-posestream-sectionstate-architecture.md)
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
 - [ADR-020: Determinism, replay, and CI](ADR-020-determinism-replay-ci.md)

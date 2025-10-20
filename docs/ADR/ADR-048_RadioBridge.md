@@ -73,6 +73,6 @@ semantics.
 
 ## References
 
-- [Section 03 — Communications & Transports](../SRS/sections/03_Comm_Transports.md)
-- [Section 10 — Telemetry & Health](../SRS/sections/10_Telemetry_Health.md)
-- [Section 12 — Extensibility & Plugins](../SRS/sections/12_Extensibility_Plugins.md)
+- [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+- [Section 64 — Telemetry & Health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
+- [Section 94 — Extensibility, Packaging & Updates](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)

@@ -69,6 +69,6 @@ Templates define header metadata, required data sources, and widget layout. Plug
 
 ## SRS Impact
 
-- Addresses report template governance R-DATA-049 in §08 Data Model & Storage and related packaging guidance.【F:docs/SRS/sections/08_Data_Model_Storage.md†L37-L38】
-- Supplies generate/preview flows defined by R-FE-076 in §05 Frontends.【F:docs/SRS/sections/05_Frontends.md†L31】
-- Requires plugin registration and export packaging policies covered in §12 Extensibility.【F:docs/SRS/sections/12_Extensibility_Plugins.md†L18-L36】
+- Addresses report template governance R-DATA-049 in §08 Data Model & Storage and related packaging guidance.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L37-L38】
+- Supplies generate/preview flows defined by R-FE-076 in §05 Frontends.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L31】
+- Requires plugin registration and export packaging policies covered in §12 Extensibility.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L18-L36】

@@ -13,7 +13,7 @@
   (`aog-core.service`, `aog-agio.service`) with hardened defaults.【F:tools/packaging/linux/build-packages.sh†L1-L214】【F:tools/packaging/linux/systemd/aog-core.service†L1-L27】
 - Ensure the host satisfies O-BACKEND-6: Ubuntu/Debian or RPM-based distro with
   .NET 8 runtime, writable `/var/lib/aog` for state, and `/etc/aog` for
-  configuration overrides.【F:docs/SRS/options/O-BACKEND-6_LinuxCoreService.md†L6-L33】
+  configuration overrides.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L6-L33】
 - Confirm access to the `nexus` release bundle if you need to cross-check
   appsettings defaults or plugin payloads.【F:SERVICES.md†L9-L46】
 
@@ -140,7 +140,7 @@ AGiO journal. Investigate persistent warnings before fielding builds on SBCs.
 
 - Use `journalctl --since "-1 day" -u aog-core -o json` to export structured
   health logs and attach them to support tickets, satisfying the telemetry
-  readiness goals in SRS §10.【F:docs/SRS/sections/10_Telemetry_Health.md†L1-L37】
+  readiness goals in SRS §10.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L1-L37】
 - Mirror `/var/log/aog` and replay bundles from `/var/lib/aog` onto a support
   workstation when diagnosing issues offline. Packaging keeps permissions owned
   by `aogsvc` to preserve provenance when copying across systems.【F:tools/packaging/linux/build-packages.sh†L231-L269】

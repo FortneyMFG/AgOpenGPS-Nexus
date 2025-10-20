@@ -32,8 +32,8 @@ UI overlays, dashboards, and inspectors need to consume layer metadata without h
 - Remote companion mode must pass contract conformance tests validating schema parity and field-level ACLs.
 
 ## References
-- [Frontend requirements](../SRS/sections/05_Frontends.md)
-- [Telemetry & health requirements](../SRS/sections/10_Telemetry_Health.md)
-- [Extensibility & plugin requirements](../SRS/sections/12_Extensibility_Plugins.md)
+- [Frontend requirements](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [Telemetry & health requirements](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
+- [Extensibility & plugin requirements](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
 - [ADR-068: Layer controllers and aggregation runtime](ADR-068-layer-controllers-runtime.md)

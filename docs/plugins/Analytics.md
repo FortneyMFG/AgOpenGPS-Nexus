@@ -9,11 +9,11 @@ multi-field envelopes require new filtering and provenance expectations.
 
 ## Runtime Contracts
 
-- Subscribe to `onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, and `onSessionStart` to cache active context and trigger incremental analytics updates. Events include authoring metadata (`createdBy`, `createdAt`, `lastModifiedAt`) and plugin `extensions` for crop/profit overlays.【F:docs/SRS/sections/03_JobLifecycle.md†L18-L74】
-- Listen for `onSessionPause`/`onSessionResume` to manage incremental analytics windows, and `onSessionWeatherUpdate` when weather-dependent compliance checks are required.【F:docs/SRS/sections/03_JobLifecycle.md†L38-L64】
+- Subscribe to `onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, and `onSessionStart` to cache active context and trigger incremental analytics updates. Events include authoring metadata (`createdBy`, `createdAt`, `lastModifiedAt`) and plugin `extensions` for crop/profit overlays.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】
+- Listen for `onSessionPause`/`onSessionResume` to manage incremental analytics windows, and `onSessionWeatherUpdate` when weather-dependent compliance checks are required.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L38-L64】
 - Handle `onLayerStartEdit`/`onFeatureCommit` events to recalculate analytics when operators adjust crop, genetics, risk, or profit zones via the shared editing toolchain.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
 - Accept filters for `seasonId`, `jobId`, and `sessionId` to scope analytics outputs. Provide Season-first and Farm-first report
-  presets to match UI navigation flows.【F:docs/SRS/sections/03_JobLifecycle.md†L74-L92】
+  presets to match UI navigation flows.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L74-L92】
 - Read `job.stats.fields[]` to present per-field summaries even when jobs span multiple fields. Aggregations should clearly
   delineate totals vs. per-field results.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L47-L75】
 - Honor `Layer.v1` provenance when aggregating planned vs. actual data. Preserve `source`, `transform`, `hash`, `createdBy`, and `actor`

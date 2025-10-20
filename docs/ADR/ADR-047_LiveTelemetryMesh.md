@@ -84,6 +84,6 @@ device.
 
 ## References
 
-- [Section 03 — Communications & Transports](../SRS/sections/03_Comm_Transports.md)
-- [Section 05 — Frontends](../SRS/sections/05_Frontends.md)
-- [Section 10 — Telemetry & Health](../SRS/sections/10_Telemetry_Health.md)
+- [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+- [Section 91 — UI Shell & Layout](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [Section 64 — Telemetry & Health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)

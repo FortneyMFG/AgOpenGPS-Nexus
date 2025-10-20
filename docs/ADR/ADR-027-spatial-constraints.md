@@ -40,17 +40,17 @@ Example JSON representation:
 
 ## SRS Impact
 
-- Satisfies spatial constraint storage, buffering, and indexing requirements R-DATA-026…R-DATA-028 in §08 Data Model & Storage.【F:docs/SRS/sections/08_Data_Model_Storage.md†L21-L23】
-- Enables zone gating visibility and override workflows described in §05 Frontends (R-FE-041…R-FE-042).【F:docs/SRS/sections/05_Frontends.md†L20-L24】
+- Satisfies spatial constraint storage, buffering, and indexing requirements R-DATA-026…R-DATA-028 in §08 Data Model & Storage.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L21-L23】
+- Enables zone gating visibility and override workflows described in §05 Frontends (R-FE-041…R-FE-042).【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L20-L24】
 
 ## Consequences
 - **Positive impacts**
-  - Guidance plugins gain deterministic access to headland and keep-out geometry for intent inference, auto-extend, and recovery logic while remaining bounded by Core policies.【F:docs/SRS/sections/03_Comm_Transports.md†L25-L35】【F:docs/SRS/sections/08_Data_Model_Storage.md†L53-L76】【F:docs/SRS/sections/09_Control_Automation.md†L37-L49】
-  - Section control benefits from uniform gating semantics, ensuring product shutoff in no-work/keep-out zones with auditable logs and operator notifications.【F:docs/SRS/sections/09_Control_Automation.md†L50-L60】【F:docs/SRS/sections/10_Telemetry_Health.md†L34-L41】
-  - UIs and interop flows display and edit the same zone metadata, reducing divergence across desktop, headless, and import/export tooling.【F:docs/SRS/sections/05_Frontends.md†L37-L47】【F:docs/SRS/sections/08_Data_Model_Storage.md†L77-L88】
+  - Guidance plugins gain deterministic access to headland and keep-out geometry for intent inference, auto-extend, and recovery logic while remaining bounded by Core policies.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L25-L35】【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L53-L76】【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L37-L49】
+  - Section control benefits from uniform gating semantics, ensuring product shutoff in no-work/keep-out zones with auditable logs and operator notifications.【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L50-L60】【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L34-L41】
+  - UIs and interop flows display and edit the same zone metadata, reducing divergence across desktop, headless, and import/export tooling.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L37-L47】【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L77-L88】
 - **Negative/mitigated impacts**
-  - Maintaining buffered polygons and R-tree indexes adds CPU cost; mitigated by caching last-known zone state and querying only candidate polygons per PoseStream sample.【F:docs/SRS/sections/03_Comm_Transports.md†L36-L45】
-  - Operators need training on override policies; mitigated through UI toggles, alerts, and audit logs described in the Telemetry & Health section.【F:docs/SRS/sections/05_Frontends.md†L48-L54】【F:docs/SRS/sections/10_Telemetry_Health.md†L42-L49】
+  - Maintaining buffered polygons and R-tree indexes adds CPU cost; mitigated by caching last-known zone state and querying only candidate polygons per PoseStream sample.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L36-L45】
+  - Operators need training on override policies; mitigated through UI toggles, alerts, and audit logs described in the Telemetry & Health section.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L48-L54】【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L42-L49】
 - **Follow-up actions**
   - Implement ZoneService, storage, and pose mask plumbing in Core.
   - Update guidance and section plugins to subscribe to zones, integrate keep-out costs, and honor constraint gates.
@@ -71,11 +71,11 @@ Example JSON representation:
 - Field assets track boundaries and headlands through text exports (`Boundary.txt`, `Headland.txt`), and the WinForms runtime draws those polygons for lift cues, but there is no formal notion of keep-out or work-disabled zones beyond manual operator overrides.【F:docs/porting/V6-Functionality-Gap-Analysis.md†L16-L25】【F:docs/aog-v6-mapping-brief.md†L23-L34】
 
 ### Legacy Dev Branch
-- The dev branch inherits the same boundary/headland-only model, leaving constraint gating requirements such as zone masks and automated keep-out enforcement unsatisfied, which is why new SRS items call for a ZoneService and arbiter gating around keep-out/work-disabled areas.【F:docs/SRS/sections/03_Comm_Transports.md†L19-L24】【F:docs/SRS/sections/09_Control_Automation.md†L23-L24】
+- The dev branch inherits the same boundary/headland-only model, leaving constraint gating requirements such as zone masks and automated keep-out enforcement unsatisfied, which is why new SRS items call for a ZoneService and arbiter gating around keep-out/work-disabled areas.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L19-L24】【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L23-L24】
 
 ## References
-- [Section 03 — Communications & Transports](../SRS/sections/03_Comm_Transports.md)
-- [Section 05 — Frontends](../SRS/sections/05_Frontends.md)
-- [Section 08 — Data Model & Storage](../SRS/sections/08_Data_Model_Storage.md)
-- [Section 09 — Control & Automation](../SRS/sections/09_Control_Automation.md)
-- [Section 10 — Telemetry & Health](../SRS/sections/10_Telemetry_Health.md)
+- [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
+- [Section 91 — UI Shell & Layout](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [Section 32 — Persistence & Formats](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
+- [Section 61 — Kinematics & Pose Fusion](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+- [Section 64 — Telemetry & Health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)

@@ -7,7 +7,7 @@ Accepted
 
 
 ## Context
-Nexus development depends on deterministic simulation for CI, operator training, and plugin validation. The backend and extensibility sections highlight the need for a composite simulation loop where Core owns the authoritative clock, plugins publish to a shared bus, and hardware inputs can pre-empt simulated data without duplicating routing logic.【F:docs/SRS/sections/04_Backend_Services.md†L1-L70】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L18-L71】 Option O-STACK-1 reinforces this model by positioning AgIO’s simulation backend alongside Windows and Linux backends using the same contracts.【F:docs/SRS/options/O-STACK-1_DotNet8Avalonia.md†L9-L47】
+Nexus development depends on deterministic simulation for CI, operator training, and plugin validation. The backend and extensibility sections highlight the need for a composite simulation loop where Core owns the authoritative clock, plugins publish to a shared bus, and hardware inputs can pre-empt simulated data without duplicating routing logic.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L70】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L18-L71】 Option O-STACK-1 reinforces this model by positioning AgIO’s simulation backend alongside Windows and Linux backends using the same contracts.【F:docs/SRS/options/1X/O-STACK-1_DotNet8Avalonia.md†L9-L47】
 
 ## Decision
 Create a composite simulation fabric governed by the Core service:
@@ -44,9 +44,9 @@ Plugins register simulation providers against this fabric and must respect seede
 - Simulation lives inside the monolithic `CSim` helper, which synthesizes GNSS/IMU data in-process without a shared bus or external plugin hooks, limiting reuse and determinism across tools.【F:docs/porting/V6-Inventory.md†L45-L49】
 
 ### Legacy Dev Branch
-- Current dev tooling still depends on standalone utilities such as ModSim and direct wiring in the WinForms app, so there is no authoritative clock/bus that multiple modules can share without duplicating logic.【F:docs/SRS/sections/05_Frontends.md†L7-L17】【F:docs/SRS/sections/12_Extensibility_Plugins.md†L51-L56】
+- Current dev tooling still depends on standalone utilities such as ModSim and direct wiring in the WinForms app, so there is no authoritative clock/bus that multiple modules can share without duplicating logic.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L7-L17】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L51-L56】
 
 ## References
-- [Section 04 — Backend Services](../SRS/sections/04_Backend_Services.md)
-- [Section 12 — Extensibility & Plugins](../SRS/sections/12_Extensibility_Plugins.md)
-- [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/O-STACK-1_DotNet8Avalonia.md)
+- [Section 21 — System Decomposition & Boundaries](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
+- [Section 94 — Extensibility, Packaging & Updates](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
+- [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/1X/O-STACK-1_DotNet8Avalonia.md)

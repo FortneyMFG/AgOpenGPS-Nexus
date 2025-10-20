@@ -12,9 +12,9 @@ The Nexus refactor introduces metadata-driven layers, deterministic replay, and 
 common aggregation runtime. Legacy AgOpenGPS streamers intermix IO ingestion, accumulation, and rendering, which makes it hard
 to add new sensors, keep overlap math deterministic, or replay controller outputs headlessly. SRS §04 backend requirements and
 Option O-BACKEND-4 call for per-section controllers that buffer GNSS-aligned samples, maintain rolling accumulators, and emit
-immutable snapshots so PoseStream, SectionState, and TileStore stay consistent.【F:docs/SRS/sections/04_Backend_Services.md†L6-L27】【F:docs/SRS/options/O-BACKEND-4_LayerControllers.md†L1-L46】 Layer registry work (ADR-010) and metadata-driven layer schemas
+immutable snapshots so PoseStream, SectionState, and TileStore stay consistent.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L27】【F:docs/SRS/options/6X/O-BACKEND-4_LayerControllers.md†L1-L46】 Layer registry work (ADR-010) and metadata-driven layer schemas
 (O-DATA-5) assume controllers can normalize values, units, and quality weights while journaling provenance to satisfy analytics
-and regulatory workloads.【F:docs/SRS/options/O-DATA-5_MetadataDrivenLayers.md†L1-L58】 Without a canonical runtime, plugins
+and regulatory workloads.【F:docs/SRS/options/7X/O-DATA-5_MetadataDrivenLayers.md†L1-L58】 Without a canonical runtime, plugins
 duplicate logic, the UI sees inconsistent values, and replay fixtures cannot guarantee deterministic hashes for coverage tiles
 or rate history.
 
@@ -58,20 +58,20 @@ Adopt a layered aggregation runtime owned by Core:
 4. Snapshots publish to the event bus and TileStore writers. Mapping/rate plugins receive updates via dependency injection and
    update UI overlays or control loops accordingly.
 5. `LayerDiagnosticsService` monitors latency, drift, and sample gaps, surfacing alerts and metrics to Telemetry & Health
-   dashboards per SRS §10.【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L49】
+   dashboards per SRS §10.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L6-L49】
 6. Journals persist to disk using ADR-020 deterministic replay policies. Recovery replays journals to rebuild controller state
    before acknowledging `onSessionResume`.
 
 ## SRS Impact
 
 - Delivers the aggregation runtime mandated by §04 Backend Services (R-BE-010…R-BE-013) so ingestion, accumulation, and
-  rendering are decoupled and deterministic.【F:docs/SRS/sections/04_Backend_Services.md†L6-L35】
+  rendering are decoupled and deterministic.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L35】
 - Satisfies §08 Data Model expectations for per-layer metadata, accumulators, and provenance by emitting canonical snapshots and
-  journals aligned with O-DATA-5 metadata-driven layers.【F:docs/SRS/sections/08_Data_Model_Storage.md†L10-L33】【F:docs/SRS/options/O-DATA-5_MetadataDrivenLayers.md†L1-L58】
+  journals aligned with O-DATA-5 metadata-driven layers.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L10-L33】【F:docs/SRS/options/7X/O-DATA-5_MetadataDrivenLayers.md†L1-L58】
 - Provides telemetry hooks and health metrics required in §10 Telemetry & Health, enabling alerting when controller latency or
-  quality falls outside targets.【F:docs/SRS/sections/10_Telemetry_Health.md†L6-L41】
+  quality falls outside targets.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L6-L41】
 - Enables deterministic replay goals from §03 Communications & Transports and ADR-020 by producing repeatable hashes and
-  journals for PoseStream-aligned controllers.【F:docs/SRS/sections/03_Comm_Transports.md†L25-L45】【F:docs/ADR/ADR-020-determinism-replay-ci.md†L11-L40】
+  journals for PoseStream-aligned controllers.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L25-L45】【F:docs/ADR/ADR-020-determinism-replay-ci.md†L11-L40】
 
 ## Consequences
 
@@ -111,9 +111,9 @@ Adopt a layered aggregation runtime owned by Core:
 
 ## References
 
-- [O-BACKEND-4 — Layer Controllers](../SRS/options/O-BACKEND-4_LayerControllers.md)
-- [O-DATA-5 — Metadata-driven layers](../SRS/options/O-DATA-5_MetadataDrivenLayers.md)
-- [O-TEST-4 — Layer replay CI harness](../SRS/options/O-TEST-4_LayerReplayCI.md)
+- [O-BACKEND-4 — Layer Controllers](../SRS/options/6X/O-BACKEND-4_LayerControllers.md)
+- [O-DATA-5 — Metadata-driven layers](../SRS/options/7X/O-DATA-5_MetadataDrivenLayers.md)
+- [O-TEST-4 — Layer replay CI harness](../SRS/options/9X/O-TEST-4_LayerReplayCI.md)
 - [ADR-010 — Layer registry & variable rate](ADR-010-layer-registry-variable-rate.md)
 - [ADR-027 — Spatial constraints & zone policies](ADR-027-spatial-constraints.md)
 - [ADR-020 — Determinism & replay CI](ADR-020-determinism-replay-ci.md)

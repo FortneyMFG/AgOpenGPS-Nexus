@@ -58,7 +58,7 @@ Adopt a Preset model that binds Equipment, Implement, and Layout selections into
   states during orchestration.【F:docs/ADR/ADR-031-official-plugin-bundle.md†L15-L62】
 - Layout inheritance and live-link semantics are now normative for UI pods; updates
   must respect the deterministic overlay rules and provenance requirements captured
-  in the frontend SRS section.【F:docs/SRS/sections/05_Frontends.md†L22-L88】
+  in the frontend SRS section.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L22-L88】
 - Task orchestration for preset application is officially bound to the JobsService
   lifecycle contracts, ensuring preset provenance is journaled alongside job/session
   metadata for auditing.【F:docs/ADR/ADR-030-field-job-sessions.md†L20-L96】
@@ -75,5 +75,5 @@ Adopt a Preset model that binds Equipment, Implement, and Layout selections into
 ## References
 - [SRS §2.8 Documentation](../SRS/NOTES.md#srs-28-documentation)
 - [SRS §4.2 Safety & QA](../SRS/NOTES.md#srs-42-safety--qa)
-- [SRS §12 Extensibility & Plugins](../SRS/sections/12_Extensibility_Plugins.md)
+- [SRS §12 Extensibility & Plugins](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 - Tasks spec excerpt provided by product stakeholders (internal notes)

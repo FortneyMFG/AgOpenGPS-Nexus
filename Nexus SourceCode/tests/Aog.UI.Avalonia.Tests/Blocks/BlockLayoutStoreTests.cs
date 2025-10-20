@@ -49,6 +49,36 @@ public class BlockLayoutStoreTests
         preferences.ShellLayout.Instances.Single().DefinitionId.Value.Should().Be("Cmd.Start");
     }
 
+    [Fact]
+    public void Load_RemovesInstancesWithUnknownDefinitions()
+    {
+        var preferences = new UiPreferences();
+        preferences.ShellLayout.Instances.Add(new BlockInstance
+        {
+            DefinitionId = new BlockDefinitionId("Cmd.Start"),
+            Origin = BlockOrigin.Clone,
+            Region = BlockRegion.Bottom,
+            Order = 0,
+        });
+        preferences.ShellLayout.Instances.Add(new BlockInstance
+        {
+            DefinitionId = new BlockDefinitionId("Cmd.Legacy"),
+            Origin = BlockOrigin.Clone,
+            Region = BlockRegion.Bottom,
+            Order = 1,
+        });
+
+        var service = new FakePreferencesService(preferences);
+        var catalog = new BlockCatalog(new IBlockProvider[] { new CoreBlockProvider() });
+        var store = new BlockLayoutStore(service, catalog);
+
+        var instances = store.Load();
+
+        instances.Should().NotContain(instance => instance.DefinitionId.Value == "Cmd.Legacy");
+        preferences.ShellLayout.Instances.Should().NotContain(instance => instance.DefinitionId.Value == "Cmd.Legacy");
+        preferences.ShellLayout.Instances.Should().Contain(instance => instance.DefinitionId.Value == "Cmd.Start");
+    }
+
     private sealed class FakePreferencesService : IUiPreferencesService
     {
         private readonly UiPreferences _preferences;

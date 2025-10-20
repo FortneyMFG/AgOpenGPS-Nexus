@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using Aog.UI.Avalonia.Blocks;
 using Microsoft.Extensions.Logging;
 
 namespace Aog.UI.Avalonia.Settings;
@@ -11,11 +12,7 @@ namespace Aog.UI.Avalonia.Settings;
 public sealed class JsonUiPreferencesStore : IUiPreferencesStore
 {
     private const string SettingsFileName = "ui-preferences.json";
-    private static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-        WriteIndented = true,
-        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
-    };
+    private static readonly JsonSerializerOptions SerializerOptions = CreateSerializerOptions();
 
     private readonly ILogger<JsonUiPreferencesStore> _logger;
     private readonly string _settingsPath;
@@ -78,5 +75,17 @@ public sealed class JsonUiPreferencesStore : IUiPreferencesStore
         using var stream = File.Create(_settingsPath);
         JsonSerializer.Serialize(stream, preferences, SerializerOptions);
         _logger.LogInformation("UI preferences saved to {Path}.", _settingsPath);
+    }
+
+    private static JsonSerializerOptions CreateSerializerOptions()
+    {
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+        };
+
+        options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        BlockJsonConverters.Configure(options);
+        return options;
     }
 }

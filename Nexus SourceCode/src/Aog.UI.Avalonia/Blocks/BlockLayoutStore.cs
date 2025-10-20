@@ -39,7 +39,8 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         var layout = preferences.ShellLayout;
         EnsureInstanceList(layout);
 
-        var changed = EnsureMenuScopedCanonicals(layout);
+        var changed = RemoveMissingDefinitions(layout);
+        changed |= EnsureMenuScopedCanonicals(layout);
         changed |= EnsureDefaultClones(layout);
 
         if (changed)
@@ -68,6 +69,17 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         {
             layout.Instances = new List<BlockInstance>();
         }
+    }
+
+    private bool RemoveMissingDefinitions(ShellLayoutPreferences layout)
+    {
+        var removed = layout.Instances.RemoveAll(instance =>
+            instance is null
+            || instance.DefinitionId is null
+            || string.IsNullOrWhiteSpace(instance.DefinitionId.Value)
+            || _catalog.Get(instance.DefinitionId) is null);
+
+        return removed > 0;
     }
 
     private bool EnsureMenuScopedCanonicals(ShellLayoutPreferences layout)

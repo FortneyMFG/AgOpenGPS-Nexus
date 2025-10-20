@@ -21,20 +21,8 @@ public sealed class ShellLayoutPreferences
     /// <summary>Gets or sets the persisted block layout instances.</summary>
     public List<BlockInstance> Instances { get; set; } = new();
 
-    /// <summary>Gets or sets the layout metrics for the left sidebar.</summary>
-    public SidebarLayoutSettings LeftSidebar { get; set; } = SidebarLayoutSettings.CreateVerticalDefaults();
-
-    /// <summary>Gets or sets the layout metrics for the right sidebar.</summary>
-    public SidebarLayoutSettings RightSidebar { get; set; } = SidebarLayoutSettings.CreateVerticalDefaults();
-
-    /// <summary>Gets or sets the layout metrics for the bottom toolbar.</summary>
-    public SidebarLayoutSettings BottomSidebar { get; set; } = SidebarLayoutSettings.CreateBottomDefaults();
-
-    /// <summary>Gets or sets the layout metrics for the top telemetry strip.</summary>
-    public SidebarLayoutSettings TopSidebar { get; set; } = SidebarLayoutSettings.CreateTopDefaults();
-
-    /// <summary>Gets or sets the layout metrics for the central workspace grid.</summary>
-    public SidebarLayoutSettings WorkspaceGrid { get; set; } = SidebarLayoutSettings.CreateWorkspaceDefaults();
+    /// <summary>Gets or sets the global grid layout definition.</summary>
+    public Layout.ShellGridLayout Grid { get; set; } = new();
 
     /// <summary>
     /// Legacy alias maintained for compatibility with existing bindings.
@@ -64,11 +52,15 @@ public sealed class ShellLayoutPreferences
             ShowTopToolbar = ShowTopToolbar,
             ShowRightSidebar = ShowRightSidebar,
             ActiveWorkspaceId = ActiveWorkspaceId,
-            LeftSidebar = (LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
-            RightSidebar = (RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
-            BottomSidebar = (BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone(),
-            TopSidebar = (TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone(),
-            WorkspaceGrid = (WorkspaceGrid ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone(),
+            Grid = new Layout.ShellGridLayout
+            {
+                CellPx = Grid?.CellPx ?? 56,
+                GutterPx = Grid?.GutterPx ?? 8,
+                Columns = Grid?.Columns ?? 1,
+                Rows = Grid?.Rows ?? 1,
+                RootPane = ClonePane(Grid?.RootPane),
+                Tiles = Grid?.Tiles is { Count: > 0 } tiles ? CloneTiles(tiles) : new List<Layout.TileSpec>(),
+            },
         };
 
         if (Instances.Count > 0)
@@ -77,6 +69,49 @@ public sealed class ShellLayoutPreferences
             {
                 clone.Instances.Add(instance.Clone());
             }
+        }
+
+        return clone;
+    }
+
+    private static Layout.PaneNode? ClonePane(Layout.PaneNode? node)
+    {
+        return node switch
+        {
+            Layout.SplitPane split => new Layout.SplitPane
+            {
+                Id = split.Id,
+                Orientation = split.Orientation,
+                Ratios = split.Ratios is { Length: > 0 } ratios ? (double[])ratios.Clone() : new[] { 1.0 },
+                Children = split.Children.ConvertAll(child => ClonePane(child) ?? new Layout.LeafPane()),
+            },
+            Layout.LeafPane leaf => new Layout.LeafPane
+            {
+                Id = leaf.Id,
+                Kind = leaf.Kind,
+                PluginId = leaf.PluginId,
+            },
+            _ => null,
+        };
+    }
+
+    private static List<Layout.TileSpec> CloneTiles(IEnumerable<Layout.TileSpec> tiles)
+    {
+        var clone = new List<Layout.TileSpec>();
+        foreach (var tile in tiles)
+        {
+            clone.Add(new Layout.TileSpec
+            {
+                Id = tile.Id,
+                Row = tile.Row,
+                Col = tile.Col,
+                RowSpan = tile.RowSpan,
+                ColSpan = tile.ColSpan,
+                PaneAttached = tile.PaneAttached,
+                PaneId = tile.PaneId,
+                Anchor = tile.Anchor,
+                Offset = tile.Offset,
+            });
         }
 
         return clone;

@@ -1,140 +1,123 @@
-# 11 — OS Support
+# 11 — Operating System Support
+*(Status: drafting)*
 
-> **In plain terms:** We promise operators that Windows installs keep working while
-> we grow a Linux-friendly service build. Think of it as keeping today’s cab PCs
-> happy, adding a headless Linux box for fleets, and laying the groundwork so a
-> phone or tablet can join later without rewriting everything.
-
-*(Status: Proposed)*
-
-**Author:** Codex  
-**Created:** 2025-10-20  
-**Version:** 0.1.0  
 **Section ID:** 11  
-**Editors:** Platform Foundations Working Group  
-**Last Updated:** 2025-10-20  
+**Version:** 0.1.0  
+**Editors:** @owner, @reviewer  
+**Last Updated:** 2025-10-21  
 **Related Sections:** 12 — Development Language & Runtime, 14 — Build Environment & Tooling  
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
-**Downstream Impacts:** 5X — Hardware IO Device Layer, 9X — Frontends & Ops
+**Downstream Impacts:** 5X — Hardware I/O Device Layer, 9X — Frontends & Ops
 
 ---
 
 ## 11.1 Purpose & Scope
 
-Define the operating system (OS) coverage required for Nexus Core, AgIO backends, plugins, and desktop user interfaces.
-This section clarifies which platforms must remain first-class, how emerging Linux deployments interact with the Windows legacy base, and what expectations exist for headless, kiosk, and remote UI workloads.
+Define operating system (OS) coverage for Nexus.  
+This section sets expectations for where the application must/should run at the OS level and how hardware I/O behaves consistently on each platform.
+
+> **Example:**  
+> This section defines requirements and design options for cross-OS runtime support.  
+> It covers installation targets, OS-level compatibility, and I/O parity expectations.
 
 ---
 
 ## 11.2 Context
 
-- Legacy AgOpenGPS installers and tooling target Windows 10/11 on x64 hardware.
-- Contributors are piloting Linux (Ubuntu/Debian) deployments for headless Core + remote UI flows.
-- AgIO abstracts hardware access but currently depends on Windows-first device APIs; Linux alternatives require parity validation.
-- Multi-monitor cabs, kiosk installs, and potential Android/iOS companions impose usability and packaging constraints.
-
-### Questions operators ask
-
-- **“Can I keep using the Windows installer I already know?”** Yes—the Windows build remains first-class and is validated on every release.
-- **“What happens if I want to run Nexus on a Raspberry Pi or CM5?”** The Linux headless build provides systemd units and packaging so you can drop it onto those devices.
-- **“How do I know if my graphics card is fast enough?”** Section 11.5 documents the 60 FPS benchmark and points to the reference hardware list.
-
-### Scenario: Launching a new mixed fleet
-
-1. A dealer installs the familiar Windows desktop app in the cab so operators recognize the workflow.
-2. The same farm adds a Linux CM5 running the headless Core, using systemd packaging to keep it running without manual babysitting.
-3. Later, the team tests a tablet-based companion UI; the dual-first requirements ensure Avalonia keeps layouts consistent across every screen.
+- Depends on .NET 8 runtime and the selected cross-platform UI framework (see §12).  
+- Interacts with AgIO for hardware interfaces (serial, UDP, CAN) (see §5X).  
+- Out of scope: service modes (e.g., headless), packaging specifics, mobile companions.
 
 ---
 
 ## 11.3 Legacy Comparison
 
+Describe how legacy or prior implementations handled this capability.
+
 | Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
 |---------------|-----------------|------------------------|---------------------------|--------------------|
-| Deployment | Windows WinExe installers for Core, UI, and AgIO utilities. | Linux deployments ad-hoc; no consistent packaging. | Ship Linux systemd units, container images, and Pi/CM5 bundles. | Historical AgOpenGPS releases |
-| Hardware Access | Direct Win32 serial, HID, and vendor CAN SDK integrations. | Tight coupling to Windows drivers; limited SocketCAN coverage. | Encapsulate device access in AgIO backends with Linux parity. | AgIO codebase |
-| UI Shells | WinForms primary UI; WPF experiments retired. | Operators rely on AgOpenGPS v6 while Nexus UI matures. | Adopt cross-platform UI stack that reuses shared contracts. | Nexus UI discussions |
+| Deployment | Windows-only desktop installer. | No multi-OS distribution. | Add Linux desktop builds with similar install UX. | [Link] |
+| Hardware I/O | Win32 serial/UDP and vendor CAN SDKs. | OS-specific code paths. | OS-agnostic I/O via AgIO abstraction. | [Link] |
+| UI | Windows Forms. | Platform-locked UI code. | Cross-platform UI stack (see §12). | [Link] |
 
-> **Informative:** Captures historical context and modernization drivers.
+> **Informative:** Background only; does not impose requirements.
 
 ---
 
 ## 11.4 Definitions
 
 | Term | Definition |
-|------|-------------|
-| AgIO | Nexus hardware abstraction host process that surfaces GNSS, CAN, and IO services.
-| Headless Core | Service-oriented deployment of Nexus Core without a local UI shell.
-| Kiosk Mode | Locked-down UI configuration for cabs with limited input and multi-monitor requirements.
-| Companion Remote | Mobile or remote desktop client consuming Nexus APIs over gRPC or gRPC-Web.
+|------|------------|
+| AgIO | Hardware I/O layer providing serial, UDP, and CAN communication across OSes. |
+| Platform Tier | Level of official support (e.g., Primary, Secondary). |
+| Cross-Platform Runtime | Shared runtime/toolkit used to build Windows and Linux desktop apps. |
 
 ---
 
-> **Requirement Grammar (RFC-2119):**
-> - **MUST / MUST NOT** = mandatory; verification required.
-> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.
-> - **MAY** = optional; document enabling conditions.
+> **Requirement Grammar (RFC-2119):**  
+> - **MUST / MUST NOT** = mandatory; test must exist.  
+> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.  
+> - **MAY** = optional; document enabling conditions.  
+>
+> **Clarity Checklist:** Prefer measurable forms and single-behavior statements.
 
 ## 11.5 Requirements
 
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
-|----|-----------|-----------|----------|-----------------|-----------------------------|
-| R-OS-000 | MUST | Compatibility | Maintain shipping Windows desktop runtimes for Core UI executables. | Legacy operator fleet | Windows build lane + installer smoke tests |
-| R-OS-001 | MUST | Hardware IO | Keep AgIO Windows Forms host viable for serial, UDP, and CAN management. | AgIO contributor feedback | Automated regression suite for device dialogs |
-| R-OS-002 | SHOULD | Deployment | Preserve Windows-based flows relied on by external controllers (e.g., SK21). | Partner integrations | Beta installers validated against partner rigs |
-| R-OS-003 | SHOULD | UX | Continue multi-monitor aware window placement to keep dashboards visible. | Community UX notes | UI smoke test with multi-monitor layouts |
-| R-OS-004 | SHOULD | Portability | Package a Linux headless “AOG Core” service with systemd unit and dependencies. | Linux Core pilots | Linux CI lane + field smoke checklist |
-| R-OS-005 | COULD | Deployment | Offer container images/AppImage bundles for advanced users. | Power user backlog | Container build pipeline with basic run verification |
-| R-OS-006 | SHOULD | Performance | Document baseline hardware capable of sustaining 60 FPS rendering. | Hardware survey | Hardware validation bench capturing FPS |
-| R-OS-007 | SHOULD | Mobility | Plan for Android/iOS targets that reuse Avalonia UI with minimal conditional code. | Mobile WG notes | Companion app prototypes hitting UI parity checklist |
-| R-OS-008 | COULD | Mobility | Map USB-OTG serial/Bluetooth SPP/BLE integrations to shared AgIO abstractions. | Mobile WG notes | Android pilot verifying IO parity |
+|----|----------|----------|---------|----------------|----------------------------|
+| R-OS-000 | MUST | Compatibility | Provide a fully functional **Windows** desktop build for operators. | Legacy baseline | Installer launches; UI renders; smoke tests pass. |
+| R-OS-001 | MUST | Hardware I/O | Support **Serial, UDP, and CAN** via AgIO consistently across supported OSes. | I/O parity goal | OS-specific loopback/device tests pass. |
+| R-OS-002 | SHOULD | Portability | Provide an equivalent **Linux** desktop build (x86-64, ARM64) with feature parity to Windows. | Cross-OS target | App launches; UI parity checklist passes. |
+| R-OS-003 | SHOULD | Deployment | Distribute signed installers/packages per platform. | Release hygiene | Signature/notarization verified. |
+| R-OS-004 | SHOULD | Performance | Publish minimum hardware guidance (e.g., render target such as 60 FPS on reference scene). | Operator guidance | Benchmark doc meets stated targets. |
+| R-OS-005 | MAY | Mobility | Allow future desktop builds to interoperate with mobile/tablet clients using shared contracts. | Interop note | Prototype handshake tests compile/run. |
 
-> **Why it matters:** These requirements guarantee a familiar Windows download for
-> current farms, introduce a reliable Linux service build for fleets, and keep us
-> honest about documenting hardware expectations so newcomers know if their gear
-> is powerful enough.
+> **Normative:** Each requirement must be objectively testable and traceable.
 
 ### 11.5.1 Requirement Sources & Rationale
 
 | Req ID | Source | Rationale |
 |--------|--------|-----------|
-| R-OS-000 | Legacy Windows releases | Preserve operator trust and upgrade path. |
-| R-OS-004 | Linux Core pilot plan | Enable headless rigs and remote client flows. |
-| R-OS-006 | Cross-platform pilots | Ensure hardware targets are realistic and published. |
-| R-OS-007 | ADR-003 Avalonia UI | Align desktop and mobile client investments. |
+| R-OS-000 | Legacy Windows usage | Preserve baseline operability. |
+| R-OS-001 | Cross-OS I/O need | Ensure device behavior is consistent regardless of OS. |
+| R-OS-002 | Cross-platform goal | Extend reach without forking features. |
+| R-OS-004 | Operator clarity | Prevent underpowered hardware surprises. |
 
 ---
 
 ## 11.6 Acceptance Criteria & Verification
 
-- Windows and Linux CI lanes publish build artifacts on every PR with smoke validation.
-- Multi-monitor UI regression tests confirm window placement helpers function across OSes.
-- Linux headless packages pass systemd enable/start/stop cycle tests and telemetry replay benchmarks.
+Describe how compliance with the requirements is validated.
+
+- Windows installer launch and basic UI smoke test completes without errors.  
+- Linux desktop build launches and completes parity checklist.  
+- AgIO serial/UDP/CAN tests succeed on each supported OS.  
+- Performance benchmark meets published minimums.
 
 ### 11.6.1 Requirement-to-Verification Map
 
-| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
-|--------|--------------------|---------------------|---------------------|
-| R-OS-000 | CI integration | `pipelines/windows-build.yml` | Installer boots and launches UI |
-| R-OS-004 | Manual checklist | `qa/checklists/linux-core.md` | All tasks ✓ |
-| R-OS-006 | Benchmark | `benchmarks/platform/fps.md` | ≥ 60 FPS sustained in reference scene |
-| R-OS-007 | Prototype demo | `demos/mobile-companion/README.md` | Feature parity scenarios complete |
+| Req ID   | Verification Type | Artifact / Location | Pass/Fail Threshold |
+|----------|-------------------|---------------------|---------------------|
+| R-OS-000 | Installation test | `[to be added]` | App installs and launches. |
+| R-OS-001 | I/O tests | `[to be added]` | All I/O channels pass loopback/device tests. |
+| R-OS-002 | UI parity checklist | `[to be added]` | All items ✓. |
+| R-OS-004 | Benchmark | `[to be added]` | Meets or exceeds stated FPS/latency targets. |
 
 ---
 
 ## 11.7 Constraints
 
-- Must remain compliant with vendor driver EULAs and redistributable terms.
-- Maintain parity between Windows and Linux AgIO backends for critical device classes (serial GNSS, CAN bus).
-- Ensure build pipelines handle code signing and package notarization where applicable.
+- Must use the cross-platform runtime defined in §12.  
+- Must avoid OS-specific forks in I/O logic; AgIO is the single abstraction.  
+- Must respect platform code-signing/notarization requirements.
 
 ### 11.7.1 Non-Functional Requirement Classes
 
-- **Performance:** Rendering FPS, IO latency, startup time.
-- **Reliability:** Service restarts, driver reconnect behavior, offline recovery.
-- **Security:** Signed artifacts, trusted transport encryption between components.
-- **Portability:** Windows x64, Linux x86_64, Linux ARM64 baselines.
-- **Maintainability:** Avoid OS-specific forks; keep abstractions within AgIO layer.
+- **Performance:** render/frame targets, I/O latency.  
+- **Reliability & Availability:** startup success, error handling for missing drivers.  
+- **Security:** signed artifacts, trusted transports.  
+- **Portability:** Windows x64; Linux x86-64 and ARM64.  
+- **Maintainability:** minimize OS-conditionals outside AgIO.
 
 ---
 
@@ -142,30 +125,26 @@ This section clarifies which platforms must remain first-class, how emerging Lin
 
 | ID | Description | Impact | Mitigation / Status | Owner |
 |----|-------------|--------|---------------------|-------|
-| RISK-11-1 | Linux packaging lacks maintainers. | Medium | Pair with Release WG; document build scripts. | @platform-wg |
-| RISK-11-2 | Hardware vendor SDKs missing Linux support. | High | Isolate via gRPC shims; pursue vendor contact. | @agio |
-| ISSUE-11-1 | Define supported Linux distros and kernels. | Medium | Draft support matrix in Section 14. | @release |
-| ISSUE-11-2 | Certify ARM64 GPU performance for Avalonia UI. | Medium | Track via 12-O1 validation plan. | @ui |
+| RISK-11-1 | Divergent driver support between Windows and Linux. | Medium | Keep I/O behind AgIO; document supported devices. | [TBD] |
+| ISSUE-11-1 | Define which Linux distributions are in scope. | Medium | Publish support matrix in §14. | [TBD] |
 
 ---
 
 ## 11.9 Design Considerations
 
 | ID | Consideration | Description |
-|----|----------------|-------------|
-| C1 | Windows-first baseline | Preserve installer workflows and UI expectations for existing operators. |
-| C2 | Linux headless core | Deliver service packaging, systemd integration, and remote client compatibility. |
-| C3 | Dual-first strategy | Balance Windows + Linux parity without fragmenting development tooling. |
-| C4 | Remote/companion clients | Support gRPC/Web transports for Android/iOS or remote desktops. |
-| C5 | Hardware abstraction | Keep IO stacks behind AgIO to avoid OS-specific forks in Core/UI. |
-| C6 | Packaging ergonomics | Provide containers/AppImage bundles for advanced deployments. |
-| C7 | Performance baselines | Document GPU/CPU requirements to guard against underpowered hardware. |
+|----|---------------|-------------|
+| C1 | Windows baseline | Windows desktop remains the mandatory baseline for operators. |
+| C2 | Linux parity | Linux desktop SHOULD provide equivalent features using the same codebase. |
+| C3 | Unified I/O | Serial/UDP/CAN are OS-agnostic through AgIO. |
+| C4 | Packaging | Use platform-native installers/packages; avoid custom loaders. |
+| C5 | Performance guidance | Publish minimum hardware targets per release. |
 
 ### 11.9.1 Assumptions & Preconditions
 
-- [A1] Reference hardware lists remain updated per release cycle.
-- [A2] AgIO abstraction contracts remain stable across OS backends.
-- [A3] Contributors can provision Windows and Linux CI lanes for validation.
+- [A1] Cross-platform UI renders consistently on Windows and Linux.  
+- [A2] Required device classes are available on each platform (or documented alternatives exist).  
+- [A3] Build tooling produces native installers/packages per OS.
 
 ---
 
@@ -173,106 +152,79 @@ This section clarifies which platforms must remain first-class, how emerging Lin
 
 | Option ID | Status | Type / Theme | Description | Reference Document |
 |-----------|--------|--------------|-------------|--------------------|
-| **11-O1** | Proposed | Cross-platform runtime | Unified Windows/Linux deployment via .NET 8 + Avalonia stack, leveraging shared AgIO backends. | [11-O1_Unified_DotNet8_Avalonia.md](11-O1_Unified_DotNet8_Avalonia.md) |
+| **11-O1** | Proposed | Cross-OS packaging | Windows and Linux desktop builds using shared runtime and AgIO. | 11-O1_CrossOS_Packaging.md |
 
-> **Informative:** Conceptual alternatives from legacy notes now live in §11.9 Design Considerations.
+> **Informative:** Options are explored alternatives, not binding requirements.
 
 ---
 
 ## 11.11 Comparison Matrix
 
-| Attribute / Criteria | 11-O1 — Unified .NET 8 Stack | Legacy Windows-only Baseline |
-|----------------------|------------------------------|------------------------------|
-| Core Approach | Shared runtime + UI across Windows/Linux | Windows-exclusive binaries |
-| Implementation Effort | Medium — requires Linux packaging + CI | Low — keep current pipelines |
-| Maintainability | High — one codebase, shared contracts | Low — diverging forks for Linux |
-| Performance | High — GPU-tuned Avalonia + AgIO parity | Medium — proven on Windows only |
-| Extensibility | High — supports remote clients + plugins | Low — Linux/mobile off roadmap |
-| Risk Level | Medium — new tooling, Linux drivers | Medium — stagnates modernization |
+| Attribute / Criteria | 11-O1 |
+|----------------------|-------|
+| Core Approach | Shared runtime for Windows & Linux desktop apps |
+| Implementation Effort | Medium |
+| Maintainability | High |
+| Performance Potential | High |
+| Extensibility | High |
+| Risk Level | Medium |
 
 ---
 
 ## 11.12 Decision Matrix
 
+*(Reserved — to be completed if/when an option is selected.)*
+
 ### 11.12.1 Weighting Method
 
 | Criterion | Rationale for Inclusion | Weight |
-|-----------|------------------------|--------|
-| Implementation Complexity | Balances engineering cost vs. modernization benefit. | 0.25 |
-| Performance / Quality Impact | Ensures guidance UI and IO remain responsive. | 0.25 |
-| Maintainability | Avoids OS-specific forks and duplicated tooling. | 0.20 |
-| Extensibility / Roadmap Fit | Enables remote clients and Linux growth. | 0.20 |
-| Ecosystem Alignment | Evaluates community familiarity and library support. | 0.10 |
+|----------|-------------------------|--------|
+| Implementation Complexity | Effort to build/ship per OS | 0.25 |
+| Performance / Quality Impact | Impact on operator experience | 0.25 |
+| Maintainability | Long-term sustainability | 0.20 |
+| Extensibility / Roadmap Fit | Future desktop growth | 0.20 |
+| Ecosystem Alignment | Runtime/tooling maturity | 0.10 |
 | **Total** |  | **1.0** |
 
 ### 11.12.2 Scoring Scale
 
-| Score | Meaning | Qualitative Description |
-|-------|---------|-------------------------|
-| 1 | Very Poor | Fundamentally unsuited; major blockers. |
-| 2 | Poor | Feasible but with unacceptable trade-offs. |
-| 3 | Adequate | Meets minimal expectations with caveats. |
-| 4 | Good | Performs well and aligns with design goals. |
-| 5 | Excellent | Ideal fit; strong performance and maintainability. |
+*(Reserved)*
 
 ### 11.12.3 Scoring Evidence
 
-| Criterion | 11-O1 Justification | Legacy Baseline Justification |
-|-----------|---------------------|------------------------------|
-| Implementation Complexity | Requires Linux packaging + CI extensions, but reuse existing C# code. | Minimal change; stays with Win-only installers. |
-| Performance / Quality Impact | Avalonia pilots demonstrate 60 FPS on Windows + Linux ARM64. | Proven on Windows; no Linux/mobile support. |
-| Maintainability | Single runtime, shared contracts, fewer forks. | Divergent code paths for Linux experiments. |
-| Extensibility / Roadmap Fit | Unlocks remote clients and mobile companions. | Linux/mobile efforts stay ad-hoc. |
-| Ecosystem Alignment | Leverages .NET 8 LTS, Avalonia ecosystem, existing skills. | Locked to Win32 stack; limited community growth. |
+*(Reserved)*
 
 ### 11.12.4 Weighted Scoring Table
 
-| Criterion | Weight | 11-O1 | Legacy Baseline |
-|-----------|--------|-------|-----------------|
-| Implementation Complexity | 0.25 | 3.5 | 4.5 |
-| Performance / Quality Impact | 0.25 | 4.5 | 3 |
-| Maintainability | 0.20 | 4.5 | 2 |
-| Extensibility / Roadmap Fit | 0.20 | 4.5 | 1.5 |
-| Ecosystem Alignment | 0.10 | 4 | 2 |
-| **Weighted Total** | **1.0** | **4.15** | **2.85** |
+*(Reserved)*
 
 ### 11.12.5 Decision Summary
 
-**Selected Option:** 11-O1 — Unified .NET 8 Stack  
-**Rationale:** Highest weighted score with strong alignment to modernization roadmap and cross-platform goals.  
-**Formal Record:** [11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md](11-ADR-001%20-%20Adopt%20Unified%20.NET%208%20Runtime%20&%20Avalonia%20Stack.md)
-
-> **Verification:** Platform Foundations WG reviewed scoring on 2025-10-20.
+*(Reserved)*
 
 ---
 
 ## 11.13 Evaluation & Verification
 
-- Benchmark Linux ARM64 and Windows x64 builds against 60 FPS rendering requirement.
-- Execute AgIO device matrix (serial, CAN, GPS) across OS backends.
-- Validate remote client latency over Wi-Fi/Ethernet using shared gRPC contracts.
+*(Reserved — to be completed alongside packaging & benchmark details.)*
 
 ---
 
 ## 11.14 Implementation Policy
 
-- Maintain shared deployment manifests for Windows installers and Linux packages.
-- Version AgIO backends alongside shared contracts to guarantee compatibility.
-- Document OS support tiers (Supported, Preview, Experimental) per release.
+*(Reserved)*
 
 ---
 
 ## 11.15 Community Sentiment
 
-- Community favors dual-first Windows + Linux strategy while keeping Windows operators productive.
-- Contributors expect Linux Core packaging plus Avalonia UI to unlock Pi/CM5 deployments.
-- Mobile pilot interest remains, contingent on cross-platform stack maturity.
+*(Reserved — optional; may remain blank until there is feedback.)*
 
 ### 11.15.1 Section Change Log
 
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Initial rebaseline using standardized SRS template. | #0000 |
+| Date       | Summary                     | PR / Issue |
+|------------|-----------------------------|------------|
+| 2025-10-21 | Initial draft (OS-only)     | #0000      |
 
 ---
 
@@ -280,21 +232,22 @@ This section clarifies which platforms must remain first-class, how emerging Lin
 
 | Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
 |----------------|-------------------|--------|-----------------------|--------------------------|
-| R-OS-000 | 11-O1 | 11-ADR-001 | Windows installer CI | `SourceCode/GPS/` projects |
-| R-OS-004 | 11-O1 | 11-ADR-001 | Linux Core checklist | `deployment/linux-core/` |
-| R-OS-007 | 11-O1 | 11-ADR-001 | Mobile prototype demo | `ui/mobile-companion/` |
+| R-OS-000 | 11-O1 | — | `[to be added]` | `[to be added]` |
+| R-OS-001 | 11-O1 | — | `[to be added]` | `[to be added]` |
+| R-OS-002 | 11-O1 | — | `[to be added]` | `[to be added]` |
 
 ---
 
 ## 11.17 Conformance
 
-An implementation conforms to Section 11 when:
-1. All **MUST** requirements (R-OS-000, R-OS-001) are satisfied and validated.
-2. **SHOULD** requirements have verification evidence or documented waivers.
-3. No **MUST NOT** constraints are violated during deployment or runtime.
+An implementation **conforms** to §11 when:  
+1) All **MUST** requirements (R-OS-000, R-OS-001) are satisfied and verified;  
+2) All **SHOULD** requirements have evidence or a documented waiver;  
+3) No **MUST NOT** constraint (none defined here) is violated.
 
 ---
 
 ## Standards Context
 
-This section aligns with **ISO/IEC/IEEE 29148:2018** requirements management guidance and maps to Nexus deployment governance for cross-platform support.
+Aligns with **ISO/IEC/IEEE 29148:2018** and **IEEE 1016:2017**.
+

@@ -1,40 +1,81 @@
-# ADR-024: Discovery and identity services
+# 42-ADR-024 — Discovery and identity services
+*(Status: Proposed)*
 
-## Status
-Drafting (target review window: 2025-12-15 week)
+**Author:** Codex
+**Reviewers:** Interprocess Communications Working Group
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Supersedes:** _None_
+**Superseded by:** _None_
+**Related SRS:** [42 — Transports](42_Transports.md)
+**Related Considerations:** [C1 - Legacy PGN Transport Stewardship](42_Transports.md#c1---legacy-pgn-transport-stewardship), [C4 - Plugin Leases & Security Enforcement](42_Transports.md#c4---plugin-leases--security-enforcement)
 
-**Relevant Plugin(s):** Device Manager, AgIO Host Services, Autosteer, Section Control, Rate Control, Mapping, Telemetry Logging
+---
 
+## 1) Context
 
-## Context
-Multiple controllers, plugins, and firmware nodes must discover each other, exchange capabilities, and present operator-friendly identities across transports. Current discovery flows lack consistent naming, leases, and security posture, creating confusion and risk in multi-node rigs. ADR-024 defines discovery, identity, and security expectations aligned with ADR-018 plugin API, ADR-016 firmware transports, and ADR-031 manifest governance.
+Multiple controllers, plugins, and firmware nodes must discover each other, exchange capabilities, and present operator-friendly
+identities across transports. Current discovery flows lack consistent naming, leases, and security posture, creating confusion and
+risk in multi-node rigs.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L134-L205】
 
-## Decision
-- Specify identity schemas and naming conventions for rigs, nodes, and capabilities, including lease renewals and retirement flows.
-- Implement discovery watchers and capability handshakes that complete quickly across transports while honoring permission models.
-- Enforce security controls (e.g., mTLS) for remote nodes with actionable telemetry when authentication fails.
-- Provide operator-facing UI for managing identities (rename, retire) with audit logging tied to provenance pipelines.
-- Introduce an `IdentityRegistryViewModel` in the desktop shell to surface discovered nodes, enforce rename/retire workflows, and emit audit entries that feed provenance DAGs.
+```mermaid
+flowchart LR
+  A[Ad-hoc discovery] --> B[Inconsistent identities]
+  B --> C[Standardized registry]
+  C --> D[Governed leases + security]
+```
 
-## Consequences
-- Operators gain clarity when managing multi-node rigs, improving troubleshooting and governance.
-- Security requirements increase implementation complexity but mitigate unauthorized access risks.
-- Discovery and identity services must integrate tightly with manifests and capability registries, requiring coordination across teams.
+---
 
-## Governance Updates
-- **Zero-touch provisioning.** Device onboarding supports QR-code and pre-shared bootstrap token flows that enroll hardware without manual certificate copying.
-- **Disaster recovery.** Compromised identities trigger automated certificate revocation, credential rotation checklists, and offline recovery steps documented in the incident response runbook.
-- **Lease tuning.** Identity leases include adaptive renewal timers tolerant of high-latency field links while maintaining revocation responsiveness.
+## 2) Decision
 
-## Validation
-- Discovery handshake must complete within two seconds for five-node rigs and populate the identity registry with unique IDs verified across transports.
-- Security model must enforce mTLS authentication and reject unauthenticated clients with structured telemetry events.
-- Operator identity UI must support rename/retire flows covered by automated UI tests with telemetry for every change.
+Define discovery, identity, and security expectations aligned with plugin APIs, firmware transports, and manifest governance.
 
-## References
-- [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-- [Hardware I/O requirements](../SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
-- [Extensibility & plugin requirements](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
-- [ADR-016: Firmware and transport for variable-rate layer PGNs](ADR-016-firmware-transport-variable-rate-pgns.md)
-- [ADR-018: Plugin API and capability discovery](ADR-018-plugin-api.md)
-- [ADR-031: Official plugin bundle governance](ADR-031-official-plugin-bundle.md)
+### Decision Summary
+
+* **Scope:** Identity schemas, discovery watchers, capability handshakes, and operator workflows.
+* **Boundary:** Transport-level encryption governed by ADR-043 (Channel Security); this ADR focuses on identity orchestration.
+* **Implementation Level:** Design + code; registry services, UI surfaces, and telemetry instrumentation.
+
+---
+
+## 3) Consequences
+
+**Positive Impacts:**
+
+* Operators gain clarity managing multi-node rigs via consistent naming and lifecycle workflows.
+* Security posture improves with mTLS requirements and actionable telemetry when authentication fails.
+* Discovery integrates with manifests and capability registries, enabling deterministic plugin enablement.
+
+**Negative / Mitigated Impacts:**
+
+* Increased implementation complexity — mitigated via shared registry services and UI tooling.
+* Requires coordination across teams (Core, AgIO, UI) — addressed by joint working group milestones.
+* Offline provisioning workflows add surface area — covered by zero-touch onboarding guidelines.
+
+**Follow-up Actions:**
+
+* Implement identity schemas with lease renewals, retirement flows, and audit logging.
+* Build discovery watchers that complete within two seconds for five-node rigs across transports.
+* Deliver desktop `IdentityRegistryViewModel` for rename/retire operations emitting provenance events.
+
+---
+
+## 4) Rationale
+
+Standardized identity services reduce operator confusion, enforce security policies, and tie discovery to capability registries,
+ensuring plugins and firmware negotiate permissions before streaming control data. Audit trails feed provenance pipelines for
+compliance and diagnostics.
+
+---
+
+## 5) Alternatives Considered
+
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| Status quo discovery | Continue ad-hoc UDP announcements. | Inconsistent naming, no leases, weak security. |
+| Manual registry management | Rely on operators editing config files. | Error-prone, lacks telemetry, unsuitable for multi-node rigs. |
+| External identity provider | Outsource discovery to third-party IAM. | Adds dependencies and complexity unsuited for offline rigs. |
+

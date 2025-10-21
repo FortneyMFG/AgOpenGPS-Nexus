@@ -92,17 +92,17 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 - [O-BACKEND-6 – Linux Core Service](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
 
 #### 4X — Interprocess & Communications
-- [O-COMM-5 – Variable-rate PGNs](sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md)
-- [O-COMM-6 – PGN Compatibility Bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md)
-- [O-COMM-7 – Gauge Telemetry PGNs](sections/4X_Interprocess_Communications/42-O7%20-%20Gauge%20telemetry%20PGNs%20for%20engine%20%26%20machine%20data.md)
+- [C2 – Variable-rate Layer Streams](sections/4X_Interprocess_Communications/42_Transports.md#c2---versioned-variable-rate-layer-streams)
+- [C3 – PGN Compatibility Bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge)
+- [C6 – Gauge Telemetry Channels](sections/4X_Interprocess_Communications/42_Transports.md#c6---gauge-telemetry-channels)
 
 #### 5X — Hardware I/O & Device Layer
 - [O-HW-5 – Modular Layer Firmware](sections/5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md)
 - [O-HW-7 – MultiSteer Configurator](sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md)
 
 #### 6X — Core Domain Services
-- [O-API-5 – Versioned Layer Schemas](sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md)
-- [Layer Controllers Consideration](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
+- [C2 – Versioned Layer Registries](sections/4X_Interprocess_Communications/41_Inter_Application_API.md#c2---versioned-layer-registries)
+- [O-BACKEND-4 – Layer Controllers](sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md)
 - [O-TELE-4 – Layer Diagnostics](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md)
 
 #### 7X — Mapping & Geospatial
@@ -236,14 +236,14 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 |-------------|----------------------|----------------------|-----------------|
 | R-COMM-000 | O-COMM-0 | Comm settings dialog (legacy baseline) | ADR-COMM-001 (TBD) |
 | R-COMM-001 | O-COMM-0 | UDP tooling (legacy baseline) | ADR-COMM-001 (TBD) |
-| R-COMM-002 | O-COMM-0, O-COMM-6 | PGN designer (legacy baseline) | ADR-COMM-002 (TBD) |
+| R-COMM-002 | O-COMM-0, C3 | PGN designer (legacy baseline) | ADR-COMM-002 (TBD) |
 | R-COMM-003 | O-COMM-0 | NTRIP UI (legacy baseline) | ADR-COMM-003 (TBD) |
-| R-COMM-010 | O-COMM-5 | [Variable-rate PGNs](sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md) | ADR-COMM-004 (TBD) |
-| R-COMM-011 | O-COMM-5 | [Diagnostics hooks](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md) | ADR-COMM-004 (TBD) |
-| R-COMM-004 | O-COMM-2, O-COMM-6, O-COMM-7 | [Linux Core boundary](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-COMM-005 (TBD) |
-| R-COMM-005 | O-COMM-6, O-COMM-7 | [PGN bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | ADR-COMM-005 (TBD) |
-| R-COMM-012 | O-COMM-2, O-COMM-6, O-COMM-7 | [Latency budgets](sections/4X_Interprocess_Communications/42_Transports.md) | ADR-COMM-006 (TBD) |
-| R-COMM-013 | O-COMM-2, O-COMM-6, O-COMM-7 | [Security slice](sections/9X_Frontends_Ops/95_Security_Permissions.md) | ADR-COMM-006 (TBD) |
+| R-COMM-010 | C2 | [Variable-rate layer streams](sections/4X_Interprocess_Communications/42_Transports.md#c2---versioned-variable-rate-layer-streams) | ADR-COMM-004 (TBD) |
+| R-COMM-011 | C2 | [Diagnostics hooks](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md) | ADR-COMM-004 (TBD) |
+| R-COMM-004 | O-COMM-2, C3, C6 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-COMM-005 (TBD) |
+| R-COMM-005 | C3, C6 | [PGN bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge) | ADR-COMM-005 (TBD) |
+| R-COMM-012 | C3, C5 | [Latency budgets](sections/4X_Interprocess_Communications/42_Transports.md) | ADR-COMM-006 (TBD) |
+| R-COMM-013 | C3, C5 | [Security slice](sections/9X_Frontends_Ops/95_Security_Permissions.md) | ADR-COMM-006 (TBD) |
 
 ### Section 21 — System Decomposition & Boundaries
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
@@ -254,8 +254,8 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-BE-003 | O-BE-1 | Automation APIs (legacy baseline) | ADR-BE-003 (TBD) |
 | R-BE-010 | O-BE-5 | [Layer controllers](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-BE-004 (TBD) |
 | R-BE-011 | O-BE-5 | [Replay CI](sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md) | ADR-BE-004 (TBD) |
-| R-BE-004 | O-BE-6, O-BE-7 | [Linux Core boundary](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-BE-005 (TBD) |
-| R-BE-012 | O-BE-6, O-BE-7 | [PGN bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | ADR-BE-005 (TBD) |
+| R-BE-004 | O-BE-6, O-BE-7 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-BE-005 (TBD) |
+| R-BE-012 | C3, C6 | [PGN bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge) | ADR-BE-005 (TBD) |
 | R-BE-013 | O-BE-6, O-BE-7 | [Service health targets](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-BE-006 (TBD) |
 | R-BE-014 | O-BE-6, O-BE-7 | [Fail-safe expectations](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-BE-006 (TBD) |
 
@@ -282,8 +282,8 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-HW-003 | O-HW-0 | UDP tool (legacy baseline) | ADR-HW-003 (TBD) |
 | R-HW-010 | O-HW-5 | [Modular firmware option](sections/5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md) | ADR-HW-004 (TBD) |
 | R-HW-011 | O-HW-5 | [Modular firmware option](sections/5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md) | ADR-HW-004 (TBD) |
-| R-HW-004 | O-HW-6 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-HW-005 (TBD) |
-| R-HW-005 | O-HW-6 | [PGN bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | ADR-HW-005 (TBD) |
+| R-HW-004 | O-HW-6 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-HW-005 (TBD) |
+| R-HW-005 | C3 | [PGN bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge) | ADR-HW-005 (TBD) |
 | R-HW-006 | O-HW-5 | [Capability discovery](sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md) | ADR-HW-006 (TBD) |
 | R-HW-012 | O-HW-5 | [ISOBUS reference](references/ISOBUS_Section_Control.md) | ADR-HW-007 (TBD) |
 | R-HW-013 | O-HW-5, O-HW-6 | [Safety interlocks](sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md) | ADR-HW-008 (TBD) |
@@ -295,12 +295,12 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-API-000 | O-API-0 | PGN designer (legacy baseline) | ADR-API-001 (TBD) |
 | R-API-001 | O-API-0 | UDP monitor (legacy baseline) | ADR-API-001 (TBD) |
 | R-API-002 | O-API-0 | NTRIP settings (legacy baseline) | ADR-API-002 (TBD) |
-| R-API-003 | O-API-1, O-API-3 | [Schema policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-003 (TBD) |
-| R-API-010 | O-API-5 | [Versioned schemas](sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md) | ADR-API-004 (TBD) |
-| R-API-011 | O-API-5 | [Versioned schemas](sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md) | ADR-API-004 (TBD) |
-| R-API-004 | O-API-6 | [PGN bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | ADR-API-005 (TBD) |
-| R-API-005 | O-API-6 | [Handshake notes](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-006 (TBD) |
-| R-API-012 | O-API-5, O-API-6 | [Release management policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-007 (TBD) |
+| R-API-003 | C2, C3 | [Schema policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-003 (TBD) |
+| R-API-010 | C2 | [Versioned registries](sections/4X_Interprocess_Communications/41_Inter_Application_API.md#c2---versioned-layer-registries) | ADR-API-004 (TBD) |
+| R-API-011 | C2 | [Versioned registries](sections/4X_Interprocess_Communications/41_Inter_Application_API.md#c2---versioned-layer-registries) | ADR-API-004 (TBD) |
+| R-API-004 | C3 | [PGN bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge) | ADR-API-005 (TBD) |
+| R-API-005 | C3 | [Handshake notes](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-006 (TBD) |
+| R-API-012 | C2, C4 | [Release management policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-007 (TBD) |
 
 ### Section 32 — Persistence & Formats
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
@@ -409,7 +409,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
 |-------------|----------------------|----------------------|-----------------|
 | R-GA-000 | Workstream TBD | [Gauge mappings](sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md) | ADR-GA-001 (TBD) |
-| R-GA-001 | Workstream TBD | [Gauge telemetry PGNs](sections/4X_Interprocess_Communications/42-O7%20-%20Gauge%20telemetry%20PGNs%20for%20engine%20%26%20machine%20data.md) | ADR-GA-002 (TBD) |
+| R-GA-001 | Workstream TBD | [Gauge telemetry channels](sections/4X_Interprocess_Communications/42_Transports.md#c6---gauge-telemetry-channels) | ADR-GA-002 (TBD) |
 | R-GA-002 | Workstream TBD | [Gauge configuration JSON](sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md) | ADR-GA-003 (TBD) |
 | R-GA-003 | Workstream TBD | [Gauge UI behaviors](sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md) | ADR-GA-004 (TBD) |
 | R-GA-004 | Workstream TBD | [Smoothing rules](sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md) | ADR-GA-005 (TBD) |

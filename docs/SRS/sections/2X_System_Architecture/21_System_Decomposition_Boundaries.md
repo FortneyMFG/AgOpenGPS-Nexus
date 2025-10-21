@@ -98,7 +98,7 @@ Automation APIs, PGN shims, and UI bindings require targeted integration tests p
 
 - Core service MUST target .NET 8 and remain portable across Windows and Debian-based Linux distributions.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
 - Deterministic SimClock/SimBus MUST govern plugin interactions to avoid diverging timing implementations.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L46】
-- PGN compatibility MUST be preserved until all dependent hardware fleets migrate to modern APIs.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6 - PGN compatibility bridge layered over new APIs.md†L1-L35】
+- PGN compatibility MUST be preserved until all dependent hardware fleets migrate to modern APIs.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L158-L205】
 
 ---
 

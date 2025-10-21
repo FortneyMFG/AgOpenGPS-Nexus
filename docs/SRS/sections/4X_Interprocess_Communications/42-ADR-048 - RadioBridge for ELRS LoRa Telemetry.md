@@ -1,78 +1,82 @@
-# ADR-048 — RadioBridge for ELRS/LoRa Telemetry
+# 42-ADR-048 — RadioBridge for ELRS/LoRa Telemetry
+*(Status: Proposed)*
 
-- **Status:** Drafting
-- **Date:** 2025-03-19
-- **Author(s):** Nexus architecture guild
-- **NX Task:** NX-190 Comprehensive ADR portfolio review
+**Author:** Codex
+**Reviewers:** Nexus Architecture Guild
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Supersedes:** _None_
+**Superseded by:** _None_
+**Related SRS:** [42 — Transports](42_Transports.md)
+**Related Considerations:** [C5 - Timebase & Telemetry Mesh Governance](42_Transports.md#c5---timebase--telemetry-mesh-governance)
 
-## Context
+---
+
+## 1) Context
 
 Rural deployments frequently rely on low-bandwidth radios (ELRS, LoRa) for inter-machine communication. These transports require
 binary framing, retransmission policies, and bandwidth shaping tuned to agricultural operations. The Live Telemetry Mesh (ADR-047)
-needs a bridge that adapts mesh topics to radio-friendly frames with predictable latency and resilience.
+needs a bridge that adapts mesh topics to radio-friendly frames with predictable latency and resilience.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L205-L229】
 
-## Decision
+```mermaid
+flowchart LR
+  A[Mesh topics] --> B[Radio constraints]
+  B --> C[RadioBridge framing]
+  C --> D[Resilient low-bandwidth telemetry]
+```
 
-Implement a RadioBridge module that encapsulates binary framing, encryption, acknowledgement, and replay rules for ELRS/LoRa
-links. The bridge exposes a pluggable transport interface so additional radio stacks can be supported later without changing mesh
-semantics.
+---
 
-### Framing & Reliability
+## 2) Decision
 
-- Frames carry a compact header (`version`, `topicHash`, `payloadType`, `sequence`, `ackId`), CRC16, and compressed payloads.
-- Uses selective repeat ARQ with a replay window of 32 packets and adaptive resend intervals based on RSSI/packet loss.
-- Supports optional forward error correction blocks when configured for high-loss environments.
+Implement a RadioBridge module encapsulating binary framing, encryption, acknowledgement, and replay rules for ELRS/LoRa links.
+The bridge exposes a pluggable transport interface so additional radio stacks can be supported without changing mesh semantics.
 
-### Integration
+### Decision Summary
 
-- Mesh topics map to numeric IDs via a shared registry distributed with the plugin manifest. Devices negotiate supported tiers
-  during handshake.
-- Encryption optional but recommended: AES-CCM with pre-shared keys stored in device profiles. Authentication failures trigger
-  quarantine mode with operator alerts.
-- Bridge exposes telemetry counters (latency, retries, drop rate) to the UI for diagnostics.
+* **Scope:** Radio adaptation of mesh topics including presence, coverage, trails, and alerts.
+* **Boundary:** Mesh service semantics defined in ADR-047; this ADR focuses on radio framing and reliability.
+* **Implementation Level:** Design + code; radio drivers, framing layer, telemetry counters, and configuration tooling.
 
-## Consequences
+---
 
-- Provides deterministic behavior for low-bandwidth collaboration while remaining extensible to future radios.
-- Requires provisioning workflows for keys and topic registries.
-- Adds complexity to device setup; tooling must simplify configuration.
+## 3) Consequences
 
-## Governance Updates
+**Positive Impacts:**
 
-- **Topic ID escrow.** Topic hash registries are promoted through the manifest governance program; releases must attach signed
-  registry diffs and replay fixtures covering all advertised tiers before publication.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L17-L70】
-- **Firmware compliance.** Transport adapters include compatibility manifests listing supported firmware revisions and
-  handshake features; CI rejects builds that downgrade retry windows or omit selective-repeat coverage tests.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L21-L70】
-- **Security rotations.** Key provisioning docs mandate quarterly rotation rehearsals with captured telemetry proving old keys
-  are revoked and new ones sync across the fleet without breaking mesh connectivity.【F:schemas/Device.v1.json†L1-L120】
+* Provides deterministic behavior for low-bandwidth collaboration while remaining extensible to future radios.
+* Integrates encryption, acknowledgements, and replay windows tuned for rural conditions.
+* Surfaces telemetry counters (latency, retries, drop rate) for operator diagnostics.
 
-## Amendment — 2025 architecture refresh (NX-190)
+**Negative / Mitigated Impacts:**
 
-- Envelope-aware throttling ensures multi-field jobs prioritize field-local deltas first, reducing congestion when multiple
-  plugins publish edits simultaneously.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】
-- Session metadata hashed into frame headers lets replay tools stitch radio captures back to specific job timelines without
-  manual bookkeeping.【F:schemas/Session.v1.json†L1-L120】
-- Weather, Field Health, and Profit alerts inherit the same retry policies as coverage traffic so operator notifications remain
-  consistent even when bandwidth drops during collaborative edits.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md†L9-L66】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L9-L70】
+* Requires provisioning workflows for keys and topic registries — mitigated by manifest governance and tooling.
+* Adds configuration complexity — addressed via UI guidance and automation.
+* Selective repeat and FEC introduce processing overhead — balanced by configurable profiles.
 
-## Alternatives Considered
+**Follow-up Actions:**
 
-1. **Use TCP over cellular modems.** Not reliable enough in remote fields and increases operating costs.
-2. **Generic LoRa chat protocols.** Lack tight integration with Nexus topics and provenance requirements.
+* Maintain topic ID registries in manifest bundles with signed diffs and replay fixtures.
+* Publish compatibility manifests listing supported firmware revisions and handshake features.
+* Document quarterly key rotation rehearsals with telemetry evidence of successful rollover.
 
-## Dependencies
+---
 
-- Consumed by ADR-047 Live Telemetry Mesh.
-- Coordinates with ADR-050 Profit and ADR-052 Field Health for remote alert delivery when mesh connectivity is available.
+## 4) Rationale
 
-## SRS Impact
+RadioBridge’s framing layer (`version`, `topicHash`, `payloadType`, `sequence`, `ackId`) plus CRC and compression enables reliable
+transfer on constrained links. Selective-repeat ARQ with adaptive resend intervals and optional FEC maintains continuity, while
+AES-CCM encryption and ACLs protect sensitive data.
 
-- Adds radio framing requirements to §03 Communications & Transports.
-- Extends §10 Telemetry diagnostics with radio health counters.
-- Updates plugin documentation to describe provisioning steps and ACL configuration.
+---
 
-## References
+## 5) Alternatives Considered
 
-- [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-- [Section 64 — Telemetry & Health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
-- [Section 94 — Extensibility, Packaging & Updates](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| TCP over cellular modems | Use cellular networks for inter-machine telemetry. | Unreliable coverage, higher operating cost. |
+| UDP broadcast without bridge | Broadcast mesh topics raw over radios. | Lacks retransmission, encryption, and bandwidth governance. |
+| Third-party industrial radio stack | Adopt proprietary telemetry platforms. | Locks Nexus into vendor ecosystems and limits extensibility. |
+

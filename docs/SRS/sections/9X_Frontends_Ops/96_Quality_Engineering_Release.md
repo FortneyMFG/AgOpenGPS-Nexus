@@ -42,7 +42,7 @@ Coverage, release reliability, effort to maintain, reproducibility, compatibilit
 ## Current sentiment
 - Keep basic tests running but invest in CI pipelines that can still emit the simple zip packages operators expect.
 - Replay-driven validation is viewed as mandatory before enabling layer telemetry by default, ensuring field confidence.【F:docs/SRS/sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md†L47-L64】
-- Linux packaging and PGN bridge builds must be proven in CI before encouraging field pilots.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L44】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
+- Linux packaging and PGN bridge builds must be proven in CI before encouraging field pilots.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L1-L44】【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L158-L205】
 
 ## Upcoming ADR coverage
 - **ADR-013 Derived products** will define the analytics-to-prescription recipes and QA metrics expected by R-CI-021, ensuring prescriptions remain auditable and repeatable.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L67-L73】

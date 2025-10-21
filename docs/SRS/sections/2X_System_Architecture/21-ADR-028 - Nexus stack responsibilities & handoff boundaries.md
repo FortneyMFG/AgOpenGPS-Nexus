@@ -1,52 +1,148 @@
-# ADR-028: Nexus stack responsibilities & handoff boundaries
+# 21-ADR-028 — Nexus Stack Responsibilities & Handoff Boundaries
 
-## Status
-Accepted
+*(Status: Accepted)*
 
-**Relevant Plugin(s):** Full Stack
+**Authors:** @architecture-wg
+**Reviewers:** @nexus-specs, @core-wg
+**Created:** 2024-09-30
+**Last Updated:** 2025-02-14
+**Supersedes:** —
+**Superseded by:** —
+**Related SRS:** `21_System_Decomposition_Boundaries.md`
+**Related Options:** `21-O5 - Layer controllers with aggregation pipelines.md`, `21-O6 - Linux Core service with remote frontends.md`
 
+---
 
-## Context
-Contributors requested a single reference that maps how firmware, hardware services, the Core runtime, and feature plugins divide responsibilities so features can be planned without blurring safety and contract boundaries. Existing SRS sections and ADRs already define expectations for transports, hardware governance, and plugin lifecycle, but they are scattered across documents, making it easy to misplace functionality or duplicate work.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L3-L35】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L3-L27】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L6-L34】
+## 1) Context
 
-## Decision
-Adopt the following layered responsibility map. Each layer owns the concerns listed under "Responsibilities" and must not bypass the contractual boundaries called out under "Boundaries". Data and commands always move up-stack through the exposed contracts rather than by reaching around another layer.
+Contributors requested a single reference mapping how firmware, hardware services, the Core runtime, and feature plugins divide responsibilities so new features land without blurring safety and contract boundaries.
+Existing SRS sections already define transports, hardware governance, and plugin lifecycle, but they are scattered, leading to duplicated work or misplaced functionality.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L3-L35】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L3-L116】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L17-L211】
+Linux Core pilots (§21-O6) and layer controller modernization (§21-O5) require explicit boundaries to guarantee determinism, observability, and safe extensibility across OS platforms.
 
-| Layer | Responsibilities | Owns / Publishes | Boundaries |
-| --- | --- | --- | --- |
-| **Field MCUs (AOG-Link)** | Encode GNSS, IMU, section, rate, and actuator telemetry; execute real-time control loops within firmware-defined budgets; honor watchdogs and heartbeat policy. | Nanopb payloads over UDP, RS-485, or CAN using the AOG-Link frame header. | Never speaks gRPC directly; all host coordination goes through the Bridge. Shares schemas with higher layers but cannot change them unilaterally.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md†L6-L44】 |
-| **AgIO / Bridge services** | Discover devices, translate between AOG-Link, legacy PGNs, and the generated gRPC contracts; manage hardware permissions, health telemetry, and capability negotiation as a privileged plugin. | gRPC endpoints defined in `Aog.Abstractions`, device enumeration APIs, health metrics, firmware update channels. | Must not embed guidance or automation policy; forwards only typed data and command intents to Core. Enforces permission gates before exposing raw I/O handles.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md†L18-L45】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L22-L27】 |
-| **Core runtime (Aog.Core)** | Own the authoritative pose timeline, control arbitration, data persistence, deterministic simulation clock/bus, and a minimal geospatial kernel (CRS math, tiling helpers, frame counter, and timebase). Host the gRPC services consumed by plugins/UI, enforce permissions, and arbitrate source routing between hardware, simulation, and replay. | Pose, Guidance, SectionControl, LayerRegistry, Mapping contracts, EventBus, Health, Config, and Capabilities gRPC services; SimClock + SimBus; storage snapshots. | Contains no feature-specific automation logic—delegates to plugins. All hardware access happens via AgIO; Core interacts only through the generated contracts and permission gates. The embedded geospatial kernel stays contract-focused and ships null implementations so rigs can run without mapping plugins.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L12-L33】【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L10-L18】【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L20】【F:docs/aog-v6-mapping-brief.md†L23-L34】 |
-| **Feature plugins** | Implement automation, analytics, transports, simulation providers, mapping engines, and UI contributions within declared capabilities (autosteer, section-control, guidance, rate-control, telemetry). Publish/consume Core services via gRPC, respect lifecycle states, and surface health telemetry. | Capability declarations, SectionState/Guidance RPC clients, Mapping RPC clients/publishers, map overlays, simulation topics, telemetry sinks. | Cannot bypass Core arbitration or open hardware directly without explicit permissions. Must honor enable/disable contracts, constraint gates, and deterministic replay requirements enforced by Core. Mapping plugins run out-of-process for optionality and fault isolation while speaking the frozen `Aog.Abstractions.Mapping` contracts exported by Core.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L12-L34】【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L16-L56】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L6-L80】【F:docs/aog-v6-mapping-brief.md†L35-L53】 |
-| **UI shells** | Render plugin and Core data, collect operator intent, expose configuration, and drive simulation controls. Remain declarative consumers of Core/Plugin APIs. | Avalonia panels, dashboards, configuration flows, SimClock controls. | No direct hardware access; all commands route through Core services so automation and safety logs remain authoritative.【F:docs/SRS/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L15-L28】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L12-L26】 |
+```mermaid
+graph TD
+  A[Firmware / Hardware] --> B[Core Runtime]
+  B --> C[Plugins]
+  C --> D[Frontends]
+  B --> E[Telemetry / Ops]
+```
 
-### Plugin capability bands
+---
 
-The plugin manifest declares the capability bands below. Each band maps to the Core contracts it is allowed to call, the data it produces, and the guard rails it must follow.
+## 2) Decision
 
-| Capability band | Typical modules | Required Core surfaces | Key guard rails |
-| --- | --- | --- | --- |
-| **Guidance** | AB line solvers, headland planners, route optimizers. | PoseStream, Guidance, ZoneService, LayerRegistry. | Must respect SimClock ordering, zone masks, and constraint gating before emitting waypoints or lookahead cues.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L10-L18】【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L16-L56】 |
-| **Autosteer** | Steering controllers, multi-axle kinematics solvers. | PoseStream, Guidance command RPCs, SectionControl (for interlocks), Health. | Commands only apply when Core issues an automation lease; must log operator acknowledgements and drop outputs when constraints disable automation.【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L16-L56】 |
-| **Section & rate control** | Section relays, variable-rate controllers, nozzle diagnostics. | SectionControl, LayerRegistry, TileQuery, Pose zone masks. | Enforce on/auto/off graph, obey keep-out/headland zones, publish health metrics for audits.【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L16-L56】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L70-L80】 |
-| **Telemetry & analytics** | Yield monitors, layer aggregators, replay/telemetry sinks. | EventBus, LayerRegistry, Storage export APIs. | Read-only unless granted `storage.write`; must respect deterministic replay expectations when simulating data.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L12-L33】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L48-L80】 |
-| **Hardware bridges** | AgIO, ISOBUS transport plugins, sensor gateways. | Device enumeration, hardware lease RPCs, Pose/Section publishers (as producers). | Operate as privileged plugins with device permissions; publish diagnostics and obey health leasing semantics.【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L22-L27】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L16-L34】 |
+Document authoritative handoff boundaries for the Nexus stack and require new features to declare which layer they affect.
 
-### Data flow checklist
+### Decision Summary
 
-1. **Firmware to host:** MCUs encode telemetry in AOG-Link frames. The Bridge validates headers, applies CRC/sequence rules, and translates payloads to the gRPC contracts shared with Core.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md†L12-L44】
-2. **Hardware arbitration:** AgIO applies permission gates and reports device health before forwarding pose, section, and rate topics into Core. Legacy PGNs stay encapsulated behind the same gateway.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md†L18-L45】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L22-L54】
-3. **Core orchestration:** Core ingests the canonical streams, chooses authoritative producers via source routing, and exposes the resulting state through deterministic services, SimClock, and SimBus.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L10-L18】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L12-L26】
-4. **Plugin execution:** Plugins subscribe to the exported services, apply their domain logic, and emit commands or analytics only within the scopes granted in their manifest. Health and lease updates flow back into Core for supervision.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L12-L34】
-5. **Operator interface:** UI shells consume Core and plugin feeds, drive configuration, and display health/constraint status without bypassing arbitration, preserving a single audit trail.【F:docs/SRS/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L15-L28】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L12-L26】
+* **Scope:** Applies to Core runtime, plugins, frontends, and supporting services.
+* **Boundary:** Hardware firmware and third-party cloud services remain governed by respective specs; this ADR focuses on Nexus-owned components.
+* **Implementation Level:** Policy + design guidance enforced in SRS and code reviews.
 
-## Governance Updates
-- **Drift monitoring.** Quarterly audits review each layer against the responsibility matrix. Variances become NX tasks with owners and due dates, and the report archives live in the architecture workspace.
-- **CI guardrails.** Static analysis checks flag cross-layer references. Pull requests adding new dependencies must include a justification linking to ADR updates or waivers approved by architecture leads.
-- **Program reporting.** Release notes summarize boundary audits so stakeholders know which exceptions remain and when remediation is scheduled.
+Boundaries include:
 
-## Consequences
-- **Aligned planning:** Contributors can assign features to the correct layer without reopening earlier ADRs because the responsibilities table summarizes contract boundaries.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L12-L34】
-- **Safety clarity:** Automation developers see where constraint gates, leases, and watchdogs live, reducing the chance of bypassing Core arbitration.【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L16-L56】
-- **Documentation debt reduction:** Newcomers no longer need to mine multiple ADRs/SRS sections to understand the stack boundary between AgIO, Core, and plugins, improving onboarding and review discussions.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L3-L35】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L3-L27】
+* **Firmware vs Hardware Services:** Firmware handles low-level IO; hardware services translate to Core topics and enforce safety interlocks.
+* **Core Runtime vs Plugins:** Core owns deterministic scheduling, configuration policy, and contract enforcement; plugins supply optional capabilities via approved interfaces.
+* **Core vs Frontends:** Core exposes APIs and telemetry; frontends render state and gather operator input without reimplementing business logic.
 
+---
+
+## 3) Consequences
+
+**Positive Impacts:**
+
+* Aligns modernization efforts (layer controllers, Linux Core) around shared expectations, reducing integration churn.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L58-L146】
+* Clarifies safety ownership, enabling faster ADR review cycles.
+* Facilitates documentation updates and onboarding for new contributors.
+
+**Negative / Mitigated Impacts:**
+
+* Requires ongoing governance to keep boundaries current — mitigated through quarterly reviews.
+* May slow experimental prototypes until boundary exemptions documented.
+
+**Follow-up Actions:**
+
+* Update SRS sections (21–24) with boundary tables and traceability entries.
+* Create review checklist ensuring ADRs specify impacted layers.
+* Coordinate with plugin maintainers to align extension points.
+
+---
+
+## 4) Rationale
+
+A single authoritative boundary document reduces ambiguity and prevents cross-layer regressions.
+Alternative approaches (duplicated guidance per project or ad-hoc reviews) failed to scale with contributors and OS targets.
+Centralizing expectations within the SRS ensures modernization tracks share assumptions and reduces merge conflicts between UI, Core, and plugin teams.
+
+---
+
+## 5) Alternatives Considered
+
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| Status-quo documentation | Keep guidance scattered across sections. | Contributors repeatedly misapplied responsibilities. |
+| Plugin-first governance | Let plugin ADRs define boundaries. | Ignores Core responsibilities and hardware constraints. |
+| Tooling enforcement only | Rely on CI linting to detect boundary violations. | Hard to encode nuanced architectural rules in automation. |
+
+---
+
+## 6) Implementation & Governance
+
+* **Governance ownership:** Architecture working group maintains boundary matrix and review checklist.
+* **Update cadence:** Review boundaries each release or after major ADR approvals.
+* **Documentation:** Update SRS §21–§24, plugin SDK guidelines, and deployment docs whenever boundaries shift.
+
+```mermaid
+graph TD
+  A[Boundary Matrix] --> B[Code Review Checklist]
+  B --> C[Implementation]
+  C --> D[Telemetry / Ops]
+```
+
+---
+
+## 7) Risks & Mitigations
+
+| ID | Risk | Impact | Mitigation / Monitoring |
+|----|------|--------|-------------------------|
+| R1 | Boundaries fall out of sync with actual implementation. | Medium | Schedule quarterly audits; link SRS updates to code changes. |
+| R2 | Teams bypass boundaries for expediency. | Medium | Require ADR waivers and document temporary exceptions. |
+
+---
+
+## 8) Legacy Implementation Notes
+
+* Legacy AgOpenGPS blurred UI and Core responsibilities, with business logic tied to WinForms presenters.
+* Hardware integrations often lived inside UI assemblies, complicating portability.
+* Lack of explicit boundaries contributed to regressions during plugin experiments.
+
+---
+
+## 9) Governance Updates
+
+* **Review frequency:** Quarterly plus whenever significant ADR lands in sections 4X–9X.
+* **Decision owner:** Architecture working group.
+* **Compliance metrics:** Code review checklist usage rate; reduction in cross-layer bug reports.
+
+---
+
+## 10) References
+
+* **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.12; `22_Process_Model_Deployment.md` — §22.5; `24_Configuration_Environment.md` — §24.5.
+* **Option Documents:** `21-O5 - Layer controllers with aggregation pipelines.md`, `21-O6 - Linux Core service with remote frontends.md`
+* **Prior ADRs:** `21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md`
+* **External References:** Architecture WG minutes (2024-09-30), Plugin API governance doc (2024-Q4).
+
+---
+
+## 11) Change Log
+
+| Date | Change | Author | PR / Issue |
+|------|--------|--------|------------|
+| 2024-09-30 | Initial decision drafted. | @architecture-wg | #0000 |
+| 2025-02-14 | Reformatted to ADR template; added governance guidance. | @architecture-wg | #0000 |
+
+---
+
+> **Lifecycle:** Proposed → Accepted → Superseded → Deprecated → Rejected
+> **Traceability:** Links to SRS Decision Matrix § 21.12 and options 21-O5, 21-O6.

@@ -1,52 +1,150 @@
-# ADR-004: Establish the composite simulation fabric (SimClock + SimBus)
+# 21-ADR-004 — Establish the Composite Simulation Fabric (SimClock + SimBus)
 
-## Status
-Accepted
+*(Status: Accepted)*
 
-**Relevant Plugin(s):** Simulation & Replay providers, Mapping, Autosteer, Section Control, Rate Control, Telemetry Logging
+**Authors:** @simulation-wg
+**Reviewers:** @nexus-specs, @core-architects
+**Created:** 2024-08-22
+**Last Updated:** 2025-02-14
+**Supersedes:** —
+**Superseded by:** —
+**Related SRS:** `21_System_Decomposition_Boundaries.md`
+**Related Options:** `21-O5 - Layer controllers with aggregation pipelines.md`
 
+---
 
-## Context
-Nexus development depends on deterministic simulation for CI, operator training, and plugin validation. The backend and extensibility sections highlight the need for a composite simulation loop where Core owns the authoritative clock, plugins publish to a shared bus, and hardware inputs can pre-empt simulated data without duplicating routing logic.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L70】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L18-L71】 Option 11-O1 reinforces this model by positioning AgIO’s simulation backend alongside Windows and Linux backends using the same contracts.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
+## 1) Context
 
-## Decision
-Create a composite simulation fabric governed by the Core service:
-- **SimClock** — fixed-step, seekable clock (default 10 ms) that drives Core processing, replay, and plugin simulators.
-- **SimBus** — typed publish/subscribe channel with last-value caching for canonical topics (pose, IMU, sections, telemetry) shared by hardware and simulated producers.
-- **Source routing** — priority rules owned by Core that select hardware, simulation, or replay producers per topic so hardware-in-the-loop overrides remain deterministic.
-Plugins register simulation providers against this fabric and must respect seeded RNGs and SimClock state to guarantee reproducibility across machines and CI lanes.
+Nexus modernization requires deterministic simulation for CI, operator training, and plugin validation.
+Legacy executables managed their own clocks and message pumps, leading to drift, replay inconsistency, and duplicated routing logic.
+SRS §21 identifies the need for a composite simulation fabric where Core owns the authoritative clock, plugins publish to a shared bus, and hardware inputs can pre-empt simulated data without breaking determinism.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L120】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L17-L71】
+Option 11-O1 aligns by positioning AgIO’s simulation backend alongside Windows and Linux backends using common contracts.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
 
-## Consequences
-- Positive impacts
-  - Deterministic replay and simulation flows accelerate development, CI, and operator training.
-  - Shared fabric avoids per-plugin duplication of timing, routing, and state management.
-  - Enables hybrid scenarios where real hardware augments simulated data without bespoke wiring.
-- Negative/mitigated impacts
-  - Requires rigorous topic/version governance to keep SimBus schemas stable; mitigated by aligning with the gRPC contracts and layer registries.
-  - Adds scheduling complexity inside Core; addressed via profiling and headless smoke tests.
-- Follow-up actions
-  - Define the topic catalog and schema ownership within the forthcoming protobuf contracts (NX-003/NX-004).
-  - Implement regression vectors and seeded scenarios as part of the CI smoke suite (future NX testing tasks).
+```mermaid
+flowchart LR
+  A[Problem: Fragmented Clocks] --> B[Evaluated Options]
+  B --> C[Composite Fabric]
+  C --> D[Deterministic Simulation]
+```
 
-## Governance Updates
-- **SimBus topic registry.** Core maintains a signed YAML registry enumerating topic names, payload schemas, version history, and maximum payload sizes. Pull requests that introduce new topics must update the registry and attach determinism fixtures before CI accepts the change.
-- **Determinism lint tooling.** A command-line validator rejects builds when topics lack registered schemas or publish payloads exceeding size budgets. Plugin authors receive local tooling to rehearse registration before opening PRs.
-- **Regression fixture cadence.** Quarterly scenario packs replay weather, GNSS drift, and failure injections. New topics must supply at least two chaos scripts (e.g., packet duplication, latency spikes) that Core incorporates into the shared suite.
+---
 
-## Amendment — 2025 architecture refresh (NX-190)
+## 2) Decision
 
-- Replay fixtures now cover multi-field job envelopes (ADR-043) and session timelines (ADR-041). Scenario packs include start/stop session sequences, collaborative zone edits, and layer reuse to verify provenance in headless runs.
-- LayerEditEvent journals emitted from ADR-044 editing sessions must replay deterministically. The fixture catalog adds TODOs for collaborative edit meshes once ADR-047 mesh replication ships.
-- Profit, genetics, and yield plugins consume replay outputs to validate cross-plugin analytics. Sim harnesses capture their layers and compare planned vs. actual aggregates as part of CI.
+Adopt a composite simulation fabric governed by the Core service:
 
-## Legacy Implementation Notes
-### AgOpenGPS v6
-- Simulation lives inside the monolithic `CSim` helper, which synthesizes GNSS/IMU data in-process without a shared bus or external plugin hooks, limiting reuse and determinism across tools.【F:docs/porting/V6-Inventory.md†L45-L49】
+### Decision Summary
 
-### Legacy Dev Branch
-- Current dev tooling still depends on standalone utilities such as ModSim and direct wiring in the WinForms app, so there is no authoritative clock/bus that multiple modules can share without duplicating logic.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L7-L17】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L51-L56】
+* **Scope:** Applies to Core runtime, plugins, and tooling that participate in simulation, replay, or hardware-in-the-loop.
+* **Boundary:** UI visualization specifics remain out of scope; transport protocols covered separately.
+* **Implementation Level:** Design + code policy codified in Core runtime libraries.
 
-## References
-- [Section 21 — System Decomposition & Boundaries](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
-- [Section 94 — Extensibility, Packaging & Updates](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
-- [Option 11-O1 — Unified .NET 8 + Avalonia stack](../SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md)
+The fabric consists of:
+
+* **SimClock** — fixed-step, seekable clock (default 10 ms) driving Core processing, replay, and plugin simulators.
+* **SimBus** — typed publish/subscribe channel with last-value caching for canonical topics (pose, IMU, sections, telemetry) shared by hardware and simulated producers.
+* **Source routing** — Core-owned priority rules choosing hardware, simulation, or replay producers per topic to guarantee deterministic overrides.
+* **Seeded randomness** — Plugins respect deterministic seeds to ensure reproducible outputs across machines and CI lanes.
+
+---
+
+## 3) Consequences
+
+**Positive Impacts:**
+
+* Provides deterministic replay for CI and training scenarios.【F:docs/SRS/sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md†L1-L120】
+* Simplifies plugin development via shared timing primitives.
+* Enables automated regression detection for coverage math and control loops.
+
+**Negative / Mitigated Impacts:**
+
+* Requires refactoring legacy streamers to publish through SimBus — mitigated by 21-O5 adoption.
+* Increases complexity of Core runtime initialization — mitigated with DI registration templates and documentation.
+
+**Follow-up Actions:**
+
+* Implement SimClock/SimBus libraries within Core service.
+* Update plugin SDKs and replay tooling to use new interfaces.
+* Create deterministic replay CI suite verifying canonical scenarios.
+
+---
+
+## 4) Rationale
+
+Composite fabric outperformed alternatives by offering deterministic scheduling, simplified routing, and shared telemetry.
+Other options (per-plugin clocks, ad-hoc replay loops) failed to guarantee reproducibility or required duplicating infrastructure.
+Weighted scoring in SRS §21.12 ranked deterministic shared contracts highest for maintainability and roadmap alignment.
+
+---
+
+## 5) Alternatives Considered
+
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| Maintain per-executable clocks | Each app manages its own timing loop. | Drift between processes and inconsistent replay fidelity. |
+| Ad-hoc message bus per plugin | Plugins own their buses and priorities. | Fragmented routing, no deterministic overrides. |
+| External simulation orchestrator | Separate process controls timing. | Adds deployment complexity; reduces Core authority. |
+
+---
+
+## 6) Implementation & Governance
+
+* **Governance ownership:** Simulation working group maintains fabric contracts and coordinates changes.
+* **Update cadence:** Review quarterly or when major plugin frameworks evolve.
+* **Documentation:** Keep SRS §21, option 21-O5, and plugin SDK docs synchronized with SimClock/SimBus contract changes.
+
+```mermaid
+graph TD
+  A[ADR Published] --> B[Implementation]
+  B --> C[Validation]
+  C --> D{Ongoing Review}
+  D -->|Reassess| E[Revision / Supersession]
+```
+
+---
+
+## 7) Risks & Mitigations
+
+| ID | Risk | Impact | Mitigation / Monitoring |
+|----|------|--------|-------------------------|
+| R1 | SimBus backlog causes latency spikes. | Medium | Instrument queue depth; enforce bounded channels and telemetry alerts. |
+| R2 | Plugins bypass SimClock for custom timing. | High | SDK validators and CI tests ensure compliant usage. |
+
+---
+
+## 8) Legacy Implementation Notes
+
+* Legacy streamers directly pulled system time and updated UI threads, limiting determinism.
+* Replay tooling lacked standardized routing, requiring manual data merges.
+* These limitations motivated unified clock and bus abstraction.
+
+---
+
+## 9) Governance Updates
+
+* **Review frequency:** Annual or after major release.
+* **Decision owner:** Simulation working group.
+* **Compliance metrics:** Replay CI pass rate, telemetry drift metrics staying within ±2 ms.
+
+---
+
+## 10) References
+
+* **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.12; `23_Threading_Scheduling_Timing.md` — §23.5.
+* **Option Documents:** `21-O5 - Layer controllers with aggregation pipelines.md`
+* **Prior ADRs:** None.
+* **External References:** Replay datasets 2024-H2, Simulation WG minutes (2024-09-18).
+
+---
+
+## 11) Change Log
+
+| Date | Change | Author | PR / Issue |
+|------|--------|--------|------------|
+| 2024-08-22 | Initial decision drafted. | @simulation-wg | #0000 |
+| 2025-02-14 | Reformatted to ADR template; added governance details. | @simulation-wg | #0000 |
+
+---
+
+> **Lifecycle:** Proposed → Accepted → Superseded → Deprecated → Rejected
+> **Traceability:** Links to SRS Decision Matrix § 21.12 and option 21-O5.

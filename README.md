@@ -1,20 +1,31 @@
-# Nexus (AgOpenGPS Next Generation)
+# Welcome to the Nexus Experiment
 
-Nexus is an experiment in how far a community guided by AI co-pilots can take AgOpenGPS when human time is no longer the limiting factor. The goal is to produce the best, most connected version of AOG possible while staying transparent, documented, and collaborative for the broader farming community.
+_AgOpenGPS Next Generation_
 
-## Vision at a Glance
+Nexus is the living laboratory for a community effort to see how far we can take AgOpenGPS when AI co-pilots help carry the load. The repository now serves two audiences at once: people following the **Nexus Experiment** itself, and people who want to evaluate or adopt **Jon Fortney's proposed System Requirements Specification (SRS) and companion Architecture Decision Records (ADRs)** as the foundation for next-generation development.
 
-- **Full backward compatibility.**  
+## Start Here
+
+- **Review the SRS first if requirements are your focus.** Head over to the [SRS overview](docs/SRS/00_ReadMe.md) to explore Jon's proposed structure, requirements, and ADR trail. The draft began as a single place to capture every note Jon collected while researching AgOpenGPS. It has since been reorganized so the community can adopt, modify, or replace sections rather than starting from scratch.
+- **Remember the experiment's origin story.** The SRS and ADR bundle was prepared so we could hand a "finished" spec to AI helpers and learn how far automated development could go. You are encouraged to critique the assumptions, update requirements, and document revisions as Nexus transitions from experiment to shared roadmap.
+
+## Why "Nexus"?
+
+The name highlights the goal of building a hub that connects the people, hardware, and software that make precision agriculture work. The next-generation program should keep the Nexus identity because the project stands at the intersection of legacy rigs, future hardware like the CM5/Pi 5, and the AI-assisted workflows that tie everything together.
+
+## Experiment at a Glance
+
+- **Full backward compatibility.**
   Nexus is built to run natively with existing **AgOpenGPS Windows tablet + AIO** setups—no hardware changes or wiring rewrites required. Every configuration, connection, and control scheme supported today continues to work out of the box.
-- **CM5-first option.**  
+- **CM5-first option.**
   For new installations, a **Raspberry Pi Compute Module 5 (or Pi 5)** can host the entire Nexus stack—replacing both the tablet and the Teensy in an AIO—with identical functionality, reduced complexity, and a **steep cost savings**. One or more HDMI/DSI touch displays can be connected directly.
-- **AI-assisted evolution.**  
+- **AI-assisted evolution.**
   Nexus treats every artifact—code, docs, packaging, and automation—as something an AI helper can draft while humans review and steer.
-- **Runs how you want.**  
+- **Runs how you want.**
   The same stack operates on Linux or Windows tablets, laptops, and desktops, and it remains compatible with existing AIO hardware through USB, Ethernet, or CAN links.
-- **AOG-Link V1 bridge.**  
+- **AOG-Link V1 bridge.**
   Nexus modernizes the legacy UDP PGN link (V0) with nanopb messaging and optional MQTT/MQTT-SN transport while keeping the V0 protocol available for drop-in compatibility.
-- **Composable everything.**  
+- **Composable everything.**
   Every service is a replaceable block that communicates through efficient gRPC contracts, letting operators enable, disable, or swap plugins without rewriting the core.
 
 ## Modular Software Architecture (Slightly Simplified)
@@ -37,7 +48,7 @@ flowchart TD
     ISOBUS[To Isobus Equipement]
     PPP[Pumkin Pi Plugin]
     PPH[Hardware - Steer, Section, Rate - connected straight to Pi interfaces]
-    
+
 
     Core --> UI
     Telemetry <--> Core
@@ -56,7 +67,7 @@ flowchart TD
     ELRSR <--> EAOG
     Core <--> PPP
     PPP <--> PPH
-    
+
 ```
 
 Core coordinates the data model, kinematics, job/session orchestration, and routing while UI shells focus on visualization. Plugins plug into the gRPC event bus for guidance, mapping, telemetry, analytics, and hardware integrations. AgIO (and its bridge) surface those decisions to MCU modules or legacy AIO boards through AOG-Link V1 or the existing UDP PGN stack.
@@ -132,7 +143,7 @@ Reference `bundles/base.bundle.json` and `bundles/headless.bundle.json` for the 
 
 - Remote dashboards stay monitor-only unless an operator grants an explicit control lease; mesh profiles restrict which telemetry leaves the cab by default.
 - Constraint gates and safety checks stay in Core; plugins receive advisory overlays without gaining direct actuator control.
-- Nexus remains experimental. The Architecture Decision Records (ADR) catalog and System Requirements Specification (SRS) outline the proposed path forward so the community can iterate together even when AI authors the first draft.
+- Nexus remains experimental. The Architecture Decision Records (ADR) catalog and System Requirements Specification (SRS) outline the proposed path forward so the community can iterate together even when the AI prototypes the next chapter.
 
 ## Additional Resources
 

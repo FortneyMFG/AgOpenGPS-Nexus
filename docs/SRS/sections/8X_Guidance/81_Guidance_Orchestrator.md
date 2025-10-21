@@ -1,104 +1,190 @@
-# 81 — Guidance Orchestrator (Status: drafting requirements)
+# 81 — Guidance Orchestrator
+*(Status: Proposed)*
 
-## Problem statement
-Operators need a Nexus-native guidance workflow that converts live driving into dependable field boundaries, plans efficient swaths with Fields2Cover, and streams deterministic targets to Autosteer while respecting spatial constraints and implement state. The current stack requires manual boundary imports and brittle refresh flows that do not honor keep-outs or dynamic implement width.
+**Author:** Codex
+**Created:** 2025-10-20
+**Version:** 0.1.0
+**Section ID:** 81
+**Editors:** Guidance Working Group
+**Last Updated:** 2025-10-20
+**Related Sections:** 82 — Planning, 83 — Autosteer Target Models
+**Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications, ADR-033, ADR-069
+**Downstream Impacts:** 6X — Core Domain Services, 9X — Frontends & Ops, Guidance plugins
 
-## Scope
-This section captures requirements for the Guidance Orchestrator plugin responsible for live boundary construction, keep-out handling, planner coordination, and path execution. It complements ADR-033 (guidance planner & autosteer orchestration) and ADR-027 (spatial constraints) by defining the higher-level behaviors, operator UX, and data contracts needed to ship the Fields2Cover-backed planner.
+---
 
-## Assumptions & dependencies
-- PoseStream delivers fused ENU pose (position, heading, speed) at ≥ 50 Hz with deterministic latency budgets established in ADR-033.
-- Section state (On/Auto) is available from the Sections plugin at ≥ 4 Hz per ADR-027, enabling effective width calculations with hysteresis.
-- Fields2Cover (F2C) runs as a local gRPC sidecar with CPU isolation and meets the SLA of ≤ 200 ms median response for ≤ 65 ha fields.
-- Autosteer plugin consumes `SteerTargets` at 20–50 Hz (25 Hz default) and exposes engagement lifecycle events defined in ADR-033.
-- Mapping UI supplies gestures (tap, long-press) and boundary editing primitives consistent with ADR-044.
+## 81.1 Purpose & Scope
 
-## Requirements
+Deliver a Nexus-native guidance workflow that converts live driving into dependable field boundaries, coordinates planner refreshes, and streams deterministic targets to Autosteer while honoring spatial constraints and implement state.
+This section defines the orchestration behaviors, UX responsibilities, and contract expectations that frame Guidance plugin development and verification.
 
-### R-GO-LFB — Live field builder & keep-outs
-- R-GO-LFB-000 (MUST): Detect closed loops in the driven track and prompt the operator to accept or reject candidate field boundaries when the polygon area ≥ 0.25 ha and passes validity checks (no self-intersections, correct winding).
-- R-GO-LFB-001 (MUST): Allow operators to create keep-out polygons through map long-press/right-click gestures and by tracing around obstacles, producing polygons that become holes in the active field boundary.
-- R-GO-LFB-002 (SHOULD): Maintain boundary revision identifiers and emit change events so downstream planners can cache by `(rev, effective width bucket, settings hash)`.
-- R-GO-LFB-003 (SHOULD): Apply Douglas-Peucker or equivalent simplification with configurable tolerance (default 0.1 m) to reduce noise while preserving key vertices for headland loops.
-- R-GO-LFB-004 (SHOULD): When multiple loops are detected during the first lap, prefer the largest simple loop as the boundary and present remaining loops as candidate keep-outs.
-- R-GO-LFB-005 (MUST): Reject polygon submissions with > 50k vertices or > 32 holes and prompt the operator to simplify before planning to maintain planner SLA compliance.
-- R-GO-LFB-006 (SHOULD): Support fields with multiple disjoint outer rings by planning each component independently or prompting the operator to split the field when sequencing would conflict.
+---
 
-### R-GO-IMP — Effective width & implement state
-- R-GO-IMP-000 (MUST): Compute effective implement width (`W_eff`) from active section spans (On/Auto) and expose total width, active spans, and lateral centroid (vehicle frame) to planners at ≥ 4 Hz.
-- R-GO-IMP-001 (MUST): Apply hysteresis so only ≥ 10% change in `W_eff` (or ≥ 0.3 m absolute) triggers Quick Refresh banners and ≥ 20% change forces automatic replans; smaller deltas raise advisory banners without recomputing plans.
-- R-GO-IMP-002 (SHOULD): Support both dynamic spacing (swath spacing = `W_eff`) and fixed spacing (swath spacing = nominal width) with operator-selected default per job profile.
+## 81.2 Context
 
-### R-GO-PLAN — Planner integration (Fields2Cover)
-- R-GO-PLAN-000 (MUST): Convert `{boundary, holes, W_eff, implement profile, headland settings, orientation}` into F2C plan requests and surface planner errors/fallbacks to the operator within 1 s.
-- R-GO-PLAN-001 (MUST): Cache successful F2C responses keyed by `(field.rev, width bucket, settings hash)` and reuse them unless inputs change beyond hysteresis thresholds (boundary debounce 500 ms, keep-out 250 ms).
-- R-GO-PLAN-002 (MUST): Provide fallback AB-line offset generation when F2C times out (≥ 500 ms) or returns an error, preserving operator control continuity and flagging plan source as `fallback`.
-- R-GO-PLAN-003 (SHOULD): Support partial replans that preserve unworked swaths/headlands when new keep-outs are added ≥ 30 m away from the current active path and catalog family order remains unchanged; otherwise perform a full replan to maintain sequencing integrity.
-- R-GO-PLAN-004 (SHOULD): Persist the last three committed catalogs per `field.rev` under `~/.nexus/guidance/plans/<fieldId>/<plan_id>.json` (configurable root with disk budget enforcement) and restore the most recent on plugin restart to avoid unnecessary replanning.
-- R-GO-PLAN-005 (SHOULD): Exclude pockets with legal area < `2 × W_eff` or width bottlenecks < `W_eff`, marking them `unworkable`, avoiding automatic bridging attempts, and surfacing the exclusion to the operator.
-- R-GO-PLAN-006 (MUST): Compose `plan.key` for caching as `SHA256(field.rev || holes.rev || width_bucket || settings_hash || orientation_source || round(bearing_rad, 1e-4))` so deterministic retries reuse identical plans.
+- Legacy stacks require manual boundary imports and refresh flows that ignore keep-outs or dynamic implement width.
+- PoseStream provides fused ENU pose at ≥ 50 Hz; Sections publishes section states at ≥ 4 Hz, enabling live implement width tracking.
+- Fields2Cover (F2C) runs as a local gRPC sidecar with CPU isolation and ≤ 200 ms median response for ≤ 65 ha fields.
+- Autosteer consumes `SteerTargets` at 20–50 Hz (25 Hz default) with engagement lifecycle hooks defined in ADR-033.
+- Mapping UI supplies gestures and editing primitives aligned with ADR-044 zone tooling.
 
-### R-GO-EXEC — Path catalog & execution
-- R-GO-EXEC-000 (MUST): Store headland loops, interior swaths, and optional connectors in a path catalog with metadata (`id`, `family`, length, curvature, coverage) accessible to UI and automation controllers.
-- R-GO-EXEC-001 (MUST): Allow operators to lock onto any catalog path via map tap or list selection and stream preview curves / steer targets at 25 Hz to Autosteer.
-- R-GO-EXEC-002 (MUST): Track per-path progress (0..1) using pose projection onto the active spline and emit completion events for sequencing.
-- R-GO-EXEC-003 (SHOULD): Support serpentine or operator-defined sequencing, exposing next/previous path commands in the UI and via plugin API.
-- R-GO-EXEC-004 (SHOULD): Publish coverage polygons for the active implement footprint to the Coverage Writer so worked area overlays stay synchronized.
-- R-GO-EXEC-005 (MUST): Maintain steer-target publication during replans by continuing the previously committed path until the new plan is committed; if the active path remains geometrically equivalent (Hausdorff distance < 0.2 m on remaining segment) keep it engaged, otherwise finish the current swath before switching.
-- R-GO-EXEC-006 (MUST): Treat paths as equivalent during hot swaps only when the remaining segment meets both Hausdorff < 0.2 m and heading RMS < 0.5°; otherwise defer switching until the next connector or operator confirmation.
-- R-GO-EXEC-007 (MUST): When Autosteer disengages or manual steering input exceeds the override threshold, freeze the active `path_id`, suppress automatic replans, and require explicit operator action to resume sequencing; a configurable auto-resume timer (default OFF) MAY unfreeze the plan after sustained inactivity.
-- R-GO-EXEC-008 (SHOULD): Publish `speed_cap_mps` in `SteerTargets` when curvature exceeds implement limits at the current speed so UI can prompt speed reductions.
-- R-GO-EXEC-009 (COULD): Accept optional row/implement sensor bias (`row_bias_m`) that laterally offsets the preview point within configured bounds (`row_bias_max_m = ±0.15`, `row_bias_decay_s = 2.0` default) without changing `path_id`.
+---
 
-### R-GO-REFRESH — Dynamic refresh policies
-- R-GO-REFRESH-000 (MUST): Provide a “Quick Refresh” control that re-runs F2C with latest boundary/keep-outs and `W_eff`, guaranteeing UI responsiveness (command acknowledged within 250 ms) while continuing to publish steer targets from the last committed plan.
-- R-GO-REFRESH-001 (MUST): Auto-trigger planning when boundaries/holes change, headland settings change, or orientation mode toggles; defer to operator confirmation for minor width changes below hysteresis.
-- R-GO-REFRESH-002 (SHOULD): Support optional auto-refresh after headland `N` completes, as configured per job or session.
+## 81.3 Legacy Comparison
 
-### R-GO-UX — Operator experience & messaging
-- R-GO-UX-000 (MUST): Surface status pills (Recording, Field Established, Planning, Ready, Executing) and Quick Refresh availability in the plugin UI state machine.
-- R-GO-UX-001 (MUST): Display prompts for detected loops (“Add as Field / Keep-Out?”) with area readout, and for major width changes (“W_eff changed to X m; Quick Refresh recommended”).
-- R-GO-UX-002 (SHOULD): Provide side panel controls for headland count/width/smoothing, swath spacing/bias, orientation mode, and implement parameters sourced from equipment profiles.
-- R-GO-UX-003 (COULD): Offer map overlays previewing planned swaths/headlands with color-coding for family (`Headland`, `Swath`, `WorkEdge`, `Contour`).
-- R-GO-UX-004 (SHOULD): Surface plan orientation provenance (`ab_operator`, `ab_profile`, `optimal_f2c`, `inherited`) with bearing readout, capture the narrative reason string (e.g., "Adopt current heading @ timestamp"), and provide an "Adopt current heading" shortcut for AB mode.
-- R-GO-UX-005 (MUST): When `speed_cap_mps` is emitted, display the limit in localized mph/kph alongside the raw m/s value within the guidance UI.
+| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
+|---------------|-----------------|------------------------|---------------------------|--------------------|
+| Boundary Capture | Manual polygon imports or offline edits. | No live validation; operator friction in-cab. | Automated live field builder with validation prompts. | Legacy AOG workflow |
+| Keep-out Handling | Treated as optional layers without planner enforcement. | Planner ignores obstacles; risk of collisions. | Promote keep-outs to first-class plan inputs with catalog metadata. | ADR-033 backlog |
+| Planner Refresh | Manual replan triggers with long pauses. | Autosteer stalls while planner recomputes. | Quick Refresh pipeline that continues publishing existing targets. | Guidance pilot notes |
+| Implement Width | Static width configured per implement. | No hysteresis; width drift causes UI churn. | Dynamic effective width from Sections plugin with hysteresis thresholds. | Sections plugin design |
 
-## Data contracts
-- `Polygon`, `TrackPoint`, `EffectiveWidth`, `Implement`, `F2CRequest`, `Path`, `Catalog`, and `SteerTargets` structures SHALL follow the shapes documented in ADR-069, including IDs, frames, units, revision fields, timestamps, and the new metadata hooks (`origin_llh`, `enu_epoch`, `orientation_reason`). JSON Schema supplements SHALL use draft 2020-12 with `$id` prefix `aog://schemas/guidance-orchestrator/...`.
-- Planner requests/responses MUST encode timestamps, revision identifiers, plan source (`f2c` | `fallback`), and planner provenance (Fields2Cover version & license ID) so telemetry logs can correlate operator actions with generated paths.
-- Implement metadata MUST reference the equipment profile identifier used for the session to maintain traceability.
-- Catalog metadata SHALL capture `plan_id`, `field_rev`, orientation source, bearing, `orientation_reason`, and retention bookkeeping (`kept`, `evicted`) to support replay and diagnostics.
-- `SteerTargets` SHALL include optional `speed_cap_mps` and `row_bias_m` fields; downstream consumers MUST ignore the fields when omitted and accept both the canonical `_per_m` curvature properties and legacy `_1pm` aliases during the migration window.
-- Curvature-bearing properties in planner/execution contracts SHALL use the `_per_m` suffix (`max_curv_per_m`, `ref_curvature_per_m`, `desired_curvature_per_m`, `peak_curv_per_m`).
-- Equivalence policy SHALL be published alongside catalog metadata (Hausdorff and heading tolerances) to keep automation and UI consistent.
+---
 
-## Frames, units, and rates
-- World frame SHALL be East-North-Up meters; vehicle frame origin SHALL be the rear axle midpoint with `+x` forward and `+y` left.
-- Angles SHALL be expressed in radians and curvature in 1/m for all APIs.
-- Planner evaluation loop SHALL run at 4 Hz, loop detection at 2 Hz while recording, and `SteerTargets` SHALL publish at 25 Hz with ±5 ms jitter.
+## 81.4 Definitions
 
-## Performance & timing
-- Loop detection and polygonization SHALL run at ≥ 2 Hz while recording headlands, with latency ≤ 150 ms per iteration for 10 km traces.
-- Orchestrator core loop SHALL evaluate refresh triggers and build preview bundles at 4 Hz without exceeding 50 ms per cycle.
-- Steer target publishing MUST remain within ±5 ms jitter at 25 Hz to avoid degrading Autosteer stability budgets defined in ADR-033.
-- Fields2Cover plans SHALL meet p50 latency ≤ 120 ms and p95 latency ≤ 200 ms for ≤ 65 ha polygons with ≤ 2 holes when running on the reference CPU budget; AB fallback SHALL engage within 20 ms of a timeout.
-- Operator overrides SHALL not introduce gaps in `SteerTargets`; frozen paths MUST continue publishing at 25 Hz until resume or re-lock.
+| Term | Definition |
+|------|-------------|
+| Live Field Builder | Module that detects loops in driven tracks and proposes field boundaries. |
+| Effective Width (`W_eff`) | Active implement width computed from section spans and hysteresis thresholds. |
+| Catalog | Structured collection of headland loops, swaths, and connectors persisted for execution. |
+| Quick Refresh | Operator or automatic trigger that re-runs planning with current geometry and implement state. |
+| Equivalence Policy | Hausdorff and heading tolerances that determine whether a refreshed path matches the active path. |
 
-## Validation
-- Simulated 65 ha fields with one keep-out SHALL produce valid plans (no self-intersections, coverage ≥ 98% of legal area) with plan latency p50 ≤ 120 ms and p95 ≤ 200 ms.
-- Hardware-in-loop tests SHALL confirm Quick Refresh end-to-end latency (operator click to first new steer target) ≤ 1.5 s with cached F2C responses and zero gaps in `SteerTargets` at 25 Hz during replans.
-- Regression suites SHALL include loop-detection traces with varying noise levels to ensure false-positive rate < 2% when noise σ ≤ 0.15 m and polygon auto-repair success rate ≥ 99.9%.
-- Stability testing SHALL show pass flip rate < 0.05 flips/min under nominal field noise when hysteresis features are enabled.
-- Regression harness SHALL include the golden scenarios enumerated in ADR-069 (T01–T07) and record latency, coverage, fallback usage, and override behavior metrics for each run.
-- All regression artifacts SHALL record `planner_seed` and `sequencer_seed` values to guarantee deterministic reruns across environments.
+---
 
-## Open questions
-- Should Fields2Cover connectors be persisted for re-entry after manual detours, or generated on demand per transition?
-- How should multi-implement rigs (e.g., hitch-drawn plus trailing) expose composite effective width to planners without over-complicating operator controls?
-- What telemetry subset is required for remote monitoring of planning events while respecting offline privacy constraints?
+> **Requirement Grammar (RFC-2119):**
+> - **MUST / MUST NOT** = mandatory requirements with verification evidence.
+> - **SHOULD / SHOULD NOT** = strong recommendations; document exceptions.
+> - **MAY / COULD** = optional behaviors or roadmap items.
 
-## References
-- [ADR-033 — Guidance planner and autosteer orchestration](../ADR/ADR-033-guidance-planner-autosteer.md)
+## 81.5 Requirements
+
+### 81.5.1 Live Field Builder & Keep-Outs
+
+| ID | Priority | Summary | Verification |
+|----|----------|---------|--------------|
+| R-GO-LFB-000 | MUST | Detect closed loops in driven tracks; prompt operator to accept polygons ≥ 0.25 ha with validity checks. | Loop-detection regression suite; operator prompt telemetry. |
+| R-GO-LFB-001 | MUST | Support keep-out polygon creation via gestures and tracing; treat accepted polygons as catalog holes. | UI integration tests; coverage overlay validation. |
+| R-GO-LFB-002 | SHOULD | Maintain boundary revision identifiers and emit change events for planner caches keyed by `(rev, width bucket, settings hash)`. | Planner cache hit-rate metrics. |
+| R-GO-LFB-003 | SHOULD | Apply configurable simplification (default 0.1 m) to reduce noise while preserving headland fidelity. | Geometry unit tests. |
+| R-GO-LFB-004 | SHOULD | Prefer the largest simple loop as primary boundary during first lap; offer remaining loops as keep-outs. | Pilot workflow observations. |
+| R-GO-LFB-005 | MUST | Reject polygons with > 50k vertices or > 32 holes; prompt operator to simplify before planning. | Input validation tests. |
+| R-GO-LFB-006 | SHOULD | Support multiple disjoint outer rings via independent planning or operator-assisted field splits. | Multi-component field scenarios. |
+
+### 81.5.2 Effective Width & Implement State
+
+| ID | Priority | Summary | Verification |
+|----|----------|---------|--------------|
+| R-GO-IMP-000 | MUST | Compute `W_eff` from section spans and publish totals, active spans, and lateral centroid ≥ 4 Hz. | Integration tests with Sections plugin. |
+| R-GO-IMP-001 | MUST | Apply hysteresis so ≥ 10% change prompts Quick Refresh and ≥ 20% change forces replans. | HIL tests capturing width deltas. |
+| R-GO-IMP-002 | SHOULD | Support dynamic spacing (swath spacing = `W_eff`) and fixed spacing with operator defaults. | Planner configuration coverage. |
+
+### 81.5.3 Planner Integration (Fields2Cover)
+
+| ID | Priority | Summary | Verification |
+|----|----------|---------|--------------|
+| R-GO-PLAN-000 | MUST | Convert `{boundary, holes, W_eff, implement profile, headland settings, orientation}` into F2C requests and surface errors within 1 s. | Planner integration tests. |
+| R-GO-PLAN-001 | MUST | Cache F2C responses keyed by `(field.rev, width bucket, settings hash)`; reuse unless inputs change beyond hysteresis thresholds. | Cache telemetry; replay tests. |
+| R-GO-PLAN-002 | MUST | Provide fallback AB-line offsets when F2C times out ≥ 500 ms or errors; label `plan_source=fallback`. | Failure-injection tests. |
+| R-GO-PLAN-003 | SHOULD | Support partial replans when new keep-outs appear ≥ 30 m from active path; otherwise perform full replan. | Scenario regression suite. |
+| R-GO-PLAN-004 | SHOULD | Persist last three committed catalogs per `field.rev` under configurable disk root and restore on restart. | Persistence tests. |
+| R-GO-PLAN-005 | SHOULD | Exclude pockets with legal area < `2 × W_eff` or bottlenecks < `W_eff`, marking them `unworkable`. | Planner QA metrics. |
+| R-GO-PLAN-006 | MUST | Compose deterministic cache key `SHA256(field.rev || holes.rev || width_bucket || settings_hash || orientation_source || round(bearing_rad, 1e-4))`. | Hash consistency checks. |
+
+### 81.5.4 Path Catalog & Execution
+
+| ID | Priority | Summary | Verification |
+|----|----------|---------|--------------|
+| R-GO-EXEC-000 | MUST | Store headlands, swaths, connectors with metadata accessible to UI and automation controllers. | Catalog schema tests. |
+| R-GO-EXEC-001 | MUST | Allow operators to lock onto catalog paths and publish preview curves / steer targets at 25 Hz. | UI automation; Autosteer telemetry. |
+| R-GO-EXEC-002 | MUST | Track per-path progress (0..1) via pose projection and emit completion events. | Sequencer regression. |
+| R-GO-EXEC-003 | SHOULD | Support serpentine or operator-defined sequencing with next/previous commands. | UX acceptance tests. |
+| R-GO-EXEC-004 | SHOULD | Publish coverage polygons for active implement footprint to Coverage Writer. | Coverage overlay integration. |
+| R-GO-EXEC-005 | MUST | Continue publishing existing targets during replans until new plan committed; maintain engagement if geometry equivalent. | Latency monitoring; equivalence policy tests. |
+| R-GO-EXEC-006 | MUST | Treat paths as equivalent during hot swaps only when Hausdorff < 0.2 m and heading RMS < 0.5°. | Equivalence validation suite. |
+| R-GO-EXEC-007 | MUST | Freeze active `path_id` on Autosteer disengage or manual override; require explicit resume or optional auto-resume timer. | HIL disengage tests. |
+| R-GO-EXEC-008 | SHOULD | Publish `speed_cap_mps` when curvature exceeds limits so UI can prompt speed reductions. | Telemetry inspection. |
+| R-GO-EXEC-009 | COULD | Accept optional row/implement sensor bias offsets within configured bounds without changing `path_id`. | Sensor fusion experiments. |
+
+### 81.5.5 Refresh Policies & Operator Experience
+
+| ID | Priority | Summary | Verification |
+|----|----------|---------|--------------|
+| R-GO-REFRESH-000 | MUST | Provide “Quick Refresh” control acknowledging commands ≤ 250 ms while maintaining steer targets. | UI latency measurement. |
+| R-GO-REFRESH-001 | MUST | Auto-trigger planning when geometry or orientation changes; require confirmation for minor width deltas below hysteresis. | Planner trigger logs. |
+| R-GO-REFRESH-002 | SHOULD | Support optional auto-refresh after headland `N` completes per job/session. | Configuration tests. |
+| R-GO-UX-000 | MUST | Surface status pills (Recording, Field Established, Planning, Ready, Executing) and Quick Refresh availability. | UX checklist. |
+| R-GO-UX-001 | MUST | Display prompts for detected loops and major width changes. | UI acceptance tests. |
+| R-GO-UX-002 | SHOULD | Provide controls for headland, swath spacing, orientation, and implement parameters. | UX review. |
+| R-GO-UX-003 | COULD | Offer map overlays previewing planned swaths/headlands with color coding. | Visual QA. |
+| R-GO-UX-004 | SHOULD | Surface orientation provenance and offer “Adopt current heading” shortcut. | UX tests. |
+| R-GO-UX-005 | MUST | Display speed limits derived from `speed_cap_mps` in localized units. | Localization tests. |
+
+---
+
+## 81.6 Interfaces & Data Contracts
+
+- `Polygon`, `TrackPoint`, `EffectiveWidth`, `Implement`, `F2CRequest`, `Path`, `Catalog`, and `SteerTargets` follow ADR-069 structures, including IDs, frames, units, revisions, timestamps, and metadata hooks (`origin_llh`, `enu_epoch`, `orientation_reason`).
+- JSON Schemas use draft 2020-12 with `$id` prefix `aog://schemas/guidance-orchestrator/...`.
+- Planner requests/responses include timestamps, revision identifiers, `plan_source`, and planner provenance (Fields2Cover version & license ID).
+- Implement metadata references the session’s equipment profile identifier for traceability.
+- Catalog metadata captures `plan_id`, `field_rev`, orientation source, bearing, `orientation_reason`, and retention markers (`kept`, `evicted`).
+- `SteerTargets` include optional `speed_cap_mps` and `row_bias_m`; downstream consumers ignore omitted fields and accept `_per_m` curvature properties alongside temporary `_1pm` aliases.
+- Equivalence policy is published with catalog metadata, exposing Hausdorff and heading tolerances for automation and UI alignment.
+
+---
+
+## 81.7 Performance & Timing
+
+- Loop detection and polygonization run ≥ 2 Hz while recording headlands with latency ≤ 150 ms per iteration for 10 km traces.
+- Orchestrator core loop evaluates refresh triggers and builds preview bundles at 4 Hz with ≤ 50 ms per cycle.
+- `SteerTargets` publish at 25 Hz with ±5 ms jitter to protect Autosteer stability budgets from ADR-033.
+- Fields2Cover plans meet p50 latency ≤ 120 ms and p95 latency ≤ 200 ms for ≤ 65 ha polygons with ≤ 2 holes; AB fallback engages within 20 ms of timeout.
+- Operator overrides do not introduce gaps in `SteerTargets`; frozen paths continue publishing at 25 Hz until resume or relock.
+
+---
+
+## 81.8 Verification & Validation
+
+- Simulated 65 ha fields with one keep-out yield valid plans (no self-intersections, coverage ≥ 98%) with plan latency p50 ≤ 120 ms and p95 ≤ 200 ms.
+- Hardware-in-loop tests confirm Quick Refresh end-to-end latency ≤ 1.5 s with cached responses and zero gaps in `SteerTargets` at 25 Hz during replans.
+- Regression suites cover loop-detection traces across noise levels, ensuring false-positive rate < 2% when noise σ ≤ 0.15 m and polygon auto-repair success ≥ 99.9%.
+- Stability testing demonstrates pass flip rate < 0.05 flips/min under nominal noise with hysteresis features enabled.
+- Golden scenarios (ADR-069 T01–T07) record latency, coverage, fallback usage, and override behavior with `planner_seed` and `sequencer_seed` for deterministic reruns.
+
+---
+
+## 81.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Live boundary UX | Prioritize in-cab prompts and preview overlays so operators trust automated loop detection. |
+| C2 | Planner continuity | Maintain steer-target publication during replans to avoid Autosteer dropouts. |
+| C3 | Keep-out governance | Enforce obstacle metadata as first-class plan inputs with revision tracking. |
+| C4 | Operator overrides | Provide predictable manual override handling with explicit resume pathways. |
+| C5 | Telemetry completeness | Capture latency, plan source, and seed metadata to support diagnostics and replay. |
+
+### 81.9.1 Assumptions & Preconditions
+
+- PoseStream, Sections plugin, and Autosteer publish at documented cadences.
+- Fields2Cover sidecar remains reachable within latency budgets; fallback AB mode stays validated.
+- Guidance UI surfaces required prompts and orientation controls defined in ADR-069.
+
+---
+
+## 81.10 Open Questions
+
+- Should Fields2Cover connectors persist for re-entry after manual detours or regenerate on demand per transition?
+- How should multi-implement rigs expose composite effective width without overcomplicating operator controls?
+- What telemetry subset enables remote monitoring of planning events while respecting offline privacy constraints?
+
+---
+
+## 81.11 References
+
+- [ADR-033 — Guidance planner and autosteer orchestration](81-ADR-033%20-%20Guidance%20planner%20and%20autosteer%20orchestration.md)
+- [ADR-069 — Guidance Orchestrator plugin](81-ADR-069%20-%20Guidance%20Orchestrator%20plugin.md)
 - [ADR-027 — Spatial constraints and zone policies](../ADR/ADR-027-spatial-constraints.md)
 - [ADR-044 — Zone & layer drawing framework](../ADR/ADR-044_ZoneDrawingFramework.md)
 - [How-to: guidance lane contracts](../howto/guidance-lane-contracts.md)

@@ -1,43 +1,121 @@
-# ADR-007: PoseStream and SectionState architecture
+# 61-ADR-007 — PoseStream and SectionState Architecture
 
-## Status
-In Review (target sign-off window: 2025-10-24 week)
+*(Status: Proposed)*
 
-**Relevant Plugin(s):** Mapping, Variable Mapping, Autosteer, Section Control, Rate Control, Telemetry Logging
+**Author:** Codex
+**Reviewers:** Core Domain Working Group
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Supersedes:** —
+**Superseded by:** —
+**Related SRS:** `61_Kinematics_Pose_Fusion.md`
+**Related Options:** `61-O2`, `61-O3`
 
+---
 
-## Context
-Nexus requires a single authoritative timeline that carries tractor, implement, toolbar, and section poses alongside diffed SectionState updates. Existing prototypes rely on disparate logs and cadence assumptions that break determinism, complicate automation gating, and make replay analysis inconsistent. ADR-007 formalizes PoseStream expectations so downstream ADRs for equipment hierarchy, persistence, guidance, and control share the same temporal guarantees while inheriting stack boundaries set by ADR-028.
+## 1) Context
 
-## Decision
-- Ship a unified PoseStream that sequences all pose-producing sources with an explicit cadence/decimation policy and shared time authority.
-- Represent SectionState as diffs on the same timeline, including optional micro-streams when plugin cadence diverges, while enforcing monotonic ordering under drift.
-- Define opportunity/event tally semantics and vector log expectations so replay determinism targets are measurable.
-- Establish degraded-mode behaviors when optional feeds are absent, ensuring deterministic fallbacks and telemetry signaling.
+Nexus requires a single authoritative timeline that carries tractor, implement,
+toolbar, and section poses alongside diffed SectionState updates. Legacy prototypes
+relied on disparate logs and cadence assumptions that broke determinism, complicated
+automation gating, and made replay analysis inconsistent. This ADR formalizes
+PoseStream expectations so downstream ADRs for equipment hierarchy, persistence,
+guidance, and control share temporal guarantees while inheriting stack boundaries
+set by ADR-028.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md†L9-L28】
 
-## Consequences
-- Downstream services (e.g., equipment hierarchy, persistence, guidance) can assume a stable pose timeline with bounded payload sizes and deterministic diff ordering.
-- Replay tooling must ingest PoseStream outputs and preserve ordering to remain within determinism budgets.
-- Legacy components will require shims to adapt multi-stream pose logs into the new combined format.
+```mermaid
+flowchart LR
+  A[Fragmented pose logs] --> B[Determinism gaps]
+  B --> C[Unified PoseStream timeline]
+  C --> D[Consistent automation & replay]
+```
 
-## Implementation Artifacts (NX-611)
-- `proto/core.proto` now defines `PoseStreamService`, `PoseStreamFrame`, and `SectionState*` contracts for gRPC consumers.
-- JSON schemas (`schemas/PoseStreamFrame.v1.json`, `schemas/SectionStateTally.v1.json`) describe vector log payloads and opportunity/event tallies consumed by replay tooling.
-- Deterministic fixtures in `docs/plugins/fixtures/pose-section-fixture.jsonl` exercise PoseStream + SectionState ingestion alongside the aggregated tally sample.
+Key inputs include communications and transport requirements, data persistence
+formats, and section control working-group feedback.
 
-## Governance Updates
-- **Schema evolution rules.** PoseStream payloads accept additive-only field changes with reserved IDs tracked in a central registry. Dual-write shims cover consumers for at least one minor release before removals and require downgrade verification in replay CI.
-- **Chaos validation.** Integration suites now include packet duplication, reorder, and ±75 ms clock skew bursts. Contributors must publish deterministic expectations for each case and prove downstream tallies stay within tolerance.
-- **Consumer sign-off.** Equipment hierarchy, guidance, and persistence teams run acceptance scripts on recorded agronomic traces before PoseStream schema changes graduate from feature flags.
+---
 
-## Validation
-- PoseStream diff compression must maintain ≤ 2.5 KB median frame payload at 20 Hz for 48-section rigs under replay testing.
-- Opportunity/event tallies derived from PoseStream must match analytical goldens within 1% per hectare across the regression suite.
-- Forced clock skew of ±25 ms must not break monotonic SectionState sequencing when exercised in integration fault-injection tests.
+## 2) Decision
 
-## References
-- [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-- [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
-- [Control & automation requirements](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
-- [Extensibility & plugin requirements](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
-- [ADR-028: Stack boundaries](ADR-028-stack-boundaries.md)
+Standardize on a unified PoseStream that sequences all pose-producing sources with
+explicit cadence policies and shared time authority while diffing SectionState on
+the same timeline. Enforce monotonic ordering under drift, define opportunity/event
+tally semantics, and establish degraded-mode behaviors when optional feeds are
+absent to guarantee deterministic fallbacks and telemetry signaling.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md†L12-L24】
+
+### Decision Summary
+
+* **Scope:** Core pose ingestion, automation arbitration, telemetry logging, and replay tooling.
+* **Boundary:** Does not implement kinematics math or downstream visualizations.
+* **Implementation Level:** Design + service contracts governing PoseStream and SectionState APIs.
+
+---
+
+## 3) Consequences
+
+**Positive Impacts:**
+
+* Downstream services (equipment hierarchy, persistence, guidance) assume a stable
+  pose timeline with bounded payload sizes and deterministic diff ordering.
+* Replay tooling preserves ordering to remain within determinism budgets.
+* Telemetry and analytics gain opportunity/event tallies with traceable provenance.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md†L26-L40】
+
+**Negative / Mitigated Impacts:**
+
+* Legacy components require shims to adapt multi-stream logs into the combined format —
+  mitigated through compatibility adapters.
+* Integration suites must expand fault-injection coverage (duplication, reordering,
+  ±75 ms clock skew) — mitigated via CI automation.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md†L40-L52】
+
+**Follow-up Actions:**
+
+* Publish protobuf and JSON schema updates for PoseStream and SectionState payloads.
+* Extend replay fixtures and determinism benchmarks to cover new cadence guarantees.
+* Coordinate consumer sign-off across equipment hierarchy, guidance, and persistence teams.
+
+---
+
+## 4) Rationale
+
+The unified PoseStream provides deterministic sequencing required by section control
+and automation ADRs while reducing duplicated logs. Alternative approaches relying on
+independent streams could not meet determinism, audit, or telemetry tally goals
+without excessive synchronization overhead.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md†L9-L28】
+
+---
+
+## 5) Alternatives Considered
+
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| 61-O1 | Maintain legacy multi-stream pose logs. | Fails determinism and replay requirements. |
+| 61-O4 | Introduce per-plugin pose timelines with reconciliation. | Adds complexity and still requires global arbitration. |
+| 61-O5 | Linux Core kiosk without unified pose stream. | Lacks guarantees for headless automation gating. |
+
+---
+
+## 6) Implementation Notes
+
+* Update `proto/core.proto` with PoseStreamService and SectionState contracts.
+* Publish `PoseStreamFrame.v1.json` and `SectionStateTally.v1.json` schemas.
+* Add deterministic fixtures under `docs/plugins/fixtures/pose-section-fixture.jsonl`.
+* Document schema evolution rules (additive fields, reserved IDs) and downgrade verification.
+
+---
+
+## 7) Verification
+
+* Integration suites include packet duplication, reorder, and ±75 ms clock skew bursts.
+* PoseStream diff compression must maintain ≤ 2.5 KB median frame payload at 20 Hz for
+  48-section rigs under replay testing.
+* Opportunity/event tallies must match analytical goldens within 1% per hectare.
+* Forced clock skew of ±25 ms must not break monotonic SectionState sequencing.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md†L32-L52】
+
+---
+
+## 8) References
+
+* [Communications & transports requirements](../4X_Interprocess_Communications/42_Transports.md)
+* [Data model & storage requirements](../3X_Data_Storage/32_Persistence_Formats.md)

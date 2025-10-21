@@ -1,48 +1,119 @@
-# ADR-067: Equipment configuration and axle-centric kinematics runtime
+# 61-ADR-067 — Equipment Configuration and Axle-Centric Kinematics Runtime
 
-## Status
-Accepted — 2025-05-17 multi-pod joint review
+*(Status: Proposed)*
 
-**Relevant Plugin(s):** Autosteer, Guidance Planner, Section Control, Mapping, Calibration Toolkit
+**Author:** Codex
+**Reviewers:** Kinematics Runtime Working Group
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Supersedes:** —
+**Superseded by:** —
+**Related SRS:** `61_Kinematics_Pose_Fusion.md`
+**Related Options:** `61-O2`, `61-O3`
 
-## Context
-Operators need to configure articulated, multi-steer, and tracked machines without hand-editing JSON while Core consumes a kinematic graph that respects axle geometry, hitch couplers, sensors, and mode-dependent limits. [O-HW-7](../SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md) now specifies the multi-steer configurator UX, schema, and sensor catalog, including axle-first topology, steering module behaviors, calibration workflows, and validation criteria for Ackermann, slip, drift, and fail-safe profiles.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L1-L152】【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L203-L333】【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L357-L446】  [ADR-017](ADR-017-profiles-kinematics.md) established the expectation that guidance and control engines ingest richer profiles, but it stops short of defining how configuration exports feed the runtime solver or how acceptance is measured across automation modes.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-017 - Equipment profiles and kinematics.md†L1-L53】  We need an executable contract that bridges the configurator exports to Core’s kinematics, pose fusion, and planner guardrails without requiring bespoke integration work per rig.
+---
 
-## Decision
-- Adopt the axle-centric runtime described in [O-HW-7](../SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md) as the canonical equipment configuration export: axles are primary nodes, drawbars encode rigid or articulated joints, and wheels attach with steering geometry metadata (including Ackermann mapping sourced from linkage sensors where present) so [ADR-017](ADR-017-profiles-kinematics.md) can compute curvature, slip, and Ackermann-corrected commands directly.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L127-L219】
-- Require every exported profile to include frames/units/timebase metadata, steering module definitions with authority and latency policies, hitch/joint dynamics (including float and transport locks), sensor attachments with redundancy policies, and mode profiles with interlocks/fail-safe fallbacks as outlined in the blueprint.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L19-L126】【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L203-L333】【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L334-L446】
-- Define an ingestion API in Core that validates the exported graph (single rooted tree, dependency completeness, schema/version compatibility), enforces `meta.compat.guard` requirements, exposes deterministic ingestion (`{deterministic, seed}`), and surfaces timebase/late-measurement policies to the runtime. Validation failures return namespaced error codes with severities so automation blocks are explicit.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L220-L255】
-- Publish telemetry, calibration, and planner hand-off contracts that mirror the blueprint: `/machine/health`, `/planner/limits`, `/estimator/debug`, `/calibration/status`, plus capability summaries (turn radius, curvature limits, drive direction policy) and profile hashes for regression tracking.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L352-L533】
-- Lock export determinism: `contentHash = SHA256(canonicalJson(profile \ calibrationBundle))` must remain stable across import/export cycles; any kinematic or sensor change requires bumping `schemaVersion` or `profileId` before ingestion will accept the profile.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L29-L35】【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L236-L244】
-- Core computes per-axle capacity from per-wheel slip and publishes `κ_max` each cycle; planners must honor the advertised curvature limit when generating headland or crab trajectories.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L410-L432】
-- Establish Definition of Done gates for profile-driven rigs that align with NX-414: configuration round-trips must be lossless, mode switches must meet latency/overshoot budgets, and slip/accuracy metrics must hold across representative fixtures before declaring a rig supported.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L479-L533】
+## 1) Context
 
-## SRS Impact
+Operators need to configure articulated, multi-steer, and tracked machines without hand-editing
+JSON while Core consumes a kinematic graph that respects axle geometry, hitch couplers, sensors,
+and mode-dependent limits. The multi-steer configurator blueprint defines UX, schema, and sensor
+catalog expectations, but an executable contract is required to bridge exports into Core’s
+kinematics runtime, pose fusion, and planner guardrails without bespoke integration per rig.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md†L9-L32】
 
-- Fulfils the multi-steer configurator blueprint captured in §06 Hardware I/O and option O-HW-7, establishing schema, calibration, and redundancy requirements for articulated rigs.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L19-L446】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L1-L38】
-- Extends §09 Control & Automation by publishing curvature limits, drive-direction policies, and slip feedback the planners must honour across autosteer modes.【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L12-L60】
-- Provides telemetry and health contracts referenced in §10 Telemetry & Health for monitoring controller authority, calibration state, and fallback behaviour.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L6-L41】
+```mermaid
+flowchart TD
+  Configurator --> ProfileExport
+  ProfileExport --> CoreIngestion
+  CoreIngestion --> KinematicsRuntime
+  CoreIngestion --> Telemetry
+```
 
-## Consequences
-- Guidance, section, and automation planners can rely on a uniform axle-centric model with explicit limits, reducing bespoke rig integrations and enabling deterministic simulation across articulated tractors, tracked drives, and steerable implements.
-- Operators gain a guided configuration workflow with wizard + graph views that exports validated profiles, cutting onboarding time and reducing field errors from ambiguous geometry or missing sensors.
-- Core must ship ingestion, validation, and telemetry surfaces alongside regression fixtures, increasing upfront engineering effort but lowering long-term support costs as rigs share the same contracts.
-- Legacy presets remain compatible through migration helpers that seed axle/drawbar definitions, but they now carry schema versioning and content hashes that require coordinated updates with dealers and support teams.
+---
 
-## Implementation Plan
-1. **Configurator export & schema tooling (NX-414).** Finalize JSON schema, validation rules, and export pipeline from the multi-steer configurator, including content hashes, calibration stamps, and compatibility guards.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L19-L126】【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L357-L446】
-2. **Core ingestion service (NX-452).** Implement a loader that parses profiles, enforces Definition of Done checks, maps axle/drawbar structures into [ADR-017](ADR-017-profiles-kinematics.md) runtime types, and exposes health/limits telemetry topics. The loader must honor compatibility guards, support deterministic seeds, expose `lateMeasurementPolicy`, and emit the `KIN-###` error taxonomy. Provide deterministic fixtures that simulate articulated, tracked, and steer-cart rigs.
-3. **Automation integration (NX-453).** Wire guidance planner, section arbiter, and autosteer controllers to consume curvature limits, drive-direction policies, and slip estimates from the ingestion service. Ensure mode profile toggles propagate within the required latency budgets.
-4. **Calibration & validation workflows (NX-454).** Deliver the Ackermann wizard, hitch zeroing, slip sanity fixtures, and transport lock checks described in the blueprint so operators can close the loop before field deployment.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L203-L333】【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L447-L533】
-5. **Documentation & presets (NX-455).** Publish operator guides, preset libraries, and support checklists that map legacy rigs into the new schema, including hardware hints and telemetry expectations for redundancy and fallback modes.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L334-L446】
+## 2) Decision
 
-## Validation
-- Automated regression fixtures must confirm ≤5 cm RMS toolpoint cross-track error on flat ground and ≤10 cm RMS on 8 % sidehills without crab steering, matching the blueprint acceptance gates over ≥3 km mixed-maneuver datasets.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L489-L533】
-- Mode profile transitions (road ↔ field ↔ fail_safe) must complete in <150 ms with <1° transient on dependent joints, verified across simulated articulated and steer-cart rigs.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L505-L533】
-- Profile export/import round-trips must preserve content hashes (modulo calibration stamps), and ingestion validators must reject graphs with cycles, missing sensors for enabled modules, or schema incompatibilities. Acceptance vectors include Ackermann wizard CSV loopback (<0.2° RMS residual), sidehill slip sanity (0.08–0.16 m/s with κ_max derate ≥15 %), and road→field mode flips (<150 ms, <1° transient).【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L365-L380】
+Adopt the axle-centric runtime from the multi-steer configurator as the canonical equipment export.
+Axles form primary nodes, drawbars encode joints, and wheels attach with steering geometry metadata
+so kinematics compute curvature, slip, and Ackermann-corrected commands. Require exports to include
+frames/units/timebase metadata, steering module definitions, hitch/joint dynamics, sensor attachments,
+mode profiles, and deterministic content hashes. Define a Core ingestion API that validates the graph,
+enforces compatibility guards, exposes deterministic ingestion, and surfaces timebase/late-measurement
+policies. Publish telemetry and planner hand-off contracts (`/machine/health`, `/planner/limits`,
+`/estimator/debug`, `/calibration/status`) alongside capability summaries and profile hashes.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md†L32-L84】
 
-## References
-- [O-HW-7 — Multi-steer equipment configurator primitives](../SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md)
-- [ADR-017 — Equipment profiles and kinematics](ADR-017-profiles-kinematics.md)
-- [ADR-033 — Guidance planner and autosteer orchestration](ADR-033-guidance-planner-autosteer.md)
-- [ADR-028 — Stack boundaries](ADR-028-stack-boundaries.md)
+### Decision Summary
+
+* **Scope:** Configurator exports, Core ingestion service, telemetry and planner contracts.
+* **Boundary:** Does not define hardware calibration tooling beyond schema requirements.
+* **Implementation Level:** Design + runtime implementation with deterministic ingestion and telemetry surfaces.
+
+---
+
+## 3) Consequences
+
+**Positive Impacts:**
+
+* Guidance, section, and automation planners rely on uniform axle-centric models with explicit limits,
+  reducing bespoke integrations and enabling deterministic simulation across articulated rigs.
+* Operators gain guided configuration workflows with validation and content hashes, improving onboarding and support.
+* Telemetry surfaces expose curvature limits, health, and calibration status for diagnostics and automation governance.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md†L86-L130】
+
+**Negative / Mitigated Impacts:**
+
+* Core must ship ingestion, validation, and telemetry services, increasing engineering effort — mitigated by shared fixtures and automation.
+* Legacy presets require migration helpers and coordination with dealers — mitigated via scripted conversions and documentation.
+
+**Follow-up Actions:**
+
+* Finalize JSON schema, validation rules, and export pipeline including content hashes and calibration stamps.
+* Implement Core loader enforcing Definition of Done checks, compatibility guards, deterministic seeds, and error taxonomy.
+* Integrate planners and controllers with curvature limits, drive-direction policies, and slip estimates.
+* Deliver calibration workflows (Ackermann wizard, hitch zeroing, slip checks) and publish operator guides plus preset libraries.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md†L130-L188】
+
+---
+
+## 4) Rationale
+
+Axle-centric exports provide deterministic geometry for Core without bespoke adapters. Alternatives that
+kept legacy presets or partial schemas failed to capture steering authority, latency, and slip metadata
+needed for automation safety and planner guardrails.
+
+---
+
+## 5) Alternatives Considered
+
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| Legacy preset conversion | Continue manual JSON editing per rig. | Error-prone, lacks deterministic ingestion and telemetry. |
+| Minimal profile export | Export limited geometry without axle focus. | Cannot derive curvature limits or slip budgets reliably. |
+| Plugin-specific ingestion | Allow each planner to parse exports. | Duplicates logic and breaks determinism across services. |
+
+---
+
+## 6) Implementation Notes
+
+* Ingestion validates single rooted tree, dependency completeness, schema compatibility, and `meta.compat.guard` requirements.
+* Deterministic ingestion provides `{deterministic, seed}` parameters and publishes profile hashes for regression tracking.
+* Telemetry topics mirror configurator blueprint and include capability summaries for planners and diagnostics.
+* Definition of Done gates demand lossless round-trips, latency/overshoot budgets, and slip/accuracy metrics across fixtures.
+
+---
+
+## 7) Verification
+
+* Regression fixtures confirm ≤ 5 cm RMS toolpoint cross-track error on flat ground and ≤ 10 cm on 8% sidehills without crab steering.
+* Mode profile transitions (road ↔ field ↔ fail_safe) complete in < 150 ms with < 1° transient on dependent joints.
+* Export/import round-trips preserve content hashes (modulo calibration stamps) and reject cycles, missing sensors, or incompatible schemas.
+* Ackermann wizard CSV loopback yields < 0.2° RMS residual; sidehill slip sanity produces 0.08–0.16 m/s with κ_max derate ≥ 15%; road→field flips stay < 150 ms and < 1° transient.【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md†L188-L210】
+
+---
+
+## 8) References
+
+* [Multi-steer equipment configurator blueprint](../6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md#6192-multi-steer-configurator-detail)
+* [ADR-017 — Equipment profiles and kinematics](61-ADR-017%20-%20Equipment%20profiles%20and%20kinematics.md)
+* [ADR-033 — Guidance planner and autosteer orchestration](../6X_Core_Domain_Services/61-ADR-033%20-%20Guidance%20planner%20and%20autosteer%20orchestration.md)
+* [ADR-028 — Stack boundaries](../6X_Core_Domain_Services/61-ADR-028%20-%20Stack%20boundaries.md)

@@ -1,45 +1,112 @@
-# ADR-023: Session and job model with provenance graph
+# 62-ADR-023 — Session and Job Model with Provenance Graph
 
-## Status
-Drafting (target review window: 2025-12-09 week)
+*(Status: Proposed)*
 
-**Relevant Plugin(s):** Job Tasks, Mapping, Variable Mapping, Telemetry Logging, UI Shell
+**Author:** Codex
+**Reviewers:** Lifecycle & Provenance Working Group
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Supersedes:** —
+**Superseded by:** —
+**Related SRS:** `62_Job_Lifecycle.md`
+**Related Options:** `62-O2`, `62-O3`
 
+---
 
+## 1) Context
 
-## Context
-Nexus must relate jobs, sessions, PoseStreams, and derived artifacts so provenance (ADR-019) and lifecycle services (ADR-030) operate consistently. Legacy flows treat sessions as ad-hoc folders without stable identifiers, hindering provenance and automation. ADR-023 defines session lifecycle semantics, identifiers, and graph relationships tying together jobs, equipment snapshots, PoseStreams, and derived outputs.
+Nexus must relate jobs, sessions, PoseStreams, and derived artifacts so provenance and lifecycle
+services operate consistently. Legacy flows treated sessions as ad-hoc folders without stable
+identifiers, hindering provenance and automation. This ADR defines lifecycle semantics, identifiers,
+and graph relationships tying jobs, equipment snapshots, PoseStreams, and derived outputs together.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-023 - Session and job model with provenance graph.md†L9-L20】
 
-## Decision
-- Establish session lifecycle phases (create, resume, switch, close) with deterministic identifiers and state transitions tied to JobsService (ADR-030).
-- Capture equipment and profile snapshots for each session, ensuring reproducibility and compatibility with ADR-017 kinematics.
-- Define how PoseStreams, layers, and derived artifacts attach to sessions within the provenance graph shared with ADR-019.
-- Provide APIs, storage schemas, and UI hooks for managing sessions, including integrity checks that prevent orphaned references.
+```mermaid
+flowchart LR
+  Job --> Session
+  Session --> PoseStream
+  Session --> Layer
+  Session --> Provenance
+```
 
-## Consequences
-- Provenance and analytics systems can traverse session graphs to understand context, improving auditability.
-- Session orchestration introduces coordination overhead but enables deterministic resume and multi-stream management.
-- UI and automation pipelines must surface session awareness, requiring new UX patterns and telemetry events.
+---
 
-## Governance Updates
-- **Transactional guarantees.** Session writes now leverage journaling with two-phase commit semantics between session state and storage backends. Crash recovery replays logs and reconciles provenance pointers automatically.
-- **Consistency tooling.** Maintenance CLI scans provenance graphs for orphaned edges, offering guided repair actions that operators can run during scheduled downtime.
-- **Operational playbooks.** Fleet administrators receive monthly health reports highlighting drift, reconciliation results, and outstanding repairs.
+## 2) Decision
 
-## Amendment — 2025 architecture refresh (NX-190)
+Establish session lifecycle phases (create, resume, switch, close) with deterministic identifiers and
+state transitions tied to JobsService. Capture equipment and profile snapshots for each session,
+ensuring compatibility with kinematics ADRs. Define how PoseStreams, layers, and derived artifacts
+attach to sessions within the provenance graph shared with ADR-019. Provide APIs, storage schemas, and
+UI hooks for managing sessions, including integrity checks preventing orphaned references.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-023 - Session and job model with provenance graph.md†L20-L30】
 
-- Terminology normalized to “Session” across Core, UI, telemetry, and documentation. Legacy “Run” hooks trigger transitional warnings and map to session events until plugins migrate fully.
-- Session metadata now records crop type and genetics references, allowing plugins to link crop rotation and seed lot analytics directly to the session context.
-- Multi-field job envelopes (ADR-043) propagate field membership into session records so coverage, yield, and profitability rollups can split per field while maintaining a single session timeline.
+### Decision Summary
 
-## Validation
-- Session lifecycle tests must demonstrate create/resume/switch flows that maintain referential integrity with zero orphaned references.
-- Snapshot storage must persist implement/equipment state with < 500 ms serialization latency and ≤ 5% storage overhead compared to raw configurations.
-- Provenance graph builder must emit DAGs validated against schema, rejecting cycles and invalid attachments in integration tests.
+* **Scope:** Session lifecycle orchestration, provenance graph modeling, snapshot storage.
+* **Boundary:** Does not dictate UI layout beyond session awareness or analytics algorithms.
+* **Implementation Level:** Design + service contracts and storage schema definitions.
 
-## References
-- [Backend services requirements](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
-- [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
-- [Control & automation requirements](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
-- [ADR-019: Provenance, audit, and QA governance](ADR-019-provenance-audit-qa.md)
-- [ADR-030: Field job sessions and lifecycle services](ADR-030-field-job-sessions.md)
+---
+
+## 3) Consequences
+
+**Positive Impacts:**
+
+* Provenance and analytics systems traverse session graphs to understand context, improving auditability.
+* Deterministic sessions enable resume flows and multi-stream management across plugins.
+* Crop and genetics metadata attaches directly to sessions for analytics alignment.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-023 - Session and job model with provenance graph.md†L30-L43】
+
+**Negative / Mitigated Impacts:**
+
+* Session orchestration adds coordination overhead — mitigated by transactional journaling and CLI repair tools.
+* UI must surface session awareness — mitigated by shared component library updates.
+
+**Follow-up Actions:**
+
+* Implement two-phase commit journaling between session state and storage backends with crash recovery.
+* Ship consistency tooling that scans provenance graphs for orphaned edges and guides repairs.
+* Publish operational playbooks delivering monthly drift and reconciliation reports.
+
+---
+
+## 4) Rationale
+
+A structured session model provides reproducibility, enables automation gating, and aligns provenance.
+Alternatives that rely on loose folders cannot guarantee referential integrity or deterministic resume
+behavior.
+
+---
+
+## 5) Alternatives Considered
+
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| Legacy folder model | Continue storing session artifacts without IDs. | Fails provenance and resume requirements. |
+| Per-plugin session handling | Let each plugin track sessions independently. | Breaks consistency and introduces conflicts. |
+| Immutable job-only history | Avoid session entities. | Loses multi-session context and real-time telemetry alignment. |
+
+---
+
+## 6) Implementation Notes
+
+* Normalize terminology to “Session” across Core, UI, telemetry, and documentation.
+* Record crop type and genetics references within session metadata for analytics alignment.
+* Propagate multi-field job envelopes into session records for per-field rollups.
+
+---
+
+## 7) Verification
+
+* Lifecycle tests demonstrate create/resume/switch flows maintaining referential integrity without orphaned references.
+* Snapshot storage persists equipment state with < 500 ms serialization latency and ≤ 5% overhead versus raw configs.
+* Provenance graph builder emits DAGs validated against schema, rejecting cycles and invalid attachments in integration tests.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-023 - Session and job model with provenance graph.md†L45-L55】
+
+---
+
+## 8) References
+
+* [System decomposition boundaries](../2X_System_Architecture/21_System_Decomposition_Boundaries.md)
+* [Persistence formats](../3X_Data_Storage/32_Persistence_Formats.md)
+* [Control & automation requirements](../6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+* [ADR-019 — Provenance, audit, and QA governance](64-ADR-019%20-%20Provenance%20audit%20and%20QA%20governance.md)
+* [ADR-030 — Field job sessions and lifecycle services](62-ADR-030%20-%20Field%20job%20sessions%20and%20lifecycle%20services.md)

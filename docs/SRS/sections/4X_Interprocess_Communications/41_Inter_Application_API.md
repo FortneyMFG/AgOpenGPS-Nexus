@@ -8,9 +8,9 @@ Define the data contracts between AgOpenGPS, AgIO, companion tools, and external
 - R-API-001 (MUST, current-AgIO): Keep UDP monitor tooling that surfaces raw PGNs for diagnostics and third-party reuse.【F:SourceCode/AgIO/Source/Forms/FormUDPMonitor.cs†L8-L100】
 - R-API-002 (SHOULD, current-AgIO): Continue exposing GNSS correction settings (NTRIP credentials, targets) via config dialogs until a new API replaces them.【F:SourceCode/AgIO/Source/Forms/FormNtrip.cs†L58-L160】
 - R-API-003 (SHOULD): Provide versioning/compat guidance if we add protobuf/JSON schemas so legacy PGN clients remain supported.
-- R-API-010 (MUST, proposed-variable-layer): Publish versioned layer definitions, units registries, quality rules, and schema hashes so remote clients and plugins stay aligned with firmware-emitted telemetry.【F:docs/SRS/options/6X/O-API-5_VersionedLayerSchemas.md†L1-L31】
-- R-API-011 (SHOULD, proposed-variable-layer): Reserve ID ranges, exchange monotonic timestamps + validity bitmaps, and fail fast on schema mismatches to prevent silent drift.【F:docs/SRS/options/6X/O-API-5_VersionedLayerSchemas.md†L32-L49】
-- R-API-004 (SHOULD, proposed-PGNBridge): Publish the canonical PGN reference and formalize how the bridge exposes versioning, validation, and translation hooks for new APIs.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
+- R-API-010 (MUST, proposed-variable-layer): Publish versioned layer definitions, units registries, quality rules, and schema hashes so remote clients and plugins stay aligned with firmware-emitted telemetry.【F:docs/SRS/sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md†L1-L31】
+- R-API-011 (SHOULD, proposed-variable-layer): Reserve ID ranges, exchange monotonic timestamps + validity bitmaps, and fail fast on schema mismatches to prevent silent drift.【F:docs/SRS/sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md†L32-L49】
+- R-API-004 (SHOULD, proposed-PGNBridge): Publish the canonical PGN reference and formalize how the bridge exposes versioning, validation, and translation hooks for new APIs.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
 - R-API-005 (COULD): Document handshake messages for capability discovery across processes.
 - R-API-012 (SHOULD, release management): Adopt semantic versioning, deprecation periods, and schema compatibility tests for every published API/registry so contributors know when breaking changes are permitted and how long legacy clients are supported.
 - R-GEO-000 (MUST, implement geometry): Publish a canonical equipment → implement → toolbar → section hierarchy with stable IDs, offsets, and working widths so Core, UI, plugins, and firmware target consistent geometry metadata.
@@ -30,8 +30,8 @@ Define the data contracts between AgOpenGPS, AgIO, companion tools, and external
 - O-API-2: Design a JSON/REST surface for high-level interactions.
 - O-API-3: Introduce gRPC streams with PGN bridges.
 - O-API-4: Adopt OPC-UA or similar industrial protocol for sensors.
-- O-API-5: [Versioned layer schemas and quality metadata](../options/6X/O-API-5_VersionedLayerSchemas.md) — Shared catalogs + schema hashes for telemetry.
-- O-API-6: [PGN compatibility bridge with typed APIs](../options/4X/O-COMM-6_PGNCompatibilityBridge.md) — Legacy PGNs translated into gRPC/WebSocket contracts.
+- O-API-5: [Versioned layer schemas and quality metadata](../4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md) — Shared catalogs + schema hashes for telemetry.
+- O-API-6: [PGN compatibility bridge with typed APIs](../4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) — Legacy PGNs translated into gRPC/WebSocket contracts.
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -49,8 +49,8 @@ Compatibility with firmware, tooling support, latency, schema governance, ease o
 
 ## Current sentiment
 - Keep PGNs as the source of truth while defining how typed APIs can layer on top without fragmenting the ecosystem.
-- Schema hashing + registry publishing is seen as a prerequisite before exposing new APIs or plugins to the layer data.【F:docs/SRS/options/6X/O-API-5_VersionedLayerSchemas.md†L50-L64】
-- Bridging PGNs to typed APIs is viewed as the safest path toward Linux/Core pilots without stranding current firmware.【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】
+- Schema hashing + registry publishing is seen as a prerequisite before exposing new APIs or plugins to the layer data.【F:docs/SRS/sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md†L50-L64】
+- Bridging PGNs to typed APIs is viewed as the safest path toward Linux/Core pilots without stranding current firmware.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】
 
 ## Upcoming ADR coverage
 - **ADR-008 Equipment hierarchy** will settle the canonical geometry/tree metadata, satisfying new requirements R-GEO-000 through R-GEO-002 and feeding the control semantics defined in Section 61.【F:docs/ADR/ADR-roadmap.md†L27-L33】【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L1-L80】

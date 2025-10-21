@@ -13,7 +13,7 @@
   (`aog-core.service`, `aog-agio.service`) with hardened defaults.【F:tools/packaging/linux/build-packages.sh†L1-L214】【F:tools/packaging/linux/systemd/aog-core.service†L1-L27】
 - Ensure the host satisfies O-BACKEND-6: Ubuntu/Debian or RPM-based distro with
   .NET 8 runtime, writable `/var/lib/aog` for state, and `/etc/aog` for
-  configuration overrides.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L6-L33】
+  configuration overrides.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L6-L33】
 - Confirm access to the `nexus` release bundle if you need to cross-check
   appsettings defaults or plugin payloads.【F:SERVICES.md†L9-L46】
 

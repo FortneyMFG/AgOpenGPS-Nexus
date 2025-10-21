@@ -1,4 +1,4 @@
-# O-COMM-5: Versioned variable-rate PGN suite
+# 42-O5 — Versioned variable-rate PGN suite
 
 ## Summary
 Defines a set of CAN/UDP PGNs and sequencing rules that stream variable-rate layers, acknowledge layer definitions, and guard against packet loss while remaining backward compatible with existing AgIO transports.
@@ -36,8 +36,8 @@ Defines a set of CAN/UDP PGNs and sequencing rules that stream variable-rate lay
 M — Requires firmware updates, AgIO decoding changes, schema negotiation logic, and documentation but reuses the established transport stack.
 
 ## References
-- [Section 51 — Sensor & Actuator Abstractions](../sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
-- [Section 61 — Kinematics & Pose Fusion](../sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+- [Section 51 — Sensor & Actuator Abstractions](../5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
+- [Section 61 — Kinematics & Pose Fusion](../6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
 - [AgIO PGN baseline](../references/AgIO_PGN_Baseline.md)
 
 ## Related ADRs

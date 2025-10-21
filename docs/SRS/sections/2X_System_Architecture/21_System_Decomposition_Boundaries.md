@@ -8,10 +8,10 @@ Map the guidance, mapping, field data, and rules services that power the applica
 - R-BE-001 (MUST, current-AgOpenGPS): Continue shipping the field streamer stack that handles boundaries, tram lines, worked area, and recorded paths on disk.【F:SourceCode/AgOpenGPS.Core/Streamers/Field/FieldStreamer.cs†L7-L107】
 - R-BE-002 (SHOULD, current-AgOpenGPS): Keep map tile and OpenGL render helpers accessible to both WinForms and WPF consumers.【F:SourceCode/GPS/AgOpenGPS.csproj†L39-L48】【F:SourceCode/AgOpenGPS.Core/AgOpenGPS.Core.csproj†L7-L15】
 - R-BE-003 (SHOULD): Provide APIs for automation (e.g., headland, auto-steer) without breaking existing logic loops.
-- R-BE-010 (MUST, proposed-variable-layer): Introduce per-section layer controllers that normalize inputs, aggregate overlap math, and expose quality metrics while keeping binary coverage intact.【F:docs/SRS/options/6X/O-BACKEND-4_LayerControllers.md†L1-L28】
-- R-BE-011 (SHOULD, proposed-variable-layer): Separate IO ingestion, aggregation, and rendering via immutable snapshots to protect frame rate and simplify testing.【F:docs/SRS/options/6X/O-BACKEND-4_LayerControllers.md†L29-L46】【F:docs/SRS/options/9X/O-TEST-4_LayerReplayCI.md†L7-L18】
-- R-BE-004 (SHOULD, proposed-LinuxCore): Extract the business logic into a headless service with defined API boundaries, packaging, and health endpoints while keeping today’s in-process host for Windows builds until parity is proven.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L1-L44】
-- R-BE-012 (COULD, proposed-LinuxCore): Provide compatibility shims (PGN bridge, SocketCAN adapters) managed by the core service rather than each UI.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L16-L44】【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
+- R-BE-010 (MUST, proposed-variable-layer): Introduce per-section layer controllers that normalize inputs, aggregate overlap math, and expose quality metrics while keeping binary coverage intact.【F:docs/SRS/sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md†L1-L28】
+- R-BE-011 (SHOULD, proposed-variable-layer): Separate IO ingestion, aggregation, and rendering via immutable snapshots to protect frame rate and simplify testing.【F:docs/SRS/sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md†L29-L46】【F:docs/SRS/sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md†L7-L18】
+- R-BE-004 (SHOULD, proposed-LinuxCore): Extract the business logic into a headless service with defined API boundaries, packaging, and health endpoints while keeping today’s in-process host for Windows builds until parity is proven.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L1-L44】
+- R-BE-012 (COULD, proposed-LinuxCore): Provide compatibility shims (PGN bridge, SocketCAN adapters) managed by the core service rather than each UI.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L16-L44】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
 - R-BE-013 (SHOULD, service health): Define target service health metrics for the Core and layer controllers (steady-state CPU <20% on reference hardware, <500 MB RAM, restart <30 s with persisted state replay) before approving ADRs that depend on them.
 - R-BE-014 (SHOULD, fail-safe): Specify how the system degrades when the Core, PGN bridge, or controller services drop offline (e.g., auto-disable remote control, surface operator alerts, maintain manual override paths) so safety-critical actions remain bounded.
 - R-BE-020 (SHOULD, proposed-composite-sim): Provide a deterministic composite simulation loop (fixed-step clock + seeded RNG) that can drive all Core services and plugins in lockstep while letting hardware inputs preempt simulated values topic-by-topic.
@@ -22,8 +22,8 @@ Map the guidance, mapping, field data, and rules services that power the applica
 - O-BE-2: Move to containerized microservices (e.g., navigation, mapping) talking over a bus.
 - O-BE-3: Hybrid — keep real-time services local, push heavy analytics to cloud.
 - O-BE-4: Scriptable engine embedded via Lua/Python for business rules.
-- O-BE-5: [Layer controllers with aggregation pipelines](../options/6X/O-BACKEND-4_LayerControllers.md) — Metadata-driven ingestion + mapping snapshots.
-- O-BE-6: [Linux Core service split from UI](../options/2X/O-BACKEND-6_LinuxCoreService.md) — Headless daemon + API bridge + packaging.
+- O-BE-5: [Layer controllers with aggregation pipelines](../2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md) — Metadata-driven ingestion + mapping snapshots.
+- O-BE-6: [Linux Core service split from UI](../2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) — Headless daemon + API bridge + packaging.
 - O-BE-7: AgIO gRPC host with swappable Windows/Linux/Sim backends shipping unified NuGet contracts for Core/UI/Plugins.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
 
 ## Comparison (quick matrix)
@@ -43,9 +43,9 @@ Determinism, offline resilience, ease of customization, testability, deployment 
 
 ## Current sentiment
 - Keep the current in-process services while cataloging seams where dedicated processes (e.g., telemetry recorder) make sense.
-- Broad agreement that the layer-controller refactor should land with replay coverage before any microservice work proceeds.【F:docs/SRS/options/6X/O-BACKEND-4_LayerControllers.md†L47-L58】【F:docs/SRS/options/9X/O-TEST-4_LayerReplayCI.md†L7-L27】
+- Broad agreement that the layer-controller refactor should land with replay coverage before any microservice work proceeds.【F:docs/SRS/sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md†L47-L58】【F:docs/SRS/sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md†L7-L27】
 - The AgIO gRPC host with .NET 8 backends is now positioned as the preferred modernization track because it keeps Core logic identical across OSes and rides on shared NuGet contracts for plugins and UI.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
-- Contributors want to scope a Linux Core pilot that keeps the Windows host running in parallel until PGN compatibility and performance targets are proven in the field.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L21-L44】【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
+- Contributors want to scope a Linux Core pilot that keeps the Windows host running in parallel until PGN compatibility and performance targets are proven in the field.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L44】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
 - Simulation modernization must keep the timeline authoritative inside the Core so replay, plugin simulators, and physical hardware can blend predictably without reimplementing routing logic per executable.
 
 ## Open questions

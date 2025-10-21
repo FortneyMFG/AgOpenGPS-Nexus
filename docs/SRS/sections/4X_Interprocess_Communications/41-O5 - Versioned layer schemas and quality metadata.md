@@ -1,4 +1,4 @@
-# O-API-5: Versioned layer schemas and quality metadata
+# 41-O5 — Versioned layer schemas and quality metadata
 
 ## Summary
 Extends interprocess contracts so JSON/protobuf definitions describe layer metadata, schema hashes, quality rules, and alarm bands, enabling remote clients and plugins to stay in sync with firmware-emitted layers.
@@ -37,9 +37,9 @@ Extends interprocess contracts so JSON/protobuf definitions describe layer metad
 M — Requires schema design, serialization tooling, validation, and contributor education but largely builds on existing configuration exchange mechanisms.
 
 ## References
-- [Section 31 — Domain Data Model](../sections/3X_Data_Storage/31_Domain_Data_Model.md)
-- [Section 32 — Persistence & Formats](../sections/3X_Data_Storage/32_Persistence_Formats.md)
-- [Section 94 — Extensibility, Packaging & Updates](../sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
+- [Section 31 — Domain Data Model](../3X_Data_Storage/31_Domain_Data_Model.md)
+- [Section 32 — Persistence & Formats](../3X_Data_Storage/32_Persistence_Formats.md)
+- [Section 94 — Extensibility, Packaging & Updates](../9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 
 ## Related ADRs
 - [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)

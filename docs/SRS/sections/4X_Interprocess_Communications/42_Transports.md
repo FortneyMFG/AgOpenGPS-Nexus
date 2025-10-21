@@ -8,10 +8,10 @@ Define how field devices, guidance engines, and remote clients exchange data acr
 - R-COMM-001 (MUST, current-AgIO): Maintain UDP discovery, scanning, and monitoring workflows used to find and supervise field modules.【F:SourceCode/AgIO/Source/Forms/FormUDP.cs†L13-L160】【F:SourceCode/AgIO/Source/Forms/FormUDPMonitor.cs†L8-L100】
 - R-COMM-002 (MUST, current-AgOpenGPS): Continue emitting and receiving CAN/UDP PGNs that drive auto-steer, machine control, and section data flows.【F:SourceCode/GPS/Forms/PGN.Designer.cs†L430-L491】
 - R-COMM-003 (SHOULD, current-AgIO): Support NTRIP over TCP alongside UDP/serial routing for GNSS corrections.【F:SourceCode/AgIO/Source/Forms/FormNtrip.cs†L22-L160】
-- R-COMM-010 (MUST, proposed-variable-layer): Provide versioned PGNs, sequencing, and schema negotiation so layer definitions and feedback streams stay consistent across firmware and apps.【F:docs/SRS/options/4X/O-COMM-5_VariableRatePGNs.md†L1-L41】
-- R-COMM-011 (SHOULD, proposed-variable-layer): Enforce monotonic timestamps, bounds checks, and bad-sample counters on layer transports to simplify diagnostics and retries.【F:docs/SRS/options/4X/O-COMM-5_VariableRatePGNs.md†L19-L41】【F:docs/SRS/options/6X/O-TELE-4_LayerDiagnostics.md†L7-L22】
-- R-COMM-004 (SHOULD, proposed-LinuxCore): Stand up a gRPC/WebSocket facade that coexists with legacy PGNs so new clients can attach without rewriting firmware.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L6-L44】【F:docs/SRS/options/9X/O-FRONT-6_RemoteClients.md†L1-L34】
-- R-COMM-005 (MUST, proposed-PGNBridge): Preserve byte-for-byte compatibility with the current AgIO PGN framing or provide a deterministic bridge when introducing new transports.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
+- R-COMM-010 (MUST, proposed-variable-layer): Provide versioned PGNs, sequencing, and schema negotiation so layer definitions and feedback streams stay consistent across firmware and apps.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md†L1-L41】
+- R-COMM-011 (SHOULD, proposed-variable-layer): Enforce monotonic timestamps, bounds checks, and bad-sample counters on layer transports to simplify diagnostics and retries.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md†L19-L41】【F:docs/SRS/sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md†L7-L22】
+- R-COMM-004 (SHOULD, proposed-LinuxCore): Stand up a gRPC/WebSocket facade that coexists with legacy PGNs so new clients can attach without rewriting firmware.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L6-L44】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L1-L34】
+- R-COMM-005 (MUST, proposed-PGNBridge): Preserve byte-for-byte compatibility with the current AgIO PGN framing or provide a deterministic bridge when introducing new transports.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
 - R-COMM-012 (SHOULD, transport-hardening): Establish latency budgets (<100 ms round-trip for control loops, <500 ms for monitoring) and error budgets (≤0.1% packet loss after retries) for any new gRPC/WebSocket channels so contributors know when the slice is ready to graduate from proposal to review.
 - R-COMM-013 (SHOULD, security posture): Document optional encryption/authentication expectations (TLS 1.3, mutual certs or token auth) for modern transports while ensuring PGN bridges can operate offline when credentials are unavailable.
 - R-COMM-020 (MUST, PoseStream cadence): Publish a canonical PoseStream cadence/decimation policy with deterministic sequencing so Core, plugins, and firmware consume a single authoritative pose timeline during live runs and replays.
@@ -82,8 +82,8 @@ Key expectations carried into this section:
 - O-COMM-2: Introduce gRPC for high-level clients while tunneling legacy PGNs.
 - O-COMM-3: Adopt MQTT or AMQP for telemetry fan-out.
 - O-COMM-4: Embed a REST API around PGN state for web dashboards.
-- O-COMM-5: [Versioned variable-rate PGN suite](../options/4X/O-COMM-5_VariableRatePGNs.md) — Sequenced layer streams with schema handshakes.
-- O-COMM-6: [PGN compatibility bridge layered over new APIs](../options/4X/O-COMM-6_PGNCompatibilityBridge.md) — Legacy PGNs in, typed events out.
+- O-COMM-5: [Versioned variable-rate PGN suite](../4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md) — Sequenced layer streams with schema handshakes.
+- O-COMM-6: [PGN compatibility bridge layered over new APIs](../4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) — Legacy PGNs in, typed events out.
 - O-COMM-7: gRPC/protobuf API surface published via `Aog.Abstractions` NuGet and consumed by Core/UI/Plugins while AgIO/Bridge backends handle transport specifics.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L36】
 
 ## Comparison (quick matrix)
@@ -103,9 +103,9 @@ Deterministic latency, message integrity (CRC/sequencing), offline buffering, co
 
 ## Current sentiment
 - Keep PGNs flowing through AgIO while we inventory what hardening is required before layering a modern API facade.
-- Community wants the layer PGN suite staged behind feature flags so existing rigs stay stable while richer telemetry rolls out.【F:docs/SRS/options/4X/O-COMM-5_VariableRatePGNs.md†L43-L57】【F:docs/SRS/options/9X/O-TEST-4_LayerReplayCI.md†L7-L27】
+- Community wants the layer PGN suite staged behind feature flags so existing rigs stay stable while richer telemetry rolls out.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md†L43-L57】【F:docs/SRS/sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md†L7-L27】
 - The shared gRPC/protobuf surface is considered the preferred evolution path when paired with the PGN bridge because it keeps hardware compatibility while aligning Core, UI, and plugins on one contract package.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
-- There is appetite to prototype the compatibility bridge alongside the Core API so UDP/serial devices remain usable during a Linux migration.【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L21-L44】
+- There is appetite to prototype the compatibility bridge alongside the Core API so UDP/serial devices remain usable during a Linux migration.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L44】
 
 ## Open questions
 - Do we converge on a single heartbeat/watchdog strategy across transports?

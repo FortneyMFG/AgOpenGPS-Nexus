@@ -1,4 +1,4 @@
-# O-BACKEND-6: Linux "AOG Core" service with remote frontends
+# 21-O6 — Linux "AOG Core" service with remote frontends
 
 ## Summary
 Split AgOpenGPS into a headless "Core" that runs on Linux (SBC/PC) and exposes APIs that multiple frontends can consume. The core
@@ -52,9 +52,9 @@ L (multi-phase). Requires architecture refactor, new service host, API contracts
 
 ## References
 - Community discussions on cross-platform goals and splitting UI/business logic (Telegram/GitHub threads, Feb 2024).
-- [Section 42 — Transports](../sections/4X_Interprocess_Communications/42_Transports.md)
-- [Section 21 — System Decomposition & Boundaries](../sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
-- [Section 91 — UI Shell & Layout](../sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [Section 42 — Transports](../4X_Interprocess_Communications/42_Transports.md)
+- [Section 21 — System Decomposition & Boundaries](../2X_System_Architecture/21_System_Decomposition_Boundaries.md)
+- [Section 91 — UI Shell & Layout](../9X_Frontends_Ops/91_UI_Shell_Layout.md)
 
 ## Related ADRs
 - [ADR-004 — Composite Simulation](../../ADR/ADR-004-composite-simulation.md)

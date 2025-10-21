@@ -1,4 +1,4 @@
-# O-HW-5: Modular firmware publishing variable-rate layers
+# 51-O5 — Modular firmware publishing variable-rate layers
 
 ## Summary
 Expands hardware IO expectations so CAN/UDP modules (e.g., SK21 AOG_RC and future controllers) can publish multiple variable-rate layers per section, advertise firmware capabilities, and map physical channels to logical layers without core code changes.
@@ -35,8 +35,8 @@ Expands hardware IO expectations so CAN/UDP modules (e.g., SK21 AOG_RC and futur
 M — Firmware, configuration UI, and discovery protocol changes but largely additive to existing module infrastructure.
 
 ## References
-- [Section 51 — Sensor & Actuator Abstractions](../sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
-- [Section 61 — Kinematics & Pose Fusion](../sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+- [Section 51 — Sensor & Actuator Abstractions](../5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
+- [Section 61 — Kinematics & Pose Fusion](../6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
 - [Gauge ID Registry](../appendices/GaugeId_Registry.md)
 
 ## Related ADRs

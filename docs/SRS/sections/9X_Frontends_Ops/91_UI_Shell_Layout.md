@@ -8,10 +8,10 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - R-FE-001 (MUST, current-AgIO): Maintain the AgIO companion app used to configure transports and hardware modules.【F:SourceCode/AgIO/Source/AgIO.csproj†L1-L60】
 - R-FE-002 (SHOULD, current-AgOpenGPS): Continue providing auxiliary tools (AgDiag, ModSim, GPS_Out, Keypad) within the solution for troubleshooting and simulation.【F:SourceCode/AgOpenGPS.sln†L6-L35】
 - R-FE-003 (SHOULD): Offer a consistent story for remote display/control without regressing current Windows workflows.
-- R-FE-010 (MUST, proposed-variable-layer): Make dashboards, overlays, and inspectors metadata-driven so new layer types light up without code changes.【F:docs/SRS/options/9X/O-UI-5_MetadataDrivenDashboards.md†L1-L29】
-- R-FE-011 (SHOULD, proposed-variable-layer): Provide configuration tooling (Layer Definition Manager, section presets) and drill-down dashboards that reuse aggregation metadata while respecting multi-monitor layouts.【F:docs/SRS/options/9X/O-UI-5_MetadataDrivenDashboards.md†L30-L51】
+- R-FE-010 (MUST, proposed-variable-layer): Make dashboards, overlays, and inspectors metadata-driven so new layer types light up without code changes.【F:docs/SRS/sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md†L1-L29】
+- R-FE-011 (SHOULD, proposed-variable-layer): Provide configuration tooling (Layer Definition Manager, section presets) and drill-down dashboards that reuse aggregation metadata while respecting multi-monitor layouts.【F:docs/SRS/sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md†L30-L51】
 - R-FE-004 (COULD): Introduce thin clients (web/tablet) that mirror dashboards when networked.
-- R-FE-012 (SHOULD, proposed-LinuxCore): Ensure at least one frontend can operate purely as a remote client over the Core APIs (gRPC/WebSocket) while maintaining offline workflows for Windows rigs.【F:docs/SRS/options/9X/O-FRONT-6_RemoteClients.md†L1-L34】
+- R-FE-012 (SHOULD, proposed-LinuxCore): Ensure at least one frontend can operate purely as a remote client over the Core APIs (gRPC/WebSocket) while maintaining offline workflows for Windows rigs.【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L1-L34】
 - R-FE-013 (SHOULD, safety posture): Distinguish monitor-only remote clients from control-capable clients with explicit capability flags so safety-critical actions are disabled on unreliable links by default.
 - R-FE-014 (SHOULD, operator readiness): Capture training, preset migration, and configuration handoff requirements when metadata-heavy dashboards roll out so operators can transition without losing saved layouts.
 - R-FE-020 (SHOULD, proposed-composite-sim): Surface a unified simulation bar that drives play/pause/seek/speed for the authoritative SimClock so operators, replay, and plugin simulators stay synchronized.
@@ -53,8 +53,8 @@ Describe the operator-facing applications (desktop, mobile, remote) and how they
 - O-FE-2: Native mobile companion (Android/iOS) for monitoring only.
 - O-FE-3: Browser-based dashboard fed by WebSockets.
 - O-FE-4: Remote desktop appliance dedicated to cab displays.
-- O-FE-5: [Metadata-driven dashboards and visualization](../options/9X/O-UI-5_MetadataDrivenDashboards.md) — Layer-aware overlays, inspectors, and presets.
-- O-FE-6: [Remote gRPC/WebSocket clients backed by the Linux Core](../options/9X/O-FRONT-6_RemoteClients.md) — Native + browser displays.
+- O-FE-5: [Metadata-driven dashboards and visualization](../9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md) — Layer-aware overlays, inspectors, and presets.
+- O-FE-6: [Remote gRPC/WebSocket clients backed by the Linux Core](../9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md) — Native + browser displays.
 - O-FE-7: Avalonia desktop frontend consuming shared gRPC contracts with optional Windows-native shell hosting.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L1-L47】
 
 ## Comparison (quick matrix)
@@ -74,9 +74,9 @@ Operator familiarity, deployment friction, offline resilience, latency, maintain
 
 ## Current sentiment
 - Keep the Windows suite in place while testing what “remote display” actually needs (mirror vs. control).
-- Operators welcome metadata-driven dashboards if they ship with presets and inspector upgrades rather than requiring manual wiring per layer.【F:docs/SRS/options/9X/O-UI-5_MetadataDrivenDashboards.md†L52-L64】
+- Operators welcome metadata-driven dashboards if they ship with presets and inspector upgrades rather than requiring manual wiring per layer.【F:docs/SRS/sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md†L52-L64】
 - The Avalonia desktop frontend is now viewed as the preferred successor because it keeps one C# codebase and can slide into the Windows quick-start flow before expanding to Pi/CM5 deployments.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L1-L79】
-- Remote-first clients are attractive if they piggyback on the Core without forcing Windows operators to learn a new UI overnight.【F:docs/SRS/options/9X/O-FRONT-6_RemoteClients.md†L21-L34】
+- Remote-first clients are attractive if they piggyback on the Core without forcing Windows operators to learn a new UI overnight.【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L21-L34】
 - Simulation tooling should reuse the same controls regardless of data source so operators can blend hardware inputs with plugin-provided scenarios without context switching.
 
 ## Mobile companion and embedded roadmap

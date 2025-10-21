@@ -8,7 +8,7 @@ Define how operators obtain, install, and roll back software updates when field 
 - R-UPD-001 (MUST, current-AgOpenGPS): Keep `dotnet publish` workflows that produce a consolidated output folder for manual deployment.【F:README.md†L35-L41】
 - R-UPD-002 (SHOULD): Provide rollback guidance so rigs can revert to a known-good build without re-imaging machines.
 - R-UPD-003 (SHOULD): Allow staged updates (AgOpenGPS vs. AgIO vs. controllers) without breaking compatibility.
-- R-UPD-004 (SHOULD, proposed-LinuxCore): Provide Debian packages, Docker images, and AppImage builds for the Core/frontends with documented rollback (keep prior version) while preserving zip releases.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L6-L20】
+- R-UPD-004 (SHOULD, proposed-LinuxCore): Provide Debian packages, Docker images, and AppImage builds for the Core/frontends with documented rollback (keep prior version) while preserving zip releases.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L6-L20】
 - R-UPD-005 (COULD): Add delta packages or background downloaders that respect limited connectivity.
 - R-UPD-006 (SHOULD, rollout safety): Capture validation and rollback checklists (hash verification, pre-flight compatibility checks, firmware/controller coordination steps) so staggered desktop/Core releases remain in lockstep with field hardware.
 
@@ -18,7 +18,7 @@ Define how operators obtain, install, and roll back software updates when field 
 - O-UPD-2: Offline installer bundle (MSIX/Setup) with repair/rollback.
 - O-UPD-3: Package manager integration (Winget/Chocolatey) for automated upgrades.
 - O-UPD-4: Field-update kit (USB stick) with scripted upgrade/rollback steps.
-- O-UPD-5: Linux package repositories + container images for Core/UI.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L6-L20】
+- O-UPD-5: Linux package repositories + container images for Core/UI.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L6-L20】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -35,7 +35,7 @@ Offline usability, rollback capability, operator effort, package integrity, comp
 
 ## Current sentiment
 - Manual zips work but need a clearer rollback plan and optional automation for well-connected fleets.
-- Linux packaging must ship with clear rollback/dual-boot instructions before inviting operators to pilot the Core service.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L6-L23】
+- Linux packaging must ship with clear rollback/dual-boot instructions before inviting operators to pilot the Core service.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L6-L23】
 
 ## Open questions
 - How do we validate updates before rollout when rigs stay offline for months?

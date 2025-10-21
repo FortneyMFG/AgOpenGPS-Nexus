@@ -8,9 +8,9 @@ Clarify how fields, boundaries, tram lines, tiles, and telemetry are stored, syn
 - R-DATA-001 (MUST, current-AgOpenGPS): Continue shipping SQLite-based persistence used for mapping and section records via WinForms packages.【F:SourceCode/GPS/AgOpenGPS.csproj†L39-L48】
 - R-DATA-002 (SHOULD, current-AgOpenGPS): Keep shared libraries (AgOpenGPS.Core + AgLibrary) responsible for geometry and streaming logic.【F:SourceCode/AgOpenGPS.Core/AgOpenGPS.Core.csproj†L7-L15】
 - R-DATA-003 (SHOULD): Define export/import formats (ISOXML, shapefile, GeoJSON) with clear versioning.
-- R-DATA-010 (MUST, proposed-variable-layer): Preserve binary section coverage while storing additional layer geometry, accumulators, and quality metadata per section/row.【F:docs/SRS/options/7X/O-DATA-5_MetadataDrivenLayers.md†L1-L29】
-- R-DATA-011 (MUST, proposed-variable-layer): Ship a layer catalogue, units registry, and configuration schema that can be extended without code changes while keeping exports (CSV/GeoTIFF) consistent.【F:docs/SRS/options/7X/O-DATA-5_MetadataDrivenLayers.md†L30-L58】
-- R-DATA-012 (SHOULD, proposed-variable-layer): Bundle chunked, compressed map tiles with quantization metadata and schema hashes so replay and analytics can reconstruct engineering values exactly.【F:docs/SRS/options/7X/O-DATA-5_MetadataDrivenLayers.md†L59-L78】
+- R-DATA-010 (MUST, proposed-variable-layer): Preserve binary section coverage while storing additional layer geometry, accumulators, and quality metadata per section/row.【F:docs/SRS/sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md†L1-L29】
+- R-DATA-011 (MUST, proposed-variable-layer): Ship a layer catalogue, units registry, and configuration schema that can be extended without code changes while keeping exports (CSV/GeoTIFF) consistent.【F:docs/SRS/sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md†L30-L58】
+- R-DATA-012 (SHOULD, proposed-variable-layer): Bundle chunked, compressed map tiles with quantization metadata and schema hashes so replay and analytics can reconstruct engineering values exactly.【F:docs/SRS/sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md†L59-L78】
 - R-DATA-004 (COULD): Add compression and delta sync for large telemetry sets without breaking existing file readers.
 - R-DATA-013 (SHOULD, retention): Define minimum retention/archival windows for agronomic history (e.g., three seasons accessible offline, long-term archives exportable to cold storage) so future requirements inherit a shared performance envelope.
 - R-DATA-014 (SHOULD, schema integrity): Clarify how schema hashes flow through export/import tooling (including mismatch detection and operator prompts) to prevent silent drift between machines running different Core or firmware versions.
@@ -57,7 +57,7 @@ Clarify how fields, boundaries, tram lines, tiles, and telemetry are stored, syn
 - O-DATA-2: Move storage to a centralized database (PostgreSQL/PostGIS) with sync clients.
 - O-DATA-3: Use cloud object storage for heavy assets with local caching.
 - O-DATA-4: Introduce versioned packages (zip bundles) for field moves.
-- O-DATA-5: [Metadata-driven variable-rate layers](../options/7X/O-DATA-5_MetadataDrivenLayers.md) — Catalog + storage for multi-layer telemetry.
+- O-DATA-5: [Metadata-driven variable-rate layers](../3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md) — Catalog + storage for multi-layer telemetry.
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -74,7 +74,7 @@ Offline use, storage footprint, interoperability, migration effort, tooling avai
 
 ## Current sentiment
 - Keep local files operational while documenting how they evolve and what metadata is missing for machine-to-machine exchange.
-- Layer catalog work should land with export tooling and schema hashes before any centralized storage move is reconsidered.【F:docs/SRS/options/7X/O-DATA-5_MetadataDrivenLayers.md†L59-L78】【F:docs/SRS/options/9X/O-TEST-4_LayerReplayCI.md†L7-L27】
+- Layer catalog work should land with export tooling and schema hashes before any centralized storage move is reconsidered.【F:docs/SRS/sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md†L59-L78】【F:docs/SRS/sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md†L7-L27】
 - Spatial constraint zones should reuse the same geometry store and provenance logging so interop, replay, and automation consumers receive identical data regardless of import source or deployment topology.
 
 ## Upcoming ADR coverage

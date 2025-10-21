@@ -550,8 +550,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-026 | TimingCaps probe (Linux PPS/PTP) | Done |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Report jitter |
 | NX-959 | Linux NMEA scan hot reload | In Progress |  | — | [SRS §3.3 AGiO Services](docs/SRS/NOTES.md#srs-33-agio-services) | Cancel and restart serial scan loop when configuration changes |
 | NX-027 | Legacy UDP gateway skeleton | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/SRS/NOTES.md#srs-43-legacy-compatibility) | Loopback test |
-| NX-029 | Agio.Linux SocketCAN backend (CAN→gRPC) | Done |  | — | [SRS Option 11-O1](SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md) | Streams CAN frames + section relays |
-| NX-066 | GNSS source policy + TCP/UDP provider | Done |  | — | [SRS Option 11-O1](SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md) | Aggregates `IPositionSource` feeds |
+| NX-029 | Agio.Linux SocketCAN backend (CAN→gRPC) | Done |  | — | [SRS Option 11-O1](docs/SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md) | Streams CAN frames + section relays |
+| NX-066 | GNSS source policy + TCP/UDP provider | Done |  | — | [SRS Option 11-O1](docs/SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md) | Aggregates `IPositionSource` feeds |
 | NX-117 | Bridge service host for gRPC ⇄ AOG-Link | Done |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Standalone daemon mediating inter-process, AOG-Link, and PGN flows |
 | NX-118 | gRPC ⇄ AOG-Link translator layer | Done |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Map service calls/streams onto nanopb datagrams with ack/retry semantics |
 | NX-119 | AOG-Link ⇄ PGN compatibility bridge | Done |  | — | [SRS Option O-COMM-6](docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md) | Maintain legacy devices during migration |

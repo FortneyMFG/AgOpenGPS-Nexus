@@ -1,4 +1,9 @@
 # 12 — Development Language & Runtime
+
+> **In plain terms:** Everyone writing Nexus code installs the same .NET 8 SDK,
+> follows the same dependency rules, and uses shared contracts so plugins and
+> tools behave the same on Windows and Linux.
+
 *(Status: Proposed)*
 
 **Author:** Codex  
@@ -26,6 +31,13 @@ Clarify how runtime governance supports cross-platform deployments and plugin co
 - Contributors target .NET 8 LTS to unify runtime behavior across Windows and Linux.
 - Shared gRPC contracts (`Aog.Abstractions`) coordinate Core, UI, AgIO, and plugins.
 - Build tooling (Section 14) must pin SDK versions, dependencies, and signing assets to guarantee reproducibility.
+
+> **Quick start for newcomers**
+>
+> 1. Install the .NET 8 SDK listed in `global.json`.
+> 2. Clone the repo and run `tools/scripts/nexus.sh bootstrap` (or `nexus.ps1` on Windows) to restore dependencies.
+> 3. Run `dotnet build` followed by `dotnet test`; if both succeed, you are ready to contribute.
+> 4. Keep the dependency allowlist handy—new packages require a governance review before merge.
 
 ---
 
@@ -66,6 +78,8 @@ Clarify how runtime governance supports cross-platform deployments and plugin co
 | R-STACK-005 | MUST | Hardware Abstraction | Keep OS-specific device bindings behind DI interfaces to avoid forks. | AgIO maintainers | Integration tests verifying backend swaps |
 | R-STACK-006 | SHOULD | Observability | Provide logging, metrics, and tracing primitives consistent across runtime hosts. | Ops feedback | `nexus sim smoke` + telemetry verification |
 
+> **Why it matters:** These guardrails stop surprise runtime drift, help plugin authors know which APIs are safe, and make sure a new contributor can match the CI environment in an afternoon.
+
 ### 12.5.1 Requirement Sources & Rationale
 
 | Req ID | Source | Rationale |
@@ -74,6 +88,15 @@ Clarify how runtime governance supports cross-platform deployments and plugin co
 | R-STACK-002 | Release WG notes | Prevent regressions from incompatible dependencies. |
 | R-STACK-003 | Supply chain policy | Guard against tampering and build drift. |
 | R-STACK-004 | Plugin backlog | Keep third-party integrations stable across releases. |
+
+### 12.5.2 Governance quick reference
+
+| If you need to… | Talk to… | Where it lives |
+|-----------------|-----------|----------------|
+| Add or upgrade a NuGet package | Release governance lead | Dependency allowlist PR + Section 14 tooling |
+| Ship a new plugin contract | Plugin working group | `Aog.Abstractions` package + contract tests |
+| Update the runtime SDK version | Platform foundations WG | `global.json` change with rollout checklist |
+| Introduce native helpers (C++/Rust) | Core/AgIO maintainers | Section 14 FFI guidance + security review |
 
 ---
 

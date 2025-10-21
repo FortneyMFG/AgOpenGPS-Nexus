@@ -1,61 +1,184 @@
-# 41 — Inter-Application API (Status: collecting proposals)
+# 41 — Inter-Application API
+*(Status: Proposed)*
 
-## Problem statement
-Define the data contracts between AgOpenGPS, AgIO, companion tools, and external integrations, covering PGNs, UDP packets, and potential JSON/gRPC schemas.
+**Author:** Codex
+**Created:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Section ID:** 41
+**Editors:** Interprocess Communications Working Group
+**Last Updated:** 2025-10-20
+**Related Sections:** 21 — System Decomposition & Boundaries, 42 — Transports, 61 — Kinematics & Pose Fusion
+**Upstream Dependencies:** 1X — Platform Foundations, 2X — System Architecture
+**Downstream Impacts:** 5X — Hardware IO Device Layer, 7X — Mapping & Geospatial, 9X — Frontends & Ops
 
-## Requirements (from contributors)
-- R-API-000 (MUST, current-AgOpenGPS): Maintain the PGN catalog used for steer, machine, relay, and section messaging.【F:SourceCode/GPS/Forms/PGN.Designer.cs†L430-L491】
-- R-API-001 (MUST, current-AgIO): Keep UDP monitor tooling that surfaces raw PGNs for diagnostics and third-party reuse.【F:SourceCode/AgIO/Source/Forms/FormUDPMonitor.cs†L8-L100】
-- R-API-002 (SHOULD, current-AgIO): Continue exposing GNSS correction settings (NTRIP credentials, targets) via config dialogs until a new API replaces them.【F:SourceCode/AgIO/Source/Forms/FormNtrip.cs†L58-L160】
-- R-API-003 (SHOULD): Provide versioning/compat guidance if we add protobuf/JSON schemas so legacy PGN clients remain supported.
-- R-API-010 (MUST, proposed-variable-layer): Publish versioned layer definitions, units registries, quality rules, and schema hashes so remote clients and plugins stay aligned with firmware-emitted telemetry.【F:docs/SRS/sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md†L1-L31】
-- R-API-011 (SHOULD, proposed-variable-layer): Reserve ID ranges, exchange monotonic timestamps + validity bitmaps, and fail fast on schema mismatches to prevent silent drift.【F:docs/SRS/sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md†L32-L49】
-- R-API-004 (SHOULD, proposed-PGNBridge): Publish the canonical PGN reference and formalize how the bridge exposes versioning, validation, and translation hooks for new APIs.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
-- R-API-005 (COULD): Document handshake messages for capability discovery across processes.
-- R-API-012 (SHOULD, release management): Adopt semantic versioning, deprecation periods, and schema compatibility tests for every published API/registry so contributors know when breaking changes are permitted and how long legacy clients are supported.
-- R-GEO-000 (MUST, implement geometry): Publish a canonical equipment → implement → toolbar → section hierarchy with stable IDs, offsets, and working widths so Core, UI, plugins, and firmware target consistent geometry metadata.
-- R-GEO-001 (SHOULD, section grouping): Describe overlapping SectionGroup semantics, master group overrides, and per-toolbar lookahead/overlap policies so control logic, simulators, and analytics derive identical gating behavior.
-- R-GEO-002 (SHOULD, profile discovery): Expose manifest metadata (e.g., hitch profiles, attachment points, kinematic parameters) through the shared registries so plugin capability discovery can populate control and visualization surfaces without bespoke wiring.
+---
 
-### R-API — Plugin contracts & lifecycle
-- R-API-020 (MUST, capabilities service): Provide a Capabilities gRPC service for plugin registration, manifest exchange, lease renewal, and version negotiation so Core can enforce compatibility at runtime.
-- R-API-021 (MUST, service catalog): Publish typed gRPC contracts for Pose, Equipment, SectionControl, LayerRegistry, TileQuery, Config, EventBus, Guidance, and Health services with explicit streaming semantics and error codes.
-- R-API-022 (SHOULD, schema negotiation): Include feature flags and semantic version ranges in plugin manifests so Core can downgrade or reject plugins when contracts diverge.
-- R-API-023 (SHOULD, UI manifest contract): Define a declarative schema for plugin UI contributions (panels, config pages, overlays) consumed by the frontend APIs without embedding arbitrary UI code.
-- R-API-024 (SHOULD, audit logging): Require control-affecting RPCs (section commands, rate commands, pose writes) to include operator/plugin identity and timestamps so audit trails align with Section 61 control requirements.
+## 41.1 Purpose & Scope
 
-## Options
-- O-API-0: Status quo — Binary PGNs over UDP/serial with tooling to inspect.
-- O-API-1: Wrap PGNs in protobuf definitions for typed consumption.
-- O-API-2: Design a JSON/REST surface for high-level interactions.
-- O-API-3: Introduce gRPC streams with PGN bridges.
-- O-API-4: Adopt OPC-UA or similar industrial protocol for sensors.
-- O-API-5: [Versioned layer schemas and quality metadata](../4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md) — Shared catalogs + schema hashes for telemetry.
-- O-API-6: [PGN compatibility bridge with typed APIs](../4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) — Legacy PGNs translated into gRPC/WebSocket contracts.
+Define the cross-process and cross-application APIs that connect Nexus Core, UI shells, automation tooling, and companion
+services. This section governs the contracts, versioning practices, and lifecycle expectations for gRPC, WebSocket, and
+registry surfaces so that headless Linux deployments and legacy Windows tooling can interoperate without bespoke bridges.
 
-## Comparison (quick matrix)
-| Option | Pros | Cons | Risks | Borrow from existing |
-|---|---|---|---|---|
-| O-API-0 | Stable and widely deployed | Hard to evolve contracts | Binary parsing burden | PGN definitions + monitors |
-| O-API-1 | Strong typing | Requires translators for legacy modules | Schema drift with firmware | Field log captures |
-| O-API-2 | Easy for web tooling | Verbose payloads | Latency overhead | AgDiag exports |
-| O-API-3 | Streaming-friendly | New infra to host | Requires bridging PGNs | PGN wrappers |
-| O-API-4 | Industrial ecosystem | Complex stack | Overkill for small rigs | Existing PGNs as base |
-| O-API-5 | Shared metadata, early mismatch detection | Additional serialization + documentation work | Version skew between firmware and apps | Current config serialization + registry plan |
-| O-API-6 | Keeps PGNs usable while modern APIs evolve | Translation layer to maintain | Drift between spec + implementation | PGN compatibility bridge |
+---
 
-## Evaluation criteria
-Compatibility with firmware, tooling support, latency, schema governance, ease of extension.
+## 41.2 Context
 
-## Current sentiment
-- Keep PGNs as the source of truth while defining how typed APIs can layer on top without fragmenting the ecosystem.
-- Schema hashing + registry publishing is seen as a prerequisite before exposing new APIs or plugins to the layer data.【F:docs/SRS/sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md†L50-L64】
-- Bridging PGNs to typed APIs is viewed as the safest path toward Linux/Core pilots without stranding current firmware.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】
+- AgOpenGPS and AgIO historically exchange binary PGNs over UDP/serial for steering, section control, and telemetry.
+- Linux pilots require typed APIs that expose the same semantics to remote front-ends and automation services.
+- Plugins and third-party tools need predictable versioning, schema discovery, and capability negotiation mechanisms.
+- Legacy PGN clients must remain functional throughout the migration to typed contracts.
 
-## Upcoming ADR coverage
-- **ADR-008 Equipment hierarchy** will settle the canonical geometry/tree metadata, satisfying new requirements R-GEO-000 through R-GEO-002 and feeding the control semantics defined in Section 61.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L27-L33】【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L1-L80】
-- **ADR-017 Profiles & kinematics** will extend the manifest expectations with hitch linkages, pivot tongues, and sensor fusion priorities so pose outputs align with the PoseStream architecture (ADR-007).【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L99-L105】
+---
 
-## Open questions
-- How do we synchronize schema changes with firmware releases?
-- What’s the minimum metadata (IDs, versions) that every PGN must expose going forward?
+## 41.3 Legacy Comparison
+
+| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
+|---------------|-----------------|------------------------|---------------------------|--------------------|
+| Runtime APIs | UDP/serial PGNs exchanged via AgIO utilities. | No formal schema or version discovery; binary parsing burden on clients. | Publish typed contracts with negotiated versions and compatibility bridges. | Legacy AgIO toolchain |
+| Metadata Registries | Manual spreadsheets for layer IDs, quality rules, and units. | Frequent drift between firmware, UI, and analytics tooling. | Centralize registries with schema hashes and capability negotiation. | Community registry backlog |
+| Plugin Lifecycle | Plugins register ad-hoc over config files and shared memory. | No standard handshake or audit logging, making enforcement difficult. | Define gRPC capabilities service and manifest schema enforced by Core. | Nexus plugin discussions |
+
+> **Informative:** Captures historical context and modernization drivers.
+
+---
+
+## 41.4 Definitions
+
+| Term | Definition |
+|------|-------------|
+| PGN | Parameter Group Number used by AgOpenGPS UDP/CAN protocols.
+| Capability Registry | Shared catalog enumerating services, layers, and plugins with semantic versions.
+| Compatibility Bridge | Service that translates between legacy PGNs and typed contracts without data loss.
+| Manifest | Declarative description of plugin capabilities, UI contributions, and feature flags.
+
+---
+
+> **Requirement Grammar (RFC-2119):**
+> - **MUST / MUST NOT** = mandatory; test must exist.
+> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.
+> - **MAY** = optional; document enabling conditions.
+>
+> **Clarity Checklist:** Avoid weak words: *fast, robust, user-friendly, handle, support, adequate,* etc.
+> Prefer measurable forms: *“≤ 250 ms p95,” “error rate < 0.1%,” “99.5% success over 10k trials.”*
+> Each requirement: single behavior, single actor, single condition, single metric.
+
+## 41.5 Requirements
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|-----------|---------|----------------|-----------------------------|
+| R-API-000 | MUST | Compatibility | Maintain the existing PGN catalog for steer, machine, relay, and section messaging. | C1 | Regression replay of legacy PGN payloads over bridge.
+| R-API-001 | MUST | Diagnostics | Expose UDP/PGN monitor tooling for inspectors and third-party clients. | C1 | CLI tool decodes ≥ 30 PGNs/s with checksum validation.
+| R-API-002 | SHOULD | Configuration | Continue surfacing GNSS correction settings until equivalent typed API lands. | C1 | Feature parity checklist between PGN and typed surfaces.
+| R-API-003 | SHOULD | Versioning | Provide compatibility guidance for protobuf/JSON schemas alongside PGNs. | C2 | Version matrix published and enforced in CI lint.
+| R-API-004 | SHOULD | Bridge | Publish canonical PGN reference and bridge hooks for typed APIs. | C3 | Bridge integration tests cover ≥ 95% PGN catalog.
+| R-API-005 | MAY | Discovery | Document handshake messages for capability discovery across processes. | C3 | gRPC discovery endpoint coverage in contract tests.
+| R-API-010 | MUST | Metadata | Publish versioned layer definitions, quality rules, and schema hashes. | C2 | Registry diff detection triggers on hash mismatch in CI.
+| R-API-011 | SHOULD | Integrity | Reserve ID ranges, enforce monotonic timestamps, and fail on schema mismatch. | C2 | Contract tests confirm rejection on hash mismatch.
+| R-API-012 | SHOULD | Governance | Adopt semantic versioning, deprecation periods, and compatibility tests. | C2 | Release checklist with version gating automation.
+| R-GEO-000 | MUST | Geometry | Provide canonical equipment hierarchy with stable IDs and offsets. | C2 | Schema published with integration test verifying IDs.
+| R-GEO-001 | SHOULD | Control Semantics | Document SectionGroup semantics and overrides for deterministic gating. | C2 | Behavior verified in control simulator.
+| R-GEO-002 | SHOULD | Discovery | Expose manifest metadata so plugins populate control/visualization surfaces. | C3 | Plugin manifest validation suite passes baseline cases.
+| R-API-020 | MUST | Capabilities | Provide Capabilities gRPC service for plugin registration and leasing. | C3 | Integration tests validate lease renewal and rejection flows.
+| R-API-021 | MUST | Service Catalog | Publish typed gRPC contracts for Pose, Equipment, SectionControl, LayerRegistry, TileQuery, Config, EventBus, Guidance, and Health. | C3 | Contract proto repo with lint + backward compatibility checks.
+| R-API-022 | SHOULD | Negotiation | Include feature flags and semantic versions in plugin manifests. | C3 | Manifest schema validated against compatibility rules.
+| R-API-023 | SHOULD | UI Contracts | Define declarative schema for plugin UI contributions consumed by frontend APIs. | C4 | UI schema contract tests ensure layout metadata loads.
+| R-API-024 | SHOULD | Audit | Require audit metadata on control-affecting RPCs. | C4 | Audit log integration test ensures identity + timestamp captured.
+
+### 41.5.1 Requirement Sources & Rationale
+
+| Req ID | Source (issue/discussion/standard) | Rationale (one line) |
+|--------|-------------------------------------|----------------------|
+| R-API-000 | Legacy PGN workflow; community field logs | Preserve compatibility during transition. |
+| R-API-004 | Bridge working group discussions | Typed APIs must not strand existing hardware. |
+| R-API-010 | Layer registry proposals | Shared schema prevents drift between firmware/UI. |
+| R-API-020 | Plugin lifecycle review | Enforce consistent capability negotiation. |
+| R-API-024 | Safety and audit reviews | Command traces must be attributable. |
+
+---
+
+## 41.6 Acceptance Criteria & Verification
+
+- Regression replay suite MUST validate PGN ↔ typed API parity across at least three representative field logs.
+- Contract code generation pipelines MUST block incompatible protobuf/schema changes without explicit version increments.
+- Plugin onboarding checklist MUST verify capability registration, manifest validation, and audit logging before approval.
+
+### 41.6.1 Requirement-to-Verification Map
+
+| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
+|--------|--------------------|---------------------|---------------------|
+| R-API-000 | Replay harness | `/tests/replay/pgn_bridge/` | 100% PGN diff coverage, zero checksum errors. |
+| R-API-010 | CI lint | `/tools/registry-lint/` | Schema hash drift detected within one CI cycle. |
+| R-API-021 | Contract tests | `/tests/contracts/grpc/` | Backward compatibility gate passes on PR merges. |
+| R-API-024 | Integration tests | `/tests/integration/audit_logging/` | All control RPCs emit audit trail entries. |
+
+---
+
+## 41.7 Constraints
+
+- Core API surfaces MUST be consumable from both Windows and Linux hosts.
+- PGN compatibility MUST be preserved until field telemetry, firmware, and analytics migrate together.
+- All public APIs MUST enforce authenticated channels as defined in Section 43 (Channel Security).
+
+### 41.7.1 Non-Functional Requirement Classes
+
+- **Performance:** gRPC request p95 ≤ 150 ms intra-host; PGN bridge adds ≤ 10 ms overhead.
+- **Reliability & Availability:** Bridge services restartable without dropping in-flight leases; manifests revalidated on reconnect.
+- **Security:** Mutual TLS for gRPC services; signed manifest bundles for plugins.
+- **Operability:** Structured logs with schema version and PGN identifiers; health endpoints advertise capability sets.
+- **Maintainability:** Proto definitions versioned with backward compatibility tests; registry updates documented.
+
+---
+
+## 41.8 Risks & Open Issues
+
+| ID | Description | Impact | Mitigation / Status | Owner |
+|----|-------------|--------|---------------------|-------|
+| RISK-41-1 | Schema drift between firmware and typed APIs. | High | Registry hash negotiation and CI lint. | @interop-wg |
+| RISK-41-2 | Bridge latency impacts real-time control. | Medium | Enforce ≤10 ms overhead; benchmark under load. | @interop-wg |
+| ISSUE-41-1 | Define manifest schema for UI contributions. | Medium | Draft schema in plugin repo; coordinate with UI WG. | @interop-wg |
+
+---
+
+## 41.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | PGN Compatibility Horizon | Legacy PGN transports remain authoritative until typed services cover all control paths. |
+| C2 | Versioned Layer Registries | Shared layer definitions, units, and quality rules require schema hashes and negotiated IDs. |
+| C3 | Typed API Bridge Strategy | Bridge services must translate PGNs ↔ typed gRPC without data loss or added coupling. |
+| C4 | Plugin UX & Audit Guarantees | UI contributions and control RPCs require declarative manifests plus audit hooks. |
+
+### 41.9.1 Assumptions & Preconditions
+
+- [A1] Field-deployed firmware continues emitting PGNs during the transition window.
+- [A2] Registry publishing pipeline can distribute schema hashes alongside artifacts within one release cycle.
+- [A3] Plugin manifests are distributed via signed bundles managed by Nexus release tooling.
+
+#### C1 - PGN Compatibility Horizon
+
+- Maintain binary PGN payloads for steer, section, relay, and machine telemetry during migration phases.
+- Ensure diagnostic tooling (e.g., UDP monitor) remains available for integrators relying on PGN inspection.
+- Document capability discovery messages so typed clients can negotiate available services without breaking PGN peers.
+
+#### C2 - Versioned Layer Registries
+
+- Layer definition records include schema version, IDs, names, units, normalization ranges, aggregation modes, composite rules,
+  display ranges, smoothing parameters, alarm bands, quality rules, derived layer bindings, storage precision, and cadence hints.
+- `sourceMappings` describe how hardware inputs populate logical layers, keeping analytics and visualization in sync.
+- Registry negotiation exchanges schema hashes and validity bitmaps; mismatches trigger fast-fail with remediation guidance.
+- Units registry reserves IDs (1–239 core, 240–255 third-party) with collision linting in CI.
+
+#### C3 - Typed API Bridge Strategy
+
+- Bridge services publish canonical PGN references, translation hooks, and validation flows for typed APIs.
+- Sequencing ensures monotonic timestamps and compatibility with capability leasing semantics.
+- Bridge implementation MUST sustain PGN throughput without compromising low-latency control paths.
+
+#### C4 - Plugin UX & Audit Guarantees
+
+- Plugin manifests declare UI panels, overlays, and configuration surfaces consumed by frontend APIs without embedding arbitrary UI code.
+- Feature flags and semantic version ranges gate plugin activation; mismatches trigger downgrade or rejection flows.
+- Control-affecting RPCs include operator/plugin identity and timestamps to satisfy audit requirements.
+
+---

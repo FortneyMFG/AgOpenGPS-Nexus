@@ -1,10 +1,12 @@
 # 33 — Offline-first & Sync
-*(Status: review)*
+*(Status: Proposed)*
 
+**Author:** Codex
+**Created:** 2025-10-20
 **Section ID:** 33
-**Version:** 0.2.0
+**Version:** 0.1.0
 **Editors:** @nexus-docs-team
-**Last Updated:** 2025-02-14
+**Last Updated:** 2025-10-20
 **Related Sections:** [31 — Domain Data Model](31_Domain_Data_Model.md), [32 — Persistence & Formats](32_Persistence_Formats.md), [34 — Backup, Retention & Archival](34_Backup_Retention_Archival.md)
 **Upstream Dependencies:** [ADR-019](../../ADR/ADR-019-provenance-audit-qa.md), [ADR-024](../../ADR/ADR-024-discovery-identity.md), [ADR-028](../../ADR/ADR-028-stack-boundaries.md)
 **Downstream Impacts:** Release packaging workflows, Core/AgIO update channels, backup exporters, retention planners
@@ -20,7 +22,7 @@ This section defines how Nexus distributes software, applies updates, and synchr
 ## 33.2 Context
 
 - Legacy AgOpenGPS deployments rely on manual zip downloads and `dotnet publish` outputs for offline installation.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L6-L33】
-- Upcoming Linux Core packaging (Debian, Docker, AppImage) requires offline-safe distribution and rollback instructions.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L6-L23】
+- Upcoming Linux Core packaging (Debian, Docker, AppImage) requires offline-safe distribution and rollback instructions.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L23】
 - Release governance (ADR-019, ADR-024, ADR-028) imposes provenance, identity, and stack boundary checks that must hold during offline updates.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L36-L120】
 
 Constraints:
@@ -79,7 +81,7 @@ Constraints:
 | R-UPD-001 | MUST | Build Output | Keep `dotnet publish` outputs for manual deployment workflows.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L6-L24】 |
 | R-UPD-002 | SHOULD | Rollback | Provide rollback guidance enabling rigs to revert builds without re-imaging.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L34-L64】 |
 | R-UPD-003 | SHOULD | Staged Deployment | Allow staged updates (AgOpenGPS vs. AgIO vs. controllers) with compatibility protection.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L34-L94】 |
-| R-UPD-004 | SHOULD | Packaging | Provide Debian packages, Docker images, AppImage builds with rollback instructions while preserving zip releases.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L6-L23】 |
+| R-UPD-004 | SHOULD | Packaging | Provide Debian packages, Docker images, AppImage builds with rollback instructions while preserving zip releases.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L23】 |
 | R-UPD-005 | COULD | Delta Delivery | Add delta packages or background downloaders mindful of limited connectivity.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L64-L94】 |
 | R-UPD-006 | SHOULD | Validation | Capture validation/rollback checklists (hash verification, compatibility checks, firmware coordination).【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L34-L120】 |
 

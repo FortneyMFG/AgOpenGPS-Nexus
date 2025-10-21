@@ -26,6 +26,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-155 Composite simulation fabric GA _(Done)_
 - [x] NX-156 AOG-Link transport rollout _(Done)_
 - [x] NX-157 Plugin API lease & manifest enforcement _(Done)_
+- [x] NX-1317 Platform foundations doc accessibility sweep _(Done)_ — Refresh 1X sections to guide non-technical readers
 - [ ] NX-1014 Contract baseline generator tooling resilience — Ensure baseline generator works without direct project references
 
 - [x] NX-610 Governance telemetry automation _(Done)_ — ADR roadmap program board, dependency digests, and review minutes publishing
@@ -533,9 +534,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-453 | Automation integration for axle-centric limits | Done | Core Owner | — | [ADR-067](docs/SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md) | Wire planners/controllers to curvature/slip limits |
 | NX-454 | Calibration workflows & fixtures | Done | Core Owner | — | [ADR-067](docs/SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md) | Deliver Ackermann wizard, hitch zeroing, slip sanity tests |
 | NX-455 | Documentation & preset libraries for axle-centric rigs | Done | Core Owner | — | [ADR-067](docs/SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md) | Publish operator guides + preset bundles |
-| NX-462 | Linux Core service packaging & systemd units | Done | Core Owner | — | [O-BACKEND-6](docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | Create deb/rpm installers, systemd units, and upgrade path |
+| NX-462 | Linux Core service packaging & systemd units | Done | Core Owner | — | [O-BACKEND-6](docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | Create deb/rpm installers, systemd units, and upgrade path |
 | NX-463 | Linux Core operations & observability playbook | Done | Core Owner | — | [ADR-068](docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md), [SRS §10](docs/SRS/sections/10_Telemetry_Health.md) | Document logging, metrics, alerting, and recovery drills |
-| NX-464 | Headless Core + AGiO integration validation | Done | Core Owner | — | [ADR-068](docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md), [O-BACKEND-6](docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | End-to-end smoke with AGiO backends on Linux headless |
+| NX-464 | Headless Core + AGiO integration validation | Done | Core Owner | — | [ADR-068](docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md), [O-BACKEND-6](docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | End-to-end smoke with AGiO backends on Linux headless |
 
 ### Section C — AGiO & Backends
 

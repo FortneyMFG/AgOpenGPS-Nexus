@@ -1,89 +1,83 @@
-# ADR-047 — Live Telemetry Mesh
+# 42-ADR-047 — Live Telemetry Mesh
+*(Status: Proposed)*
 
-- **Status:** Drafting
-- **Date:** 2025-03-19
-- **Author(s):** Nexus architecture guild
-- **NX Task:** NX-190 Comprehensive ADR portfolio review
+**Author:** Codex
+**Reviewers:** Nexus Architecture Guild
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Supersedes:** _None_
+**Superseded by:** _None_
+**Related SRS:** [42 — Transports](42_Transports.md)
+**Related Considerations:** [C5 - Timebase & Telemetry Mesh Governance](42_Transports.md#c5---timebase--telemetry-mesh-governance), [C6 - Gauge Telemetry Channels](42_Transports.md#c6---gauge-telemetry-channels)
 
-## Context
+---
 
-Multi-machine collaboration requires low-latency sharing of presence, coverage, and layer updates across tractors, sprayers, and
-scouts working the same job. Existing approaches rely on ad-hoc TCP servers or manual file syncing, which fail in rural network
-conditions and lack access control. Nexus needs a mesh-friendly transport that integrates with plugin context, respects privacy,
-and feeds UI overlays in real time.
+## 1) Context
 
-## Decision
+Multi-machine collaboration requires low-latency sharing of presence, coverage, and layer updates across tractors, sprayers,
+and scouts working the same job. Existing approaches rely on ad-hoc TCP servers or manual file syncing, which fail in rural
+network conditions and lack access control. Nexus needs a mesh-friendly transport that integrates with plugin context,
+respects privacy, and feeds UI overlays in real time.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L180-L229】
 
-Create a Live Telemetry Mesh plugin composed of two parts: a pub/sub overlay (`LiveMeshService`) using topics
-`aog/live/{season}/{job}/{layer}` and a RadioBridge module for ELRS/LoRa transport. Devices publish presence heartbeats, trails,
-coverage tiles, and select layer deltas over the mesh. Subscription profiles define which data tiers a device consumes.
+```mermaid
+flowchart LR
+  A[Ad-hoc file sync] --> B[Mesh requirements]
+  B --> C[Live telemetry mesh design]
+  C --> D[Collaborative operations]
+```
 
-### Entities & Topics
+---
 
-- **Device** — Immutable ID, human-readable label, hardware capabilities, and permissions.
-- **Presence** — Online/offline state, pose, and session metadata broadcast at 2 Hz on `.../presence` topics.
-- **ShareProfile** — Declares which data tiers (Presence, Trails, Coverage, Layers) the device publishes per job.
-- **SubscribeProfile** — Filters inbound tiers and layers; stored per-device with ACL checks.
-- Topics follow `aog/live/{seasonId}/{jobId}/{layerNamespace}`; layer namespace may be `coverage`, `trail`, `zone`, or plugin
-  specific (e.g., `cropType.actual`).
+## 2) Decision
 
-### QoS & Reliability
+Create a Live Telemetry Mesh plugin composed of a pub/sub overlay (`LiveMeshService`) and RadioBridge modules supporting ELRS/LoRa
+transports. Devices publish presence heartbeats, trails, coverage tiles, and selected layer deltas; subscription profiles define
+which tiers each device consumes.
 
-- Presence tier uses UDP-like broadcast with expiry timers (stale after 5 seconds).
-- Coverage and layer deltas support QoS 1 semantics with replay window; acknowledgements handled by RadioBridge when operating
-  over constrained links.
-- Privacy enforced through ACLs tied to Share/Subscribe profiles; encrypted payloads on radio links when keys provisioned.
+### Decision Summary
 
-### Integration Points
+* **Scope:** Presence, trails, coverage, and layer delta sharing across machines participating in a job.
+* **Boundary:** Core transports, timebase synchronization, and security policies remain defined in related ADRs.
+* **Implementation Level:** Design + code; mesh service, profile schemas, RadioBridge integration, and UI overlays.
 
-- Plugins (Yield, Profit, Field Health) may opt into layer replication by registering with the mesh service.
-- UI renders remote machines with icons, stale indicators, and trail polylines. Operators can subscribe/unsubscribe layers per
-device.
-- The mesh service records incoming deltas via `LayerEditEvent` journals for audit and offline replay.
+---
 
-## Consequences
+## 3) Consequences
 
-- Enables collaborative operations with deterministic context sharing.
-- Introduces complexity in QoS management and access control; requires tooling to manage profiles and keys.
-- Necessitates careful bandwidth budgeting for low-rate radios.
+**Positive Impacts:**
 
-## Governance Updates
+* Enables collaborative operations with deterministic context sharing across machines.
+* Integrates with plugin manifests, allowing opt-in replication of layer data.
+* Provides operators with real-time visibility into remote devices via UI overlays.
 
-- **Profile registry.** Share and subscribe profiles are versioned artifacts in the manifest bundle; CI blocks deployments that
-  omit ACL policies or exceed the per-tier payload budgets defined for radio transports.【F:schemas/ShareProfile.v1.json†L1-L120】【F:schemas/SubscribeProfile.v1.json†L1-L120】
-- **Presence accountability.** Presence heartbeats now include session IDs, mounted field sets, and profile hashes so the audit
-  trail links mesh events to the authoritative job state emitted by JobsService.【F:schemas/Session.v1.json†L1-L120】【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L13-L96】
-- **Key rotation playbook.** RadioBridge integrations must document rolling key rotations and publish test vectors covering
-  encryption handshake success/failure paths before an operator bundle can ship.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md†L17-L60】
+**Negative / Mitigated Impacts:**
 
-## Amendment — 2025 architecture refresh (NX-190)
+* QoS management and access control add complexity — mitigated by profile schemas and CI validation.
+* Bandwidth constraints on radios require throttling and store-and-forward strategies — addressed by profile budgets and replay windows.
+* Key rotation and ACL enforcement demand operational tooling — satisfied by documented rotation playbooks and telemetry audits.
 
-- Mesh broadcasts include deterministic seeds and layer edit provenance so Zone Drawing undo stacks reconcile edits regardless
-  of mesh topology or transport retries.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L9-L74】
-- Crop, Genetics, Yield, and Profit plugins register analytics windows keyed off mesh presence events to align streaming
-  overlays with the same session boundaries used in replay and report builder exports.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L9-L96】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L9-L70】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L9-L70】
-- Multi-field envelopes propagate into mesh topic routing so devices receive only the layers relevant to their mounted fields,
-  reducing bandwidth and simplifying analytics splits in collaborative jobs.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】
+**Follow-up Actions:**
 
-## Alternatives Considered
+* Version share and subscribe profile schemas in manifest bundles; block deployments lacking ACL policies or exceeding payload budgets.
+* Include session IDs, mounted field sets, and profile hashes in presence heartbeats for auditability.
+* Document key rotation and replay strategies for RadioBridge integrations with test vectors covering success/failure paths.
 
-1. **Centralized MQTT broker.** Rejected due to dependency on backhaul connectivity and single-point failure for offline farms.
-2. **File sync via cloud storage.** Too slow and lacks live presence information.
+---
 
-## Dependencies
+## 4) Rationale
 
-- Relies on ADR-040/041/043 context broadcasts to scope topics.
-- RadioBridge details defined in ADR-048.
-- Mesh data consumed by plugins from ADR-045–ADR-053.
+A structured mesh overlay with share/subscribe profiles ensures only authorized data leaves the cab, while RadioBridge integrations
+provide resilience on constrained links. Storing deltas as `LayerEditEvent` journals preserves replayability and provenance.
 
-## SRS Impact
+---
 
-- Updates §03 Communications & Transports with mesh QoS, topics, and ACL rules.
-- Extends §10 Telemetry with presence/trail expectations and stale indicators.
-- Adds plugin documentation requirements for share/subscribe UI in §05 Frontends.
+## 5) Alternatives Considered
 
-## References
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| Manual file sync | Copy coverage/layer files between machines. | High latency, prone to conflicts, no real-time collaboration. |
+| Central cloud broker | Route all telemetry through an external service. | Dependent on connectivity; unacceptable for offline fields. |
+| Peer-to-peer TCP mesh | Build custom TCP overlay per device. | Poor performance on lossy links; lacks QoS governance. |
 
-- [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-- [Section 91 — UI Shell & Layout](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
-- [Section 64 — Telemetry & Health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)

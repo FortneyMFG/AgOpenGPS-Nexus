@@ -9,7 +9,7 @@
 **Supersedes:** —
 **Superseded by:** —
 **Related SRS:** `21_System_Decomposition_Boundaries.md`
-**Related Options:** `21-O5 - Layer controllers with aggregation pipelines.md`
+**Related Considerations:** §21.9 (C1), §23.9 (C2)
 
 ---
 
@@ -51,7 +51,7 @@ Controllers:
 
 **Positive Impacts:**
 
-* Enables deterministic replay comparisons for coverage math and rate control.【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L9-L58】
+* Enables deterministic replay comparisons for coverage math and rate control.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L120】
 * Provides richer telemetry (quality metrics, rateNA flags) to monitoring dashboards (§64).
 * Simplifies plugin extensibility by centralizing aggregation logic.
 
@@ -130,7 +130,7 @@ graph TD
 ## 10) References
 
 * **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.12; `23_Threading_Scheduling_Timing.md` — §23.5; `24_Configuration_Environment.md` — §24.5.
-* **Option Documents:** `21-O5 - Layer controllers with aggregation pipelines.md`
+* **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.9; `23_Threading_Scheduling_Timing.md` — §23.5, §23.9.
 * **Prior ADRs:** `21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md`
 * **External References:** Layer controller prototype replay reports (2025-05-10).
 
@@ -146,4 +146,4 @@ graph TD
 ---
 
 > **Lifecycle:** Proposed → Accepted → Superseded → Deprecated → Rejected
-> **Traceability:** Links to SRS Decision Matrix § 21.12 and option 21-O5.
+> **Traceability:** Links to SRS Decision Matrix §21.12 and design consideration §21.9 (C1).

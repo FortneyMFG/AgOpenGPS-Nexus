@@ -1,10 +1,13 @@
 # 21 — System Decomposition & Boundaries
-*(Status: aligned with ADR-068 layer runtime)*
+*(Status: Proposed)*
 
+**Author:** Codex
+**Created:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
 **Section ID:** 21
-**Version:** 0.2.0
 **Editors:** @nexus-specs, @layer-wg
-**Last Updated:** 2025-02-14
+**Last Updated:** 2025-10-20
 **Related Sections:** 22, 23, 24
 **Upstream Dependencies:** 11, 41, 42
 **Downstream Impacts:** 51, 61, 81, 91, 96
@@ -14,7 +17,7 @@
 ## 21.1 Purpose & Scope
 
 Define the major runtime seams of Nexus so guidance, mapping, telemetry, and automation services evolve without breaking determinism or legacy rigs.
-This section establishes the components owned by the Core service, UI shells, and plugin surfaces, and it traces how proposed refactors (layer controllers, Linux Core, PGN bridge) satisfy the roadmap.【F:SourceCode/AgOpenGPS.Core/ApplicationCore.cs†L10-L45】【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L1-L58】
+This section establishes the components owned by the Core service, UI shells, and plugin surfaces, and it traces how proposed refactors (layer controllers, Linux Core, PGN bridge) satisfy the roadmap.【F:SourceCode/AgOpenGPS.Core/ApplicationCore.cs†L10-L45】【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L14-L124】
 
 ---
 
@@ -22,7 +25,7 @@ This section establishes the components owned by the Core service, UI shells, an
 
 - Retains the proven in-process orchestration so Windows deployments continue to function during modernization.【F:SourceCode/AgOpenGPS.Core/ApplicationCore.cs†L10-L45】
 - Must expose seams that let deterministic replay, telemetry capture, and headless automation reuse the same business logic.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L46】
-- Linux Core pilots rely on the same contracts and PGN compatibility layer to avoid fragmenting plugins and operator workflows.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L1-L62】
+- Linux Core pilots rely on the same contracts and PGN compatibility layer to avoid fragmenting plugins and operator workflows.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】
 - Out of scope: UI look-and-feel, field data schemas, and agronomic analytics algorithms (covered in 8X, 9X, and 6X sections).
 
 ---
@@ -31,9 +34,9 @@ This section establishes the components owned by the Core service, UI shells, an
 
 | Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
 |--------------|-----------------|-----------------------|---------------------------|--------------------|
-| Architecture | Monolithic `ApplicationCore` wires presenters, streamers, and AgIO within a single process.【F:SourceCode/AgOpenGPS.Core/ApplicationCore.cs†L10-L45】 | Tight coupling to WinForms lifecycle and manual threading control. | Introduce Core service seams with deterministic controllers and replayable buses.【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L29-L58】 |
-| Performance | Field streamers manage overlap math directly against raw GNSS samples.【F:SourceCode/AgOpenGPS.Core/Streamers/Field/FieldStreamer.cs†L7-L107】 | Hard to benchmark or isolate regressions; no shared telemetry budgets. | Adopt layer controllers and SimBus metrics to monitor CPU (<20%) and restart (<30 s) targets.【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L47-L58】 |
-| UX / Config | Configurations live near UI hosts with ad-hoc overrides and manual PGN wiring. | Risky for remote deployments; no unified health signals. | Push compatibility shims and configuration policy into the Core daemon with telemetry surfacing.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L16-L64】 |
+| Architecture | Monolithic `ApplicationCore` wires presenters, streamers, and AgIO within a single process.【F:SourceCode/AgOpenGPS.Core/ApplicationCore.cs†L10-L45】 | Tight coupling to WinForms lifecycle and manual threading control. | Introduce Core service seams with deterministic controllers and replayable buses.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 |
+| Performance | Field streamers manage overlap math directly against raw GNSS samples.【F:SourceCode/AgOpenGPS.Core/Streamers/Field/FieldStreamer.cs†L7-L107】 | Hard to benchmark or isolate regressions; no shared telemetry budgets. | Adopt layer controllers and SimBus metrics to monitor CPU (<20%) and restart (<30 s) targets.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 |
+| UX / Config | Configurations live near UI hosts with ad-hoc overrides and manual PGN wiring. | Risky for remote deployments; no unified health signals. | Push compatibility shims and configuration policy into the Core daemon with telemetry surfacing.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
 
 ---
 
@@ -56,8 +59,8 @@ This section establishes the components owned by the Core service, UI shells, an
 | R-BE-001 | MUST | Field Data | Preserve streamer stack for boundaries, tram lines, worked area, and stored paths. | Legacy AgOpenGPS backlog | Replay scenarios confirm identical geometry outputs.【F:SourceCode/AgOpenGPS.Core/Streamers/Field/FieldStreamer.cs†L7-L107】 |
 | R-BE-002 | SHOULD | Rendering | Keep map tile/OpenGL helpers shareable between WinForms and WPF/Avalonia. | Desktop roadmap | UI smoke tests across hosts.【F:SourceCode/GPS/AgOpenGPS.csproj†L39-L48】 |
 | R-BE-003 | SHOULD | Automation | Provide automation APIs without breaking current logic loops. | Automation WG | API contract review; integration harness. |
-| R-BE-004 | MUST | Service Health | Extract logic into headless service with packaging, API boundaries, and health endpoints. | Linux Core plan | Container smoke tests + health probes.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L1-L64】 |
-| R-BE-010 | MUST | Variable Rate | Introduce layer controllers with normalized inputs and aggregation metrics. | Layer controller proposal | Deterministic replay within ±1% coverage error.【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L1-L58】 |
+| R-BE-004 | MUST | Service Health | Extract logic into headless service with packaging, API boundaries, and health endpoints. | Linux Core plan | Container smoke tests + health probes.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
+| R-BE-010 | MUST | Variable Rate | Introduce layer controllers with normalized inputs and aggregation metrics. | Layer controller proposal | Deterministic replay within ±1% coverage error.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 |
 | R-BE-011 | SHOULD | Observability | Separate IO, aggregation, rendering via immutable snapshots. | Replay WG | Replay CI shows no frame drops. |
 | R-BE-012 | COULD | Compatibility | Ship PGN/SocketCAN shims managed by Core service. | PGN bridge study | Linux + Windows PGN regression harness. |
 | R-BE-013 | SHOULD | Health Metrics | Define Core CPU (<20%), RAM (<500 MB), restart (<30 s) budgets prior to dependent ADRs. | Operations WG | Continuous telemetry alarms. |
@@ -95,7 +98,32 @@ Automation APIs, PGN shims, and UI bindings require targeted integration tests p
 
 - Core service MUST target .NET 8 and remain portable across Windows and Debian-based Linux distributions.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
 - Deterministic SimClock/SimBus MUST govern plugin interactions to avoid diverging timing implementations.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L46】
-- PGN compatibility MUST be preserved until all dependent hardware fleets migrate to modern APIs.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6 - PGN compatibility bridge layered over new APIs.md†L1-L35】
+- PGN compatibility MUST be preserved until all dependent hardware fleets migrate to modern APIs.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L158-L205】
+
+---
+
+## 21.8 Risks & Open Issues
+
+| ID | Description | Impact | Mitigation / Status | Owner |
+|----|-------------|--------|---------------------|-------|
+| RISK-21-1 | Layer controller telemetry may diverge from legacy streamer math during rollout. | High | Replay harness and deterministic budgets defined in ADR-068 gate releases.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 | @layer-wg |
+| ISSUE-21-1 | Linux Core packaging needs sustained ownership for deb/rpm/systemd tooling. | Medium | Track packaging checklist from ADR-028 and hand off to ops playbook. | @deployment-wg |
+
+---
+
+## 21.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Deterministic layer aggregation | Layer controllers emit immutable snapshots and bounded diagnostics so guidance, replay, and analytics remain synchronized.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L14-L124】 |
+| C2 | Headless Core with remote frontends | A Linux-first Core service exposes gRPC/WebSocket APIs, PGN compatibility, and packaging required for remote clients and fleet operations.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
+| C3 | Shared contracts & compatibility | Core and AgIO must publish shared contracts so Windows and Linux frontends remain interoperable during modernization.【F:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md†L1-L118】 |
+
+### 21.9.1 Assumptions & Preconditions
+
+- [A1] Replay harnesses for controller math remain updated alongside telemetry thresholds.
+- [A2] Remote clients authenticate through the configuration policies defined in §24.
+- [A3] Operators can provision network time sync (PTP/NTP) for multi-process deployments.
 
 ---
 
@@ -106,13 +134,7 @@ Automation APIs, PGN shims, and UI bindings require targeted integration tests p
 | Option | Summary |
 |--------|---------|
 | 21-O0 | Status quo: in-process C# services anchored in `AgOpenGPS.Core`. |
-| 21-O1 | Modular worker services exposing gRPC/Web APIs. |
-| 21-O2 | Containerized microservices communicating via message bus. |
-| 21-O3 | Hybrid compute: local real-time services with cloud analytics. |
-| 21-O4 | Scriptable engine (Lua/Python) for business rules. |
-| 21-O5 | Layer controllers with aggregation pipelines (metadata-driven ingestion + immutable snapshots).【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L1-L58】 |
-| 21-O6 | Linux Core headless service with remote frontends (API bridge + packaging).【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L1-L62】 |
-| 21-O7 | AgIO gRPC host with shared NuGet contracts across Windows/Linux.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】 |
+| 21-O7 | AgIO gRPC host with shared NuGet contracts across Windows/Linux, aligning with Core/AgIO responsibility split.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
 
 ### 21.12.2 Scoring Criteria
 
@@ -120,28 +142,29 @@ Determinism, offline resilience, ease of customization, testability, deployment 
 
 ### 21.12.3 Scoring Evidence
 
-| Criterion | 21-O5 Justification | 21-O6 Justification | 21-O7 Justification |
-|-----------|---------------------|---------------------|---------------------|
-| Determinism | Immutable snapshots maintain replay fidelity in CI.【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L20-L58】 | API bridge keeps authoritative Core timeline when frontends reconnect.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L13-L62】 | Shared contracts ensure identical logic across OS builds.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】 |
-| Operability | Layer health metrics expose CPU/RAM budgets. | systemd packaging + health endpoints provide observability. | NuGet-hosted contracts ease CI/backwards compatibility. |
-| Maintainability | DI-registered controllers isolate telemetry math. | Centralized Core simplifies plugin compatibility shims. | Unified ABI reduces duplication for UI/Plugins. |
+| Criterion | 21-O0 Justification | 21-O7 Justification |
+|-----------|---------------------|---------------------|
+| Determinism | Proven baseline but tightly coupled to UI thread lifecycle. | Shared contracts with Core services keep deterministic APIs consistent across hosts.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】 |
+| Operability | Minimal operational tooling beyond Windows installers. | systemd/CLI packaging surfaces health endpoints and restart policies for fleet ops.【F:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md†L48-L112】 |
+| Maintainability | UI/Core coupling increases regression risk when adding services. | Contract-first boundary separates Core evolutions from frontend cadence.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
+| Extensibility | Remote clients depend on ad-hoc bridges. | gRPC/WebSocket endpoints enable remote and automation clients without duplicating logic.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L70-L126】 |
 
 ### 21.12.4 Weighted Scoring Table
 
-| Criterion | Weight | 21-O5 | 21-O6 | 21-O7 |
-|-----------|--------|-------|-------|-------|
-| Determinism | 0.30 | 4.5 | 4.0 | 4.0 |
-| Operability | 0.20 | 3.5 | 4.5 | 3.5 |
-| Maintainability | 0.20 | 4.0 | 3.5 | 4.5 |
-| Deployment Footprint | 0.15 | 3.0 | 3.5 | 4.0 |
-| Extensibility | 0.15 | 4.0 | 3.5 | 4.5 |
-| **Weighted Total** | **1.0** | **3.85** | **3.95** | **4.15** |
+| Criterion | Weight | 21-O0 | 21-O7 |
+|-----------|--------|-------|-------|
+| Determinism | 0.30 | 3.5 | 4.2 |
+| Operability | 0.20 | 2.5 | 4.3 |
+| Maintainability | 0.20 | 2.8 | 4.4 |
+| Deployment Footprint | 0.15 | 2.5 | 3.8 |
+| Extensibility | 0.15 | 2.0 | 4.5 |
+| **Weighted Total** | **1.0** | **2.79** | **4.25** |
 
 ### 21.12.5 Decision Summary
 
 **Selected Option:** 21-O7 — AgIO gRPC host with shared NuGet contracts.
 **Rationale:** Highest weighted total; preserves determinism while enabling cross-OS deployments and plugin parity.
-**Formal Record:** [21-ADR-068 - Layer Controllers & Aggregation Runtime.md](21-ADR-068 - Layer Controllers & Aggregation Runtime.md)
+**Formal Record:** [21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md](21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md)
 
 ---
 
@@ -162,8 +185,8 @@ Acceptance criteria require automated replay regression suites and manual CM5 fi
 
 ## 21.15 Community Sentiment
 
-- Contributors favor incremental Core seam extraction while keeping in-process mode for legacy rigs.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L1-L62】
-- Layer-controller refactor is prioritized alongside replay coverage before expanding microservice ambitions.【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L47-L58】
+- Contributors favor incremental Core seam extraction while keeping in-process mode for legacy rigs.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】
+- Layer-controller refactor is prioritized alongside replay coverage before expanding microservice ambitions.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】
 - Working group supports gRPC-based AgIO host for shared contracts across OS platforms.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
 
 ### 21.15.1 Section Change Log
@@ -177,12 +200,12 @@ Acceptance criteria require automated replay regression suites and manual CM5 fi
 
 ## 21.16 Traceability
 
-| Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
-|----------------|-------------------|--------|-----------------------|--------------------------|
+| Requirement ID | Related Option(s) / Considerations | ADR(s) | Verification Artifact | Implementation Reference |
+|----------------|------------------------------------|--------|-----------------------|--------------------------|
 | R-BE-000 | 21-O0, 21-O7 | — | `tests/replay/legacy_winforms.md` | `SourceCode/AgOpenGPS.Core/ApplicationCore.cs` |
-| R-BE-004 | 21-O6, 21-O7 | 21-ADR-028 | `pipelines/linux-core-smoke.yml` | `docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md` |
-| R-BE-010 | 21-O5, 21-O7 | 21-ADR-068 | `tests/replay/layer_controller_scenarios.json` | `docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md` |
-| R-BE-020 | 21-O5, 21-O7 | 21-ADR-004 | `bench/simbus_timing.md` | `docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md` |
+| R-BE-004 | C2, 21-O7 | 21-ADR-028 | `pipelines/linux-core-smoke.yml` | `docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md` |
+| R-BE-010 | C1, 21-O7 | 21-ADR-068 | `tests/replay/layer_controller_scenarios.json` | `docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md` |
+| R-BE-020 | C1 | 21-ADR-004 | `bench/simbus_timing.md` | `docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md` |
 
 ---
 

@@ -1,10 +1,12 @@
 # 32 — Persistence & Formats
-*(Status: review)*
+*(Status: Proposed)*
 
+**Author:** Codex
+**Created:** 2025-10-20
 **Section ID:** 32
-**Version:** 0.2.0
+**Version:** 0.1.0
 **Editors:** @nexus-docs-team
-**Last Updated:** 2025-02-14
+**Last Updated:** 2025-10-20
 **Related Sections:** [31 — Domain Data Model](31_Domain_Data_Model.md), [33 — Offline-first & Sync](33_Offline_First_Sync.md), [34 — Backup, Retention & Archival](34_Backup_Retention_Archival.md)
 **Upstream Dependencies:** [ADR-009](32-ADR-009 - PoseStream vector logs and layer TileStore persistence.md), [ADR-012](32-ADR-012 - Multi-session and multi-PoseStream fusion.md), [ADR-014](32-ADR-014 - Interop for prescription and agronomic formats.md), [ADR-022](32-ADR-022 - CRS units and precision policy.md)
 **Downstream Impacts:** TileStore implementation, export/import tooling, analytics pipelines, retention services, plugin schema registries
@@ -21,7 +23,7 @@ This section defines how Nexus stores, validates, synchronises, and exchanges ag
 
 - Core currently ships SQLite databases, binary section coverage, and JSON metadata used by the legacy AgOpenGPS applications.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L7-L64】
 - ADR-009…ADR-014 introduce TileStore, PoseStream replay, and interop bridges that expand beyond legacy formats while ensuring deterministic migrations.【F:docs/SRS/sections/3X_Data_Storage/32-ADR-009 - PoseStream vector logs and layer TileStore persistence.md†L9-L73】【F:docs/SRS/sections/3X_Data_Storage/32-ADR-014 - Interop for prescription and agronomic formats.md†L10-L45】
-- Plugins rely on registry hashes, schema references, and provenance metadata to produce analytics layers that align with Core-managed storage constraints.【F:docs/SRS/sections/3X_Data_Storage/32-O5 - Metadata-driven variable-rate layers.md†L1-L78】
+- Plugins rely on registry hashes, schema references, and provenance metadata to produce analytics layers that align with Core-managed storage constraints.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L224-L229】
 
 Assumptions:
 - Offline rigs must operate with local files first, then sync via USB, mesh, or intermittent internet connectivity.
@@ -46,7 +48,7 @@ Assumptions:
 | TileStore | Chunked, compressed storage for quantitative layer tiles with provenance metadata.【F:docs/SRS/sections/3X_Data_Storage/32-ADR-009 - PoseStream vector logs and layer TileStore persistence.md†L35-L63】 |
 | PoseStream | Ordered vector log capturing pose and SectionState records for deterministic replay.【F:docs/SRS/sections/3X_Data_Storage/32-ADR-009 - PoseStream vector logs and layer TileStore persistence.md†L9-L45】 |
 | Schema Hash | Deterministic fingerprint attached to stored/exported artifacts to detect version skew.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L25-L156】 |
-| Layer Catalogue | Registry describing available layer kinds, units, codecs, and schema references.【F:docs/SRS/sections/3X_Data_Storage/32-O5 - Metadata-driven variable-rate layers.md†L1-L78】 |
+| Layer Catalogue | Registry describing available layer kinds, units, codecs, and schema references.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L224-L228】 |
 | Spatial Constraint Store | Vector repository for boundaries, headlands, and keep-out zones shared by Core and plugins.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md†L13-L53】 |
 | Job Package | Structured filesystem layout (`/Jobs/<Job>/`) with metadata, resume info, and data subtrees.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L19-L86】 |
 
@@ -68,7 +70,7 @@ Assumptions:
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|-----------|---------|-----------------|-----------------------------|
 | R-32000 | MUST | Compatibility | Preserve legacy field streamer serialization for backwards compatibility while documenting migrations. | R-DATA-000, R-DATA-001 | Regression suite covering import/export parity for legacy rigs.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L7-L25】 |
-| R-32001 | MUST | Schema Governance | Publish and enforce JSON schema + registry hashes for all persisted entities and layers. | R-DATA-010…R-DATA-018 | Schema CI verifying hashes + registry catalogue integrity.【F:docs/SRS/sections/3X_Data_Storage/32-O5 - Metadata-driven variable-rate layers.md†L1-L78】 |
+| R-32001 | MUST | Schema Governance | Publish and enforce JSON schema + registry hashes for all persisted entities and layers. | R-DATA-010…R-DATA-018 | Schema CI verifying hashes + registry catalogue integrity.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L226-L229】 |
 | R-32002 | MUST | Provenance | PoseStream logs and TileStore tiles must embed monotonic ordering, provenance hashes, and compression metadata for deterministic replay. | R-DATA-015, R-DATA-016, R-DATA-025 | Replay harness ensures byte-for-byte deterministic outputs across 10k frames.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L26-L78】 |
 | R-32003 | SHOULD | Interoperability | Import/export pipelines for ISOXML, shapefile/GeoPackage, GeoTIFF/COG must retain metadata with ≤2 cm spatial error. | R-DATA-003, R-DATA-014 | Fixture-driven geospatial diff tests; CRS precision audit. 【F:docs/SRS/sections/3X_Data_Storage/32-ADR-014 - Interop for prescription and agronomic formats.md†L10-L45】 |
 | R-32004 | MUST | Lifecycle & Retention | Document and enforce retention windows, compaction triggers, and archival workflows for jobs, telemetry, and layers. | R-DATA-013, R-DATA-023 | Retention planner integration tests; audit log review. 【F:docs/SRS/sections/3X_Data_Storage/34-ADR-025 - Data lifecycle and retention policy.md†L10-L58】 |
@@ -86,9 +88,9 @@ Assumptions:
 | R-DATA-002 | SHOULD | Architecture | Keep AgOpenGPS.Core + AgLibrary responsible for geometry and streaming logic.【F:SourceCode/AgOpenGPS.Core/AgOpenGPS.Core.csproj†L7-L15】 |
 | R-DATA-003 | SHOULD | Interop | Define export/import formats (ISOXML, shapefile, GeoJSON) with clear versioning.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L21-L78】 |
 | R-DATA-004 | COULD | Performance | Add compression and delta sync for large telemetry sets without breaking existing readers.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L79-L120】 |
-| R-DATA-010 | MUST | Layers | Preserve binary section coverage while storing additional layer geometry, accumulators, quality metadata per section/row.【F:docs/SRS/sections/3X_Data_Storage/32-O5 - Metadata-driven variable-rate layers.md†L1-L29】 |
-| R-DATA-011 | MUST | Layers | Ship layer catalogue, units registry, configuration schema extendable without code changes while keeping exports consistent.【F:docs/SRS/sections/3X_Data_Storage/32-O5 - Metadata-driven variable-rate layers.md†L30-L58】 |
-| R-DATA-012 | SHOULD | Layers | Bundle chunked, compressed map tiles with quantization metadata and schema hashes for deterministic analytics.【F:docs/SRS/sections/3X_Data_Storage/32-O5 - Metadata-driven variable-rate layers.md†L59-L78】 |
+| R-DATA-010 | MUST | Layers | Preserve binary section coverage while storing additional layer geometry, accumulators, quality metadata per section/row.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L226-L229】 |
+| R-DATA-011 | MUST | Layers | Ship layer catalogue, units registry, configuration schema extendable without code changes while keeping exports consistent.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L227-L229】 |
+| R-DATA-012 | SHOULD | Layers | Bundle chunked, compressed map tiles with quantization metadata and schema hashes for deterministic analytics.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L228-L229】 |
 | R-DATA-013 | SHOULD | Retention | Define minimum retention/archival windows for agronomic history with offline accessibility.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L79-L156】 |
 | R-DATA-014 | SHOULD | Interop | Clarify schema hash flow through export/import tooling to detect mismatches.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L80-L156】 |
 | R-DATA-015 | MUST | Replay | Record PoseStream and SectionState vector logs with monotonic ordering, compression hints, replay indexes.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L26-L78】 |
@@ -204,6 +206,7 @@ Assumptions:
 | C5 | Retention Planning | Storage and archival strategies must balance on-device limits with regulatory retention windows. |
 | C6 | Observability | Operators and support teams need visibility into sync, compaction, and export health. |
 | C7 | Migration Safety | Legacy compatibility is maintained through documented packages and regression suites. |
+| C8 | Metadata-driven Layer Catalog | Layer definitions, units, quantization metadata, and chunked tiles are governed via configuration with hashed compatibility guards. |
 
 ### 32.9.1 Assumptions & Preconditions
 
@@ -217,5 +220,12 @@ Assumptions:
 - ADR-012 Multi-session fusion finalises merge semantics and provenance chaining.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L123-L149】
 - ADR-014 Interop formats map internal models to ISOXML/GeoPackage exports while preserving schema hashes.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L135-L141】
 - ADR-025 Data lifecycle and retention sets archival workflows and compaction triggers.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L165-L171】
+
+### 32.9.3 Metadata-driven Layer Catalog Guidelines
+
+- Maintain backwards-compatible coverage geometry while introducing normalized scalar controllers so additional telemetry layers coexist without renderer rewrites.
+- Publish a configurable layer catalogue and units registry capturing ranges, aggregation rules, smoothing parameters, and derived layer bindings to avoid hard-coded UI or export logic.
+- Persist layer definitions with chunked, compressed tile data (e.g., LZ4/Zstd) that records quantization metadata, schema hashes, and emission cadence hints for deterministic replay/export.
+- Hash schema-critical fields and package layer assets with configuration bundles so offline rigs detect drift, manage memory, and gate migrations behind explicit version upgrades.
 
 ---

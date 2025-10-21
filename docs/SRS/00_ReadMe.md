@@ -89,24 +89,24 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 - [11-O1 – Unified .NET 8 + Avalonia](sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md)
 
 #### 2X — System Architecture
-- [O-BACKEND-6 – Linux Core Service](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md)
+- [O-BACKEND-6 – Linux Core Service](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
 
 #### 4X — Interprocess & Communications
-- [O-COMM-5 – Variable-rate PGNs](sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md)
-- [O-COMM-6 – PGN Compatibility Bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md)
-- [O-COMM-7 – Gauge Telemetry PGNs](sections/4X_Interprocess_Communications/42-O7%20-%20Gauge%20telemetry%20PGNs%20for%20engine%20%26%20machine%20data.md)
+- [C2 – Variable-rate Layer Streams](sections/4X_Interprocess_Communications/42_Transports.md#c2---versioned-variable-rate-layer-streams)
+- [C3 – PGN Compatibility Bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge)
+- [C6 – Gauge Telemetry Channels](sections/4X_Interprocess_Communications/42_Transports.md#c6---gauge-telemetry-channels)
 
 #### 5X — Hardware I/O & Device Layer
 - [O-HW-5 – Modular Layer Firmware](sections/5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md)
 - [O-HW-7 – MultiSteer Configurator](sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md)
 
 #### 6X — Core Domain Services
-- [O-API-5 – Versioned Layer Schemas](sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md)
+- [C2 – Versioned Layer Registries](sections/4X_Interprocess_Communications/41_Inter_Application_API.md#c2---versioned-layer-registries)
 - [O-BACKEND-4 – Layer Controllers](sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md)
 - [O-TELE-4 – Layer Diagnostics](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md)
 
 #### 7X — Mapping & Geospatial
-- [O-DATA-5 – Metadata-driven Layers](sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md)
+- [C-DATA-8 – Metadata-driven Layer Catalog](sections/3X_Data_Storage/32_Persistence_Formats.md#3293-metadata-driven-layer-catalog-guidelines)
 
 #### 9X — Frontends & Ops
 - [Remote Clients & Companion Shell](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations)
@@ -215,8 +215,8 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-OS-001 | O-OS-0, O-OS-3, O-OS-6 | AgIO WinForms host (legacy baseline) | ADR-OS-001 (TBD) |
 | R-OS-002 | O-OS-0, O-OS-6 | [Project README deployment notes](../../README.md) | ADR-OS-001 (TBD) |
 | R-OS-003 | O-OS-3, O-OS-5 | Screen helper (legacy baseline) | ADR-OS-002 (TBD) |
-| R-OS-004 | O-OS-5, O-OS-6 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-OS-003 (TBD) |
-| R-OS-005 | O-OS-5, O-OS-6 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-OS-003 (TBD) |
+| R-OS-004 | O-OS-5, O-OS-6 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-OS-003 (TBD) |
+| R-OS-005 | O-OS-5, O-OS-6 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-OS-003 (TBD) |
 | R-OS-006 | O-OS-3, O-OS-5, O-OS-6 | [Baseline assumptions](01_Vision_NonGoals.md) | ADR-OS-004 (TBD) |
 
 ### Section 13 — UI Framework & UX Language
@@ -226,9 +226,9 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-UI-001 | O-UI-0, O-UI-2, O-UI-7 | WPF shell (legacy baseline) | ADR-UI-001 (TBD) |
 | R-UI-002 | O-UI-0 | AgIO dialogs (legacy baseline) | ADR-UI-002 (TBD) |
 | R-UI-003 | O-UI-0, O-UI-5 | Screen helper (legacy baseline) | ADR-UI-003 (TBD) |
-| R-UI-004 | C3 | [Metadata dashboards](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-UI-004 (TBD) |
-| R-UI-005 | O-UI-6, O-UI-7 | [Remote clients](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-UI-005 (TBD) |
-| R-UI-006 | O-UI-1, O-UI-2, O-UI-4, O-UI-7 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-UI-006 (TBD) |
+| R-UI-004 | O-UI-5 | [Metadata dashboards](sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md) | ADR-UI-004 (TBD) |
+| R-UI-005 | O-UI-6, O-UI-7 | [Remote clients](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md) | ADR-UI-005 (TBD) |
+| R-UI-006 | O-UI-1, O-UI-2, O-UI-4, O-UI-7 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-UI-006 (TBD) |
 | R-UI-007 | O-UI-2, O-UI-5, O-UI-7 | [Accessibility presets](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) | ADR-UI-007 (TBD) |
 
 ### Section 42 — Transports
@@ -236,14 +236,14 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 |-------------|----------------------|----------------------|-----------------|
 | R-COMM-000 | O-COMM-0 | Comm settings dialog (legacy baseline) | ADR-COMM-001 (TBD) |
 | R-COMM-001 | O-COMM-0 | UDP tooling (legacy baseline) | ADR-COMM-001 (TBD) |
-| R-COMM-002 | O-COMM-0, O-COMM-6 | PGN designer (legacy baseline) | ADR-COMM-002 (TBD) |
+| R-COMM-002 | O-COMM-0, C3 | PGN designer (legacy baseline) | ADR-COMM-002 (TBD) |
 | R-COMM-003 | O-COMM-0 | NTRIP UI (legacy baseline) | ADR-COMM-003 (TBD) |
-| R-COMM-010 | O-COMM-5 | [Variable-rate PGNs](sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md) | ADR-COMM-004 (TBD) |
-| R-COMM-011 | O-COMM-5 | [Diagnostics hooks](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md) | ADR-COMM-004 (TBD) |
-| R-COMM-004 | O-COMM-2, O-COMM-6, O-COMM-7 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-COMM-005 (TBD) |
-| R-COMM-005 | O-COMM-6, O-COMM-7 | [PGN bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | ADR-COMM-005 (TBD) |
-| R-COMM-012 | O-COMM-2, O-COMM-6, O-COMM-7 | [Latency budgets](sections/4X_Interprocess_Communications/42_Transports.md) | ADR-COMM-006 (TBD) |
-| R-COMM-013 | O-COMM-2, O-COMM-6, O-COMM-7 | [Security slice](sections/9X_Frontends_Ops/95_Security_Permissions.md) | ADR-COMM-006 (TBD) |
+| R-COMM-010 | C2 | [Variable-rate layer streams](sections/4X_Interprocess_Communications/42_Transports.md#c2---versioned-variable-rate-layer-streams) | ADR-COMM-004 (TBD) |
+| R-COMM-011 | C2 | [Diagnostics hooks](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md) | ADR-COMM-004 (TBD) |
+| R-COMM-004 | O-COMM-2, C3, C6 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-COMM-005 (TBD) |
+| R-COMM-005 | C3, C6 | [PGN bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge) | ADR-COMM-005 (TBD) |
+| R-COMM-012 | C3, C5 | [Latency budgets](sections/4X_Interprocess_Communications/42_Transports.md) | ADR-COMM-006 (TBD) |
+| R-COMM-013 | C3, C5 | [Security slice](sections/9X_Frontends_Ops/95_Security_Permissions.md) | ADR-COMM-006 (TBD) |
 
 ### Section 21 — System Decomposition & Boundaries
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
@@ -252,10 +252,10 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-BE-001 | O-BE-0 | Field streamer (legacy baseline) | ADR-BE-001 (TBD) |
 | R-BE-002 | O-BE-0, O-BE-5 | Shared projects (legacy baseline) | ADR-BE-002 (TBD) |
 | R-BE-003 | O-BE-1 | Automation APIs (legacy baseline) | ADR-BE-003 (TBD) |
-| R-BE-010 | O-BE-5 | [Layer controllers](sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md) | ADR-BE-004 (TBD) |
-| R-BE-011 | O-BE-5 | [Replay CI](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md#969-design-considerations) | ADR-BE-004 (TBD) |
+| R-BE-010 | O-BE-5 | [Layer controllers](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-BE-004 (TBD) |
+| R-BE-011 | O-BE-5 | [Replay CI](sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md) | ADR-BE-004 (TBD) |
 | R-BE-004 | O-BE-6, O-BE-7 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-BE-005 (TBD) |
-| R-BE-012 | O-BE-6, O-BE-7 | [PGN bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | ADR-BE-005 (TBD) |
+| R-BE-012 | C3, C6 | [PGN bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge) | ADR-BE-005 (TBD) |
 | R-BE-013 | O-BE-6, O-BE-7 | [Service health targets](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-BE-006 (TBD) |
 | R-BE-014 | O-BE-6, O-BE-7 | [Fail-safe expectations](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-BE-006 (TBD) |
 
@@ -283,7 +283,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-HW-010 | O-HW-5 | [Modular firmware option](sections/5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md) | ADR-HW-004 (TBD) |
 | R-HW-011 | O-HW-5 | [Modular firmware option](sections/5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md) | ADR-HW-004 (TBD) |
 | R-HW-004 | O-HW-6 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-HW-005 (TBD) |
-| R-HW-005 | O-HW-6 | [PGN bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | ADR-HW-005 (TBD) |
+| R-HW-005 | C3 | [PGN bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge) | ADR-HW-005 (TBD) |
 | R-HW-006 | O-HW-5 | [Capability discovery](sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md) | ADR-HW-006 (TBD) |
 | R-HW-012 | O-HW-5 | [ISOBUS reference](references/ISOBUS_Section_Control.md) | ADR-HW-007 (TBD) |
 | R-HW-013 | O-HW-5, O-HW-6 | [Safety interlocks](sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md) | ADR-HW-008 (TBD) |
@@ -295,12 +295,12 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-API-000 | O-API-0 | PGN designer (legacy baseline) | ADR-API-001 (TBD) |
 | R-API-001 | O-API-0 | UDP monitor (legacy baseline) | ADR-API-001 (TBD) |
 | R-API-002 | O-API-0 | NTRIP settings (legacy baseline) | ADR-API-002 (TBD) |
-| R-API-003 | O-API-1, O-API-3 | [Schema policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-003 (TBD) |
-| R-API-010 | O-API-5 | [Versioned schemas](sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md) | ADR-API-004 (TBD) |
-| R-API-011 | O-API-5 | [Versioned schemas](sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md) | ADR-API-004 (TBD) |
-| R-API-004 | O-API-6 | [PGN bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | ADR-API-005 (TBD) |
-| R-API-005 | O-API-6 | [Handshake notes](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-006 (TBD) |
-| R-API-012 | O-API-5, O-API-6 | [Release management policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-007 (TBD) |
+| R-API-003 | C2, C3 | [Schema policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-003 (TBD) |
+| R-API-010 | C2 | [Versioned registries](sections/4X_Interprocess_Communications/41_Inter_Application_API.md#c2---versioned-layer-registries) | ADR-API-004 (TBD) |
+| R-API-011 | C2 | [Versioned registries](sections/4X_Interprocess_Communications/41_Inter_Application_API.md#c2---versioned-layer-registries) | ADR-API-004 (TBD) |
+| R-API-004 | C3 | [PGN bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge) | ADR-API-005 (TBD) |
+| R-API-005 | C3 | [Handshake notes](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-006 (TBD) |
+| R-API-012 | C2, C4 | [Release management policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-007 (TBD) |
 
 ### Section 32 — Persistence & Formats
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
@@ -308,16 +308,16 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-DATA-000 | O-DATA-0 | Field streamer (legacy baseline) | ADR-DATA-001 (TBD) |
 | R-DATA-001 | O-DATA-0 | SQLite usage (legacy baseline) | ADR-DATA-001 (TBD) |
 | R-DATA-002 | O-DATA-0 | Shared libraries (legacy baseline) | ADR-DATA-002 (TBD) |
-| R-DATA-003 | O-DATA-0, O-DATA-5 | [Export formats](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-003 (TBD) |
-| R-DATA-010 | O-DATA-5 | [Metadata layers](sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md) | ADR-DATA-004 (TBD) |
-| R-DATA-011 | O-DATA-5 | [Metadata layers](sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md) | ADR-DATA-004 (TBD) |
-| R-DATA-012 | O-DATA-5 | [Metadata layers](sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md) | ADR-DATA-005 (TBD) |
-| R-DATA-004 | O-DATA-5 | [Compression ideas](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-006 (TBD) |
-| R-DATA-013 | O-DATA-5 | [Retention policy](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
-| R-DATA-014 | O-DATA-5 | [Schema hashes](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
-| R-DATA-026 | O-DATA-5 | [Spatial constraints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
-| R-DATA-027 | O-DATA-5 | [Buffered footprints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
-| R-DATA-028 | O-DATA-5 | [Indexed queries](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
+| R-DATA-003 | O-DATA-0, C-DATA-8 | [Export formats](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-003 (TBD) |
+| R-DATA-010 | C-DATA-8 | [Metadata layers](sections/3X_Data_Storage/32_Persistence_Formats.md#3293-metadata-driven-layer-catalog-guidelines) | ADR-DATA-004 (TBD) |
+| R-DATA-011 | C-DATA-8 | [Metadata layers](sections/3X_Data_Storage/32_Persistence_Formats.md#3293-metadata-driven-layer-catalog-guidelines) | ADR-DATA-004 (TBD) |
+| R-DATA-012 | C-DATA-8 | [Metadata layers](sections/3X_Data_Storage/32_Persistence_Formats.md#3293-metadata-driven-layer-catalog-guidelines) | ADR-DATA-005 (TBD) |
+| R-DATA-004 | C-DATA-8 | [Compression ideas](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-006 (TBD) |
+| R-DATA-013 | C-DATA-8 | [Retention policy](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
+| R-DATA-014 | C-DATA-8 | [Schema hashes](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
+| R-DATA-026 | C-DATA-8 | [Spatial constraints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
+| R-DATA-027 | C-DATA-8 | [Buffered footprints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
+| R-DATA-028 | C-DATA-8 | [Indexed queries](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
 | R-DATA-040 | O-DATA-5 | [Zone edit provenance](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-044](sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md) |
 | R-DATA-041 | O-DATA-5 | [Crop history schema](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-045](sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md) |
 | R-DATA-042 | O-DATA-5 | [Session weather snapshot](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-053](sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md) |
@@ -337,7 +337,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-MM-000 | O-MM-0 | Screen helper (legacy baseline) | ADR-MM-001 (TBD) |
 | R-MM-001 | O-MM-0 | UDP monitor (legacy baseline) | ADR-MM-001 (TBD) |
 | R-MM-002 | O-MM-2 | [Headless plans](sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md) | ADR-MM-002 (TBD) |
-| R-MM-003 | O-MM-2, O-OS-5 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-MM-003 (TBD) |
+| R-MM-003 | O-MM-2, O-OS-5 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-MM-003 (TBD) |
 | R-MM-004 | O-MM-2 | [Layout locking](sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md) | ADR-MM-004 (TBD) |
 | R-MM-005 | O-MM-2 | [Auto-recovery expectations](sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md) | ADR-MM-005 (TBD) |
 
@@ -348,7 +348,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-TH-001 | O-TH-0 | Event viewer (legacy baseline) | ADR-TH-001 (TBD) |
 | R-TH-002 | O-TH-0 | Inspector tools (legacy baseline) | ADR-TH-002 (TBD) |
 | R-TH-003 | O-TH-3 | [Telemetry feeds](sections/6X_Core_Domain_Services/64_Telemetry_Health.md) | ADR-TH-003 (TBD) |
-| R-TH-004 | O-TH-3, O-OS-5 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-TH-004 (TBD) |
+| R-TH-004 | O-TH-3, O-OS-5 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-TH-004 (TBD) |
 | R-TH-010 | O-TH-4 | [Layer diagnostics](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md) | ADR-TH-005 (TBD) |
 | R-TH-011 | O-TH-4 | [Layer diagnostics](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md) | ADR-TH-005 (TBD) |
 | R-TH-005 | O-TH-3 | [Health scoring](sections/6X_Core_Domain_Services/64_Telemetry_Health.md) | ADR-TH-006 (TBD) |
@@ -361,9 +361,9 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-CI-001 | O-CI-0 | [Manual publish flow](../../README.md) | ADR-CI-001 (TBD) |
 | R-CI-002 | O-CI-0 | [Linting ideas](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md) | ADR-CI-002 (TBD) |
 | R-CI-003 | O-CI-1 | [Packaging criteria](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md) | ADR-CI-003 (TBD) |
-| R-CI-010 | O-CI-4 | [Replay CI option](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md#969-design-considerations) | ADR-CI-004 (TBD) |
-| R-CI-011 | O-CI-4 | [Replay CI option](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md#969-design-considerations) | ADR-CI-004 (TBD) |
-| R-CI-004 | O-CI-3 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-CI-005 (TBD) |
+| R-CI-010 | O-CI-4 | [Replay CI option](sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md) | ADR-CI-004 (TBD) |
+| R-CI-011 | O-CI-4 | [Replay CI option](sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md) | ADR-CI-004 (TBD) |
+| R-CI-004 | O-CI-3 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-CI-005 (TBD) |
 | R-CI-005 | O-CI-4 | [Hardware-in-loop](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md) | ADR-CI-006 (TBD) |
 | R-CI-012 | O-CI-3 | [Release assurance](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md) | ADR-CI-007 (TBD) |
 | R-CI-013 | O-CI-4 | [Fixture governance](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md) | ADR-CI-007 (TBD) |
@@ -375,7 +375,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-EXT-001 | O-EXT-0 | Solution utilities (legacy baseline) | ADR-EXT-001 (TBD) |
 | R-EXT-002 | O-EXT-1, O-EXT-3, O-EXT-5 | [Plugin boundary](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md) | ADR-EXT-002 (TBD) |
 | R-EXT-003 | O-EXT-1, O-EXT-3, O-EXT-5 | [Templates](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md) | ADR-EXT-002 (TBD) |
-| R-EXT-010 | O-EXT-3, O-EXT-5 | [Layer controllers](sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md) | ADR-EXT-003 (TBD) |
+| R-EXT-010 | O-EXT-3, O-EXT-5 | [Layer controllers](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-EXT-003 (TBD) |
 | R-EXT-004 | O-EXT-1 | [Sandboxing notes](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md) | ADR-EXT-004 (TBD) |
 | R-EXT-011 | O-EXT-3, O-EXT-5 | [Governance requirements](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md) | ADR-EXT-005 (TBD) |
 | R-PKG-000 | Workstream TBD | [Packaging flow](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog) | ADR-PKG-001 (TBD) |
@@ -389,7 +389,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-SEC-001 | O-SEC-0 | [Offline workflow](../../README.md) | ADR-SEC-001 (TBD) |
 | R-SEC-002 | O-SEC-2 | [Role guidance](sections/9X_Frontends_Ops/95_Security_Permissions.md) | ADR-SEC-002 (TBD) |
 | R-SEC-003 | O-SEC-1 | [Secrets plan](sections/9X_Frontends_Ops/95_Security_Permissions.md) | ADR-SEC-003 (TBD) |
-| R-SEC-004 | O-SEC-3 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-SEC-004 (TBD) |
+| R-SEC-004 | O-SEC-3 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-SEC-004 (TBD) |
 | R-SEC-005 | O-SEC-3 | [Audit logging](sections/9X_Frontends_Ops/95_Security_Permissions.md) | ADR-SEC-005 (TBD) |
 | R-SEC-006 | O-SEC-1, O-SEC-4 | [Secrets migration](sections/9X_Frontends_Ops/95_Security_Permissions.md) | ADR-SEC-006 (TBD) |
 | R-SEC-007 | O-SEC-3 | [Audit readiness](sections/9X_Frontends_Ops/95_Security_Permissions.md) | ADR-SEC-006 (TBD) |
@@ -401,7 +401,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-UPD-001 | O-UPD-0 | [Publish workflow](../../README.md) | ADR-UPD-001 (TBD) |
 | R-UPD-002 | O-UPD-2, O-UPD-4 | [Rollback guidance](sections/3X_Data_Storage/33_Offline_First_Sync.md) | ADR-UPD-002 (TBD) |
 | R-UPD-003 | O-UPD-5 | [Staged updates](sections/3X_Data_Storage/33_Offline_First_Sync.md) | ADR-UPD-003 (TBD) |
-| R-UPD-004 | O-UPD-5 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-UPD-004 (TBD) |
+| R-UPD-004 | O-UPD-5 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-UPD-004 (TBD) |
 | R-UPD-005 | O-UPD-1 | [Background updates](sections/3X_Data_Storage/33_Offline_First_Sync.md) | ADR-UPD-005 (TBD) |
 | R-UPD-006 | O-UPD-5 | [Validation checklist](sections/3X_Data_Storage/33_Offline_First_Sync.md) | ADR-UPD-006 (TBD) |
 
@@ -409,7 +409,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
 |-------------|----------------------|----------------------|-----------------|
 | R-GA-000 | Workstream TBD | [Gauge mappings](sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md) | ADR-GA-001 (TBD) |
-| R-GA-001 | Workstream TBD | [Gauge telemetry PGNs](sections/4X_Interprocess_Communications/42-O7%20-%20Gauge%20telemetry%20PGNs%20for%20engine%20%26%20machine%20data.md) | ADR-GA-002 (TBD) |
+| R-GA-001 | Workstream TBD | [Gauge telemetry channels](sections/4X_Interprocess_Communications/42_Transports.md#c6---gauge-telemetry-channels) | ADR-GA-002 (TBD) |
 | R-GA-002 | Workstream TBD | [Gauge configuration JSON](sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md) | ADR-GA-003 (TBD) |
 | R-GA-003 | Workstream TBD | [Gauge UI behaviors](sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md) | ADR-GA-004 (TBD) |
 | R-GA-004 | Workstream TBD | [Smoothing rules](sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md) | ADR-GA-005 (TBD) |

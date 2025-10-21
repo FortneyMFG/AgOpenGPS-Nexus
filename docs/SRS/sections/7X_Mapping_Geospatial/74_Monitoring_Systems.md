@@ -1,125 +1,107 @@
-# 74 — Monitoring Systems (Status: collecting proposals)
+# 74 — Monitoring Systems
+*(Status: Proposed)*
 
-## Problem statement
-Capture read-only engine and machine telemetry (RPM, temperatures, pressures, voltages, fuel levels, etc.) using J1939/ISOBUS semantics while keeping AgOpenGPS transports and dashboards metadata-driven. Gauges must surface consistently across overlays, standalone panels, and compact widgets without introducing bespoke code paths per sensor.
+**Author:** Codex
+**Created:** 2025-10-20
+**Version:** 0.1.0
+**Section ID:** 74
+**Editors:** Monitoring & Telemetry Working Group
+**Last Updated:** 2025-10-20
+**Related Sections:** 42 — Interprocess Communications, 64 — Telemetry & Health, 71 — Mapping Kernel Contracts, 72 — Mapping Layers Plugin
+**Upstream Dependencies:** ADR-042-O7 Gauge Telemetry, ADR-010 Layer Registry, ADR-021 Automation Pipelines
+**Downstream Impacts:** Dashboards, Mapping overlays, Harvest analytics, Telemetry recorder
 
-## Requirements (from contributors)
-- R-GA-000 (MUST, J1939 alignment): Map core engine gauges to authoritative PGN/SPN sources so third-party controllers and gateways interoperate without custom scaling tables.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L15-L31】
-- R-GA-001 (MUST, transport): Deliver gauge telemetry through dedicated read-only PGNs (0xDA/0xD9/0xD8) that reuse the existing AOG CAN/UDP framing and preserve current layer/section PGNs.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O7%20-%20Gauge%20telemetry%20PGNs%20for%20engine%20%26%20machine%20data.md†L1-L54】
-- R-GA-002 (MUST, configuration): Define gauges through JSON metadata—ID, PGN/SPN source, scale/offset, smoothing, target/alarm bands—so operators can add/remove telemetry without recompiling clients.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L33-L92】
-- R-GA-003 (MUST, UI parity): Provide overlay, standalone panel, and mini widget presentations that honor `targetBand`, `alarmBands`, TTL, and quality gating to keep annunciation consistent across layouts.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L94-L128】
-- R-GA-004 (SHOULD, smoothing & stale handling): Support optional EMA smoothing, deadbands, and stale indicators driven by configuration so noisy sensors remain usable without hiding real faults.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L82-L128】
-- R-GA-005 (COULD, capability discovery): Advertise supported gauges via capability bits and validity heartbeats so dashboards can pre-provision tiles and detect publisher outages without bespoke logic.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L130-L156】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O7%20-%20Gauge%20telemetry%20PGNs%20for%20engine%20%26%20machine%20data.md†L23-L48】
-- R-GA-006 (MUST, combine yield ingestion): Normalize grain flow, moisture, and elevator speed data from OEM CAN (J1939 PGNs 0xF003/0xFECE) or serial payloads into standard `YieldTelemetry` frames so plugins and dashboards share one schema regardless of sensor vendor.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L160-L220】
-- R-GA-007 (MUST, calibration + QA): Persist per-crop calibration coefficients (mass flow, moisture, lag) and expose an operator workflow to confirm calibration state, last validation date, and current header width; block heatmap rendering when calibration is stale or missing.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L222-L277】
-- R-GA-008 (MUST, coverage overlays): Generate yield/moisture heatmaps aligned to harvested coverage polygons with `lagMeters`, `swathWidth`, and `sampleRateHz` metadata so replay and live views share the same tiling and smoothing logic.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L222-L277】
-- R-GA-009 (SHOULD, data export): Stream per-swatch summaries (avg/max/min yield & moisture, wet/dry bushels, harvest time span) through the telemetry recorder and allow CSV/GeoJSON export for FarmOS/Opengrade compatibility.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L279-L327】
+---
 
-## Context and scope
-Gauges focus on machine-level telemetry that dashboards consume read-only. They complement, but do not replace, layer-specific rate or steering PGNs.
+## 74.1 Purpose & Scope
 
-### Authoritative mappings
-| Gauge | J1939 PGN | SPN | Units | Rate (typ.) | Notes / Sources |
+Define how Nexus captures, normalizes, and visualizes machine monitoring telemetry—including engine gauges and combine harvest data—using metadata-driven transports. The section ensures gauges render consistently across overlays, dashboards, and widgets while aligning with Layer Registry persistence and telemetry recording.
+
+---
+
+## 74.2 Context
+
+- Gauges ingest J1939/ISOBUS PGNs and serial payloads via telemetry transports outlined in ADR-042-O7, reusing existing CAN/UDP framing.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O7%20-%20Gauge%20telemetry%20PGNs%20for%20engine%20%26%20machine%20data.md†L1-L54】
+- Mapping section 72 leverages monitoring overlays for operator dashboards; telemetry Section 64 governs health metrics, stale detection, and smoothing policies.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L24-L126】
+- Yield telemetry integrates with analytics ADRs (049/050) to keep profit and agronomy calculations consistent with coverage overlays.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L21-L52】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】
+
+---
+
+## 74.3 Legacy Comparison
+
+| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
+|---------------|-----------------|------------------------|---------------------------|--------------------|
+| Gauge Mapping | Hard-coded WinForms gauges with bespoke scaling tables. | Difficult to extend to new sensors or vendor PGNs. | JSON metadata with PGN/SPN definitions and shared registry. | Monitoring backlog |
+| UI Consistency | Gauges rendered differently across overlays, panels, and widgets. | Operators confused by conflicting alarms/targets. | Standardize rendering rules with `targetBand`/`alarmBands`. | UI audit |
+| Harvest Data | Combine telemetry ingested via custom scripts per vendor. | No deterministic provenance or calibration workflows. | Normalize to `YieldTelemetry` schema with calibration state machine. | Yield plugin proposal |
+
+---
+
+## 74.4 Definitions
+
+| Term | Definition |
+|------|-------------|
+| Gauge Definition | JSON metadata describing source PGN/SPN, scaling, smoothing, targets, and alarms for a telemetry gauge. |
+| Capability Heartbeat | Periodic message advertising supported gauge IDs and data freshness. |
+| YieldTelemetry | Structured telemetry payload containing mass flow, moisture, elevator speed, lag, and calibration metadata. |
+| Swath Summary | Aggregated harvest metrics (yield, moisture, bushels) per spatial segment exported via telemetry recorder. |
+
+---
+
+> **Requirement Grammar (RFC-2119):**
+> - **MUST / MUST NOT** = mandatory with verification.
+> - **SHOULD / SHOULD NOT** = strong preference; require waiver for deviations.
+> - **MAY** = optional, subject to telemetry policy review.
+
+## 74.5 Requirements
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|-----------|---------|-----------------|-----------------------------|
+| R-MON-7400 | MUST | Transport | Gauge telemetry MUST use dedicated read-only PGNs (0xDA/0xD9/0xD8) while preserving existing layer/section PGNs. | ADR-042-O7 | CAN gateway integration tests validating PGN routing. |
+| R-MON-7401 | MUST | Metadata | Gauges MUST be declared via JSON metadata including source PGN/SPN, scaling, smoothing, target/alarm bands, and TTL. | Monitoring proposal | Schema lint + configuration tests. |
+| R-MON-7402 | MUST | UI Consistency | Dashboards, overlays, and widgets MUST honor shared rendering rules (targetBand, alarmBands, stale indicators). | UI parity backlog | UI regression tests verifying consistent thresholds. |
+| R-MON-7403 | SHOULD | Smoothing | Gauges SHOULD support EMA smoothing, deadbands, and stale detection toggled via configuration. | Telemetry WG | Telemetry unit tests verifying smoothing options. |
+| R-MON-7404 | MUST | Capability Discovery | Publishers MUST advertise supported gauges and validity heartbeats so clients detect outages gracefully. | ADR-042-O7 | Integration tests ensuring heartbeat drop triggers stale state. |
+| R-MON-7405 | MUST | Yield Normalization | Combine telemetry MUST normalize to `YieldTelemetry` schema with calibration metadata, lag, and coverage alignment. | Monitoring proposal | Harvest simulator verifying schema + lag compensation. |
+| R-MON-7406 | MUST | Calibration & QA | System MUST persist calibration coefficients, validation timestamps, and block heatmap rendering when calibration is stale. | Monitoring proposal | QA workflow tests ensuring stale calibration prevents overlays. |
+| R-MON-7407 | SHOULD | Data Export | Telemetry recorder SHOULD emit swath summaries (yield, moisture, bushels, time span) with CSV/GeoJSON export paths. | Analytics backlog | Export integration tests verifying schema compliance. |
+
+### 74.5.1 Authoritative Gauge Mapping
+
+| Gauge | PGN | SPN | Units | Typical Rate | Notes |
 |---|---|---|---|---|---|
-| Engine Speed (RPM) | 61444 (EEC1) | 190 | rpm (0.125 rpm/bit) | 20–50 ms | Standard mapping; widely implemented. Sources: Colorado State University – Engineering; ICP DAS; forum.iqan.se. |
-| Coolant Temp | 65262 (Engine Temp 1) | 110 | °C (1 °C/bit, −40 °C offset) | ~1 s | Byte 1 per J1939-71. Sources: JCOM1939 Monitor Pro; Copperhill Technologies. |
-| Engine Oil Pressure | 65263 (Engine Fluid Lvl/Press) | 100 | kPa (4 kPa/bit) | ~100–1000 ms | Byte 4; standard scaling. Source: Cattron. |
-| Battery Potential / Power Input 1 | 65271 | 168 | V (0.05 V/bit) | ~1000 ms | Bytes 5–6; typical battery bus voltage. Source: Cattron. |
-| Fuel Level 1 | 65276 (Dash Display 1) | 96 | % (0.4 %/bit) | ~2 s | Commonly used for tank level. Sources: Cattron; maximatecc. |
+| Engine Speed | 61444 (EEC1) | 190 | rpm (0.125 rpm/bit) | 20–50 ms | Widely supported; baseline gauge. |
+| Coolant Temperature | 65262 (Engine Temp 1) | 110 | °C (1 °C/bit, −40 °C offset) | ~1 s | Byte 1 per J1939-71. |
+| Engine Oil Pressure | 65263 (Engine Fluid Lvl/Press) | 100 | kPa (4 kPa/bit) | 100–1000 ms | Byte 4 standard scaling. |
+| Battery Potential | 65271 | 168 | V (0.05 V/bit) | ~1 s | Tracks machine electrical health. |
+| Fuel Level | 65276 (Dash Display 1) | 96 | % (0.4 %/bit) | ~2 s | Tank level gauge. |
+| Hydraulic Pressure | Vendor-specific | — | psi/kPa | Varies | Map via generic analog gauge definitions. |
 
-> **Note:** Hydraulic pressure is implement-specific in ISOBUS rather than a single engine PGN. Treat these as generic analog gauges mapped through LayerDefinitions with explicit units, thresholds, and optional vendor PGN overrides.
+### 74.5.2 Gauge Definition Example
 
-### Gauge definitions (JSON examples)
 ```json
 {
   "id": "EngineSpeed",
   "gaugeId": 1,
   "source": { "pgn": 61444, "spn": 190 },
   "units": "rpm",
-  "dataType": "u16",
   "scale": 0.125,
-  "offset": 0,
   "targetBand": { "min": 600, "max": 2200 },
   "alarmBands": [
     { "min": 0, "max": 400, "severity": "warn" },
     { "min": 2600, "max": 10000, "severity": "crit" }
   ],
-  "smoothing": { "emaAlpha": 0.3, "deadband": 5.0 }
-}
-
-{
-  "id": "CoolantTemp",
-  "gaugeId": 2,
-  "source": { "pgn": 65262, "spn": 110 },
-  "units": "°C",
-  "dataType": "u8",
-  "scale": 1.0,
-  "offset": -40.0,
-  "targetBand": { "min": 75, "max": 95 },
-  "alarmBands": [
-    { "max": 65, "severity": "warn" },
-    { "min": 105, "severity": "crit" }
-  ],
-  "smoothing": { "emaAlpha": 0.25 }
-}
-
-{
-  "id": "EngineOilPressure",
-  "gaugeId": 3,
-  "source": { "pgn": 65263, "spn": 100 },
-  "units": "kPa",
-  "dataType": "u8",
-  "scale": 4.0,
-  "offset": 0.0,
-  "targetBand": { "min": 150, "max": 600 },
-  "alarmBands": [
-    { "max": 100, "severity": "crit" }
-  ],
-  "smoothing": { "emaAlpha": 0.3 }
-}
-
-{
-  "id": "BatteryPotential",
-  "gaugeId": 4,
-  "source": { "pgn": 65271, "spn": 168 },
-  "units": "V",
-  "dataType": "u16",
-  "scale": 0.05,
-  "offset": 0.0,
-  "targetBand": { "min": 12.0, "max": 14.7 },
-  "alarmBands": [
-    { "max": 11.0, "severity": "crit" },
-    { "min": 15.0, "severity": "warn" }
-  ]
-}
-
-{
-  "id": "FuelLevel1",
-  "gaugeId": 5,
-  "source": { "pgn": 65276, "spn": 96 },
-  "units": "%",
-  "dataType": "u8",
-  "scale": 0.4,
-  "offset": 0.0,
-  "targetBand": { "min": 15.0, "max": 100.0 },
-  "alarmBands": [
-    { "max": 10.0, "severity": "warn" }
-  ],
-  "smoothing": { "emaAlpha": 0.4 }
+  "smoothing": { "emaAlpha": 0.3, "deadband": 5.0 },
+  "ttlMs": 2000
 }
 ```
 
-The shared [Gauge ID Registry](../appendices/GaugeId_Registry.md) assigns stable `gaugeId` values and raw-to-engineering unit conversions.
-
-### Combine yield monitoring plugin
-
-Combine operators require the same deterministic telemetry pipeline as engine gauges but with harvest-specific semantics—grain flow, grain moisture, elevator speed, and lag-adjusted coverage. The plugin adapts vendor-specific data (e.g., Ag Leader, John Deere, CLAAS) into Nexus' metadata-driven transports so heatmaps and dashboards behave consistently across hardware.
+### 74.5.3 Yield Telemetry Schema
 
 ```json
 {
   "id": "YieldTelemetry",
   "source": { "pgn": 61443, "fallback": "serial:RS232" },
-  "dataType": "struct",
   "fields": [
     { "name": "massFlow", "units": "kg/s", "scale": 0.01 },
     { "name": "grainMoisture", "units": "%", "scale": 0.1 },
@@ -139,57 +121,88 @@ Combine operators require the same deterministic telemetry pipeline as engine ga
 }
 ```
 
-> **Note:** When OEM payloads omit elevator speed, fall back to GPS ground speed for lag compensation and flag reduced quality in telemetry.
+---
 
-#### Calibration workflow
-- Support per-crop calibration sets with mass-flow test loads, moisture meter offsets, and header width verification.
-- Track calibration state transitions (`new`, `validated`, `expired`) and persist operator, timestamp, and validation notes.
-- Warn operators when calibration exceeds `maxHoursSinceValidation` or when crop type mismatches logged calibration.
+## 74.6 Acceptance Criteria & Verification
 
-#### Heatmap generation
-- Delay coverage painting by `lagMeters` to align grain flow readings with harvested area.
-- Tile yield and moisture into the existing coverage grid with configurable kernel smoothing; default to 3×3 kernel and 10% clamp on outliers.
-- Provide live overlays plus a replay mode that replays recorded telemetry using the same smoothing pipeline to ensure deterministic analytics.
+- CAN/UDP integration tests verify PGN routing, scaling, and TTL handling across gateway implementations.
+- UI regression suites confirm overlays, panels, and widgets display identical target/alarm cues for each gauge.
+- Harvest simulator replays validate lag compensation, calibration workflows, and coverage alignment for yield/moisture heatmaps.
+- Export tests ensure swath summaries produce valid CSV and GeoJSON files compatible with downstream systems.
 
-#### Data export & persistence
-- Include per-swatch aggregates (wet/dry bushels, avg moisture, productivity) in the telemetry recorder stream.
-- Allow export to CSV (per-swatch rows) and GeoJSON (polygon features with metrics) to support FarmOS, OpenAg, and SMS imports.
-- Retain raw samples for at least 24 hours locally to regenerate maps if calibration changes within that window.
+### 74.6.1 Requirement-to-Verification Map
 
-#### Transport & scaling rules
-- Missing codes: `0xFF` (u8) and `0xFFFF` (u16) signal no data. Mark gauges stale when repeated values exceed their TTL.
-- Units and scaling originate from JSON metadata. Transports stay raw; clients compute `value = raw * scale + offset`.
-- EMA smoothing and optional `deadband` dampen noise without masking real transitions. Omit `smoothing` to disable.
-- UI widgets share `targetBand` / `alarmBands` semantics to drive color, blink, and annunciators consistently across layouts.
+| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
+|--------|--------------------|---------------------|---------------------|
+| R-MON-7400 | Integration test | `tests/integration/can_gauge_transport.cs` | Gauge PGNs transmitted without colliding with control PGNs. |
+| R-MON-7401 | Schema lint | `tools/telemetry/gauge_schema_lint.py` | 100% metadata files pass validation. |
+| R-MON-7402 | UI regression | `tests/ui/gauge_rendering.spec` | Target/alarm cues match reference renders. |
+| R-MON-7404 | Heartbeat test | `tests/integration/gauge_capability_heartbeat.cs` | Loss of heartbeat triggers stale indicator ≤ 3 s. |
+| R-MON-7405 | Harvest sim | `sim/harvest/yield_pipeline.md` | Lag-compensated yield within ±2% of baseline. |
+| R-MON-7407 | Export test | `tests/integration/harvest_export.cs` | CSV/GeoJSON exports validated against schema. |
 
-### Gauge UI behaviors
-- **Placement:** Dockable overlay strip on the map, standalone gauge panel, and compact header/footer widgets.
-- **Layout:** Configurable rows/columns, drag-to-reorder, and per-gauge size presets (S/M/L).
-- **Color & motion:** Neutral defaults, warn/crit palette derived from `alarmBands`, optional blink with `holdMs` hysteresis to avoid flicker.
-- **Visibility:** Render only when quality ≥ threshold and sample age ≤ TTL; otherwise gray out and optionally flag a stale indicator.
-- **Interactions:** Tap/long-press opens a detail modal with sparkline, min/max/avg, raw SPN bytes, source PGN, and last timestamp.
-- **Multi-source arbitration:** Prefer the highest quality publisher; tie-break on `schemaVersion` and newest timestamp.
+---
 
-### Transport notes
-- Controllers may forward native J1939 frames to an AOG gateway that emits Gauge Blocks or publish the PGNs directly.
-- Gauge traffic is unacknowledged; rely on the Gauge Heartbeat (0xD8) plus optional UDP sequence trailers (`capabilities.seq = 1`) for liveness and loss detection.
-- Follow J1939 pacing where practical: RPM @ 20–50 ms, temperatures/pressures @ 0.5–1 s, battery/fuel @ 1–2 s.
+## 74.7 Constraints
 
-### Open items
-- Define vendor-neutral gauge IDs for hydraulic and implement-specific pressure sensors with configurable ISOBUS DDI/PGN mapping hooks.
-- Extend the unit registry (kPa, bar, psi, etc.) and deliver automatic conversions in the UI.
-- Advertise supported gauges through PGN 0xE2 capability bits so dashboards can pre-provision tiles.
+- Gauge telemetry remains read-only; commands or actuator control require separate authenticated channels.
+- Embedded targets must process gauge updates within available CPU (≤ 20% core utilization) while streaming to dashboards.
+- Calibration data must persist with encryption-at-rest to protect operator and agronomy data.
 
-### Verification
-- Gauges render correctly in overlay strip and standalone panels.
-- Needles/tiles recolor based on `alarmBands` warn/crit thresholds.
-- Engine RPM and coolant temperature scale accurately against replay logs with known raw bytes.
-- Packet loss simulations trigger stale indicators after TTL expiration.
-- Reloading JSON configuration adds/removes gauges without code changes.
+### 74.7.1 Non-Functional Requirement Classes
 
-## Related ADRs
+- **Performance:** PGN handling latency, widget render frequency.
+- **Reliability:** Stale detection, heartbeat monitoring, failover to fallback sources.
+- **Security:** Read-only transport enforcement, calibration data protection.
+- **Usability:** Consistent gauge presentation, actionable alarms, calibration workflow clarity.
+- **Operability:** Telemetry recorder diagnostics, export tooling, configuration validation.
 
-- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
-- [ADR-034 — Metadata-Driven Dashboards](../../ADR/ADR-034-metadata-driven-dashboards.md)
-- [ADR-047 — Live Telemetry Mesh](../../ADR/ADR-047_LiveTelemetryMesh.md)
-- [ADR-052 — Field Health Plugin](../../ADR/ADR-052_FieldHealthPlugin.md)
+---
+
+## 74.8 Risks & Open Issues
+
+| ID | Description | Impact | Mitigation / Status | Owner |
+|----|-------------|--------|---------------------|-------|
+| RISK-74-1 | Vendor PGN deviations require custom scaling. | Medium | Allow vendor override tables in metadata with QA review. | @monitoring |
+| RISK-74-2 | Telemetry bandwidth saturation during harvest. | High | Implement adaptive throttling + buffering; monitor via telemetry metrics. | @telemetry |
+| ISSUE-74-1 | Determine retention policy for raw gauge samples vs. aggregates. | Medium | Pending storage ADR; coordinate with analytics. | @ops |
+| ISSUE-74-2 | Clarify fallback behavior when elevator speed missing for lag compensation. | Low | Document GPS speed fallback; add quality flag. | @mapping |
+
+---
+
+## 74.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Metadata-Driven Gauges | JSON-driven definitions reduce code churn and keep scaling consistent. |
+| C2 | UI Parity | Shared rendering rules avoid conflicting alarms across overlays vs. panels. |
+| C3 | Calibration Integrity | Blocking overlays on stale calibration prevents misleading analytics. |
+| C4 | Transport Isolation | Dedicated read-only PGNs protect section control traffic. |
+| C5 | Export Compatibility | Swath summaries enable integration with FarmOS, OpenAg, and similar tools. |
+| C6 | Bandwidth Management | Adaptive throttling ensures telemetry remains responsive during harvest peaks. |
+
+### 74.9.1 Assumptions & Preconditions
+
+- [A1] Gateways can publish capability heartbeats and gauge payloads at configured intervals.
+- [A2] Operators maintain calibration data for each crop/implement combination.
+- [A3] Dashboards consume JSON metadata to render gauges without custom logic.
+
+---
+
+## 74.10 Option Overview
+
+| Option ID | Status | Type / Theme | Description | Reference Document |
+|-----------|--------|--------------|-------------|--------------------|
+| — | — | — | All options consolidated as design considerations in §74.9. | — |
+
+---
+
+## 74.11 Comparison Matrix
+
+| Attribute / Criteria | Metadata-Driven Monitoring | Legacy Gauge Handling |
+|----------------------|-----------------------------|-----------------------|
+| Extensibility | JSON-defined gauges deploy without code changes | Hard-coded sensors per release |
+| UI Consistency | Shared rendering rules across overlays/panels/widgets | Divergent alarm behavior |
+| Harvest Integration | Yield telemetry normalized with calibration + lag | Vendor-specific scripts |
+| Telemetry Reliability | Heartbeats, stale detection, smoothing controls | Ad-hoc polling, no stale handling |
+| Export Support | CSV/GeoJSON swath summaries | Manual CSV exports without metadata |

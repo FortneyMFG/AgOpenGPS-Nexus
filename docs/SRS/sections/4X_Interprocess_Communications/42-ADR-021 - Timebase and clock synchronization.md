@@ -1,39 +1,81 @@
-# ADR-021: Timebase and clock synchronization
+# 42-ADR-021 — Timebase and clock synchronization
+*(Status: Proposed)*
 
-## Status
-Drafting (target review window: 2025-12-18 week)
+**Author:** Codex
+**Reviewers:** Interprocess Communications Working Group
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Supersedes:** _None_
+**Superseded by:** _None_
+**Related SRS:** [42 — Transports](42_Transports.md)
+**Related Considerations:** [C5 - Timebase & Telemetry Mesh Governance](42_Transports.md#c5---timebase--telemetry-mesh-governance)
 
-**Relevant Plugin(s):** Autosteer, Section Control, Rate Control, Mapping, AgIO Host Services, GNSS/IMU Fusion, NTRIP Client
+---
 
+## 1) Context
 
-## Context
-Deterministic PoseStream sequencing, automation timing, and telemetry diagnostics require a canonical timebase across Core, plugins, and firmware. Without defined drift detection and reconciliation, distributed nodes risk sequence breaks and latency violations. ADR-021 sets the clock authority, synchronization strategy, and diagnostic expectations aligned with ADR-007 PoseStream, ADR-016 firmware transport, and ADR-020 determinism checks.
+Cross-device coordination requires a canonical time authority to align PoseStream sequencing, telemetry mesh updates, and
+control commands. Legacy deployments relied on ad-hoc system clocks, producing drift between devices and inconsistent gating
+behavior.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L180-L205】
 
-## Decision
-- Select the canonical time authority (GPS/PTP/RTK) and define drift detection, compensation, and sequence numbering policies for PoseStream and dependent services.
-- Specify latency budgets per node, including diagnostics exposure so operators can monitor timing health.
-- Integrate drift monitors and resynchronization routines with firmware transports to ensure mismatches fail safe and emit telemetry.
-- Provide CI and simulation checks that validate monotonic sequence enforcement across distributed deployments.
+```mermaid
+flowchart LR
+  A[Uncoordinated clocks] --> B[Pose & telemetry drift]
+  B --> C[Canonical timebase]
+  C --> D[Synchronized transports]
+```
 
-## Consequences
-- Timebase consistency improves determinism and coordination but requires investment in monitoring and firmware cooperation.
-- Drift handling logic adds complexity to PoseStream ingestion and firmware transports, necessitating fault-injection coverage.
-- Diagnostics surfaces must expand to include latency histograms and drift events, increasing UI and telemetry workload.
+---
 
-## Governance Updates
-- **Reference hardware catalog.** The clock team publishes approved GPSDO and PTP appliances with firmware versions and calibration procedures. Deployments outside the list require exception review.
-- **Test harnesses.** Simulated mixed-network scenarios validate drift correction routines before firmware ships. Harnesses run nightly and on hardware driver changes.
-- **Mockable interfaces.** Firmware and plugin teams must expose injectable clock providers so unit tests exercise skew handling without physical hardware.
+## 2) Decision
 
-## Validation
-- Drift monitors must detect ≥ 2 ms/minute drift within three minutes and trigger resynchronization routines validated via simulated skew scenarios.
-- PoseStream sequence enforcement must guarantee monotonic numbering with ≤ 1 frame reorder incidents across 24-hour soak tests.
-- Diagnostics UI must surface end-to-end latency histograms updating at least once per second covering 95% of nodes.
+Establish a canonical time authority derived from GPS or PTP with system clock fallback, accompanied by drift tolerances,
+monitoring, and reconciliation policies for firmware and transports.
 
-## References
-- [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-- [Control & automation requirements](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
-- [Extensibility & plugin requirements](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
-- [ADR-007: PoseStream and SectionState architecture](ADR-007-posestream-sectionstate-architecture.md)
-- [ADR-016: Firmware and transport for variable-rate layer PGNs](ADR-016-firmware-transport-variable-rate-pgns.md)
-- [ADR-020: Determinism, replay, and CI guardrails](ADR-020-determinism-replay-ci.md)
+### Decision Summary
+
+* **Scope:** PoseStream cadence, telemetry mesh timestamps, and transport-level sequencing.
+* **Boundary:** Application-level scheduling remains under domain services; this ADR focuses on clock distribution.
+* **Implementation Level:** Design + code; clock sync daemons, telemetry metrics, and drift alerting.
+
+---
+
+## 3) Consequences
+
+**Positive Impacts:**
+
+* Deterministic sequencing across PoseStream, layer transports, and telemetry mesh topics.
+* Drift monitoring enables proactive alerts and automated reconciliation workflows.
+* Shared tooling simplifies CI replay validation and regression analysis.
+
+**Negative / Mitigated Impacts:**
+
+* Requires additional services/daemons on field devices — mitigated by lightweight agents leveraging existing GPS/PTP feeds.
+* GPS-denied environments must fall back to system clocks — addressed with drift thresholds and operator alerts.
+* Firmware updates needed to emit capture timestamps and sequence numbers — staged through reference implementations.
+
+**Follow-up Actions:**
+
+* Implement clock sync agent supporting GPS, PTP, and system clock fallback with drift metrics.
+* Extend transports to include capture timestamps and monotonic counters for reconciliation.
+* Publish dashboards and alerts highlighting drift beyond 5 ms and certificate drift for PTP sources.
+
+---
+
+## 4) Rationale
+
+A shared timebase underpins deterministic control and telemetry flows. With GPS/PTP as primary sources and system clock
+fallback, transports can reconcile sample capture times, align mesh topics, and guarantee reproducible replay behavior.
+
+---
+
+## 5) Alternatives Considered
+
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| Per-device clocks | Allow each device to free-run. | Leads to drift and non-deterministic control behavior. |
+| NTP-only sync | Use commodity NTP. | Insufficient precision for sub-10 ms control loops. |
+| Application-level reconciliation | Let each service handle drift manually. | Duplicated logic and inconsistent mitigation. |
+

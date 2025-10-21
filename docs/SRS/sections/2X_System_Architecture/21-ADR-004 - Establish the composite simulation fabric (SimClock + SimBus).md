@@ -9,7 +9,7 @@
 **Supersedes:** —
 **Superseded by:** —
 **Related SRS:** `21_System_Decomposition_Boundaries.md`
-**Related Options:** `21-O5 - Layer controllers with aggregation pipelines.md`
+**Related Considerations:** §21.9 (C1), §23.9 (C1)
 
 ---
 
@@ -58,7 +58,7 @@ The fabric consists of:
 
 **Negative / Mitigated Impacts:**
 
-* Requires refactoring legacy streamers to publish through SimBus — mitigated by 21-O5 adoption.
+* Requires refactoring legacy streamers to publish through SimBus — mitigated by §21.9 C1 execution guidance.
 * Increases complexity of Core runtime initialization — mitigated with DI registration templates and documentation.
 
 **Follow-up Actions:**
@@ -91,7 +91,7 @@ Weighted scoring in SRS §21.12 ranked deterministic shared contracts highest fo
 
 * **Governance ownership:** Simulation working group maintains fabric contracts and coordinates changes.
 * **Update cadence:** Review quarterly or when major plugin frameworks evolve.
-* **Documentation:** Keep SRS §21, option 21-O5, and plugin SDK docs synchronized with SimClock/SimBus contract changes.
+* **Documentation:** Keep SRS §21 (§21.9 C1) and plugin SDK docs synchronized with SimClock/SimBus contract changes.
 
 ```mermaid
 graph TD
@@ -130,8 +130,7 @@ graph TD
 
 ## 10) References
 
-* **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.12; `23_Threading_Scheduling_Timing.md` — §23.5.
-* **Option Documents:** `21-O5 - Layer controllers with aggregation pipelines.md`
+* **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.9; `23_Threading_Scheduling_Timing.md` — §23.5, §23.9.
 * **Prior ADRs:** None.
 * **External References:** Replay datasets 2024-H2, Simulation WG minutes (2024-09-18).
 
@@ -147,4 +146,4 @@ graph TD
 ---
 
 > **Lifecycle:** Proposed → Accepted → Superseded → Deprecated → Rejected
-> **Traceability:** Links to SRS Decision Matrix § 21.12 and option 21-O5.
+> **Traceability:** Links to SRS Decision Matrix §21.12 and design consideration §21.9 (C1).

@@ -10,7 +10,7 @@ Explain how the project is validated (unit, integration, field), packaged, and s
 - R-CI-003 (SHOULD): Provide reproducible build artifacts (signed installers/zips) without breaking today’s manual zip releases.
 - R-CI-010 (MUST, proposed-variable-layer): Stand up deterministic replay tests, aggregation math checks, and performance benchmarks covering variable-rate layers before rollout.【F:docs/SRS/sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md†L1-L23】
 - R-CI-011 (SHOULD, proposed-variable-layer): Gate new PGNs, UI flows, and persistence behind feature flags with CI validation plus operator documentation for toggles.【F:docs/SRS/sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md†L24-L46】
-- R-CI-004 (SHOULD, proposed-LinuxCore): Add Linux (amd64/arm64) CI lanes that build/test the Core service, containers, and PGN bridge alongside Windows artifacts.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L1-L44】
+- R-CI-004 (SHOULD, proposed-LinuxCore): Add Linux (amd64/arm64) CI lanes that build/test the Core service, containers, and PGN bridge alongside Windows artifacts.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L44】
 - R-CI-005 (COULD): Integrate hardware-in-the-loop smoke tests for steering/rate modules.
 - R-CI-012 (SHOULD, release assurance): Define acceptance criteria for cross-platform build artifacts (checksums, signatures, SBOM availability) before they ship to operators.
 - R-CI-013 (SHOULD, fixture governance): Document how hardware-in-the-loop rigs and replay fixtures are versioned and synchronized with firmware/controller changes so tests remain trustworthy over time.
@@ -42,7 +42,7 @@ Coverage, release reliability, effort to maintain, reproducibility, compatibilit
 ## Current sentiment
 - Keep basic tests running but invest in CI pipelines that can still emit the simple zip packages operators expect.
 - Replay-driven validation is viewed as mandatory before enabling layer telemetry by default, ensuring field confidence.【F:docs/SRS/sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md†L47-L64】
-- Linux packaging and PGN bridge builds must be proven in CI before encouraging field pilots.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L1-L44】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
+- Linux packaging and PGN bridge builds must be proven in CI before encouraging field pilots.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L44】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
 
 ## Upcoming ADR coverage
 - **ADR-013 Derived products** will define the analytics-to-prescription recipes and QA metrics expected by R-CI-021, ensuring prescriptions remain auditable and repeatable.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L67-L73】

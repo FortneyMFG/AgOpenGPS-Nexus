@@ -9,7 +9,7 @@ Define how Nexus coordinates operator stations, automation plugins, and firmware
 - R-MM-000 (MUST, current-AgOpenGPS): Preserve screen placement helpers that ensure WinForms windows remain visible across multiple monitors.【F:SourceCode/GPS/Helpers/ScreenHelper.cs†L1-L30】
 - R-MM-001 (SHOULD, current-AgIO): Keep UDP/serial monitors operable when the UI is minimized or moved off the primary screen for diagnostics.【F:SourceCode/AgIO/Source/Forms/FormUDPMonitor.cs†L8-L70】
 - R-MM-002 (SHOULD): Provide a story for running the backend with no local UI while exposing remote displays or APIs.
-- R-MM-003 (SHOULD, proposed-LinuxCore): Deliver kiosk/headless launchers for the Linux Core + remote clients (auto-login, fullscreen) so rigs boot directly into an operator-ready view.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L6-L23】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L10-L18】
+- R-MM-003 (SHOULD, proposed-LinuxCore): Deliver kiosk/headless launchers for the Linux Core + remote clients (auto-login, fullscreen) so rigs boot directly into an operator-ready view.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L23】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L10-L18】
 - R-MM-004 (COULD): Add locked-down layouts that survive accidental window drags or task-switching.
 - R-MM-005 (SHOULD, resilience): Capture watchdog and auto-recovery expectations for kiosk/headless deployments (service restart policies, layout reset scripts, power-loss recovery steps) so rigs can return to an operator-ready state without manual intervention.
 
@@ -37,7 +37,7 @@ Define how Nexus coordinates operator stations, automation plugins, and firmware
 - O-MM-2: Dedicated headless service with remote web UI.
 - O-MM-3: Windows kiosk mode packaging for cab computers.
 - O-MM-4: Remote-only thin client (tablet) controlling a headless backend.
-- O-MM-5: Linux Core kiosk/headless deployment with remote frontends.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L6-L44】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L1-L34】
+- O-MM-5: Linux Core kiosk/headless deployment with remote frontends.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L44】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L1-L34】
 
 ### Equipment configuration primitives
 - O-HW-7: Multi-steer equipment configurator primitives describe the module catalog, hitch rules, sensor attachments, mode profiles, calibration flows, telemetry surfaces, definition-of-done gates, and the axle-centric runtime graph that [ADR-017](../ADR/ADR-017-profiles-kinematics.md) consumes for articulated, tracked, or multi-axle rigs.【F:docs/SRS/sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md†L1-L420】
@@ -57,7 +57,7 @@ Operator workflow, recovery from display loss, remote access needs, control dete
 
 ## Current sentiment
 - Operators rely on multi-monitor helpers today, but headless support is ad hoc and needs a clearer plan.
-- The community wants kiosk scripts and watchdogs bundled with any Linux Core pilot so remote dashboards recover automatically after power loss.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L6-L23】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L10-L34】
+- The community wants kiosk scripts and watchdogs bundled with any Linux Core pilot so remote dashboards recover automatically after power loss.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L23】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L10-L34】
 - Control arbitration must consolidate in Core so plugins remain optional and headless deployments retain deterministic behavior.
 - Constraint gates for spatial zones need to live in the same arbiter to keep automation deterministic and ensure plugins cannot bypass safety policies.
 

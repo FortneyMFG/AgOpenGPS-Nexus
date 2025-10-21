@@ -10,7 +10,7 @@ Capture how AgOpenGPS and AgIO interface with GNSS, steer, rate, machine, and se
 - R-HW-003 (SHOULD, current-AgIO): Retain UDP scanning and diagnostic tools that locate steer, machine, IMU, and GPS modules on the network.【F:SourceCode/AgIO/Source/Forms/FormUDP.cs†L13-L160】
 - R-HW-010 (MUST, proposed-variable-layer): Advertise firmware capabilities, layer support, and channel-to-layer mappings so configuration flows can link hardware inputs to logical telemetry.【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md†L1-L27】
 - R-HW-011 (SHOULD, proposed-variable-layer): Provide presets, validation, and throttling controls for high-frequency sensors to prevent operator misconfiguration and UDP congestion.【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md†L28-L45】
-- R-HW-004 (SHOULD, proposed-LinuxCore): Offer SocketCAN, udev-based serial naming, and bridge services so Linux SBCs can connect to GNSS/IMU/section hardware without bespoke drivers.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L11-L20】
+- R-HW-004 (SHOULD, proposed-LinuxCore): Offer SocketCAN, udev-based serial naming, and bridge services so Linux SBCs can connect to GNSS/IMU/section hardware without bespoke drivers.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L11-L20】
 - R-HW-005 (MUST, proposed-PGNBridge): Document the existing PGN catalog and ensure any new hardware abstraction keeps backward compatibility or provides adapters.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
 - R-HW-006 (COULD): Add standardized hardware capability discovery (e.g., via PGN handshake) beyond today’s manual settings.
 - R-HW-012 (SHOULD, proposed-ISOBUS-alignment): Introduce ISOBUS-inspired condensed work state PGNs (289-291, 141, 161-162, 367)
@@ -32,7 +32,7 @@ Capture how AgOpenGPS and AgIO interface with GNSS, steer, rate, machine, and se
 - O-HW-3: Add plug-and-play USB/HID devices for sensors and switches.
 - O-HW-4: Provide a modular gateway (e.g., embedded Linux) that proxies between transports.
 - O-HW-5: [Modular firmware publishing variable-rate layers](../5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md) — Discovery + mapping for flexible layer telemetry.
-- O-HW-6: Linux gateway + PGN bridge that proxies SocketCAN/serial into Core APIs.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L11-L44】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
+- O-HW-6: Linux gateway + PGN bridge that proxies SocketCAN/serial into Core APIs.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L11-L44】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -51,7 +51,7 @@ Field reliability, ease of install, compatibility with existing rigs, firmware u
 ## Current sentiment
 - Keep current modules online while exploring what a hardware abstraction would require to avoid regressions for SK21 and similar systems.
 - Early adopters want firmware-discovered layer capabilities, but insist on a “legacy-only” toggle for rigs that cannot yet stream the richer telemetry.【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51-O5%20-%20Modular%20firmware%20publishing%20variable-rate%20layers.md†L46-L57】
-- Linux pilots must prove SocketCAN + PGN bridging works before operators consider retiring Windows tablets in the cab.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L44】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】
+- Linux pilots must prove SocketCAN + PGN bridging works before operators consider retiring Windows tablets in the cab.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L21-L44】【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】
 
 ## Open questions
 - How do we validate new hardware in CI without requiring physical rigs?

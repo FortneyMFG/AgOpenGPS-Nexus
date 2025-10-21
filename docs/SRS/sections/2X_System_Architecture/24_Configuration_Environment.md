@@ -1,10 +1,13 @@
 # 24 — Configuration & Environment
-*(Status: collecting proposals)*
+*(Status: Proposed)*
 
-**Section ID:** 24
+**Author:** Codex
+**Created:** 2025-10-20
+**Status:** Proposed
 **Version:** 0.1.0
+**Section ID:** 24
 **Editors:** @nexus-specs, @ops-wg
-**Last Updated:** 2025-02-14
+**Last Updated:** 2025-10-20
 **Related Sections:** 21, 22, 23, 64, 94
 **Upstream Dependencies:** 11, 64
 **Downstream Impacts:** 42, 91, 96
@@ -21,7 +24,7 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 
 - Telemetry and replay pipelines rely on consistent configuration metadata for traceability and health reporting.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L28-L146】
 - Feature flag governance must align with release engineering workflows to coordinate staged rollouts.【F:docs/SRS/sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md†L149-L211】
-- Linux Core packaging introduces secrets management requirements that differ from Windows DPAPI assumptions.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L16-L62】
+- Linux Core packaging introduces secrets management requirements that differ from Windows DPAPI assumptions.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】
 
 ---
 
@@ -94,6 +97,31 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 
 ---
 
+## 24.8 Risks & Open Issues
+
+| ID | Description | Impact | Mitigation / Status | Owner |
+|----|-------------|--------|---------------------|-------|
+| RISK-24-1 | Secrets rotation may drift between Windows DPAPI and Linux keyrings. | High | Align providers with §22 deployment playbooks and automate lease validation per ADR-028.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】 | @ops-wg |
+| ISSUE-24-1 | Feature flag telemetry coverage inconsistent across Core and UI. | Medium | Enforce registry automation and dashboards described in §96 until parity achieved. | @release |
+
+---
+
+## 24.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Profile versioning & provenance | Profiles and overrides require schema validation with audit trails for fleet reproducibility.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L28-L96】 |
+| C2 | Secrets abstraction across platforms | Configuration must reference logical keys so Windows DPAPI, Linux keyrings, and vault providers remain interchangeable.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】 |
+| C3 | Remote deployment readiness | Configuration artifacts support headless Core packaging and remote clients defined in §22 while surfacing drift telemetry.【F:docs/SRS/sections/2X_System_Architecture/22_Process_Model_Deployment.md†L1-L160】 |
+
+### 24.9.1 Assumptions & Preconditions
+
+- [A1] Schema repositories and validation tooling are version-controlled alongside deployment pipelines.
+- [A2] Secrets providers expose lease status for telemetry ingestion within 60 s.
+- [A3] Remote deployments share configuration metadata with telemetry systems to detect drift.
+
+---
+
 ## 24.12 Option Evaluation
 
 ### 24.12.1 Configuration Strategies
@@ -138,12 +166,12 @@ Reliable configuration management is viewed as prerequisite for remote deploymen
 
 ## 24.16 Traceability
 
-| Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
-|----------------|-------------------|--------|-----------------------|--------------------------|
-| R-CONF-000 | Profile registry + overrides | 21-ADR-028 | `pipelines/config_schema_check.yml` | `docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md` |
-| R-CONF-001 | Profile registry + overrides | 21-ADR-068 | `tests/security/secret_rotation.md` | `docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md` |
-| R-CONF-003 | Profile registry + overrides | 21-ADR-900 | `tools/flags/generate_registry.md` | `docs/SRS/sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md` |
-| R-CONF-005 | Profile registry + overrides | 21-ADR-004 | `tests/health/config_drift.md` | `docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md` |
+| Requirement ID | Related Strategy / Consideration | ADR(s) | Verification Artifact | Implementation Reference |
+|----------------|-------------------------------|--------|-----------------------|--------------------------|
+| R-CONF-000 | Profile registry + overrides, C1 | 21-ADR-028 | `pipelines/config_schema_check.yml` | `docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md` |
+| R-CONF-001 | Secrets providers, C2 | 21-ADR-028 | `tests/security/secret_rotation.md` | `docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md` |
+| R-CONF-003 | Feature flag registry, C3 | 21-ADR-900 | `tools/flags/generate_registry.md` | `docs/SRS/sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md` |
+| R-CONF-005 | Telemetry integration, C3 | 21-ADR-004 | `tests/health/config_drift.md` | `docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md` |
 
 ---
 

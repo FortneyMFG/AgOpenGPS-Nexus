@@ -9,7 +9,7 @@
 **Supersedes:** —
 **Superseded by:** —
 **Related SRS:** `21_System_Decomposition_Boundaries.md`
-**Related Options:** `21-O5 - Layer controllers with aggregation pipelines.md`, `21-O6 - Linux Core service with remote frontends.md`
+**Related Considerations:** §21.9 (C1, C2), §22.9 (C2, C3)
 
 ---
 
@@ -17,7 +17,7 @@
 
 Contributors requested a single reference mapping how firmware, hardware services, the Core runtime, and feature plugins divide responsibilities so new features land without blurring safety and contract boundaries.
 Existing SRS sections already define transports, hardware governance, and plugin lifecycle, but they are scattered, leading to duplicated work or misplaced functionality.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L3-L35】【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L3-L116】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L17-L211】
-Linux Core pilots (§21-O6) and layer controller modernization (§21-O5) require explicit boundaries to guarantee determinism, observability, and safe extensibility across OS platforms.
+Linux Core pilots (SRS §21.9 C2) and layer controller modernization (SRS §21.9 C1) require explicit boundaries to guarantee determinism, observability, and safe extensibility across OS platforms.
 
 ```mermaid
 graph TD
@@ -128,8 +128,7 @@ graph TD
 
 ## 10) References
 
-* **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.12; `22_Process_Model_Deployment.md` — §22.5; `24_Configuration_Environment.md` — §24.5.
-* **Option Documents:** `21-O5 - Layer controllers with aggregation pipelines.md`, `21-O6 - Linux Core service with remote frontends.md`
+* **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.9, §21.12; `22_Process_Model_Deployment.md` — §22.5, §22.9; `24_Configuration_Environment.md` — §24.5, §24.9.
 * **Prior ADRs:** `21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md`
 * **External References:** Architecture WG minutes (2024-09-30), Plugin API governance doc (2024-Q4).
 
@@ -145,4 +144,4 @@ graph TD
 ---
 
 > **Lifecycle:** Proposed → Accepted → Superseded → Deprecated → Rejected
-> **Traceability:** Links to SRS Decision Matrix § 21.12 and options 21-O5, 21-O6.
+> **Traceability:** Links to SRS Decision Matrix §21.12 and design considerations §21.9 (C1, C2).

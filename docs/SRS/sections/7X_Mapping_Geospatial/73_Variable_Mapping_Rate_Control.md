@@ -21,7 +21,7 @@ Define how variable-rate prescriptions, agronomic overlays, and closed-loop cont
 
 ## 73.2 Context
 
-- Variable-rate layers originate from metadata-driven schemas that encode units, valid ranges, and smoothing hints for controllers.【F:docs/SRS/sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md†L1-L64】
+- Variable-rate layers originate from metadata-driven schemas that encode units, valid ranges, and smoothing hints for controllers.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L224-L229】
 - Guidance and pose fusion subsystems provide spatial context, speed, and heading data required for controller lookahead and rate compensation.【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L86-L156】
 - Layer controllers share infrastructure with automation pipelines described in ADR-021 and must respect keep-outs and headlands to maintain safety.【F:docs/SRS/sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md†L1-L46】【F:docs/SRS/sections/8X_Guidance/81_Guidance_Orchestrator.md†L94-L180】
 - Telemetry and health monitoring capture commanded vs. actual rates, calibration deltas, and diagnostic metrics for audit trails.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L24-L126】

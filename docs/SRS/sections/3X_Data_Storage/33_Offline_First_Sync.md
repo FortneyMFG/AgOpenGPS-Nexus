@@ -1,10 +1,12 @@
 # 33 — Offline-first & Sync
-*(Status: review)*
+*(Status: Proposed)*
 
+**Author:** Codex
+**Created:** 2025-10-20
 **Section ID:** 33
-**Version:** 0.2.0
+**Version:** 0.1.0
 **Editors:** @nexus-docs-team
-**Last Updated:** 2025-02-14
+**Last Updated:** 2025-10-20
 **Related Sections:** [31 — Domain Data Model](31_Domain_Data_Model.md), [32 — Persistence & Formats](32_Persistence_Formats.md), [34 — Backup, Retention & Archival](34_Backup_Retention_Archival.md)
 **Upstream Dependencies:** [ADR-019](../../ADR/ADR-019-provenance-audit-qa.md), [ADR-024](../../ADR/ADR-024-discovery-identity.md), [ADR-028](../../ADR/ADR-028-stack-boundaries.md)
 **Downstream Impacts:** Release packaging workflows, Core/AgIO update channels, backup exporters, retention planners

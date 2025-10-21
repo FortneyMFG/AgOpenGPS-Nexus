@@ -1,10 +1,12 @@
 # 34 — Backup, Retention & Archival
-*(Status: review)*
+*(Status: Proposed)*
 
+**Author:** Codex
+**Created:** 2025-10-20
 **Section ID:** 34
-**Version:** 0.2.0
+**Version:** 0.1.0
 **Editors:** @nexus-docs-team
-**Last Updated:** 2025-02-14
+**Last Updated:** 2025-10-20
 **Related Sections:** [31 — Domain Data Model](31_Domain_Data_Model.md), [32 — Persistence & Formats](32_Persistence_Formats.md), [33 — Offline-first & Sync](33_Offline_First_Sync.md)
 **Upstream Dependencies:** [ADR-025](34-ADR-025 - Data lifecycle and retention policy.md), [ADR-026](../2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md)
 **Downstream Impacts:** Backup tooling, retention planners, regulatory export workflows, telemetry health dashboards
@@ -80,7 +82,7 @@ Assumptions:
 | R-BACKUP-001 | MUST | Backup Targets | Support scheduled exports to removable media and network shares (SMB/NFS/S3) with resumable uploads and checksum verification.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L16-L124】【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L24-L44】 |
 | R-BACKUP-002 | SHOULD | Snapshotting | Provide CLI/UI flows to snapshot job/session state into portable bundles for recovery or cloning.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L66-L156】【F:docs/SRS/sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md†L149-L211】 |
 | R-BACKUP-003 | MUST | Differential Sync | Optimise large dataset transfers via differential manifests or deduplicated tiles.【F:docs/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L66-L124】 |
-| R-BACKUP-004 | SHOULD | Regulatory Export | Generate retention reports (spray logs, yield histories) in open formats with provenance.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L160-L327】【F:docs/SRS/sections/3X_Data_Storage/32-O5 - Metadata-driven variable-rate layers.md†L1-L64】 |
+| R-BACKUP-004 | SHOULD | Regulatory Export | Generate retention reports (spray logs, yield histories) in open formats with provenance.【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L160-L327】【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L224-L229】 |
 | R-BACKUP-005 | MUST | Integrity Monitoring | Surface backup success/failure, last-run timestamps, storage utilisation via telemetry dashboards and CLI health checks.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L96-L146】【F:docs/SRS/sections/6X_Core_Domain_Services/64-O5 - Layer diagnostics and health monitoring.md†L1-L38】 |
 
 ### 34.5.3 Requirement Sources & Rationale

@@ -106,7 +106,7 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 - [O-TELE-4 – Layer Diagnostics](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md)
 
 #### 7X — Mapping & Geospatial
-- [O-DATA-5 – Metadata-driven Layers](sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md)
+- [C-DATA-8 – Metadata-driven Layer Catalog](sections/3X_Data_Storage/32_Persistence_Formats.md#3293-metadata-driven-layer-catalog-guidelines)
 
 #### 9X — Frontends & Ops
 - [O-FRONT-6 – Remote Clients](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md)
@@ -308,16 +308,16 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-DATA-000 | O-DATA-0 | Field streamer (legacy baseline) | ADR-DATA-001 (TBD) |
 | R-DATA-001 | O-DATA-0 | SQLite usage (legacy baseline) | ADR-DATA-001 (TBD) |
 | R-DATA-002 | O-DATA-0 | Shared libraries (legacy baseline) | ADR-DATA-002 (TBD) |
-| R-DATA-003 | O-DATA-0, O-DATA-5 | [Export formats](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-003 (TBD) |
-| R-DATA-010 | O-DATA-5 | [Metadata layers](sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md) | ADR-DATA-004 (TBD) |
-| R-DATA-011 | O-DATA-5 | [Metadata layers](sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md) | ADR-DATA-004 (TBD) |
-| R-DATA-012 | O-DATA-5 | [Metadata layers](sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md) | ADR-DATA-005 (TBD) |
-| R-DATA-004 | O-DATA-5 | [Compression ideas](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-006 (TBD) |
-| R-DATA-013 | O-DATA-5 | [Retention policy](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
-| R-DATA-014 | O-DATA-5 | [Schema hashes](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
-| R-DATA-026 | O-DATA-5 | [Spatial constraints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
-| R-DATA-027 | O-DATA-5 | [Buffered footprints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
-| R-DATA-028 | O-DATA-5 | [Indexed queries](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
+| R-DATA-003 | O-DATA-0, C-DATA-8 | [Export formats](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-003 (TBD) |
+| R-DATA-010 | C-DATA-8 | [Metadata layers](sections/3X_Data_Storage/32_Persistence_Formats.md#3293-metadata-driven-layer-catalog-guidelines) | ADR-DATA-004 (TBD) |
+| R-DATA-011 | C-DATA-8 | [Metadata layers](sections/3X_Data_Storage/32_Persistence_Formats.md#3293-metadata-driven-layer-catalog-guidelines) | ADR-DATA-004 (TBD) |
+| R-DATA-012 | C-DATA-8 | [Metadata layers](sections/3X_Data_Storage/32_Persistence_Formats.md#3293-metadata-driven-layer-catalog-guidelines) | ADR-DATA-005 (TBD) |
+| R-DATA-004 | C-DATA-8 | [Compression ideas](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-006 (TBD) |
+| R-DATA-013 | C-DATA-8 | [Retention policy](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
+| R-DATA-014 | C-DATA-8 | [Schema hashes](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
+| R-DATA-026 | C-DATA-8 | [Spatial constraints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
+| R-DATA-027 | C-DATA-8 | [Buffered footprints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
+| R-DATA-028 | C-DATA-8 | [Indexed queries](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
 | R-DATA-040 | O-DATA-5 | [Zone edit provenance](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-044](sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md) |
 | R-DATA-041 | O-DATA-5 | [Crop history schema](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-045](sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md) |
 | R-DATA-042 | O-DATA-5 | [Session weather snapshot](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-053](sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md) |

@@ -4,10 +4,10 @@ This index lists every active section in the SRS with quick links. Each section 
 
 | ID | Section | Scope | Dependencies / sequencing hints |
 |----|---------|-------|----------------------------------|
-| 11 | [OS Support](Sections/1X_Platform_Foundations/11_OS_Support.md) | Supported operating systems, deployment models, and hardware assumptions. | Baseline for hardware targets feeding 12, 21, and 52; Linux pilots depend on R-OS-006. |
-| 12 | [Development Language & Runtime](Sections/1X_Platform_Foundations/12_Development_Language_Runtime.md) | Managed runtime, language policy, dependency governance. | Builds on 11; contract versioning shared with 63 and 94. |
-| 13 | [UI Framework & UX Language](Sections/1X_Platform_Foundations/13_UI_Framework_UX.md) | Cross-platform UI stack, MVVM conventions, theming. | Depends on 11/12; metadata dashboards rely on 63 and 71 readiness. |
-| 14 | [Build Environment & Tooling](Sections/1X_Platform_Foundations/14_Build_Tooling.md) | Toolchains, reproducible builds, signing, developer onboarding. | Feeds 96 quality gates and 94 packaging standards. |
+| 11 | [OS Support](sections/1X_Platform_Foundations/11_OS_Support.md) | Supported operating systems, deployment models, and hardware assumptions. | Baseline for hardware targets feeding 12, 21, and 52; Linux pilots depend on R-OS-006. |
+| 12 | [Development Language & Runtime](sections/1X_Platform_Foundations/12_Development_Language_Runtime.md) | Managed runtime, language policy, dependency governance. | Builds on 11; contract versioning shared with 63 and 94. |
+| 13 | [UI Framework & UX Language](sections/1X_Platform_Foundations/13_UI_Framework_UX.md) | Cross-platform UI stack, MVVM conventions, theming. | Depends on 11/12; metadata dashboards rely on 63 and 71 readiness. |
+| 14 | [Build Environment & Tooling](sections/1X_Platform_Foundations/14_Build_Tooling.md) | Toolchains, reproducible builds, signing, developer onboarding. | Feeds 96 quality gates and 94 packaging standards. |
 | 21 | [System Decomposition & Boundaries](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | Core vs. AgIO vs. UI vs. plugin responsibilities. | Consumes 11–13 inputs; informs 22–24 design envelopes. |
 | 22 | [Process Model & Deployment Topologies](sections/2X_System_Architecture/22_Process_Model_Deployment.md) | In-process, split-core, remote, and container deployments. | Depends on 21 decomposition; remote clients require 41–43 security and transport guarantees. |
 | 23 | [Threading, Scheduling & Timing](sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md) | Shared clocks, latency budgets, scheduling primitives. | Drives 61 pose fusion and 81 guidance loops; telemetry coverage in 64. |

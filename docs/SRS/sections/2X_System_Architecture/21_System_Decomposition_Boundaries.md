@@ -24,7 +24,7 @@ Map the guidance, mapping, field data, and rules services that power the applica
 - O-BE-4: Scriptable engine embedded via Lua/Python for business rules.
 - O-BE-5: [Layer controllers with aggregation pipelines](../options/6X/O-BACKEND-4_LayerControllers.md) — Metadata-driven ingestion + mapping snapshots.
 - O-BE-6: [Linux Core service split from UI](../options/2X/O-BACKEND-6_LinuxCoreService.md) — Headless daemon + API bridge + packaging.
-- O-BE-7: AgIO gRPC host with swappable Windows/Linux/Sim backends shipping unified NuGet contracts for Core/UI/Plugins.【F:docs/SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
+- O-BE-7: AgIO gRPC host with swappable Windows/Linux/Sim backends shipping unified NuGet contracts for Core/UI/Plugins.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -44,7 +44,7 @@ Determinism, offline resilience, ease of customization, testability, deployment 
 ## Current sentiment
 - Keep the current in-process services while cataloging seams where dedicated processes (e.g., telemetry recorder) make sense.
 - Broad agreement that the layer-controller refactor should land with replay coverage before any microservice work proceeds.【F:docs/SRS/options/6X/O-BACKEND-4_LayerControllers.md†L47-L58】【F:docs/SRS/options/9X/O-TEST-4_LayerReplayCI.md†L7-L27】
-- The AgIO gRPC host with .NET 8 backends is now positioned as the preferred modernization track because it keeps Core logic identical across OSes and rides on shared NuGet contracts for plugins and UI.【F:docs/SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
+- The AgIO gRPC host with .NET 8 backends is now positioned as the preferred modernization track because it keeps Core logic identical across OSes and rides on shared NuGet contracts for plugins and UI.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
 - Contributors want to scope a Linux Core pilot that keeps the Windows host running in parallel until PGN compatibility and performance targets are proven in the field.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L21-L44】【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】
 - Simulation modernization must keep the timeline authoritative inside the Core so replay, plugin simulators, and physical hardware can blend predictably without reimplementing routing logic per executable.
 

@@ -36,7 +36,7 @@ Updates the desktop UI so widgets, charts, and inspectors consume layer metadata
 L — Touches core rendering, inspector UX, dashboard frameworks, and configuration workflows to make them metadata-driven.
 
 ## References
-- [Section 13 — UI Framework & UX Language](../../Sections/1X_Platform_Foundations/13_UI_Framework_UX.md)
+- [Section 13 — UI Framework & UX Language](../../sections/1X_Platform_Foundations/13_UI_Framework_UX.md)
 - [Section 72 — Mapping Layers Plugin](../sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
 - [Section 91 — UI Shell & Layout](../sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
 

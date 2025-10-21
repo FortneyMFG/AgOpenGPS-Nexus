@@ -7,7 +7,7 @@ Accepted
 
 
 ## Context
-Nexus development depends on deterministic simulation for CI, operator training, and plugin validation. The backend and extensibility sections highlight the need for a composite simulation loop where Core owns the authoritative clock, plugins publish to a shared bus, and hardware inputs can pre-empt simulated data without duplicating routing logic.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L70】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L18-L71】 Option O-STACK-1 reinforces this model by positioning AgIO’s simulation backend alongside Windows and Linux backends using the same contracts.【F:docs/SRS/options/1X/O-STACK-1_DotNet8Avalonia.md†L9-L47】
+Nexus development depends on deterministic simulation for CI, operator training, and plugin validation. The backend and extensibility sections highlight the need for a composite simulation loop where Core owns the authoritative clock, plugins publish to a shared bus, and hardware inputs can pre-empt simulated data without duplicating routing logic.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L70】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L18-L71】 Option 11-O1 reinforces this model by positioning AgIO’s simulation backend alongside Windows and Linux backends using the same contracts.【F:SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
 
 ## Decision
 Create a composite simulation fabric governed by the Core service:
@@ -49,4 +49,4 @@ Plugins register simulation providers against this fabric and must respect seede
 ## References
 - [Section 21 — System Decomposition & Boundaries](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
 - [Section 94 — Extensibility, Packaging & Updates](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
-- [Option O-STACK-1 — .NET 8 + Avalonia stack](../SRS/options/1X/O-STACK-1_DotNet8Avalonia.md)
+- [Option 11-O1 — Unified .NET 8 + Avalonia stack](../../SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md)

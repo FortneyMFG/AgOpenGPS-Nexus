@@ -8,10 +8,10 @@
 - **Created:** 2025-10-20
 - **Last Updated:** 2025-10-20
 - **Related Specifications:**
-  - `SRS/Sections/1X_Platform_Foundations/11_OS_Support.md`
-  - `SRS/Sections/1X_Platform_Foundations/12_Development_Language_Runtime.md`
-  - `SRS/Sections/1X_Platform_Foundations/13_UI_Framework_UX.md`
-- **Related Options & ADRs:** `11-O1_Unified_DotNet8_Avalonia.md`, `11-ADR-001_Adopt_Unified_Runtime.md`, `13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md`
+  - `sections/1X_Platform_Foundations/11_OS_Support.md`
+  - `sections/1X_Platform_Foundations/12_Development_Language_Runtime.md`
+  - `sections/1X_Platform_Foundations/13_UI_Framework_UX.md`
+- **Related Options & ADRs:** `sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md`, `sections/1X_Platform_Foundations/11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md`, `sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md`
 
 ---
 

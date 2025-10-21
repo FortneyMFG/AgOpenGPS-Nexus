@@ -31,8 +31,6 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 - **Options** can be expanded in dedicated files using the
   [`docs/templates/OPTION.md`](../templates/OPTION.md) template when deeper analysis is
   needed.
-- **Decision matrices** use [`docs/templates/DECISION_MATRIX.md`](../templates/DECISION_MATRIX.md)
-  to score mutually exclusive option families once requirements are stable.
 - **References** house canonical specs (e.g., PGN catalogs) that new options must remain compatible with unless an ADR says otherwise.
 - **ADRs** document finalized decisions. Each ADR references the section(s) and options involved so we preserve traceability.
 

@@ -53,7 +53,7 @@ This section clarifies which platforms must remain first-class, how emerging Lin
 |---------------|-----------------|------------------------|---------------------------|--------------------|
 | Deployment | Windows WinExe installers for Core, UI, and AgIO utilities. | Linux deployments ad-hoc; no consistent packaging. | Ship Linux systemd units, container images, and Pi/CM5 bundles. | Historical AgOpenGPS releases |
 | Hardware Access | Direct Win32 serial, HID, and vendor CAN SDK integrations. | Tight coupling to Windows drivers; limited SocketCAN coverage. | Encapsulate device access in AgIO backends with Linux parity. | AgIO codebase |
-| UI Shells | WinForms primary UI with emerging WPF shell. | Dual maintenance burden; touch parity limited. | Adopt cross-platform UI stack that reuses shared contracts. | Nexus UI discussions |
+| UI Shells | WinForms primary UI; WPF experiments retired. | Operators rely on AgOpenGPS v6 while Nexus UI matures. | Adopt cross-platform UI stack that reuses shared contracts. | Nexus UI discussions |
 
 > **Informative:** Captures historical context and modernization drivers.
 

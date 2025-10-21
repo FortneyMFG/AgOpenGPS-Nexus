@@ -31,7 +31,7 @@ Deliver AgOpenGPS Nexus as a unified, cross-platform guidance platform that pres
 ## 3. Objectives & Success Criteria
 | ID | Objective | Success Criteria | SRS Trace |
 |----|-----------|------------------|-----------|
-| OBJ-1 | Preserve operator continuity on Windows while modernizing infrastructure. | Windows installers and WinForms/WPF flows continue shipping with validated smoke suites (R-OS-000, R-UI-000). | §11.5, §13.5 |
+| OBJ-1 | Preserve operator continuity on Windows while modernizing infrastructure. | Windows installers keep shipping AgOpenGPS v6 WinForms builds with validated smoke suites (R-OS-000, R-UI-000); WPF shell maintenance is out of scope. | §11.5, §13.5 |
 | OBJ-2 | Launch a unified cross-platform runtime and UI stack. | Demonstrate Avalonia UI parity and 60 FPS rendering on Windows x64 and Linux ARM64 hardware (R-OS-004, R-OS-006, R-UI-008). | §11.5, §13.5 |
 | OBJ-3 | Enable headless Core + AgIO deployments with remote clients. | Publish Linux systemd packages and remote client demos that meet latency targets (≤50 ms) and run-mode toggles (R-OS-004, R-UI-005, Option 11-O1). | §11.5, §13.5, Option 11-O1 |
 | OBJ-4 | Institutionalize governance for plugins, contracts, and packaging. | Maintain ADR-aligned checklists covering gRPC contracts, plugin manifests, and signed artifacts across OS builds. | §11.7, Option 11-O1 |

@@ -77,7 +77,7 @@ Alternatives either block roadmap goals or require full rewrites in less familia
 
 | Option | Summary | Reason Not Selected |
 |--------|---------|---------------------|
-| Legacy Windows baseline | Retain WinForms/WPF only. | Fails Linux/mobile goals; accumulates tech debt. |
+| Legacy Windows baseline | Retain WinForms only with no cross-platform plan. | Fails Linux/mobile goals; accumulates tech debt. |
 | Qt/C++ rewrite | Native cross-platform UI. | High rewrite cost, splits language/tooling expertise. |
 | Electron/Web UI | Web technologies for desktop. | Hardware access latency and GPU constraints unacceptable. |
 
@@ -114,7 +114,7 @@ graph TD
 
 - WinForms UI + Win32 drivers formed the operational baseline since AgOpenGPS 5.x.
 - Early Linux experiments relied on community scripts without deterministic packaging.
-- WPF shell prototypes improved UX but remained Windows-bound, motivating cross-platform UI investment.
+- WPF shell prototypes improved UX but remained Windows-bound and are now retired, reinforcing the need for a new cross-platform UI investment.
 
 ---
 

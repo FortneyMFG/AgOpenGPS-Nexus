@@ -45,7 +45,7 @@ Clarify how runtime governance supports cross-platform deployments and plugin co
 
 | Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
 |---------------|-----------------|------------------------|---------------------------|--------------------|
-| Runtime Mix | .NET Framework WinForms, .NET 6 WPF, native utilities. | Fragmented build chain; divergent APIs. | Standardize on .NET 8 with unified project structure. | Source tree inventory |
+| Runtime Mix | .NET Framework WinForms with abandoned WPF experiments plus native utilities. | Fragmented build chain; divergent APIs. | Standardize on .NET 8 with unified project structure. | Source tree inventory |
 | Dependency Governance | Ad-hoc NuGet additions per project. | Unverified Linux compatibility; inconsistent versions. | Curated allowlist with dual-OS CI validation. | Contributor discussions |
 | Plugin Contracts | Manual interface definitions; no versioning plan. | Hard to maintain compatibility across releases. | Package shared gRPC/contract libraries with semantic versioning. | Plugin WG backlog |
 
@@ -149,7 +149,7 @@ Clarify how runtime governance supports cross-platform deployments and plugin co
 | ID | Consideration | Description |
 |----|----------------|-------------|
 | C1 | Unified runtime adoption | .NET 8 LTS provides consistent language features and tooling. |
-| C2 | Legacy compatibility | Transition strategy for WinForms/WPF and native helpers. |
+| C2 | Legacy compatibility | Keep AgOpenGPS v6 hardware integrations functioning while Nexus moves to .NET 8; UI migrations are out of scope. |
 | C3 | Dependency governance | Allowlist + CI gating to ensure cross-platform compatibility. |
 | C4 | Contract versioning | Maintain stable APIs for plugins and remote clients. |
 | C5 | Tooling ergonomics | Provide setup scripts to install SDKs and analyzers consistently. |

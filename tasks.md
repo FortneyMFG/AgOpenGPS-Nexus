@@ -257,6 +257,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-954 Simulation route mode case-insensitive selection _(Done)_ — Mirror SelectedMode setter canonicalization and tests
 - [x] NX-980 Sections panel sixteen-toggle support _(Done)_ — Expand UI and tests for 16-section masks
 - [x] NX-1120 Avalonia App.axaml include cleanup _(Done)_ — Exclude build output directories from AvaloniaResource glob
+- [x] NX-1121 SRS cleanup to retire WPF maintenance plan _(Done)_ — Update SRS/ADR to keep V6 WinForms as fallback while Nexus UI develops
 - [x] NX-040 Avalonia app bootstrap
 - [x] NX-041 Connection/settings panel
 - [x] NX-042 Map view

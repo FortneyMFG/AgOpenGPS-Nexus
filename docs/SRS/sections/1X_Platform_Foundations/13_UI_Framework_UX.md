@@ -21,20 +21,20 @@
 ## 13.1 Purpose & Scope
 
 Define the presentation technologies, layout systems, and UX policies for Nexus desktop and companion clients.
-Balance legacy WinForms/WPF expectations with modernization via Avalonia and remote client strategies.
+Balance legacy WinForms expectations with modernization via Avalonia and remote client strategies; WPF maintenance is explicitly out of scope.
 
 ---
 
 ## 13.2 Context
 
-- WinForms remains the production UI for operators; WPF shell in development.
+- WinForms remains the production UI for operators via AgOpenGPS v6; WPF experiments are retired.
 - Remote clients and metadata-driven dashboards require cross-platform components.
 - Avalonia pilots aim to share view models across Windows/Linux and mobile shells.
 - UI stack must coexist with headless Core deployments connected through gRPC or WebSockets.
 
 ### Journeys to keep in mind
 
-- **Operator upgrading in the cab:** Starts the day in WinForms, flips a feature flag to preview Avalonia, and can fall back instantly if a layout feels unfamiliar.
+- **Operator upgrading in the cab:** Runs daily work on AgOpenGPS v6 WinForms and evaluates Nexus Avalonia builds on spare hardware without risking production rigs.
 - **QA verifying run modes:** Uses the Avalonia shell to swap between LocalInProc and CompanionRemote, ensuring the same dashboard cards appear without manual window reshuffling.
 - **Dealer supporting a headless rig:** Runs Avalonia on a Windows laptop while connected to a Linux Core over gRPC, confirming metadata-driven dashboards populate automatically.
 
@@ -47,7 +47,7 @@ Balance legacy WinForms/WPF expectations with modernization via Avalonia and rem
 | Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
 |---------------|-----------------|------------------------|---------------------------|--------------------|
 | WinForms UI | Primary operator interface with OpenGL panels. | Windows-only, limited touch support. | Maintain compatibility while introducing cross-platform Avalonia shell. | Production UI |
-| WPF Shell | Modernized Windows shell prototype. | Incomplete; still Windows-only. | Reuse view models within Avalonia for dual-first strategy. | WPF branch |
+| Retired WPF Experiments | Prototype panels with limited adoption. | Unmaintained; no release path. | Document lessons learned and move on. | WPF branch archive |
 | Configuration UX | Manual wiring of dashboards and inspectors. | Slow to surface new layers/metrics. | Adopt metadata-driven dashboards (O-UI-5). | UX backlog |
 
 ---
@@ -72,7 +72,6 @@ Balance legacy WinForms/WPF expectations with modernization via Avalonia and rem
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|-----------|----------|-----------------|-----------------------------|
 | R-UI-000 | MUST | Legacy Support | Keep WinForms desktop UI shipping with mapping, PGN tools, OpenGL panels. | Legacy operators | Windows regression suite |
-| R-UI-001 | MUST | Modern Shell | Continue WPF shell development targeting Windows desktop. | UI WG | WPF build + smoke tests |
 | R-UI-002 | SHOULD | AgIO Config | Maintain AgIO Windows Forms dialogs for device setup. | AgIO maintainers | UI automation on dialogs |
 | R-UI-003 | SHOULD | Multi-monitor | Preserve window placement helpers for multi-monitor cabs. | Operator feedback | UI layout tests |
 | R-UI-004 | SHOULD | Metadata Widgets | Provide metadata-driven widgets to surface new layers without code rewrites. | Metadata dashboards backlog | Prototype dashboards hitting feature checklist |
@@ -97,7 +96,7 @@ Balance legacy WinForms/WPF expectations with modernization via Avalonia and rem
 
 ## 13.6 Acceptance Criteria & Verification
 
-- WinForms and WPF builds pass smoke tests with multi-monitor layout validation.
+- WinForms (v6) regression tests stay green alongside Avalonia smoke tests covering multi-monitor layouts.
 - Metadata dashboard prototypes demonstrate dynamic widget loading.
 - Remote client demo proves gRPC transport viability for CompanionRemote mode.
 
@@ -133,7 +132,6 @@ Balance legacy WinForms/WPF expectations with modernization via Avalonia and rem
 |----|-------------|--------|---------------------|-------|
 | RISK-13-1 | Avalonia theming/performance gaps. | Medium | Run pilots on Windows + Linux; keep WinForms fallback. | @ui |
 | RISK-13-2 | Metadata-driven dashboards overwhelm operators. | Low | Provide presets + training materials. | @ux |
-| ISSUE-13-1 | Decide timeline for WPF shell support level. | Medium | Capture milestones in release plan. | @ui |
 | ISSUE-13-2 | Validate run-mode toggles UX for QA. | Medium | Prototype configuration workflow. | @qa |
 
 ---
@@ -167,7 +165,7 @@ Balance legacy WinForms/WPF expectations with modernization via Avalonia and rem
 
 ## 13.11 Comparison Matrix
 
-| Attribute / Criteria | Legacy WinForms/WPF | Avalonia-based Shell (11-O1) |
+| Attribute / Criteria | Legacy WinForms (v6) | Avalonia-based Shell (11-O1) |
 |----------------------|---------------------|-----------------------------|
 | Implementation Effort | Low (status quo) | Medium (new toolkit + theming) |
 | Maintainability | Medium | High (shared code) |
@@ -194,7 +192,7 @@ Any future toolkit alternatives will require standalone option documents under S
 
 ## 13.14 Implementation Policy
 
-- Maintain dual-build pipeline for WinForms and Avalonia until parity is declared.
+- Keep AgOpenGPS v6 releases independent while Avalonia becomes the Nexus default; no WPF pipeline is maintained.
 - Publish UI theming guidelines and accessibility checklist for all shells.
 - Require metadata schema updates to include presentation hints for dashboards.
 
@@ -202,7 +200,7 @@ Any future toolkit alternatives will require standalone option documents under S
 
 ## 13.15 Community Sentiment
 
-- Operators request gradual transition; WinForms must remain stable until Avalonia proves parity.
+- Operators request gradual transition; WinForms must remain stable via the existing v6 distribution while Nexus matures separately.
 - Contributors endorse Avalonia due to shared C# skill set and mobile ambitions.
 - UX working group emphasizes metadata-driven approach to reduce manual dashboard wiring.
 

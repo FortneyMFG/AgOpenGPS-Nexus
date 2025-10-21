@@ -133,7 +133,7 @@ flowchart LR
 
 ## 10) Migration, Rollout, and Backout
 
-- Stage migration: maintain legacy WinForms/WPF flows while introducing Avalonia UI in preview.
+- Stage migration: keep AgOpenGPS v6 WinForms builds available while introducing Avalonia UI in Nexus previews.
 - Roll out Linux Core as opt-in preview before default inclusion in release builds.
 - Backout: retain ability to ship Windows-only release if Linux parity blockers appear; revert via feature flags.
 
@@ -160,7 +160,7 @@ flowchart LR
 
 | Option | Summary | Reason Not Selected |
 |--------|---------|---------------------|
-| Windows-only baseline | Continue shipping WinForms/WPF only. | Blocks Linux/mobile roadmap; maintenance debt. |
+| Windows-only baseline | Continue shipping WinForms only. | Blocks Linux/mobile roadmap; maintenance debt. |
 | Native Qt/C++ stack | Cross-platform UI without .NET. | Splits language/tooling; high rewrite cost. |
 | Electron/Web stack | Leverage web talent for UI. | Latency and hardware integration gaps for CAN/GNSS. |
 

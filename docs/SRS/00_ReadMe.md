@@ -238,7 +238,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
 |-------------|----------------------|----------------------|-----------------|
 | R-UI-000 | O-UI-0 | WinForms project (legacy baseline) | ADR-UI-001 (TBD) |
-| R-UI-001 | O-UI-0, O-UI-2, O-UI-7 | WPF shell (legacy baseline) | ADR-UI-001 (TBD) |
+| R-UI-001 | Retired | WPF shell maintenance removed; operators remain on AgOpenGPS v6 WinForms until Nexus UI ships. | ADR-UI-001 (TBD) |
 | R-UI-002 | O-UI-0 | AgIO dialogs (legacy baseline) | ADR-UI-002 (TBD) |
 | R-UI-003 | O-UI-0, O-UI-5 | Screen helper (legacy baseline) | ADR-UI-003 (TBD) |
 | R-UI-004 | O-UI-5 | [Metadata dashboards](sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md) | ADR-UI-004 (TBD) |

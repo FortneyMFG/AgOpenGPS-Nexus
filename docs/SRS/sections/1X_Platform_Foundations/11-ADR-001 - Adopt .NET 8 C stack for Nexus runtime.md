@@ -47,10 +47,10 @@ Standardise the Nexus codebase on C# targeting .NET 8 for every first-party comp
 
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
-- Windows remains the only supported runtime, with WinForms and WPF projects compiled as Windows desktop executables, so the stack is tied to the .NET Framework toolchain and lacks cross-platform parity today.【F:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md†L6-L13】【F:docs/SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md†L6-L17】
+- Windows remains the only supported runtime, with WinForms projects (and now-retired WPF experiments) compiled as Windows desktop executables, so the stack is tied to the .NET Framework toolchain and lacks cross-platform parity today.【F:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md†L6-L13】【F:docs/SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md†L6-L17】
 
 ### Legacy Dev Branch
-- The community dev branch follows the same Windows-only WinForms/WPF approach, reflecting the status-quo option of incremental modernization without a shared cross-platform runtime or packaging story.【F:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md†L6-L13】【F:docs/SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md†L16-L29】
+- The community dev branch follows the same Windows-only WinForms approach, with the WPF work left as experimental branches, reflecting the status-quo option of incremental modernization without a shared cross-platform runtime or packaging story.【F:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md†L6-L13】【F:docs/SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md†L16-L29】
 
 ## Governance Updates
 - **Supported runtime roster.** Nexus ships on .NET 8 through November 2026 with quarterly compatibility snapshots. Engineering pre-bakes manifests for the next LTS (currently .NET 10 preview) and publishes a readiness scorecard each June covering Core, AgIO, plugins, and tooling. A go/no-go decision is recorded 90 days before Microsoft GA so dependent teams can stage migrations without fire drills.

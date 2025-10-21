@@ -9,7 +9,7 @@
 **Supersedes:** —
 **Superseded by:** —
 **Related SRS:** `21_System_Decomposition_Boundaries.md`
-**Related Options:** `21-O5 - Layer controllers with aggregation pipelines.md`, `21-O6 - Linux Core service with remote frontends.md`
+**Related Considerations:** §21.9 (C1, C2), §22.9 (C2, C3)
 
 ---
 
@@ -130,7 +130,7 @@ graph TD
 ## 10) References
 
 * **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.15; `23_Threading_Scheduling_Timing.md` — §23.5; `24_Configuration_Environment.md` — §24.5.
-* **Option Documents:** `21-O5 - Layer controllers with aggregation pipelines.md`, `21-O6 - Linux Core service with remote frontends.md`
+* **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.9; `22_Process_Model_Deployment.md` — §22.5, §22.9.
 * **Prior ADRs:** `21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md`, `21-ADR-068 - Layer Controllers & Aggregation Runtime.md`
 * **External References:** Program board minutes (2025-01 to 2025-02), automation scripts in `tools/roadmap/`.
 
@@ -146,4 +146,4 @@ graph TD
 ---
 
 > **Lifecycle:** Proposed → Accepted → Superseded → Deprecated → Rejected
-> **Traceability:** Links to SRS Decision Matrix § 21.12 and options 21-O5, 21-O6.
+> **Traceability:** Links to SRS Decision Matrix §21.12 and design considerations §21.9 (C1, C2).

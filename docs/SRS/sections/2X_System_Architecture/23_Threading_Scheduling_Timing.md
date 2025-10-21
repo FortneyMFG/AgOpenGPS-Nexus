@@ -1,10 +1,13 @@
 # 23 — Threading, Scheduling & Timing
-*(Status: collecting proposals)*
+*(Status: Proposed)*
 
-**Section ID:** 23
+**Author:** Codex
+**Created:** 2025-10-20
+**Status:** Proposed
 **Version:** 0.1.0
+**Section ID:** 23
 **Editors:** @nexus-specs, @replay-wg
-**Last Updated:** 2025-02-14
+**Last Updated:** 2025-10-20
 **Related Sections:** 21, 22, 24, 61, 64
 **Upstream Dependencies:** 11, 21
 **Downstream Impacts:** 51, 81, 93
@@ -21,7 +24,7 @@ Capture timing budgets, threading models, and scheduling primitives required to 
 
 - SimClock/SimBus from §21 govern deterministic loops for simulation, replay, and hardware ingestion.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L46】
 - Headless batching (CLI jobs, automation) must not starve real-time threads while honoring CLI SLA targets.【F:docs/SRS/sections/9X_Frontends_Ops/93_Command_Line_Interface.md†L15-L66】
-- Remote frontends rely on clock synchronization (PTP/NTP) to keep telemetry overlays aligned with Core state.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L13-L62】
+- Remote frontends rely on clock synchronization (PTP/NTP) to keep telemetry overlays aligned with Core state.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】
 
 ---
 
@@ -94,6 +97,31 @@ Telemetry dashboards expose live loop metrics and alert on threshold breaches.
 
 ---
 
+## 23.8 Risks & Open Issues
+
+| ID | Description | Impact | Mitigation / Status | Owner |
+|----|-------------|--------|---------------------|-------|
+| RISK-23-1 | Layer controller refactors may introduce jitter beyond deterministic budgets. | High | Replay-driven latency benchmarks gate releases per ADR-068.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 | @replay-wg |
+| ISSUE-23-1 | Cross-process clock sync tooling for remote clients not finalized. | Medium | Coordinate with §22 deployment owners to publish NTP/PTP configuration guidance. | @deployment-wg |
+
+---
+
+## 23.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Deterministic SimClock governance | SimClock/SimBus orchestrates loop cadence and replay determinism across services.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L86】 |
+| C2 | Layer-aware scheduling | Layer controllers emit immutable snapshots that decouple ingestion from rendering/UI threads.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 |
+| C3 | Remote synchronization | Multi-process deployments rely on shared clock sync and telemetry alerts to protect remote overlays.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】 |
+
+### 23.9.1 Assumptions & Preconditions
+
+- [A1] Replay and hardware benches expose identical telemetry metrics for latency and jitter.
+- [A2] Remote deployments inherit §22 reconnect budgets and §24 configuration policies.
+- [A3] CI environments provide representative Windows and Linux timing baselines.
+
+---
+
 ## 23.12 Option Evaluation
 
 ### 23.12.1 Scheduling Strategies
@@ -106,7 +134,7 @@ Telemetry dashboards expose live loop metrics and alert on threshold breaches.
 
 ### 23.12.2 Decision Summary
 
-Hosted services and bounded channels are the favored strategy because they align with deterministic SimBus integration while keeping deployment complexity manageable; real-time kernel tuning remains optional for specialized rigs.【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L29-L58】
+Hosted services and bounded channels are the favored strategy because they align with deterministic SimBus integration while keeping deployment complexity manageable; real-time kernel tuning remains optional for specialized rigs.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】
 
 ---
 
@@ -139,11 +167,11 @@ Contributors view deterministic scheduling as prerequisite for Linux deployments
 
 ## 23.16 Traceability
 
-| Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
-|----------------|-------------------|--------|-----------------------|--------------------------|
-| R-TIME-000 | Hosted services + channels | 21-ADR-004 | `bench/simbus_timing.md` | `docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md` |
-| R-TIME-001 | Hosted services + channels | 21-ADR-068 | `tests/replay/loop_latency.md` | `docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md` |
-| R-TIME-003 | Hosted services + channels | 21-ADR-028 | `tests/load/high_priority_preemption.md` | `docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md` |
+| Requirement ID | Related Strategy / Consideration | ADR(s) | Verification Artifact | Implementation Reference |
+|----------------|----------------------------------|--------|-----------------------|--------------------------|
+| R-TIME-000 | Hosted services + channels, C1 | 21-ADR-004 | `bench/simbus_timing.md` | `docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md` |
+| R-TIME-001 | Hosted services + channels, C2 | 21-ADR-068 | `tests/replay/loop_latency.md` | `docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md` |
+| R-TIME-003 | Hosted services + channels, C3 | 21-ADR-028 | `tests/load/high_priority_preemption.md` | `docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md` |
 | R-TIME-005 | Hosted services + channels | 21-ADR-900 | `tests/cli/headless_batch.md` | `docs/SRS/sections/9X_Frontends_Ops/93_Command_Line_Interface.md` |
 
 ---

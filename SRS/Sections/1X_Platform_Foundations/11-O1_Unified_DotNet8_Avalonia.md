@@ -9,7 +9,7 @@
 **Reviewers:** Platform Foundations Working Group  
 **Created:** 2025-10-20  
 **Last Updated:** 2025-10-20  
-**Related SRS:** `SRS/Sections/1X_Platform_Foundations/11_OS_Support.md`  
+**Related SRS:** `SRS/sections/1X_Platform_Foundations/11_OS_Support.md`  
 **Related ADRs:** `11-ADR-001_Adopt_Unified_Runtime.md`
 
 ---

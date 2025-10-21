@@ -84,7 +84,7 @@ Key expectations carried into this section:
 - O-COMM-4: Embed a REST API around PGN state for web dashboards.
 - O-COMM-5: [Versioned variable-rate PGN suite](../options/4X/O-COMM-5_VariableRatePGNs.md) — Sequenced layer streams with schema handshakes.
 - O-COMM-6: [PGN compatibility bridge layered over new APIs](../options/4X/O-COMM-6_PGNCompatibilityBridge.md) — Legacy PGNs in, typed events out.
-- O-COMM-7: gRPC/protobuf API surface published via `Aog.Abstractions` NuGet and consumed by Core/UI/Plugins while AgIO/Bridge backends handle transport specifics.【F:docs/SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L36】
+- O-COMM-7: gRPC/protobuf API surface published via `Aog.Abstractions` NuGet and consumed by Core/UI/Plugins while AgIO/Bridge backends handle transport specifics.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L36】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -104,7 +104,7 @@ Deterministic latency, message integrity (CRC/sequencing), offline buffering, co
 ## Current sentiment
 - Keep PGNs flowing through AgIO while we inventory what hardening is required before layering a modern API facade.
 - Community wants the layer PGN suite staged behind feature flags so existing rigs stay stable while richer telemetry rolls out.【F:docs/SRS/options/4X/O-COMM-5_VariableRatePGNs.md†L43-L57】【F:docs/SRS/options/9X/O-TEST-4_LayerReplayCI.md†L7-L27】
-- The shared gRPC/protobuf surface is considered the preferred evolution path when paired with the PGN bridge because it keeps hardware compatibility while aligning Core, UI, and plugins on one contract package.【F:docs/SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
+- The shared gRPC/protobuf surface is considered the preferred evolution path when paired with the PGN bridge because it keeps hardware compatibility while aligning Core, UI, and plugins on one contract package.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
 - There is appetite to prototype the compatibility bridge alongside the Core API so UDP/serial devices remain usable during a Linux migration.【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L1-L35】【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L21-L44】
 
 ## Open questions

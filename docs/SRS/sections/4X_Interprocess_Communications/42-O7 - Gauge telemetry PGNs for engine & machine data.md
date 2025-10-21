@@ -1,4 +1,4 @@
-# O-COMM-7: Gauge telemetry PGNs for engine & machine data
+# 42-O7 — Gauge telemetry PGNs for engine & machine data
 
 ## Summary
 Define a read-only PGN suite (0xDA/0xD9/0xD8) that carries engine and machine gauges over CAN and UDP. The transport keeps the
@@ -69,7 +69,7 @@ interpret gauge metadata (IDs, scaling, validity) supplied via JSON definitions.
 - **Medium:** Requires firmware updates (new PGNs + heartbeats), dashboard parsing/rendering, and registry/tooling support.
 
 ## References
-- J1939/ISOBUS mappings in [Section 15 – Engine & Machine Gauges](../sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md).
+- J1939/ISOBUS mappings in [Section 15 – Engine & Machine Gauges](../7X_Mapping_Geospatial/74_Monitoring_Systems.md).
 - Current PGN framing documented in [AgIO PGN baseline](../references/AgIO_PGN_Baseline.md).
 
 ## Related ADRs

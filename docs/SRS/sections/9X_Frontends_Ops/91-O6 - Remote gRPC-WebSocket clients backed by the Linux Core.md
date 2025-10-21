@@ -1,4 +1,4 @@
-# O-FRONT-6: Remote clients over gRPC/WebSocket
+# 91-O6 — Remote gRPC/WebSocket clients backed by the Linux Core
 
 ## Summary
 Frontends (desktop, web, tablet) connect to the Linux Core through gRPC and WebSocket APIs. A native desktop UI (Qt/Avalonia) can
@@ -38,8 +38,8 @@ M (requires API scaffolding, UI rewrites, and sync features).
 
 ## References
 - Community discussions on headless deployments, kiosk mode, and remote displays (GitHub Discussions Feb 2024).
-- [Section 91 — UI Shell & Layout](../sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
-- [Section 41 — Inter-Application API](../sections/4X_Interprocess_Communications/41_Inter_Application_API.md)
+- [Section 91 — UI Shell & Layout](../9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [Section 41 — Inter-Application API](../4X_Interprocess_Communications/41_Inter_Application_API.md)
 
 ## Related ADRs
 - [ADR-003 — Avalonia UI](../../ADR/ADR-003-avalonia-ui.md)

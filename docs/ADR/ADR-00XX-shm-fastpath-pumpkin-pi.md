@@ -31,7 +31,7 @@ Pumpkin Pi will ship as a CM5-local plugin that:
 Legacy deployments route steer setpoints exclusively through AgIO-managed serial/UDP PGNs without a CM5-local HAL, so latency depends on broker and bridge scheduling.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L6-L15】 Pumpkin Pi introduces the first integrated fast path for Nexus.
 
 ### Legacy Dev Branch
-The legacy dev branch prototypes Linux bridges and PGN compatibility but still relies on AgIO services for hardware arbitration; no dedicated HAL plugin or SHM ring exists, underscoring the need for Pumpkin Pi in CM5 integrated mode.【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L6-L35】【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L11-L44】
+The legacy dev branch prototypes Linux bridges and PGN compatibility but still relies on AgIO services for hardware arbitration; no dedicated HAL plugin or SHM ring exists, underscoring the need for Pumpkin Pi in CM5 integrated mode.【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L6-L35】【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L11-L44】
 
 ## References
 - [Section 53 — AOG-Link Compatibility](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md)

@@ -1,4 +1,4 @@
-# O-BACKEND-4: Layer controllers with aggregation pipelines
+# 21-O5 — Layer controllers with aggregation pipelines
 
 ## Summary
 Refactors the backend navigation/mapping services to manage per-section layer controllers that normalize raw sensor feeds, buffer samples between GNSS fixes, and emit aggregated geometry snapshots for rendering, dashboards, and storage.
@@ -38,9 +38,9 @@ Refactors the backend navigation/mapping services to manage per-section layer co
 L — Touches ingestion, mapping, rendering, and configuration code paths with new controller abstractions and replay harnesses.
 
 ## References
-- [Section 72 — Mapping Layers Plugin](../sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
-- [Section 32 — Persistence & Formats](../sections/3X_Data_Storage/32_Persistence_Formats.md)
-- [Section 61 — Kinematics & Pose Fusion](../sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+- [Section 72 — Mapping Layers Plugin](../7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
+- [Section 32 — Persistence & Formats](../3X_Data_Storage/32_Persistence_Formats.md)
+- [Section 61 — Kinematics & Pose Fusion](../6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
 
 ## Related ADRs
 - [ADR-010 — Layer Registry & Variable Rate](../../ADR/ADR-010-layer-registry-variable-rate.md)

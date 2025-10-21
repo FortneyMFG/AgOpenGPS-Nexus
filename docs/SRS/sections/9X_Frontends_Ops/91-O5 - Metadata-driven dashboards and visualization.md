@@ -1,4 +1,4 @@
-# O-UI-5: Metadata-driven dashboards and visualization
+# 91-O5 — Metadata-driven dashboards and visualization
 
 ## Summary
 Updates the desktop UI so widgets, charts, and inspectors consume layer metadata rather than hard-coded IDs, enabling declarative dashboards for planters, sprayers, and combines while supporting per-layer visualization rules and drill-downs.
@@ -36,9 +36,9 @@ Updates the desktop UI so widgets, charts, and inspectors consume layer metadata
 L — Touches core rendering, inspector UX, dashboard frameworks, and configuration workflows to make them metadata-driven.
 
 ## References
-- [Section 13 — UI Framework & UX Language](../../sections/1X_Platform_Foundations/13_UI_Framework_UX.md)
-- [Section 72 — Mapping Layers Plugin](../sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
-- [Section 91 — UI Shell & Layout](../sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [Section 13 — UI Framework & UX Language](../1X_Platform_Foundations/13_UI_Framework_UX.md)
+- [Section 72 — Mapping Layers Plugin](../7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
+- [Section 91 — UI Shell & Layout](../9X_Frontends_Ops/91_UI_Shell_Layout.md)
 
 ## Related ADRs
 - [ADR-032 — Presets and Layout Linking](../../ADR/ADR-032-presets-and-layout-linking.md)

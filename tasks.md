@@ -533,9 +533,9 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-453 | Automation integration for axle-centric limits | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Wire planners/controllers to curvature/slip limits |
 | NX-454 | Calibration workflows & fixtures | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Deliver Ackermann wizard, hitch zeroing, slip sanity tests |
 | NX-455 | Documentation & preset libraries for axle-centric rigs | Done | Core Owner | — | [ADR-067](docs/ADR/ADR-067-equipment-configuration-kinematics.md) | Publish operator guides + preset bundles |
-| NX-462 | Linux Core service packaging & systemd units | Done | Core Owner | — | [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | Create deb/rpm installers, systemd units, and upgrade path |
+| NX-462 | Linux Core service packaging & systemd units | Done | Core Owner | — | [O-BACKEND-6](docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | Create deb/rpm installers, systemd units, and upgrade path |
 | NX-463 | Linux Core operations & observability playbook | Done | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [SRS §10](docs/SRS/sections/10_Telemetry_Health.md) | Document logging, metrics, alerting, and recovery drills |
-| NX-464 | Headless Core + AGiO integration validation | Done | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [O-BACKEND-6](docs/SRS/options/O-BACKEND-6_LinuxCoreService.md) | End-to-end smoke with AGiO backends on Linux headless |
+| NX-464 | Headless Core + AGiO integration validation | Done | Core Owner | — | [ADR-068](docs/ADR/ADR-068-layer-controllers-runtime.md), [O-BACKEND-6](docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | End-to-end smoke with AGiO backends on Linux headless |
 
 ### Section C — AGiO & Backends
 
@@ -554,7 +554,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-066 | GNSS source policy + TCP/UDP provider | Done |  | — | [SRS Option 11-O1](docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md) | Aggregates `IPositionSource` feeds |
 | NX-117 | Bridge service host for gRPC ⇄ AOG-Link | Done |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Standalone daemon mediating inter-process, AOG-Link, and PGN flows |
 | NX-118 | gRPC ⇄ AOG-Link translator layer | Done |  | — | [ADR-002 gRPC Contracts](docs/ADR/ADR-002-grpc-contracts.md) | Map service calls/streams onto nanopb datagrams with ack/retry semantics |
-| NX-119 | AOG-Link ⇄ PGN compatibility bridge | Done |  | — | [SRS Option O-COMM-6](docs/SRS/options/O-COMM-6_PGNCompatibilityBridge.md) | Maintain legacy devices during migration |
+| NX-119 | AOG-Link ⇄ PGN compatibility bridge | Done |  | — | [SRS Option O-COMM-6](docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | Maintain legacy devices during migration |
 | NX-120 | AOG-Link Ethernet/UDP driver | Done |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Implement multicast/unicast transport with command retries |
 | NX-121 | AOG-Link RS-485/serial driver | Done |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | COBS framing + CRC-16 with token/slot scheduling |
 | NX-122 | AOG-Link CAN/CAN-FD driver | Done |  | — | [ADR-006 AOG-Link](docs/ADR/ADR-006-aog-link-mcu-communications.md) | Implement AOG-CAN ID layout + ISO-TP / fragment support |

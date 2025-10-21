@@ -1,4 +1,4 @@
-# O-TEST-4: Replay-driven CI and rollout for layers
+# 96-O5 — Replay-driven CI and rollout for layers
 
 ## Summary
 Builds a deterministic replay and benchmarking suite that validates aggregation math, rendering parity, and performance targets for variable-rate layers before field rollout, paired with staged feature flags.
@@ -40,8 +40,8 @@ Builds a deterministic replay and benchmarking suite that validates aggregation 
 M — Significant investment in replay assets, CI scripting, and documentation but amortizes risk for future layer additions.
 
 ## References
-- [Section 72 — Mapping Layers Plugin](../sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
-- [Section 96 — Quality Engineering & Release](../sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md)
+- [Section 72 — Mapping Layers Plugin](../7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
+- [Section 96 — Quality Engineering & Release](../9X_Frontends_Ops/96_Quality_Engineering_Release.md)
 
 ## Related ADRs
 - [ADR-004 — Composite Simulation](../../ADR/ADR-004-composite-simulation.md)

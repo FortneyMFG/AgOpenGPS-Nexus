@@ -8,7 +8,7 @@ Identify how credentials, operator roles, and device access are managed today an
 - R-SEC-001 (MUST, current-AgOpenGPS): Preserve offline operation without requiring cloud authentication given field connectivity constraints.【F:README.md†L28-L33】
 - R-SEC-002 (SHOULD): Provide guidance on user roles/permissions if shared workstations become common.
 - R-SEC-003 (SHOULD): Encrypt or obfuscate sensitive config values at rest without breaking existing upgrade paths.
-- R-SEC-004 (SHOULD, proposed-LinuxCore): Run the Linux Core under a dedicated service account with least-privilege access to `/dev` devices and config directories, documenting how credentials are stored for remote clients.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L21-L44】
+- R-SEC-004 (SHOULD, proposed-LinuxCore): Run the Linux Core under a dedicated service account with least-privilege access to `/dev` devices and config directories, documenting how credentials are stored for remote clients.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L44】
 - R-SEC-005 (COULD): Add audit logging for configuration changes and remote connections.
 - R-SEC-006 (SHOULD, secrets migration): Define an encrypted storage format, backup/restore workflow, and migration plan for existing plaintext secrets before enabling remote Core access.
 - R-SEC-007 (SHOULD, audit readiness): Establish minimum audit requirements (timestamped operator actions, remote session trails retained for at least one season) so security-sensitive ADRs have clear acceptance criteria.
@@ -35,7 +35,7 @@ Offline usability, credential safety, operator workflow impact, implementation c
 
 ## Current sentiment
 - Security is light today; we must secure credentials and config changes without breaking offline workflows.
-- Any Linux service rollout must demonstrate least-privilege defaults and credential handling before the community adopts it broadly.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L21-L44】【F:docs/SRS/options/9X/O-FRONT-6_RemoteClients.md†L21-L34】
+- Any Linux service rollout must demonstrate least-privilege defaults and credential handling before the community adopts it broadly.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L44】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L21-L34】
 
 ## Open questions
 - How do we migrate stored passwords when introducing encryption?

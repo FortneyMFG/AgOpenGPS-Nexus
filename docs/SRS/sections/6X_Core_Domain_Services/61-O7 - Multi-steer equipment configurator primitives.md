@@ -1,4 +1,4 @@
-# O-HW-7 — Multi-steer equipment configurator primitives
+# 61-O7 — Multi-steer equipment configurator primitives
 
 ## Problem
 Guidance, rate, and section controllers currently assume a single steering axle or a

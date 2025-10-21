@@ -8,9 +8,9 @@ Detail how we observe system health, log events, and surface telemetry (packet r
 - R-TH-001 (MUST, current-AgIO): Keep event log viewers that consolidate historical and in-session diagnostics.【F:SourceCode/AgIO/Source/Forms/FormEventViewer.cs†L8-L72】
 - R-TH-002 (SHOULD, current-AgOpenGPS): Continue exposing PGN inspector tools and message guides in the UI.【F:SourceCode/AgIO/Source/Forms/FormUDPMonitor.cs†L52-L99】
 - R-TH-003 (SHOULD): Provide machine-readable telemetry feeds (e.g., metrics, status) for remote monitoring.
-- R-TH-004 (SHOULD, proposed-LinuxCore): Expose `/healthz` endpoints, structured JSONL logs, and watchdog hooks from the Core service so systemd and remote dashboards can supervise it.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L21-L33】
-- R-TH-010 (SHOULD, proposed-variable-layer): Surface packet-rate monitors, legend parity tests, and bad-sample counters tied to layer metadata so operators can spot telemetry degradation quickly.【F:docs/SRS/options/6X/O-TELE-4_LayerDiagnostics.md†L1-L27】
-- R-TH-011 (COULD, proposed-variable-layer): Publish operator guidance and overlays that borrow AgDiag tooling while gating heavy diagnostics behind opt-in toggles.【F:docs/SRS/options/6X/O-TELE-4_LayerDiagnostics.md†L28-L57】
+- R-TH-004 (SHOULD, proposed-LinuxCore): Expose `/healthz` endpoints, structured JSONL logs, and watchdog hooks from the Core service so systemd and remote dashboards can supervise it.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L33】
+- R-TH-010 (SHOULD, proposed-variable-layer): Surface packet-rate monitors, legend parity tests, and bad-sample counters tied to layer metadata so operators can spot telemetry degradation quickly.【F:docs/SRS/sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md†L1-L27】
+- R-TH-011 (COULD, proposed-variable-layer): Publish operator guidance and overlays that borrow AgDiag tooling while gating heavy diagnostics behind opt-in toggles.【F:docs/SRS/sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md†L28-L57】
 - R-TH-005 (COULD): Add health scoring/alerting that correlates GNSS quality, network status, and module firmware levels.
 - R-TH-012 (SHOULD, governance): Define log retention periods, alert routing expectations (local alarms vs. remote notifications), and privacy constraints when structured telemetry leaves the cab so future monitoring features align with operator consent and regional regulations.
 - R-TH-020 (MUST, mapping pipeline): Document how PoseStream samples feed ribbons, heatmaps, and contour layers with deterministic interpolation so UI, analytics, and exports render identical coverage.
@@ -31,7 +31,7 @@ Detail how we observe system health, log events, and surface telemetry (packet r
 - O-TH-2: Cloud-based telemetry aggregation with dashboards.
 - O-TH-3: Embedded analytics module that scores system health locally.
 - O-TH-4: Hardware probes that feed additional diagnostics (voltage, temperature).
-- O-TH-5: [Layer diagnostics and health monitoring](../options/6X/O-TELE-4_LayerDiagnostics.md) — Shared overlays + counters for variable-rate telemetry.
+- O-TH-5: [Layer diagnostics and health monitoring](../6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md) — Shared overlays + counters for variable-rate telemetry.
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -48,8 +48,8 @@ Latency, usability in the cab, offline capability, scalability, data retention p
 
 ## Current sentiment
 - Keep existing monitors while defining minimum telemetry that should be streamed for automated alerting.
-- Add layer-aware diagnostics in tandem with the PGN/schema upgrades so operators aren’t blind to quality issues.【F:docs/SRS/options/6X/O-TELE-4_LayerDiagnostics.md†L28-L57】【F:docs/SRS/options/4X/O-COMM-5_VariableRatePGNs.md†L24-L41】
-- Linux service health must integrate with metrics/logging expectations before we can deploy headless rigs broadly.【F:docs/SRS/options/2X/O-BACKEND-6_LinuxCoreService.md†L21-L33】【F:docs/SRS/options/9X/O-FRONT-6_RemoteClients.md†L21-L34】
+- Add layer-aware diagnostics in tandem with the PGN/schema upgrades so operators aren’t blind to quality issues.【F:docs/SRS/sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md†L28-L57】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md†L24-L41】
+- Linux service health must integrate with metrics/logging expectations before we can deploy headless rigs broadly.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L33】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L21-L34】
 - Constraint-driven alerts and logs must ship with the same telemetry plumbing so automation stays explainable when Core enforces spatial policies.
 
 ## Upcoming ADR coverage

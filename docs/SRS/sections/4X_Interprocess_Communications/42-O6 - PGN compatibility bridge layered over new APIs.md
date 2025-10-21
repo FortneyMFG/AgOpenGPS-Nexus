@@ -1,4 +1,4 @@
-# O-COMM-6: PGN compatibility bridge for new transports
+# 42-O6 — PGN compatibility bridge layered over new APIs
 
 ## Summary
 Maintain UDP/serial PGN behavior while introducing a core API (gRPC/WebSocket) by standing up a compatibility bridge. The bridge
@@ -40,8 +40,8 @@ M (requires new service plus extensive regression validation).
 ## References
 - Legacy PGN documentation maintained in project wiki/forums.
 - Discussions on modernizing transport while keeping PGNs for compatibility.
-- [Section 42 — Transports](../sections/4X_Interprocess_Communications/42_Transports.md)
-- [Section 41 — Inter-Application API](../sections/4X_Interprocess_Communications/41_Inter_Application_API.md)
+- [Section 42 — Transports](../4X_Interprocess_Communications/42_Transports.md)
+- [Section 41 — Inter-Application API](../4X_Interprocess_Communications/41_Inter_Application_API.md)
 
 ## Related ADRs
 - [ADR-006 — AgIO Link MCU Communications](../../ADR/ADR-006-aog-link-mcu-communications.md)

@@ -62,9 +62,9 @@ Adopt AOG-Link v1, a compact protobuf/nanopb-based datagram protocol, as the sta
 - MCU and host communications ride on the classic PGN frame (0x80/0x81 header, CRC trailer) across UDP and serial links, so firmware today exchanges fixed-width byte payloads without protobuf schemas.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L24】
 
 ### Legacy Dev Branch
-- Dev experiments focus on normalizing those same PGNs—including SocketCAN bridges—but still depend on the legacy framing rather than nanopb-based datagrams.【F:docs/SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md†L7-L36】
+- Dev experiments focus on normalizing those same PGNs—including SocketCAN bridges—but still depend on the legacy framing rather than nanopb-based datagrams.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L7-L36】
 
 ## References
 - [Section 42 — Transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-- [Option O-COMM-6 — PGN compatibility bridge](../SRS/options/4X/O-COMM-6_PGNCompatibilityBridge.md)
+- [Option O-COMM-6 — PGN compatibility bridge](../SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md)
 - [ADR-002 — Expose Nexus services over gRPC/protobuf contracts](ADR-002-grpc-contracts.md)

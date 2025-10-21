@@ -1,223 +1,208 @@
 # 21 — System Decomposition & Boundaries
-*(Status: Proposed)*
+*(Status: Drafting — Option-Neutral Overview)*
 
-**Author:** Codex
-**Created:** 2025-10-20
-**Status:** Proposed
-**Version:** 0.1.0
-**Section ID:** 21
-**Editors:** @nexus-specs, @layer-wg
-**Last Updated:** 2025-10-20
-**Related Sections:** 22, 23, 24
-**Upstream Dependencies:** 11, 41, 42
-**Downstream Impacts:** 51, 61, 81, 91, 96
+**Author:** Codex  
+**Created:** 2025-10-20  
+**Version:** 0.3.0  
+**Editors:** @nexus-specs, @layer-wg  
+**Last Updated:** 2025-10-21  
 
 ---
 
 ## 21.1 Purpose & Scope
 
-Define the major runtime seams of Nexus so guidance, mapping, telemetry, and automation services evolve without breaking determinism or legacy rigs.
-This section establishes the components owned by the Core service, UI shells, and plugin surfaces, and it traces how proposed refactors (layer controllers, Linux Core, PGN bridge) satisfy the roadmap.【F:SourceCode/AgOpenGPS.Core/ApplicationCore.cs†L10-L45】【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L14-L124】
+This section defines how the Nexus system is functionally decomposed into **logical domains** (e.g., guidance, mapping, I/O, automation) and how those domains may be **partitioned across process boundaries** such as Core, AgIO, UI hosts, or runtime-loaded modules.
+
+It does **not prescribe** one final architecture. Instead, it establishes the **reference topology** from which subsequent Options (§21.12) evaluate specific splits (e.g., Plugin Runtime, Modular Monolith, or Monolithic Core).
 
 ---
 
-## 21.2 Context
+## 21.2 Current State (Legacy Reference)
 
-- Retains the proven in-process orchestration so Windows deployments continue to function during modernization.【F:SourceCode/AgOpenGPS.Core/ApplicationCore.cs†L10-L45】
-- Must expose seams that let deterministic replay, telemetry capture, and headless automation reuse the same business logic.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L46】
-- Linux Core pilots rely on the same contracts and PGN compatibility layer to avoid fragmenting plugins and operator workflows.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】
-- Out of scope: UI look-and-feel, field data schemas, and agronomic analytics algorithms (covered in 8X, 9X, and 6X sections).
+Historically, **AgOpenGPS (V6 / ROC)** operated as a **single-process monolith**:
+- `ApplicationCore` managed guidance, steering, mapping, and PGN I/O within one thread space.
+- WinForms and AgIO shared direct references, no explicit API seams.
+- Simulation and telemetry replay required ad-hoc stubs.
+- Timing, UI rendering, and logic loops were all interleaved.
 
----
-
-## 21.3 Legacy Comparison
-
-| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
-|--------------|-----------------|-----------------------|---------------------------|--------------------|
-| Architecture | Monolithic `ApplicationCore` wires presenters, streamers, and AgIO within a single process.【F:SourceCode/AgOpenGPS.Core/ApplicationCore.cs†L10-L45】 | Tight coupling to WinForms lifecycle and manual threading control. | Introduce Core service seams with deterministic controllers and replayable buses.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 |
-| Performance | Field streamers manage overlap math directly against raw GNSS samples.【F:SourceCode/AgOpenGPS.Core/Streamers/Field/FieldStreamer.cs†L7-L107】 | Hard to benchmark or isolate regressions; no shared telemetry budgets. | Adopt layer controllers and SimBus metrics to monitor CPU (<20%) and restart (<30 s) targets.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 |
-| UX / Config | Configurations live near UI hosts with ad-hoc overrides and manual PGN wiring. | Risky for remote deployments; no unified health signals. | Push compatibility shims and configuration policy into the Core daemon with telemetry surfacing.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
+This baseline remains functional and deterministic but is difficult to maintain, extend across OSes, or isolate faults.
 
 ---
 
-## 21.4 Definitions
+## 21.3 Functional Domains
 
-| Term | Definition |
-|------|------------|
-| Core Service | Headless runtime that owns guidance logic, telemetry, and deterministic timing. |
-| Layer Controller | Pipeline element that normalizes sensor feeds and emits immutable coverage snapshots. |
-| PGN Bridge | Compatibility shim translating legacy AgIO PGNs into Core events. |
-| Composite Simulation Fabric | SimClock + SimBus orchestration that blends hardware, replay, and simulation inputs. |
-
----
-
-## 21.5 Requirements
-
-| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
-|----|----------|----------|---------|----------------|-----------------------------|
-| R-BE-000 | MUST | Legacy Parity | Maintain `ApplicationCore` orchestration for existing Windows rigs during transition. | Field streamer backlog | Manual regression pass on legacy WinForms host.【F:SourceCode/AgOpenGPS.Core/ApplicationCore.cs†L10-L45】 |
-| R-BE-001 | MUST | Field Data | Preserve streamer stack for boundaries, tram lines, worked area, and stored paths. | Legacy AgOpenGPS backlog | Replay scenarios confirm identical geometry outputs.【F:SourceCode/AgOpenGPS.Core/Streamers/Field/FieldStreamer.cs†L7-L107】 |
-| R-BE-002 | SHOULD | Rendering | Keep map tile/OpenGL helpers shareable between WinForms and Avalonia; WPF support is retired. | Desktop roadmap | UI smoke tests across hosts.【F:SourceCode/GPS/AgOpenGPS.csproj†L39-L48】 |
-| R-BE-003 | SHOULD | Automation | Provide automation APIs without breaking current logic loops. | Automation WG | API contract review; integration harness. |
-| R-BE-004 | MUST | Service Health | Extract logic into headless service with packaging, API boundaries, and health endpoints. | Linux Core plan | Container smoke tests + health probes.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
-| R-BE-010 | MUST | Variable Rate | Introduce layer controllers with normalized inputs and aggregation metrics. | Layer controller proposal | Deterministic replay within ±1% coverage error.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 |
-| R-BE-011 | SHOULD | Observability | Separate IO, aggregation, rendering via immutable snapshots. | Replay WG | Replay CI shows no frame drops. |
-| R-BE-012 | COULD | Compatibility | Ship PGN/SocketCAN shims managed by Core service. | PGN bridge study | Linux + Windows PGN regression harness. |
-| R-BE-013 | SHOULD | Health Metrics | Define Core CPU (<20%), RAM (<500 MB), restart (<30 s) budgets prior to dependent ADRs. | Operations WG | Continuous telemetry alarms. |
-| R-BE-014 | SHOULD | Fail-Safe | Specify degraded modes for Core or PGN bridge outages. | Safety review | Field test checklists. |
-| R-BE-020 | SHOULD | Simulation | Provide deterministic composite simulation loop for services and plugins. | Simulation WG | Sim replay vs hardware parity within tolerance.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L46】 |
-
-### 21.5.1 Requirement Sources & Rationale
-
-| Req ID | Source (issue/discussion/standard) | Rationale |
-|--------|------------------------------------|-----------|
-| R-BE-000 | Legacy parity review (2024-11-12) | Prevent regressions during modernization. |
-| R-BE-004 | Linux Core pilot notes (2025-01) | Enable cross-OS deployments with identical logic. |
-| R-BE-010 | Layer controller prototype replay | Achieve deterministic coverage math with telemetry. |
-| R-BE-020 | Simulation working group minutes | CI and plugin validation depend on unified timing. |
+| Domain | Description | Key Responsibilities | Typical Timing Requirements |
+|---------|--------------|----------------------|-----------------------------|
+| **Kinematics** | Vehicle model, IMU/GNSS fusion, speed/heading output | Pose stream @50–100 Hz, deterministic | Hard-real-time |
+| **Guidance** | Path generation, headland logic, coverage targets | Plan updates @5–10 Hz | Soft-real-time |
+| **Autosteer** | Steering control loop and actuator outputs | Command update @20–50 Hz | Hard-real-time |
+| **Mapping** | Layer editing, visualization, field geometry | User interactions, background tile render | Non-real-time |
+| **Variable Mapping / Rate** | Attribute-based map layers, control setpoints | Background rate resolver | Soft-real-time |
+| **Monitoring** | Planter/yield sensors, alarms | Poll inputs @1–10 Hz | Soft |
+| **AgIO (I/O Layer)** | CAN, serial, UDP, USB, etc. | PGN framing, socket control | Real-time I/O |
+| **Radiobridge** | RTK, radio telemetry | Link state, corrections | Soft |
+| **UI Shells** | Display, configuration, operator interaction | Rendering @30–60 Hz | Visual only |
+| **Simulation / Replay** | Deterministic time and state journals | SimClock, SimBus | Deterministic offline |
 
 ---
 
-## 21.6 Acceptance Criteria & Verification
+## 21.4 Structural Models Considered
 
-Deterministic replay runs, CI smoke tests, and manual rig validation must demonstrate the Core meets all MUST requirements before approving dependent ADRs.
-Automation APIs, PGN shims, and UI bindings require targeted integration tests prior to rollout.
-
-### 21.6.1 Requirement-to-Verification Map
-
-| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
-|--------|-------------------|---------------------|---------------------|
-| R-BE-000 | Manual regression | `tests/replay/legacy_winforms.md` | Identical coverage footprints |
-| R-BE-004 | CI integration | `pipelines/linux-core-smoke.yml` | Health endpoints return 200 within 30 s |
-| R-BE-010 | Replay harness | `tests/replay/layer_controller_scenarios.json` | Coverage error ≤1% vs baseline |
-| R-BE-020 | Simulation benchmark | `bench/simbus_timing.md` | Loop jitter ≤2 ms p95 |
+| Model | Description | Process Boundaries | Deployment Example |
+|--------|-------------|--------------------|--------------------|
+| **A — Monolithic Core** | All logic compiled into one executable. | None (single process) | Windows WinForms legacy |
+| **B — Modular Monolith** | Logical modules separated by clean interfaces but still in one process. | None (in-proc only) | Avalonia host with modular namespaces |
+| **C — Plugin Runtime** | Core, AgIO, and domain services separated into individual services or dynamically loaded modules. | Process or gRPC boundaries | Linux Core + detachable plugins |
 
 ---
 
-## 21.7 Constraints
+## 21.5 Domain-to-Model Mapping
 
-- Core service MUST target .NET 8 and remain portable across Windows and Debian-based Linux distributions.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
-- Deterministic SimClock/SimBus MUST govern plugin interactions to avoid diverging timing implementations.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L46】
-- PGN compatibility MUST be preserved until all dependent hardware fleets migrate to modern APIs.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L158-L205】
-
----
-
-## 21.8 Risks & Open Issues
-
-| ID | Description | Impact | Mitigation / Status | Owner |
-|----|-------------|--------|---------------------|-------|
-| RISK-21-1 | Layer controller telemetry may diverge from legacy streamer math during rollout. | High | Replay harness and deterministic budgets defined in ADR-068 gate releases.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 | @layer-wg |
-| ISSUE-21-1 | Linux Core packaging needs sustained ownership for deb/rpm/systemd tooling. | Medium | Track packaging checklist from ADR-028 and hand off to ops playbook. | @deployment-wg |
-
----
-
-## 21.9 Design Considerations
-
-| ID | Consideration | Description |
-|----|----------------|-------------|
-| C1 | Deterministic layer aggregation | Layer controllers emit immutable snapshots and bounded diagnostics so guidance, replay, and analytics remain synchronized.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L14-L124】 |
-| C2 | Headless Core with remote frontends | A Linux-first Core service exposes gRPC/WebSocket APIs, PGN compatibility, and packaging required for remote clients and fleet operations.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
-| C3 | Shared contracts & compatibility | Core and AgIO must publish shared contracts so Windows and Linux frontends remain interoperable during modernization.【F:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md†L1-L118】 |
-
-### 21.9.1 Assumptions & Preconditions
-
-- [A1] Replay harnesses for controller math remain updated alongside telemetry thresholds.
-- [A2] Remote clients authenticate through the configuration policies defined in §24.
-- [A3] Operators can provision network time sync (PTP/NTP) for multi-process deployments.
+| Domain | In Model A | In Model B | In Model C | Timing Risk if Separated | Typical Interfaces |
+|---------|-------------|------------|-------------|---------------------------|--------------------|
+| Kinematics | Core | Core | Core | High | SimBus / gRPC |
+| Autosteer | Core | Core | Core (hard loop) | High | SimBus / gRPC |
+| Guidance | Core | Internal module | External plugin | Medium | gRPC / Contracts.Guidance |
+| Mapping | Core (tied to UI) | Module (MVVM) | Plugin | Low | Contracts.Mapping |
+| Variable Mapping | Core | Module | Plugin | Low | Contracts.Mapping |
+| Variable Rate | Core | Module | Plugin | Low | Contracts.Rate |
+| Monitoring | Core | Module | Plugin | Low | Contracts.Monitor |
+| AgIO | Core | Shared service | Sidecar | Medium | Contracts.PGN |
+| Radiobridge | Core | Module | Plugin | Low | Contracts.Radio |
+| Simulation | None / ad-hoc | Integrated | Shared service | Low | SimBus |
+| UI Shells | WinForms host | Avalonia host | Remote clients | Low | WebSocket / gRPC |
 
 ---
 
-## 21.12 Option Evaluation
+## 21.6 Comparative Evaluation
 
-### 21.12.1 Option Catalog
-
-| Option | Summary |
-|--------|---------|
-| 21-O0 | Status quo: in-process C# services anchored in `AgOpenGPS.Core`. |
-| 21-O7 | AgIO gRPC host with shared NuGet contracts across Windows/Linux, aligning with Core/AgIO responsibility split.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
-
-### 21.12.2 Scoring Criteria
-
-Determinism, offline resilience, ease of customization, testability, deployment footprint.
-
-### 21.12.3 Scoring Evidence
-
-| Criterion | 21-O0 Justification | 21-O7 Justification |
-|-----------|---------------------|---------------------|
-| Determinism | Proven baseline but tightly coupled to UI thread lifecycle. | Shared contracts with Core services keep deterministic APIs consistent across hosts.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】 |
-| Operability | Minimal operational tooling beyond Windows installers. | systemd/CLI packaging surfaces health endpoints and restart policies for fleet ops.【F:docs/SRS/sections/1X_Platform_Foundations/11_OS_Support.md†L48-L112】 |
-| Maintainability | UI/Core coupling increases regression risk when adding services. | Contract-first boundary separates Core evolutions from frontend cadence.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】 |
-| Extensibility | Remote clients depend on ad-hoc bridges. | gRPC/WebSocket endpoints enable remote and automation clients without duplicating logic.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L70-L126】 |
-
-### 21.12.4 Weighted Scoring Table
-
-| Criterion | Weight | 21-O0 | 21-O7 |
-|-----------|--------|-------|-------|
-| Determinism | 0.30 | 3.5 | 4.2 |
-| Operability | 0.20 | 2.5 | 4.3 |
-| Maintainability | 0.20 | 2.8 | 4.4 |
-| Deployment Footprint | 0.15 | 2.5 | 3.8 |
-| Extensibility | 0.15 | 2.0 | 4.5 |
-| **Weighted Total** | **1.0** | **2.79** | **4.25** |
-
-### 21.12.5 Decision Summary
-
-**Selected Option:** 21-O7 — AgIO gRPC host with shared NuGet contracts.
-**Rationale:** Highest weighted total; preserves determinism while enabling cross-OS deployments and plugin parity.
-**Formal Record:** [21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md](21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md)
+| Criterion | Model A — Monolithic | Model B — Modular Monolith | Model C — Plugin Runtime |
+|------------|----------------------|-----------------------------|---------------------------|
+| **Performance** | No IPC overhead | Minor abstraction cost | ≤1 ms IPC overhead (target) |
+| **Determinism** | Simple timing | Deterministic if SimClock central | Deterministic with explicit SimBus |
+| **Reliability** | Shared fault domain | Partial isolation | Full fault isolation (process) |
+| **Maintainability** | Tight coupling | Moderate | High — clear contracts |
+| **Cross-OS Portability** | Low | Medium | High |
+| **Community Extensibility** | Low | Medium | High |
+| **Testing & Simulation** | Manual | Replay harnesses possible | Fully deterministic replay |
+| **Deployment Complexity** | Simple | Simple | Higher (service mgmt) |
 
 ---
 
-## 21.13 Evaluation & Verification
+## 21.7 Current Boundaries
 
-Benchmarks track replay jitter, CPU/RAM ceilings, and PGN bridge fidelity.
-Acceptance criteria require automated replay regression suites and manual CM5 field checks before promoting releases.
+```mermaid
+flowchart LR
+  subgraph Core
+    KIN[Kinematics]
+    ST[Steering Loop]
+    GUI[Guidance]
+    MAP[Mapping]
+    IO[AgIO]
+  end
 
----
+  subgraph UI
+    UI[WinForms/Avalonia]
+  end
 
-## 21.14 Implementation Policy
+  UI <-- direct refs --> Core
+  IO --> Core
+```
 
-- Register controllers and services through dependency injection to keep plugin discovery deterministic.
-- Store configuration under `/etc/aog` (service) and `%PROGRAMDATA%\AgOpenGPS` (Windows) with schema validation (see §24).
-- All new telemetry publishers MUST attach SimBus topic metadata and health metrics for dashboard surfacing.
-
----
-
-## 21.15 Community Sentiment
-
-- Contributors favor incremental Core seam extraction while keeping in-process mode for legacy rigs.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】
-- Layer-controller refactor is prioritized alongside replay coverage before expanding microservice ambitions.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】
-- Working group supports gRPC-based AgIO host for shared contracts across OS platforms.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
-
-### 21.15.1 Section Change Log
-
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-02-14 | Reformatted to SRS v2 template; updated option scoring. | #0000 |
-| 2024-12-10 | Added layer controller modernization requirements. | #0000 |
+### Limitations
+- No stable contracts for external modules.  
+- Any device driver crash can terminate Core.  
+- UI and business logic are inseparable.
 
 ---
 
-## 21.16 Traceability
+## 21.8 Candidate Future Boundary Diagram (Conceptual)
 
-| Requirement ID | Related Option(s) / Considerations | ADR(s) | Verification Artifact | Implementation Reference |
-|----------------|------------------------------------|--------|-----------------------|--------------------------|
-| R-BE-000 | 21-O0, 21-O7 | — | `tests/replay/legacy_winforms.md` | `SourceCode/AgOpenGPS.Core/ApplicationCore.cs` |
-| R-BE-004 | C2, 21-O7 | 21-ADR-028 | `pipelines/linux-core-smoke.yml` | `docs/SRS/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md` |
-| R-BE-010 | C1, 21-O7 | 21-ADR-068 | `tests/replay/layer_controller_scenarios.json` | `docs/SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md` |
-| R-BE-020 | C1 | 21-ADR-004 | `bench/simbus_timing.md` | `docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md` |
+```mermaid
+flowchart LR
+  subgraph Core
+    KIN[Kinematics]
+    ST[Steering Arbiter]
+    SIM[SimBus / Replay]
+  end
+  subgraph Services
+    MAP[Mapping]
+    GUID[Guidance]
+    VAR[Variable Rate]
+    MON[Monitoring]
+  end
+  subgraph IO
+    AGIO[AgIO / Drivers]
+  end
+  subgraph UI
+    AV[UI Shells]
+  end
+  IO --> Core
+  Core <-- gRPC / SimBus --> Services
+  Services --> UI
+```
 
 ---
 
-## 21.17 Conformance
+## 21.9 Trade-Offs Summary
 
-An implementation **conforms** when:
-1. All **MUST** requirements (R-BE-000, R-BE-001, R-BE-004, R-BE-010, R-BE-020) are verified by mapped artifacts.
-2. All **SHOULD** requirements include either verification evidence or documented exceptions approved by the working group.
-3. No **MUST NOT** constraint is violated and PGN compatibility remains intact during rollout.
+| Aspect | Tighter Coupling (Monolith) | Looser Coupling (Modular / Plugin) |
+|---------|-----------------------------|------------------------------------|
+| **Latency** | Lowest possible | Slight IPC cost (<1 ms target) |
+| **Fault Isolation** | None | Restartable modules |
+| **Complexity** | Simple | Requires supervision tools |
+| **Cross-Platform** | Windows-biased | Works on Linux / headless |
+| **Testability** | Limited | Replay & simulation ready |
+| **Contribution Model** | Centralized | Distributed (per domain) |
+| **Upgrade Path** | Single package | Versioned contracts |
+| **Risk** | Core regressions cascade | Interface drift if unmanaged |
 
 ---
 
-## Standards Context
+## 21.10 Determinism Constraints
 
-This section aligns with ISO/IEC/IEEE 29148:2018 requirement structure and IEEE 1016:2017 design description expectations for interface boundaries and traceability.
+- All timing originates from a single **SimClock** reference.
+- Data interchange between processes must include timestamps and sequence numbers.
+- Hard-real-time loops (Steering, Kinematics) **must remain in-process** with Core.
+- gRPC/IPC targets: **p95 ≤ 1 ms**, **p99 ≤ 3 ms** for intra-host links.
+
+---
+
+## 21.11 Open Questions
+
+| ID | Question | Current Thinking | Owner |
+|----|-----------|------------------|--------|
+| Q-21-1 | Should AgIO be part of Core or run as a sidecar? | Split for isolation, see ADR-028 | Core WG |
+| Q-21-2 | Can mapping remain cross-platform without Avalonia dependency? | Yes, via SDK contracts | UI WG |
+| Q-21-3 | What minimum SDK granularity keeps developer friction low? | 4–5 contracts (Pose, LayerSnapshot, Target, Setpoint, Health) | SDK WG |
+| Q-21-4 | How to guarantee deterministic replay when services are split? | Shared SimBus / sequence journal | Simulation WG |
+
+---
+
+## 21.12 Option References
+
+Subsequent subsections (21-O1 … 21-O7) define concrete architecture proposals.  
+For example:
+- **21-O1:** Maintain Monolithic Core  
+- **21-O4:** Modular Monolith  
+- **21-O7:** Plugin Runtime (AgIO + Core + Plugins via SDK)
+
+Each option will include quantitative scoring (determinism, maintainability, latency, complexity) and updated ADR references.
+
+---
+
+## 21.13 Verification & Traceability
+
+Verification ensures architectural integrity regardless of model selection:
+- Deterministic replay (SimBus jitter ≤ 2 ms p95)
+- Regression replay equivalence (geometry ± 1%)
+- Health endpoints operational (< 30 s startup)
+- Cross-OS contract parity (Core/AgIO/SDK)
+
+---
+
+## 21.14 Summary
+
+This section defines *where the system’s seams could be*.  
+It acknowledges that the **Plugin Runtime** model offers long-term agility, but leaves adoption to a formal Option decision.  
+Future ADRs and options will compare measurable trade-offs in determinism, latency, and maintainability while preserving a unified SimBus-driven Core.

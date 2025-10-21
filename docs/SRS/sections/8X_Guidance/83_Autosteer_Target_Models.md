@@ -1,50 +1,89 @@
-# 83 — Autosteer Target Models (Status: drafting)
+# 83 — Autosteer Target Models
+*(Status: Proposed)*
 
-## 83.1 Purpose
-Define how Nexus converts planner output (desired path, orientation, and speed targets) into real-time steering commands.  This section standardizes controller requirements, compares available algorithms, and outlines evaluation metrics to ensure consistent performance across vehicles and implements.
-
----
-
-## 83.2 Controller Requirements
-| ID | Priority | Category | Summary | Key Metrics |
-|----|-----------|-----------|----------|--------------|
-| R-AUTO-000 | MUST | Capability | Provide **at least one conformant autosteer target generator** via a stable interface. The specific algorithm is **not prescribed** by this SRS. | Conformance tests pass with any selected controller. |
-| R-AUTO-001 | MUST | Publication | Emit `SteerTargets` at **25 Hz ±5 ms jitter**, honoring optional inputs `speed_cap_mps` and `row_bias_m`. | Measured target jitter ≤ 5 ms. |
-| R-AUTO-002 | MUST | Pose Inputs | Support fused pose streams ≥ 50 Hz; integrate row/implement sensors when present; reject inputs older than 100 ms. | Pose freshness monitored in telemetry. |
-| R-AUTO-003 | SHOULD | Delay Compensation | Provide per-controller latency and steer-rate compensation using feed‑forward or predictive methods. | Latency ≤ 50 ms at 95th percentile. |
-| R-AUTO-004 | SHOULD | Tuning & Persistence | Persist controller gains per equipment profile and expose parameters through the Autosteer UI per ADR‑033. | Tunables round‑trip verified. |
-| R-AUTO-005 | MUST | Verification | Validate controller performance in simulation and field regression tests; log cross-track, heading, and latency metrics. | QA metrics within specified tolerances. |
+**Author:** Codex
+**Created:** 2025-10-20
+**Version:** 0.1.0
+**Section ID:** 83
+**Editors:** Autonomy Working Group
+**Last Updated:** 2025-10-20
+**Related Sections:** 81 — Guidance Orchestrator, 82 — Planning, ADR-033
+**Upstream Dependencies:** PoseStream, Equipment Profiles, Sections plugin
+**Downstream Impacts:** Autosteer controllers, UI overlays, Telemetry dashboards
 
 ---
 
-## 83.3 Controller Options Overview
-This subsection is **informative** and enumerates candidate algorithms that may satisfy the above requirements. The SRS does not prescribe a specific control law; conformant controllers SHALL meet interface and performance requirements regardless of implementation method.
+## 83.1 Purpose & Scope
 
-| Option ID | Name | Type | Description | Reference Document |
-|-----------|------|------|-------------|--------------------|
-| **83‑O1** | **Pure Pursuit** | Geometric | Uses look‑ahead geometry to compute curvature toward a forward point along the path. Simple, deterministic baseline. | 83‑O1_PurePursuit.md |
-| **83‑O2** | **Stanley** | Feedback | Combines heading and cross‑track errors with a proportional term scaled by speed for stable curvature tracking. | 83‑O2_Stanley.md |
-| **83‑O3** | **MPC (Model Predictive Control)** | Predictive / Optimization | Predicts vehicle and implement states ahead in time to minimize total error and control effort with constraints. | 83‑O3_MPC.md |
-| **83‑O4** | **Custom / Experimental** | Interface‑compliant | Placeholder for any compatible algorithm meeting performance criteria. | — |
-
-**Document naming convention:** Option specs live alongside this file using the pattern `83‑OX_<Name>.md` (e.g., `83‑O1_PurePursuit.md`). When an option document does not exist yet, leave the **Reference Document** cell as `—`.
+Standardize how Nexus converts planner output (desired path, orientation, and speed targets) into real-time steering commands.
+This section defines controller requirements, evaluation metrics, and documentation expectations so diverse algorithms remain interoperable across vehicles and implements.
 
 ---
 
-## 83.4 Comparison Matrix
+## 83.2 Context
+
+- Guidance Orchestrator publishes catalogs and `SteerTargets` that controllers must track reliably at 25 Hz.
+- Operators expect algorithm neutrality with transparent tuning, persistence, and telemetry for debugging.
+- Legacy controllers (Pure Pursuit, Stanley) coexist with advanced approaches (MPC) requiring shared interfaces.
+- Hardware variations (articulated rigs, sensor feedback) demand extensible models for bias, rate limits, and latency compensation.
+
+---
+
+## 83.3 Legacy Comparison
+
+| Controller | Legacy Behavior | Limitation | Modernization Opportunity | Source |
+|------------|-----------------|------------|---------------------------|--------|
+| Pure Pursuit | Deterministic geometric look-ahead. | Limited delay compensation; minimal implement modeling. | Retain as baseline with documented latency expectations. | Autosteer archives |
+| Stanley | Combines heading and cross-track error. | Partial handling of rate/angle limits; limited row sensor fusion. | Extend with configurable gains and sensor inputs. | Nexus control notes |
+| MPC | Prototype only. | High compute load; complex tuning. | Evaluate for advanced rigs with documented resource budgets. | MPC pilot logs |
+
+---
+
+## 83.4 Definitions
+
+| Term | Definition |
+|------|-------------|
+| `SteerTargets` | Time-series commands containing preview point, curvature, optional speed cap, and row bias. |
+| Controller | Algorithm translating planner references into actuator commands or steerable targets. |
+| Delay Compensation | Feed-forward or predictive methods that offset command latency. |
+| Equivalence Window | Tolerance range for curvature and heading used to judge controller stability across swaths. |
+
+---
+
+> **Requirement Grammar (RFC-2119):**
+> - **MUST / MUST NOT** = mandatory controller expectations.
+> - **SHOULD / SHOULD NOT** = preferred behaviors with waiver process.
+> - **MAY / COULD** = optional enhancements or roadmap items.
+
+## 83.5 Requirements
+
+| ID | Priority | Category | Summary | Verification |
+|----|----------|----------|---------|--------------|
+| R-AUTO-000 | MUST | Capability | Provide at least one conformant autosteer target generator via a stable interface; algorithm choice not prescribed. | Interface conformance tests. |
+| R-AUTO-001 | MUST | Publication | Emit `SteerTargets` at 25 Hz ±5 ms jitter; honor optional `speed_cap_mps` and `row_bias_m`. | Telemetry jitter analysis. |
+| R-AUTO-002 | MUST | Pose Inputs | Support fused pose streams ≥ 50 Hz; integrate row/implement sensors when present; reject inputs older than 100 ms. | Pose freshness validation. |
+| R-AUTO-003 | SHOULD | Delay Compensation | Publish controller latency metadata and compensate using feed-forward or predictive methods. | Closed-loop latency tests. |
+| R-AUTO-004 | SHOULD | Tuning & Persistence | Persist controller gains per equipment profile; expose tunables through Autosteer UI (ADR-033). | UI round-trip tests. |
+| R-AUTO-005 | MUST | Verification | Validate controller performance in simulation + field regression; log cross-track, heading, and latency metrics. | QA evidence review. |
+| R-AUTO-006 | SHOULD | Implement Geometry | Support articulated and multi-implement rigs via configurable geometry parameters. | HIL geometry tests. |
+| R-AUTO-007 | COULD | Adaptive Bias | Accept optional `row_bias_m` decay parameters for sensor fusion experiments. | Experimental controller evaluation. |
+
+---
+
+## 83.6 Controller Comparison
+
 | Controller | Delay Compensation | Rate / Angle Limits | Implement Geometry | Row Feeler Support | Typical Rate | Compute Load |
-|-------------|--------------------|--------------------|--------------------|--------------------|---------------|---------------|
-| **Pure Pursuit** | No | No | No | External add‑on | 10–50 Hz | Very Low |
-| **Stanley** | Partial | Partial | No | Partial (pose fusion only) | 25–50 Hz | Low |
-| **MPC** | Yes | Yes | Yes | Native (direct fusion) | 50–100 Hz | Moderate |
+|------------|--------------------|--------------------|--------------------|--------------------|--------------|--------------|
+| Pure Pursuit | No | No | No | External add-on | 10–50 Hz | Very Low |
+| Stanley | Partial | Partial | No | Partial (pose fusion only) | 25–50 Hz | Low |
+| MPC | Yes | Yes | Yes | Native (direct fusion) | 50–100 Hz | Moderate |
 
 ---
 
-## 83.5 Decision Matrix (Template)
-The following decision matrix template helps document rationale when selecting or approving controller options. Each candidate is scored against key evaluation criteria; higher totals indicate stronger suitability. Scores are 1 (low) – 5 (high).
+## 83.7 Decision Matrix Template
 
 | Criterion | Weight | Pure Pursuit | Stanley | MPC | Custom |
-|------------|--------|---------------|----------|------|---------|
+|-----------|--------|---------------|---------|-----|--------|
 | Implementation Complexity | 0.1 | 5 | 4 | 2 | — |
 | Compute Efficiency | 0.2 | 5 | 4 | 3 | — |
 | Delay / Latency Handling | 0.2 | 2 | 3 | 5 | — |
@@ -55,40 +94,64 @@ The following decision matrix template helps document rationale when selecting o
 
 ---
 
-## 83.6 Evaluation & Verification
+## 83.8 Evaluation & Verification
+
 **Performance Benchmarks**
 - Target jitter ≤ 5 ms @ 25 Hz.
-- Cross‑track error ≤ 0.2 m; heading error ≤ 1° (95 %).
-- Latency < 50 ms end‑to‑end.
+- Cross-track error ≤ 0.2 m; heading error ≤ 1° (95%).
+- Latency < 50 ms end-to-end.
 - Seamless fallback transitions under planner swap.
 
 **Test Procedure Summary**
-1. Run closed‑loop simulation with recorded field data for each controller option.
+1. Run closed-loop simulation with recorded field data for each controller option.
 2. Verify pose fusion latency and timestamp integrity.
 3. Execute regression across representative field geometries.
 4. Log telemetry for jitter, error, and stability metrics.
 
 **Acceptance Criteria**
-- All mandatory requirements (R‑AUTO‑000 → 005) validated by QA tests.
+- All mandatory requirements (R-AUTO-000 → 007) validated by QA tests.
 - Controller selection and fallback decisions recorded in telemetry.
-- Operator‑visible tuning persisted between sessions.
+- Operator-visible tuning persists between sessions.
 
 ---
 
-## 83.7 Implementation Policy
-- System SHALL allow runtime controller selection via configuration profile.
-- A **default profile** SHALL be provided that selects a conformant controller; algorithm choice is **implementation-specific**.
-- Additional controllers MAY be distributed as plugins provided they meet all interface and performance requirements.
-- Controller interfaces SHALL remain backward-compatible with existing `SteerTarget` messages.
+## 83.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Pure Pursuit baseline | Maintain deterministic, low-compute controller as compatibility anchor. |
+| C2 | Stanley enhancements | Extend Stanley-style feedback with configurable delay compensation and rate limits. |
+| C3 | MPC investment | Evaluate predictive controllers for articulated rigs with documented CPU/GPU budgets. |
+| C4 | Custom / experimental slot | Reserve interface-compliant hooks for third-party or research controllers. |
+| C5 | Decision governance | Use weighted decision matrix to document rationale before approving controller changes. |
+
+### 83.9.1 Community Sentiment
+
+- Contributors support algorithm neutrality focused on measurable behavior.
+- Shared regression datasets and telemetry dashboards are critical for tuning transparency.
+- Plugin architecture should simplify experimentation while safeguarding operator trust.
 
 ---
 
-## 83.8 Community Sentiment
-Recent contributor discussions highlight consensus around maintaining an open, flexible control architecture rather than prescribing a specific algorithm. Developers and operators value predictable performance, transparent tuning, and compatibility with legacy Pure Pursuit controllers while leaving space for modern approaches like MPC. The community favors:
+## 83.10 Implementation Policy
 
-- **Algorithm neutrality** — focus on measurable behavior, not implementation.
-- **Shared test data** — open regression datasets for controller verification.
-- **Plugin extensibility** — easy path for experimentation and third-party controllers.
-- **Field feedback loops** — telemetry and QA dashboards to inform tuning defaults.
+- System SHALL allow runtime controller selection via configuration profiles.
+- A default profile SHALL select a conformant controller; algorithm specifics remain implementation-defined.
+- Additional controllers MAY ship as plugins if they meet interface and performance requirements.
+- Controller interfaces SHALL stay backward-compatible with existing `SteerTarget` contracts.
 
-Overall sentiment supports a standards-driven interface with room for innovation, ensuring interoperability across hardware and controller generations.
+---
+
+## 83.11 Open Questions
+
+- Should MPC controllers expose adaptive horizon length for varying implement response?
+- What safety interlocks are required when swapping controllers mid-field?
+- How should telemetry sampling scale for long-duration jobs without overwhelming storage?
+
+---
+
+## 83.12 References
+
+- [ADR-033 — Guidance planner and autosteer orchestration](81-ADR-033%20-%20Guidance%20planner%20and%20autosteer%20orchestration.md)
+- [ADR-069 — Guidance Orchestrator plugin](81-ADR-069%20-%20Guidance%20Orchestrator%20plugin.md)
+- [Guidance lane contracts how-to](../howto/guidance-lane-contracts.md)

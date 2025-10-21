@@ -1,93 +1,164 @@
-# 72 — Mapping Layers Plugin (Status: drafting)
+# 72 — Mapping Layers Plugin
+*(Status: Proposed)*
 
-## Overview
+**Author:** Codex
+**Created:** 2025-10-20
+**Version:** 0.1.0
+**Section ID:** 72
+**Editors:** Mapping & Geospatial Working Group
+**Last Updated:** 2025-10-20
+**Related Sections:** 71 — Mapping Kernel Contracts, 62 — Job Lifecycle, 64 — Telemetry & Health, 81 — Guidance Orchestrator
+**Upstream Dependencies:** ADR-030, ADR-041, ADR-044, ADR-047, ADR-045–ADR-053
+**Downstream Impacts:** Mapping UI, Rate/Guidance plugins, Analytics & Reporting layers
 
-Mapping plugins render coverage, rate, and guidance layers while respecting farm/field geometry and job/session provenance.
-Multi-field job envelopes must provide continuous navigation across adjacent fields without breaking statistics or journaling. Core publishes lifecycle events (`onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, `onSessionStart`) so mapping engines can hydrate caches, consume job or session `extensions`, and expose plugin-authored overlays (crop type, profitability, genetics, field health, weather) alongside core coverage.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L64】 Zone editing flows reuse the shared LayerEditService contracts defined in ADR-044.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
+---
 
-## Multi-Field Envelope Handling
+## 72.1 Purpose & Scope
 
-- Mapping plugins receive `mountFields(fieldIds[])` and must load all referenced field polygons, build a union envelope, and maintain an R-tree for per-field spatial queries. Job `extensions` provide optional crop-type, genetics, profitability, and risk overlays aligned with mounted fields.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L12-L68】【F:schemas/Job.v1.json†L1-L146】
-- When rendering coverage, plugins accumulate totals both for the job aggregate and per-field rollups stored in
-  `job.stats.fields[]` and exposed via analytics exports.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L47-L75】
-- Guidance and section control consumers rely on the union envelope to avoid operator prompts when crossing internal lanes; the
-  plugin must emit boundary updates whenever the envelope changes.
-- Performance target: union envelope queries must resolve within ≤ 25 ms p95 for up to 10 mounted fields.
+Specify expectations for Nexus mapping plugins that render coverage, agronomic overlays, and guidance artifacts while consuming lifecycle events and registry metadata from Core. The section governs how plugins hydrate multi-field envelopes, maintain provenance, and participate in collaborative zone editing.
 
-## Session Context & Layer Provenance
+---
 
-- Mapping, rate, guidance, and analytics plugins receive `jobId`, `sessionId`, and `fieldIds[]` in context events. Outputs must attach provenance referencing the active session, inherit authoring metadata, and include `layerId` entries in `session.layerRefs[]` when persisted.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L66】【F:schemas/Session.v1.json†L1-L115】
-- Layer documents record `jobId`, optional `sessionId`, `units`, and a `provenance` block containing `source`, `transform`,
-  `hash`, `createdAt`, and optional `actor`. Reused layers update `jobId`/`sessionId` while appending provenance history instead
-  of duplicating payloads.【F:schemas/Layer.v1.json†L1-L117】
-- Planned vs. actual layers are differentiated by metadata: planners mark layers as `planned`, runtime outputs mark `actual`; UI
-  surfaces both in the layer drawer with toggles and provenance summaries.
+## 72.2 Context
 
-## Layer Reuse & Move Semantics
+- Job and session lifecycle events deliver farm/field envelopes, session IDs, and plugin extension payloads used to hydrate caches.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L66】
+- LayerEditService in ADR-044 centralizes geometry editing, journaling, and undo/redo semantics shared across plugins.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
+- Telemetry mesh (ADR-047) replicates live layer edits and controller telemetry so collaborative users share a coherent view.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L33-L62】
+- Plugin-specific ADRs define schemas for crop type, genetics, yield, profit, risk, and weather overlays that must align with Layer Registry entries.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L29-L71】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L21-L49】
 
-- Moving a layer between jobs updates references without copying tiles: tooling rewrites `jobId`/`sessionId`, appends a
-  provenance record, and updates the destination session’s `layerRefs[]`.
-- When reusing a layer (e.g., applying last year’s prescription), the layer remains stored once; jobs include a `layerRefs[]`
-  pointer for traceability.
-- Tile stores enforce deterministic hashing; merging operations produce consistent `hash` values given identical inputs to ensure
-  analytics deduplicate reused layers.
+---
 
-## Storage & Journaling Expectations
+## 72.3 Legacy Comparison
 
-- Session autosave triggers flush coverage tiles, LayerEditEvent journals, and provenance updates before acknowledging `onSessionEnd` events.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L66-L92】
-- Layers inherit the job’s folder layout (`/Jobs/<Job>/layers/<layerId>/`) with metadata stored in `Layer.v1` documents and tiles
-  stored under `tiles/` with recommended cell sizes documented in layer-specific ADRs.
-- Journaling retains both planned and actual layers with timestamped provenance entries, enabling later audits to reconstruct the
-  exact inputs and transformations applied during the session.
+| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
+|---------------|-----------------|------------------------|---------------------------|--------------------|
+| Multi-Field Handling | Plugins mounted one field at a time with manual boundary switching. | Crossing field edges interrupted coverage and statistics. | Adopt union envelopes with shared R-tree queries and lifecycle updates. | ADR-043 review |
+| Layer Provenance | Layers stored as ad-hoc files without provenance metadata. | Difficult to audit or reuse layers across jobs. | Require provenance blocks per `Layer.v1` and session linkage. | Layer schema audit |
+| Zone Editing | Individual plugins shipped unique editing tools. | No shared undo/redo or collaborative editing path. | Centralize editing in LayerEditService (ADR-044). | Zone framework RFC |
 
-## UX Requirements
+---
 
-- Layer drawer displays active job layers grouped by session; operators can toggle historical layers, move a layer to another job
-  (relocate provenance), or reuse from a prior job via a selection modal.
-- Multi-field selection UI presents combined envelope outlines and per-field coverage completion percentages updated in real time.
-- Session metadata panel surfaces linked layers with provenance badges showing source plugin, createdAt, and reuse indicators.
-- Provenance DAG builder in Core exposes a validation API that rejects cycles/disconnected components before layers commit,
-  aligning with ADR-019 audit requirements and emitting actionable diagnostics for UI surfaces.
+## 72.4 Definitions
 
-## Plugin API Summary
+| Term | Definition |
+|------|-------------|
+| Union Envelope | Combined polygon covering all mounted fields for a job session, used for navigation and analytics. |
+| LayerEditService | Core-hosted editing service providing journaled geometry edits and shared tooling per ADR-044. |
+| Provenance DAG | Directed acyclic graph representing layer creation and transformations for audits and reuse. |
+| Plugin Extension Bag | Structured JSON payload emitted in job/session context events so plugins surface additional overlays. |
 
-| Plugin Type | Required Updates |
+---
+
+> **Requirement Grammar (RFC-2119):**
+> - **MUST / MUST NOT** = mandatory expectations with verification.
+> - **SHOULD / SHOULD NOT** = strong preference subject to waiver.
+> - **MAY** = optional capability recorded with enabling conditions.
+
+## 72.5 Requirements
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|-----------|---------|-----------------|-----------------------------|
+| R-MAP-7200 | MUST | Lifecycle | Plugins MUST consume `onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, and `onSessionStart` events to hydrate caches before rendering. | ADR-030/041 | Automated integration harness verifies event handling order. |
+| R-MAP-7201 | MUST | Geometry | Multi-field mounts MUST construct a union envelope and per-field R-tree enabling ≤ 25 ms p95 spatial lookups for up to 10 fields. | ADR-043 | Performance bench in `bench/mapping/envelope_mount.md`. |
+| R-MAP-7202 | MUST | Provenance | Layers written by plugins MUST populate provenance blocks, `jobId`, optional `sessionId`, and register IDs in `session.layerRefs[]`. | Layer.v1 schema | Schema validation tests and replay audits. |
+| R-MAP-7203 | SHOULD | UX | Layer drawers SHOULD group overlays by session and expose provenance badges, move/reuse flows, and toggle planned vs. actual states. | Mapping UI backlog | UI automation verifying drawer affordances. |
+| R-MAP-7204 | MUST | Zone Editing | Editable layers MUST integrate with LayerEditService hooks (`onLayerStartEdit`, `onFeatureCommit`, undo/redo). | ADR-044 | Manual + automated editing tests. |
+| R-MAP-7205 | SHOULD | Telemetry | Plugins SHOULD publish commanded vs. actual metrics and provenance updates into telemetry topics for audit. | ADR-047, Telemetry SRS | Telemetry integration tests confirm event emission. |
+
+### 72.5.1 Plugin API Surface
+
+| Plugin Type | Required Hooks |
 | --- | --- |
-| Mapping | Implement `mountFields(fieldIds[])`, `setActiveSession(sessionId)`, `writeLayer(layerId, payload, provenance)`, and LayerEditService hooks (`onLayerStartEdit`, `onFeatureCommit`, `onLayerUndo/Redo`); publish per-field stats. |
-| Rate/Sections | Consume `jobId`, `sessionId`, and `fieldIds[]` in lifecycle events; write session-aware layers with provenance. |
-| Guidance | Respect multi-field envelopes for lookahead and coverage overlays; include session metadata in telemetry outputs; pause automation while LayerEditService is active to avoid conflicting edits. |
-| Analytics/Export | Filter by `seasonId`, `jobId`, and `sessionId`; honor provenance when generating planned vs. actual reports; consume plugin overlays (crop type, genetics, yield, profit, risk, weather) via context events. |
+| Mapping | `mountFields(fieldIds[])`, `setActiveSession(sessionId)`, `writeLayer(layerId, payload, provenance)`, LayerEditService callbacks; emit per-field stats. |
+| Rate / Sections | Consume lifecycle context, respect keep-outs/headlands, and write provenance-aware actual layers. |
+| Guidance | Use union envelopes for lookahead; pause automation when LayerEditService is active to avoid conflicting edits. |
+| Analytics / Export | Filter by `seasonId`, `jobId`, `sessionId`; honor provenance metadata when producing planned vs. actual reports. |
 
-## Shared Zone Drawing Framework
+### 72.5.2 Layer Catalog Participation
 
-- Layer editing is centralized in Core’s LayerEditService (ADR-044). Plugins declare editable layers and attribute schemas via manifests and respond to `onLayerStartEdit`, `onFeatureCommit`, and `onLayerUndo/Redo` events.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
-- Toolbar modes include polygon, rectangle, brush, and eraser tools supplied by Core; plugins contribute attribute panels (crop, genetics, risk, profit tags) declaratively.
-- LayerEditEvent journals persist geometry/attribute operations with deterministic hashes. Collaborative scenarios replicate journals via the Live Telemetry Mesh (ADR-047).【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L33-L62】
+- Crop type, genetics, yield, profit, risk, weather, soil, terrain, drainage, and advisor layers MUST align with registry schema definitions published alongside plugin ADRs.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L29-L71】【F:docs/plugins/Terrain3D.md†L1-L140】
+- Imports via NX-113 normalization flow MUST record source hashes, operator IDs, and transforms prior to persistence to maintain provenance DAG integrity.
 
-## Layer Catalog Additions
+---
 
-- **Crop Type:** `cropType.planned`, `cropType.actual`, `cropType.history` store crop, year, status, source, and notes aligned with Field crop history and job/session context.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L29-L71】
-- **Genetics:** `genetics.plan`, `genetics.variety` capture seed brand/product/lot/treatment with provenance to coverage events and barcode change logs.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md†L21-L66】
-- **Yield:** `yield.actual`, `yield.moisture`, `yield.testWeight` store normalized harvest metrics with smoothing metadata and aggregation bins.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L21-L52】
-- **Profit:** `profit.net` overlays combine yield-derived revenue and cost inputs, referencing `CostRecord` transactions and source layers.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】
-- **Risk:** `risk.flood`, `risk.compaction`, `risk.weeds`, `risk.other` annotate severity and observations, leveraging LayerEditService for edits and validating metadata with `FieldHealthRiskLayer.v1` (severity scale, observer provenance, attachments).【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md†L21-L44】【F:schemas/FieldHealthRiskLayer.v1.json†L1-L140】
-- **Weather:** `weather.overlay` visualizes rainfall, temperature, and wind vectors sourced from sensors/APIs and linked to session weather snapshots.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L21-L49】
-- **Soil:** `soil.ph`, `soil.om`, `soil.p`, `soil.k`, `soil.n`, `soil.zn`, `soil.ec`, `soil.cec` grids capture lab-imported attributes with sample depth, lot, and lab provenance for agronomic analytics and prescription derivations.【F:docs/plugins/SoilLab.md†L1-L120】
-- **Terrain:** `terrain.elevation`, `terrain.slope`, `terrain.aspect`, and `terrain.flowAccumulation` surfaces derive from LiDAR/RTK/DEM ingest to support drainage planning, erosion mitigation, and contour guidance workflows.【F:docs/plugins/Terrain3D.md†L1-L140】
-- **Drainage design:** `drain.tilePlan` and `drain.outlet` vector layers store planned tile paths, outlet locations, pipe sizes, and installation notes for export to contractors and integration with guidance paths.【F:docs/plugins/Terrain3D.md†L85-L140】
-- **Advisor recommendations:** `advisor.vrRecommendation.*` layers (e.g., population, nitrogen) store AI-derived prescription candidates with model metadata, confidence scores, and source history to keep decisions auditable and reproducible in replay fixtures.【F:docs/plugins/AgronomicAdvisor.md†L1-L170】
+## 72.6 Acceptance Criteria & Verification
 
-Each layer definition includes unit metadata, provenance expectations, and accessibility requirements (color ramps, legends) maintained in plugin manifests and schema files under `/schemas`.
+- Scenario tests mount multi-field envelopes, edit layers collaboratively, and verify provenance replay without divergence.
+- Import/export smoke tests validate GeoTIFF, GeoJSON, and ISOXML pathways populate registry-compliant metadata.
+- UI regression suites ensure layer drawers, provenance badges, and session grouping remain functional across sessions.
 
-## External ingest flow (NX-113)
+### 72.6.1 Requirement-to-Verification Map
 
-1. **Normalization:** Incoming GeoTIFF/COG rasters and GeoJSON/GeoPackage vectors are reprojected to the field’s working CRS (ADR-022) and resampled to registry-defined resolution.
-2. **Validation:** Normalized payloads validate against Layer Registry definitions (ADR-010). Units, planned/actual flags, and provenance fields must match the catalog entry before persistence.
-3. **Provenance capture:** Successful imports append provenance entries to `Layer.v1` noting source file hashes, operator, transform pipeline, and ingestion timestamps.
-4. **Session linking:** When imports occur during an active session, JobsService appends the layer ID to `session.layerRefs[]` and emits `onLayerImported` events so plugins refresh overlays.
-5. **Error handling:** Validation failures emit structured diagnostics referencing the expected schema hash and missing attributes. Operators receive actionable guidance to adjust source data.
+| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
+|--------|--------------------|---------------------|---------------------|
+| R-MAP-7200 | Lifecycle integration | `tests/integration/mapping_plugin_lifecycle.cs` | Event ordering matches spec; caches hydrated before render. |
+| R-MAP-7201 | Performance bench | `bench/mapping/envelope_mount.md` | Union envelope queries ≤ 25 ms p95 for 10 fields. |
+| R-MAP-7202 | Schema validation | `tests/schemas/layer_provenance.spec` | 100% provenance fields populated in fixtures. |
+| R-MAP-7204 | Functional test | `tests/integration/layer_edit_service.cs` | Undo/redo + journal replay succeeds with no conflicts. |
+| R-MAP-7205 | Telemetry test | `tests/telemetry/mapping_metrics.cs` | Commanded vs. actual metrics available in telemetry stream. |
 
-## Open Questions
+---
 
-- What fallback envelope should mapping use if a field polygon is missing or corrupt during mount?
-- How should plugins express partial field mounts (e.g., split ownership) without breaking union envelopes?
+## 72.7 Constraints
+
+- Shared editing toolbar modes originate from Core; plugins may not override geometry primitives without ADR approval.
+- Autosave cadence and TileStore flush behavior must match Section 71 persistence guarantees to avoid data loss.
+- Mapping plugins must respect embedded hardware budgets (≤ 1.5 GB RAM, ≤ 256 MB tile cache) during intensive sessions.
+
+### 72.7.1 Non-Functional Requirement Classes
+
+- **Performance:** Envelope queries, tile streaming, UI rendering latency.
+- **Reliability:** Autosave + provenance replay fidelity, collaborative edit resilience.
+- **Security:** Authenticated plugin manifests, provenance chain integrity.
+- **Usability:** Layer drawer clarity, session grouping, conflict resolution dialogs.
+- **Operability:** Diagnostics for layer imports, telemetry for cache health.
+
+---
+
+## 72.8 Risks & Open Issues
+
+| ID | Description | Impact | Mitigation / Status | Owner |
+|----|-------------|--------|---------------------|-------|
+| RISK-72-1 | Multi-field envelopes exceed performance targets on low-end hardware. | Medium | Profile union algorithms; cache spatial indices per session. | @mapping |
+| RISK-72-2 | Provenance DAG cycles caused by manual layer moves. | Low | Enforce DAG validation before commit; expose UI diagnostics. | @core |
+| ISSUE-72-1 | Define fallback when a mounted field polygon is missing/corrupt. | Medium | Pending decision in guidance + mapping WG. | @mapping |
+| ISSUE-72-2 | Expressing partial field ownership in union envelopes. | Medium | Track in ADR follow-up; may require envelope metadata extensions. | @product |
+
+---
+
+## 72.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Multi-Field Navigation | Operators expect seamless traversal across adjacent fields without prompts. |
+| C2 | Provenance Transparency | Layer drawers, telemetry, and reports must surface provenance for audits and reuse. |
+| C3 | Collaborative Editing | Shared LayerEditService enables deterministic undo/redo and telemetry replication. |
+| C4 | Import Normalization | External GIS data must normalize into registry schemas with reproducible transforms. |
+| C5 | UI Ergonomics | Layer drawers, session grouping, and provenance badges guide operators through complex overlays. |
+| C6 | Hardware Constraints | Tile caches and spatial indices must respect Raspberry Pi resource budgets. |
+
+### 72.9.1 Assumptions & Preconditions
+
+- [A1] Core lifecycle events remain authoritative and reliable for context hydration.
+- [A2] Plugins integrate telemetry emission libraries for provenance and rate metrics.
+- [A3] Operators possess necessary permissions to reuse or relocate layers across jobs.
+
+---
+
+## 72.10 Option Overview
+
+| Option ID | Status | Type / Theme | Description | Reference Document |
+|-----------|--------|--------------|-------------|--------------------|
+| — | — | — | All architectural trade-offs reflected as design considerations in §72.9. | — |
+
+---
+
+## 72.11 Comparison Matrix
+
+| Attribute / Criteria | Unified Mapping Plugin Framework | Legacy Plugin Integrations |
+|----------------------|----------------------------------|----------------------------|
+| Envelope Handling | Union envelopes with R-tree lookups | Per-field manual selection |
+| Provenance | Mandatory provenance DAG + layer references | Ad-hoc filenames and notes |
+| Editing | Shared LayerEditService with journaling | Plugin-specific tools, no shared undo |
+| Telemetry | Commanded vs. actual metrics exported | Limited or no telemetry hooks |
+| Import/Export | Normalized ingest with provenance capture | Manual GIS conversions |

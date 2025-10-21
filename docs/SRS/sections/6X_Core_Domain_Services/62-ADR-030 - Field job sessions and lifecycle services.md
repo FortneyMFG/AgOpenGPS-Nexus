@@ -1,60 +1,127 @@
-# ADR-030: Field job sessions and lifecycle services
+# 62-ADR-030 — Field Job Sessions and Lifecycle Services
 
-## Status
-Proposed
+*(Status: Proposed)*
 
-**Relevant Plugin(s):** Job Tasks, Mapping, Variable Mapping, UI Shell, Device Manager, Telemetry Logging
+**Author:** Codex
+**Reviewers:** Job Lifecycle Working Group
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Supersedes:** —
+**Superseded by:** —
+**Related SRS:** `62_Job_Lifecycle.md`
+**Related Options:** `62-O1`, `62-O2`, `62-O3`
 
+---
 
+## 1) Context
 
-## Context
-AgOpenGPS v6 exposes field sessions as loosely-structured folders with ad-hoc menu flows for New, Resume, Open, Drive-In, and import verbs. Coverage tiles, boundaries, and guidance data live side-by-side, and Resume.txt is the only structured metadata. The Nexus Core host now orchestrates plugins, presets, and layouts, but has no first-class job lifecycle model, making it difficult to coordinate autosave, geofence discovery, or plugin participation. A unified Job abstraction is required so Core, UI, and plugins can exchange consistent metadata, load/save workflows, and resume behavior while remaining compatible with V6 job archives.
+AgOpenGPS v6 exposes field sessions as loosely-structured folders with ad-hoc menu flows. Coverage
+files, boundaries, and guidance assets share directories and `Resume.txt` is the only structured
+metadata. Nexus Core orchestrates plugins, presets, and layouts but lacks a first-class job lifecycle
+model, making autosave, geofence discovery, and plugin participation inconsistent. A unified Job
+abstraction must exchange consistent metadata, load/save workflows, and resume behavior while remaining
+compatible with legacy archives.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L9-L23】
 
-## Decision
+```mermaid
+flowchart LR
+  JobsService --> Plugins
+  JobsService --> UI
+  JobsService --> Storage
+  Storage --> Autosave
+```
+
+---
+
+## 2) Decision
+
 Establish Jobs as a first-class concept spanning Core, UI, and plugins with the following pillars:
 
-1. **Job metadata contract.** Define a versioned `aog.job.v1` JSON schema stored as `job.json` inside each job folder. Metadata captures identity, timestamps, spatial hints, asset paths (boundaries, coverage, guidance, prescriptions, attachments), equipment/preset pointers, layout references, and user tags. Resume.txt remains updated for V6 compatibility.
-2. **Filesystem job store.** Maintain a `/Jobs/<Job DisplayName>/` root containing `job.json`, `Resume.txt`, and a `data/` subtree for boundaries, guidance, coverage tiles, prescriptions, and attachments. Hosts may add cloud-backed mirrors but must persist local structure for offline workflows.
-3. **JobsService lifecycle API.** Provide a Core-hosted gRPC service exposing verbs for `New`, `Resume`, `Open`, `DriveIn`, `Import`, `Clone`, `Save`, and `Close`, plus `GetActive`, `List`, and `Watch` for state transitions and progress events. Importers accept ISOXML, KML, or plugin-defined types and normalize artifacts into the job store before activation.
-4. **UI integrations.** Mirror the legacy Job menu (New, Resume, Open, Drive-In, Import ISOXML, From KML, Clone Existing, Close) and surface the active job in a top-bar chip that opens a job drawer showing boundaries, coverage status, guidance sets, and implement context. Drive-In monitors geofences and prompts operators when proximity matches a stored job.
-5. **Plugin extensibility.** Allow plugins to register Job Sources under the Import menu, contribute decorators that attach data on open/save/close, and receive lifecycle hooks (`onJobOpen`, `onJobSave`, `onJobClose`) gated by `jobs.lifecycle` permissions. Job metadata can link to shared Layouts or Presets; live updates flow through these links while allowing snapshot overrides for historical integrity.
-6. **Safety & autosave.** Track dirty state for coverage and guidance edits, autosave at intervals and before risky operations, and run crash-safe journaling for coverage tiles so replay can restore state after interruptions.
+1. **Job metadata contract.** Versioned `aog.job.v1` schema stored as `job.json` capturing identity,
+   timestamps, spatial hints, asset paths, equipment/preset pointers, layout references, and user tags.
+2. **Filesystem job store.** `/Jobs/<DisplayName>/` root containing `job.json`, `Resume.txt`, and `data/`
+   subtree for boundaries, guidance, coverage, prescriptions, and attachments. Cloud mirrors optional,
+   but offline structure mandatory.
+3. **JobsService lifecycle API.** Core-hosted gRPC service exposing verbs for `New`, `Resume`, `Open`,
+   `DriveIn`, `Import`, `Clone`, `Save`, `Close`, plus `GetActive`, `List`, and `Watch` for transitions.
+4. **UI integrations.** Mirror legacy menu, surface active job in UI chip, provide drawers showing assets
+   and implement context, and offer Drive-In geofence prompts.
+5. **Plugin extensibility.** Allow plugins to register import sources, contribute decorators, and receive
+   lifecycle hooks gated by permissions.
+6. **Safety & autosave.** Track dirty state, autosave at intervals/before risky operations, and run crash-safe
+   journaling for coverage tiles.
 
-### Degraded operation & messaging
-- **No mapping provider:** When mapping capabilities are absent (`mapping:offline`), the JobsService annotates active jobs as "Map-light" and skips coverage journaling expectations. The UI still renders job metadata and Drive-In prompts but adds a banner clarifying that coverage playback will be limited. Once mapping returns, Core backfills coverage pointers without forcing operators to restart the job.
-- **Plugin hooks unavailable:** If lifecycle-capable plugins decline hooks (e.g., automation plugin disabled), Core logs the skipped hooks with reason codes and surfaces a toast in the Activity pane so operators understand why certain automations did not run. Jobs remain openable/resumable, but the job drawer highlights affected integrations.
-- **Filesystem pressure / read-only media:** When the job store detects read-only media or low disk, JobsService automatically shifts to rolling snapshot mode and warns operators before autosave would fail. Crash recovery prompts include guidance on exporting the job or freeing space prior to resuming full journaling.
+Degraded operation messaging covers missing mapping providers, unavailable plugin hooks, and read-only or
+low-disk job stores with explicit operator alerts and fallback behaviors.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L25-L63】
 
-## Consequences
-- **Consistent lifecycle orchestration.** Core, UI, and plugins share a single authority for job identity and storage, enabling autosave policies, Drive-In geofence matching, and deterministic crash recovery while keeping V6 Resume flows functional.
-- **Extensible import pipeline.** ISOXML, KML, and plugin-defined importers normalize assets into the job store, making future sources (cloud prescriptions, RTK base lists) pluggable without diverging UI experiences.
-- **Shared layout & preset context.** Jobs may reference presets or layouts by link or snapshot, letting seasonal layout updates propagate automatically while preserving overrides when required.
-- **Follow-up work.** Implement the `aog.job.v1` schema and helpers, build the JobsService host, refresh the UI menu and drawer, port ISOXML/KML importers, add Drive-In discovery with geofence indexing, wire autosave + coverage journaling, and provide migration tools for V6 archives.
+### Decision Summary
 
-## Governance Updates
-- **Schema migration tooling.** JobsService ships a semantic diff tool that highlights layout, asset, and provenance changes between versions. Migration PRs must attach generated reports.
-- **Transactional hooks.** Plugin hook contracts declare commit/rollback semantics. Core enforces these hooks so partial failures revert gracefully and log reasons.
-- **Release gates.** Before promoting schema changes, maintainers run full job lifecycle rehearsals (create, execute, archive) covering automation hooks and UI integrations.
+* **Scope:** Core JobsService, on-disk schema, UI orchestration, plugin lifecycle hooks.
+* **Boundary:** Does not enforce cloud sync; offline-first operation remains primary.
+* **Implementation Level:** Design + Core service implementation and UI integration.
 
-## Amendment — 2025 architecture refresh (NX-190)
+---
 
-- Canonical on-disk layout reaffirmed as `/Jobs/<JobName>/job.json`, `Resume.txt`, and typed subfolders (`layers/`, `sessions/`, `attachments/`). Cloud sync remains optional; devices reconcile job folders upon landing instead of requiring continuous connectivity.
-- Session awareness (ADR-041) replaces legacy Run terminology. JobsService emits `onSessionStart`/`End`/`MetadataChange` hooks to plugins, and UI copy now references Sessions across drawers, reports, and telemetry.
-- Remote dashboards operate in monitor-only mode. They consume lifecycle events via gRPC/WebSocket but cannot mutate jobs unless operators grant explicit permissions, keeping offline rigs safe.
+## 3) Consequences
 
-## Validation
-- **Crash recovery:** Resume-from-crash workflows must restore the previously active job within 8 seconds and avoid duplicating more than one PoseStream segment in journal entries.
-- **Migration coverage:** The legacy archive migration harness must successfully convert at least 50 representative V6 jobs without schema validation failures, emitting warnings whenever fields are downgraded or skipped.
-- **Drive-In accuracy:** Drive-In geofence discovery must populate implement entry/exit events with ≤ 50 cm spatial error when replayed against recorded RTK datasets.
+**Positive Impacts:**
 
-## Legacy Implementation Notes
-### AgOpenGPS v6
-- Stores field sessions as folder trees with `Resume.txt` markers, coverage bins, and assorted JSON files; job metadata is implicit and tightly coupled to UI flows.
+* Core, UI, and plugins share a single authority for job identity and storage enabling autosave, Drive-In
+  geofence matching, and deterministic crash recovery while keeping V6 compatibility.
+* Extensible import pipeline normalizes ISOXML, KML, and plugin-defined sources into the job store.
+* Jobs reference presets/layouts by link or snapshot allowing seasonal updates with historical overrides.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L63-L88】
 
-### Legacy Dev Branch
-- Mirrors V6 behaviors without a centralized Jobs service or metadata schema; Drive-In relies on direct geofence scans of legacy folders.
+**Negative / Mitigated Impacts:**
 
-## References
-- [Data model & storage requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
-- [Plugin lifecycle](../ADR/ADR-018-plugin-api.md)
-- [Mapping & coverage responsibilities](../ADR/ADR-029-mapping-plugin-architecture.md)
+* Implementation workload spans schema, service host, UI, and migration tooling — mitigated with staged work
+  packages and automated migration harnesses.
+* Offline storage pressure and plugin absence require UX messaging — mitigated by built-in alerts and fallback modes.
+
+**Follow-up Actions:**
+
+* Implement schema helpers, JobsService host, refreshed UI flows, and importer pipeline.
+* Deliver Drive-In geofence indexing, autosave + coverage journaling, and V6 migration tools.
+* Maintain schema diff tooling, transactional hooks, and release rehearsals before promoting changes.
+
+---
+
+## 4) Rationale
+
+A first-class job service enforces consistent metadata, lifecycle operations, and plugin coordination while
+preserving legacy archives. Alternatives relying on folder heuristics cannot deliver deterministic resumes,
+structured imports, or extensible automation hooks.
+
+---
+
+## 5) Alternatives Considered
+
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| Legacy folder workflows | Keep existing Resume.txt-driven flows. | Lacks structured metadata and automation hooks. |
+| Plugin-owned job stores | Let plugins manage jobs independently. | Causes divergent workflows and breaks crash recovery. |
+| Cloud-only job database | Require online connectivity. | Violates offline-first requirement for rigs. |
+
+---
+
+## 6) Implementation Notes
+
+* Canonical disk layout `/Jobs/<JobName>/job.json`, `Resume.txt`, `layers/`, `sessions/`, `attachments/` reaffirmed.
+* Session awareness events (`onSessionStart`, `onSessionEnd`, `onSessionMetadataChange`) emitted to plugins and dashboards.
+* Remote dashboards operate monitor-only unless operators grant write permissions.
+
+---
+
+## 7) Verification
+
+* Crash recovery restores previously active job within 8 seconds without duplicating more than one PoseStream segment.
+* Migration harness converts ≥ 50 representative V6 jobs without schema failures, flagging downgraded fields as warnings.
+* Drive-In geofence discovery populates entry/exit events with ≤ 50 cm spatial error on RTK replay datasets.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L88-L108】
+
+---
+
+## 8) References
+
+* [Persistence formats](../3X_Data_Storage/32_Persistence_Formats.md)
+* [Plugin lifecycle](../9X_Frontends_Ops/94-ADR-018%20-%20Plugin%20API%20and%20capability%20discovery.md)
+* [Mapping & coverage responsibilities](../9X_Frontends_Ops/94-ADR-029%20-%20Mapping%20plugin%20architecture.md)

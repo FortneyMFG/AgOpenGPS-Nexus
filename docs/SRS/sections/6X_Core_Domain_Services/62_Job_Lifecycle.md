@@ -1,83 +1,218 @@
-# 62 — Job Lifecycle & Session Management (Status: aligned with ADR-040/041/043)
+# 62 — Job Lifecycle & Session Management
+*(Status: Proposed)*
 
-## Overview
+**Author:** Codex
+**Created:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Section ID:** 62
+**Editors:** @Codex
+**Last Updated:** 2025-10-20
+**Related Sections:** 61 Kinematics & Pose Fusion, 63 Layer Registry, 72 Mapping Layers Plugin
+**Upstream Dependencies:** 31-ADR-043 Multi-Field Envelopes, 62-ADR-041 Job Sessions Lifecycle
+**Downstream Impacts:** TaskService, Telemetry Logging, Analytics Pipelines
 
-Job lifecycle services orchestrate navigation, plugin hooks, journaling, and resume behavior across the Season → Job → Session
-hierarchy. Core maintains the authoritative context (`farmId`, `fieldIds[]`, `seasonId?`, `jobId`, `sessionId`) and broadcasts
-updates to plugins so spatial renderers, rate controllers, and analytics stay aligned with operator actions.
+---
 
-## Lifecycle States
+## 62.1 Purpose & Scope
 
-1. **Planned:** Job exists with metadata but no active session. Operators may attach prescriptions or stage assets.
-2. **Mounted:** Job is selected, fields are mounted, and Session 1 auto-creates with environment snapshot.
-3. **Active Session:** Operator performs work. Autosave/journaling persist coverage tiles, telemetry, and metadata checkpoints.
-4. **Paused:** Operator intentionally stops the session (manual) or Core detects inactivity; session remains open until End Session
-   action runs.
-5. **Closed:** Session ended, job remains reopenable. Starting a new session increments the counter and triggers journaling.
-6. **Completed:** Operator marks job finished; analytics/export flows run, but sessions remain immutable for audit.
+This section defines lifecycle orchestration for farms, seasons, jobs, and sessions.
+It governs the state machine, events, journaling cadence, multi-field mounting,
+resume flows, and work-order integration so plugins, analytics, and automation retain
+consistent provenance and auditability.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L4-L96】
 
-## Core lifecycle events
+---
 
-| Event | Trigger | Payload | Plugin expectations |
-| --- | --- | --- | --- |
-| `onFarmLoaded` | Operator selects a farm in the navigator | `farmId`, farm metadata snapshot, mounted field roster | Preload geometry, imagery, and plugin extensions for the farm. |
-| `onSeasonLoaded` | Season selected or job references a season | `seasonId`, `name`, `jobIds[]`, date range, optimizer state, `extensions` | Prestage seasonal analytics, budget snapshots, and crop rotation context. |
-| `onJobLoaded` | Job mounted or resumed | `farmId`, `seasonId?`, `jobId`, `fieldIds[]`, job metadata (core + `extensions`), immutable IDs | Initialize caches, stage per-field stats, prep overlays, and subscribe to envelope updates. |
-| `onContextChanged` | Farm/season/job/session IDs change (field mount, season swap) | Diff summary + latest context snapshot | Reconcile caches idempotently; rebuild spatial indices, refresh analytics. |
-| `onSessionStart` | Session opened (new or resume) | `farmId`, `seasonId?`, `jobId`, `sessionId`, `fieldIds[]`, env snapshot, crop/genetics context | Bind provenance context, prime journaling buffers, auto-fill crop/genetics defaults. |
-| `onSessionPause` | Operator pauses work | Context snapshot + pause reason | Suspend live logging, mark telemetry streams paused without closing session. |
-| `onSessionResume` | Operator resumes after pause | Context snapshot + resume timestamp | Resume coverage logging, refresh analytics caches. |
-| `onSessionMetadataChange` | Operator updates session metadata | Updated session document with diff summary | Persist changes, refresh dashboards, honor authoring metadata immutability. |
-| `onSessionWeatherUpdate` | Weather auto-logging records a new sample | Weather delta payload (temp, humidity, wind, rainfall, pressure, source) | Update session weather snapshot, notify spraying/analytics plugins. |
-| `onSessionEnd` | Operator ends the session or job completes | `farmId`, `seasonId?`, `jobId`, `sessionId`, summary stats | Flush journals, finalize layers, update analytics snapshots. |
-| `onLayerStartEdit` | Zone Drawing Framework enters edit mode | Layer context (layerId, jobId, sessionId?, editable attributes) | Prepare attribute editors, suspend conflicting automation. |
-| `onFeatureCommit` | Geometry/attribute change committed | `LayerEditEvent` payload | Update analytics, sync collaborative meshes, refresh overlays. |
-| `onLayerUndo`/`onLayerRedo` | Undo stack mutates | `LayerEditEvent` pointer + diff summary | Rollback/redo analytics caches, update UI history. |
+## 62.2 Context
 
-- Core emits `onFarmLoaded` → `onSeasonLoaded` (when applicable) → `onJobLoaded` → `onSessionStart` in order during mounts. Crash recovery replays `onJobLoaded`, replays pending `onContextChanged` diffs, and resumes the active session before firing `onSessionStart`.
-- Existing jobs without sessions surface as a single implicit session; UI prompts operators to create additional sessions when resuming legacy jobs.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L12-L60】
+- Depends on Core services exposing farm/season/job/session contexts with immutable IDs.
+- Interacts with mapping layers, telemetry logging, TaskService work orders, and
+  weather ingestion pipelines.
+- Out of scope: UI layout specifics or analytics algorithms that consume session data.
 
-## Autosave & Journaling
+---
 
-- **Autosave cadence:** Minimum every 60 seconds or when >5 MB of coverage tiles are written, whichever comes first. Layer edits trigger autosave when 10 or more `LayerEditEvent` entries are buffered.
-- **Crash safety:** Journal entries persist to disk before acknowledging `onSessionEnd`. Recovery replays incomplete batches.
-- **Metadata:** Session documents (embedded or `sessions/<id>.json`) update atomically. Notes and inputs include timestamps and
-  user attribution where available.
-- **Layer provenance:** Layers created during the session append provenance records referencing `jobId` and `sessionId`; reused layers keep the original `hash` and `source` while updating the mounting job. Authoring metadata flows into `Layer.v1` alongside plugin-provided `extensions`. Layer edits emit `LayerEditEvent.v1` journals with deterministic hashes for undo/redo and collaborative replication.【F:schemas/Layer.v1.json†L1-L117】【F:schemas/LayerEditEvent.v1.json†L1-L140】
+## 62.3 Legacy Comparison
 
-## Multi-Field Mount/Unmount
+| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
+|--------------|-----------------|-----------------------|---------------------------|--------------------|
+| Lifecycle Control | Manual job/session toggles with limited provenance. | Resume flows rely on ad hoc caches and can lose context. | Formalize mount → session start ordering with deterministic events. | 【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L8-L61】 |
+| Journaling | Autosave triggered by operator actions. | Crash recovery may replay incomplete batches inconsistently. | Define autosave cadence, journaling checkpoints, and deterministic recovery. | 【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L63-L74】 |
+| Multi-field Support | Single-field focus with manual mounts. | Multi-field jobs require duplicated work. | Support mount/unmount APIs and provenance for multi-field workflows. | 【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L76-L88】 |
 
-- When operators select multiple fields, Core emits a single `mountFields(fieldIds[])` call to mapping plugins, which respond with the union envelope and per-field indices. Job `extensions` supply optional crop/genetics metadata for plugins to render overlays alongside coverage.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L12-L68】
-- Field unmounts occur only when jobs close or operators explicitly remove a field; Core updates `fieldIds` and notifies plugins
-  prior to persisting changes.
-- Per-field stats accumulate in `job.stats.fields[]`, retaining historical coverage even if a field is later unmounted.
-- `onContextChanged` fires after field mount/unmount, season reassignment, or crop context updates so plugins can rehydrate caches without redundant restarts.
+---
 
-## Resume & Last-Open Pointers
+## 62.4 Definitions
 
-- Core tracks the last open job and active session per operator profile. On startup, the UI offers a "Resume Last Session" action
-  that remounts the job, restores session state, and replays pending journaling batches.
-- Plugins receive the same `onSessionStart` event during resume to refresh caches, restore telemetry subscriptions, and hydrate analytics from session `extensions`.
-- Session IDs are deterministic (`session:1`, `session:2`, …) for automatically generated sessions; custom UUIDs remain supported
-  for imported history.
+| Term | Definition |
+|------|------------|
+| Session | Time-bounded execution period within a job capturing telemetry and provenance. |
+| Autosave | Periodic persistence of session state, coverage, and metadata triggered by cadence rules. |
+| Work Order | TaskService entity representing planned work with presets, implements, and checklists. |
+| Context Diff | Snapshot delta emitted when farm/season/job/session identifiers or metadata change. |
 
-## UX Requirements
+---
 
-- **Season-first flow:** Season list → Farm summary (fields participating in the season) → Job → Session timeline with notes.
-- **Farm-first flow:** Farm → Fields → Job → Session timeline; seasons appear as badges when linked.
-- **Start New Session:** Accessible during an active job; prompts for optional name and notes before closing the current session.
-- **Session metadata panel:** Inline edits for env snapshot, inputs, notes, and layer references with autosave indicators.
+## 62.5 Requirements
 
-## Work orders & task orchestration
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|----------|----------|---------|-----------------|----------------------------|
+| R-JOB-000 | MUST | Lifecycle | Maintain deterministic lifecycle states (Planned, Mounted, Active, Paused, Closed, Completed). | C1 | State-machine tests verifying transitions and event ordering. |
+| R-JOB-001 | MUST | Event Bus | Emit ordered lifecycle events (`onFarmLoaded`…`onSessionEnd`) with authoritative context payloads. | C1 | Integration test harness replaying mount/resume flows. |
+| R-JOB-002 | MUST | Journaling | Autosave at ≤60 s cadence or after 5 MB coverage delta with crash-safe persistence. | C2 | Fault-injection test verifying recovery replays complete batches. |
+| R-JOB-003 | SHOULD | Provenance | Append provenance metadata (jobId, sessionId, actor, timestamps) to layer and session documents. | C3 | Schema validation ensuring provenance fields present. |
+| R-JOB-004 | SHOULD | Multi-field | Support batch mount/unmount of multiple fields with deterministic context diffs. | C4 | API contract test verifying union envelopes and diff notifications. |
+| R-JOB-005 | SHOULD | Resume | Provide "Resume Last Session" workflow restoring context and pending journals. | C5 | UX regression verifying resume replays pending batches. |
+| R-JOB-006 | SHOULD | UX Flow | Offer season-first and farm-first navigation while maintaining immutable identifiers. | C6 | UI integration ensuring ID continuity across flows. |
+| R-JOB-040 | MUST | Work Orders | Launching a work order auto-opens a session with provenance for presets, implements, and assignees. | C7 | TaskService integration test verifying provenance fields recorded. |
+| R-JOB-041 | SHOULD | Companion Sync | Mobile clients sync checklists/notes into `Session.notes[]` with actor/timestamp. | C7 | Sync test ensuring bidirectional updates. |
+| R-JOB-042 | MUST | Task Events | Emit task state transitions (Assigned → In Progress → Completed/Cancelled) with telemetry payloads. | C7 | Event stream verification with Profit & Telemetry subscribers. |
+| R-JOB-043 | SHOULD | Inventory Reconciliation | Reconcile work-order material reservations with Inventory Ledger updates. | C7 | Ledger test ensuring quantity deltas captured. |
 
-- R-JOB-040 (MUST): Provide a TaskService-backed Work Order list that lets managers assign jobs with presets, implements, and planned inputs. Launching a work order must automatically open a session with the originating `workOrderId`, preset hash, and assignee captured in session metadata and provenance.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L17-L40】【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L33-L55】
-- R-JOB-041 (SHOULD): Mobile/companion clients shall surface per-work-order checklists, notes, and completion toggles that sync into `Session.notes[]` entries with actor/timestamp data for proof-of-work exports.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L46-L55】
-- R-JOB-042 (MUST): Task state transitions (Assigned → In Progress → Completed/Cancelled) must emit lifecycle events so Profit, Telemetry Logging, and regulatory plugins can stamp provenance without polling queue state. Events include `workOrderId`, `jobId`, `sessionId`, `assignee`, and checklist completion percentage.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L32-L40】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L17-L34】
-- R-JOB-043 (SHOULD): TaskService must reconcile work order material reservations with the Inventory Ledger, reducing on-hand quantity when sessions report consumption and flagging discrepancies for manual review.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L15-L34】
+### 62.5.1 Requirement Sources & Rationale
 
-These requirements extend the session lifecycle so orchestration, crew scheduling, and audit logs align with field execution while preserving deterministic provenance across plugins.
+| Req ID | Source | Rationale |
+|--------|--------|-----------|
+| R-JOB-000 | Session lifecycle working group | Provides deterministic workflow for plugins. |
+| R-JOB-002 | Autosave governance notes | Prevents data loss and ensures crash recovery. |
+| R-JOB-040 | TaskService charter | Aligns field execution with assigned work orders. |
+| R-JOB-042 | Profit & telemetry integration plan | Enables downstream analytics without polling. |
 
-## Open Questions
+---
 
-- How should automatic session segmentation behave when equipment idles in-field for extended periods?
-- Do shared rigs need concurrent session support (multiple implements under one job)?
+## 62.6 Acceptance Criteria & Verification
+
+Lifecycle validation relies on integration suites that replay mount/resume sequences,
+fault-injection tests validating autosave durability, and API contract tests covering
+multi-field mounts, work-order launches, and provenance sync. Manual review confirms
+UX flows preserve immutable IDs while automated checks audit emitted event payloads.
+
+### 62.6.1 Requirement-to-Verification Map
+
+| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
+|--------|-------------------|---------------------|---------------------|
+| R-JOB-000 | Simulation | `tests/sim/JobLifecycleStateMachine.json` | All transitions exercised without invalid states. |
+| R-JOB-002 | Fault Injection | `tests/replay/AutosaveCrashRecovery.jsonl` | Recovery restores last committed autosave. |
+| R-JOB-040 | Integration | `tests/integration/TaskServiceWorkOrder.cs` | Session metadata includes workOrderId + preset hash. |
+| R-JOB-043 | Ledger Test | `tests/integration/InventoryReconciliation.cs` | Ledger quantities adjusted within ±1% tolerance. |
+
+---
+
+## 62.7 Constraints
+
+- Must maintain immutable IDs for farm, season, job, and session entities once issued.
+- Must respect privacy policies for notes and telemetry when syncing across devices.
+- Must operate offline-first, syncing when connectivity is restored without data loss.
+
+---
+
+## 62.8 Stakeholder Expectations
+
+Operators expect intuitive resume flows and clear session timelines, managers require
+work-order orchestration with audit trails, and analytics teams rely on deterministic
+journal playback to compute coverage, profit, and compliance metrics.
+
+---
+
+## 62.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|---------------|-------------|
+| C1 | Ordered lifecycle events | Plugins and UI shells depend on deterministic event sequencing across mount and resume scenarios. |
+| C2 | Crash-safe journaling | Autosave cadences and atomic writes ensure recovery without user intervention. |
+| C3 | Provenance completeness | Session and layer records require actor, timestamp, and source metadata for replay and audits. |
+| C4 | Multi-field orchestration | Batch mounting fields must compute union envelopes while retaining per-field statistics. |
+| C5 | Resume fidelity | Pending journals and cached context need restoration without duplicate side effects. |
+| C6 | Navigation flexibility | Season-first and farm-first flows must reach the same immutable entities. |
+| C7 | Work-order alignment | TaskService integration must remain authoritative for presets, checklists, and inventory. |
+| C8 | Weather and telemetry hooks | Weather auto-logging and telemetry subscriptions must update session context consistently. |
+
+### 62.9.1 Assumptions & Preconditions
+
+- [A1] Autosave storage is available locally even in offline deployments.
+- [A2] Operators authenticate before modifying session metadata or work orders.
+- [A3] Weather providers deliver updates at ≥15 min cadence when configured.
+
+---
+
+## 62.10 Option Overview
+
+| Option ID | Status | Type / Theme | Description | Reference Document |
+|-----------|--------|--------------|-------------|--------------------|
+| 62-O1 | Proposed | Resume Flow | Persist UI state for "Resume Last Session" shortcut. | — |
+| 62-O2 | In Review | Offline Sync | Deferred journal upload with conflict resolution. | 32 Persistence Formats |
+| 62-O3 | Exploring | Work-order Guided Flow | TaskService-driven job picker with presets. | 62-ADR-041 |
+
+---
+
+## 62.11 Comparison Matrix
+
+| Attribute / Criteria | 62-O1 | 62-O2 | 62-O3 |
+|----------------------|-------|-------|-------|
+| Operator Effort | Low | Medium | Medium |
+| Implementation Complexity | Low | Medium | High |
+| Offline Resilience | Medium | High | Medium |
+| Work-order Adoption | Medium | Medium | High |
+
+---
+
+## 62.12 Option Evaluation
+
+Preliminary evaluation favors combining offline sync (62-O2) with work-order guided
+flows (62-O3) to satisfy TaskService alignment while maintaining resume convenience.
+Detailed scoring is deferred to ADR updates.
+
+---
+
+## 62.13 Evaluation & Verification
+
+Verification benchmarks track autosave latency, resume time-to-ready, and work-order
+latency from assignment to session creation. Regression suites replay historical jobs
+and confirm provenance completeness.
+
+---
+
+## 62.14 Implementation Policy
+
+Core must expose lifecycle APIs with versioned payloads, persist session documents
+atomically, and document TaskService integration contracts. Client shells must respect
+immutable IDs and use provided journaling hooks.
+
+---
+
+## 62.15 Community Sentiment
+
+Contributors emphasize deterministic resume flows, richer work-order orchestration,
+and audit-ready provenance for collaborative crews.
+
+### 62.15.1 Section Change Log
+
+| Date | Summary | PR / Issue |
+|------|---------|------------|
+| 2025-10-20 | Initial rewrite using v0.1 template. | #0000 |
+
+---
+
+## 62.16 Traceability
+
+| Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
+|----------------|-------------------|--------|-----------------------|--------------------------|
+| R-JOB-000 | 62-O1 | 62-ADR-041 | `tests/sim/JobLifecycleStateMachine.json` | `Core/JobLifecycleService` |
+| R-JOB-002 | 62-O2 | 62-ADR-030 | `tests/replay/AutosaveCrashRecovery.jsonl` | `Core/Journaling` |
+| R-JOB-040 | 62-O3 | 62-ADR-041 | `tests/integration/TaskServiceWorkOrder.cs` | `Services/TaskServiceClient` |
+
+---
+
+## 62.17 Conformance
+
+Implementations conform when lifecycle events follow the defined state machine,
+autosave policies meet cadence and durability requirements, and work-order provenance
+is preserved without violating privacy or offline constraints.
+
+---
+
+## Standards Context
+
+This section aligns with ISO/IEC/IEEE 29148:2018 and IEEE 1016:2017 guidance for
+requirements and design descriptions, emphasizing determinism, auditability, and
+cross-service orchestration.

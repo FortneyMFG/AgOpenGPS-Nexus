@@ -49,7 +49,7 @@ Latency, usability in the cab, offline capability, scalability, data retention p
 ## Current sentiment
 - Keep existing monitors while defining minimum telemetry that should be streamed for automated alerting.
 - Add layer-aware diagnostics in tandem with the PGN/schema upgrades so operators aren’t blind to quality issues.【F:docs/SRS/sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md†L28-L57】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md†L24-L41】
-- Linux service health must integrate with metrics/logging expectations before we can deploy headless rigs broadly.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L33】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L21-L34】
+- Linux service health must integrate with metrics/logging expectations before we can deploy headless rigs broadly.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L44】【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L168-L176】
 - Constraint-driven alerts and logs must ship with the same telemetry plumbing so automation stays explainable when Core enforces spatial policies.
 
 ## Upcoming ADR coverage

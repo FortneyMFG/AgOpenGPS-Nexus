@@ -109,9 +109,9 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 - [O-DATA-5 – Metadata-driven Layers](sections/3X_Data_Storage/32-O5%20-%20Metadata-driven%20variable-rate%20layers.md)
 
 #### 9X — Frontends & Ops
-- [O-FRONT-6 – Remote Clients](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md)
-- [O-TEST-4 – Layer Replay CI](sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md)
-- [O-UI-5 – Metadata-driven Dashboards](sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md)
+- [Remote Clients & Companion Shell](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations)
+- [Layer Replay CI](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md#969-design-considerations)
+- [Metadata-driven Dashboards](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations)
 
 ### Appendices
 - [DFU catalog schema](appendices/DFU_Catalog_Schema.md)
@@ -226,8 +226,8 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-UI-001 | O-UI-0, O-UI-2, O-UI-7 | WPF shell (legacy baseline) | ADR-UI-001 (TBD) |
 | R-UI-002 | O-UI-0 | AgIO dialogs (legacy baseline) | ADR-UI-002 (TBD) |
 | R-UI-003 | O-UI-0, O-UI-5 | Screen helper (legacy baseline) | ADR-UI-003 (TBD) |
-| R-UI-004 | O-UI-5 | [Metadata dashboards](sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md) | ADR-UI-004 (TBD) |
-| R-UI-005 | O-UI-6, O-UI-7 | [Remote clients](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md) | ADR-UI-005 (TBD) |
+| R-UI-004 | C3 | [Metadata dashboards](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-UI-004 (TBD) |
+| R-UI-005 | O-UI-6, O-UI-7 | [Remote clients](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-UI-005 (TBD) |
 | R-UI-006 | O-UI-1, O-UI-2, O-UI-4, O-UI-7 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-UI-006 (TBD) |
 | R-UI-007 | O-UI-2, O-UI-5, O-UI-7 | [Accessibility presets](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) | ADR-UI-007 (TBD) |
 
@@ -253,7 +253,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-BE-002 | O-BE-0, O-BE-5 | Shared projects (legacy baseline) | ADR-BE-002 (TBD) |
 | R-BE-003 | O-BE-1 | Automation APIs (legacy baseline) | ADR-BE-003 (TBD) |
 | R-BE-010 | O-BE-5 | [Layer controllers](sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md) | ADR-BE-004 (TBD) |
-| R-BE-011 | O-BE-5 | [Replay CI](sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md) | ADR-BE-004 (TBD) |
+| R-BE-011 | O-BE-5 | [Replay CI](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md#969-design-considerations) | ADR-BE-004 (TBD) |
 | R-BE-004 | O-BE-6, O-BE-7 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-BE-005 (TBD) |
 | R-BE-012 | O-BE-6, O-BE-7 | [PGN bridge](sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | ADR-BE-005 (TBD) |
 | R-BE-013 | O-BE-6, O-BE-7 | [Service health targets](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-BE-006 (TBD) |
@@ -265,11 +265,11 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-FE-000 | O-FE-0 | WinForms project (legacy baseline) | ADR-FE-001 (TBD) |
 | R-FE-001 | O-FE-0 | AgIO project (legacy baseline) | ADR-FE-001 (TBD) |
 | R-FE-002 | O-FE-0 | Solution utilities (legacy baseline) | ADR-FE-002 (TBD) |
-| R-FE-003 | O-FE-6, O-FE-7 | [Remote clients option](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md) | ADR-FE-003 (TBD) |
-| R-FE-010 | O-FE-5 | [Metadata dashboards](sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md) | ADR-FE-004 (TBD) |
-| R-FE-011 | O-FE-5 | [Metadata dashboards](sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md) | ADR-FE-004 (TBD) |
-| R-FE-004 | O-FE-6 | [Remote clients option](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md) | ADR-FE-003 (TBD) |
-| R-FE-012 | O-FE-6, O-FE-7 | [Remote clients option](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md) | ADR-FE-005 (TBD) |
+| R-FE-003 | O-FE-6, O-FE-7 | [Remote clients option](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-003 (TBD) |
+| R-FE-010 | C3 | [Metadata dashboards](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-004 (TBD) |
+| R-FE-011 | C3 | [Metadata dashboards](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-004 (TBD) |
+| R-FE-004 | O-FE-6 | [Remote clients option](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-003 (TBD) |
+| R-FE-012 | O-FE-6, O-FE-7 | [Remote clients option](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-005 (TBD) |
 | R-FE-013 | O-FE-6, O-FE-7 | [Safety posture notes](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) | ADR-FE-005 (TBD) |
 | R-FE-014 | O-FE-5 | [Training & presets](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) | ADR-FE-006 (TBD) |
 
@@ -361,8 +361,8 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-CI-001 | O-CI-0 | [Manual publish flow](../../README.md) | ADR-CI-001 (TBD) |
 | R-CI-002 | O-CI-0 | [Linting ideas](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md) | ADR-CI-002 (TBD) |
 | R-CI-003 | O-CI-1 | [Packaging criteria](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md) | ADR-CI-003 (TBD) |
-| R-CI-010 | O-CI-4 | [Replay CI option](sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md) | ADR-CI-004 (TBD) |
-| R-CI-011 | O-CI-4 | [Replay CI option](sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md) | ADR-CI-004 (TBD) |
+| R-CI-010 | O-CI-4 | [Replay CI option](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md#969-design-considerations) | ADR-CI-004 (TBD) |
+| R-CI-011 | O-CI-4 | [Replay CI option](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md#969-design-considerations) | ADR-CI-004 (TBD) |
 | R-CI-004 | O-CI-3 | [Linux Core option](sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md) | ADR-CI-005 (TBD) |
 | R-CI-005 | O-CI-4 | [Hardware-in-loop](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md) | ADR-CI-006 (TBD) |
 | R-CI-012 | O-CI-3 | [Release assurance](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md) | ADR-CI-007 (TBD) |

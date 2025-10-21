@@ -1,49 +1,213 @@
-# 95 — Security & Permissions (Status: collecting proposals)
+# 95 — Security & Permissions
+*(Status: Proposed)*
 
-## Problem statement
-Identify how credentials, operator roles, and device access are managed today and what controls are needed as the platform grows.
+**Author:** Codex  
+**Created:** 2025-10-20  
+**Version:** 0.1.0  
+**Section ID:** 95  
+**Editors:** Frontend & Operations Working Group  
+**Last Updated:** 2025-10-20  
+**Related Sections:** 21 — System Architecture, 91 — UI Shell & Layout, 94 — Extensibility & Packaging Updates, 96 — Quality Engineering & Release  
+**Upstream Dependencies:** 1X — Platform Foundations, 5X — Hardware IO Device Layer  
+**Downstream Impacts:** Plugin governance, deployment pipelines, audit & compliance tooling
 
-## Requirements (from contributors)
-- R-SEC-000 (MUST, current-AgIO): Continue supporting stored NTRIP credentials while planning a more secure secrets flow (currently saved in application settings).【F:SourceCode/AgIO/Source/Forms/FormNtrip.cs†L58-L120】
-- R-SEC-001 (MUST, current-AgOpenGPS): Preserve offline operation without requiring cloud authentication given field connectivity constraints.【F:README.md†L28-L33】
-- R-SEC-002 (SHOULD): Provide guidance on user roles/permissions if shared workstations become common.
-- R-SEC-003 (SHOULD): Encrypt or obfuscate sensitive config values at rest without breaking existing upgrade paths.
-- R-SEC-004 (SHOULD, proposed-LinuxCore): Run the Linux Core under a dedicated service account with least-privilege access to `/dev` devices and config directories, documenting how credentials are stored for remote clients.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L44】
-- R-SEC-005 (COULD): Add audit logging for configuration changes and remote connections.
-- R-SEC-006 (SHOULD, secrets migration): Define an encrypted storage format, backup/restore workflow, and migration plan for existing plaintext secrets before enabling remote Core access.
-- R-SEC-007 (SHOULD, audit readiness): Establish minimum audit requirements (timestamped operator actions, remote session trails retained for at least one season) so security-sensitive ADRs have clear acceptance criteria.
-- R-SEC-008 (MUST, plugin platform): Enforce manifest-declared permission scopes through a runtime gate so untrusted bundles cannot load capabilities they were not explicitly granted.
+---
 
-## Options
-- O-SEC-0: Status quo — Windows user accounts + stored settings for credentials.
-- O-SEC-1: Introduce a secrets vault (DPAPI, OS keychain) for sensitive data.
-- O-SEC-2: Add in-app user roles with permission gating.
-- O-SEC-3: Move to centralized auth (OAuth/OpenID) for remote services.
-- O-SEC-4: Provide signed firmware/config packages to prevent tampering.
+## 95.1 Purpose & Scope
 
-## Comparison (quick matrix)
-| Option | Pros | Cons | Risks | Borrow from existing |
-|---|---|---|---|---|
-| O-SEC-0 | Works offline, simple | Credentials in plain settings | Machine compromise exposes secrets | Existing settings store |
-| O-SEC-1 | Protects passwords | Platform-specific work | Lockouts if key lost | Windows DPAPI |
-| O-SEC-2 | Limits accidental changes | Complexity | Operator friction | Settings dialogs |
-| O-SEC-3 | Unified identity | Needs internet | Login outages halt work | Web services |
-| O-SEC-4 | Prevents config tampering | Signing infrastructure | Firmware update logistics | Release pipeline |
+Define the security posture and permission model for Nexus frontends and operations. This section addresses credential storage, offline requirements, service accounts, audit logging, and plugin permission enforcement so modernization efforts do not compromise operator trust or regulatory readiness.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L21-L44】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L230-L334】
 
-## Evaluation criteria
-Offline usability, credential safety, operator workflow impact, implementation complexity, backward compatibility.
+---
 
-## Current sentiment
-- Security is light today; we must secure credentials and config changes without breaking offline workflows.
-- Any Linux service rollout must demonstrate least-privilege defaults and credential handling before the community adopts it broadly.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L44】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L21-L34】
+## 95.2 Context
 
-## Open questions
-- How do we migrate stored passwords when introducing encryption?
-- Do we need per-operator audit logs for regulatory compliance?
+- Legacy applications store credentials in plaintext settings to satisfy offline workflows.  
+- Linux Core deployments and remote clients introduce multi-user, multi-machine environments requiring least privilege and audit trails.  
+- Plugin manifests declare capabilities that must be enforced at runtime to prevent untrusted bundles from issuing control commands.  
+- Regulatory expectations demand traceability for operator actions, remote sessions, and configuration changes.
 
-## Related ADRs
+---
 
-- [ADR-019 — Provenance, Audit, & QA](../../ADR/ADR-019-provenance-audit-qa.md)
-- [ADR-024 — Discovery & Identity](../../ADR/ADR-024-discovery-identity.md)
-- [ADR-028 — Stack Boundaries](../../ADR/ADR-028-stack-boundaries.md)
-- [ADR-031 — Official Plugin Bundle](../../ADR/ADR-031-official-plugin-bundle.md)
+## 95.3 Legacy Comparison
+
+| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
+|---------------|-----------------|------------------------|---------------------------|--------------------|
+| Credential Storage | Plaintext settings per executable. | Secrets exposed if workstation compromised. | Encrypted secrets vault with migration plan. | AgIO NTRIP settings【F:SourceCode/AgIO/Source/Forms/FormNtrip.cs†L58-L120】 |
+| Offline Access | Full functionality without authentication. | No concept of operator roles or audit. | Offline-ready credential cache with optional role enforcement. | README offline notes【F:README.md†L28-L33】 |
+| Plugin Permissions | Implicit trust of loaded assemblies. | Untrusted code can access sensitive APIs. | Manifest-scoped permission gate tied to capability registry. | ADR-031 governance |
+
+---
+
+## 95.4 Definitions
+
+| Term | Definition |
+|------|-------------|
+| Secrets Vault | Encrypted storage for credentials (DPAPI, OS keychain, libsecret) with backup/restore workflow. |
+| Permission Scope | Named capability (`pose.read`, `section.command`, etc.) required to access protected APIs. |
+| Service Account | Dedicated OS user for Linux Core deployments with constrained device and filesystem access. |
+| Audit Trail | Timestamped log capturing operator actions, remote sessions, and configuration mutations for compliance. |
+
+---
+
+> **Requirement Grammar (RFC-2119):**  
+> - **MUST / MUST NOT** = mandatory; verification required.  
+> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.  
+> - **MAY** = optional; document enabling conditions.
+
+## 95.5 Requirements
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|----------|---------|-----------------|-----------------------------|
+| R-SEC-000 | MUST | Credential Storage | Continue supporting stored NTRIP credentials while planning migration to secure secrets flow. | AgIO NTRIP form【F:SourceCode/AgIO/Source/Forms/FormNtrip.cs†L58-L120】 | Secrets migration test plan |
+| R-SEC-001 | MUST | Offline Operation | Preserve offline operation without requiring cloud auth due to connectivity constraints. | Field usage notes【F:README.md†L28-L33】 | Offline smoke tests |
+| R-SEC-002 | SHOULD | Role Guidance | Provide guidance on user roles/permissions for shared workstations. | Community support backlog | Role-based UX documentation |
+| R-SEC-003 | SHOULD | At-rest Protection | Encrypt or obfuscate sensitive config values without breaking upgrade paths. | Security backlog | Migration scripts + regression |
+| R-SEC-004 | SHOULD | Linux Core Hardening | Run Linux Core under dedicated service account with least-privilege access; document credential storage for remote clients. | Linux Core ADR【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L21-L44】 | Systemd unit + credential audit |
+| R-SEC-005 | COULD | Audit Logging | Add audit logging for configuration changes and remote connections. | Provenance ADR-019 | Audit prototype results |
+| R-SEC-006 | SHOULD | Secrets Migration | Define encrypted storage format and migration plan for existing plaintext secrets. | Security roadmap | Migration acceptance tests |
+| R-SEC-007 | SHOULD | Audit Retention | Establish minimum audit retention (timestamped actions, remote session trails for ≥ one season). | ADR-019 provenance | Audit retention verification |
+| R-SEC-008 | MUST | Plugin Permission Gate | Enforce manifest-declared permission scopes via runtime gate preventing unauthorized capability access. | ADR-031 governance | Permission enforcement tests |
+
+### 95.5.1 Requirement Sources & Rationale
+
+| Req ID | Source | Rationale |
+|--------|--------|-----------|
+| R-SEC-000 | Legacy credential handling | Maintain continuity while planning secure migration. |
+| R-SEC-001 | Operator feedback | Offline workflows remain critical in the field. |
+| R-SEC-004 | Linux Core pilots | Ensure remote deployments follow least-privilege practices. |
+| R-SEC-007 | Provenance ADR-019 | Provide audit readiness for regulatory reviews. |
+| R-SEC-008 | Plugin governance | Prevent untrusted bundles from exercising critical APIs. |
+
+---
+
+## 95.6 Acceptance Criteria & Verification
+
+Security controls undergo automated tests, manual audits, and migration rehearsals. Offline smoke tests confirm usability, while plugin permission gates are validated against manifest fixtures.
+
+### 95.6.1 Requirement-to-Verification Map
+
+| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
+|--------|-------------------|---------------------|---------------------|
+| R-SEC-000 | Migration rehearsal | `tests/security/SecretsMigration.feature` | Existing credentials migrate to encrypted store without loss |
+| R-SEC-001 | Offline regression | `tests/security/OfflineModeSuite` | All core workflows succeed without network connectivity |
+| R-SEC-004 | System hardening audit | `docs/security/LinuxCoreHardening.md` | Service account restricts device/config access; credential storage documented |
+| R-SEC-007 | Audit verification | `tests/security/AuditRetention.feature` | Audit trail retains events for minimum retention window |
+| R-SEC-008 | Permission gate tests | `tests/security/PluginScopeEnforcement.cs` | Unauthorized capability access blocked 100% |
+
+---
+
+## 95.7 Constraints
+
+- Offline operation remains non-negotiable; authentication flows must support air-gapped rigs.  
+- Secrets storage must include recovery/backup guidance to avoid permanent lockouts.  
+- Permission gates must integrate with plugin manifest schema defined in §94 without imposing breaking changes.
+
+---
+
+## 95.8 Interfaces & Dependencies
+
+- Shares manifest scopes and governance rules with §94 Extensibility.  
+- Exposes audit data to §96 Quality Engineering for compliance reporting.  
+- Relies on transport hardening and remote client posture defined in §91 and §21.
+
+---
+
+## 95.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Secrets vault strategy | Adopt DPAPI (Windows) and OS keychains/libsecret (Linux) with consistent abstraction for backups. |
+| C2 | Offline-first auth | Provide credential caching and grace windows so operators remain productive without connectivity. |
+| C3 | Service account hardening | Document systemd profiles, device access, and credential rotation for Linux Core deployments. |
+| C4 | Audit fidelity | Capture operator identity, plugin source, and action context for replay and compliance. |
+| C5 | Plugin scope taxonomy | Maintain canonical permission scope list aligned with capability registry to simplify governance. |
+
+### 95.9.1 Assumptions & Preconditions
+
+- [A1] Operators can provision secure storage mechanisms (DPAPI, libsecret) on supported platforms.  
+- [A2] Plugin authors declare permission scopes accurately within manifest metadata.  
+- [A3] Audit storage retains sufficient space for per-season retention policies.
+
+---
+
+## 95.10 Option Overview
+
+No alternative security framework is under evaluation; modernization proceeds via considerations C1–C5 while maintaining offline compatibility.
+
+---
+
+## 95.11 Comparison Matrix
+
+| Attribute / Criteria | Plaintext Baseline | Hardened Secrets & Permissions |
+|----------------------|--------------------|--------------------------------|
+| Credential Safety | Low | High — encrypted storage & rotation |
+| Offline Support | High | High — cached credentials with grace windows |
+| Plugin Governance | Low | High — runtime permission enforcement |
+| Auditability | Low | High — structured audit trails |
+| Implementation Complexity | Low | Medium — requires vault abstraction & migration |
+
+---
+
+## 95.12 Decision Matrix
+
+> **Informative:** Detailed weighting deferred until secrets vault pilot confirms cross-platform feasibility; scope decisions align with considerations C1–C5 and ADR-019/ADR-031 guidance.
+
+---
+
+## 95.13 Evaluation & Verification
+
+- Execute credential migration rehearsals covering backup/restore and lockout scenarios.  
+- Perform penetration testing against remote client authentication flows.  
+- Review audit logs for completeness after simulated incidents (remote connection, preset change, plugin install).
+
+**Acceptance Criteria**
+
+- Encrypted storage and permission gates verified across Windows and Linux deployments.  
+- Offline workflows documented with operator guidance.  
+- Audit retention meets minimum season-long requirement with export tooling.
+
+---
+
+## 95.14 Implementation Policy
+
+- Store secrets using OS-specific vault providers with fallback to encrypted files guarded by hardware-derived keys.  
+- Document credential rotation procedures in `docs/security/credential-rotation.md`.  
+- Publish permission scope taxonomy and mapping to manifest metadata in `docs/plugins/permission-scopes.md`.
+
+---
+
+## 95.15 Community Sentiment
+
+- Operators demand security improvements that do not jeopardize offline workflows.  
+- Contributors expect clear permission scopes and enforcement before expanding plugin ecosystem.  
+- Linux Core adopters require documented service account hardening and credential policies.【F:docs/SRS/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L21-L44】
+
+### 95.15.1 Section Change Log
+
+| Date | Summary | PR / Issue |
+|------|---------|------------|
+| 2025-10-20 | Converted to new SRS template; formalized security requirements and considerations. | #0000 |
+
+---
+
+## 95.16 Traceability
+
+| Requirement ID | Considerations | ADR(s) | Verification Artifact | Implementation Reference |
+|----------------|----------------|--------|-----------------------|--------------------------|
+| R-SEC-000 | C1 | — | `tests/security/SecretsMigration.feature` | Credential storage service |
+| R-SEC-001 | C2 | — | `tests/security/OfflineModeSuite` | Offline operation runbook |
+| R-SEC-004 | C3 | 21-O6 | `docs/security/LinuxCoreHardening.md` | Linux Core deployment scripts |
+| R-SEC-007 | C4 | ADR-019 | `tests/security/AuditRetention.feature` | Audit logging pipeline |
+| R-SEC-008 | C5 | ADR-031 | `tests/security/PluginScopeEnforcement.cs` | Plugin permission middleware |
+
+---
+
+## 95.17 Conformance
+
+Implementations conform when encrypted credential storage is in place, offline workflows remain functional, audit trails meet retention policy, and plugin permission gates block unauthorized access.
+
+---
+
+## Standards Context
+
+Aligns with OWASP Application Security Verification Standard (ASVS) controls for secrets management, authentication, and logging, while honoring agricultural field requirements for offline capability.

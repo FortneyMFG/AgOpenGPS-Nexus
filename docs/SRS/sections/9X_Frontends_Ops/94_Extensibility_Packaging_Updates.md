@@ -1,82 +1,262 @@
-# 94 — Extensibility, Packaging & Updates (Status: collecting proposals)
+# 94 — Extensibility, Packaging & Updates
+*(Status: Proposed)*
 
-## Problem statement
-Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules) without forking core code, and what constraints exist today.
+**Author:** Codex  
+**Created:** 2025-10-20  
+**Version:** 0.1.0  
+**Section ID:** 94  
+**Editors:** Frontend & Operations Working Group  
+**Last Updated:** 2025-10-20  
+**Related Sections:** 11 — OS Support, 21 — System Architecture, 62 — Job Lifecycle, 72 — Zone Drawing Framework  
+**Upstream Dependencies:** 1X — Platform Foundations, 5X — Hardware IO Device Layer  
+**Downstream Impacts:** Plugin catalog, packaging pipelines, simulation ecosystem, security policies
 
-## Requirements (from contributors)
-- R-EXT-000 (MUST, current-AgOpenGPS): Continue exposing shared libraries (`AgLibrary`, `AgOpenGPS.Core`) that downstream executables reference for customization.【F:SourceCode/GPS/AgOpenGPS.csproj†L32-L48】【F:SourceCode/AgIO/Source/AgIO.csproj†L23-L33】
-- R-EXT-001 (MUST, current-AgOpenGPS): Keep multiple companion executables (AgIO, ModSim, GPS_Out, Keypad, AgDiag) available for extension via source modifications.【F:SourceCode/AgOpenGPS.sln†L6-L35】
-- R-EXT-002 (SHOULD): Define a plugin boundary (UI, PGN handlers, analytics) that avoids shipping forked executables for every variation.
-- R-EXT-003 (SHOULD): Provide guidelines or templates for third-party modules so they integrate with packaging and settings.
-- R-EXT-010 (SHOULD, proposed-variable-layer): Allow plugins/modules to register new telemetry layers via dependency injection and published ID registries so they appear in dashboards without core code edits.【F:docs/SRS/sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md†L19-L33】【F:docs/SRS/sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md†L32-L49】
-- R-EXT-080 (MUST, zone editing contracts): Require plugins that author spatial layers to integrate with LayerEditService (`registerEditableLayer`, `onLayerStartEdit`, `onFeatureCommit`, `onLayerUndo/Redo`) so Core enforces consistent geometry handling and provenance.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
-- R-EXT-081 (MUST, context bus): Publish strongly typed lifecycle events (`onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, `onSessionStart/Pause/Resume/End`, `onSessionWeatherUpdate`) and SDK helpers so plugins subscribe deterministically without bespoke event plumbing.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】
-- R-EXT-082 (SHOULD, analytics APIs): Provide shared query surfaces (`getYieldByCrop`, `getYieldByVariety`, `getPreviousCrop`, profit summaries) so plugins consume crop, genetics, yield, and profit analytics without duplicating aggregation logic.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L57-L71】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L21-L59】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】
-- R-EXT-083 (SHOULD, financial hooks): Allow plugins to submit `CostRecord` entries, consume profit overlays, and subscribe to cost-change events for downstream automation (e.g., invoice exports).【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】
-- R-EXT-084 (SHOULD, report builder integration): Expose `registerReportSection()` and `onReportGenerate()` hooks with dependency declarations so plugins contribute report content safely.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L21-L52】
-- R-EXT-004 (COULD): Support sandboxing or capability declarations for plugins to protect critical operations.
-- R-EXT-011 (SHOULD, governance): Establish contribution governance for community plugins (review queues, namespace reservation, security vetting) before enabling DI registration so unsafe modules cannot bypass safety-critical boundaries.
-- R-EXT-020 (SHOULD, official-bundle): Ship first-party capabilities (desktop UI, AgIO bridge, gauges, variable-rate controllers) as separately versioned plugins that install alongside core but can be disabled for headless or minimal deployments.
-- R-EXT-030 (SHOULD, proposed-composite-sim): Allow plugins to register simulation providers that consume/publish typed topics through a shared SimBus so they can inject deterministic test data without special-case wiring in Core.
-- R-EXT-031 (SHOULD, proposed-composite-sim): Require simulation providers to respect the authoritative SimClock and seeded RNG so multi-plugin scenarios replay identically across machines and CI lanes.
-- R-EXT-100 (MUST, NX-099): Ship an ISOBUS communications plugin that registers as a transport provider within the managed plugin manifest so CAN frames and PGN payloads flow onto the shared SimBus and hardware routing graph without bespoke wiring.【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L16-L54】
-- R-EXT-101 (MUST, NX-099): Normalize ISO 11783 condensed work state, gauge, and diagnostics PGNs (289–291, 65279, 65242, 65263, 65265, 65266, 64964) into the Layer/Telemetry registries so section control, machine status, and gauge widgets consume consistent topic IDs regardless of physical bus source.【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L4-L134】
-- R-EXT-102 (SHOULD, NX-099): Surface plugin-provided diagnostics (bus load, address-claim status, last-PGN timestamps, fault codes) through the standard plugin health contract so the desktop UI and headless monitors can present actionable alerts without bespoke code paths.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog†L7-L58】
-- R-EXT-103 (SHOULD, NX-099): Offer declarative mapping metadata that links configured implements to their ISOBUS Device Descriptor Identifiers (DDIs) and section counts, enabling UI manifests to auto-populate section control panels and gauge groups with accurate labels and units.【F:docs/SRS/appendices/GaugeId_Registry.md†L12-L20】【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】
-- R-EXT-120 (MUST, capability discovery): Require plugin manifests to declare produced/consumed PoseStream topics, layer definitions, control endpoints, and hardware bindings so Core can authorize and route capabilities deterministically.
-- R-EXT-150 (MUST, NX-134): Maintain an authoritative dependency register, manifest catalog, and compatibility matrix for all first-party plugins so operators and Core can validate stack composition before activation.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】
-- R-EXT-151 (MUST, equivalency profiles): Manifest `provides.capabilities` and `provides.profiles` entries must advertise contract versions, optional feature flags, and conformance attestations so alternate providers can prove compatibility without bespoke aliases.【F:docs/plugins/nexus-plugin-dependency-map.md†L36-L86】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L25-L74】
-- R-EXT-152 (MUST, dependency semantics): Loader enforces `requires.capabilities`, `requires.profiles`, and relationship hints (`peerOf`, `conflictsWith`, `replaces`, `extends`) when solving the plugin graph so peer agreements, migrations, and decorator chains remain deterministic.【F:docs/plugins/nexus-plugin-dependency-map.md†L88-L143】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L49-L83】
-- R-EXT-153 (SHOULD, provider policy): Publish a deterministic multi-provider selection policy (admin pins → site policy → highest compatible version → provider hints) with audit logs so operators understand which plugin satisfied each capability edge.【F:docs/plugins/nexus-plugin-dependency-map.md†L144-L205】
+---
 
-### R-EXT — Plugin lifecycle & security
-- R-EXT-130 (MUST, lifecycle states): Standardize plugin lifecycle states (discovered, verified, started, healthy, degraded, stopped) with observable transitions so Core can supervise hot-plug workflows and automated recovery.
-- R-EXT-131 (MUST, permission gate): Enforce a policy-driven permission gate (pose.read, section.command, storage.write, io.device, config.manage) during plugin registration so untrusted modules cannot bypass safety-critical services.
-- R-EXT-132 (SHOULD, manifest signing): Support optional signing/verification of plugin bundles with operator overrides documented for air-gapped rigs.
-- R-EXT-133 (SHOULD, remote plugins): Document requirements for remote plugin connections (mTLS, leases, restart policies) so edge clusters and cab computers behave consistently.
-- R-EXT-134 (SHOULD, audit trails): Capture plugin health, command history, and configuration edits in a provenance stream to satisfy Section 61 control audit requirements.
-- R-EXT-140 (MUST, job lifecycle hooks): Expose plugin lifecycle callbacks (`onJobOpen`, `onJobSave`, `onJobClose`, `onJobImport`) gated by `jobs.lifecycle` permissions so importers, analytics, and automation modules participate deterministically in job workflows.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L47-L86】
-- R-EXT-141 (SHOULD, preset orchestration): Provide SDK helpers and permissions for presets/layout services so plugins can request preset applications, contribute validators, and register dependency graph observers without bypassing Core arbitration.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L7-L34】
-- R-EXT-142 (SHOULD, Drive-In providers): Allow plugins to register Drive-In discovery sources and job importers while Core enforces schema validation and provenance logging for contributed assets.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L47-L86】
-- R-EXT-143 (SHOULD, task orchestration API): Standardize background task submission, progress streaming, and retry semantics so preset-related preparation work remains observable and restartable across plugins and UI shells.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L17-L34】
+## 94.1 Purpose & Scope
 
-## Options
-- O-EXT-0: Status quo — Extend by modifying source projects and rebuilding.
-- O-EXT-1: Introduce a managed plugin API (MEF/AssemblyLoadContext) for UI and logic extensions.
-- O-EXT-2: Expose scripting hooks (Python/Lua) for automation and custom workflows.
-- O-EXT-3: Offer gRPC/webhook extension points for out-of-process services.
-- O-EXT-4: Package optional modules as NuGet packages consumed by the desktop apps.
-- O-EXT-5: Managed plugin manifests using `AssemblyLoadContext` + shared gRPC contracts so plugins run identically on Windows and Linux.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L13-L47】
+Define the extensibility surface, packaging policies, and update workflows that allow Nexus contributors to add functionality without forking core executables. This section establishes plugin APIs, manifest governance, simulation integration, and distribution rules so official and community modules remain safe, maintainable, and deterministic across Windows and Linux deployments.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L19-L83】
 
-## Comparison (quick matrix)
-| Option | Pros | Cons | Risks | Borrow from existing |
-|---|---|---|---|---|
-| O-EXT-0 | Simple, aligns with current repos | Requires full rebuilds | Fork divergence | Shared libraries |
-| O-EXT-1 | Controlled extension points | Loader/security complexity | Plugin crashes impact runtime | MEF patterns |
-| O-EXT-2 | Rapid prototyping | Performance + safety concerns | Scripts can break guidance | Existing automation | 
-| O-EXT-3 | Language-agnostic | Requires transport layer | Network failures | PGN bridge |
-| O-EXT-4 | Versioned distribution | Package management overhead | Dependency hell | NuGet ecosystem |
-| O-EXT-5 | Consistent plugin surface across OSes, reuse C# skillset | Requires loader governance + ABI testing | Plugin bugs propagate via shared contracts | .NET 8 + Avalonia stack |
+---
 
-## Evaluation criteria
-Safety, maintainability, ease for contributors, performance impact, packaging complexity.
+## 94.2 Context
 
-## Current sentiment
-- Developers fork today; we need a plugin surface that honors safety-critical boundaries while reducing merge burden.
-- Layer metadata + ID registries are expected to become the bridge for safe third-party modules once DI hooks exist.【F:docs/SRS/sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md†L34-L47】【F:docs/SRS/sections/4X_Interprocess_Communications/41-O5%20-%20Versioned%20layer%20schemas%20and%20quality%20metadata.md†L32-L64】
-- The unified .NET 8 plugin runtime (shared gRPC contracts + manifest loader) is the leading proposal because it supports cross-platform simulation, replay, and device plugins without per-OS rewrites.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
-- Treating the UI and advanced agronomy modules as “official plugins” keeps the default install familiar while letting operators toggle them off to run core services headless.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog†L7-L58】
-- Contributors want the simulation surface to live inside the plugin contract so device, agronomy, and automation modules can share deterministic scenarios without recompiling Core or duplicating ModSim logic.
-- The official plugin dependency map now enumerates cross-domain hard/soft requirements, manifest metadata, and compatibility ranges to guide bundle validation and satisfy R-EXT-150.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】
+- Legacy AgOpenGPS relies on shared libraries and multiple executables that contributors modify directly.  
+- Metadata-driven dashboards and zone editing demand declarative plugin contracts across UI, telemetry, and analytics.  
+- Simulation, ISOBUS integration, and remote deployments require deterministic manifests and capability discovery to remain safe.  
+- Packaging updates must cover MSI, deb/rpm, and plugin bundles distributed via catalog UI (§91) and CLI (§93).
 
-## Composite simulation blueprint
+---
 
-- **SimClock** — fixed-step controller (default 10 ms) exposed over plugin APIs so play/pause/seek/speed adjustments from the frontend drive every simulator in lockstep.
-- **SimBus** — typed publish/subscribe channel with last-value caching for topics such as pose, IMU, sections, and planter row status; plugins publish fake device readings and consume peer outputs through this bus.
-- **Source routing** — Core-owned priority rules pick between hardware, simulation, and replay producers per topic, allowing hardware inputs (e.g., manual section switch) to override simulator outputs without tearing down the scenario.
-- **Plugin sim providers** — plugins declare the topics they produce/consume, configure scenarios, and start/stop alongside the SimClock so agronomy and steering models remain modular.
-  - Manifests register their declared providers with the simulation catalog at load time so the shared registry always lists plugin outputs and wiring metadata.
-- **Hardware-in-the-loop passthrough** — real inputs flow onto the same SimBus topics at higher priority so mixed rigs stay predictable while training operators.
+## 94.3 Legacy Comparison
+
+| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
+|---------------|-----------------|------------------------|---------------------------|--------------------|
+| Extensibility | Fork core executables to add features. | Merge burden and divergent safety posture. | Managed plugin API with manifest governance. | Legacy repos; ADR-031 governance |
+| Packaging | Manual installers per executable. | No plugin catalog or compatibility matrix. | Versioned plugin bundles validated via dependency map. | Plugin dependency map【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】 |
+| Simulation | Standalone ModSim utilities. | No shared clock or deterministic replay integration. | Composite SimBus with manifest-declared providers. | Simulation blueprint notes |
+
+---
+
+## 94.4 Definitions
+
+| Term | Definition |
+|------|-------------|
+| Plugin Manifest | Declarative description of capabilities, dependencies, and lifecycle hooks loaded by the plugin host. |
+| Capability Registry | Authoritative list of topics, layers, and services available for plugin consumption/production. |
+| Official Bundle | Curated set of first-party plugins distributed with Nexus releases under ADR-031 governance. |
+| SimBus | Shared publish/subscribe fabric enabling deterministic simulation topics aligned with SimClock. |
+
+---
+
+> **Requirement Grammar (RFC-2119):**  
+> - **MUST / MUST NOT** = mandatory; verification required.  
+> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.  
+> - **MAY** = optional; document enabling conditions.
+
+## 94.5 Requirements
+
+### 94.5.1 Baseline Extensibility
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|----------|---------|-----------------|-----------------------------|
+| R-EXT-000 | MUST | Shared Libraries | Continue exposing shared libraries (`AgLibrary`, `AgOpenGPS.Core`) for downstream customization. | Legacy WinForms projects【F:SourceCode/GPS/AgOpenGPS.csproj†L32-L48】【F:SourceCode/AgIO/Source/AgIO.csproj†L23-L33】 | Build artifacts include libraries |
+| R-EXT-001 | MUST | Companion Executables | Keep companion executables (AgIO, ModSim, GPS_Out, Keypad, AgDiag) available for extension. | Solution baseline【F:SourceCode/AgOpenGPS.sln†L6-L35】 | Installer contains utilities |
+| R-EXT-002 | SHOULD | Plugin Boundary | Define plugin boundaries (UI, PGN handlers, analytics) to avoid per-variation forks. | Extensibility WG | Plugin host design review |
+| R-EXT-003 | SHOULD | Templates & Docs | Provide templates/guides for third-party modules integrating with packaging and settings. | Community onboarding | Documentation publication |
+
+### 94.5.2 Metadata & Analytics Integration
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|----------|---------|-----------------|-----------------------------|
+| R-EXT-010 | SHOULD | Layer Registration | Allow plugins to register telemetry layers via DI and ID registries so dashboards update without code edits. | Layer controllers & schemas【F:docs/SRS/sections/2X_System_Architecture/21-O5 - Layer controllers with aggregation pipelines.md†L19-L33】【F:docs/SRS/sections/4X_Interprocess_Communications/41-O5 - Versioned layer schemas and quality metadata.md†L32-L49】 | Metadata registry integration tests |
+| R-EXT-080 | MUST | Zone Editing | Require spatial plugins to integrate with `LayerEditService` for consistent geometry handling. | ADR-044 zone framework【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】 | Zone editing contract tests |
+| R-EXT-081 | MUST | Context Bus | Publish strongly typed lifecycle events with SDK helpers for deterministic subscription. | Job lifecycle docs【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】 | Context bus integration suite |
+| R-EXT-082 | SHOULD | Analytics APIs | Provide shared analytics queries (yield, crop, profit) to avoid duplicate aggregation logic. | Mapping plugin ADRs【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L57-L71】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L21-L59】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】 | Analytics API unit tests |
+| R-EXT-083 | SHOULD | Financial Hooks | Allow plugins to submit `CostRecord` entries and consume profit overlays for automation. | Cost & profit ADR【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】 | Financial integration tests |
+| R-EXT-084 | SHOULD | Report Builder | Expose report hooks so plugins contribute sections with declared dependencies. | ADR-051 report builder【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L21-L52】 | Report contribution tests |
+
+### 94.5.3 Simulation & ISOBUS Integration
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|----------|---------|-----------------|-----------------------------|
+| R-EXT-030 | SHOULD | Simulation Providers | Allow plugins to register simulation providers on shared SimBus. | Simulation blueprint | SimBus integration tests |
+| R-EXT-031 | SHOULD | Deterministic Sim | Require simulation providers to follow SimClock and seeded RNG for consistent replay. | Simulation blueprint | Deterministic replay suite |
+| R-EXT-100 | MUST | ISOBUS Transport Plugin | Ship ISOBUS communications plugin registering as transport provider in managed manifest. | Hardware IO abstractions【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L16-L54】 | ISOBUS plugin acceptance |
+| R-EXT-101 | MUST | ISO 11783 Normalization | Normalize ISO 11783 PGNs into Layer/Telemetry registries for consistent topic IDs. | ISOBUS references【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L4-L134】 | Telemetry registry tests |
+| R-EXT-102 | SHOULD | Diagnostics Surface | Expose plugin diagnostics (bus load, address claims, faults) via standard health contract. | Plugin health guidelines | Diagnostics UI regression |
+| R-EXT-103 | SHOULD | Declarative Implement Metadata | Map implements to DDIs/section counts for UI auto-population. | Gauge registry & references【F:docs/SRS/appendices/GaugeId_Registry.md†L12-L20】【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】 | Implement metadata tests |
+
+### 94.5.4 Governance & Bundles
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|----------|---------|-----------------|-----------------------------|
+| R-EXT-011 | SHOULD | Community Governance | Establish review queues, namespace reservations, and security vetting before DI registration. | ADR-031 governance【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L19-L83】 | Governance policy publication |
+| R-EXT-020 | SHOULD | Official Bundle | Ship first-party capabilities as versioned plugins that can be disabled for headless deployments. | Packaging updates catalog | Bundle packaging tests |
+| R-EXT-120 | MUST | Capability Declarations | Require manifests to declare produced/consumed topics, layers, control endpoints, and hardware bindings. | ADR-018 capability discovery【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L19-L66】 | Manifest schema validation |
+| R-EXT-150 | MUST | Dependency Register | Maintain authoritative dependency register and compatibility matrix. | Plugin dependency map【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】 | Catalog CI validation |
+| R-EXT-151 | MUST | Equivalency Profiles | Require manifests to advertise contract versions, feature flags, and conformance attestations. | Dependency map + ADR-031【F:docs/plugins/nexus-plugin-dependency-map.md†L36-L86】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L25-L74】 | Equivalency profile tests |
+| R-EXT-152 | MUST | Dependency Semantics | Enforce `requires`, `peerOf`, `conflictsWith`, `replaces`, `extends` semantics when solving plugin graph. | Dependency map + ADR-031【F:docs/plugins/nexus-plugin-dependency-map.md†L88-L143】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L49-L83】 | Solver integration tests |
+| R-EXT-153 | SHOULD | Provider Selection Policy | Publish deterministic provider selection policy with audit logs. | Dependency map【F:docs/plugins/nexus-plugin-dependency-map.md†L144-L205】 | Provider audit logging tests |
+
+### 94.5.5 Lifecycle & Security
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|----------|---------|-----------------|-----------------------------|
+| R-EXT-004 | COULD | Sandboxing | Support sandboxing/capability declarations to protect critical operations. | Security roadmap | Sandbox feasibility study |
+| R-EXT-130 | MUST | Lifecycle States | Standardize plugin lifecycle states (discovered, verified, started, healthy, degraded, stopped) with observable transitions. | Plugin lifecycle notes | Lifecycle telemetry tests |
+| R-EXT-131 | MUST | Permission Gate | Enforce policy-driven permission gate during registration (`pose.read`, `section.command`, etc.). | §95 Security & Permissions | Permission enforcement tests |
+| R-EXT-132 | SHOULD | Manifest Signing | Support optional signing/verification with operator overrides for air-gapped rigs. | Security governance | Signing validation tests |
+| R-EXT-133 | SHOULD | Remote Plugins | Document requirements for remote plugin connections (mTLS, leases, restart policies). | Remote deployment plan | Remote plugin integration tests |
+| R-EXT-134 | SHOULD | Audit Trails | Capture plugin health, command history, configuration edits for provenance. | Section 61 control audit | Audit logging tests |
+| R-EXT-140 | MUST | Job Lifecycle Hooks | Expose plugin callbacks for job workflows gated by `jobs.lifecycle` permissions. | ADR-030 job lifecycle【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L47-L86】 | Job lifecycle integration |
+| R-EXT-141 | SHOULD | Preset Orchestration | Provide SDK helpers for presets/layout services with arbitration safeguards. | ADR-032 presets & layout linking【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L7-L34】 | Preset orchestration tests |
+| R-EXT-142 | SHOULD | Drive-In Providers | Allow registration of Drive-In discovery/importers with schema validation and provenance logging. | ADR-030 job lifecycle【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L47-L86】 | Drive-In provider tests |
+| R-EXT-143 | SHOULD | Task Orchestration API | Standardize background task submission, progress, retry semantics for preset operations. | ADR-032 presets & layout linking【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L17-L34】 | Task orchestration harness |
+
+### 94.5.6 Requirement Sources & Rationale
+
+| Req ID | Source | Rationale |
+|--------|--------|-----------|
+| R-EXT-000 | Legacy shared libraries | Preserve existing extension points during transition. |
+| R-EXT-010 | Layer metadata roadmap | Enable metadata-driven dashboards without code duplication. |
+| R-EXT-100 | ISOBUS integration plan | Provide official CAN/ISOBUS bridge to avoid forks. |
+| R-EXT-150 | Plugin dependency map | Ensure operators validate bundle compatibility before activation. |
+| R-EXT-130 | Operations resilience | Monitor plugin health and enable deterministic recovery. |
+
+---
+
+## 94.6 Acceptance Criteria & Verification
+
+Extensibility features must pass manifest schema validation, dependency solver tests, lifecycle telemetry checks, and simulation determinism suites. Packaging pipelines verify Windows/Linux bundles and plugin catalog metadata before release.
+
+### 94.6.1 Requirement-to-Verification Map
+
+| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
+|--------|-------------------|---------------------|---------------------|
+| R-EXT-010 | Integration | `tests/plugins/LayerRegistry.feature` | Layers appear in dashboards without code change |
+| R-EXT-100 | Hardware-in-loop | `tests/plugins/IsobusTransportSuite` | ISOBUS plugin routes PGNs to SimBus + hardware graph |
+| R-EXT-120 | Schema validation | `schemas/plugins/manifest.schema.json` | All manifests declare capabilities/bindings |
+| R-EXT-150 | Catalog CI | `tests/catalog/CompatibilityMatrix.cs` | Dependency solver resolves official bundle combinations |
+| R-EXT-130 | Lifecycle telemetry | `tests/plugins/LifecycleState.feature` | State transitions emit expected events |
+
+---
+
+## 94.7 Constraints
+
+- Plugin manifests must remain backward-compatible across patch releases or provide migration scripts documented in release notes.  
+- Packaging must adhere to OS security policies (code signing, notarization, repository trust).  
+- Simulation providers cannot bypass safety gating or command channels defined in §95 Security & Permissions.
+
+---
+
+## 94.8 Interfaces & Dependencies
+
+- Depends on capability discovery and manifest schema defined in ADR-018 and ADR-031.  
+- Integrates with UI Shell (§91) and CLI (§93) for plugin catalog management.  
+- Shares telemetry and replay expectations with §96 Quality Engineering & Release.
+
+---
+
+## 94.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Managed plugin runtime | Favor .NET 8 `AssemblyLoadContext` loader with shared gRPC contracts for cross-platform parity.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】 |
+| C2 | Plugin catalog UX | Provide catalog UI + CLI surfaces for installing, updating, and auditing plugins with dependency visualization. |
+| C3 | Composite simulation | Implement SimClock/SimBus pattern for deterministic replay and hardware-in-loop testing. |
+| C4 | Community onboarding | Offer templates, documentation, and review processes to encourage safe third-party contributions. |
+| C5 | Governance transparency | Publish compatibility matrices, provider selection logs, and security attestations for operator trust. |
+
+### 94.9.1 Assumptions & Preconditions
+
+- [A1] Official bundle maintainers update dependency matrix alongside releases.  
+- [A2] Plugin authors adopt manifest schema and lifecycle hooks.  
+- [A3] Operators manage signing certificates and credential stores per §95 guidance.
+
+---
+
+## 94.10 Option Overview
+
+No alternative extensibility proposals are under evaluation; modernization focuses on considerations C1–C5 and the managed plugin runtime described in ADR-031.
+
+---
+
+## 94.11 Comparison Matrix
+
+| Attribute / Criteria | Legacy Fork Model | Managed Plugin Runtime |
+|----------------------|-------------------|------------------------|
+| Maintainability | Low — forks diverge quickly. | High — governed manifests and shared runtime. |
+| Safety | Medium — bespoke changes risk bypassing checks. | High — permission gates and audit trails. |
+| Deployment | Manual rebuilds per change. | Catalog-driven updates with compatibility checks. |
+| Simulation Support | External ModSim utilities. | Integrated SimBus with deterministic replay. |
+| Operator Control | Limited toggles. | Enable/disable plugins per deployment profile. |
+
+---
+
+## 94.12 Decision Matrix
+
+> **Informative:** Weighted scoring deferred until managed plugin runtime reaches beta; governance decisions currently tracked in ADR-031.
+
+---
+
+## 94.13 Evaluation & Verification
+
+- Run dependency solver against official bundle combinations before each release.  
+- Execute simulation replay suites to confirm SimBus determinism and plugin interoperability.  
+- Perform security audits on manifest signing, permission gates, and remote plugin policies.
+
+**Acceptance Criteria**
+
+- All **MUST** requirements pass automated validation and manual sign-off.  
+- Plugin catalog publishes compatibility matrix with traceable provenance.  
+- Simulation providers demonstrate deterministic replay under composite scenarios.
+
+---
+
+## 94.14 Implementation Policy
+
+- Store manifests in `plugins/<PluginName>/manifest.json` validated during build and release pipelines.  
+- Publish plugin catalog metadata to `docs/plugins/catalog.json` consumed by UI and CLI surfaces.  
+- Require versioned migration scripts for breaking manifest changes, referenced in §96 release notes.
+
+---
+
+## 94.15 Community Sentiment
+
+- Contributors favor managed plugin runtime to reduce merge debt while keeping safety boundaries.  
+- Operators request transparent compatibility matrices before enabling new bundles.  
+- Simulation stakeholders advocate for shared SimBus to avoid duplicate ModSim efforts and ensure deterministic QA.
+
+### 94.15.1 Section Change Log
+
+| Date | Summary | PR / Issue |
+|------|---------|------------|
+| 2025-10-20 | Converted to new SRS template; organized requirements into governance, simulation, and lifecycle groups. | #0000 |
+
+---
+
+## 94.16 Traceability
+
+| Requirement ID | Considerations | ADR(s) | Verification Artifact | Implementation Reference |
+|----------------|----------------|--------|-----------------------|--------------------------|
+| R-EXT-010 | C1, C4 | 21-O5, 41-O5 | `tests/plugins/LayerRegistry.feature` | Layer registry service |
+| R-EXT-100 | C1, C3 | — | `tests/plugins/IsobusTransportSuite` | ISOBUS plugin package |
+| R-EXT-120 | C2, C5 | 94-ADR-018, 94-ADR-031 | `schemas/plugins/manifest.schema.json` | Manifest schema repository |
+| R-EXT-150 | C2, C5 | 94-ADR-031 | `tests/catalog/CompatibilityMatrix.cs` | Plugin catalog pipeline |
+| R-EXT-130 | C5 | — | `tests/plugins/LifecycleState.feature` | Plugin host runtime |
+
+---
+
+## 94.17 Conformance
+
+Implementations conform when all **MUST** requirements pass verification, manifests comply with governance policies, and operators can manage plugins via catalog and CLI without resorting to forks.
+
+---
+
+## Standards Context
+
+Draws on OSGi-style module governance, semantic versioning (SemVer 2.0.0), and ISO 11783 interoperability guidelines to balance extensibility with deterministic operations.
 
 ## Proposed plugin tiers
 

@@ -219,7 +219,7 @@ Any future toolkit alternatives will require standalone option documents under S
 | Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
 |----------------|-------------------|--------|-----------------------|--------------------------|
 | R-UI-000 | — | — | `tests/ui/winforms-smoke/` | `Legacy SourceCode -V6/SourceCode/GPS/` |
-| R-UI-004 | 9X Option O-UI-5 | — | `demos/ui/metadata-dashboard/` | `docs/SRS/sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md` |
+| R-UI-004 | 9X Consideration C3 | — | `demos/ui/metadata-dashboard/` | `docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations` |
 | R-UI-005 | — | 11-ADR-001 | `tests/ui/remote-client/` | `deployment/companion/` |
 | R-UI-008 | 11-O1 | 11-ADR-001 | `pipelines/ui-avalonia.yml` | `Nexus SourceCode/src/Aog.UI.Avalonia/` |
 

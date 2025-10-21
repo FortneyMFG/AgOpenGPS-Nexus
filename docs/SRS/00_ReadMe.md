@@ -109,9 +109,9 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 - [C-DATA-8 – Metadata-driven Layer Catalog](sections/3X_Data_Storage/32_Persistence_Formats.md#3293-metadata-driven-layer-catalog-guidelines)
 
 #### 9X — Frontends & Ops
-- [O-FRONT-6 – Remote Clients](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md)
-- [O-TEST-4 – Layer Replay CI](sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md)
-- [O-UI-5 – Metadata-driven Dashboards](sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md)
+- [Remote Clients & Companion Shell](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations)
+- [Layer Replay CI](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md#969-design-considerations)
+- [Metadata-driven Dashboards](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations)
 
 ### Appendices
 - [DFU catalog schema](appendices/DFU_Catalog_Schema.md)
@@ -265,11 +265,11 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-FE-000 | O-FE-0 | WinForms project (legacy baseline) | ADR-FE-001 (TBD) |
 | R-FE-001 | O-FE-0 | AgIO project (legacy baseline) | ADR-FE-001 (TBD) |
 | R-FE-002 | O-FE-0 | Solution utilities (legacy baseline) | ADR-FE-002 (TBD) |
-| R-FE-003 | O-FE-6, O-FE-7 | [Remote clients option](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md) | ADR-FE-003 (TBD) |
-| R-FE-010 | O-FE-5 | [Metadata dashboards](sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md) | ADR-FE-004 (TBD) |
-| R-FE-011 | O-FE-5 | [Metadata dashboards](sections/9X_Frontends_Ops/91-O5%20-%20Metadata-driven%20dashboards%20and%20visualization.md) | ADR-FE-004 (TBD) |
-| R-FE-004 | O-FE-6 | [Remote clients option](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md) | ADR-FE-003 (TBD) |
-| R-FE-012 | O-FE-6, O-FE-7 | [Remote clients option](sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md) | ADR-FE-005 (TBD) |
+| R-FE-003 | O-FE-6, O-FE-7 | [Remote clients option](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-003 (TBD) |
+| R-FE-010 | C3 | [Metadata dashboards](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-004 (TBD) |
+| R-FE-011 | C3 | [Metadata dashboards](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-004 (TBD) |
+| R-FE-004 | O-FE-6 | [Remote clients option](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-003 (TBD) |
+| R-FE-012 | O-FE-6, O-FE-7 | [Remote clients option](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md#919-design-considerations) | ADR-FE-005 (TBD) |
 | R-FE-013 | O-FE-6, O-FE-7 | [Safety posture notes](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) | ADR-FE-005 (TBD) |
 | R-FE-014 | O-FE-5 | [Training & presets](sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) | ADR-FE-006 (TBD) |
 

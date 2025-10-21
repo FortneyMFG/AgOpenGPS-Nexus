@@ -1,10 +1,12 @@
 # 31 — Domain Data Model
-*(Status: review)*
+*(Status: Proposed)*
 
+**Author:** Codex
+**Created:** 2025-10-20
 **Section ID:** 31
-**Version:** 0.2.0
+**Version:** 0.1.0
 **Editors:** @nexus-docs-team
-**Last Updated:** 2025-02-14
+**Last Updated:** 2025-10-20
 **Related Sections:** [32 — Persistence & Formats](32_Persistence_Formats.md), [33 — Offline-first & Sync](33_Offline_First_Sync.md), [34 — Backup, Retention & Archival](34_Backup_Retention_Archival.md)
 **Upstream Dependencies:** [ADR-040](31-ADR-040 - Season Organizers.md), [ADR-041](../6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md), [ADR-043](31-ADR-043 - Multi-Field Job Envelopes.md), [ADR-044](../7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md)
 **Downstream Impacts:** Schema contracts under `schemas/`, layer catalog governance, season navigation UX, plugin provenance pipelines

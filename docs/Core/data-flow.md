@@ -1,11 +1,11 @@
 # Data Flow Architecture
 
-This document describes how data flows through the Nexus system, as specified in [SRS Communications Requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md) and implemented through [ADR-002: gRPC Contracts](../ADR/ADR-002-grpc-contracts.md).
+This document describes how data flows through the Nexus system, as specified in [SRS Communications Requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md) and implemented through [ADR-002: gRPC Contracts](../SRS/sections/4X_Interprocess_Communications/41-ADR-002 - Expose Nexus services over gRPC protobuf contracts.md).
 
 ## Core Data Streams
 
 ### PoseStream
-As defined in [ADR-007: PoseStream Architecture](../ADR/ADR-007-posestream-sectionstate-architecture.md):
+As defined in [ADR-007: PoseStream Architecture](../SRS/sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md):
 
 ```mermaid
 graph LR
@@ -49,13 +49,13 @@ graph TD
 ## Data Storage
 
 ### Vector Tile Store
-As specified in [ADR-009: Vector Tile Storage](../ADR/ADR-009-posestream-vector-tilestore-persistence.md):
+As specified in [ADR-009: Vector Tile Storage](../SRS/sections/3X_Data_Storage/32-ADR-009 - PoseStream vector logs and layer TileStore persistence.md):
 - Efficient spatial indexing
 - Compressed storage format
 - Real-time update capability
 
 ### Session Data
-Following [ADR-023: Session/Job Model](../ADR/ADR-023-session-job-model.md):
+Following [ADR-023: Session/Job Model](../SRS/sections/6X_Core_Domain_Services/62-ADR-023 - Session and job model with provenance graph.md):
 - Job records
 - Equipment configurations
 - Operation logs
@@ -86,7 +86,7 @@ Following [ADR-023: Session/Job Model](../ADR/ADR-023-session-job-model.md):
 
 ## Performance Characteristics
 
-As defined in [ADR-026: Performance Budgets](../ADR/ADR-026-performance-budgets.md):
+As defined in [ADR-026: Performance Budgets](../SRS/sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md):
 
 | Metric | Target | Notes |
 |--------|--------|-------|

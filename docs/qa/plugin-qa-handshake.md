@@ -1,7 +1,7 @@
 # Plugin QA Handshake Checklist
 
 The QA handshake formalises how plugin teams and governance stewards validate
-manifest changes introduced under [ADR-031](../ADR/ADR-031-official-plugin-bundle.md).
+manifest changes introduced under [ADR-031](../SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md).
 Follow this checklist whenever a manifest diff affects dependencies, capability
 leases, or runtime compatibility.
 

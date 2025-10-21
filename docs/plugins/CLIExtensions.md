@@ -27,7 +27,7 @@ packaging instructions.
   Drop the assembly beside your plugin package and export one or more
   `ICommandHandler` types. The host will instantiate each handler via dependency
   injection and mount its commands under `nx <plugin-id> …` when the plugin is
-  installed locally.【F:docs/ADR/ADR-054_NexusCliHost.md†L20-L56】
+  installed locally.【F:docs/SRS/sections/9X_Frontends_Ops/93-ADR-054 - Nexus CLI Host and Plugin Verb Architecture.md†L20-L56】
 - **Reflection services** let remote-only plugins expose verbs without shipping a
   local adapter. Implement the CLI reflection gRPC contract published by the
   Core team so the host can enumerate verbs and parameters dynamically. Use this
@@ -47,7 +47,7 @@ service during development to confirm option metadata before writing adapters.
   `.nexus/`, environment variables) so CLI and UI edits remain consistent.
 - **Version gating:** Declare verb compatibility requirements in your plugin
   manifest. The host will block incompatible versions and surface remediation
-  hints during `nx plugin list` and command execution.【F:docs/ADR/ADR-054_NexusCliHost.md†L36-L56】
+  hints during `nx plugin list` and command execution.【F:docs/SRS/sections/9X_Frontends_Ops/93-ADR-054 - Nexus CLI Host and Plugin Verb Architecture.md†L36-L56】
 
 ## Packaging & testing
 - Ship adapter binaries as part of your plugin archive so single-file CLI builds

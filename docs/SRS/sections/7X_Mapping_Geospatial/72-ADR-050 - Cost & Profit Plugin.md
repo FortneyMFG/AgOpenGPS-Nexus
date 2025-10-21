@@ -50,18 +50,18 @@ deducts quantities, updates weighted cost bases, and feeds replenishment forecas
 - **Ledger attestation.** `CostRecord.v1` entries require dual attestation (operator + reviewer) for high-impact categories; CI
   validates that rollups reconcile with inventory ledger balances before releases exit staging.【F:schemas/CostRecord.v1.json†L1-L160】
 - **Profit layer certification.** `ProfitLayer.v1` exports carry summary stats and hash manifests so Report Builder and analytics
-  consumers confirm the layer matches recorded sessions before generating financial statements.【F:schemas/ProfitLayer.v1.json†L1-L140】【F:docs/ADR/ADR-051_ReportBuilder.md†L9-L70】
+  consumers confirm the layer matches recorded sessions before generating financial statements.【F:schemas/ProfitLayer.v1.json†L1-L140】【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L9-L70】
 - **Cross-plugin gating.** Profit analytics may only publish rollups when Crop, Genetics, Yield, Field Health, and Weather
-  plugins expose session-aligned context, preventing partially informed financial summaries.【F:docs/ADR/ADR-045_CropTypePlugin.md†L9-L96】【F:docs/ADR/ADR-049_YieldPlugin.md†L9-L96】【F:docs/ADR/ADR-053_WeatherPlugin.md†L9-L70】
+  plugins expose session-aligned context, preventing partially informed financial summaries.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L9-L96】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L9-L96】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L9-L70】
 
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - Multi-field envelope splits allocate costs and revenue per field automatically, keeping cross-field jobs auditable without
-  manual spreadsheets.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+  manual spreadsheets.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】
 - Profit rollups include session hashes, crop IDs, genetics lots, and weather snapshots so downstream analytics can trace every
-  metric back to the exact operating context.【F:schemas/Session.v1.json†L1-L120】【F:docs/ADR/ADR-053_WeatherPlugin.md†L9-L66】
+  metric back to the exact operating context.【F:schemas/Session.v1.json†L1-L120】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L9-L66】
 - Mesh presence events trigger incremental profit exports, letting collaborating machines compare live profitability while
-  radio bandwidth stays bounded via RadioBridge throttling policies.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L70】【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+  radio bandwidth stays bounded via RadioBridge throttling policies.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L21-L70】【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md†L9-L60】
 
 ## Alternatives Considered
 

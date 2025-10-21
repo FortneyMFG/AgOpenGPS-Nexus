@@ -3,7 +3,7 @@
 ADR-025 and ADR-026 require Nexus to enforce data retention windows, stay within
 published performance budgets, and keep deterministic replay plus crash recovery
 fixtures wired into CI. This guide bundles those guardrails so contributors and
-automation can run the same checks before merging changes.【F:docs/ADR/ADR-025-data-lifecycle-retention.md†L17-L38】【F:docs/ADR/ADR-026-performance-budgets.md†L12-L37】【F:docs/ADR/ADR-roadmap.md†L571-L600】
+automation can run the same checks before merging changes.【F:docs/SRS/sections/3X_Data_Storage/34-ADR-025 - Data lifecycle and retention policy.md†L17-L38】【F:docs/SRS/sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md†L12-L37】【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L571-L600】
 
 ## Guardrail coverage
 

@@ -10,7 +10,7 @@
 **Created:** 2025-10-20  
 **Last Updated:** 2025-10-20  
 **Related SRS:** `11_OS_Support.md`
-**Related ADRs:** `11-ADR-001_Adopt_Unified_Runtime.md`
+**Related ADRs:** `11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md`
 
 ---
 
@@ -189,8 +189,8 @@ flowchart LR
 ## 16) References
 
 - **SRS:** `11_OS_Support.md`
-- **ADRs:** `11-ADR-001_Adopt_Unified_Runtime.md`
-- **Prior work:** `docs/ADR/ADR-001-dotnet8-runtime.md`, `docs/ADR/ADR-003-avalonia-ui.md`
+- **ADRs:** `11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md`
+- **Prior work:** `docs/SRS/sections/1X_Platform_Foundations/11-ADR-001 - Adopt .NET 8 C stack for Nexus runtime.md`, `docs/SRS/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md`
 
 ---
 

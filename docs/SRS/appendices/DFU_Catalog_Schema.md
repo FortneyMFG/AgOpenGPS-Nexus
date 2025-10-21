@@ -180,7 +180,7 @@ Implementations should treat unknown bits as reserved and ignore them.
 
 ## Related ADRs
 
-- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
-- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
-- [ADR-018 — Plugin API](../../ADR/ADR-018-plugin-api.md)
-- [ADR-048 — RadioBridge](../../ADR/ADR-048_RadioBridge.md)
+- [ADR-015 — Section Control Grouping Semantics](../sections/6X_Core_Domain_Services/61-ADR-015 - Section control and grouping semantics.md)
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../sections/4X_Interprocess_Communications/42-ADR-016 - Firmware and transport for variable-rate layer PGNs.md)
+- [ADR-018 — Plugin API](../sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md)
+- [ADR-048 — RadioBridge](../sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md)

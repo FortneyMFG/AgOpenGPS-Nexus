@@ -1,11 +1,11 @@
 # Hardware Integration Patterns
 
-This document outlines the hardware integration patterns used in Nexus, mapping directly to the requirements specified in the [OS Support Requirements](../SRS/sections/1X_Platform_Foundations/11_OS_Support.md) and implemented through [ADR-006: AOG-Link MCU Communications](../ADR/ADR-006-aog-link-mcu-communications.md).
+This document outlines the hardware integration patterns used in Nexus, mapping directly to the requirements specified in the [OS Support Requirements](../SRS/sections/1X_Platform_Foundations/11_OS_Support.md) and implemented through [ADR-006: AOG-Link MCU Communications](../SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md).
 
 ## Integration Models
 
 ### 1. CM5/Pi5 Direct Integration
-As defined in [ADR-001](../ADR/ADR-001-dotnet8-runtime.md), the CM5/Pi5 deployment model enables:
+As defined in [ADR-001](../SRS/sections/1X_Platform_Foundations/11-ADR-001 - Adopt .NET 8 C stack for Nexus runtime.md), the CM5/Pi5 deployment model enables:
 - Direct GPIO control for steering and sections
 - Native serial/CAN communication
 - Hardware-accelerated display support
@@ -16,7 +16,7 @@ Maintains compatibility with existing hardware through:
 - USB serial connections
 - Ethernet/UDP communication
 - Legacy PGN protocol support
-See [ADR-002: gRPC Contracts](../ADR/ADR-002-grpc-contracts.md) for protocol details.
+See [ADR-002: gRPC Contracts](../SRS/sections/4X_Interprocess_Communications/41-ADR-002 - Expose Nexus services over gRPC protobuf contracts.md) for protocol details.
 
 ### 3. Hybrid Deployments
 Supports mixed hardware configurations:
@@ -105,6 +105,6 @@ As specified in [Threading, Scheduling & Timing requirements](../SRS/sections/2X
 
 - [OS Support Requirements](../SRS/sections/1X_Platform_Foundations/11_OS_Support.md)
 - [Communications Requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-- [ADR-006: AOG-Link Protocol](../ADR/ADR-006-aog-link-mcu-communications.md)
+- [ADR-006: AOG-Link Protocol](../SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md)
 - [Deployment Guide](../deployment/INDEX.md)
 - [Hardware Compatibility List](../deployment/hardware/compatibility.md)

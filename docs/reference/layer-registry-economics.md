@@ -20,11 +20,11 @@ traceability.
 
 - **Session alignment.** Profit overlays include the session identifier when
   derived from live application data so Report Builder exports and QA harnesses
-  can replay the exact inputs.【F:schemas/ProfitLayer.v1.json†L1-L36】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L11-L46】
+  can replay the exact inputs.【F:schemas/ProfitLayer.v1.json†L1-L36】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L11-L46】
 - **Actual layer semantics.** `x-nexus-actual=true` signals that the layer
   represents observed profitability; registry automation and dashboards avoid
   classifying it as a planned prescription.【F:schemas/ProfitLayer.v1.json†L1-L36】
 
 ## References
-- [ADR-050 — Cost & Profit Plugin](../ADR/ADR-050_CostProfitPlugin.md)
+- [ADR-050 — Cost & Profit Plugin](../SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md)
 - [Layer registry overview](../SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md)

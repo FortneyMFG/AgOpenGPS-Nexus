@@ -6,11 +6,11 @@ The Multi-Machine plugin implements the live telemetry mesh described in ADR-047
 
 ## Runtime Responsibilities
 
-- Publish `Presence` messages at 1 Hz containing device identity, profile hashes, and capability summaries. Consume `ShareProfile` documents to determine which topics (presence, trails, coverage, layer edits, session state) leave the cab.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L84】
+- Publish `Presence` messages at 1 Hz containing device identity, profile hashes, and capability summaries. Consume `ShareProfile` documents to determine which topics (presence, trails, coverage, layer edits, session state) leave the cab.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L21-L84】
 - Honor `SubscribeProfile` ACLs and visibility presets. Operators may choose presets such as `Presence only`, `Trails`, or `Full coverage`; the plugin must adjust subscriptions and UI overlays accordingly.
 - Queue outbound payloads when offline (store-and-forward up to 20 MB/device) and replay them when connectivity returns, maintaining order and verifying hash signatures per ADR-047.
-- Bridge Zone Tool events to collaborators by forwarding `LayerEditEvent.v1` journals with deduplication and replay protection.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】【F:schemas/LayerEditEvent.v1.json†L1-L140】
-- Integrate with RadioBridge when narrowband links are active. Throttle high-bandwidth topics, decimate trails to ≤1 Hz, and prefer store-and-forward bundles for coverage layers.【F:docs/ADR/ADR-048_RadioBridge.md†L15-L52】【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L86-L110】
+- Bridge Zone Tool events to collaborators by forwarding `LayerEditEvent.v1` journals with deduplication and replay protection.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】【F:schemas/LayerEditEvent.v1.json†L1-L140】
+- Integrate with RadioBridge when narrowband links are active. Throttle high-bandwidth topics, decimate trails to ≤1 Hz, and prefer store-and-forward bundles for coverage layers.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md†L15-L52】【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L86-L110】
 
 ## UX Requirements
 
@@ -25,5 +25,5 @@ The Multi-Machine plugin implements the live telemetry mesh described in ADR-047
 
 ## Compatibility Notes
 
-- Mesh communications must function offline on LAN without cloud dependencies. Cloud sync is optional and reconciles on landing per ADR-030.【F:docs/ADR/ADR-030-field-job-sessions.md†L33-L86】
-- Session IDs replace legacy Run identifiers in all payloads to stay aligned with ADR-041.【F:docs/ADR/ADR-041_JobSessions.md†L55-L73】
+- Mesh communications must function offline on LAN without cloud dependencies. Cloud sync is optional and reconciles on landing per ADR-030.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L33-L86】
+- Session IDs replace legacy Run identifiers in all payloads to stay aligned with ADR-041.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L55-L73】

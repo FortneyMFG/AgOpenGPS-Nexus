@@ -445,7 +445,7 @@ def main() -> None:
 
     tasks_path = root / "tasks.md"
     manifest_root = root / "docs/plugins/manifests"
-    minutes_root = root / "docs/ADR/reviews"
+    minutes_root = root / "docs/SRS/sections/2X_System_Architecture/reviews"
 
     program_board = parse_program_board(tasks_path, args.section)
     dependency_digest = build_dependency_digest(manifest_root)

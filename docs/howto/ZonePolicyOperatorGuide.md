@@ -2,7 +2,7 @@
 
 This guide explains how Nexus surfaces spatial constraint policies to operators and how those
 policies influence automation behaviour in the field. It complements
-[ADR-027 — Spatial constraints & zone policies](../ADR/ADR-027-spatial-constraints.md) and the UI
+[ADR-027 — Spatial constraints & zone policies](../SRS/sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) and the UI
 policy toggles implemented in the Avalonia shell so crews know when automation is gated and
 what steps are required to resume work. Operators can cross-reference the
 [SRS control & automation section](../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md) for the underlying

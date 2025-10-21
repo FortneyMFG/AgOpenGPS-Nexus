@@ -32,6 +32,6 @@ patterns so future integrations (e.g., PR 607) can reuse documented DDI semantic
 
 ## Related ADRs
 
-- [ADR-006 — AgIO Link MCU Communications](../../ADR/ADR-006-aog-link-mcu-communications.md)
-- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
-- [ADR-048 — RadioBridge](../../ADR/ADR-048_RadioBridge.md)
+- [ADR-006 — AgIO Link MCU Communications](../sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md)
+- [ADR-015 — Section Control Grouping Semantics](../sections/6X_Core_Domain_Services/61-ADR-015 - Section control and grouping semantics.md)
+- [ADR-048 — RadioBridge](../sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md)

@@ -52,18 +52,18 @@ device.
 - **Profile registry.** Share and subscribe profiles are versioned artifacts in the manifest bundle; CI blocks deployments that
   omit ACL policies or exceed the per-tier payload budgets defined for radio transports.【F:schemas/ShareProfile.v1.json†L1-L120】【F:schemas/SubscribeProfile.v1.json†L1-L120】
 - **Presence accountability.** Presence heartbeats now include session IDs, mounted field sets, and profile hashes so the audit
-  trail links mesh events to the authoritative job state emitted by JobsService.【F:schemas/Session.v1.json†L1-L120】【F:docs/ADR/ADR-030-field-job-sessions.md†L13-L96】
+  trail links mesh events to the authoritative job state emitted by JobsService.【F:schemas/Session.v1.json†L1-L120】【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L13-L96】
 - **Key rotation playbook.** RadioBridge integrations must document rolling key rotations and publish test vectors covering
-  encryption handshake success/failure paths before an operator bundle can ship.【F:docs/ADR/ADR-048_RadioBridge.md†L17-L60】
+  encryption handshake success/failure paths before an operator bundle can ship.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md†L17-L60】
 
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - Mesh broadcasts include deterministic seeds and layer edit provenance so Zone Drawing undo stacks reconcile edits regardless
-  of mesh topology or transport retries.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L9-L74】
+  of mesh topology or transport retries.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L9-L74】
 - Crop, Genetics, Yield, and Profit plugins register analytics windows keyed off mesh presence events to align streaming
-  overlays with the same session boundaries used in replay and report builder exports.【F:docs/ADR/ADR-045_CropTypePlugin.md†L9-L96】【F:docs/ADR/ADR-049_YieldPlugin.md†L9-L70】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L9-L70】
+  overlays with the same session boundaries used in replay and report builder exports.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L9-L96】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L9-L70】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L9-L70】
 - Multi-field envelopes propagate into mesh topic routing so devices receive only the layers relevant to their mounted fields,
-  reducing bandwidth and simplifying analytics splits in collaborative jobs.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+  reducing bandwidth and simplifying analytics splits in collaborative jobs.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】
 
 ## Alternatives Considered
 

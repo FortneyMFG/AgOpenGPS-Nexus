@@ -75,7 +75,7 @@ The Nexus roadmap upgrades the legacy UDP PGN (Coined AOG-Link V0) interface to 
 
 ## Plugin & Component Highlights
 
-- **AutoSteer & Guidance.** Closed-loop steering, lookahead tuning, and constraint gating run as plugins connected to Core routing. Refer to [docs/plugins/AutoSteer.md](docs/plugins/AutoSteer.md) and [docs/ADR/ADR-033-guidance-planner-autosteer.md](docs/ADR/ADR-033-guidance-planner-autosteer.md) for control theory and safety notes.
+- **AutoSteer & Guidance.** Closed-loop steering, lookahead tuning, and constraint gating run as plugins connected to Core routing. Refer to [docs/plugins/AutoSteer.md](docs/plugins/AutoSteer.md) and [docs/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md](docs/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md) for control theory and safety notes.
 - **Sections & Rate Control.** Section management, variable rate, and product control share the Layer Registry and telemetry feeds, with nanopb contracts ready for MCU modules. See [docs/plugins/Sections.md](docs/plugins/Sections.md) and [docs/plugins/RateControl.md](docs/plugins/RateControl.md).
 - **Mapping & Analytics.** Layer editing, replay, and telemetry logging use the TileStore, Layer Registry, and report builder services. Explore [docs/plugins/Mapping.md](docs/plugins/Mapping.md), [docs/plugins/Replay.md](docs/plugins/Replay.md), and [docs/plugins/TelemetryLogging.md](docs/plugins/TelemetryLogging.md).
 - **ISOBUS & External Devices.** The ISOBUS bridge, GNSS/IMU fusion, and device manager plugins coordinate identities and capabilities across the mesh; details are under [docs/plugins/ISOBUS.md](docs/plugins/ISOBUS.md) and [docs/plugins/DeviceManager.md](docs/plugins/DeviceManager.md).
@@ -138,7 +138,7 @@ Reference `bundles/base.bundle.json` and `bundles/headless.bundle.json` for the 
 
 - [docs/INDEX.md](docs/INDEX.md) — curated links into ADRs, SRS sections, and plugin guides.
 - [docs/SRS/NOTES.md](docs/SRS/NOTES.md) — narrative summary of the SRS with quick links into requirement sections.
-- [docs/ADR/](docs/ADR) — Architecture Decision Records, including [ADR roadmap highlights](docs/ADR/INDEX.md) for upcoming work.
+- [docs/SRS/sections](docs/SRS/sections) — Architecture Decision Records organized by SRS sections, including the [PoseStream roadmap](docs/SRS/sections/2X_System_Architecture/21-ADR-900%20-%20PoseStream,%20Layer,%20and%20Control%20Program%20Roadmap.md) for upcoming work.
 - [docs/howto/developer-setup.md](docs/howto/developer-setup.md) — step-by-step instructions for downloading release builds or running from source.
 - [docs/howto/simulation-scenarios.md](docs/howto/simulation-scenarios.md) — deterministic sim walkthroughs for validation and QA.
 - [docs/templates/ui-modernization-ai-prompts.md](docs/templates/ui-modernization-ai-prompts.md) — examples of AI prompt bundles used in Nexus development.

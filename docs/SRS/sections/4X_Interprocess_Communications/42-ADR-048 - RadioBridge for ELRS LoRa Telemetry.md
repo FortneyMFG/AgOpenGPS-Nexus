@@ -40,20 +40,20 @@ semantics.
 ## Governance Updates
 
 - **Topic ID escrow.** Topic hash registries are promoted through the manifest governance program; releases must attach signed
-  registry diffs and replay fixtures covering all advertised tiers before publication.【F:docs/ADR/ADR-031-official-plugin-bundle.md†L17-L70】
+  registry diffs and replay fixtures covering all advertised tiers before publication.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L17-L70】
 - **Firmware compliance.** Transport adapters include compatibility manifests listing supported firmware revisions and
-  handshake features; CI rejects builds that downgrade retry windows or omit selective-repeat coverage tests.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L70】
+  handshake features; CI rejects builds that downgrade retry windows or omit selective-repeat coverage tests.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L21-L70】
 - **Security rotations.** Key provisioning docs mandate quarterly rotation rehearsals with captured telemetry proving old keys
   are revoked and new ones sync across the fleet without breaking mesh connectivity.【F:schemas/Device.v1.json†L1-L120】
 
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - Envelope-aware throttling ensures multi-field jobs prioritize field-local deltas first, reducing congestion when multiple
-  plugins publish edits simultaneously.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+  plugins publish edits simultaneously.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】
 - Session metadata hashed into frame headers lets replay tools stitch radio captures back to specific job timelines without
   manual bookkeeping.【F:schemas/Session.v1.json†L1-L120】
 - Weather, Field Health, and Profit alerts inherit the same retry policies as coverage traffic so operator notifications remain
-  consistent even when bandwidth drops during collaborative edits.【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L9-L66】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L9-L70】
+  consistent even when bandwidth drops during collaborative edits.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md†L9-L66】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L9-L70】
 
 ## Alternatives Considered
 

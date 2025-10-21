@@ -38,13 +38,13 @@ python tools/scripts/generate-governance-telemetry.py \
    capabilities are summarised so governance checks can detect drift in the
    official bundle.
 3. **Review minutes** — Meeting notes stored as JSON files under
-   `docs/ADR/reviews/` are collated into the Markdown digest. Each entry can list
+   `docs/SRS/sections/2X_System_Architecture/reviews/` are collated into the Markdown digest. Each entry can list
    decisions, action items, and reference links. The Markdown output renders the
    structured data with checkboxes for quick status reviews.
 
 ## Minutes schema
 
-Each JSON file inside `docs/ADR/reviews/` should follow this structure:
+Each JSON file inside `docs/SRS/sections/2X_System_Architecture/reviews/` should follow this structure:
 
 ```json
 {
@@ -65,7 +65,7 @@ Each JSON file inside `docs/ADR/reviews/` should follow this structure:
       "completed_date": "2025-02-20"
     }
   ],
-  "links": [{"label": "Roadmap", "url": "docs/ADR/ADR-roadmap.md"}]
+  "links": [{"label": "Roadmap", "url": "docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md"}]
 }
 ```
 

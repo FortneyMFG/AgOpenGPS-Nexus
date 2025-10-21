@@ -32,14 +32,14 @@ Adopt a layered aggregation runtime owned by Core:
   `(sectionId, layerNamespace)` and provides lookup helpers for plugins and TileStore writers.
 - **Pose alignment:** Controllers subscribe to PoseStream updates via a deterministic event bus. Each tick receives the active
   pose (vehicle + implement), zone mask (ADR-027), and section mask so coverage math respects spatial constraints and implements
-  can compute overlap area consistently.【F:docs/ADR/ADR-027-spatial-constraints.md†L11-L53】
+  can compute overlap area consistently.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md†L11-L53】
 - **Snapshot pipeline:** `LayerSnapshotWriter` writes controller outputs into TileStore segments and publishes `LayerSnapshot`
   events for UI/analytics consumers. Snapshots carry `sessionId`, `jobId`, `seasonId?`, `fieldIds[]`, and `poseHash` so replay
   and offline analytics can reconstruct provenance without additional lookups. Snapshots include per-layer `contentHash`
   computed from canonical JSON to guarantee determinism across runs.
 - **Quality & diagnostics:** Controllers maintain running statistics (`samples`, `min`, `max`, `mean`, `variance`,
   `lastUpdateLatencyMs`). `LayerDiagnosticsService` exposes `/diagnostics/layers` for health dashboards and publishes warnings
-  when latency or quality thresholds drift beyond budgets defined in ADR-026 performance guardrails.【F:docs/ADR/ADR-026-performance-budgets.md†L19-L66】
+  when latency or quality thresholds drift beyond budgets defined in ADR-026 performance guardrails.【F:docs/SRS/sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md†L19-L66】
 - **Plugin extension points:** Plugins can contribute additional controllers by shipping assemblies that implement
   `ILayerControllerFactory`. Factories declare capability requirements and fallback behaviour (e.g., degrade to binary
   coverage only). Controllers may expose extra analytics via `extensions` objects stored alongside snapshots; Core treats the
@@ -71,7 +71,7 @@ Adopt a layered aggregation runtime owned by Core:
 - Provides telemetry hooks and health metrics required in §10 Telemetry & Health, enabling alerting when controller latency or
   quality falls outside targets.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L6-L41】
 - Enables deterministic replay goals from §03 Communications & Transports and ADR-020 by producing repeatable hashes and
-  journals for PoseStream-aligned controllers.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L25-L45】【F:docs/ADR/ADR-020-determinism-replay-ci.md†L11-L40】
+  journals for PoseStream-aligned controllers.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L25-L45】【F:docs/SRS/sections/9X_Frontends_Ops/96-ADR-020 - Determinism replay and CI guardrails.md†L11-L40】
 
 ## Consequences
 

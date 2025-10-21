@@ -27,6 +27,6 @@ The AutoSteer plugin implements Nexus’ closed-loop steering controller. It tra
 
 ## Related Resources
 - `docs/plugins/Guidance.md` for upstream data flow.
-- `docs/ADR/ADR-010-layer-registry-variable-rate.md` for how steering interacts with variable rate overlays.
+- `docs/SRS/sections/3X_Data_Storage/32-ADR-010 - Layer registry and variable-rate framework.md` for how steering interacts with variable rate overlays.
 - `docs/plugins/tutorials/testing.md` for guidance on replay-based validation.
 

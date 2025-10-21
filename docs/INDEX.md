@@ -8,19 +8,19 @@
 
 ## Architecture Decisions
 
-- [ADR Roadmap](ADR/ADR-roadmap.md) — status, dependencies, and icebox items for the 2025 program.
-- [ADR-040 — Season Organizers](ADR/ADR-040_SeasonOrganizers.md)
-- [ADR-041 — Job Sessions](ADR/ADR-041_JobSessions.md)
-- [ADR-043 — Multi-Field Job Envelopes](ADR/ADR-043_MultiFieldJobEnvelopes.md)
-- [ADR-044 — Zone & Layer Drawing Framework](ADR/ADR-044_ZoneDrawingFramework.md)
-- [ADR-045 — Crop Type Plugin & Layers](ADR/ADR-045_CropTypePlugin.md)
-- [ADR-046 — Genetics Plugin & Layers](ADR/ADR-046_GeneticsPlugin.md)
-- [ADR-047 — Live Telemetry Mesh](ADR/ADR-047_LiveTelemetryMesh.md)
-- [ADR-048 — RadioBridge](ADR/ADR-048_RadioBridge.md)
-- [ADR-049 — Yield & Analytics Plugin](ADR/ADR-049_YieldPlugin.md)
-- [ADR-050 — Cost & Profit Plugin](ADR/ADR-050_CostProfitPlugin.md)
-- [ADR-051 — Report Builder & Export System](ADR/ADR-051_ReportBuilder.md)
-- [ADR-069 — Guidance Orchestrator plugin](ADR/ADR-069_GuidanceOrchestrator.md)
+- [ADR Roadmap](SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md) — status, dependencies, and icebox items for the 2025 program.
+- [ADR-040 — Season Organizers](SRS/sections/3X_Data_Storage/31-ADR-040 - Season Organizers.md)
+- [ADR-041 — Job Sessions](SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md)
+- [ADR-043 — Multi-Field Job Envelopes](SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md)
+- [ADR-044 — Zone & Layer Drawing Framework](SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md)
+- [ADR-045 — Crop Type Plugin & Layers](SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md)
+- [ADR-046 — Genetics Plugin & Layers](SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md)
+- [ADR-047 — Live Telemetry Mesh](SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md)
+- [ADR-048 — RadioBridge](SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md)
+- [ADR-049 — Yield & Analytics Plugin](SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md)
+- [ADR-050 — Cost & Profit Plugin](SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md)
+- [ADR-051 — Report Builder & Export System](SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md)
+- [ADR-069 — Guidance Orchestrator plugin](SRS/sections/8X_Guidance/81-ADR-069 - Guidance Orchestrator plugin.md)
 
 ## System Requirements Specification
 

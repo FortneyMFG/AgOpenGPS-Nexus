@@ -7,9 +7,9 @@ Yield plugins ingest combine telemetry, imports, and external datasets to produc
 ## Runtime Contracts
 
 - Subscribe to session events to bind telemetry to the active job/session and capture environment metadata for reporting.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】
-- Register layer definitions `yield.actual`, `yield.moisture`, and `yield.testWeight` in the Layer Registry. Ensure units, smoothing metadata, and provenance conform to ADR-049.【F:docs/ADR/ADR-049_YieldPlugin.md†L21-L59】【F:docs/ADR/ADR-010-layer-registry-variable-rate.md†L33-L58】
-- Support data ingest from machine telemetry, ISOXML TaskData, and CSV/GeoTIFF imports. Normalize to registry expectations (CRS, units) per the NX-113 flow before writing layers.【F:docs/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L84-L106】【F:docs/ADR/ADR-014-interop-prescription-formats.md†L12-L56】
-- Emit per-field and per-zone aggregates, linking results to crop type and genetics context to enable cross-filter analytics.【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】
+- Register layer definitions `yield.actual`, `yield.moisture`, and `yield.testWeight` in the Layer Registry. Ensure units, smoothing metadata, and provenance conform to ADR-049.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L21-L59】【F:docs/SRS/sections/3X_Data_Storage/32-ADR-010 - Layer registry and variable-rate framework.md†L33-L58】
+- Support data ingest from machine telemetry, ISOXML TaskData, and CSV/GeoTIFF imports. Normalize to registry expectations (CRS, units) per the NX-113 flow before writing layers.【F:docs/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L84-L106】【F:docs/SRS/sections/3X_Data_Storage/32-ADR-014 - Interop for prescription and agronomic formats.md†L12-L56】
+- Emit per-field and per-zone aggregates, linking results to crop type and genetics context to enable cross-filter analytics.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L29-L71】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md†L21-L66】
 
 ## Layer Metadata Expectations
 
@@ -27,7 +27,7 @@ Clients relying on historical ad-hoc `extensions` fields should migrate to these
 
 ## Analytics & Reporting
 
-- Provide APIs for profit and report builder plugins to request yield × crop type/genetics breakdowns, field/season rollups, and temporal comparisons.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L21-L52】【F:docs/ADR/ADR-051_ReportBuilder.md†L21-L52】
+- Provide APIs for profit and report builder plugins to request yield × crop type/genetics breakdowns, field/season rollups, and temporal comparisons.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L21-L52】
 - Maintain QA fixtures verifying moisture/test weight calibration, smoothing algorithms, and aggregation accuracy across representative datasets.
 - Surface anomaly detection (e.g., sensor dropouts, excessive smoothing) with actionable warnings and provenance references.
 
@@ -44,5 +44,5 @@ Clients relying on historical ad-hoc `extensions` fields should migrate to these
 
 ## Compatibility Notes
 
-- Offline operation is mandatory; imports and telemetry logging must persist locally and sync opportunistically when cloud storage is available.【F:docs/ADR/ADR-030-field-job-sessions.md†L33-L86】
-- Session IDs replace legacy Run references; exported analytics must reference `sessionId` for replay parity.【F:docs/ADR/ADR-041_JobSessions.md†L55-L73】
+- Offline operation is mandatory; imports and telemetry logging must persist locally and sync opportunistically when cloud storage is available.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L33-L86】
+- Session IDs replace legacy Run references; exported analytics must reference `sessionId` for replay parity.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L55-L73】

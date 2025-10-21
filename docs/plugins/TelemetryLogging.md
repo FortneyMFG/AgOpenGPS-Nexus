@@ -5,13 +5,13 @@ Telemetry logging plugins capture session-scoped data for replay, analytics, and
 
 ## Runtime Responsibilities
 
-- Subscribe to session lifecycle events to open/close log files per session, capturing environment metadata, equipment profiles, and provenance references.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】【F:docs/ADR/ADR-017-profiles-kinematics.md†L33-L86】
-- Record telemetry topics (PoseStream, rate, section state, layer edits, mesh presence) using deterministic timestamping aligned with SimClock/SimBus expectations from ADR-004.【F:docs/ADR/ADR-004-composite-simulation.md†L21-L78】
+- Subscribe to session lifecycle events to open/close log files per session, capturing environment metadata, equipment profiles, and provenance references.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L74】【F:docs/SRS/sections/6X_Core_Domain_Services/61-ADR-017 - Equipment profiles and kinematics.md†L33-L86】
+- Record telemetry topics (PoseStream, rate, section state, layer edits, mesh presence) using deterministic timestamping aligned with SimClock/SimBus expectations from ADR-004.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L21-L78】
 - Persist logs in an append-only format with integrity hashes and session IDs. Store metadata for quick indexing (start/end timestamps, job/field IDs, active plugins).
 - Stamp `jobId`, `sessionId`, and `seasonId` columns on every telemetry record so provenance survives export and replay boundaries per ADR-040/ADR-041.
 - Integrate with the multi-machine mesh to capture collaborative events, ensuring share profiles govern whether remote data is included.【F:docs/plugins/MultiMachine.md†L1-L80】
 - Capture equipment hour counters, fault codes, and implement usage metrics needed by the Equipment Health plugin, tagging logs with machine IDs so maintenance schedules stay accurate.【F:docs/plugins/EquipmentHealth.md†L1-L160】
-- Record work order checkpoints (start, pause, checklist updates) so contractor billing and proof-of-work exports can replay crew progress.【F:docs/ADR/ADR-041_JobSessions.md†L46-L55】
+- Record work order checkpoints (start, pause, checklist updates) so contractor billing and proof-of-work exports can replay crew progress.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L46-L55】
 
 ## Session Artifacts
 
@@ -28,5 +28,5 @@ Telemetry logging plugins capture session-scoped data for replay, analytics, and
 
 ## Compatibility Notes
 
-- Offline-first: logs write to local storage; cloud sync or transfer is optional and reconciles when connectivity returns.【F:docs/ADR/ADR-030-field-job-sessions.md†L33-L86】
-- Legacy Run terminology must be replaced with Session identifiers in filenames, metadata, and exports.【F:docs/ADR/ADR-041_JobSessions.md†L55-L73】
+- Offline-first: logs write to local storage; cloud sync or transfer is optional and reconciles when connectivity returns.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L33-L86】
+- Legacy Run terminology must be replaced with Session identifiers in filenames, metadata, and exports.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L55-L73】

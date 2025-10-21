@@ -45,9 +45,9 @@ Coverage, release reliability, effort to maintain, reproducibility, compatibilit
 - Linux packaging and PGN bridge builds must be proven in CI before encouraging field pilots.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L1-L44】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
 
 ## Upcoming ADR coverage
-- **ADR-013 Derived products** will define the analytics-to-prescription recipes and QA metrics expected by R-CI-021, ensuring prescriptions remain auditable and repeatable.【F:docs/ADR/ADR-roadmap.md†L67-L73】
-- **ADR-019 Provenance, audit, and QA** will formalize the provenance schema, quality scores, and audit trail requirements captured in R-CI-020, aligning storage and visualization expectations.【F:docs/ADR/ADR-roadmap.md†L115-L121】
-- **ADR-020 Determinism, replay & CI** will enhance the golden dataset workflows required by R-CI-030, including hashing schemes, fixture formats, and performance gates.【F:docs/ADR/ADR-roadmap.md†L123-L129】
+- **ADR-013 Derived products** will define the analytics-to-prescription recipes and QA metrics expected by R-CI-021, ensuring prescriptions remain auditable and repeatable.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L67-L73】
+- **ADR-019 Provenance, audit, and QA** will formalize the provenance schema, quality scores, and audit trail requirements captured in R-CI-020, aligning storage and visualization expectations.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L115-L121】
+- **ADR-020 Determinism, replay & CI** will enhance the golden dataset workflows required by R-CI-030, including hashing schemes, fixture formats, and performance gates.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L123-L129】
 
 ## Open questions
 - How do we validate PGN compatibility in automation without physical hardware?

@@ -1,7 +1,7 @@
 # CRS Normalization Matrix
 
 > **Scope.** This matrix operationalizes the coordinate-reference-system (CRS) policy
-> captured in [ADR-022](../ADR/ADR-022-crs-units-precision-policy.md). It applies to every
+> captured in [ADR-022](../SRS/sections/3X_Data_Storage/32-ADR-022 - CRS units and precision policy.md). It applies to every
 > ingest, storage, and replay path that carries spatial data inside Nexus.
 
 ## Why publish a matrix?

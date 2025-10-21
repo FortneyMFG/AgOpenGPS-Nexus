@@ -41,20 +41,20 @@ Templates define header metadata, required data sources, and widget layout. Plug
 ## Governance Updates
 
 - **Template signing.** Templates bundled with operator presets include signed manifests listing required plugin versions and
-  schema hashes; CI rejects unsigned templates or those referencing deprecated sections.【F:schemas/Layer.v1.json†L1-L120】【F:docs/ADR/ADR-031-official-plugin-bundle.md†L17-L70】
+  schema hashes; CI rejects unsigned templates or those referencing deprecated sections.【F:schemas/Layer.v1.json†L1-L120】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L17-L70】
 - **Section certification.** Plugins must ship regression renderings for each registered section demonstrating compatibility with
-  multi-field envelopes, session splits, and collaborative edits before release.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L9-L74】
+  multi-field envelopes, session splits, and collaborative edits before release.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L9-L74】
 - **Audit trails.** Generated reports embed session hashes and provenance pointers so downstream audits and export archives can
   verify the exact state used during generation.【F:schemas/Session.v1.json†L1-L120】
 
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - Report scopes now default to session snapshots that already include crop, genetics, yield, profit, field health, and weather
-  context, reducing custom data joins for template authors.【F:docs/ADR/ADR-045_CropTypePlugin.md†L9-L96】【F:docs/ADR/ADR-049_YieldPlugin.md†L9-L96】【F:docs/ADR/ADR-053_WeatherPlugin.md†L9-L66】
+  context, reducing custom data joins for template authors.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L9-L96】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L9-L96】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L9-L66】
 - Templates can render collaborative timelines by replaying LayerEditEvent journals, letting teams illustrate who edited which
-  zones during a session without exporting raw logs.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L9-L74】
+  zones during a session without exporting raw logs.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L9-L74】
 - Profit summaries now include live mesh metrics when available, capturing collaborative machine contributions while respecting
-  RadioBridge ACLs for shared data.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L70】【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+  RadioBridge ACLs for shared data.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L21-L70】【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md†L9-L60】
 
 ## Alternatives Considered
 

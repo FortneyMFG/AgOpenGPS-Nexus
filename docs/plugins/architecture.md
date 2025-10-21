@@ -152,6 +152,6 @@ CI pipelines should:
 - `src/Aog.Core/PLUGINS.md` — Core service integration.
 - `src/Aog.UI.Avalonia/PLUGINS.md` — UI contribution points.
 - `docs/plugins/official/` — Reference cards for the plugins bundled with Nexus.
-- `docs/ADR/ADR-0xx-plugin-architecture.md` — Architectural decision record governing the zip plugin model.
+- `docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-029 - Mapping as a plugin with a minimal geospatial kernel in Core.md` — Architectural decision record governing the zip plugin model.
 - `docs/plugins/tutorials/first-plugin.md` — Hands-on walkthrough of building and packaging a plugin.
 

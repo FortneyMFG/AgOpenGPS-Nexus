@@ -1,7 +1,7 @@
 # Device Manager Compatibility Dashboard
 
 The Device Manager compatibility dashboard visualises the manifest governance
-signals defined in [ADR-031](../ADR/ADR-031-official-plugin-bundle.md) so
+signals defined in [ADR-031](../SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md) so
 operators can verify that the official plugin bundle is healthy before field
 work. It consumes the dependency matrix and capability exports produced by the
 plugin manifest tooling and renders pass/warn/fail states with remediation

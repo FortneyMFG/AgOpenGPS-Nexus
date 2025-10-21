@@ -125,58 +125,58 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 - [ISOBUS section control](references/ISOBUS_Section_Control.md)
 
 ### ADR index
-- [ADR – 001 .NET 8 runtime](../ADR/ADR-001-dotnet8-runtime.md)
-- [ADR – 002 gRPC contracts](../ADR/ADR-002-grpc-contracts.md)
-- [ADR – 003 Avalonia UI](../ADR/ADR-003-avalonia-ui.md)
-- [ADR – 004 Composite simulation](../ADR/ADR-004-composite-simulation.md)
-- [ADR – 006 AOG Link MCU communications](../ADR/ADR-006-aog-link-mcu-communications.md)
-- [ADR – 007 PoseStream section-state architecture](../ADR/ADR-007-posestream-sectionstate-architecture.md)
-- [ADR – 008 Equipment hierarchy](../ADR/ADR-008-equipment-hierarchy.md)
-- [ADR – 009 PoseStream vector tile-store persistence](../ADR/ADR-009-posestream-vector-tilestore-persistence.md)
-- [ADR – 00XX SHM fastpath for Pumpkin Pi](../ADR/ADR-00XX-shm-fastpath-pumpkin-pi.md)
-- [ADR – 010 Layer registry for variable rate](../ADR/ADR-010-layer-registry-variable-rate.md)
-- [ADR – 011 Mapping visualization imagery](../ADR/ADR-011-mapping-visualization-imagery.md)
-- [ADR – 012 Multi-session PoseStream fusion](../ADR/ADR-012-multi-session-posestream-fusion.md)
-- [ADR – 013 Derived products & analytics prescriptions](../ADR/ADR-013-derived-products-analytics-prescriptions.md)
-- [ADR – 014 Interop prescription formats](../ADR/ADR-014-interop-prescription-formats.md)
-- [ADR – 015 Section control grouping semantics](../ADR/ADR-015-section-control-grouping-semantics.md)
-- [ADR – 016 Firmware transport for variable-rate PGNs](../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
-- [ADR – 017 Profiles & kinematics](../ADR/ADR-017-profiles-kinematics.md)
-- [ADR – 018 Plugin API](../ADR/ADR-018-plugin-api.md)
-- [ADR – 019 Provenance, audit, and QA](../ADR/ADR-019-provenance-audit-qa.md)
-- [ADR – 020 Determinism replay CI](../ADR/ADR-020-determinism-replay-ci.md)
-- [ADR – 021 Timebase clock sync](../ADR/ADR-021-timebase-clock-sync.md)
-- [ADR – 022 CRS units precision policy](../ADR/ADR-022-crs-units-precision-policy.md)
-- [ADR – 023 Session & job model](../ADR/ADR-023-session-job-model.md)
-- [ADR – 024 Discovery & identity](../ADR/ADR-024-discovery-identity.md)
-- [ADR – 025 Data lifecycle & retention](../ADR/ADR-025-data-lifecycle-retention.md)
-- [ADR – 026 Performance budgets](../ADR/ADR-026-performance-budgets.md)
-- [ADR – 027 Spatial constraints](../ADR/ADR-027-spatial-constraints.md)
-- [ADR – 028 Stack boundaries](../ADR/ADR-028-stack-boundaries.md)
-- [ADR – 029 Mapping plugin architecture](../ADR/ADR-029-mapping-plugin-architecture.md)
-- [ADR – 030 Field job sessions](../ADR/ADR-030-field-job-sessions.md)
-- [ADR – 031 Official plugin bundle](../ADR/ADR-031-official-plugin-bundle.md)
-- [ADR – 032 Presets and layout linking](../ADR/ADR-032-presets-and-layout-linking.md)
-- [ADR – 033 Guidance planner & autosteer](../ADR/ADR-033-guidance-planner-autosteer.md)
-- [ADR – 034 Metadata-driven dashboards](../ADR/ADR-034-metadata-driven-dashboards.md)
-- [ADR – 040 Season organizers](../ADR/ADR-040_SeasonOrganizers.md)
-- [ADR – 041 Job sessions](../ADR/ADR-041_JobSessions.md)
-- [ADR – 043 Multi-field job envelopes](../ADR/ADR-043_MultiFieldJobEnvelopes.md)
-- [ADR – 044 Zone drawing framework](../ADR/ADR-044_ZoneDrawingFramework.md)
-- [ADR – 045 Crop type plugin](../ADR/ADR-045_CropTypePlugin.md)
-- [ADR – 046 Genetics plugin](../ADR/ADR-046_GeneticsPlugin.md)
-- [ADR – 047 Live telemetry mesh](../ADR/ADR-047_LiveTelemetryMesh.md)
-- [ADR – 048 Radio bridge](../ADR/ADR-048_RadioBridge.md)
-- [ADR – 049 Yield plugin](../ADR/ADR-049_YieldPlugin.md)
-- [ADR – 050 Cost & profit plugin](../ADR/ADR-050_CostProfitPlugin.md)
-- [ADR – 051 Report builder](../ADR/ADR-051_ReportBuilder.md)
-- [ADR – 052 Field health plugin](../ADR/ADR-052_FieldHealthPlugin.md)
-- [ADR – 053 Weather plugin](../ADR/ADR-053_WeatherPlugin.md)
-- [ADR – 054 Nexus CLI host](../ADR/ADR-054_NexusCliHost.md)
-- [ADR – 067 Equipment configuration kinematics](../ADR/ADR-067-equipment-configuration-kinematics.md)
-- [ADR – 068 Layer controllers runtime](../ADR/ADR-068-layer-controllers-runtime.md)
-- [ADR – 069 Guidance orchestrator](../ADR/ADR-069_GuidanceOrchestrator.md)
-- [ADR roadmap](../ADR/ADR-roadmap.md)
+- [ADR – 001 .NET 8 runtime](sections/1X_Platform_Foundations/11-ADR-001 - Adopt .NET 8 C stack for Nexus runtime.md)
+- [ADR – 002 gRPC contracts](sections/4X_Interprocess_Communications/41-ADR-002 - Expose Nexus services over gRPC protobuf contracts.md)
+- [ADR – 003 Avalonia UI](sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md)
+- [ADR – 004 Composite simulation](sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md)
+- [ADR – 006 AOG Link MCU communications](sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md)
+- [ADR – 007 PoseStream section-state architecture](sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md)
+- [ADR – 008 Equipment hierarchy](sections/6X_Core_Domain_Services/61-ADR-008 - Equipment Implement Toolbar Section hierarchy.md)
+- [ADR – 009 PoseStream vector tile-store persistence](sections/3X_Data_Storage/32-ADR-009 - PoseStream vector logs and layer TileStore persistence.md)
+- [ADR – 00XX SHM fastpath for Pumpkin Pi](sections/5X_Hardware_IO_Device_Layer/54-ADR-00XX - 00XX CM5 SHM Fastpath + HAL Plugin (Pumpkin Pi).md)
+- [ADR – 010 Layer registry for variable rate](sections/3X_Data_Storage/32-ADR-010 - Layer registry and variable-rate framework.md)
+- [ADR – 011 Mapping visualization imagery](sections/9X_Frontends_Ops/91-ADR-011 - Mapping and visualization imagery pipeline.md)
+- [ADR – 012 Multi-session PoseStream fusion](sections/3X_Data_Storage/32-ADR-012 - Multi-session and multi-PoseStream fusion.md)
+- [ADR – 013 Derived products & analytics prescriptions](sections/3X_Data_Storage/32-ADR-013 - Derived products and prescription analytics.md)
+- [ADR – 014 Interop prescription formats](sections/3X_Data_Storage/32-ADR-014 - Interop for prescription and agronomic formats.md)
+- [ADR – 015 Section control grouping semantics](sections/6X_Core_Domain_Services/61-ADR-015 - Section control and grouping semantics.md)
+- [ADR – 016 Firmware transport for variable-rate PGNs](sections/4X_Interprocess_Communications/42-ADR-016 - Firmware and transport for variable-rate layer PGNs.md)
+- [ADR – 017 Profiles & kinematics](sections/6X_Core_Domain_Services/61-ADR-017 - Equipment profiles and kinematics.md)
+- [ADR – 018 Plugin API](sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md)
+- [ADR – 019 Provenance, audit, and QA](sections/6X_Core_Domain_Services/64-ADR-019 - Provenance audit and QA governance.md)
+- [ADR – 020 Determinism replay CI](sections/9X_Frontends_Ops/96-ADR-020 - Determinism replay and CI guardrails.md)
+- [ADR – 021 Timebase clock sync](sections/4X_Interprocess_Communications/42-ADR-021 - Timebase and clock synchronization.md)
+- [ADR – 022 CRS units precision policy](sections/3X_Data_Storage/32-ADR-022 - CRS units and precision policy.md)
+- [ADR – 023 Session & job model](sections/6X_Core_Domain_Services/62-ADR-023 - Session and job model with provenance graph.md)
+- [ADR – 024 Discovery & identity](sections/4X_Interprocess_Communications/42-ADR-024 - Discovery and identity services.md)
+- [ADR – 025 Data lifecycle & retention](sections/3X_Data_Storage/34-ADR-025 - Data lifecycle and retention policy.md)
+- [ADR – 026 Performance budgets](sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md)
+- [ADR – 027 Spatial constraints](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md)
+- [ADR – 028 Stack boundaries](sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md)
+- [ADR – 029 Mapping plugin architecture](sections/7X_Mapping_Geospatial/72-ADR-029 - Mapping as a plugin with a minimal geospatial kernel in Core.md)
+- [ADR – 030 Field job sessions](sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md)
+- [ADR – 031 Official plugin bundle](sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md)
+- [ADR – 032 Presets and layout linking](sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md)
+- [ADR – 033 Guidance planner & autosteer](sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md)
+- [ADR – 034 Metadata-driven dashboards](sections/9X_Frontends_Ops/91-ADR-034 - Metadata-driven dashboards and inspector surfaces.md)
+- [ADR – 040 Season organizers](sections/3X_Data_Storage/31-ADR-040 - Season Organizers.md)
+- [ADR – 041 Job sessions](sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md)
+- [ADR – 043 Multi-field job envelopes](sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md)
+- [ADR – 044 Zone drawing framework](sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md)
+- [ADR – 045 Crop type plugin](sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md)
+- [ADR – 046 Genetics plugin](sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md)
+- [ADR – 047 Live telemetry mesh](sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md)
+- [ADR – 048 Radio bridge](sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md)
+- [ADR – 049 Yield plugin](sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md)
+- [ADR – 050 Cost & profit plugin](sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md)
+- [ADR – 051 Report builder](sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md)
+- [ADR – 052 Field health plugin](sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md)
+- [ADR – 053 Weather plugin](sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md)
+- [ADR – 054 Nexus CLI host](sections/9X_Frontends_Ops/93-ADR-054 - Nexus CLI Host and Plugin Verb Architecture.md)
+- [ADR – 067 Equipment configuration kinematics](sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md)
+- [ADR – 068 Layer controllers runtime](sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md)
+- [ADR – 069 Guidance orchestrator](sections/8X_Guidance/81-ADR-069 - Guidance Orchestrator plugin.md)
+- [ADR roadmap](sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md)
 
 ## Workflow expectations
 1. Start discussion in the matching GitHub Discussion for the section.
@@ -315,21 +315,21 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-DATA-004 | O-DATA-5 | [Compression ideas](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-006 (TBD) |
 | R-DATA-013 | O-DATA-5 | [Retention policy](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
 | R-DATA-014 | O-DATA-5 | [Schema hashes](sections/3X_Data_Storage/32_Persistence_Formats.md) | ADR-DATA-007 (TBD) |
-| R-DATA-026 | O-DATA-5 | [Spatial constraints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](../ADR/ADR-027-spatial-constraints.md) |
-| R-DATA-027 | O-DATA-5 | [Buffered footprints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](../ADR/ADR-027-spatial-constraints.md) |
-| R-DATA-028 | O-DATA-5 | [Indexed queries](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](../ADR/ADR-027-spatial-constraints.md) |
-| R-DATA-040 | O-DATA-5 | [Zone edit provenance](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-044](../ADR/ADR-044_ZoneDrawingFramework.md) |
-| R-DATA-041 | O-DATA-5 | [Crop history schema](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-045](../ADR/ADR-045_CropTypePlugin.md) |
-| R-DATA-042 | O-DATA-5 | [Session weather snapshot](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-053](../ADR/ADR-053_WeatherPlugin.md) |
-| R-DATA-043 | O-DATA-5 | [Plugin attribute schemas](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-044](../ADR/ADR-044_ZoneDrawingFramework.md) |
-| R-DATA-044 | O-DATA-5 | [Genetics records](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-046](../ADR/ADR-046_GeneticsPlugin.md) |
-| R-DATA-045 | O-DATA-5 | [Yield layers](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-049](../ADR/ADR-049_YieldPlugin.md) |
-| R-DATA-046 | O-DATA-5 | [Cost & profit schemas](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-050](../ADR/ADR-050_CostProfitPlugin.md) |
-| R-DATA-047 | O-DATA-5 | [Risk overlays](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-052](../ADR/ADR-052_FieldHealthPlugin.md) |
-| R-DATA-048 | O-DATA-5 | [Weather overlays](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-053](../ADR/ADR-053_WeatherPlugin.md) |
-| R-DATA-049 | O-DATA-5 | [Report templates](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-051](../ADR/ADR-051_ReportBuilder.md) |
-| R-DATA-050 | O-DATA-5 | [Inventory ledger](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-050](../ADR/ADR-050_CostProfitPlugin.md) |
-| R-DATA-051 | O-DATA-5 | [Inventory provenance](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-050](../ADR/ADR-050_CostProfitPlugin.md) |
+| R-DATA-026 | O-DATA-5 | [Spatial constraints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
+| R-DATA-027 | O-DATA-5 | [Buffered footprints](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
+| R-DATA-028 | O-DATA-5 | [Indexed queries](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-027](sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md) |
+| R-DATA-040 | O-DATA-5 | [Zone edit provenance](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-044](sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md) |
+| R-DATA-041 | O-DATA-5 | [Crop history schema](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-045](sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md) |
+| R-DATA-042 | O-DATA-5 | [Session weather snapshot](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-053](sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md) |
+| R-DATA-043 | O-DATA-5 | [Plugin attribute schemas](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-044](sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md) |
+| R-DATA-044 | O-DATA-5 | [Genetics records](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-046](sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md) |
+| R-DATA-045 | O-DATA-5 | [Yield layers](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-049](sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md) |
+| R-DATA-046 | O-DATA-5 | [Cost & profit schemas](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-050](sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md) |
+| R-DATA-047 | O-DATA-5 | [Risk overlays](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-052](sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md) |
+| R-DATA-048 | O-DATA-5 | [Weather overlays](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-053](sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md) |
+| R-DATA-049 | O-DATA-5 | [Report templates](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-051](sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md) |
+| R-DATA-050 | O-DATA-5 | [Inventory ledger](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-050](sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md) |
+| R-DATA-051 | O-DATA-5 | [Inventory provenance](sections/3X_Data_Storage/32_Persistence_Formats.md) | [ADR-050](sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md) |
 
 ### Section 61 — Kinematics & Pose Fusion
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |

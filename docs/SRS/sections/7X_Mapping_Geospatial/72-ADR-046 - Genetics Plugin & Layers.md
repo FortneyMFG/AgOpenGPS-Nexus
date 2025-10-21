@@ -53,18 +53,18 @@ coverage events to auto-write variety polygons during planting.
 - **Schema lineage.** `GeneticsPlan.v1` and `GeneticsVariety.v1` revisions must include upgrade/downgrade scripts for
   archived plans so cost, profit, and yield analytics consume a uniform attribute set across seasons.【F:schemas/GeneticsPlan.v1.json†L1-L120】【F:schemas/GeneticsVariety.v1.json†L1-L124】
 - **Barcode audit.** Change-log events capture scanner ID, operator, and session timestamps; regression fixtures validate they
-  replay identically through the Zone Drawing undo stack and mesh replication flows before releases are approved.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L21-L74】【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L66】
+  replay identically through the Zone Drawing undo stack and mesh replication flows before releases are approved.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L21-L74】【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L21-L66】
 - **Lot governance.** Inventory ledger integrations require matching `inventoryLotId` entries and reject cost posts that lack a
-  genetics reference, keeping Profit analytics aligned with planted varieties.【F:schemas/CostRecord.v1.json†L1-L160】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L9-L70】
+  genetics reference, keeping Profit analytics aligned with planted varieties.【F:schemas/CostRecord.v1.json†L1-L160】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L9-L70】
 
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - Session metadata now snapshots the active genetics assignment so replay and report builder exports can reconcile variety
-  changes with crop, yield, and profit overlays without scraping edit journals.【F:schemas/Session.v1.json†L1-L120】【F:docs/ADR/ADR-051_ReportBuilder.md†L9-L70】
+  changes with crop, yield, and profit overlays without scraping edit journals.【F:schemas/Session.v1.json†L1-L120】【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L9-L70】
 - Multi-field envelopes drive deterministic split exports: each mounted field receives per-variety acreage and cost share data,
-  avoiding ambiguous aggregates when a planter spans adjacent fields in one pass.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+  avoiding ambiguous aggregates when a planter spans adjacent fields in one pass.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】
 - Mesh broadcasts include hashed variety manifests so collaborating machines confirm they share identical seed catalogs before
-  exchanging coverage deltas, reducing drift in collaborative planting scenarios.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L9-L70】
+  exchanging coverage deltas, reducing drift in collaborative planting scenarios.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L9-L70】
 
 ## Alternatives Considered
 

@@ -2,8 +2,8 @@
 
 NX-295 refreshed the job session start/stop UX and NX-296 added
 multi-field job selection support aligned with
-[ADR-041](../ADR/ADR-041_JobSessions.md) and
-[ADR-043](../ADR/ADR-043_MultiFieldJobEnvelopes.md). The Avalonia UI layer now
+[ADR-041](../SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md) and
+[ADR-043](../SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md). The Avalonia UI layer now
 exposes dedicated presentation models that can be bound inside the job drawer
 or simulator surfaces.
 

@@ -23,12 +23,12 @@ sync while the contracts mature.
 
 - **Renderer cache alignment.** `WeatherOverlay.v1` surfaces `x-nexus-layerIds`
   so renderer caches can index imagery by layer ID instead of ad-hoc naming
-  conventions, matching ADR-011 guidance.【F:schemas/WeatherOverlay.v1.json†L1-L36】【F:docs/ADR/ADR-011-mapping-visualization-imagery.md†L1-L52】
+  conventions, matching ADR-011 guidance.【F:schemas/WeatherOverlay.v1.json†L1-L36】【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-011 - Mapping and visualization imagery pipeline.md†L1-L52】
 - **Fusion provenance.** Weather overlays participate in prescription fusion
   workflows; provenance must include the overlay hash so QA harnesses confirm the
-  same dataset fed ADR-013 derivations.【F:schemas/examples/WeatherOverlay.sample.json†L1-L31】【F:docs/ADR/ADR-013-derived-products-analytics-prescriptions.md†L11-L42】
+  same dataset fed ADR-013 derivations.【F:schemas/examples/WeatherOverlay.sample.json†L1-L31】【F:docs/SRS/sections/3X_Data_Storage/32-ADR-013 - Derived products and prescription analytics.md†L11-L42】
 
 ## References
-- [ADR-011 — Mapping & Imagery Visualization](../ADR/ADR-011-mapping-visualization-imagery.md)
-- [ADR-053 — Weather Plugin](../ADR/ADR-053_WeatherPlugin.md)
+- [ADR-011 — Mapping & Imagery Visualization](../SRS/sections/9X_Frontends_Ops/91-ADR-011 - Mapping and visualization imagery pipeline.md)
+- [ADR-053 — Weather Plugin](../SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md)
 - [Layer registry overview](../SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md)

@@ -13,6 +13,6 @@ Gauge IDs from 240–255 are reserved for vendor-specific or experimental mappin
 
 ## Related ADRs
 
-- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
-- [ADR-017 — Profiles & Kinematics](../../ADR/ADR-017-profiles-kinematics.md)
-- [ADR-047 — Live Telemetry Mesh](../../ADR/ADR-047_LiveTelemetryMesh.md)
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../sections/4X_Interprocess_Communications/42-ADR-016 - Firmware and transport for variable-rate layer PGNs.md)
+- [ADR-017 — Profiles & Kinematics](../sections/6X_Core_Domain_Services/61-ADR-017 - Equipment profiles and kinematics.md)
+- [ADR-047 — Live Telemetry Mesh](../sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md)

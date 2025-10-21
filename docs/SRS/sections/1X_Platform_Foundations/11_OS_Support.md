@@ -1,4 +1,10 @@
 # 11 — OS Support
+
+> **In plain terms:** We promise operators that Windows installs keep working while
+> we grow a Linux-friendly service build. Think of it as keeping today’s cab PCs
+> happy, adding a headless Linux box for fleets, and laying the groundwork so a
+> phone or tablet can join later without rewriting everything.
+
 *(Status: Proposed)*
 
 **Author:** Codex  
@@ -26,6 +32,18 @@ This section clarifies which platforms must remain first-class, how emerging Lin
 - Contributors are piloting Linux (Ubuntu/Debian) deployments for headless Core + remote UI flows.
 - AgIO abstracts hardware access but currently depends on Windows-first device APIs; Linux alternatives require parity validation.
 - Multi-monitor cabs, kiosk installs, and potential Android/iOS companions impose usability and packaging constraints.
+
+### Questions operators ask
+
+- **“Can I keep using the Windows installer I already know?”** Yes—the Windows build remains first-class and is validated on every release.
+- **“What happens if I want to run Nexus on a Raspberry Pi or CM5?”** The Linux headless build provides systemd units and packaging so you can drop it onto those devices.
+- **“How do I know if my graphics card is fast enough?”** Section 11.5 documents the 60 FPS benchmark and points to the reference hardware list.
+
+### Scenario: Launching a new mixed fleet
+
+1. A dealer installs the familiar Windows desktop app in the cab so operators recognize the workflow.
+2. The same farm adds a Linux CM5 running the headless Core, using systemd packaging to keep it running without manual babysitting.
+3. Later, the team tests a tablet-based companion UI; the dual-first requirements ensure Avalonia keeps layouts consistent across every screen.
 
 ---
 
@@ -70,6 +88,11 @@ This section clarifies which platforms must remain first-class, how emerging Lin
 | R-OS-006 | SHOULD | Performance | Document baseline hardware capable of sustaining 60 FPS rendering. | Hardware survey | Hardware validation bench capturing FPS |
 | R-OS-007 | SHOULD | Mobility | Plan for Android/iOS targets that reuse Avalonia UI with minimal conditional code. | Mobile WG notes | Companion app prototypes hitting UI parity checklist |
 | R-OS-008 | COULD | Mobility | Map USB-OTG serial/Bluetooth SPP/BLE integrations to shared AgIO abstractions. | Mobile WG notes | Android pilot verifying IO parity |
+
+> **Why it matters:** These requirements guarantee a familiar Windows download for
+> current farms, introduce a reliable Linux service build for fleets, and keep us
+> honest about documenting hardware expectations so newcomers know if their gear
+> is powerful enough.
 
 ### 11.5.1 Requirement Sources & Rationale
 

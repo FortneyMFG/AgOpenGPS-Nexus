@@ -1,6 +1,23 @@
 # AgOpenGPS Next SRS
 
-Welcome to the Software Requirements Specification (SRS) workspace for the next generation of AgOpenGPS. This folder curates requirements, options, and discussions before the community makes architecture decisions.
+Welcome to the Software Requirements Specification (SRS) workspace for the next generation of AgOpenGPS.
+
+## What lives here
+
+- **Software Requirements Specification (SRS)** – The living catalogue of _what_ the Nexus platform must do. It captures scope, constraints, and success criteria before any code is written.
+- **Architecture Decision Records (ADRs)** – Lightweight memos that explain _why_ we chose a solution once the community agrees on a direction. Every ADR links back to the requirements and options that shaped the choice.
+- **Options, decision matrices, and references** – Supporting material that keeps trade-off discussions grounded in data and traceable from requirement ➜ option ➜ decision.
+
+Think of the SRS as the map and the ADRs as the signposts we install along the route. Reading them together helps newcomers understand the current plan and gives maintainers the context needed to revisit earlier choices.
+
+### Quick start for new readers
+
+1. Skim the [Vision & Non-goals](01_Vision_NonGoals.md) to understand the product direction and deliberate omissions.
+2. Jump to the [System slices](02_System_Slices.md) index and find the area that matches your question (e.g., UI, hardware IO, guidance).
+3. Open the corresponding section under [`sections/`](sections/) to see requirements (`R-` IDs), open questions (`Q-` IDs), and option stubs (`O-` IDs).
+4. Follow links into ADRs when you need the final decision, implementation guardrails, or rollout notes.
+
+Returning contributors can skip straight to sections flagged "Under review" or "Ready for ADR" to catch the latest work-in-progress discussions.
 
 ## Revision log
 | Date | Summary | Key slices |

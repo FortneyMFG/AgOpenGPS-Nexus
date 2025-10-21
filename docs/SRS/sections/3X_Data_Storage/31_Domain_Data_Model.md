@@ -1,170 +1,212 @@
-# 31 — Domain Data Model: Farm → Field and Season → Job → Session Hierarchies (Status: aligned with ADR-040/041/043)
+# 31 — Domain Data Model
+*(Status: review)*
 
-## Overview
+**Section ID:** 31
+**Version:** 0.2.0
+**Editors:** @nexus-docs-team
+**Last Updated:** 2025-02-14
+**Related Sections:** [32 — Persistence & Formats](32_Persistence_Formats.md), [33 — Offline-first & Sync](33_Offline_First_Sync.md), [34 — Backup, Retention & Archival](34_Backup_Retention_Archival.md)
+**Upstream Dependencies:** [ADR-040](31-ADR-040 - Season Organizers.md), [ADR-041](../6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md), [ADR-043](31-ADR-043 - Multi-Field Job Envelopes.md), [ADR-044](../7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md)
+**Downstream Impacts:** Schema contracts under `schemas/`, layer catalog governance, season navigation UX, plugin provenance pipelines
 
-Nexus manages agronomic work using two complementary hierarchies:
+---
 
-1. **Spatial hierarchy — Farm → Field:** Organizes reusable geometry, imagery, and operational metadata.
-2. **Operational hierarchy — Season → Job → Session:** Structures planned and actual work across time, equipment, and
-   multi-field envelopes.
+## 31.1 Purpose & Scope
 
-These hierarchies share identifiers, authoring metadata, and provenance so Core, plugins, and analytics can traverse
-relationships without relying on filesystem structure alone. Every primary entity carries immutable IDs, human-readable labels,
-and audit fields (`createdBy`, `createdAt`, `lastModifiedAt`). Core owns the lifecycle of these fields while plugins attach
-domain-specific facts through `extensions` bags that Core stores verbatim.
+This section defines the canonical agronomic data hierarchy that Nexus uses to organise spatial assets and operational work. It establishes the Farm → Field spatial lineage, the Season → Job → Session operational cadence, and the shared provenance metadata that binds layers, journals, and analytics across the platform. The scope covers Core-managed identities, plugin extension points, schema ownership, and provenance guarantees required for deterministic replay and compliance reporting.
 
-### Core vs. plugin responsibilities
+---
 
-| Area | Core-owned | Plugin-extendable |
-| --- | --- | --- |
-| Identity & metadata | `id`, `name`, authoring metadata, relationship pointers, immutable `createdBy/createdAt/lastModifiedAt` | Derived analytics (`cropType.*`, profitability summaries), historical annotations |
-| Geometry | Farm/field polygons, headlands, shared assets | Zone drawings, prescription overlays stored as layers via LayerEditService |
-| Operational hierarchy | Season/job/session creation, lifecycle events, journaling checkpoints, context publication events | Session extensions, job-level agronomic insights, plugin-specific lifecycle listeners |
-| Provenance | `jobId`, `sessionId`, `createdAt`, `hash`, actor | Additional provenance attributes per plugin (e.g., calibration IDs, source payload hashes) |
+## 31.2 Context
 
-## Entities
+- Core persists immutable identifiers and authoring metadata for every entity, providing a stable anchor for synchronization, schema validation, and provenance reconciliation.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L12-L156】
+- Plugins enrich the hierarchy through `extensions` payloads while respecting Core-owned fields documented in JSON schemas under `schemas/` and ADR-040…ADR-045.【F:schemas/Farm.v1.json†L1-L92】【F:schemas/Field.v1.json†L1-L154】【F:schemas/Season.v1.json†L1-L91】【F:schemas/Job.v1.json†L1-L146】【F:schemas/Session.v1.json†L1-L115】
+- Season organisers, job lifecycle services, and layer journaling depend on this hierarchy to coordinate multi-field work, cross-session analytics, and operator navigation flows.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-040 - Season Organizers.md†L14-L104】【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L32-L121】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
 
-### Farm.v1
-- **Identity:** `farm:<slug>` unique to the operator organization.
-- **Core attributes:** `name`, authoring metadata, optional imagery/asset references, shared notes for operators.
+Assumptions and exclusions:
+- Legacy AgOpenGPS file layouts remain supported through import/export bridges but do not dictate identifier formats or metadata ownership going forward.
+- Hardware inventories, regulatory exports, and analytics layers reference the entities defined here but are specified in their respective SRS sections.
+
+---
+
+## 31.3 Legacy Comparison
+
+| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
+|---------------|-----------------|------------------------|---------------------------|--------------------|
+| Architecture | Directories per field/job with implicit relationships encoded by folder names. | Coupled storage prevents cross-field jobs and season views. | Normalize hierarchies with explicit IDs and schema-governed relationships. | [ADR-040](31-ADR-040 - Season Organizers.md) |
+| Performance | Flat files per session/layer without provenance hashes. | Hard to audit or replay deterministically. | Embed provenance hashes and session references in schemas to enable deterministic replay. | [ADR-041](../6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md) |
+| UX / Config | Operators pivot between farms and seasons manually; plugins store bespoke metadata. | Inconsistent navigation, brittle plugin integrations. | Provide shared navigation flows (Season-first, Farm-first) and typed `extensions` namespaces for plugins. | [ADR-043](31-ADR-043 - Multi-Field Job Envelopes.md) |
+
+---
+
+## 31.4 Definitions
+
+| Term | Definition |
+|------|-------------|
+| Farm.v1 | Core-owned entity describing operator farms, spatial assets, and shared metadata.【F:schemas/Farm.v1.json†L1-L92】 |
+| Field.v1 | Spatial child of a farm containing polygons, headlands, and crop history extensions.【F:schemas/Field.v1.json†L1-L154】 |
+| Season.v1 | Operational grouping aggregating jobs across farms and years.【F:schemas/Season.v1.json†L1-L91】 |
+| Job.v1 | Work package referencing farms, fields, seasons, and sessions with plugin extension hooks.【F:schemas/Job.v1.json†L1-L146】 |
+| Session.v1 | Execution slice within a job carrying environment snapshots, layer references, and provenance.【F:schemas/Session.v1.json†L1-L115】 |
+| Layer.v1 | Persisted output or telemetry layer storing provenance, units, and attachments.【F:schemas/Layer.v1.json†L1-L117】 |
+| LayerEditEvent.v1 | Journal entry capturing deterministic layer edit provenance and undo/redo linkage.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】 |
+| CropTypeHistoryRecord.v1 | Embedded history for crop rotations tied to fields and crop layers.【F:schemas/CropTypeHistoryRecord.v1.json†L1-L53】 |
+
+---
+
+> **Requirement Grammar (RFC-2119):**
+> - **MUST / MUST NOT** = mandatory; test must exist.
+> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.
+> - **MAY** = optional; document enabling conditions.
+>
+> **Clarity Checklist:** Avoid weak words: *fast, robust, user-friendly, handle, support, adequate,* etc.
+> Prefer measurable forms: *“≤ 250 ms p95,” “error rate < 0.1%,” “99.5% success over 10k trials.”*
+> Each requirement: single behavior, single actor, single condition, single metric.
+
+## 31.5 Requirements
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|-----------|---------|-----------------|-----------------------------|
+| R-31000 | MUST | Capability | Core MUST persist canonical Farm → Field and Season → Job → Session hierarchies with immutable IDs and authoring metadata. | C1, ADR-040 | Schema validation against `Farm.v1`, `Field.v1`, `Season.v1`, `Job.v1`, `Session.v1`; round-trip sync tests.【F:schemas/Farm.v1.json†L1-L92】【F:schemas/Job.v1.json†L1-L146】 |
+| R-31001 | MUST | Provenance | Every entity MUST expose `createdBy`, `createdAt`, and `lastModifiedAt` with Core ownership; plugins MAY extend via `extensions`. | C2, ADR-041 | Contract tests ensuring read-only enforcement and plugin serialization.【F:schemas/Field.v1.json†L29-L151】 |
+| R-31002 | SHOULD | Extensibility | Plugins SHOULD register schema references for extension payloads to enable validation without Core interpretation. | C3, ADR-045 | Plugin schema registry acceptance tests (lint + CI).【F:schemas/CropTypeHistoryRecord.v1.json†L1-L53】 |
+| R-31003 | MUST | Provenance | Layers MUST record `jobId`, `sessionId?`, provenance hashes, and actor metadata for deterministic replay. | C4, ADR-044 | Layer fixture replay verifying provenance chain integrity.【F:schemas/Layer.v1.json†L21-L117】 |
+| R-31004 | MUST | Observability | Sessions MUST capture weather snapshots with defined metrics and emit deltas on update. | C5, ADR-053 | Weather snapshot schema validation; replay harness diff tests.【F:schemas/Session.v1.json†L64-L113】 |
+| R-31005 | SHOULD | Navigation | UI flows SHOULD offer Season-first and Farm-first traversals backed by canonical hierarchy queries. | C6, ADR-040 | UX acceptance checklist; navigation integration tests.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-040 - Season Organizers.md†L58-L104】 |
+| R-31006 | MAY | Analytics | Cost, profit, genetics, and risk analytics MAY attach domain-specific facts using `extensions` while preserving Core-owned identifiers. | C7, ADR-050 | Plugin integration smoke tests verifying extensions do not mutate Core fields.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】 |
+
+### 31.5.1 Requirement Sources & Rationale
+
+| Req ID | Source (issue/discussion/standard) | Rationale (one line) |
+|--------|-------------------------------------|----------------------|
+| R-31000 | ADR-040 review minutes, NX-223 season aggregator rollout | Cross-device season navigation requires normalized IDs. |
+| R-31001 | ADR-041 session lifecycle QA notes | Provenance auditing demands immutable authoring metadata. |
+| R-31002 | ADR-045 crop history schema briefing | Plugin-managed schemas avoid Core re-release for analytics updates. |
+| R-31003 | ADR-044 layer journaling sign-off | Replay harnesses depend on consistent provenance chaining. |
+| R-31004 | ADR-053 weather plugin kickoff | Compliance exports and agronomy analytics need structured weather snapshots. |
+| R-31005 | Season navigator UX study | Operators require both season-centric and farm-centric workflows. |
+| R-31006 | ADR-050 cost/profit governance | Financial analytics must extend Core entities without breaking provenance. |
+
+---
+
+## 31.6 Acceptance Criteria & Verification
+
+> **Examples:**
+> - Automated unit or integration test coverage thresholds.
+> - Simulated scenario replay verification.
+> - Manual review or field test sign-off checklist.
+
+### 31.6.1 Requirement-to-Verification Map
+
+| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
+|--------|--------------------|---------------------|---------------------|
+| R-31000 | Contract tests | `tests/Core/DomainHierarchyTests.cs` (planned) | CRUD + sync round-trips preserve IDs and metadata. |
+| R-31001 | Schema lint + CI | `schemas/*.json` validation suite | JSON schema CI reports 0 violations per release. |
+| R-31002 | Plugin integration | `plugins/*/tests/ExtensionSchemaTests.cs` | Extensions register schema refs and serialize without Core diffs. |
+| R-31003 | Replay harness | `tests/Replays/LayerProvenanceReplay.md` | Deterministic hash match across 10k frames. |
+| R-31004 | Simulation fixture | `tests/Replays/WeatherSnapshotReplay.md` | Weather snapshots diff-free against baseline. |
+| R-31005 | UX acceptance | `docs/QA/navigation-checklist.md` | All navigation tasks completed ≤ 3 steps. |
+| R-31006 | Plugin smoke | `plugins/*/tests/ExtensionInvarianceTests.cs` | Core-owned fields unchanged after plugin persistence cycles. |
+
+---
+
+## 31.7 Constraints
+
+- Identifiers MUST use lowercase slugs with ASCII-safe separators (`-`, `_`, `.`, `:`) for filesystem and URI safety.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L58-L104】
+- `fieldIds` MUST reference farms explicitly authorized for a job; cross-farm jobs require explicit envelopes defined in ADR-043.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L32-L121】
+- Authoring metadata (`createdBy`, `createdAt`) is immutable after persistence; updates MUST write `lastModifiedAt` instead.【F:schemas/Job.v1.json†L63-L142】
+- Sessions MUST maintain stable IDs to preserve layer provenance across edits and sync operations.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L40-L92】
+
+### 31.7.1 Non-Functional Requirement Classes
+
+- **Performance:** Hierarchy queries return within 150 ms p95 for 10k entities (target for future performance ADRs).
+- **Reliability & Availability:** Sync conflicts resolved deterministically with eventual convergence under offline merges.
+- **Security:** Access control inherits from operator identities and season membership policies (see ADR-019).
+- **Safety:** Provenance integrity underpins audit trails for agronomic compliance.
+- **Usability/UX:** Navigation flows minimize context switching between season-first and farm-first journeys.
+- **Operability:** Audit logs track all hierarchy mutations with actor attribution.
+- **Portability:** JSON schema definitions remain serializable across Windows and Linux deployments.
+- **Maintainability:** Entity schemas versioned via semantic suffixes (`*.v1`) with migration notes in ADRs.
+
+---
+
+## 31.8 Risks & Open Issues
+
+| ID | Description | Impact | Mitigation / Status | Owner |
+|----|-------------|--------|---------------------|-------|
+| RISK-31-1 | Legacy file imports may omit provenance metadata required by new schemas. | Medium | Import bridge injects default provenance and flags gaps for operator review. | @nexus-docs-team |
+| RISK-31-2 | Plugin extensions without schema refs reduce validation coverage. | Medium | Enforce schema registration via CI guardrails (planned). | @nexus-platform |
+| ISSUE-31-1 | Need authoritative navigation API for season-first queries. | Low | Draft API in progress under ADR-040 follow-up. | @nexus-core |
+
+---
+
+## 31.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Canonical Hierarchies | Farm → Field and Season → Job → Session must remain the system of record across services and storage layers. |
+| C2 | Provenance Integrity | Immutable authoring metadata and provenance hashes are required for replay, analytics, and compliance. |
+| C3 | Plugin Extensions | `extensions` namespaces allow domain innovation without Core schema churn but must reference typed schemas. |
+| C4 | Layer Provenance | Layers depend on stable job/session IDs and provenance journals for deterministic reuse. |
+| C5 | Environment Context | Weather snapshots and operator notes enrich sessions for analytics and reporting. |
+| C6 | Operator Navigation | UI clients need both season-centric and farm-centric traversal patterns. |
+| C7 | Analytics Attachments | Financial, genetics, and risk analytics attach to jobs/sessions via extensions while preserving Core ownership. |
+
+### 31.9.1 Assumptions & Preconditions
+
+- [A1] PoseStream vector logs provide ≥ 25 Hz pose data referenced by sessions and layers.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L30-L156】
+- [A2] Network time synchronization keeps distributed rigs within ±50 ms, ensuring provenance timestamps remain ordered.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
+- [A3] Operators retain write access to job data directories required for journaling and sync tools.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L121-L156】
+
+### 31.9.2 Entity Profiles
+
+The following summaries capture Core vs. plugin responsibilities per entity. Detailed schema definitions live under `schemas/`.
+
+#### Farm.v1
+- **Identity:** `farm:<slug>` unique to the operator organisation.
+- **Core Attributes:** `name`, authoring metadata, optional imagery/asset references, shared operator notes.
 - **Relationships:** Owns one or more fields; referenced as the primary farm on a job.
-- **Plugin extensions:** `extensions` may include crop-type plans, profitability projections, or geojson overlays published by
-  analytics plugins.
-- **Schema:** `schemas/Farm.v1.json` (draft) defines required fields, authoring metadata, and asset metadata, with `x-nexus-scope`
-  flags denoting core vs plugin control.【F:schemas/Farm.v1.json†L1-L92】
+- **Plugin Extensions:** Crop plans, profitability projections, geojson overlays stored verbatim in `extensions`.
+- **Schema:** `schemas/Farm.v1.json` defines required fields and scope annotations.【F:schemas/Farm.v1.json†L1-L92】
 
-### Field.v1
-- **Identity:** `field:<slug>` unique within the owning farm.
-- **Core attributes:** Polygons (with holes), tags/headlands, notes, authoring metadata.
+#### Field.v1
+- **Identity:** `field:<slug>` unique within a farm.
+- **Core Attributes:** Polygons with optional holes, headlands, tags, notes, authoring metadata.
 - **Relationships:** Belongs to a farm; referenced by jobs via `fieldIds`.
-- **Geometry:** Stored as polygon exteriors and optional holes using `[lon, lat (, elevation)]` coordinates; headlands capture
-  width, units, and optional pass counts.
-- **Plugin extensions:** Zone drawings, soil sampling layers, crop rotation histories recorded inside `extensions`.
-- **Crop history:** `cropTypeHistory[]` (plugin-owned) records chronological crop assignments with `year`, `crop`, `status`,
-  `source`, `layerId`, and optional `notes`, enabling analytics without mutating core geometry.
-- **Schema:** `schemas/Field.v1.json` documents the geometry, metadata layout, authoring fields, crop history extensions, and
-  plugin hooks.【F:schemas/Field.v1.json†L1-L154】
+- **Geometry:** Stored as polygon exteriors and holes using `[lon, lat (, elevation)]` coordinates; headlands capture width, units, optional pass counts.
+- **Plugin Extensions:** Zone drawings, soil sampling, crop rotation histories inside `extensions`.
+- **Schema:** `schemas/Field.v1.json` outlines geometry metadata and plugin hooks.【F:schemas/Field.v1.json†L1-L154】
 
-### Season.v1
-- **Identity:** `season:<year-or-label>` unique across the operator’s deployment.
-- **Core attributes:** `name`, date range, ordered `jobIds`, optimizer state, authoring metadata.
-- **Relationships:** May contain jobs from multiple farms; referenced by jobs through `seasonId`.
-- **Plugin extensions:** Budget snapshots, crop rotation targets, planned profitability stored within `extensions`.
-- **Schema:** `schemas/Season.v1.json` establishes the payload, authoring metadata, and validator fields.【F:schemas/Season.v1.json†L1-L91】
+#### Season.v1
+- **Identity:** `season:<year-or-label>` unique across deployments.
+- **Core Attributes:** `name`, date range, ordered `jobIds`, optimizer state, authoring metadata.
+- **Relationships:** Aggregates jobs from multiple farms; referenced by jobs via `seasonId`.
+- **Plugin Extensions:** Budget snapshots, crop rotation targets, planned profitability.
+- **Schema:** `schemas/Season.v1.json` documents payload and validator fields.【F:schemas/Season.v1.json†L1-L91】
 
-### Job.v1
+#### Job.v1
 - **Identity:** `job:<slug>` stable across devices.
-- **Core attributes:** Primary `farmId`, multi-field `fieldIds[]`, operation classification, planned/actual timing, authoring
-  metadata, per-field statistics.
-- **Relationships:** Optionally linked to a Season; contains Sessions; references Layers created during execution.
-- **Plugin extensions:** Profitability models, zone analytics, crop genetics overlays, and other plugin-owned data live in the
-  `extensions` object.
-- **Schema:** `schemas/Job.v1.json` adds `seasonId?`, `fieldIds[]`, `sessions[]`, authoring metadata, and extension hooks for
-  multi-field envelopes and session tracking.【F:schemas/Job.v1.json†L1-L146】
+- **Core Attributes:** Primary `farmId`, multi-field `fieldIds[]`, operation classification, planned/actual timing, authoring metadata, per-field statistics.
+- **Relationships:** Optionally linked to a season; contains sessions; references layers created during execution.
+- **Plugin Extensions:** Profitability models, analytics overlays, plugin-owned lifecycle data.
+- **Schema:** `schemas/Job.v1.json` sets envelope semantics and extension hooks.【F:schemas/Job.v1.json†L1-L146】
 
-### Session.v1
+#### Session.v1
 - **Identity:** `session:<number-or-uuid>` unique within a job.
-- **Core attributes:** Name, start/end timestamps, environment snapshot, input summary, notes, `layerRefs[]`, authoring
-  metadata.
-- **Relationships:** Belongs to a job; referenced by layers for provenance; surfaced to plugins via lifecycle events.
-- **Weather snapshot:** `weatherSnapshot` (core-owned) captures temperature, humidity, wind, rainfall, and pressure samples at
-  session start with optional incremental updates emitted via lifecycle events.
-- **Plugin extensions:** Session `extensions` collect crop-type actuals, rate summaries, operator journals, weather analytics,
-  and other plugin insights.
-- **Schema:** `schemas/Session.v1.json` captures required metadata, authoring fields, weather snapshots, and flexible extension
-  hooks.【F:schemas/Session.v1.json†L1-L115】
+- **Core Attributes:** Name, start/end timestamps, environment snapshot, input summary, notes, `layerRefs[]`, authoring metadata.
+- **Relationships:** Belongs to a job; referenced by layers for provenance.
+- **Weather Snapshot:** Captures environmental metrics with optional updates emitted via lifecycle events.
+- **Plugin Extensions:** Journals, rate summaries, operator notes, analytics metadata.
+- **Schema:** `schemas/Session.v1.json` defines required metadata and extension hooks.【F:schemas/Session.v1.json†L1-L115】
 
-### Layer.v1 (update)
-- **Identity:** `layer:<slug>` stable across storage round-trips.
-- **Core attributes:** Kind, units, job/session references, provenance object (source, transform, hash, createdAt, actor,
-  authoring metadata), attachments.
-- **Relationships:** Linked to the producing job/session; reused layers retain provenance but may be mounted by later jobs via
-  metadata updates.
-- **Plugin extensions:** Plugins may append statistics or derived summaries in `extensions` while Core guards canonical
-  provenance.
-- **Schema:** `schemas/Layer.v1.json` codifies provenance, authoring metadata, and extension requirements for reuse/move
-  operations.【F:schemas/Layer.v1.json†L1-L117】
+#### Layer.v1 and Journals
+- **Layer.v1:** Stores kind, units, job/session references, provenance object, attachments, and plugin extensions.【F:schemas/Layer.v1.json†L1-L117】
+- **LayerEditEvent.v1:** Immutable journal entries linking edits to jobs, sessions, and collaborative mesh replication.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
 
-### LayerEditEvent.v1 (new)
-- **Identity:** `layerEdit:<uuid>` immutable journal entries emitted by the Zone Drawing Framework.
-- **Core attributes:** `layerId`, `jobId`, `sessionId`, `context.farmId`, `context.fieldIds[]`, `tool`, `actor`, `createdAt`,
-  `operations[]` (create/update/delete/merge/split descriptors), `tileRefs[]`, `operationGroupId`, `previousHash`, `nextHash`
-  for undo/redo chains.
-- **Relationships:** Linked to layers and sessions; consumed by collaborative mesh replication and analytics plugins.
-- **Schema:** `schemas/LayerEditEvent.v1.json` enumerates operation payloads (geometry diffs, vertex edits, JSON Patch attribute
-  updates) and provenance metadata, marking geometry diffs as Core-owned and attribute payloads as plugin-extendable.
+#### Embedded Records
+- **CropTypeHistoryRecord.v1:** Records crop status, year, source, and provenance references for analytics without mutating core geometry.【F:schemas/CropTypeHistoryRecord.v1.json†L1-L53】
+- **GeneticsPlan.v1 / GeneticsVariety.v1:** Plugin-owned plan/actual layer schemas preserving provenance to jobs/sessions.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md†L21-L66】
+- **CostRecord.v1 / ProfitLayer.v1:** Financial extensions capturing expenses, revenues, and attribution.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】
+- **WeatherOverlay.v1:** Raster overlays referencing weather sources with plugin-owned value arrays.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L21-L49】
 
-### CropTypeHistoryRecord.v1 (new)
-- **Identity:** Embedded within `Field.cropTypeHistory[]`.
-- **Core attributes:** `year`, `crop`, `status` (`planned`, `actual`, `historical`), `source`, `layerId`, `recordedAt`, optional `jobId`/`sessionId`, authoring metadata.【F:schemas/CropTypeHistoryRecord.v1.json†L1-L53】
-- **Relationships:** References layers produced by the Crop Type plugin; optional job/session references let analytics and reporting link directly to the originating work context while informing crop context broadcasts.【F:schemas/CropTypeHistory.v1.json†L20-L55】
-- **Schema:** `schemas/CropTypeHistoryRecord.v1.json` defines validation and plugin ownership flags.
-
-### GeneticsPlan.v1 & GeneticsVariety.v1 (new)
-- **Identity:** `layer:<namespace>` features persisted by the Genetics plugin.
-- **Core attributes:** Immutable IDs, layer references, authoring metadata, provenance to jobs/sessions.
-- **Plugin attributes:** `brand`, `product`, `traitStack`, `lot`, `treatment`, `source`, `notes`, `appliedAt` (actual layer), and
-  barcode/change-log metadata.
-- **Schema:** `schemas/GeneticsPlan.v1.json` and `schemas/GeneticsVariety.v1.json` separate Core-owned provenance from plugin
-  attribute namespaces.
-
-### CostRecord.v1 & ProfitLayer.v1 (new)
-- **CostRecord.v1:** Stores granular expenses with scope (`farmId`, `fieldId?`, `jobId?`, `sessionId?`), `category`, `amount`,
-  `currency`, `quantity`, authoring metadata, optional layer references for attribution, and `inventoryLotId` hooks back to
-  the material ledger when deductions affect tracked stock.
-- **ProfitLayer.v1:** Extends `Layer.v1` with `revenuePerArea`, `costPerArea`, `profitPerArea`, and links to contributing
-  sources via `yieldLayerId`, `costLayerIds`, and audited `costRecordIds`.
-- **Schema:** `schemas/CostRecord.v1.json` and `schemas/ProfitLayer.v1.json` mark financial fields as plugin-owned while Core
-  enforces ID and provenance integrity.
-
-### WeatherOverlay.v1 (new)
-- **Identity:** `layer:weather.overlay:<timestamp>`.
-- **Core attributes:** Weather raster grid metadata (units, spatial resolution), authoring metadata, provenance to source
-  station/API.
-- **Schema:** Documented via `schemas/WeatherOverlay.v1.json` with plugin-owned value arrays and Core-owned metadata.
-
-## Relationships & Constraints
-
-| Parent | Child | Cardinality | Notes |
-| --- | --- | --- | --- |
-| Farm | Field | 1 → N | Fields inherit shared assets from the farm. |
-| Season | Job | 0 → N | Jobs may omit `seasonId`; seasons can aggregate jobs across farms. |
-| Farm | Job | 1 → N | Every job declares a primary farm; multi-farm jobs use multiple entries in `fieldIds`. |
-| Job | Session | 1 → N | Session 1 auto-creates on job start; additional sessions created by operator. |
-| Job/Session | Layer | 0 → N | Layers record job and optional session provenance; reuse retains source IDs. |
-
-Additional constraints:
-- `fieldIds` must reference fields that belong to either the job’s primary farm or explicitly shared farms when cross-farm work
-  is planned.
-- Session IDs must remain stable during lifecycle operations so layer provenance stays intact.
-- Seasons deduplicate `jobIds`; synchronization merges the set without re-ordering active job lists unless explicitly managed by
-  the operator.
-- Authoring metadata is immutable once persisted; updates create new `lastModifiedAt` timestamps but do not change `createdBy`
-  or `createdAt`.
-
-## Identifier & Provenance Policies
-
-- Identifiers use lowercase slugs with ASCII-safe separators (`-`, `_`, `.`, `:`) to support filesystem storage and URIs.
-- Provenance entries record `source`, `transform`, `hash`, `createdAt`, and optional `actor` to trace layer reuse and analytics
-  derivations.
-- When moving a layer between jobs, tooling updates `jobId`/`sessionId` while appending provenance records; data duplication is
-  discouraged in favor of lightweight relinking.
-
-## UX & Navigation Implications
-
-- Navigators support **Season-first** (Season → Farm(s) → Job → Session) and **Farm-first** (Farm → Field → Job → Session) flows.
-- Multi-field jobs present aggregated statistics with drill-down to per-field metrics sourced from `job.stats.fields` plus
-  plugin-augmented overlays (crop type, profitability) surfaced from `job.extensions`.
-- Operators can start a new session mid-job, capturing the environment snapshot and notes without closing the job.
-
-## Open Questions
-
-- How should optimizer state be versioned to ensure backwards compatibility between season planners?
-- What access controls are required when seasons span multiple organizations or contractors?
-
-## Related ADRs
-
-- [ADR-023 — Session & Job Model](../../ADR/ADR-023-session-job-model.md)
-- [ADR-030 — Field Job Sessions](../../ADR/ADR-030-field-job-sessions.md)
-- [ADR-040 — Season Organizers](../../ADR/ADR-040_SeasonOrganizers.md)
-- [ADR-043 — Multi-Field Job Envelopes](../../ADR/ADR-043_MultiFieldJobEnvelopes.md)
+---

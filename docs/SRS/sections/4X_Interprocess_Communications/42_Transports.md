@@ -1,115 +1,200 @@
-# 42 — Transports (Status: collecting proposals)
+# 42 — Transports
+*(Status: Proposed)*
 
-## Problem statement
-Define how field devices, guidance engines, and remote clients exchange data across serial, UDP, CAN, and higher-level transports with resiliency and observability.
+**Author:** Codex
+**Created:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Section ID:** 42
+**Editors:** Interprocess Communications Working Group
+**Last Updated:** 2025-10-20
+**Related Sections:** 21 — System Decomposition & Boundaries, 53 — AOG-Link Compatibility, 61 — Kinematics & Pose Fusion
+**Upstream Dependencies:** 1X — Platform Foundations, 2X — System Architecture
+**Downstream Impacts:** 5X — Hardware IO Device Layer, 6X — Core Domain Services, 7X — Mapping & Geospatial
 
-## Requirements (from contributors)
-- R-COMM-000 (MUST, current-AgIO): Preserve the serial port management that bridges GPS, IMU, steer, and machine modules through configurable baud/port settings.【F:SourceCode/AgIO/Source/Forms/FormCommSetGPS.cs†L20-L160】
-- R-COMM-001 (MUST, current-AgIO): Maintain UDP discovery, scanning, and monitoring workflows used to find and supervise field modules.【F:SourceCode/AgIO/Source/Forms/FormUDP.cs†L13-L160】【F:SourceCode/AgIO/Source/Forms/FormUDPMonitor.cs†L8-L100】
-- R-COMM-002 (MUST, current-AgOpenGPS): Continue emitting and receiving CAN/UDP PGNs that drive auto-steer, machine control, and section data flows.【F:SourceCode/GPS/Forms/PGN.Designer.cs†L430-L491】
-- R-COMM-003 (SHOULD, current-AgIO): Support NTRIP over TCP alongside UDP/serial routing for GNSS corrections.【F:SourceCode/AgIO/Source/Forms/FormNtrip.cs†L22-L160】
-- R-COMM-010 (MUST, proposed-variable-layer): Provide versioned PGNs, sequencing, and schema negotiation so layer definitions and feedback streams stay consistent across firmware and apps.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md†L1-L41】
-- R-COMM-011 (SHOULD, proposed-variable-layer): Enforce monotonic timestamps, bounds checks, and bad-sample counters on layer transports to simplify diagnostics and retries.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md†L19-L41】【F:docs/SRS/sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md†L7-L22】
-- R-COMM-004 (SHOULD, proposed-LinuxCore): Stand up a gRPC/WebSocket facade that coexists with legacy PGNs so new clients can attach without rewriting firmware.【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L6-L44】【F:docs/SRS/sections/9X_Frontends_Ops/91-O6%20-%20Remote%20gRPC-WebSocket%20clients%20backed%20by%20the%20Linux%20Core.md†L1-L34】
-- R-COMM-005 (MUST, proposed-PGNBridge): Preserve byte-for-byte compatibility with the current AgIO PGN framing or provide a deterministic bridge when introducing new transports.【F:docs/SRS/references/AgIO_PGN_Baseline.md†L1-L120】【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】
-- R-COMM-012 (SHOULD, transport-hardening): Establish latency budgets (<100 ms round-trip for control loops, <500 ms for monitoring) and error budgets (≤0.1% packet loss after retries) for any new gRPC/WebSocket channels so contributors know when the slice is ready to graduate from proposal to review.
-- R-COMM-013 (SHOULD, security posture): Document optional encryption/authentication expectations (TLS 1.3, mutual certs or token auth) for modern transports while ensuring PGN bridges can operate offline when credentials are unavailable.
-- R-COMM-020 (MUST, PoseStream cadence): Publish a canonical PoseStream cadence/decimation policy with deterministic sequencing so Core, plugins, and firmware consume a single authoritative pose timeline during live runs and replays.
-- R-COMM-021 (SHOULD, layer transport handshake): Extend the layer PGN/registry handshake with registry hashes, payload chunking rules, and retry/back-pressure signals so variable-rate controllers can negotiate capabilities before exchanging SectionState deltas.
-- R-COMM-022 (MUST, spatial constraints service): Expose a ZoneService gRPC API (`ListZones`, `WatchZones`, `GetZonesInBounds`) that streams boundary, headland, keep-out, and work-disabled polygons with provenance metadata so guidance and section plugins share authoritative constraint geometry.
-- R-COMM-023 (MUST, pose zone mask): Embed a `PoseZoneMask` in each PoseStream sample exposing `inside_boundary` (`insideBoundary` in JSON), `inside_headland`, `inside_keep_out`, and `inside_work_disabled` booleans plus the ordered list of intersecting zone identifiers and the `zone_registry_hash`. Replay, automation, and logging pipelines rely on the mask to reproduce gating decisions deterministically when transports relay pose data.
+---
 
-### R-COMM — Plugin transport & leases
-- R-COMM-030 (MUST, plugin transport): Define how Core exposes gRPC endpoints, discovery directories, and lease heartbeats so plugins can register/renew capabilities without restarting Core or the UI.
-- R-COMM-031 (MUST, capability permissions): Require every plugin connection to negotiate an authenticated session (local policy or certificates) and enforce per-capability permissions (pose.read, section.command, storage.write) before streaming data.
-- R-COMM-032 (SHOULD, health semantics): Publish health/metrics RPC expectations (Ping, GetStatus, GetMetrics) and degraded-state signaling so operators can see when transports or plugins fall behind without guesswork.
+## 42.1 Purpose & Scope
 
-### R-TIME — Timebase & clock sync
-- R-COMM-040 (MUST, canonical timebase): Establish a canonical time authority (GPS, PTP, or system clock fallback) with documented drift tolerances for PoseStream sequencing and cross-node coordination.
-- R-COMM-041 (SHOULD, timestamp reconciliation): Require firmware-ingested samples to include capture timestamps and sequence numbers so Core can reconcile device clocks against the canonical timebase and surface drift metrics.
-- R-COMM-042 (SHOULD, latency budgets): Document maximum end-to-end latency budgets per topic (pose ingest, section commands, tile flush) to guide scheduling and CI alerts across transports and plugins.
+Define how field devices, guidance engines, and remote clients exchange data across serial, UDP, CAN, radio, and higher-level
+transports with resiliency, deterministic timing, and observability. This section governs transport selection, bridging
+strategies, sequencing requirements, and telemetry mesh expectations for both legacy PGN flows and emerging typed APIs.
 
-## Adopted architecture (ADR alignment)
-- [ADR-002](../../ADR/ADR-002-grpc-contracts.md) establishes gRPC/protobuf as the authoritative **inter-process** API between Core, UI, plugins, automation tooling, and the Bridge/AgIO hosts. All desktop/server processes share the generated `Aog.Abstractions` clients while transports below the Bridge remain opaque to them.
-- [ADR-006](../../ADR/ADR-006-aog-link-mcu-communications.md) defines **AOG-Link** as the MCU communications layer using nanopb datagrams over Ethernet, RS-485/serial, or CAN. The Bridge service translates between gRPC contracts, AOG-Link frames, and legacy PGN flows so firmware evolution does not alter higher-layer APIs.
+---
 
-## Upcoming ADR coverage
-- **ADR-007 PoseStream & SectionState architecture** will standardize the pose timeline, SectionState diff rules, and replay guarantees that satisfy transport requirements R-COMM-010, R-COMM-011, and R-COMM-020 while aligning plugin/service expectations captured in Section 12.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L67-L73】【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L6-L34】
-- **ADR-027 Spatial constraints & zone policies** introduces the ZoneService, buffered zone masks, and constraint gating transports required by R-COMM-020…R-COMM-023 so guidance, section control, and telemetry share deterministic context.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L27-L41】
-- **ADR-016 Firmware/Transport: Variable-Rate & Layer PGNs** will finalize payload packing, sequencing, and registry-handshake semantics for layer definitions, fulfilling R-COMM-010, R-COMM-011, and R-COMM-021 prior to firmware rollout.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L91-L97】
-- **ADR-021 Timebase & clock sync** will establish the canonical clock, drift handling, and latency budgets that anchor R-COMM-020 and R-COMM-040…R-COMM-042 across Core, plugins, and firmware.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L131-L137】
+## 42.2 Context
 
-## Multi-machine telemetry mesh (ADR-047)
+- AgIO manages serial and UDP PGNs that power steer, section, and telemetry flows today.
+- Linux pilots require gRPC/WebSocket facades while maintaining byte-level parity with legacy transports.
+- Variable-rate controllers and analytics expect schema negotiation, sequencing, and integrity checks on layer data.
+- Remote operations demand secure channels, mesh sharing, and bandwidth-aware throttling across heterogeneous links.
 
-- **Entities:** Devices broadcast `Presence` messages describing identity, capabilities, and profile hashes. Operators curate `ShareProfile` documents defining what data leaves the cab (presence only, trails, coverage, layer edits). `SubscribeProfile` policies declare what remote data a cab ingests.
-- **Pub/Sub topics:** Core defines topics for `presence`, `poseTrail`, `coverage`, `layerEdit`, and `sessionState`. Each topic advertises QoS budgets: presence at 1 Hz, trails at ≤2 Hz, coverage at ≤1 Hz aggregated, layer edits immediately with deduplication, session state on change.
-- **Store-and-forward:** Offline cabs queue shared payloads (coverage tiles, LayerEditEvent journals) up to 20 MB/device. When connectivity returns, queued payloads replay in order with hash validation. Mesh nodes drop stale payloads beyond 30 minutes unless explicitly marked archival.
-- **Privacy & ACL:** Share profiles enforce allow/deny lists keyed by device IDs or organization tags. Sensitive feeds (layer edits, profitability) default to deny; operators opt-in per session.
-- **Failure handling:** Mesh heartbeats include freshness timers. Receivers flag stale data when heartbeats exceed 5 seconds or when coverage deltas pause for >15 seconds, triggering UI warnings.
+---
 
-## RadioBridge abstraction (ADR-048)
+## 42.3 Legacy Comparison
 
-- **Transports:** RadioBridge encapsulates ELRS, LoRa, XBee, or other low-bandwidth radios behind a binary framing layer. Frames use CBOR or FlatBuffers encoding with optional compression.
-- **Acknowledgements & replay:** Commands mark `needsAck`; devices retry at exponential backoff up to 5 times. Replay windows allow 60 seconds of history for lossy links; recipients request retransmit by sequence number.
-- **Rate governors:** Links expose configured bitrate ceilings. Core throttles coverage and telemetry streams to respect medium constraints (e.g., LoRa 56 kbps). Higher bandwidth topics fall back to store-and-forward bundles.
-- **Mapping to mesh topics:** RadioBridge integrates with the multi-machine mesh; share profiles declare which topics traverse radio links. Layer edits compress to delta operations; pose trails decimate to 1 Hz for narrowband.
+| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
+|---------------|-----------------|------------------------|---------------------------|--------------------|
+| Serial/UDP PGNs | Fixed PGN framing via AgIO utilities. | No sequencing beyond ad-hoc counters; limited schema awareness. | Introduce versioned PGNs with registry handshakes and retries. | AgIO toolchain |
+| Transport Facades | Windows-first UDP/serial bridging. | Lacks typed APIs for Linux/headless deployments. | Layer gRPC/WebSocket facade with deterministic PGN bridge. | Linux pilot reports |
+| Telemetry Sharing | Ad-hoc UDP multicast and file export. | No authenticated mesh or throttled radio support. | Build share profiles, mesh QoS, and RadioBridge abstraction. | Community telemetry backlog |
 
-### AOG-Link MCU datagram protocol
-AOG-Link standardizes MCU-to-host and MCU-to-MCU exchanges on compact protobuf
-messages compiled with nanopb. Section 3A captures the full wire specification,
-including the frame layout, discovery handshakes, transport bindings, and
-latency targets.[^aoglink-srs]
+> **Informative:** Captures historical context and modernization drivers.
 
-Key expectations carried into this section:
+---
 
-- A single 8-byte header (`0xA5` prefix, version, flags, `msg_id`, length,
-  service, method) precedes all `aoglink.v1` protobuf payloads; serial and CAN
-  transports append CRC16-CCITT and use COBS framing where required.
-- Commands set `FLAGS.ACK_REQUIRED` and retry until an `Ack{msg_id}` arrives;
-  telemetry is fire-and-forget but embeds sequence numbers and monotonic
-  microsecond clocks for loss detection.
-- UDP, USB-CDC serial, and CAN(FD) share the same logical model while MQTT can
-  mirror payloads for pub/sub fan-out without the binary header.
-- A v0 bridge preserves legacy PGN interoperability during migration so the
-  Bridge can translate between gRPC contracts, AOG-Link v1 frames, and existing
-  UDP-only devices.
+## 42.4 Definitions
 
-[^aoglink-srs]: See [Section 53 — AOG-Link Compatibility](03A_AOG_Link_v1.md).
+| Term | Definition |
+|------|-------------|
+| AOG-Link | Nanopb-based datagram protocol for MCU ↔ host communications defined in Section 53.
+| PoseStream | Authoritative stream of pose, velocity, and zone mask samples consumed across services.
+| Share Profile | Operator policy describing which telemetry topics exit a cab and what external data is ingested.
+| RadioBridge | Abstraction over ELRS, LoRa, XBee, or similar radios with acknowledgement and replay semantics.
 
-## Options
-- O-COMM-0: Status quo — AgIO-managed UDP + serial PGN transports with optional NTRIP.
-- O-COMM-1: Consolidate on a single binary framing library shared across serial/UDP/CAN.
-- O-COMM-2: Introduce gRPC for high-level clients while tunneling legacy PGNs.
-- O-COMM-3: Adopt MQTT or AMQP for telemetry fan-out.
-- O-COMM-4: Embed a REST API around PGN state for web dashboards.
-- O-COMM-5: [Versioned variable-rate PGN suite](../4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md) — Sequenced layer streams with schema handshakes.
-- O-COMM-6: [PGN compatibility bridge layered over new APIs](../4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) — Legacy PGNs in, typed events out.
-- O-COMM-7: gRPC/protobuf API surface published via `Aog.Abstractions` NuGet and consumed by Core/UI/Plugins while AgIO/Bridge backends handle transport specifics.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L36】
+---
 
-## Comparison (quick matrix)
-| Option | Pros | Cons | Risks | Borrow from existing |
-|---|---|---|---|---|
-| O-COMM-0 | Proven in-field behavior and tooling | No built-in sequencing beyond custom logic | Harder to scale beyond LAN | Current AgIO UDP/serial stack |
-| O-COMM-1 | Shared codecs, easier testing | Migration effort for each module | Regression risk for older firmware | Existing PGN definitions |
-| O-COMM-2 | Strong typing and streaming | Needs bridge to hardware PGNs | Service footprint grows | Field loggers + PGN spec |
-| O-COMM-3 | Turnkey pub/sub | More infra to run | Broker outages impact steering | Use telemetry monitors |
-| O-COMM-4 | Familiar web tooling | Polling overhead | Divergent auth story | AgDiag HTTP prototypes |
-| O-COMM-5 | Adds sequencing, schema hashes, and layer registries | Firmware/app upgrades required | Bandwidth pressure if many layers stream | AgIO UDP monitor + layer registry plan |
-| O-COMM-6 | Allows Core/API modernization without stranding modules | Bridge adds latency + new failure mode | Incorrect translation can break steering | PGN compatibility bridge |
-| O-COMM-7 | Strong typing, shared contracts, works across Windows/Linux | Requires disciplined versioning + CI | Backend bug impacts every client | .NET 8 + Avalonia stack |
+> **Requirement Grammar (RFC-2119):**
+> - **MUST / MUST NOT** = mandatory; test must exist.
+> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.
+> - **MAY** = optional; document enabling conditions.
+>
+> **Clarity Checklist:** Avoid weak words: *fast, robust, user-friendly, handle, support, adequate,* etc.
+> Prefer measurable forms: *“≤ 250 ms p95,” “error rate < 0.1%,” “99.5% success over 10k trials.”*
+> Each requirement: single behavior, single actor, single condition, single metric.
 
-## Evaluation criteria
-Deterministic latency, message integrity (CRC/sequencing), offline buffering, compatibility with existing AgIO channels, firewall friendliness.
+## 42.5 Requirements
 
-## Current sentiment
-- Keep PGNs flowing through AgIO while we inventory what hardening is required before layering a modern API facade.
-- Community wants the layer PGN suite staged behind feature flags so existing rigs stay stable while richer telemetry rolls out.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O5%20-%20Versioned%20variable-rate%20PGN%20suite.md†L43-L57】【F:docs/SRS/sections/9X_Frontends_Ops/96-O5%20-%20Replay-driven%20CI%20and%20rollout%20for%20layers.md†L7-L27】
-- The shared gRPC/protobuf surface is considered the preferred evolution path when paired with the PGN bridge because it keeps hardware compatibility while aligning Core, UI, and plugins on one contract package.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
-- There is appetite to prototype the compatibility bridge alongside the Core API so UDP/serial devices remain usable during a Linux migration.【F:docs/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md†L1-L35】【F:docs/SRS/sections/2X_System_Architecture/21-O6%20-%20Linux%20Core%20service%20with%20remote%20frontends.md†L21-L44】
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|-----------|---------|----------------|-----------------------------|
+| R-COMM-000 | MUST | Compatibility | Preserve serial port configuration pipeline for GPS, IMU, steer, and machine modules. | C1 | Serial integration tests cover default baud/port combos. |
+| R-COMM-001 | MUST | Discovery | Maintain UDP discovery, scanning, and monitoring workflows. | C1 | UDP monitor decodes ≥ 30 PGNs/s with checksum validation. |
+| R-COMM-002 | MUST | PGN Transport | Continue emitting and receiving CAN/UDP PGNs for control flows. | C1 | Replay harness validates PGN parity vs legacy logs. |
+| R-COMM-003 | SHOULD | Corrections | Support NTRIP over TCP alongside UDP/serial routing. | C1 | GNSS correction test verifies failover and reconnect. |
+| R-COMM-004 | SHOULD | Facade | Provide gRPC/WebSocket facade that coexists with PGNs. | C3 | Bridge integration tests validate typed facade parity. |
+| R-COMM-005 | MUST | Bridge Integrity | Preserve byte-for-byte PGN framing or provide deterministic bridge. | C3 | Round-trip diff < 1 byte difference on regression logs. |
+| R-COMM-010 | MUST | Layer Streams | Deliver versioned PGNs with sequencing and schema negotiation. | C2 | CI ensures schema hash negotiation and sequence checks. |
+| R-COMM-011 | SHOULD | Diagnostics | Enforce monotonic timestamps, bounds checks, and bad-sample counters. | C2 | Transport tests inject faults and verify rejection. |
+| R-COMM-012 | SHOULD | Latency Budgets | Document and enforce latency/error budgets for new channels. | C3 | Benchmarks confirm ≤100 ms control RTT, ≤0.1% loss. |
+| R-COMM-020 | MUST | Pose Cadence | Publish canonical PoseStream cadence and sequencing policy. | C3 | Replay diff ensures deterministic ordering across clients. |
+| R-COMM-021 | SHOULD | Layer Handshake | Extend registry handshake with chunking, retry, and back-pressure semantics. | C2 | Integration test verifies handshake negotiation. |
+| R-COMM-022 | MUST | Zone Service | Expose ZoneService gRPC API for boundary/headland polygons. | C3 | Contract tests stream ≥ 10 zones with provenance metadata. |
+| R-COMM-023 | MUST | Pose Zone Mask | Embed PoseZoneMask with zone identifiers and registry hash. | C3 | Replay verifies deterministic gating decisions. |
+| R-COMM-030 | MUST | Plugin Transport | Define plugin registration, leases, and heartbeats over transports. | C3 | Plugin integration suite validates lease renewals. |
+| R-COMM-031 | MUST | Permissions | Enforce authenticated sessions and capability permissions per connection. | C4 | Security tests confirm unauthorized access is rejected. |
+| R-COMM-032 | SHOULD | Health Reporting | Publish health/metrics RPC expectations and degraded-state signaling. | C4 | Health endpoint returns status within 200 ms under load. |
+| R-COMM-040 | MUST | Time Authority | Establish canonical timebase with documented tolerances. | C5 | Clock drift tests confirm ≤5 ms drift across nodes. |
+| R-COMM-041 | SHOULD | Timestamp Reconcile | Require capture timestamps/sequence numbers for reconciliation. | C5 | Integration tests realign device clocks within tolerance. |
+| R-COMM-042 | SHOULD | End-to-End Latency | Document latency budgets per topic. | C5 | Monitoring dashboards alert when thresholds exceeded. |
 
-## Open questions
-- Do we converge on a single heartbeat/watchdog strategy across transports?
-- Should we adopt protobuf/FlatBuffers for higher-level APIs?
+### 42.5.1 Requirement Sources & Rationale
 
-## Related specifications
-- Device identity heartbeat and DFU orchestration: see [Section 55 — Firmware Interfaces & Updates](17_Device_Firmware_Updates.md).
+| Req ID | Source (issue/discussion/standard) | Rationale (one line) |
+|--------|-------------------------------------|----------------------|
+| R-COMM-000 | AgIO serial configuration backlog | Ensure continuity for deployed rigs. |
+| R-COMM-004 | Linux remote-core pilots | Typed facade enables headless deployments. |
+| R-COMM-010 | Layer registry proposals | Sequencing prevents telemetry drift. |
+| R-COMM-030 | Plugin lifecycle reviews | Plugins require deterministic leasing. |
+| R-COMM-040 | Timebase working sessions | Shared clock anchors determinism. |
+
+---
+
+## 42.6 Acceptance Criteria & Verification
+
+- Transport regression suite MUST replay historical PGN logs against bridge outputs with byte-for-byte parity.
+- Performance benchmarks MUST confirm transport latency budgets before enabling remote pilots.
+- Mesh simulations MUST validate share profile enforcement, store-and-forward windows, and RadioBridge throttling under loss.
+
+### 42.6.1 Requirement-to-Verification Map
+
+| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
+|--------|--------------------|---------------------|---------------------|
+| R-COMM-002 | Replay harness | `/tests/replay/pgn_transport/` | Zero mismatched PGN frames over baseline logs. |
+| R-COMM-010 | CI lint | `/tools/layer-registry-lint/` | Schema hash drift detected within one CI cycle. |
+| R-COMM-030 | Integration tests | `/tests/integration/plugin_transport/` | Lease renewals succeed; unauthorized clients rejected. |
+| R-COMM-040 | Clock sync tests | `/tests/simulation/timebase/` | Drift ≤5 ms after 30-minute run. |
+
+---
+
+## 42.7 Constraints
+
+- Transports MUST operate across Windows and Linux hosts without conditional compilation forks.
+- Offline scenarios MUST degrade gracefully, buffering telemetry for at least 30 minutes before discard.
+- Security controls MUST align with Section 43 channel policies, including mutual TLS or token negotiation where applicable.
+
+### 42.7.1 Non-Functional Requirement Classes
+
+- **Performance:** Control loop RTT ≤ 100 ms; monitoring channels ≤ 500 ms; radio links respect configured bitrate ceilings.
+- **Reliability & Availability:** Bridge and mesh services restart without data loss, leveraging replay windows and acknowledgements.
+- **Security:** Mutual authentication on typed transports; encrypted radio links where hardware permits; share profiles enforce ACLs.
+- **Operability:** Structured logs include transport IDs, schema hashes, and sequence counters; health endpoints expose back-pressure state.
+- **Maintainability:** Transport bindings share codecs and configuration schema; registry updates documented with automated linting.
+
+---
+
+## 42.8 Risks & Open Issues
+
+| ID | Description | Impact | Mitigation / Status | Owner |
+|----|-------------|--------|---------------------|-------|
+| RISK-42-1 | Bridge latency exceeds control budgets under load. | High | Benchmark with replay suite and optimize batching. | @interop-wg |
+| RISK-42-2 | Mesh share profiles misconfigured, leaking sensitive data. | Medium | Provide templates and CI validation for profiles. | @interop-wg |
+| ISSUE-42-1 | Define telemetry topic prioritization for RadioBridge throttling. | Medium | Draft prioritization table with Ops WG. | @interop-wg |
+
+---
+
+## 42.9 Design Considerations
+
+| ID | Consideration | Description |
+|----|----------------|-------------|
+| C1 | Legacy PGN Transport Stewardship | Serial and UDP PGNs remain authoritative; configuration tooling must persist across OS targets. |
+| C2 | Versioned Variable-Rate Layer Streams | Layer PGNs require schema hashes, sequencing, and registry negotiation to prevent drift. |
+| C3 | Typed Facade & Compatibility Bridge | gRPC/WebSocket APIs must coexist with PGNs via deterministic translation. |
+| C4 | Plugin Leases & Security Enforcement | Transport-level leasing, permissions, and health semantics govern plugin behavior. |
+| C5 | Timebase & Telemetry Mesh Governance | Canonical timebase, mesh share profiles, and RadioBridge policies ensure deterministic multi-device coordination. |
+| C6 | Gauge Telemetry Channels | Dedicated gauge PGNs deliver engine and machine data with backwards compatibility and diagnostics. |
+
+### 42.9.1 Assumptions & Preconditions
+
+- [A1] Field hardware continues emitting legacy PGNs during typed transport rollout.
+- [A2] Mesh participants maintain connectivity sufficient for heartbeat exchange (≥1 per 5 s) or trigger failover.
+- [A3] RadioBridge deployments negotiate bitrate limits prior to enabling higher-rate telemetry topics.
+
+#### C1 - Legacy PGN Transport Stewardship
+
+- Preserve serial port management for GPS, IMU, steer, and machine modules with configurable baud/port settings.
+- Maintain UDP discovery, scanning, and monitoring workflows used for field module supervision.
+- Continue publishing canonical PGN references and regression logs to validate compatibility during upgrades.
+
+#### C2 - Versioned Variable-Rate Layer Streams
+
+- PGNs `0xE1`, `0xE0`, and `0xDE` carry analog and binary layer samples with sequence counters to detect loss.
+- `0xE4`/`0xE3` commands, definition handshake `0xE2`, and aggregated summaries `0xDF` coordinate retries and acknowledgements.
+- Layer IDs reserve ranges (1=Working, 2=Flow State, 10=Actual/Commanded, 20=Downforce, 30=Yield, 40=Moisture, 240–255 third-party).
+- Samples outside expected bounds trigger `badSample` counters; monotonic timestamps accompany payloads for reconciliation.
+
+#### C3 - Typed Facade & Compatibility Bridge
+
+- Bridge services translate PGNs to typed gRPC/WebSocket events without altering payload semantics.
+- Sequencing and schema hashes ensure typed clients detect drift and request resynchronization.
+- Byte-for-byte validation across replay logs confirms deterministic translation and acceptable latency overhead.
+
+#### C4 - Plugin Leases & Security Enforcement
+
+- Core exposes capability directories, lease heartbeats, and permissions gating (pose.read, section.command, storage.write).
+- Health RPCs (Ping, GetStatus, GetMetrics) report degraded states, enabling operators to diagnose lagging transports.
+- All plugin connections authenticate (local policy or certificates) and emit structured audit logs for control actions.
+
+#### C5 - Timebase & Telemetry Mesh Governance
+
+- Canonical time authority derived from GPS or PTP with system clock fallback; drift tolerance ≤5 ms across nodes.
+- Mesh topics include `presence`, `poseTrail`, `coverage`, `layerEdit`, and `sessionState` with QoS budgets (presence 1 Hz, trails ≤2 Hz, coverage ≤1 Hz aggregated).
+- Share profiles define export/import policies, allow/deny lists, and privacy defaults (sensitive feeds opt-in).
+- Store-and-forward queues retain up to 20 MB/device, replaying payloads with hash validation; stale payloads drop after 30 minutes unless marked archival.
+
+#### C6 - Gauge Telemetry Channels
+
+- Gauge telemetry PGNs (0xDA, 0xD9, 0xD8) reuse existing AgOpenGPS framing to deliver engine and machine metrics.
+- Capability discovery advertises supported gauges and validity heartbeats for dashboards to pre-provision tiles.
+- Diagnostics tooling decodes raw payload bytes, engineering values, and source metadata to support troubleshooting.
+
+---

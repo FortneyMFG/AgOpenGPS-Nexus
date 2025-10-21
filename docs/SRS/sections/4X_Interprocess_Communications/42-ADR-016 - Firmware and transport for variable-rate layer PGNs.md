@@ -1,38 +1,82 @@
-# ADR-016: Firmware and transport for variable-rate layer PGNs
+# 42-ADR-016 — Firmware and transport for variable-rate layer PGNs
+*(Status: Proposed)*
 
-## Status
-Drafting (target review window: 2025-11-18 week)
+**Author:** Codex
+**Reviewers:** Interprocess Communications Working Group
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-20
+**Status:** Proposed
+**Version:** 0.1.0
+**Supersedes:** _None_
+**Superseded by:** _None_
+**Related SRS:** [42 — Transports](42_Transports.md)
+**Related Considerations:** [C2 - Versioned Variable-Rate Layer Streams](42_Transports.md#c2---versioned-variable-rate-layer-streams)
 
-**Relevant Plugin(s):** Rate Control, Section Control, Variable Mapping, AgIO Host Services, Planter Monitor, ISOBUS Bridge
+---
 
+## 1) Context
 
-## Context
-Delivering layer definitions and feedback between Core, AgIO, and implement firmware requires deterministic CAN/UDP messages aligned with the new layer registry and section control semantics. Legacy PGNs do not cover registry hashes or degraded mode signaling. ADR-016 specifies the transport contracts so firmware, simulators, and the AgIO bridge can exchange variable-rate information with bounded latency.
+Delivering layer definitions and feedback between Core, AgIO, and implement firmware requires deterministic CAN/UDP messages
+aligned with the layer registry and section-control semantics. Legacy PGNs lack registry hashes, degraded-mode signaling, and
+sequence discipline, motivating a modernized suite.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L96-L178】
 
-## Decision
-- Define CAN and UDP message suites for layer definitions and feedback (E2/E1/E0/DF/E3/E4) including node IDs, sequencing, timeout, and heartbeat semantics.
-- Integrate registry hash handshakes (ADR-010) to ensure firmware and Core operate on matching layer catalogs with fail-safe fallbacks.
-- Specify degraded-mode and heartbeat policies that keep sections fail-safe when transport errors occur, including telemetry diagnostics.
-- Provide reference firmware stubs, simulators, and conformance tests to validate interoperability across transports.
+```mermaid
+flowchart LR
+  A[Legacy layer PGNs] --> B[Registry hash & handshake gaps]
+  B --> C[Variable-rate PGN suite]
+  C --> D[Firmware & bridge conformance]
+```
 
-## Consequences
-- Firmware and AgIO bridge gain clear expectations for variable-rate messaging but must implement additional handshake logic and telemetry.
-- Transport specifications improve safety by ensuring mismatched hashes fail-safe quickly, though they increase implementation complexity.
-- CI and simulation infrastructure must expand to cover latency, jitter, and error injection scenarios for both CAN and UDP paths.
+---
 
-## Governance Updates
-- **Timing reference implementations.** Shared firmware examples include jitter injectors and watchdog tunables. Vendors must certify against the reference suite before distributing updates.
-- **Shared conformance lab.** Nexus QA operates a lab with CAN/UDP harnesses, publishing monthly health summaries and escalating regressions within 48 hours.
-- **Configurable safety thresholds.** Specifications now expose parameterized watchdog sensitivity with documented safe ranges, allowing deployments to adjust without forking firmware.
+## 2) Decision
 
-## Validation
-- Firmware simulators must demonstrate end-to-end PGN exchange with ≤ 15 ms jitter at 20 Hz over CAN and ≤ 25 ms over UDP.
-- Registry hash mismatches must trigger degraded mode within 200 ms and log actionable error codes for diagnostics.
-- Heartbeat watchdog tests must prove sections fail closed after 300 ms of missed heartbeats and recover automatically when communication resumes.
+Standardize CAN/UDP PGNs `E2/E1/E0/DF/E3/E4` for layer definitions, feedback, and control acknowledgements, including node IDs,
+sequencing, timeout, and heartbeat semantics.
 
-## References
-- [Communications & transports requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-- [Hardware I/O requirements](../SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
-- [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
-- [ADR-015: Section control and grouping semantics](ADR-015-section-control-grouping-semantics.md)
-- [ADR-031: Official plugin bundle governance](ADR-031-official-plugin-bundle.md)
+### Decision Summary
+
+* **Scope:** Variable-rate layer payloads exchanged between firmware, AgIO bridge, and Core.
+* **Boundary:** gRPC typed APIs continue to surface layer data; MCU transports remain AOG-Link (ADR-006).
+* **Implementation Level:** Design + code; shared reference firmware, simulators, and conformance tests.
+
+---
+
+## 3) Consequences
+
+**Positive Impacts:**
+
+* Deterministic schema negotiation with registry hash handshakes prevents silent drift.
+* Sequencing and watchdog policies improve safety by failing sections closed when telemetry stops.
+* Shared conformance tooling aligns firmware vendors, simulators, and bridge implementations.
+
+**Negative / Mitigated Impacts:**
+
+* Firmware and AgIO bridge must implement additional handshake logic and telemetry — mitigated via reference stubs.
+* Increased implementation complexity — offset by documented watchdog thresholds and configuration hooks.
+* CI infrastructure must expand to cover latency, jitter, and error injection scenarios — addressed via shared labs.
+
+**Follow-up Actions:**
+
+* Publish firmware examples with jitter injectors and watchdog tunables.
+* Operate shared CAN/UDP harnesses for monthly health summaries and regression escalation.
+* Expose configurable safety thresholds with documented safe ranges to avoid firmware forks.
+
+---
+
+## 4) Rationale
+
+The defined PGN suite provides explicit registry hash negotiation, per-packet sequencing, and degraded-mode signals, aligning
+firmware behavior with Core expectations and enabling deterministic analytics and control loops. Watchdog policies ensure
+sections fail closed within 300 ms if communication is lost.
+
+---
+
+## 5) Alternatives Considered
+
+| Option | Summary | Reason Not Selected |
+|--------|---------|---------------------|
+| Maintain legacy PGNs | Keep existing layer PGNs without registry hashes. | No drift detection; unsafe failure modes. |
+| Push all telemetry via gRPC | Skip PGNs and rely on typed APIs only. | Firmware lacks capacity; PGN clients would break. |
+| Custom vendor-specific frames | Allow OEM-specific payloads per implement. | Fragmented ecosystem and higher maintenance cost. |
+

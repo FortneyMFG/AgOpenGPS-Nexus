@@ -1,5 +1,9 @@
 # 11-O1 — Unified .NET 8 + Avalonia Cross-Platform Stack
 
+> **In plain terms:** We keep one C# codebase for everything—Windows cab PCs,
+> Linux headless boxes, and future tablets—so teams install the same features on
+> every machine without juggling separate projects.
+
 *(Status: Proposed)*
 
 **Option ID:** 11-O1  
@@ -49,6 +53,13 @@ Windows-only tooling locks modernization efforts and makes Linux headless deploy
   - Managed plugin catalog (`Aog.Plugins`) loaded via manifests and `AssemblyLoadContext`.
 - **Data flow:** Hardware inputs land in AgIO backend → published over gRPC/protobuf → consumed by Core/UI/plugins.
 - **Integration context:** Works with remote companions (Android/iOS) via gRPC-Web bridge or proxy.
+
+**How the pieces connect (at a glance):**
+
+- **Devices** feed **AgIO** regardless of OS.
+- **AgIO** streams data to **Core** for guidance math and to the **Avalonia UI** for dashboards.
+- **Plugins** tap into the same streams, so adding features doesn’t depend on the OS you compiled for.
+- **Remote companions** subscribe to the Core/UI feeds over the network, using the same contracts.
 
 ```mermaid
 graph TD
@@ -125,6 +136,13 @@ flowchart LR
 - Stage migration: maintain legacy WinForms/WPF flows while introducing Avalonia UI in preview.
 - Roll out Linux Core as opt-in preview before default inclusion in release builds.
 - Backout: retain ability to ship Windows-only release if Linux parity blockers appear; revert via feature flags.
+
+**Rollout checkpoints:**
+
+1. **Stabilize Windows UI (Phase 1):** Ship Avalonia side-by-side with WinForms so operators can compare without risk.
+2. **Preview Linux Core (Phase 2):** Publish systemd packages and document the smoke checklist for Pi/CM5 rigs.
+3. **Expand to companions (Phase 3):** Exercise Android/iOS remote flows once Core/AgIO parity is proven.
+4. **Consolidate tooling (Phase 4):** Retire duplicate Windows-only build scripts after Linux packaging becomes default.
 
 ---
 

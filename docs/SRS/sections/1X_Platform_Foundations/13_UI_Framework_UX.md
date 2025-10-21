@@ -1,4 +1,9 @@
 # 13 — UI Framework & UX Language
+
+> **In plain terms:** We keep the familiar WinForms screens stable while teaching
+> everyone how the newer Avalonia shell, dashboards, and remote modes will feel,
+> so operators are never surprised when the UI evolves.
+
 *(Status: Proposed)*
 
 **Author:** Codex  
@@ -26,6 +31,14 @@ Balance legacy WinForms/WPF expectations with modernization via Avalonia and rem
 - Remote clients and metadata-driven dashboards require cross-platform components.
 - Avalonia pilots aim to share view models across Windows/Linux and mobile shells.
 - UI stack must coexist with headless Core deployments connected through gRPC or WebSockets.
+
+### Journeys to keep in mind
+
+- **Operator upgrading in the cab:** Starts the day in WinForms, flips a feature flag to preview Avalonia, and can fall back instantly if a layout feels unfamiliar.
+- **QA verifying run modes:** Uses the Avalonia shell to swap between LocalInProc and CompanionRemote, ensuring the same dashboard cards appear without manual window reshuffling.
+- **Dealer supporting a headless rig:** Runs Avalonia on a Windows laptop while connected to a Linux Core over gRPC, confirming metadata-driven dashboards populate automatically.
+
+> **Visual reference:** The annotated layouts in `docs/ui/sidebar-layout-overview.md` and the run-mode walkthrough in `docs/ui/avalonia-run-modes.md` show how windows, panels, and dashboards change between WinForms and Avalonia.
 
 ---
 
@@ -68,6 +81,8 @@ Balance legacy WinForms/WPF expectations with modernization via Avalonia and rem
 | R-UI-007 | SHOULD | Accessibility | Support high-DPI scaling, contrast presets, localization hooks. | Accessibility WG | Accessibility test matrix |
 | R-UI-008 | MUST | Shared Mobile Shell | Keep Avalonia project free of platform-specific forks for mobile builds. | ADR-003 Avalonia UI | Mobile CI builds |
 | R-UI-009 | SHOULD | Run-mode Toggles | Provide configuration surface for run-mode switching. | ADR-003 Avalonia UI | QA scenarios covering run modes |
+
+> **Why it matters:** These requirements let today’s operators trust the WinForms UI, show what Avalonia adds (touch layouts, metadata dashboards), and guarantee remote clients see the same widgets without custom coding.
 
 ### 13.5.1 Requirement Sources & Rationale
 

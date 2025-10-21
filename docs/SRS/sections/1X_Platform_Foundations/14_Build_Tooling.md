@@ -1,4 +1,9 @@
 # 14 — Build Environment & Tooling
+
+> **In plain terms:** Anyone can spin up the Nexus build in minutes, the CI
+> machines use the exact same scripts, and secrets stay locked away so signed
+> installers and packages are always trustworthy.
+
 *(Status: Proposed)*
 
 **Author:** Codex  
@@ -25,6 +30,13 @@ Document the build toolchains, automation, signing, and secrets policies that en
 - Containerized builds support simulation, testing, and remote deployments.
 - Secrets (signing keys, credentials) must be centrally managed.
 - Developers need bootstrap tooling to align with CI environments.
+
+> **Quick start for new developers**
+>
+> 1. Clone the repo and run `tools/scripts/nexus.sh bootstrap` (Linux/macOS) or `tools/scripts/nexus.ps1 bootstrap` (Windows).
+> 2. Execute `dotnet build` and `dotnet test` to confirm the toolchain matches CI.
+> 3. Use `tools/scripts/nexus.sh run --help` to explore common workflows without memorizing project paths.
+> 4. Never copy signing keys locally—CI retrieves them just-in-time from the vault.
 
 ---
 
@@ -63,6 +75,10 @@ Document the build toolchains, automation, signing, and secrets policies that en
 | R-BUILD-003 | SHOULD | Developer Ergonomics | Automate environment bootstrap via scripts/CLI. | Developer onboarding | `nexus setup` success rate |
 | R-BUILD-004 | MUST | Secrets Handling | Store signing keys and credentials in managed vault with short-lived tokens. | Security policy | Secrets audit log |
 | R-BUILD-005 | SHOULD | Cross-platform Validation | Run smoke builds on Windows + Linux for each PR. | Section 11 dependencies | Dual-lane CI completion |
+
+> **Why it matters:** These rules keep every release repeatable, guarantee that a single command sets up a developer machine, and prevent leaked secrets by automating signing inside the vault-backed pipelines.
+
+> **Everyday security translation:** “Secrets handling” here simply means you never email or store signing keys on disk. Pipelines fetch short-lived tokens, and developers use the bootstrap scripts without handling raw certificates.
 
 ### 14.5.1 Requirement Sources & Rationale
 

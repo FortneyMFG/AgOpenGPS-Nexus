@@ -26,6 +26,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-155 Composite simulation fabric GA _(Done)_
 - [x] NX-156 AOG-Link transport rollout _(Done)_
 - [x] NX-157 Plugin API lease & manifest enforcement _(Done)_
+- [x] NX-1317 Platform foundations doc accessibility sweep _(Done)_ — Refresh 1X sections to guide non-technical readers
 - [ ] NX-1014 Contract baseline generator tooling resilience — Ensure baseline generator works without direct project references
 
 - [x] NX-610 Governance telemetry automation _(Done)_ — ADR roadmap program board, dependency digests, and review minutes publishing

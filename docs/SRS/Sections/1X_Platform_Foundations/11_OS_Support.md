@@ -130,13 +130,12 @@ This section clarifies which platforms must remain first-class, how emerging Lin
 
 | ID | Consideration | Description |
 |----|----------------|-------------|
-| C1 | Windows-first baseline | Preserve installer workflows and UI expectations for existing operators. |
-| C2 | Linux headless core | Deliver service packaging, systemd integration, and remote client compatibility. |
-| C3 | Dual-first strategy | Balance Windows + Linux parity without fragmenting development tooling. |
-| C4 | Remote/companion clients | Support gRPC/Web transports for Android/iOS or remote desktops. |
-| C5 | Hardware abstraction | Keep IO stacks behind AgIO to avoid OS-specific forks in Core/UI. |
-| C6 | Packaging ergonomics | Provide containers/AppImage bundles for advanced deployments. |
-| C7 | Performance baselines | Document GPU/CPU requirements to guard against underpowered hardware. |
+| C1 | Windows Support | Preserve installer workflows and UI expectations for existing operators. |
+| C2 | Linux Support | Deliver service packaging, systemd integration, and remote client compatibility. |
+| C3 | Remote/companion clients | Support gRPC/Web transports for Android/iOS or remote desktops. |
+| C4 | Hardware abstraction | Keep IO stacks behind AgIO to avoid OS-specific forks in Core/UI. |
+| C5 | Packaging ergonomics | Provide containers/AppImage bundles for advanced deployments. |
+| C6 | Performance baselines | Document GPU/CPU requirements to guard against underpowered hardware. |
 
 ### 11.9.1 Assumptions & Preconditions
 

@@ -28,10 +28,10 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 
 ### Section catalog
 #### 1X — Platform Foundations
-- [11 — OS Support](sections/1X_Platform_Foundations/11_OS_Support.md)
-- [12 — Development Language & Runtime](sections/1X_Platform_Foundations/12_Development_Language_Runtime.md)
-- [13 — UI Framework & UX Language](sections/1X_Platform_Foundations/13_UI_Framework_UX.md)
-- [14 — Build Environment & Tooling](sections/1X_Platform_Foundations/14_Build_Tooling.md)
+- [11 — OS Support](Sections/1X_Platform_Foundations/11_OS_Support.md)
+- [12 — Development Language & Runtime](Sections/1X_Platform_Foundations/12_Development_Language_Runtime.md)
+- [13 — UI Framework & UX Language](Sections/1X_Platform_Foundations/13_UI_Framework_UX.md)
+- [14 — Build Environment & Tooling](Sections/1X_Platform_Foundations/14_Build_Tooling.md)
 
 #### 2X — System Architecture
 - [21 — System Decomposition & Boundaries](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
@@ -86,7 +86,7 @@ Welcome to the Software Requirements Specification (SRS) workspace for the next 
 
 ### Option catalog
 #### 1X — Platform Foundations
-- [O-STACK-1 – .NET 8 + Avalonia](options/1X/O-STACK-1_DotNet8Avalonia.md)
+- [11-O1 – Unified .NET 8 + Avalonia](Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md)
 
 #### 2X — System Architecture
 - [O-BACKEND-6 – Linux Core Service](options/2X/O-BACKEND-6_LinuxCoreService.md)

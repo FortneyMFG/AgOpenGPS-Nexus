@@ -46,7 +46,7 @@ Outline how developers extend AgOpenGPS (custom tools, integrations, UI modules)
 - O-EXT-2: Expose scripting hooks (Python/Lua) for automation and custom workflows.
 - O-EXT-3: Offer gRPC/webhook extension points for out-of-process services.
 - O-EXT-4: Package optional modules as NuGet packages consumed by the desktop apps.
-- O-EXT-5: Managed plugin manifests using `AssemblyLoadContext` + shared gRPC contracts so plugins run identically on Windows and Linux.【F:docs/SRS/options/1X/O-STACK-1_DotNet8Avalonia.md†L13-L47】
+- O-EXT-5: Managed plugin manifests using `AssemblyLoadContext` + shared gRPC contracts so plugins run identically on Windows and Linux.【F:docs/SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L13-L47】
 
 ## Comparison (quick matrix)
 | Option | Pros | Cons | Risks | Borrow from existing |
@@ -64,7 +64,7 @@ Safety, maintainability, ease for contributors, performance impact, packaging co
 ## Current sentiment
 - Developers fork today; we need a plugin surface that honors safety-critical boundaries while reducing merge burden.
 - Layer metadata + ID registries are expected to become the bridge for safe third-party modules once DI hooks exist.【F:docs/SRS/options/6X/O-BACKEND-4_LayerControllers.md†L34-L47】【F:docs/SRS/options/6X/O-API-5_VersionedLayerSchemas.md†L32-L64】
-- The unified .NET 8 plugin runtime (shared gRPC contracts + manifest loader) is the leading proposal because it supports cross-platform simulation, replay, and device plugins without per-OS rewrites.【F:docs/SRS/options/1X/O-STACK-1_DotNet8Avalonia.md†L9-L79】
+- The unified .NET 8 plugin runtime (shared gRPC contracts + manifest loader) is the leading proposal because it supports cross-platform simulation, replay, and device plugins without per-OS rewrites.【F:docs/SRS/Sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】
 - Treating the UI and advanced agronomy modules as “official plugins” keeps the default install familiar while letting operators toggle them off to run core services headless.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog†L7-L58】
 - Contributors want the simulation surface to live inside the plugin contract so device, agronomy, and automation modules can share deterministic scenarios without recompiling Core or duplicating ModSim logic.
 - The official plugin dependency map now enumerates cross-domain hard/soft requirements, manifest metadata, and compatibility ranges to guide bundle validation and satisfy R-EXT-150.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】

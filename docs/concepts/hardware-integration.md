@@ -1,6 +1,6 @@
 # Hardware Integration Patterns
 
-This document outlines the hardware integration patterns used in Nexus, mapping directly to the requirements specified in the [OS Support Requirements](../SRS/sections/1X_Platform_Foundations/11_OS_Support.md) and implemented through [ADR-006: AOG-Link MCU Communications](../ADR/ADR-006-aog-link-mcu-communications.md).
+This document outlines the hardware integration patterns used in Nexus, mapping directly to the requirements specified in the [OS Support Requirements](../SRS/Sections/1X_Platform_Foundations/11_OS_Support.md) and implemented through [ADR-006: AOG-Link MCU Communications](../ADR/ADR-006-aog-link-mcu-communications.md).
 
 ## Integration Models
 
@@ -103,7 +103,7 @@ As specified in [Threading, Scheduling & Timing requirements](../SRS/sections/2X
 
 ## Related Documentation
 
-- [OS Support Requirements](../SRS/sections/1X_Platform_Foundations/11_OS_Support.md)
+- [OS Support Requirements](../SRS/Sections/1X_Platform_Foundations/11_OS_Support.md)
 - [Communications Requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
 - [ADR-006: AOG-Link Protocol](../ADR/ADR-006-aog-link-mcu-communications.md)
 - [Deployment Guide](../deployment/INDEX.md)

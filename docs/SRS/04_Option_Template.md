@@ -9,7 +9,7 @@
 **Reviewers:** [Working Group or Reviewers]
 **Created:** YYYY-MM-DD
 **Last Updated:** YYYY-MM-DD
-**Related SRS:** `SRS/Sections/[Section_Folder]/[Section_Title].md`
+**Related SRS:** `Sections/[Section_Folder]/[Section_Title].md`
 **Related ADRs:** `[Section]-ADR-###_Title.md` (planned or linked)
 
 ---

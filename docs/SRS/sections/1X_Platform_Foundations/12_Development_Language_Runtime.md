@@ -1,241 +1,217 @@
 # 12 — Development Language & Runtime
+*(Status: Drafting — Decision Agnostic)*
 
-> **In plain terms:** Everyone writing Nexus code installs the same .NET 8 SDK,
-> follows the same dependency rules, and uses shared contracts so plugins and
-> tools behave the same on Windows and Linux.
-
-*(Status: Proposed)*
-
-**Author:** Codex  
-**Created:** 2025-10-20  
-**Version:** 0.1.0  
 **Section ID:** 12  
-**Editors:** Platform Foundations Working Group  
-**Last Updated:** 2025-10-20  
+**Version:** 0.1.0  
+**Editors:** Platform Foundations WG  
+**Last Updated:** 2025-10-21  
 **Related Sections:** 11 — OS Support, 14 — Build Environment & Tooling  
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
-**Downstream Impacts:** 6X — Core Domain Services, 9X — Frontends & Ops
+**Downstream Impacts:** 6X — Core Domain Services, 9X — Frontends & Ops  
 
 ---
 
-## 12.1 Purpose & Scope
+## 12.1 Purpose & Scope  
 
-Define the managed language, runtime, and dependency policies that keep Nexus Core, AgIO, plugins, and tooling aligned on a coherent stack.
-Clarify how runtime governance supports cross-platform deployments and plugin compatibility while enabling deterministic builds.
+This section defines the **language, runtime, and dependency policies** that govern all Nexus codebases.  
+It ensures contributors use a common runtime environment and development toolchain, producing predictable, reproducible, and portable builds across Windows and Linux.  
+It also defines boundaries for dependency management and contract versioning so that plugins, AgIO, and user interfaces can interoperate without breaking compatibility.  
 
----
-
-## 12.2 Context
-
-- Legacy code spans .NET Framework, .NET 6, and native helpers, complicating modernization.
-- Contributors target .NET 8 LTS to unify runtime behavior across Windows and Linux.
-- Shared gRPC contracts (`Aog.Abstractions`) coordinate Core, UI, AgIO, and plugins.
-- Build tooling (Section 14) must pin SDK versions, dependencies, and signing assets to guarantee reproducibility.
-
-> **Quick start for newcomers**
->
-> 1. Install the .NET 8 SDK listed in `global.json`.
-> 2. Clone the repo and run `tools/scripts/nexus.sh bootstrap` (or `nexus.ps1` on Windows) to restore dependencies.
-> 3. Run `dotnet build` followed by `dotnet test`; if both succeed, you are ready to contribute.
-> 4. Keep the dependency allowlist handy—new packages require a governance review before merge.
+> **Plain summary:**  
+> Everyone writing Nexus code uses the same managed runtime, follows shared dependency rules, and relies on common interface contracts so everything behaves the same on all platforms.  
 
 ---
 
-## 12.3 Legacy Comparison
+## 12.2 Context  
+
+- All Nexus components share a managed runtime that supports both Windows and Linux as defined in §11.  
+- Prior versions of AgOpenGPS mixed .NET Framework, WPF, and native utilities, leading to inconsistent build behavior.  
+- The modern Nexus stack aims to unify runtime, language, and dependency handling across Core, AgIO, UI, and CLI tools.  
+- Build environment and CI enforcement are covered in §14, while this section defines the policies that those builds must enforce.  
+
+---
+
+## 12.3 Legacy Comparison  
 
 | Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
 |---------------|-----------------|------------------------|---------------------------|--------------------|
-| Runtime Mix | .NET Framework WinForms with abandoned WPF experiments plus native utilities. | Fragmented build chain; divergent APIs. | Standardize on .NET 8 with unified project structure. | Source tree inventory |
-| Dependency Governance | Ad-hoc NuGet additions per project. | Unverified Linux compatibility; inconsistent versions. | Curated allowlist with dual-OS CI validation. | Contributor discussions |
-| Plugin Contracts | Manual interface definitions; no versioning plan. | Hard to maintain compatibility across releases. | Package shared gRPC/contract libraries with semantic versioning. | Plugin WG backlog |
+| Runtime Mix | Combination of .NET Framework, .NET Core 6, and native executables. | Inconsistent APIs and build pipelines. | Migrate all managed components to a single LTS runtime. | AOG v6 Source Analysis |
+| Dependency Governance | Ad-hoc package additions per project. | Version drift, missing Linux validation. | Curated dependency allowlist reviewed through CI. | Contributor discussions |
+| Plugin Contracts | Manual interface definitions shared by copy. | Frequent breakage across versions. | Centralized, versioned contract libraries. | Plugin WG notes |
+| Build Reproducibility | No consistent toolchain pinning. | Builds vary between machines. | Enforce deterministic builds and SDK pinning. | Build WG proposal |
 
 ---
 
-## 12.4 Definitions
+## 12.4 Definitions  
 
 | Term | Definition |
 |------|-------------|
-| Managed Runtime | .NET runtime (CLR/CoreCLR) executing managed assemblies. |
-| Contract Package | NuGet bundle exposing shared interfaces/protobuf definitions. |
-| Deterministic Build | Repeatable compilation with identical outputs given pinned dependencies. |
+| **Managed Runtime** | The long-term-support runtime (e.g., .NET LTS) used to execute compiled assemblies. |
+| **Contract Package** | A shared, versioned interface definition library used by Core, UI, AgIO, and plugins. |
+| **Deterministic Build** | A build process that produces identical artifacts from identical inputs. |
+| **Allowlist** | A formally reviewed list of approved dependencies and their versions. |
 
 ---
 
-> **Requirement Grammar (RFC-2119):**
-> - **MUST / MUST NOT** = mandatory requirements.
-> - **SHOULD / SHOULD NOT** = strong recommendations with waiver process.
-> - **MAY** = optional capabilities or roadmap items.
-
-## 12.5 Requirements
+## 12.5 Requirements  
 
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
-|----|-----------|-----------|----------|-----------------|-----------------------------|
-| R-STACK-000 | MUST | Runtime | Standardize on .NET 8 as baseline for Core, UI, AgIO, CLI. | Section 11 dependencies | CI ensures all projects target .NET 8 |
-| R-STACK-001 | MUST | Language | Use C# as primary implementation language; expose language-agnostic contracts. | Architecture WG | Contract linting + API docs |
-| R-STACK-002 | SHOULD | Dependency | Maintain curated dependency allowlist validated on Windows + Linux builds. | Release governance | Automated dependency diff + dual-OS builds |
-| R-STACK-003 | MUST | Build Integrity | Pin toolchain versions via `global.json`, sign assemblies, ensure repeatable restore. | Build policy | Build reproducibility check in CI |
-| R-STACK-004 | SHOULD | ABI Governance | Version shared contracts with runtime updates to keep plugins compatible. | Plugin WG | Semantic versioning policy + compatibility tests |
-| R-STACK-005 | MUST | Hardware Abstraction | Keep OS-specific device bindings behind DI interfaces to avoid forks. | AgIO maintainers | Integration tests verifying backend swaps |
-| R-STACK-006 | SHOULD | Observability | Provide logging, metrics, and tracing primitives consistent across runtime hosts. | Ops feedback | `nexus sim smoke` + telemetry verification |
+|----|-----------|-----------|----------|----------------|-----------------------------|
+| **R-STACK-001** | **MUST** | Runtime | Use a single long-term-support managed runtime across all Nexus projects. | Architecture WG | CI confirms all projects target the same TFM. |
+| **R-STACK-002** | **MUST** | Language | Use C# as the primary implementation language while keeping shared contracts language-agnostic. | Core WG | Contract build produces valid stubs for all languages. |
+| **R-STACK-003** | **MUST** | Build Integrity | Pin SDK and dependency versions to ensure deterministic builds. | Build WG | Hash comparison between builds is identical. |
+| **R-STACK-004** | **MUST** | Abstraction | Contain all OS-specific or hardware-specific logic behind dependency-injected interfaces. | AgIO WG | Swappable backend tests pass on both Windows and Linux. |
+| **R-STACK-005** | **SHOULD** | Dependency Governance | Maintain a curated dependency allowlist verified across Windows and Linux CI lanes. | Release WG | CI pipeline rejects unapproved package additions. |
+| **R-STACK-006** | **SHOULD** | Contract Versioning | Use semantic versioning and automated compatibility testing for shared interface packages. | Plugin WG | Compatibility tests pass across two consecutive versions. |
+| **R-STACK-007** | **MAY** | Native Extensions | Allow optional native or FFI modules behind a stable abstraction layer with documented safety rules. | Core maintainers | Manual review and static analysis pass. |
 
-> **Why it matters:** These guardrails stop surprise runtime drift, help plugin authors know which APIs are safe, and make sure a new contributor can match the CI environment in an afternoon.
-
-### 12.5.1 Requirement Sources & Rationale
-
-| Req ID | Source | Rationale |
-|--------|--------|-----------|
-| R-STACK-000 | ADR-001 (.NET 8 runtime) | Enables cross-platform parity and long-term support. |
-| R-STACK-002 | Release WG notes | Prevent regressions from incompatible dependencies. |
-| R-STACK-003 | Supply chain policy | Guard against tampering and build drift. |
-| R-STACK-004 | Plugin backlog | Keep third-party integrations stable across releases. |
-
-### 12.5.2 Governance quick reference
-
-| If you need to… | Talk to… | Where it lives |
-|-----------------|-----------|----------------|
-| Add or upgrade a NuGet package | Release governance lead | Dependency allowlist PR + Section 14 tooling |
-| Ship a new plugin contract | Plugin working group | `Aog.Abstractions` package + contract tests |
-| Update the runtime SDK version | Platform foundations WG | `global.json` change with rollout checklist |
-| Introduce native helpers (C++/Rust) | Core/AgIO maintainers | Section 14 FFI guidance + security review |
+> **Intent:**  
+> These requirements ensure consistent development environments, predictable runtime behavior, and portable plugins.  
 
 ---
 
-## 12.6 Acceptance Criteria & Verification
+## 12.6 Acceptance Criteria & Verification  
 
-- CI enforces .NET 8 target frameworks and runs on Windows + Linux lanes.
-- Dependency diff workflow flags unapproved packages before merge.
-- Signed artifacts verified in pipelines before publishing.
-
-### 12.6.1 Requirement-to-Verification Map
+**Verification expectations:**  
+- CI pipelines build and test all managed components under the same target runtime.  
+- Dependency scanners verify only allowlisted packages are used.  
+- Contract compatibility tests confirm backward and forward support.  
+- Build artifacts generated on different systems produce identical hashes.  
 
 | Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
-|--------|--------------------|---------------------|---------------------|
-| R-STACK-000 | CI integration | `pipelines/dotnet-build.yml` | All projects compile against .NET 8 |
-| R-STACK-002 | Automated policy | `tools/dependency-allowlist.json` | No unauthorized packages detected |
-| R-STACK-003 | Build audit | `qa/build-repeatability.md` | Hash comparison matches baseline |
-| R-STACK-004 | Contract tests | `tests/contracts/versioning/` | All required compatibility tests pass |
+|--------|-------------------|---------------------|---------------------|
+| R-STACK-001 | CI Integration | `/pipelines/dotnet.yml` | All projects compile under unified TFM. |
+| R-STACK-003 | Build Audit | `/qa/build_repeatability.md` | Hash and signature match baseline. |
+| R-STACK-005 | Policy Check | `/tools/dependency-allowlist.json` | No unapproved dependencies detected. |
+| R-STACK-006 | Contract Test | `/tests/contracts/` | All API compatibility tests succeed. |
 
 ---
 
-## 12.7 Constraints
+## 12.7 Constraints  
 
-- Align runtime upgrades with .NET LTS cadence; avoid mid-cycle runtime shifts without ADR review.
-- Maintain compatibility with plugin SDK requirements; breaking changes require migration guides.
-- Keep cross-platform build durations within release pipeline SLAs (< 30 minutes per lane).
+- Runtime and SDK versions must remain aligned with the project’s supported OS list (§11).  
+- Build processes must be reproducible, signed, and verifiable.  
+- All dependency changes require review under the dependency governance policy.  
+- Breaking contract changes require migration notes and version increments.  
 
-### 12.7.1 Non-Functional Requirement Classes
+### 12.7.1 Non-Functional Requirements  
 
-- **Performance:** Startup and runtime overhead of managed services.
-- **Reliability:** Deterministic restore/build process; CI gating.
-- **Security:** Signed binaries, SBOM publication, vulnerability scanning.
-- **Maintainability:** Code style, analyzer enforcement, shared libraries.
-- **Portability:** Ensure runtime features available on Windows x64, Linux x86_64, Linux ARM64.
+- **Performance:** Managed overhead shall not exceed 10% compared to native equivalents under test loads.  
+- **Reliability:** CI must validate runtime behavior across at least two OS architectures.  
+- **Security:** All builds must produce signed binaries and published SBOMs.  
+- **Maintainability:** Shared code analyzers and style rules are mandatory for all repos.  
+- **Portability:** Must compile and run on both Windows x64 and Linux (x86-64, ARM64).  
 
 ---
 
-## 12.8 Risks & Open Issues
+## 12.8 Risks & Open Issues  
 
 | ID | Description | Impact | Mitigation / Status | Owner |
 |----|-------------|--------|---------------------|-------|
-| RISK-12-1 | Legacy .NET Framework components resist upgrade. | Medium | Provide shims; schedule incremental rewrites. | @core |
-| RISK-12-2 | Dependency allowlist slows contribution velocity. | Low | Automate approvals with cross-OS smoke builds. | @release |
-| ISSUE-12-1 | Define policy for native helper utilities (C++/Rust). | Medium | Document in Section 14; require FFI guidelines. | @platform |
-| ISSUE-12-2 | Determine cadence for contract version bumps. | Medium | Align with release calendar; publish roadmap. | @plugins |
+| **RISK-12-1** | Legacy Framework components may not port cleanly. | Medium | Introduce adapters or gradual rewrite. | @core |
+| **RISK-12-2** | Dependency allowlist process may slow merges. | Low | Automate checks; document review process. | @release |
+| **ISSUE-12-1** | Define policy for native/FFI helpers. | Medium | Add to §14 build policy. | @platform |
+| **ISSUE-12-2** | Confirm versioning cadence for shared contracts. | Medium | Establish per-release compatibility window. | @plugins |
 
 ---
 
-## 12.9 Design Considerations
+## 12.9 Design Considerations  
 
 | ID | Consideration | Description |
 |----|----------------|-------------|
-| C1 | Unified runtime adoption | .NET 8 LTS provides consistent language features and tooling. |
-| C2 | Legacy compatibility | Keep AgOpenGPS v6 hardware integrations functioning while Nexus moves to .NET 8; UI migrations are out of scope. |
-| C3 | Dependency governance | Allowlist + CI gating to ensure cross-platform compatibility. |
-| C4 | Contract versioning | Maintain stable APIs for plugins and remote clients. |
-| C5 | Tooling ergonomics | Provide setup scripts to install SDKs and analyzers consistently. |
-| C6 | Simulation parity | Ensure runtime supports deterministic sim/replay frameworks. |
+| **C1** | Single Runtime | Simplifies builds and reduces fragmentation. |
+| **C2** | Language-Agnostic Contracts | Enables plugin developers to use other languages if desired. |
+| **C3** | Deterministic Builds | Required for reproducibility, trust, and debugging. |
+| **C4** | Dependency Hygiene | Keeps supply chain secure and licenses transparent. |
+| **C5** | Native Hooks | Provides optional performance paths while keeping portability. |
 
-### 12.9.1 Assumptions & Preconditions
-
-- [A1] Contributors can install .NET 8 SDK and required workloads on development machines.
-- [A2] Build infrastructure supports Windows and Linux agents with identical toolchains.
-- [A3] Plugin maintainers participate in compatibility validation.
+**Assumptions:**  
+- Contributors can install the chosen LTS runtime on Windows or Linux.  
+- CI agents mirror contributor toolchains.  
+- Plugin maintainers test against contract compatibility suites.  
 
 ---
 
-## 12.10 Option Overview
+## 12.10 Option Overview  
 
 | Option ID | Status | Type / Theme | Description | Reference Document |
-|-----------|--------|--------------|-------------|--------------------|
-| — | — | — | No standalone option documents for Section 12. See Section 11 Option 11-O1 for cross-platform runtime baseline. | — |
+|------------|--------|--------------|-------------|--------------------|
+| **12-O1** | Proposed | Runtime Policy | Use a single LTS managed runtime and unified toolchain. | 12-O1_Runtime_Policy.md |
+| **12-O2** | Proposed | Contract Governance | Define semantic versioning and compatibility tests for shared packages. | 12-O2_Contract_Governance.md |
 
 ---
 
-## 12.11 Comparison Matrix
+## 12.11 Comparison Matrix  
 
-| Attribute / Criteria | Unified .NET 8 Stack (11-O1) | Mixed Runtime Legacy |
-|----------------------|------------------------------|---------------------|
-| Implementation Effort | Medium | Low |
-| Maintainability | High | Low |
-| Performance | High | Medium |
-| Extensibility | High | Low |
+| Attribute / Criteria | 12-O1 (Unified Runtime) | 12-O2 (Contract Governance) |
+|----------------------|--------------------------|-----------------------------|
+| Implementation Effort | Medium | Medium |
+| Maintainability | High | High |
+| Performance | High | Neutral |
+| Extensibility | Medium | High |
 | Risk Level | Medium | Medium |
 
 ---
 
-## 12.12 Decision Matrix
+## 12.12 Decision Matrix  
 
-Section 12 defers to OS Support §11.12 for quantitative scoring; runtime governance inherits the selected Option 11-O1.
-Focus for this section is policy execution (allowlists, signing, tooling).
-
----
-
-## 12.13 Evaluation & Verification
-
-- Maintain automated build repeatability report per release.
-- Validate cross-platform CLI/tooling by running `nexus sim smoke` on Windows and Linux lanes.
-- Track dependency vulnerability scan results (SCA) with remediation SLAs.
+*(Reserved — to be completed when runtime and contract governance options are evaluated.)*
 
 ---
 
-## 12.14 Implementation Policy
+## 12.13 Evaluation & Verification  
 
-- Commit `global.json` updates via governance review; document SDK upgrades.
-- Require dependency proposals via pull request template referencing allowlist updates.
-- Publish plugin contract version map each release with migration notes.
+- Verify build reproducibility by rebuilding from scratch and comparing artifact hashes.  
+- Validate plugin API compatibility using automated diff tests across two versions.  
+- Confirm all CI pipelines use identical SDK and dependency baselines.  
+
+**Acceptance Criteria:**  
+All MUST requirements pass their corresponding tests and audits with no waivers.  
 
 ---
 
-## 12.15 Community Sentiment
+## 12.14 Implementation Policy  
 
-- Contributors support moving to .NET 8 to align with Avalonia UI roadmap.
-- Plugin authors request clear versioning policy to avoid unexpected breaking changes.
-- Build/release team emphasizes reproducibility and secret hygiene across pipelines.
+- Toolchain and SDK versions are pinned via repository manifest (`global.json` or equivalent).  
+- Dependency additions require a governance pull request referencing the allowlist.  
+- Contract package releases follow semantic versioning and publish changelogs.  
+- Every public API change must include version bump and test update.  
 
-### 12.15.1 Section Change Log
+---
+
+## 12.15 Community Sentiment  
+
+Contributors broadly support a unified managed runtime and stricter dependency controls for reliability and onboarding simplicity.  
+Plugin authors have requested clear documentation for contract versioning and migration guidance.  
+Build maintainers emphasize reproducibility and security of the release pipeline.  
 
 | Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Rebaselined runtime governance using standardized template. | #0000 |
+|------|----------|------------|
+| 2025-10-21 | Initial draft of runtime and dependency governance | #0000 |
 
 ---
 
-## 12.16 Traceability
+## 12.16 Traceability  
 
 | Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
 |----------------|-------------------|--------|-----------------------|--------------------------|
-| R-STACK-000 | 11-O1 | 11-ADR-001 | `pipelines/dotnet-build.yml` | `global.json` |
-| R-STACK-002 | — | — | `tools/dependency-allowlist.json` | `packaging/dependency-policy.md` |
-| R-STACK-004 | — | — | `tests/contracts/versioning/` | `Nexus SourceCode/src/Aog.Abstractions/` |
+| R-STACK-001 | 12-O1 | — | `/pipelines/dotnet.yml` | `/global.json` |
+| R-STACK-003 | 12-O1 | — | `/qa/build_repeatability.md` | `/src/Build/` |
+| R-STACK-006 | 12-O2 | — | `/tests/contracts/` | `/src/Aog.Abstractions/` |
 
 ---
 
-## 12.17 Conformance
+## 12.17 Conformance  
 
-Implementations conform when managed components target .NET 8, dependency allowlists are enforced, and contract versioning policies are followed with documented verification artifacts.
+An implementation conforms to §12 when:  
+1. All **MUST** requirements (R-STACK-001–R-STACK-004) are satisfied and verified;  
+2. All **SHOULD** requirements (R-STACK-005–R-STACK-006) are satisfied or formally waived;  
+3. No **MUST NOT** conditions are violated.  
 
 ---
 
-## Standards Context
+## Standards Context  
 
-Aligns with **ISO/IEC/IEEE 29148:2018** for requirement traceability and **CNCF Secure Supply Chain** guidelines for build integrity.
+Aligns with **ISO/IEC/IEEE 29148:2018** (*Systems and Software Requirements Specification*) and  
+**IEEE 1016:2017** (*Software Design Description*).  
+Also consistent with **CNCF Secure Supply Chain** principles for deterministic builds and dependency transparency.  

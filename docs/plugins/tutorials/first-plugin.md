@@ -1,6 +1,6 @@
 # Creating Your First Plugin
 
-This tutorial walks through creating a basic Nexus plugin. For detailed requirements, see [ADR-018: Plugin API](../../ADR/ADR-018-plugin-api.md) and [Plugin Requirements](../../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md).
+This tutorial walks through creating a basic Nexus plugin. For detailed requirements, see [ADR-018: Plugin API](../../SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md) and [Plugin Requirements](../../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md).
 
 ## Prerequisites
 

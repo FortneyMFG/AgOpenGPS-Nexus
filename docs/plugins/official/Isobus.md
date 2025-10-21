@@ -30,6 +30,6 @@ The ISOBUS plugin bridges Nexus with ISO 11783 task controllers, enabling sectio
 
 ## Related Resources
 - `docs/plugins/TelemetryLogging.md` for capturing ISOBUS telemetry.
-- `docs/ADR/ADR-006-aog-link-mcu-communications.md` details the broader communications architecture.
+- `docs/SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md` details the broader communications architecture.
 - Existing ISOBUS bridge brief under `docs/plugins/IsobusBridge.md` provides historical context.
 

@@ -1,7 +1,7 @@
 # Axle-centric runtime playbook
 
 Tasks **NX-452** through **NX-455** deliver the axle-centric runtime introduced by
-[ADR-067](../ADR/ADR-067-equipment-configuration-kinematics.md). This guide captures the
+[ADR-067](../SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md). This guide captures the
 operator and engineering workflows required to take a rig from configuration export to
 field-ready automation.
 

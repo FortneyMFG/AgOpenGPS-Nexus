@@ -5,7 +5,7 @@ This document outlines Nexus's security architecture and implementation, followi
 ## Core Security Principles
 
 ### 1. Capability-Based Access
-As defined in [ADR-018: Plugin API](../ADR/ADR-018-plugin-api.md):
+As defined in [ADR-018: Plugin API](../SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md):
 
 ```mermaid
 graph TD
@@ -16,7 +16,7 @@ graph TD
 ```
 
 ### 2. Hardware Control Safety
-Following [ADR-024: Discovery & Identity](../ADR/ADR-024-discovery-identity.md):
+Following [ADR-024: Discovery & Identity](../SRS/sections/4X_Interprocess_Communications/42-ADR-024 - Discovery and identity services.md):
 
 - Authenticated device identity
 - Signed command validation
@@ -77,7 +77,7 @@ Following [ADR-024: Discovery & Identity](../ADR/ADR-024-discovery-identity.md):
 ## Audit & Monitoring
 
 ### Logging
-As specified in [ADR-019: Provenance & Audit](../ADR/ADR-019-provenance-audit-qa.md):
+As specified in [ADR-019: Provenance & Audit](../SRS/sections/6X_Core_Domain_Services/64-ADR-019 - Provenance audit and QA governance.md):
 - Security events
 - Access attempts
 - Configuration changes

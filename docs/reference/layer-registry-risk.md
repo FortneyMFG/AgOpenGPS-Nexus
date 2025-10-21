@@ -27,5 +27,5 @@ handshake.
   provenance before streaming telemetry.【F:schemas/examples/FieldHealthRiskLayer.sample.json†L1-L56】
 
 ## References
-- [ADR-052 — Field Health Plugin](../ADR/ADR-052_FieldHealthPlugin.md)
+- [ADR-052 — Field Health Plugin](../SRS/sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md)
 - [Layer registry overview](../SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md)

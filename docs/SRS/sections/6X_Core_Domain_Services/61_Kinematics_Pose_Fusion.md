@@ -62,11 +62,11 @@ Operator workflow, recovery from display loss, remote access needs, control dete
 - Constraint gates for spatial zones need to live in the same arbiter to keep automation deterministic and ensure plugins cannot bypass safety policies.
 
 ## Upcoming ADR coverage
-- **ADR-007 PoseStream & SectionState architecture** introduces SectionState diffing tied to the control graph, binding R-CTRL-000 through R-CTRL-002 to the unified pose timeline for replay accuracy.【F:docs/ADR/ADR-roadmap.md†L67-L73】
-- **ADR-027 Spatial constraints & zone policies** threads zone masks and constraint gates through the control arbiter, fulfilling R-CTRL-000 and R-CTRL-006…R-CTRL-007 while keeping automation overrides auditable.【F:docs/ADR/ADR-roadmap.md†L27-L41】
-- **ADR-015 Section control & grouping semantics** will finalize arbitration, master group handling, and plugin hooks required by R-CTRL-000 and R-CTRL-001 while keeping toolbar overrides aligned with R-CTRL-002.【F:docs/ADR/ADR-roadmap.md†L118-L124】
-- **ADR-017 Profiles & kinematics** ensures toolbar placement, hitch models, and multi-steer profiles feed the control lookahead policies outlined in R-CTRL-002.【F:docs/ADR/ADR-roadmap.md†L134-L140】
-- **ADR-018 Plugin API & capability discovery** codifies automation lifecycle, permissions, and safety surfaces required by R-CTRL-003 through R-CTRL-005 so plugins stay bounded by Core arbitration.【F:docs/ADR/ADR-roadmap.md†L142-L148】
+- **ADR-007 PoseStream & SectionState architecture** introduces SectionState diffing tied to the control graph, binding R-CTRL-000 through R-CTRL-002 to the unified pose timeline for replay accuracy.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L67-L73】
+- **ADR-027 Spatial constraints & zone policies** threads zone masks and constraint gates through the control arbiter, fulfilling R-CTRL-000 and R-CTRL-006…R-CTRL-007 while keeping automation overrides auditable.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L27-L41】
+- **ADR-015 Section control & grouping semantics** will finalize arbitration, master group handling, and plugin hooks required by R-CTRL-000 and R-CTRL-001 while keeping toolbar overrides aligned with R-CTRL-002.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L118-L124】
+- **ADR-017 Profiles & kinematics** ensures toolbar placement, hitch models, and multi-steer profiles feed the control lookahead policies outlined in R-CTRL-002.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L134-L140】
+- **ADR-018 Plugin API & capability discovery** codifies automation lifecycle, permissions, and safety surfaces required by R-CTRL-003 through R-CTRL-005 so plugins stay bounded by Core arbitration.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md†L142-L148】
 
 ## Open questions
 - What minimum telemetry needs to be exposed to a headless dashboard?

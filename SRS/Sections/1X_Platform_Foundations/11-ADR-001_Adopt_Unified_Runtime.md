@@ -130,7 +130,7 @@ graph TD
 
 - **SRS Sections:** `11_OS_Support.md` — §§11.5, 11.12  
 - **Option Documents:** `11-O1_Unified_DotNet8_Avalonia.md`  
-- **Prior ADRs:** `docs/ADR/ADR-001-dotnet8-runtime.md`, `docs/ADR/ADR-003-avalonia-ui.md`
+- **Prior ADRs:** `docs/SRS/sections/1X_Platform_Foundations/11-ADR-001 - Adopt .NET 8 C stack for Nexus runtime.md`, `docs/SRS/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md`
 
 ---
 

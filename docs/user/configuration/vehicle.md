@@ -23,7 +23,7 @@ This guide covers vehicle setup and configuration in Nexus. For hardware-specifi
 ```
 
 ### Implement Settings
-Following [ADR-008: Equipment Hierarchy](../../ADR/ADR-008-equipment-hierarchy.md):
+Following [ADR-008: Equipment Hierarchy](../../SRS/sections/6X_Core_Domain_Services/61-ADR-008 - Equipment Implement Toolbar Section hierarchy.md):
 
 ```json
 {
@@ -59,7 +59,7 @@ Following [ADR-008: Equipment Hierarchy](../../ADR/ADR-008-equipment-hierarchy.m
 ## Guidance Configuration
 
 ### AutoSteer Settings
-As defined in [ADR-033: Guidance & AutoSteer](../../ADR/ADR-033-guidance-planner-autosteer.md):
+As defined in [ADR-033: Guidance & AutoSteer](../../SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md):
 
 | Parameter | Range | Description |
 |-----------|-------|-------------|

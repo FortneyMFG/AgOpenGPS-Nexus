@@ -37,4 +37,4 @@ This reference summarizes the lifecycle events and editing hooks published by Co
 - Collaborative scenarios replicate `LayerEditEvent` journals via the Live Telemetry Mesh. Plugins should handle duplicate events idempotently.
 - Weather snapshots populate `Session.weatherSnapshot` and `weather.overlay` layers. Plugins that depend on weather should subscribe to `onSessionWeatherUpdate` and fall back to the latest snapshot when updates pause.
 
-For detailed schemas refer to `/schemas` and the ADRs listed in [docs/ADR/ADR-roadmap.md](../ADR/ADR-roadmap.md).
+For detailed schemas refer to `/schemas` and the ADRs listed in [docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md](../SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md).

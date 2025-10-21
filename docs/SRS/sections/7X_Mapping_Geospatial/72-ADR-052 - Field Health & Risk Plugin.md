@@ -41,18 +41,18 @@ with the context bus for analytics.
 - **Risk schema stewardship.** `FieldHealthRiskLayer.v1` revisions must publish migration scripts and downgrade guidance so
   archived scouting logs remain readable alongside new analytics releases.【F:schemas/FieldHealthRiskLayer.v1.json†L1-L140】
 - **Observer accountability.** Risk entries require observer identity and timestamp validation tied back to session journals,
-  producing auditable records for compliance and report exports.【F:schemas/Session.v1.json†L1-L120】【F:docs/ADR/ADR-051_ReportBuilder.md†L9-L70】
+  producing auditable records for compliance and report exports.【F:schemas/Session.v1.json†L1-L120】【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L9-L70】
 - **Alert gating.** Mesh alerts derived from risk zones must honor share/subscribe ACLs and RadioBridge throttling limits to
-  avoid leaking sensitive agronomic data during collaborative operations.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L70】【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+  avoid leaking sensitive agronomic data during collaborative operations.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L21-L70】【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md†L9-L60】
 
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - Field health overlays inherit crop, genetics, and weather context from session snapshots, letting analytics rank risks by crop
-  susceptibility or weather stress automatically.【F:docs/ADR/ADR-045_CropTypePlugin.md†L9-L96】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L9-L87】【F:docs/ADR/ADR-053_WeatherPlugin.md†L9-L66】
+  susceptibility or weather stress automatically.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L9-L96】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md†L9-L87】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L9-L66】
 - Multi-field jobs track risk severities per field, improving profitability rollups and targeted scouting follow-ups without
-  manual filtering.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+  manual filtering.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】
 - Zone Drawing undo seeds propagate across mesh replicas so collaborative scouts produce identical audit trails even with
-  intermittent connectivity.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L9-L74】
+  intermittent connectivity.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L9-L74】
 
 ## Alternatives Considered
 

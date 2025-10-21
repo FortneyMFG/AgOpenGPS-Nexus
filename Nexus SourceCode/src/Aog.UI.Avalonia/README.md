@@ -11,7 +11,7 @@ the boundary tool sample while the right-hand column preserves the diagnostics/s
 ## Zone editor toolbar (NX-291)
 
 The main window now hosts a sample toolbar that exercises the zone drawing framework defined in
-[ADR-044](../../../docs/ADR/ADR-044_ZoneDrawingFramework.md). The toolbar lives inside the map card
+[ADR-044](../../../docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md). The toolbar lives inside the map card
 and is backed by `ZoneEditorToolbarViewModel`, which:
 
 * Drives tool selection for polygon, rectangle, brush, and eraser affordances.
@@ -38,14 +38,14 @@ understand what telemetry is driving the dashboard.
 ## Radio provisioning UI flows (NX-311)
 
 `RadioProvisioningFlowViewModel` models the RadioBridge provisioning workflow described in
-[ADR-048](../../../docs/ADR/ADR-048_RadioBridge.md) and the
+[ADR-048](../../../docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md) and the
 [`radiobridge-provisioning` how-to](../../../docs/howto/radio/radiobridge-provisioning.md). The card summarises
 prerequisites, CLI usage, device configuration, and validation checkpoints so operators can stage ELRS/LoRa
 bridges without switching back to documentation. The view-model also exposes the provisioning profile schema
 fields to reinforce how generated JSON maps onto adapter options and security practices.
 ## Crop quick-select UI (NX-302)
 
-`CropQuickSelectViewModel` models the crop quick-select card described in [ADR-045](../../../docs/ADR/ADR-045_CropTypePlugin.md).
+`CropQuickSelectViewModel` models the crop quick-select card described in [ADR-045](../../../docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md).
 Groups expose curated rotations, favorites, and recent assignments via `CropQuickSelectGroupViewModel`
 and `CropQuickSelectOptionViewModel`. The MainWindow binds to the sample instance returned by
 `CropQuickSelectViewModel.CreateSample()`, illustrating how plugins can publish crop context for field
@@ -67,7 +67,7 @@ ADR-027 interop requirements.
 ## Preset switcher and orchestration status (NX-297)
 
 `PresetSwitcherViewModel` models the preset selection card described in
-[ADR-032](../../../docs/ADR/ADR-032-presets-and-layout-linking.md). Presets expose dependency health,
+[ADR-032](../../../docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md). Presets expose dependency health,
 background tasks, and orchestration progress through `PresetOptionViewModel` and
 `PresetTaskStatusViewModel` records. The static `CreateSample()` helper wires the planter, sprayer, and
 harvest fixtures into `MainWindowViewModel` so UI shells can exercise status messaging without
@@ -76,14 +76,14 @@ service dependencies.
 ## Field health severity UX (NX-306)
 
 `FieldHealthSeverityPanelViewModel` captures the severity scale required by
-[ADR-052](../../../docs/ADR/ADR-052_FieldHealthPlugin.md), including layer provenance, persisted history
+[ADR-052](../../../docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md), including layer provenance, persisted history
 filters, and the severity colour ramps that align with the `FieldHealthRiskLayer.v1` schema. The sample
 panel used by `MainWindowViewModel` highlights critical, high, moderate, low, and none severities with
 recommended operator actions so future plugins can populate the same structure without bespoke UI code.
 ## Radio provisioning UI flows (NX-311)
 
 `RadioProvisioningPanelViewModel` surfaces the provisioning workflows aligned with
-[ADR-048](../../../docs/ADR/ADR-048_RadioBridge.md). The panel assembles
+[ADR-048](../../../docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md). The panel assembles
 `RadioProvisioningDeviceViewModel` records that track handshake, topic registry, key exchange, and
 reliability steps for each bridge, while `RadioProvisioningProfileViewModel` and
 `RadioProvisioningAuditEntryViewModel` expose generated keysets and operator-facing audit history. The

@@ -1,6 +1,6 @@
 # Composite Simulation Fabric GA Checklist
 
-[ADR-004 — Composite simulation fabric](../ADR/ADR-004-composite-simulation.md) defines the composite simulation fabric that stitches SimClock, SimBus topics, and deterministic fixtures together. Use this checklist to confirm the GA cut meets expectations and remains reproducible in CI. Cross-reference the [simulation library](README.md) and targeted replay coverage in the [cross-track harness guide](../howto/cross-track-replay-harness.md) when validating updates.
+[ADR-004 — Composite simulation fabric](../SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md) defines the composite simulation fabric that stitches SimClock, SimBus topics, and deterministic fixtures together. Use this checklist to confirm the GA cut meets expectations and remains reproducible in CI. Cross-reference the [simulation library](README.md) and targeted replay coverage in the [cross-track harness guide](../howto/cross-track-replay-harness.md) when validating updates.
 
 ## Fabric Components
 

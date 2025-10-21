@@ -13,8 +13,8 @@
 
 ### Equivalency & Provider Selection
 
-- **Conformance profiles.** Plugins that implement `provides.profiles` must ship CI attestations proving the declared profile/feature matrix before the bundle treats them as eligible replacements.【F:docs/SRS/appendices/plugin_manifest.schema.json†L309-L332】【F:docs/ADR/ADR-031-official-plugin-bundle.md†L25-L74】
-- **Deterministic resolver.** Core evaluates `requires.capabilities`, `requires.profiles`, and relationship hints (`peerOf`, `conflictsWith`, `replaces`, `extends`) before selecting providers, quarantining conflicts, and surfacing downgrade states when only soft matches exist.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L24-L32】【F:docs/ADR/ADR-031-official-plugin-bundle.md†L49-L83】
+- **Conformance profiles.** Plugins that implement `provides.profiles` must ship CI attestations proving the declared profile/feature matrix before the bundle treats them as eligible replacements.【F:docs/SRS/appendices/plugin_manifest.schema.json†L309-L332】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L25-L74】
+- **Deterministic resolver.** Core evaluates `requires.capabilities`, `requires.profiles`, and relationship hints (`peerOf`, `conflictsWith`, `replaces`, `extends`) before selecting providers, quarantining conflicts, and surfacing downgrade states when only soft matches exist.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L24-L32】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L49-L83】
 - **Policy overlays.** Administrators can pin preferred providers or enable multi-provider mode using a TOML DSL that flows with the manifest bundle:
 
 ```toml

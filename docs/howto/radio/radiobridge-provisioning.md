@@ -1,7 +1,7 @@
 # RadioBridge provisioning kit
 
 NX-244 introduces a repeatable provisioning workflow for the RadioBridge transports described in
-[ADR-048](../../ADR/ADR-048_RadioBridge.md). This guide covers generating device profiles,
+[ADR-048](../../SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md). This guide covers generating device profiles,
 activating ELRS and LoRa adapters, and validating that the new forward error correction settings are
 applied consistently across the fleet.
 

@@ -55,13 +55,13 @@ Adopt a Preset model that binds Equipment, Implement, and Layout selections into
 ## Accepted scope & invariants
 - Preset bundles must persist dependency graphs that align with the manifest
   governance matrix so Device Manager and PresetsService present identical health
-  states during orchestration.【F:docs/ADR/ADR-031-official-plugin-bundle.md†L15-L62】
+  states during orchestration.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L15-L62】
 - Layout inheritance and live-link semantics are now normative for UI pods; updates
   must respect the deterministic overlay rules and provenance requirements captured
   in the frontend SRS section.【F:docs/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L22-L88】
 - Task orchestration for preset application is officially bound to the JobsService
   lifecycle contracts, ensuring preset provenance is journaled alongside job/session
-  metadata for auditing.【F:docs/ADR/ADR-030-field-job-sessions.md†L20-L96】
+  metadata for auditing.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L20-L96】
 
 ## Legacy Implementation Notes
 ### AgOpenGPS v6

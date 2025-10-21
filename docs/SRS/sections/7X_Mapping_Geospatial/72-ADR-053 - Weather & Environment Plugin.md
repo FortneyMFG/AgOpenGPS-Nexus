@@ -40,20 +40,20 @@ builder and analytics.
 ## Governance Updates
 
 - **Snapshot retention.** Weather snapshots adopt the session archival cadence defined in JobsService; operators must retain raw
-  imports and API provenance so audits can rehydrate the data underpinning regulatory reports.【F:docs/ADR/ADR-030-field-job-sessions.md†L13-L96】【F:schemas/WeatherOverlay.v1.json†L1-L140】
+  imports and API provenance so audits can rehydrate the data underpinning regulatory reports.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L13-L96】【F:schemas/WeatherOverlay.v1.json†L1-L140】
 - **Source verification.** External API connectors log request/response hashes and rate limit decisions, and regression packs
-  replay them through the composite simulation harness to verify deterministic caching.【F:docs/ADR/ADR-004-composite-simulation.md†L9-L43】
+  replay them through the composite simulation harness to verify deterministic caching.【F:docs/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L9-L43】
 - **Alert scope compliance.** Weather-derived notifications respect share/subscribe ACLs and RadioBridge throttles, keeping
-  sensitive agronomic data scoped to authorized collaborators.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L21-L70】【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+  sensitive agronomic data scoped to authorized collaborators.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L21-L70】【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md†L9-L60】
 
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - Session snapshots capture weather deltas alongside crop, genetics, and profit references so analytics can correlate outcomes
-  without bespoke joins.【F:schemas/Session.v1.json†L1-L120】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L9-L96】
+  without bespoke joins.【F:schemas/Session.v1.json†L1-L120】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L9-L96】
 - Multi-field envelope membership informs weather overlays, enabling per-field rainfall and wind reporting that aligns with
-  regulatory compliance and profitability splits.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+  regulatory compliance and profitability splits.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】
 - Weather overlays seed LayerEditEvent journals when operators draw manual impact zones, ensuring collaborative edits replay
-  consistently across mesh-connected devices.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L9-L74】
+  consistently across mesh-connected devices.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L9-L74】
 
 ## Alternatives Considered
 

@@ -27,7 +27,7 @@
 
 ## Related ADRs
 
-- [ADR-001 — Adopt .NET 8 C# Stack](../ADR/ADR-001-dotnet8-runtime.md)
-- [ADR-004 — Composite Simulation](../ADR/ADR-004-composite-simulation.md)
-- [ADR-028 — Stack Boundaries](../ADR/ADR-028-stack-boundaries.md)
-- [ADR-032 — Presets and Layout Linking](../ADR/ADR-032-presets-and-layout-linking.md)
+- [ADR-001 — Adopt .NET 8 C# Stack](sections/1X_Platform_Foundations/11-ADR-001 - Adopt .NET 8 C stack for Nexus runtime.md)
+- [ADR-004 — Composite Simulation](sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md)
+- [ADR-028 — Stack Boundaries](sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md)
+- [ADR-032 — Presets and Layout Linking](sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md)

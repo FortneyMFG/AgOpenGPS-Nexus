@@ -24,12 +24,12 @@ metadata via the registry handshake.
   payloads without inferring from identifiers.【F:schemas/GeneticsPlan.v1.json†L1-L46】【F:schemas/GeneticsVariety.v1.json†L1-L51】
 - **Session awareness.** `genetics.variety` entries must include `sessionId`, matching the
   ADR-041 session lifecycle, while `genetics.plan` remains job-scoped. Controllers should
-  advertise `requiresSession=true` for the variety layer during the registry handshake.【F:docs/ADR/ADR-046_GeneticsPlugin.md†L17-L52】【F:docs/reference/layer-registry-handshake.md†L8-L64】
+  advertise `requiresSession=true` for the variety layer during the registry handshake.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md†L17-L52】【F:docs/reference/layer-registry-handshake.md†L8-L64】
 - **Change logs.** Barcode or lot updates recorded in `changeLog[]` enable downstream
   analytics to reconcile mid-session swaps and support audit reports referencing
   `LayerEditEvent` journals.【F:schemas/GeneticsVariety.v1.json†L52-L108】【F:docs/plugins/Genetics.md†L9-L34】
 
 ## References
-- [ADR-046 — Genetics Plugin & Layers](../ADR/ADR-046_GeneticsPlugin.md)
+- [ADR-046 — Genetics Plugin & Layers](../SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md)
 - [Layer Registry Hash Handshake (Draft)](layer-registry-handshake.md)
 - [Genetics Plugin Requirements](../plugins/Genetics.md)

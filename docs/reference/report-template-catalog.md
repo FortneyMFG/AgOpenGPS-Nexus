@@ -6,7 +6,7 @@
 
 The report builder centralizes how Nexus assembles cross-plugin exports by loading
 templates, invoking registered section renderers, and producing PDF/CSV/GeoJSON
-bundles for a chosen farm, season, job, or session scope.【F:docs/ADR/ADR-051_ReportBuilder.md†L16-L33】
+bundles for a chosen farm, season, job, or session scope.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L16-L33】
 Versioned `ReportTemplate` manifests capture the metadata that keeps those exports
 deterministic and auditable across releases.【F:docs/SRS/sections/3X_Data_Storage/32_Persistence_Formats.md†L37-L38】
 
@@ -15,7 +15,7 @@ deterministic and auditable across releases.【F:docs/SRS/sections/3X_Data_Stora
 The initial catalog ships three first-party templates. Each template records its
 identifier, scope, required sections, and output formats. Sections link to plugin
 contributors via `registerReportSection()` so the builder can validate readiness
-before generation.【F:docs/ADR/ADR-051_ReportBuilder.md†L17-L33】
+before generation.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L17-L33】
 
 | Template | Template ID | Scope | Primary sections | Data dependencies | Outputs |
 | --- | --- | --- | --- | --- | --- |
@@ -90,12 +90,12 @@ contributor; otherwise the builder rejects registration during boot or export.
 
 | Section ID | Provided by | Required context | Notes |
 | --- | --- | --- | --- |
-| `crop.analytics.summary` | Crop Type plugin | Crop history, job/season context | Aggregates acreage per crop and season.【F:docs/ADR/ADR-045_CropTypePlugin.md†L44-L49】 |
-| `genetics.analytics.summary` | Genetics plugin | Crop context, variety layers | Summarizes variety distribution and barcode traceability for the selected scope.【F:docs/ADR/ADR-046_GeneticsPlugin.md†L17-L43】 |
-| `yield.analytics.summary` | Yield plugin | Yield layers, crop/genetics metadata | Provides yield statistics and overlays aligned with crop and genetics context.【F:docs/ADR/ADR-049_YieldPlugin.md†L15-L53】 |
-| `profit.analytics.summary` | Cost & Profit plugin | Cost records, yield aggregations | Produces cost, revenue, and profit rollups plus ledger excerpts.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L17-L40】 |
-| `fieldHealth.summary` | Field Health plugin | Risk layers, observations | Highlights risk hotspots with severity notes and attachments.【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L17-L49】 |
-| `weather.timeline.summary` | Weather plugin | Session weather snapshots, overlays | Renders compliance timeline charts and weather overlays referenced by exports.【F:docs/ADR/ADR-053_WeatherPlugin.md†L16-L49】 |
+| `crop.analytics.summary` | Crop Type plugin | Crop history, job/season context | Aggregates acreage per crop and season.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L44-L49】 |
+| `genetics.analytics.summary` | Genetics plugin | Crop context, variety layers | Summarizes variety distribution and barcode traceability for the selected scope.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md†L17-L43】 |
+| `yield.analytics.summary` | Yield plugin | Yield layers, crop/genetics metadata | Provides yield statistics and overlays aligned with crop and genetics context.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L15-L53】 |
+| `profit.analytics.summary` | Cost & Profit plugin | Cost records, yield aggregations | Produces cost, revenue, and profit rollups plus ledger excerpts.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L17-L40】 |
+| `fieldHealth.summary` | Field Health plugin | Risk layers, observations | Highlights risk hotspots with severity notes and attachments.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md†L17-L49】 |
+| `weather.timeline.summary` | Weather plugin | Session weather snapshots, overlays | Renders compliance timeline charts and weather overlays referenced by exports.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L16-L49】 |
 
 When a template includes an optional section, ensure the contributor exposes a
 `CapabilityState.Optional` flag so the builder can mark it as skippable without
@@ -106,7 +106,7 @@ operators understand the trade-off of exporting early.【F:Nexus SourceCode/src/
 
 1. **Author templates alongside ADR updates.** New templates require an ADR or
    ADR addendum describing scope, data dependencies, and expected outputs so they
-   remain traceable to product decisions.【F:docs/ADR/ADR-051_ReportBuilder.md†L20-L33】
+   remain traceable to product decisions.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L20-L33】
 2. **Version diligently.** Bump the manifest version when section ordering,
    required data, or outputs change. Major versions accompany breaking changes;
    minor versions cover additive sections or cosmetic updates; patch versions
@@ -150,4 +150,4 @@ discoverable via `ListTemplates()` for UI and CLI tooling.【F:Nexus SourceCode/
 
 Maintaining this catalog ensures Report Builder exports remain predictable,
 verifiable, and aligned with the agronomic analytics roadmap established in
-ADR-051.【F:docs/ADR/ADR-051_ReportBuilder.md†L16-L39】
+ADR-051.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L16-L39】

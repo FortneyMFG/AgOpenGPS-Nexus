@@ -116,7 +116,7 @@ nexus sim scenario guidance-calibration
 
 ## Performance Testing
 
-As specified in [ADR-026: Performance Budgets](../ADR/ADR-026-performance-budgets.md):
+As specified in [ADR-026: Performance Budgets](../SRS/sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md):
 
 1. **Profiling**
    - CPU usage monitoring

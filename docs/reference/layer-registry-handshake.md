@@ -74,7 +74,7 @@ and firmware PGN mapping as part of ADR-016.
   data but still need registry validation.
 
 ## References
-- [ADR-010: Layer registry and variable-rate framework](../ADR/ADR-010-layer-registry-variable-rate.md)
-- [ADR-027: Spatial constraints & zone policies](../ADR/ADR-027-spatial-constraints.md)
-- [ADR-068: Layer controllers & aggregation runtime](../ADR/ADR-068-layer-controllers-runtime.md)
+- [ADR-010: Layer registry and variable-rate framework](../SRS/sections/3X_Data_Storage/32-ADR-010 - Layer registry and variable-rate framework.md)
+- [ADR-027: Spatial constraints & zone policies](../SRS/sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md)
+- [ADR-068: Layer controllers & aggregation runtime](../SRS/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md)
 - [SRS §03 — Communications & transports](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)

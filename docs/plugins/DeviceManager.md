@@ -23,4 +23,4 @@ The manifest declares exclusive leases for inventory and firmware management cap
 
 ## Operator experience
 
-When installed, Device Manager adds a hardware-focused navigation entry and dedicated panel that summarize fleet status, highlight incompatible firmware, and link directly to remediation workflows. Job Tasks integration is suggested so equipment readiness can be displayed alongside job context, mirroring the guidance called out in ADR-031 for official plugin bundles.【F:docs/ADR/ADR-031-official-plugin-bundle.md†L16-L45】
+When installed, Device Manager adds a hardware-focused navigation entry and dedicated panel that summarize fleet status, highlight incompatible firmware, and link directly to remediation workflows. Job Tasks integration is suggested so equipment readiness can be displayed alongside job context, mirroring the guidance called out in ADR-031 for official plugin bundles.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L16-L45】

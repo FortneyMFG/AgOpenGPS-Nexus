@@ -58,18 +58,18 @@ integrity, context publication, and storage; the plugin focuses on attribute sem
 - **Registry-first layers.** `cropType.planned`, `cropType.actual`, and `cropType.history` definitions are now frozen in the
   layer registry and must ship schema diffs alongside manifest changes so downstream analytics detect upgrades in advance.【F:schemas/Layer.v1.json†L1-L120】【F:schemas/CropTypePlanned.v1.json†L1-L118】
 - **History promotion checklist.** Season close-outs must attach validator output proving that `cropType.history` entries match
-  session journals before the archive publishes, providing an auditable trail for Report Builder templates and profit analytics.【F:schemas/CropTypeHistoryRecord.v1.json†L1-L130】【F:docs/ADR/ADR-051_ReportBuilder.md†L9-L70】
+  session journals before the archive publishes, providing an auditable trail for Report Builder templates and profit analytics.【F:schemas/CropTypeHistoryRecord.v1.json†L1-L130】【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L9-L70】
 - **Fixture coverage.** Regression packs now include multi-field jobs with overlapping crop edits to guarantee deterministic
-  journal playback through the Zone Drawing framework and Live Telemetry Mesh replication paths.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L9-L74】【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L9-L70】
+  journal playback through the Zone Drawing framework and Live Telemetry Mesh replication paths.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L9-L74】【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L9-L70】
 
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - Job and session snapshots embed the mounted crop IDs alongside genetics references so Profit, Field Health, and Weather
   plugins can align analytics with the authoritative crop context without bespoke joins.【F:schemas/Session.v1.json†L1-L120】
 - Multi-field job envelopes publish per-field crop summaries in `job.stats.fields[]`, allowing Report Builder templates to split
-  acreage and analytics by field even when a single job spans multiple parcels.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】
+  acreage and analytics by field even when a single job spans multiple parcels.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】
 - Crop zone edits propagated over the mesh now carry provenance hashes and replay seeds, enabling collaborative planners to
-  reconcile planned vs. actual layers after offline work without manual merge steps.【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+  reconcile planned vs. actual layers after offline work without manual merge steps.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md†L9-L60】
 
 ## Alternatives Considered
 

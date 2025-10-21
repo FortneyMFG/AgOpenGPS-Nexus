@@ -1,6 +1,6 @@
 # Avalonia Run Modes (CompanionRemote, LocalInProc, LocalOutOfProc)
 
-[ADR-003](../ADR/ADR-003-avalonia-ui.md) requires the Avalonia shell to switch between three run modes so the same UI serves as a remote companion or a full desktop host. This guide explains the configuration surface, transport wiring, and smoke tests for each mode.
+[ADR-003](../SRS/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md) requires the Avalonia shell to switch between three run modes so the same UI serves as a remote companion or a full desktop host. This guide explains the configuration surface, transport wiring, and smoke tests for each mode.
 
 ## Configuration Surface
 

@@ -70,22 +70,22 @@ validation and provenance entries.
 
 - **Layer registry alignment.** Editable layer declarations must reference the canonical registry entries introduced with the
   multi-field envelope update so Crop, Genetics, Yield, Profit, Field Health, and Weather plugins remain provenance-compatible
-  when sessions span multiple fields.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L9-L112】【F:schemas/Layer.v1.json†L1-L120】
+  when sessions span multiple fields.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L9-L112】【F:schemas/Layer.v1.json†L1-L120】
 - **Undo/redo determinism gate.** `LayerEditEvent.v1` fixtures now ship alongside each plugin bundle. CI compares journal hashes
   during replay to block releases that diverge from the reference set, ensuring collaborative edits remain deterministic across
   mesh participants.【F:schemas/LayerEditEvent.v1.json†L1-L140】
 - **Collaborative audit trail.** Mesh share profiles must declare which edit events they replicate. ZoneService rejects
   publications that omit provenance hashes or exceed the per-event payload budget defined in the manifest governance
-  program.【F:schemas/ShareProfile.v1.json†L1-L120】【F:docs/ADR/ADR-031-official-plugin-bundle.md†L17-L70】
+  program.【F:schemas/ShareProfile.v1.json†L1-L120】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L17-L70】
 
 ## Amendment — 2025 architecture refresh (NX-190)
 
 - Editing sessions record the mounted `fieldIds[]` and union envelopes published by JobsService so replay, profit, and weather
-  analytics can reconcile edits with the active job context without bespoke geometry joins.【F:docs/ADR/ADR-030-field-job-sessions.md†L13-L96】
+  analytics can reconcile edits with the active job context without bespoke geometry joins.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L13-L96】
 - `LayerEditService` broadcasts session lifecycle hooks (`onSessionStart`, `onSessionEnd`) and mesh presence metadata, allowing
-  Profit, Yield, and Weather plugins to coalesce analytics windows with the exact edit ranges captured in journals.【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L9-L70】【F:schemas/Session.v1.json†L1-L120】
+  Profit, Yield, and Weather plugins to coalesce analytics windows with the exact edit ranges captured in journals.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L9-L70】【F:schemas/Session.v1.json†L1-L120】
 - Collaborative edits over the Live Telemetry Mesh carry deterministic replay seeds so remote devices rebuild identical undo
-  stacks even when RadioBridge transports introduce retries or resequencing during constrained connectivity.【F:docs/ADR/ADR-048_RadioBridge.md†L9-L60】
+  stacks even when RadioBridge transports introduce retries or resequencing during constrained connectivity.【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md†L9-L60】
 
 ## Alternatives Considered
 

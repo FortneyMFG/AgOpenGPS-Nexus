@@ -3,13 +3,13 @@
 ## Overview
 
 Mapping plugins render coverage, rate, and guidance layers while respecting farm/field geometry and job/session provenance.
-Multi-field job envelopes must provide continuous navigation across adjacent fields without breaking statistics or journaling. Core publishes lifecycle events (`onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, `onSessionStart`) so mapping engines can hydrate caches, consume job or session `extensions`, and expose plugin-authored overlays (crop type, profitability, genetics, field health, weather) alongside core coverage.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L64】 Zone editing flows reuse the shared LayerEditService contracts defined in ADR-044.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
+Multi-field job envelopes must provide continuous navigation across adjacent fields without breaking statistics or journaling. Core publishes lifecycle events (`onFarmLoaded`, `onSeasonLoaded`, `onJobLoaded`, `onContextChanged`, `onSessionStart`) so mapping engines can hydrate caches, consume job or session `extensions`, and expose plugin-authored overlays (crop type, profitability, genetics, field health, weather) alongside core coverage.【F:docs/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L18-L64】 Zone editing flows reuse the shared LayerEditService contracts defined in ADR-044.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
 
 ## Multi-Field Envelope Handling
 
-- Mapping plugins receive `mountFields(fieldIds[])` and must load all referenced field polygons, build a union envelope, and maintain an R-tree for per-field spatial queries. Job `extensions` provide optional crop-type, genetics, profitability, and risk overlays aligned with mounted fields.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L12-L68】【F:schemas/Job.v1.json†L1-L146】
+- Mapping plugins receive `mountFields(fieldIds[])` and must load all referenced field polygons, build a union envelope, and maintain an R-tree for per-field spatial queries. Job `extensions` provide optional crop-type, genetics, profitability, and risk overlays aligned with mounted fields.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L12-L68】【F:schemas/Job.v1.json†L1-L146】
 - When rendering coverage, plugins accumulate totals both for the job aggregate and per-field rollups stored in
-  `job.stats.fields[]` and exposed via analytics exports.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L47-L75】
+  `job.stats.fields[]` and exposed via analytics exports.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L47-L75】
 - Guidance and section control consumers rely on the union envelope to avoid operator prompts when crossing internal lanes; the
   plugin must emit boundary updates whenever the envelope changes.
 - Performance target: union envelope queries must resolve within ≤ 25 ms p95 for up to 10 mounted fields.
@@ -60,18 +60,18 @@ Multi-field job envelopes must provide continuous navigation across adjacent fie
 
 ## Shared Zone Drawing Framework
 
-- Layer editing is centralized in Core’s LayerEditService (ADR-044). Plugins declare editable layers and attribute schemas via manifests and respond to `onLayerStartEdit`, `onFeatureCommit`, and `onLayerUndo/Redo` events.【F:docs/ADR/ADR-044_ZoneDrawingFramework.md†L29-L74】
+- Layer editing is centralized in Core’s LayerEditService (ADR-044). Plugins declare editable layers and attribute schemas via manifests and respond to `onLayerStartEdit`, `onFeatureCommit`, and `onLayerUndo/Redo` events.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
 - Toolbar modes include polygon, rectangle, brush, and eraser tools supplied by Core; plugins contribute attribute panels (crop, genetics, risk, profit tags) declaratively.
-- LayerEditEvent journals persist geometry/attribute operations with deterministic hashes. Collaborative scenarios replicate journals via the Live Telemetry Mesh (ADR-047).【F:docs/ADR/ADR-047_LiveTelemetryMesh.md†L33-L62】
+- LayerEditEvent journals persist geometry/attribute operations with deterministic hashes. Collaborative scenarios replicate journals via the Live Telemetry Mesh (ADR-047).【F:docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md†L33-L62】
 
 ## Layer Catalog Additions
 
-- **Crop Type:** `cropType.planned`, `cropType.actual`, `cropType.history` store crop, year, status, source, and notes aligned with Field crop history and job/session context.【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】
-- **Genetics:** `genetics.plan`, `genetics.variety` capture seed brand/product/lot/treatment with provenance to coverage events and barcode change logs.【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】
-- **Yield:** `yield.actual`, `yield.moisture`, `yield.testWeight` store normalized harvest metrics with smoothing metadata and aggregation bins.【F:docs/ADR/ADR-049_YieldPlugin.md†L21-L52】
-- **Profit:** `profit.net` overlays combine yield-derived revenue and cost inputs, referencing `CostRecord` transactions and source layers.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L21-L52】
-- **Risk:** `risk.flood`, `risk.compaction`, `risk.weeds`, `risk.other` annotate severity and observations, leveraging LayerEditService for edits and validating metadata with `FieldHealthRiskLayer.v1` (severity scale, observer provenance, attachments).【F:docs/ADR/ADR-052_FieldHealthPlugin.md†L21-L44】【F:schemas/FieldHealthRiskLayer.v1.json†L1-L140】
-- **Weather:** `weather.overlay` visualizes rainfall, temperature, and wind vectors sourced from sensors/APIs and linked to session weather snapshots.【F:docs/ADR/ADR-053_WeatherPlugin.md†L21-L49】
+- **Crop Type:** `cropType.planned`, `cropType.actual`, `cropType.history` store crop, year, status, source, and notes aligned with Field crop history and job/session context.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L29-L71】
+- **Genetics:** `genetics.plan`, `genetics.variety` capture seed brand/product/lot/treatment with provenance to coverage events and barcode change logs.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md†L21-L66】
+- **Yield:** `yield.actual`, `yield.moisture`, `yield.testWeight` store normalized harvest metrics with smoothing metadata and aggregation bins.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L21-L52】
+- **Profit:** `profit.net` overlays combine yield-derived revenue and cost inputs, referencing `CostRecord` transactions and source layers.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】
+- **Risk:** `risk.flood`, `risk.compaction`, `risk.weeds`, `risk.other` annotate severity and observations, leveraging LayerEditService for edits and validating metadata with `FieldHealthRiskLayer.v1` (severity scale, observer provenance, attachments).【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md†L21-L44】【F:schemas/FieldHealthRiskLayer.v1.json†L1-L140】
+- **Weather:** `weather.overlay` visualizes rainfall, temperature, and wind vectors sourced from sensors/APIs and linked to session weather snapshots.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L21-L49】
 - **Soil:** `soil.ph`, `soil.om`, `soil.p`, `soil.k`, `soil.n`, `soil.zn`, `soil.ec`, `soil.cec` grids capture lab-imported attributes with sample depth, lot, and lab provenance for agronomic analytics and prescription derivations.【F:docs/plugins/SoilLab.md†L1-L120】
 - **Terrain:** `terrain.elevation`, `terrain.slope`, `terrain.aspect`, and `terrain.flowAccumulation` surfaces derive from LiDAR/RTK/DEM ingest to support drainage planning, erosion mitigation, and contour guidance workflows.【F:docs/plugins/Terrain3D.md†L1-L140】
 - **Drainage design:** `drain.tilePlan` and `drain.outlet` vector layers store planned tile paths, outlet locations, pipe sizes, and installation notes for export to contractors and integration with guidance paths.【F:docs/plugins/Terrain3D.md†L85-L140】

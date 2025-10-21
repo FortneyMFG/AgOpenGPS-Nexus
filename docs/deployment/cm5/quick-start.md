@@ -29,7 +29,7 @@ graph TD
 ```
 
 ### 2. Interface Connections
-Following [ADR-006: AOG-Link MCU](../../ADR/ADR-006-aog-link-mcu-communications.md):
+Following [ADR-006: AOG-Link MCU](../../SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md):
 
 | Interface | Connection | Usage |
 |-----------|------------|--------|
@@ -147,7 +147,7 @@ nexus-diag report
 
 ## Performance Optimization
 
-As specified in [ADR-026: Performance Budgets](../../ADR/ADR-026-performance-budgets.md):
+As specified in [ADR-026: Performance Budgets](../../SRS/sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md):
 
 1. **CPU Settings**
    - Governor: performance

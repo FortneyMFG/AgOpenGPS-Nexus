@@ -217,7 +217,7 @@ This section clarifies which platforms must remain first-class, how emerging Lin
 
 **Selected Option:** 11-O1 — Unified .NET 8 Stack  
 **Rationale:** Highest weighted score with strong alignment to modernization roadmap and cross-platform goals.  
-**Formal Record:** [11-ADR-001_Adopt_Unified_Runtime.md](11-ADR-001_Adopt_Unified_Runtime.md)
+**Formal Record:** [11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md](11-ADR-001%20-%20Adopt%20Unified%20.NET%208%20Runtime%20&%20Avalonia%20Stack.md)
 
 > **Verification:** Platform Foundations WG reviewed scoring on 2025-10-20.
 

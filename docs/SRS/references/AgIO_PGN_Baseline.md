@@ -134,7 +134,7 @@ undocumented bytes. All counts are little endian unless noted.
 
 ## Related ADRs
 
-- [ADR-006 — AgIO Link MCU Communications](../../ADR/ADR-006-aog-link-mcu-communications.md)
-- [ADR-015 — Section Control Grouping Semantics](../../ADR/ADR-015-section-control-grouping-semantics.md)
-- [ADR-016 — Firmware Transport Variable Rate PGNs](../../ADR/ADR-016-firmware-transport-variable-rate-pgns.md)
-- [ADR-047 — Live Telemetry Mesh](../../ADR/ADR-047_LiveTelemetryMesh.md)
+- [ADR-006 — AgIO Link MCU Communications](../sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md)
+- [ADR-015 — Section Control Grouping Semantics](../sections/6X_Core_Domain_Services/61-ADR-015 - Section control and grouping semantics.md)
+- [ADR-016 — Firmware Transport Variable Rate PGNs](../sections/4X_Interprocess_Communications/42-ADR-016 - Firmware and transport for variable-rate layer PGNs.md)
+- [ADR-047 — Live Telemetry Mesh](../sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md)

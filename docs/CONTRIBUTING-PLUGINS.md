@@ -10,7 +10,7 @@
 
 - Register new layers with the Layer Registry via PRs referencing ADR-010. Include schema files under `/schemas`, examples under `/schemas/examples`, and planned/actual flags (`x-nexus-planned`, `x-nexus-actual`).
 - For editable layers, integrate with the LayerEditService, providing attribute panel definitions and undo/redo semantics as described in ADR-044.
-- When publishing cost, profit, crop, genetics, or yield layers, link to the corresponding ADRs (045–050) and ensure session provenance is populated.【F:docs/ADR/ADR-045_CropTypePlugin.md†L29-L71】【F:docs/ADR/ADR-046_GeneticsPlugin.md†L21-L66】【F:docs/ADR/ADR-049_YieldPlugin.md†L21-L52】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L21-L52】
+- When publishing cost, profit, crop, genetics, or yield layers, link to the corresponding ADRs (045–050) and ensure session provenance is populated.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L29-L71】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md†L21-L66】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L21-L52】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】
 
 ## Permissions & Safety
 

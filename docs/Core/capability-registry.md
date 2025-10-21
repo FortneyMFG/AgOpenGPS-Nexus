@@ -54,10 +54,10 @@ messages when required capabilities are absent.
 - **NullMapping semantics.** When no mapping provider is available, Core advertises
   `mapping:unavailable` during the handshake. When the NullMapping shim is active, Core
   instead publishes `mapping:offline` so consumers can degrade gracefully while retaining
-  deterministic behaviour.【F:docs/ADR/ADR-029-mapping-plugin-architecture.md†L61-L99】
+  deterministic behaviour.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-029 - Mapping as a plugin with a minimal geospatial kernel in Core.md†L61-L99】
 - **Zone governance.** Zone capabilities align with the layer/zone handshake described in
   ADR-027 and the registry draft, ensuring pose gating and editing surfaces share a uniform
-  contract.【F:docs/reference/layer-registry-handshake.md†L1-L58】【F:docs/ADR/ADR-027-spatial-constraints.md†L13-L33】
+  contract.【F:docs/reference/layer-registry-handshake.md†L1-L58】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md†L13-L33】
 - **Manifest validation.** Plugin manifests must only advertise capabilities listed in the
   registry or an approved extension once ADR-031 governance tooling is live. Registry
   attributes help the loader enforce bundle policies and surface actionable diagnostics.

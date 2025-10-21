@@ -35,7 +35,7 @@ updates to plugins so spatial renderers, rate controllers, and analytics stay al
 | `onLayerUndo`/`onLayerRedo` | Undo stack mutates | `LayerEditEvent` pointer + diff summary | Rollback/redo analytics caches, update UI history. |
 
 - Core emits `onFarmLoaded` → `onSeasonLoaded` (when applicable) → `onJobLoaded` → `onSessionStart` in order during mounts. Crash recovery replays `onJobLoaded`, replays pending `onContextChanged` diffs, and resumes the active session before firing `onSessionStart`.
-- Existing jobs without sessions surface as a single implicit session; UI prompts operators to create additional sessions when resuming legacy jobs.【F:docs/ADR/ADR-041_JobSessions.md†L12-L60】
+- Existing jobs without sessions surface as a single implicit session; UI prompts operators to create additional sessions when resuming legacy jobs.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L12-L60】
 
 ## Autosave & Journaling
 
@@ -47,7 +47,7 @@ updates to plugins so spatial renderers, rate controllers, and analytics stay al
 
 ## Multi-Field Mount/Unmount
 
-- When operators select multiple fields, Core emits a single `mountFields(fieldIds[])` call to mapping plugins, which respond with the union envelope and per-field indices. Job `extensions` supply optional crop/genetics metadata for plugins to render overlays alongside coverage.【F:docs/ADR/ADR-043_MultiFieldJobEnvelopes.md†L12-L68】
+- When operators select multiple fields, Core emits a single `mountFields(fieldIds[])` call to mapping plugins, which respond with the union envelope and per-field indices. Job `extensions` supply optional crop/genetics metadata for plugins to render overlays alongside coverage.【F:docs/SRS/sections/3X_Data_Storage/31-ADR-043 - Multi-Field Job Envelopes.md†L12-L68】
 - Field unmounts occur only when jobs close or operators explicitly remove a field; Core updates `fieldIds` and notifies plugins
   prior to persisting changes.
 - Per-field stats accumulate in `job.stats.fields[]`, retaining historical coverage even if a field is later unmounted.
@@ -70,10 +70,10 @@ updates to plugins so spatial renderers, rate controllers, and analytics stay al
 
 ## Work orders & task orchestration
 
-- R-JOB-040 (MUST): Provide a TaskService-backed Work Order list that lets managers assign jobs with presets, implements, and planned inputs. Launching a work order must automatically open a session with the originating `workOrderId`, preset hash, and assignee captured in session metadata and provenance.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L17-L40】【F:docs/ADR/ADR-041_JobSessions.md†L33-L55】
-- R-JOB-041 (SHOULD): Mobile/companion clients shall surface per-work-order checklists, notes, and completion toggles that sync into `Session.notes[]` entries with actor/timestamp data for proof-of-work exports.【F:docs/ADR/ADR-041_JobSessions.md†L46-L55】
-- R-JOB-042 (MUST): Task state transitions (Assigned → In Progress → Completed/Cancelled) must emit lifecycle events so Profit, Telemetry Logging, and regulatory plugins can stamp provenance without polling queue state. Events include `workOrderId`, `jobId`, `sessionId`, `assignee`, and checklist completion percentage.【F:docs/ADR/ADR-032-presets-and-layout-linking.md†L32-L40】【F:docs/ADR/ADR-050_CostProfitPlugin.md†L17-L34】
-- R-JOB-043 (SHOULD): TaskService must reconcile work order material reservations with the Inventory Ledger, reducing on-hand quantity when sessions report consumption and flagging discrepancies for manual review.【F:docs/ADR/ADR-050_CostProfitPlugin.md†L15-L34】
+- R-JOB-040 (MUST): Provide a TaskService-backed Work Order list that lets managers assign jobs with presets, implements, and planned inputs. Launching a work order must automatically open a session with the originating `workOrderId`, preset hash, and assignee captured in session metadata and provenance.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L17-L40】【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L33-L55】
+- R-JOB-041 (SHOULD): Mobile/companion clients shall surface per-work-order checklists, notes, and completion toggles that sync into `Session.notes[]` entries with actor/timestamp data for proof-of-work exports.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L46-L55】
+- R-JOB-042 (MUST): Task state transitions (Assigned → In Progress → Completed/Cancelled) must emit lifecycle events so Profit, Telemetry Logging, and regulatory plugins can stamp provenance without polling queue state. Events include `workOrderId`, `jobId`, `sessionId`, `assignee`, and checklist completion percentage.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L32-L40】【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L17-L34】
+- R-JOB-043 (SHOULD): TaskService must reconcile work order material reservations with the Inventory Ledger, reducing on-hand quantity when sessions report consumption and flagging discrepancies for manual review.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L15-L34】
 
 These requirements extend the session lifecycle so orchestration, crew scheduling, and audit logs align with field execution while preserving deterministic provenance across plugins.
 

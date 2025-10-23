@@ -29,7 +29,7 @@ This workbook consolidates legacy UI assets, plugin surface contracts, and backl
 | Surface ID | Legacy intent | Plugin contract | Injection point | Coverage assets | Provenance status |
 | --- | --- | --- | --- | --- | --- |
 | app_shell | Main Field View | core.app_shell.v1 | shell.main | Hosts shell composites (menus, toolbar, status strip). | Ported into Avalonia (`Views/Shell/AppShellView.axaml`); theme parity achieved with `App/NexusLegacyShellTheme.axaml`, awaiting live map host wiring. |
-| map_canvas | OpenGL Map Canvas | core.map_canvas.v1 | shell.map | Refer to docs/aog-v6-mapping-brief.md for overlay breakdown. | Placeholder host remains; map canvas wiring tracked under NX-412 follow-up. |
+| map_canvas | OpenGL Map Canvas | core.map_canvas.v1 | shell.map | Refer to docs/SRS/references/aog-v6-mapping-brief.md for overlay breakdown. | Placeholder host remains; map canvas wiring tracked under NX-412 follow-up. |
 
 ## Dialog Surfaces
 

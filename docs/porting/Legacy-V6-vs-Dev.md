@@ -30,7 +30,7 @@ This note captures the most meaningful differences between the legacy AgOpenGPS 
 - **Nexus direction:** Consolidates legacy inputs into the `MachineProfile` translator and validation harness, then exposes declarative profiles through gRPC/CLI tooling so vehicles, implements, and UI shells can be versioned independently while still supporting PGN bridges.【F:docs/porting/LegacyDataIngest.md†L24-L48】 It layers Presets/Layout services so operators apply live-linked or snapshot layouts alongside equipment presets without re-editing every profile.【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L7-L35】
 
 ### Spatial Constraint Governance
-- **V6:** Treats boundaries/headlands as simple text exports with manual overrides, providing no keep-out or work-disabled semantics for automation to enforce.【F:docs/porting/V6-Functionality-Gap-Analysis.md†L16-L25】【F:docs/aog-v6-mapping-brief.md†L23-L34】
+- **V6:** Treats boundaries/headlands as simple text exports with manual overrides, providing no keep-out or work-disabled semantics for automation to enforce.【F:docs/porting/V6-Functionality-Gap-Analysis.md†L16-L25】【F:docs/SRS/references/aog-v6-mapping-brief.md†L23-L34】
 - **Legacy Dev:** Mirrors the same boundary/headland-only model, leaving constraint enforcement to operator discretion rather than deterministic gating.【F:docs/porting/Legacy-Dev-Excerpts.md†L46-L61】
 - **Nexus direction:** Establishes a ZoneService with buffered boundary, headland, keep-out, and work-disabled polygons so guidance and sections honor constraint gates, log overrides, and display canonical symbology across UIs.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md†L7-L64】
 
@@ -67,7 +67,7 @@ This note captures the most meaningful differences between the legacy AgOpenGPS 
 - **Nexus direction:** Requires plugins to declare panels, overlays, and config pages via schema-driven manifests while Core enforces permission-aware visibility so monitor-only clients stay safe and automation panels appear only when authorized.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L9-L24】
 
 ### Field and Job Workflow
-- **V6:** Carries a single active job inside the field folder and relies on manual exports or “Field From Existing” workflows when operators want to resume different passes of the same boundary.【F:docs/aog-v6-mapping-brief.md†L31-L36】
+- **V6:** Carries a single active job inside the field folder and relies on manual exports or “Field From Existing” workflows when operators want to resume different passes of the same boundary.【F:docs/SRS/references/aog-v6-mapping-brief.md†L31-L36】
 - **Legacy Dev:** Stores each job in its own subdirectory beneath a field (`Fields/<Field>/Jobs/<Job>`), letting operators resume previous passes with painted coverage and sections intact without cloning the base field.【F:docs/porting/Legacy-Dev-Excerpts.md†L46-L61】
 - **Nexus direction:** Plans declarative workspace manifests that import legacy boundaries, coverage, and per-job artifacts into versioned datasets so replay, analysis, and Avalonia UIs can target any saved job run while the bridge feeds PGN hardware.【F:docs/porting/LegacyDataIngest.md†L8-L41】 The JobsService formalizes those manifests through versioned metadata, Drive-In discovery, and lifecycle hooks so sessions resume cleanly across Core, UI, and plugins.【F:docs/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L7-L86】
 

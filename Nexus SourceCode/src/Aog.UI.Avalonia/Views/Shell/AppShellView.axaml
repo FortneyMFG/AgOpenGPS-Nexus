@@ -290,9 +290,10 @@
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
           <ItemsControl.Styles>
-            <Style Selector="#TopSidebarButtons ContentPresenter">
+            <Style Selector="#TopSidebarButtons ContentPresenter"
+                   x:DataType="workspace:SidebarButtonViewModel">
               <Setter Property="Margin"
-                      Value="{Binding DataContext.Layout.TopSidebarLayout, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+                      Value="{Binding Margin}" />
             </Style>
           </ItemsControl.Styles>
         </ItemsControl>
@@ -393,9 +394,10 @@
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
           <ItemsControl.Styles>
-            <Style Selector="#BottomSidebarButtons ContentPresenter">
+            <Style Selector="#BottomSidebarButtons ContentPresenter"
+                   x:DataType="workspace:SidebarButtonViewModel">
               <Setter Property="Margin"
-                      Value="{Binding DataContext.Layout.BottomSidebarLayout, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+                      Value="{Binding Margin}" />
             </Style>
           </ItemsControl.Styles>
         </ItemsControl>

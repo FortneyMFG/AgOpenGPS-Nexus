@@ -323,10 +323,27 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         BlockRegion region)
     {
         target.Clear();
+        var margin = GetSidebarButtonMargin(region);
         foreach (var button in builder.Build(region, _instances))
         {
+            button.Margin = margin;
             target.Add(button);
         }
+    }
+
+    private Thickness GetSidebarButtonMargin(BlockRegion region)
+    {
+        var spacing = region switch
+        {
+            BlockRegion.Left => LeftSidebarLayout.Spacing,
+            BlockRegion.Right => RightSidebarLayout.Spacing,
+            BlockRegion.Top => TopSidebarLayout.Spacing,
+            BlockRegion.Bottom => BottomSidebarLayout.Spacing,
+            _ => 0d,
+        };
+
+        var normalized = Math.Max(0d, spacing) / 2d;
+        return new Thickness(normalized);
     }
 
     private static bool ShouldRenderInWorkspace(BlockRegion region)

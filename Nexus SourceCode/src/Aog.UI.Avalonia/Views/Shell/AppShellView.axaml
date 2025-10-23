@@ -265,7 +265,8 @@
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.Styles>
-          <Style Selector="#BlockTiles ContentPresenter">
+          <Style Selector="#BlockTiles ContentPresenter"
+                 x:DataType="vm:BlockItemViewModel">
             <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
             <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
             <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />

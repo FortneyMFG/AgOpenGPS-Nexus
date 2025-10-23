@@ -35,7 +35,7 @@ The Nexus importer currently focuses on a subset of the V6 assets:
   recorded paths, tram templates, and worked-area history alongside geometry so UI and
   replay layers can consume the legacy artefacts directly.【F:Nexus SourceCode/src/Aog.Core/Legacy/LegacyFieldData.cs†L11-L199】
 - Documentation and fixtures outline the extended importer coverage, keeping parity
-  expectations visible for future contributors.【F:docs/porting/LegacyDataIngest.md†L7-L36】【F:Nexus SourceCode/tests/Aog.Core.Tests/Legacy/Data/SampleField/Field.txt†L1-L9】
+  expectations visible for future contributors.【F:docs/reference/agopen-v6/porting/LegacyDataIngest.md†L7-L36】【F:Nexus SourceCode/tests/Aog.Core.Tests/Legacy/Data/SampleField/Field.txt†L1-L9】
 
 ### Gap Analysis
 

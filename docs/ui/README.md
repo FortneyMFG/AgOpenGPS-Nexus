@@ -25,22 +25,22 @@ flowchart TD
 ## Feature Highlights
 - **Run modes:** [Avalonia run modes](avalonia-run-modes.md) explain
   CompanionRemote, LocalInProc, and LocalOutOfProc hosting patterns.
-- **Shell roadmap:** [UI shell & plugin integration plan](ui-shell-and-plugin-integration.md)
+- **Shell roadmap:** [UI shell & plugin integration plan](../reference/agvalonia/ui/ui-shell-and-plugin-integration.md)
   tracks phased delivery across NX-410…NX-418.
 - **Session lifecycle:** [UI session lifecycle reference](ui-session-lifecycle.md)
   covers state synchronization with Core jobs and sessions.
 - **Styling governance:** The [metadata-driven UI style guide](metadata-driven-ui-style-guide.md)
-  and [modernization prompt bundle](ui-modernization-ai-prompts.md)
+  and [modernization prompt bundle](../reference/agvalonia/ui/ui-modernization-ai-prompts.md)
   document reusable assets and AI tooling for designers.
-- **Phase workbooks:** Detailed plans for [Phase 3](ui-phase3-job-field-lifecycle.md),
-  [Phase 4](ui-phase4-settings-hotkeys.md), and
-  [Phase 5](ui-phase5-plugin-surfaces.md) surface acceptance criteria and
+- **Phase workbooks:** Detailed plans for [Phase 3](../reference/agvalonia/ui/ui-phase3-job-field-lifecycle.md),
+  [Phase 4](../reference/agvalonia/ui/ui-phase4-settings-hotkeys.md), and
+  [Phase 5](../reference/agvalonia/ui/ui-phase5-plugin-surfaces.md) surface acceptance criteria and
   plugin dependencies, while the
-  [migration workbook](ui-migration-workbook-phase0.md) inventories legacy assets.
+  [migration workbook](../reference/agvalonia/ui/ui-migration-workbook-phase0.md) inventories legacy assets.
 
 ## Plugin Touchpoints
 - UI surfaces integrate with plugin contracts enumerated in
-  [`artifacts/ui-to-plugin.yaml`](../../artifacts/ui-to-plugin.yaml) and
+  [`docs/reference/agvalonia/artifacts/ui-to-plugin.yaml`](../reference/agvalonia/artifacts/ui-to-plugin.yaml) and
   collaborate with plugins such as
   [Device Manager](../plugins/DeviceManager.md),
   [Guidance](../plugins/Guidance.md), and
@@ -54,7 +54,7 @@ flowchart TD
 
 ## Additional References
 - [Avalonia run modes](avalonia-run-modes.md)
-- [UI migration workbook](ui-migration-workbook-phase0.md)
+- [UI migration workbook](../reference/agvalonia/ui/ui-migration-workbook-phase0.md)
 - [UI session lifecycle](ui-session-lifecycle.md)
 - [Metadata-driven UI style guide](metadata-driven-ui-style-guide.md)
-- [UI modernization prompt bundle](ui-modernization-ai-prompts.md)
+- [UI modernization prompt bundle](../reference/agvalonia/ui/ui-modernization-ai-prompts.md)

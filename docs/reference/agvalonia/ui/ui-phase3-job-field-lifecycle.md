@@ -1,9 +1,9 @@
 # NX-413 Job & Field Lifecycle Dialogs Port
 
 ## Objectives
-- Rebuild job and field lifecycle dialogs described in [`artifacts/ui-backlog.json`](../../artifacts/ui-backlog.json) and [`artifacts/ui-inventory.json`](../../artifacts/ui-inventory.json).
+- Rebuild job and field lifecycle dialogs described in [`../artifacts/ui-backlog.json`](../artifacts/ui-backlog.json) and [`../artifacts/ui-inventory.json`](../artifacts/ui-inventory.json).
 - Align Avalonia implementations with Nexus job/session services and metadata-driven styling tokens.
-- Preserve operator workflows from legacy WinForms, Dev branch, and AgValonia sources while satisfying plugin injection points defined in [`artifacts/ui-to-plugin.yaml`](../../artifacts/ui-to-plugin.yaml).
+- Preserve operator workflows from legacy WinForms, Dev branch, and AgValonia sources while satisfying plugin injection points defined in [`../artifacts/ui-to-plugin.yaml`](../artifacts/ui-to-plugin.yaml).
 
 ## Core Surfaces
 
@@ -64,9 +64,9 @@
 ## Testing & Validation
 - Add unit tests in `Aog.UI.Avalonia.Tests` covering dialog view-model validation, selection flows, and service error handling.
 - Extend simulator smoke scripts to mount jobs, edit fields, and verify dialog open/close flows without runtime exceptions.
-- Capture golden screenshots for docs per [metadata-driven UI style guide](metadata-driven-ui-style-guide.md) once layouts stabilize.
+- Capture golden screenshots for docs per [metadata-driven UI style guide](../../../ui/metadata-driven-ui-style-guide.md) once layouts stabilize.
 
 ## Deliverables
 - Avalonia XAML and view-model implementations for all dialogs listed above.
 - Updated documentation ([UI session lifecycle guide](ui-session-lifecycle.md)) describing new operator flows and any new sample helpers.
-- Backlog linkage updates ensuring completion toggles for relevant entries in `artifacts/ui-backlog.json` during rollout.
+- Backlog linkage updates ensuring completion toggles for relevant entries in `../artifacts/ui-backlog.json` during rollout.

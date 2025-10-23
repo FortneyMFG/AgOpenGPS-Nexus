@@ -10,7 +10,7 @@ from datetime import datetime
 from textwrap import dedent
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ARTIFACT_DIR = os.path.join(REPO_ROOT, "artifacts")
+ARTIFACT_DIR = os.path.join(REPO_ROOT, "docs", "reference", "agvalonia", "artifacts")
 SCREENSHOT_DIR = os.path.join(ARTIFACT_DIR, "ui-screenshots")
 
 os.makedirs(ARTIFACT_DIR, exist_ok=True)
@@ -946,7 +946,7 @@ def infer_complexity(item: dict) -> str:
         return "Medium"
     return "Low"
 
-spec_lines = ["# @nexus/ui-core Component Specification", "", "Generated from `artifacts/ui-inventory.json`. Each component references inventory ids and suggested complexity.", ""]
+spec_lines = ["# @nexus/ui-core Component Specification", "", "Generated from `docs/reference/agvalonia/artifacts/ui-inventory.json`. Each component references inventory ids and suggested complexity.", ""]
 for item in items:
     complexity = infer_complexity(item)
     spec_lines.append(f"## {item['name']} ({item['id']})")

@@ -71,7 +71,7 @@ All assets are scoped to the plugin directory; core never looks outside of the r
 
 ## Menus, Toolbars, and Commands
 
-- **Menus** – Implement `IShellCommandHandler` and register items with the `ShellCommandRegistry`. Associate menu entries by referencing injection points from `artifacts/ui-to-plugin.yaml`.
+- **Menus** – Implement `IShellCommandHandler` and register items with the `ShellCommandRegistry`. Associate menu entries by referencing injection points from `docs/reference/agvalonia/artifacts/ui-to-plugin.yaml`.
 - **Toolbar Buttons** – Provide a block descriptor or contribute to `PluginSurfaceDescriptor` injection points (`toolbar.top`, `toolbar.section`, etc.).
 - **Keyboard Shortcuts** – Use `ShortcutRegistry.Register` with unique IDs; shortcuts are automatically namespaced per plugin.
 

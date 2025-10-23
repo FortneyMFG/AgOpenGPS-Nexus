@@ -6,9 +6,9 @@ This workbook consolidates legacy UI assets, plugin surface contracts, and backl
 
 | Legacy source | Detected license | Compliance notes |
 | --- | --- | --- |
-| Legacy SourceCode -V6 | GPL-3.0 | See [artifacts/ui-license-checklist.md](ui-license-checklist.md) for required obligations. |
-| Legacy SourceCode -Dev | GPL-3.0 | See [artifacts/ui-license-checklist.md](ui-license-checklist.md) for required obligations. |
-| Legacy SourceCode -AgValoniaGPS | Missing | See [artifacts/ui-license-checklist.md](ui-license-checklist.md) for required obligations. |
+| Legacy SourceCode -V6 | GPL-3.0 | See [ui-license-checklist.md](ui-license-checklist.md) for required obligations. |
+| Legacy SourceCode -Dev | GPL-3.0 | See [ui-license-checklist.md](ui-license-checklist.md) for required obligations. |
+| Legacy SourceCode -AgValoniaGPS | Missing | See [ui-license-checklist.md](ui-license-checklist.md) for required obligations. |
 
 ## Menu Surfaces
 
@@ -62,7 +62,7 @@ This workbook consolidates legacy UI assets, plugin surface contracts, and backl
 
 ## Theme Token Snapshot
 
-Theme tokens extracted from `artifacts/ui-theme-tokens.json` to enforce parity between legacy and Nexus styling. `App/NexusLegacyShellTheme.axaml` now materializes these values into Avalonia resources consumed by the shell UI.
+Theme tokens extracted from `ui-theme-tokens.json` to enforce parity between legacy and Nexus styling. `App/NexusLegacyShellTheme.axaml` now materializes these values into Avalonia resources consumed by the shell UI.
 
 ### Typography
 

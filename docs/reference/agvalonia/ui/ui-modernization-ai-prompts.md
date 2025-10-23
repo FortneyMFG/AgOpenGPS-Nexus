@@ -10,7 +10,7 @@ UI modernization effort.
    metadata (`../Legacy SourceCode -V6`, `../Legacy SourceCode -Dev`, and
    `../Legacy SourceCode -AgValoniaGPS`).
 2. Execute the prompts sequentially. Each step produces artifacts consumed by the next.
-3. Store generated files under `artifacts/` so they can be checked into the Nexus repo or
+3. Store generated files under `docs/reference/agvalonia/artifacts/` so they can be checked into the Nexus repo or
    shared with the team for review.
 
 The canonical machine-readable definition lives in
@@ -22,12 +22,12 @@ editing.
 
 | Prompt ID           | Purpose                                                | Key Outputs                        |
 | ------------------- | ------------------------------------------------------ | ---------------------------------- |
-| `inventory-json`    | Crawl legacy repos and produce `ui-inventory.json`.    | `artifacts/ui-inventory.json`      |
-| `inventory-csv`     | Convert the JSON inventory into CSV format.            | `artifacts/ui-inventory.csv`       |
-| `mapping-yaml`      | Map UI elements to core or plugin hosts.               | `artifacts/ui-to-plugin.yaml`      |
-| `design-system-spec`| Define @nexus/ui-core components and theme tokens.     | `artifacts/ui-core-spec.md`, `artifacts/ui-theme-tokens.json` |
-| `backlog-json`      | Generate a GitHub-importable backlog of UI tasks.      | `artifacts/ui-backlog.json`        |
-| `license-checklist` | Summarize license and attribution requirements.        | `artifacts/ui-license-checklist.md`|
+| `inventory-json`    | Crawl legacy repos and produce `ui-inventory.json`.    | `../artifacts/ui-inventory.json`      |
+| `inventory-csv`     | Convert the JSON inventory into CSV format.            | `../artifacts/ui-inventory.csv`       |
+| `mapping-yaml`      | Map UI elements to core or plugin hosts.               | `../artifacts/ui-to-plugin.yaml`      |
+| `design-system-spec`| Define @nexus/ui-core components and theme tokens.     | `../artifacts/ui-core-spec.md`, `../artifacts/ui-theme-tokens.json` |
+| `backlog-json`      | Generate a GitHub-importable backlog of UI tasks.      | `../artifacts/ui-backlog.json`        |
+| `license-checklist` | Summarize license and attribution requirements.        | `../artifacts/ui-license-checklist.md`|
 
 Each prompt includes acceptance criteria so reviewers can verify completeness without
 re-reading the entire plan.
@@ -40,7 +40,7 @@ re-reading the entire plan.
 
 The repository now includes a repeatable generator at
 `tools/generate_ui_artifacts.py` that crawls the legacy WinForms, guidance refactor,
-and Avalonia configuration sources and emits the artifacts under `artifacts/`:
+and Avalonia configuration sources and emits the artifacts under `docs/reference/agvalonia/artifacts/`:
 
 - `ui-inventory.json` and `ui-inventory.csv`
 - `ui-to-plugin.yaml`

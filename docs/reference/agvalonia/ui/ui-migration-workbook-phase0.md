@@ -3,10 +3,10 @@
 ## Overview
 - Task NX-410 captures the groundwork for porting AgOpenGPS legacy UI workflows into the Nexus Avalonia shell.
 - This workbook inventories WinForms, Dev-branch, and AgValonia prototypes, flags licensing constraints, and links backlog acceptance criteria for each surface.
-- Source metadata originates from [`artifacts/ui-inventory.json`](../../artifacts/ui-inventory.json) and [`artifacts/ui-backlog.json`](../../artifacts/ui-backlog.json).
+- Source metadata originates from [`../artifacts/ui-inventory.json`](../artifacts/ui-inventory.json) and [`../artifacts/ui-backlog.json`](../artifacts/ui-backlog.json).
 
 ## Licensing Snapshot
-- **Legacy SourceCode -V6** — GPL-3.0. Preserve license text with binaries, offer source on distribution, avoid copying GPL files into permissively licensed modules, and record attribution in `THIRD_PARTY_NOTICES.md` per [`artifacts/ui-license-checklist.md`](../../artifacts/ui-license-checklist.md).
+- **Legacy SourceCode -V6** — GPL-3.0. Preserve license text with binaries, offer source on distribution, avoid copying GPL files into permissively licensed modules, and record attribution in `THIRD_PARTY_NOTICES.md` per [`../artifacts/ui-license-checklist.md`](../artifacts/ui-license-checklist.md).
 - **Legacy SourceCode -Dev** — GPL-3.0 with the same obligations as V6.
 - **Legacy SourceCode -AgValoniaGPS** — License unknown; ownership confirmation is required before reusing Avalonia XAML or assets.
 

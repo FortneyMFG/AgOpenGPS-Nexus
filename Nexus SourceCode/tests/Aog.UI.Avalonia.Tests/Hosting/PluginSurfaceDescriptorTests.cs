@@ -131,7 +131,7 @@ public sealed class PluginSurfaceDescriptorTests
     private static IReadOnlyDictionary<string, (string Contract, string InjectionPoint)> LoadSurfaceMetadata()
     {
         var root = LocateRepositoryRoot();
-        var file = Path.Combine(root, "artifacts", "ui-to-plugin.yaml");
+        var file = Path.Combine(root, "docs", "reference", "agvalonia", "artifacts", "ui-to-plugin.yaml");
         var metadata = new Dictionary<string, (string Contract, string InjectionPoint)>(StringComparer.OrdinalIgnoreCase);
 
         using var reader = new StreamReader(file);
@@ -187,7 +187,7 @@ public sealed class PluginSurfaceDescriptorTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null && directory.Exists)
         {
-            var candidate = Path.Combine(directory.FullName, "artifacts", "ui-to-plugin.yaml");
+            var candidate = Path.Combine(directory.FullName, "docs", "reference", "agvalonia", "artifacts", "ui-to-plugin.yaml");
             if (File.Exists(candidate))
             {
                 return directory.FullName;
@@ -196,7 +196,7 @@ public sealed class PluginSurfaceDescriptorTests
             directory = directory.Parent;
         }
 
-        throw new InvalidOperationException("Unable to locate repository root containing artifacts/ui-to-plugin.yaml.");
+        throw new InvalidOperationException("Unable to locate repository root containing docs/reference/agvalonia/artifacts/ui-to-plugin.yaml.");
     }
 
     private sealed class NoOpShellCommandDispatcher : IShellCommandDispatcher, IDisposable

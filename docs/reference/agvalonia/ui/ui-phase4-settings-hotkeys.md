@@ -1,9 +1,9 @@
 # NX-414 Settings, Hotkeys, and Appearance Consolidation
 
 ## Objectives
-- Consolidate legacy settings dialogs into Avalonia experiences that align with [`artifacts/ui-theme-tokens.json`](../../artifacts/ui-theme-tokens.json) and [`artifacts/ui-backlog.json`](../../artifacts/ui-backlog.json).
+- Consolidate legacy settings dialogs into Avalonia experiences that align with [`../artifacts/ui-theme-tokens.json`](../artifacts/ui-theme-tokens.json) and [`../artifacts/ui-backlog.json`](../artifacts/ui-backlog.json).
 - Reuse metadata-driven configuration infrastructure for persistence, import/export, and validation parity with V6/Dev shells.
-- Ensure accessibility (contrast, focus order, keyboard navigation) matches guidance in [metadata-driven UI style guide](metadata-driven-ui-style-guide.md).
+- Ensure accessibility (contrast, focus order, keyboard navigation) matches guidance in [metadata-driven UI style guide](../../../ui/metadata-driven-ui-style-guide.md).
 
 ## Settings Hub Composition
 
@@ -37,7 +37,7 @@
 ## Testing & QA
 - Unit-test view-model validation logic and conflict resolution in `Aog.UI.Avalonia.Tests`.
 - Extend `nexus sim smoke` scenarios to toggle themes, rebind hotkeys, and reload profiles ensuring no runtime errors.
-- Capture accessibility audit results (contrast ratios, focus order) and record them alongside screenshots in `artifacts/ui-screenshots` during rollout.
+- Capture accessibility audit results (contrast ratios, focus order) and record them alongside screenshots in `../artifacts/ui-screenshots` during rollout.
 
 ## Deliverables
 - Avalonia dialogs/panels and supporting view-models for all settings-related backlog entries.

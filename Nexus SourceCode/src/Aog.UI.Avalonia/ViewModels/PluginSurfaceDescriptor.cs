@@ -25,7 +25,7 @@ public sealed record PluginSurfaceDescriptor
 }
 
 /// <summary>
-/// Provides strongly typed access to the shell-related surfaces defined in <c>artifacts/ui-to-plugin.yaml</c>.
+/// Provides strongly typed access to the shell-related surfaces defined in <c>docs/reference/agvalonia/artifacts/ui-to-plugin.yaml</c>.
 /// </summary>
 public static class ShellPluginSurfaces
 {

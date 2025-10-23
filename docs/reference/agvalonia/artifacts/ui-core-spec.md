@@ -1,6 +1,6 @@
 # @nexus/ui-core Component Specification
 
-Generated from `artifacts/ui-inventory.json`. Each component references inventory ids and suggested complexity.
+Generated from `ui-inventory.json`. Each component references inventory ids and suggested complexity.
 
 ## Main Field View (app_shell)
 * Element type: `panel`

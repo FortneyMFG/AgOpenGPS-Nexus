@@ -302,16 +302,16 @@ NX-341,FALSE,TRUE,,,Produce zipped release artifacts for Windows and Linux build
 NX-342,FALSE,TRUE,,,docs/howto/developer-setup.md
 NX-343,FALSE,TRUE,,,UI modernization AI prompt bundle
 NX-401,FALSE,TRUE,,,Simulation catalog atomic provider registration
-NX-410,FALSE,TRUE,,,Legacy UI asset migration workbook per docs/ui/ui-shell-and-plugin-integration.md
-NX-411,FALSE,TRUE,NX-410,,Shell and navigation port from V6 and AgValonia per artifacts/ui-core-spec.md
-NX-412,FALSE,TRUE,NX-411,,Map canvas and field operations UI port aligned with artifacts/ui-inventory.json
-NX-413,FALSE,TRUE,NX-412,,Job and field lifecycle dialogs port aligned with artifacts/ui-backlog.json
+NX-410,FALSE,TRUE,,,Legacy UI asset migration workbook per docs/reference/agvalonia/ui/ui-shell-and-plugin-integration.md
+NX-411,FALSE,TRUE,NX-410,,Shell and navigation port from V6 and AgValonia per docs/reference/agvalonia/artifacts/ui-core-spec.md
+NX-412,FALSE,TRUE,NX-411,,Map canvas and field operations UI port aligned with docs/reference/agvalonia/artifacts/ui-inventory.json
+NX-413,FALSE,TRUE,NX-412,,Job and field lifecycle dialogs port aligned with docs/reference/agvalonia/artifacts/ui-backlog.json
 NX-414,FALSE,TRUE,,,Multi-steer configurator export schema GA — ADR-067 axle-centric profiles
-NX-415,FALSE,TRUE,"NX-412, NX-413",,Plugin UI surfaces for guidance device analytics and video plugins aligned with artifacts/ui-to-plugin.yaml
-NX-416,FALSE,TRUE,NX-415,,Diagnostics and AgIO workspace port aligned with artifacts/ui-core-spec.md
+NX-415,FALSE,TRUE,"NX-412, NX-413",,Plugin UI surfaces for guidance device analytics and video plugins aligned with docs/reference/agvalonia/artifacts/ui-to-plugin.yaml
+NX-416,FALSE,TRUE,NX-415,,Diagnostics and AgIO workspace port aligned with docs/reference/agvalonia/artifacts/ui-core-spec.md
 NX-417,FALSE,TRUE,"NX-416, NX-301",,Simulation shell and companion parity automation aligned with metadata-driven style guide
-NX-418,FALSE,TRUE,NX-417,,Documentation QA and release readiness aligned with artifacts/ui-screenshots/README.md
-NX-419,FALSE,TRUE,,,"Settings, hotkeys, and appearance consolidation _(Done)_ — Aligns with artifacts/ui-theme-tokens.json"
+NX-418,FALSE,TRUE,NX-417,,Documentation QA and release readiness aligned with docs/reference/agvalonia/artifacts/ui-screenshots/README.md
+NX-419,FALSE,TRUE,,,"Settings, hotkeys, and appearance consolidation _(Done)_ — Aligns with docs/reference/agvalonia/artifacts/ui-theme-tokens.json"
 NX-452,FALSE,TRUE,NX-414,,Core ingestion service for axle-centric profiles — ADR-067 runtime ingestion
 NX-453,FALSE,TRUE,NX-452,,Automation integration for axle-centric limits — ADR-067 planner/controller wiring
 NX-454,FALSE,TRUE,NX-453,,Calibration workflows & fixtures — ADR-067 calibration suite delivery

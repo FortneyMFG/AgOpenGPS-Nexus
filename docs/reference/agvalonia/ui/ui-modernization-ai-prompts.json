@@ -79,11 +79,11 @@
               "../Legacy SourceCode -Dev",
               "../Legacy SourceCode -AgValoniaGPS"
             ],
-            "output_paths": ["artifacts/ui-inventory.json", "artifacts/ui-screenshots/"]
+            "output_paths": ["docs/reference/agvalonia/artifacts/ui-inventory.json", "docs/reference/agvalonia/artifacts/ui-screenshots/"]
           },
           "expected_outputs": [
-            "artifacts/ui-inventory.json",
-            "artifacts/ui-screenshots/README.md"
+            "docs/reference/agvalonia/artifacts/ui-inventory.json",
+            "docs/reference/agvalonia/artifacts/ui-screenshots/README.md"
           ],
           "acceptance_criteria": [
             "Every screen listed includes menu/toolbar context and file paths.",
@@ -97,12 +97,12 @@
           "id": "inventory-csv",
           "title": "Export UI inventory CSV",
           "goal": "Provide a spreadsheet-friendly summary of the UI inventory entries.",
-          "instructions": "Convert ui-inventory.json into CSV format. Columns: id, screen, element_type (menu|dialog|panel|toolbar|widget), primary_action, secondary_actions, dependencies (library/plugin/proc), likely_plugin_owner. Where multiple values exist, separate with semicolons. Persist to artifacts/ui-inventory.csv.",
+          "instructions": "Convert ui-inventory.json into CSV format. Columns: id, screen, element_type (menu|dialog|panel|toolbar|widget), primary_action, secondary_actions, dependencies (library/plugin/proc), likely_plugin_owner. Where multiple values exist, separate with semicolons. Persist to docs/reference/agvalonia/artifacts/ui-inventory.csv.",
           "inputs": {
             "repo_paths": [],
-            "output_paths": ["artifacts/ui-inventory.csv"]
+            "output_paths": ["docs/reference/agvalonia/artifacts/ui-inventory.csv"]
           },
-          "expected_outputs": ["artifacts/ui-inventory.csv"],
+          "expected_outputs": ["docs/reference/agvalonia/artifacts/ui-inventory.csv"],
           "acceptance_criteria": [
             "CSV rows align one-to-one with ui-inventory.json entries.",
             "Dependencies column references concrete package or plugin names.",
@@ -116,10 +116,10 @@
           "goal": "Define the ownership of each UI element so plugins can inject their surfaces.",
           "instructions": "Using ui-inventory.json, create ui-to-plugin.yaml mapping each screen/element to either `core` or a plugin slug (e.g., plugin:section-control). Include inject_point (menu slot, settings region, toolbar zone) and a proposed capability contract id (e.g., section_control.v1). Flag uncertain assignments with `review: true`.",
           "inputs": {
-            "repo_paths": ["artifacts/ui-inventory.json"],
-            "output_paths": ["artifacts/ui-to-plugin.yaml"]
+            "repo_paths": ["docs/reference/agvalonia/artifacts/ui-inventory.json"],
+            "output_paths": ["docs/reference/agvalonia/artifacts/ui-to-plugin.yaml"]
           },
-          "expected_outputs": ["artifacts/ui-to-plugin.yaml"],
+          "expected_outputs": ["docs/reference/agvalonia/artifacts/ui-to-plugin.yaml"],
           "acceptance_criteria": [
             "Every ui-inventory id appears exactly once.",
             "Inject points reference core shell regions (menu, toolbar, settings.plugins, leftNav, map.overlay).",
@@ -134,12 +134,12 @@
           "goal": "Describe reusable components and theme tokens required for the Nexus UI shell.",
           "instructions": "From the inventory and mapping files, synthesize a component specification for the @nexus/ui-core library. For each component (AppShell, LeftNav, TopToolbar, SettingsLayout, MapCanvas controls, form inputs, dialogs, icons), document props/parameters, state management expectations, plugin injection hooks, and references back to ui-inventory entries. Output Markdown plus a machine-readable JSON theme token file capturing typography, spacing, radius, and color scales for light/dark modes.",
           "inputs": {
-            "repo_paths": ["artifacts/ui-inventory.json", "artifacts/ui-to-plugin.yaml"],
-            "output_paths": ["artifacts/ui-core-spec.md", "artifacts/ui-theme-tokens.json"]
+            "repo_paths": ["docs/reference/agvalonia/artifacts/ui-inventory.json", "docs/reference/agvalonia/artifacts/ui-to-plugin.yaml"],
+            "output_paths": ["docs/reference/agvalonia/artifacts/ui-core-spec.md", "docs/reference/agvalonia/artifacts/ui-theme-tokens.json"]
           },
           "expected_outputs": [
-            "artifacts/ui-core-spec.md",
-            "artifacts/ui-theme-tokens.json"
+            "docs/reference/agvalonia/artifacts/ui-core-spec.md",
+            "docs/reference/agvalonia/artifacts/ui-theme-tokens.json"
           ],
           "acceptance_criteria": [
             "Spec lists component complexity (Low/Medium/High).",
@@ -156,13 +156,13 @@
           "instructions": "Produce a JSON array compatible with the GitHub Issues import API. For each task: include title, body (summary, context, acceptance criteria), labels (ui, avalonia, plus plugin:<name> where applicable), estimated complexity, and suggested file paths. Group tasks into epics (shell-and-navigation, settings-and-plugins, mapping-and-canvas, section-control, autosteer, dialogs-and-wizards). Reference ui-inventory ids and component names explicitly.",
           "inputs": {
             "repo_paths": [
-              "artifacts/ui-inventory.json",
-              "artifacts/ui-to-plugin.yaml",
-              "artifacts/ui-core-spec.md"
+              "docs/reference/agvalonia/artifacts/ui-inventory.json",
+              "docs/reference/agvalonia/artifacts/ui-to-plugin.yaml",
+              "docs/reference/agvalonia/artifacts/ui-core-spec.md"
             ],
-            "output_paths": ["artifacts/ui-backlog.json"]
+            "output_paths": ["docs/reference/agvalonia/artifacts/ui-backlog.json"]
           },
-          "expected_outputs": ["artifacts/ui-backlog.json"],
+          "expected_outputs": ["docs/reference/agvalonia/artifacts/ui-backlog.json"],
           "acceptance_criteria": [
             "At least 100 tasks generated across epics.",
             "Each task contains acceptance criteria in checklist format.",
@@ -183,9 +183,9 @@
               "../Legacy SourceCode -Dev/LICENSE",
               "../Legacy SourceCode -AgValoniaGPS/LICENSE"
             ],
-            "output_paths": ["artifacts/ui-license-checklist.md"]
+            "output_paths": ["docs/reference/agvalonia/artifacts/ui-license-checklist.md"]
           },
-          "expected_outputs": ["artifacts/ui-license-checklist.md"],
+          "expected_outputs": ["docs/reference/agvalonia/artifacts/ui-license-checklist.md"],
           "acceptance_criteria": [
             "Checklist enumerates each repo with license type.",
             "Explicitly lists assets that must be recreated.",

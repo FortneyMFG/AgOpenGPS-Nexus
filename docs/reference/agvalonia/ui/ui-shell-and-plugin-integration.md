@@ -1,10 +1,10 @@
 # Nexus UI Shell & Plugin Integration Plan (NX-410 → NX-418)
 
 ## Objectives
-- Rebuild the Nexus desktop shell using the component inventory exported to [`artifacts/ui-inventory.json`](../../artifacts/ui-inventory.json) so every legacy workflow has a mapped host in Avalonia.
-- Reuse layouts, bindings, and assets from the legacy V6 WinForms shell, Dev branch experiments, and AgValonia prototypes wherever licensing allows, following the compliance checklist in [`artifacts/ui-license-checklist.md`](../../artifacts/ui-license-checklist.md).
-- Wire UI surfaces to plugin contracts enumerated in [`artifacts/ui-to-plugin.yaml`](../../artifacts/ui-to-plugin.yaml) and the component guidance in [`artifacts/ui-core-spec.md`](../../artifacts/ui-core-spec.md) while keeping metadata-driven styling aligned with [metadata-driven UI style guide](metadata-driven-ui-style-guide.md).
-- Preserve the theme tokens defined in [`artifacts/ui-theme-tokens.json`](../../artifacts/ui-theme-tokens.json) and extend the sample view-models described in [`Nexus SourceCode/src/Aog.UI.Avalonia/README.md`](../../Nexus%20SourceCode/src/Aog.UI.Avalonia/README.md) to power Storybook-style previews.
+- Rebuild the Nexus desktop shell using the component inventory exported to [`../artifacts/ui-inventory.json`](../artifacts/ui-inventory.json) so every legacy workflow has a mapped host in Avalonia.
+- Reuse layouts, bindings, and assets from the legacy V6 WinForms shell, Dev branch experiments, and AgValonia prototypes wherever licensing allows, following the compliance checklist in [`../artifacts/ui-license-checklist.md`](../artifacts/ui-license-checklist.md).
+- Wire UI surfaces to plugin contracts enumerated in [`../artifacts/ui-to-plugin.yaml`](../artifacts/ui-to-plugin.yaml) and the component guidance in [`../artifacts/ui-core-spec.md`](../artifacts/ui-core-spec.md) while keeping metadata-driven styling aligned with [metadata-driven UI style guide](../../../ui/metadata-driven-ui-style-guide.md).
+- Preserve the theme tokens defined in [`../artifacts/ui-theme-tokens.json`](../artifacts/ui-theme-tokens.json) and extend the sample view-models described in [`Nexus SourceCode/src/Aog.UI.Avalonia/README.md`](../../../../Nexus%20SourceCode/src/Aog.UI.Avalonia/README.md) to power Storybook-style previews.
 
 ## Source Harvest & Compliance (Phase 0 — NX-410)
 1. Snapshot UI assets, dialogs, and resource dictionaries from:
@@ -12,7 +12,7 @@
    - `Legacy SourceCode -Dev` experimental UI tweaks (job wizard, diagnostics panes).
    - `Legacy SourceCode -AgValoniaGPS` Avalonia prototypes (shell layout, map canvas host).
 2. Record provenance for each reused asset in a new migration log and verify GPL obligations per the license checklist.
-3. Extract view-model intent from `artifacts/ui-backlog.json` issue bodies to cross-check acceptance criteria for each surface.
+3. Extract view-model intent from `../artifacts/ui-backlog.json` issue bodies to cross-check acceptance criteria for each surface.
 4. Deliverable: migration workbook containing file paths, reuse decisions, and follow-up relicensing actions.
 
 ## Shell, Navigation & Theming (Phase 1 — NX-411)
@@ -42,7 +42,7 @@
 5. Reference plan: [UI Phase 4 plan](ui-phase4-settings-hotkeys.md).
 
 ## Plugin-owned Surfaces (Phase 5 — NX-415)
-1. Host infrastructure: Stand up the plugin surface registry (`toolbar.*`, `workspace.*`, `dialog.*`) so Avalonia controls discovered from manifests can self-register, mirroring the plugin manifest metadata surfaced in [`artifacts/ui-to-plugin.yaml`](../../artifacts/ui-to-plugin.yaml).
+1. Host infrastructure: Stand up the plugin surface registry (`toolbar.*`, `workspace.*`, `dialog.*`) so Avalonia controls discovered from manifests can self-register, mirroring the plugin manifest metadata surfaced in [`../artifacts/ui-to-plugin.yaml`](../artifacts/ui-to-plugin.yaml).
 2. Guidance & steering family:
    - Sections/Rate: Port `section_control_widget`, `section_config_dialog`, and the variable-rate overlays/wizards from V6 so sections, rate control, and variable mapping plugins share the same configurators.
    - Autosteer/Guidance: Recreate steer settings, calibration wizard, path tuning, and performance charts, mapping telemetry into the `SteerPanelViewModel` and `GuidanceDiagnosticsViewModel` families.
@@ -72,7 +72,7 @@
 4. Deliverable: simulation flows and companion parity automation covering all new UI components.
 
 ## Documentation, QA & Release Readiness (Phase 8 — NX-418)
-1. Update docs with screenshots and operator guides referencing the new UI surfaces, using the placeholders in `artifacts/ui-screenshots/README.md` as the outline.
+1. Update docs with screenshots and operator guides referencing the new UI surfaces, using the placeholders in `../artifacts/ui-screenshots/README.md` as the outline.
 2. Extend automated UI tests to cover dialog open/close flows, menu accelerators, and plugin widget commands.
 3. Refresh release notes and the support knowledge base to point to new workflows and bridging steps from legacy shells.
 4. Deliverable: documentation pack, automated regression suite updates, and release readiness checklist for the UI overhaul.

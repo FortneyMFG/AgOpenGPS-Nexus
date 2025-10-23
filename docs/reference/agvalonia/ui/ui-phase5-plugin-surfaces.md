@@ -1,7 +1,7 @@
 # NX-415 Plugin UI Surfaces (Guidance, Device, Analytics, Video)
 
 ## Objectives
-- Provide manifest-driven hosts for plugin-owned UI surfaces enumerated in [`artifacts/ui-to-plugin.yaml`](../../artifacts/ui-to-plugin.yaml).
+- Provide manifest-driven hosts for plugin-owned UI surfaces enumerated in [`../artifacts/ui-to-plugin.yaml`](../artifacts/ui-to-plugin.yaml).
 - Recreate legacy workflows for guidance, rate control, device connectivity, agronomic analytics, and companion/video experiences using Avalonia components.
 - Ensure plugin surfaces share metadata-driven styling, localization, and telemetry patterns established in earlier phases.
 
@@ -53,4 +53,4 @@
 ## Deliverables
 - Manifest-driven registry services, Avalonia hosts, and plugin sample controls covering all families listed above.
 - Updated documentation outlining plugin integration points and extension guidance.
-- Backlog housekeeping to mark corresponding entries complete in `artifacts/ui-backlog.json` and plugin manifests.
+- Backlog housekeeping to mark corresponding entries complete in `../artifacts/ui-backlog.json` and plugin manifests.

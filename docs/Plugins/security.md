@@ -24,7 +24,7 @@ authoring new plugins or reviewing third-party submissions.
 
 - [SRS §9.5 Security & Permissions](../development/SRS/sections/9X_Frontends_Ops/95_Security_Permissions.md)
 - [Mesh security penetration tests](../development/qa/mesh-security-penetration-tests.md)
-- [Plugin manifest governance](../development/howto/plugin-manifest-governance.md)
+- [Plugin manifest workflow](../development/howto/plugin-manifest-workflow.md)
 - [Plugin QA handshake](../development/qa/plugin-qa-handshake.md)
 
 Document mitigations for any security exceptions and capture the

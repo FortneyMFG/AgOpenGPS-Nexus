@@ -15,8 +15,7 @@ This catalog groups every document under `docs/development/` by theme with a one
 | [Global guardrail regression checks (NX-616)](howto/global-guardrails.md) | Details on Global guardrail regression checks (NX-616). | Program leads & governance board | 2024-06-04 |
 | [Governance Telemetry Automation](howto/governance-telemetry.md) | Details on Governance Telemetry Automation. | Program leads & governance board | 2024-06-04 |
 | [Mesh retention & privacy operations guide (NX-324)](howto/mesh-retention-privacy-operations-guide.md) | Guidance on Mesh retention & privacy operations guide (NX-324). | Program leads & governance board | 2024-06-04 |
-| [Plugin Manifest Compliance & Capability Reporting](howto/plugin-manifest-compliance.md) | Details on Plugin Manifest Compliance & Capability Reporting. | Program leads & governance board | 2024-06-04 |
-| [Plugin Manifest Governance Playbook](howto/plugin-manifest-governance.md) | Guidance on Plugin Manifest Governance Playbook. | Program leads & governance board | 2024-06-04 |
+| [Plugin Manifest Workflow](howto/plugin-manifest-workflow.md) | Consolidated governance, lint, and escalation workflow for manifests. | Program leads & governance board | 2024-06-04 |
 | [RadioBridge provisioning kit](howto/radio/radiobridge-provisioning.md) | Details on RadioBridge provisioning kit. | Program leads & governance board | 2024-06-04 |
 | [Weather Compliance Export Playbook (Draft)](howto/weather-compliance-export.md) | Guidance on Weather Compliance Export Playbook (Draft). | Program leads & governance board | 2024-06-04 |
 

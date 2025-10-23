@@ -134,8 +134,28 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 ### Appendices
 - [DFU catalog schema](appendices/DFU_Catalog_Schema.md)
 - [Gauge ID registry](appendices/GaugeId_Registry.md)
-- [Plugin catalog schema](appendices/plugin_catalog.schema.json)
-- [Plugin manifest schema](appendices/plugin_manifest.schema.json)
+- **Schema definitions**
+  - [Plugin catalog schema](appendices/schemas/plugin_catalog.schema.json)
+  - [Plugin manifest schema](appendices/schemas/plugin_manifest.schema.json)
+- **Sample manifests & datasets**
+  - [Equipment manifest sample – articulated tractor](appendices/samples/examples/articulated-tractor.v1.json)
+  - [Scenario library index](appendices/samples/scenarios/library.json)
+  - [Scenario performance matrix](appendices/samples/scenarios/performance-matrix.json)
+  - [Legacy auto-run manifest](appendices/samples/scenarios/legacy-auto-run/legacy-auto-run.json)
+  - [Legacy auto-run soak report sample](appendices/samples/scenarios/legacy-auto-run/verification/soak-report.sample.json)
+  - Plugin manifest samples
+    - [Autosteer](appendices/samples/plugins/autosteer/1.0.0.json)
+    - [Autosteer Lite](appendices/samples/plugins/autosteer-lite/1.2.0.json)
+    - [Device manager](appendices/samples/plugins/device-manager/1.0.0.json)
+    - [File IO](appendices/samples/plugins/file-io/1.0.0.json)
+    - [GNSS + IMU fusion](appendices/samples/plugins/gnss-imu-fusion/1.0.0.json)
+    - [ISOBUS bridge](appendices/samples/plugins/isobus-bridge/1.0.0.json)
+    - [Job tasks](appendices/samples/plugins/job-tasks/1.0.0.json)
+    - [NTRIP client](appendices/samples/plugins/ntrip-client/1.0.0.json)
+    - [Planter monitor](appendices/samples/plugins/planter-monitor/1.0.0.json)
+    - [Replay](appendices/samples/plugins/replay/1.0.0.json)
+    - [Sections](appendices/samples/plugins/sections/1.1.0.json)
+    - [Telemetry logging](appendices/samples/plugins/telemetry-logging/1.0.0.json)
 
 ### References
 - [AgIO PGN baseline](references/AgIO_PGN_Baseline.md)
@@ -398,7 +418,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-EXT-011 | O-EXT-3, O-EXT-5 | [Governance requirements](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md) | ADR-EXT-005 (TBD) |
 | R-PKG-000 | Workstream TBD | [Packaging flow](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog) | ADR-PKG-001 (TBD) |
 | R-PKG-005 | Workstream TBD | [Permission prompts](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog) | ADR-PKG-002 (TBD) |
-| R-PKG-020 | Workstream TBD | [Catalog schema](appendices/plugin_catalog.schema.json) | ADR-PKG-003 (TBD) |
+| R-PKG-020 | Workstream TBD | [Catalog schema](appendices/schemas/plugin_catalog.schema.json) | ADR-PKG-003 (TBD) |
 
 ### Section 95 — Security & Permissions
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |

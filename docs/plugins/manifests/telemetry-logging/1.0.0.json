@@ -1,20 +1,4 @@
 {
-  "schemaVersion": "1.0.0",
-  "id": "org.agopengps.plugins.telemetry-logging",
-  "name": "Telemetry Logging",
-  "version": "1.0.0",
-  "description": "Captures session telemetry, diagnostics, and replay artifacts.",
-  "requiredApis": {
-    "core": ">=1.0.0"
-  },
-  "settings": {
-    "rootDirectory": "~/AgOpenGPS/telemetry",
-    "metadataFileName": "session.json"
-  },
-  "supportedCapabilities": [
-    "telemetry.logging"
-  ],
-  "requiredTransports": [
-    "core://telemetry"
-  ]
+  "redirect": "../../../SRS/appendices/samples/plugins/telemetry-logging/1.0.0.json",
+  "note": "Plugin manifest sample relocated to the SRS appendices for canonical tracking."
 }

@@ -1,34 +1,4 @@
 {
-  "schemaVersion": "1.0.0",
-  "providers": [],
-  "routes": [
-    {"stream": "pose", "source": "legacy/udp/main_gps", "mode": "hardware"},
-    {"stream": "steer_state", "source": "legacy/udp/steer_state", "mode": "hardware"},
-    {"stream": "steer_cmd", "source": "legacy/udp/steer_cmd", "mode": "hardware"},
-    {"stream": "sections", "source": "legacy/udp/sections", "mode": "hardware"}
-  ],
-  "options": {"timeScale": 1.0},
-  "scenarios": [
-    {
-      "scenarioId": "legacy-auto-run",
-      "description": "Direct bridge to legacy UDP pose, steering, and section streams for regression benches.",
-      "routes": [
-        {"stream": "pose", "source": "legacy/udp/main_gps", "mode": "hardware"},
-        {"stream": "steer_state", "source": "legacy/udp/steer_state", "mode": "hardware"},
-        {"stream": "steer_cmd", "source": "legacy/udp/steer_cmd", "mode": "hardware"},
-        {"stream": "sections", "source": "legacy/udp/sections", "mode": "hardware"}
-      ],
-      "options": {"timeScale": 1.0}
-    },
-    {
-      "scenarioId": "legacy-replay-with-soak",
-      "description": "Uses the CLI soak report to validate frame counts before replaying bench captures.",
-      "routes": [
-        {"stream": "pose", "source": "legacy/udp/main_gps", "mode": "hardware"},
-        {"stream": "steer_state", "source": "legacy/udp/steer_state", "mode": "hardware"},
-        {"stream": "steer_cmd", "source": "legacy/udp/steer_cmd", "mode": "hardware"}
-      ],
-      "options": {"timeScale": 0.5}
-    }
-  ]
+  "redirect": "../../SRS/appendices/samples/scenarios/legacy-auto-run/legacy-auto-run.json",
+  "note": "Scenario manifest relocated to the SRS appendices for centralized cataloging."
 }

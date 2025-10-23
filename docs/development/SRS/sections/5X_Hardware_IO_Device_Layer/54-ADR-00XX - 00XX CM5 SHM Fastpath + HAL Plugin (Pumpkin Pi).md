@@ -13,13 +13,13 @@ Pumpkin Pi will ship as a CM5-local plugin that:
 
 - Exposes a versioned shared-memory ring (`/dev/shm/aoglink_steer`) and eventfd notifications so NAV publishes the latest `SteerTarget` with <2 ms p50 latency and mirrors retained copies on MQTT topics for observability and fallback.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L11-L33】【F:docs/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L298-L323】【F:docs/Plugins/pumpkin-pi.md†L5-L28】
 - Owns the CM5 HAL, providing libgpiod, PWM, SocketCAN, I²C, and SPI backends that apply setpoints deterministically while health and status telemetry flow back to MQTT and the AgIO Bridge.【F:docs/Plugins/pumpkin-pi.md†L5-L30】
-- Keeps the AgIO Bridge enabled so legacy transports, MQTT-SN gateways, and v0 PGN bridges continue to operate, with Pumpkin Pi mirroring targets and status into bridge topics to maintain UI dashboards and mixed-fleet compatibility.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L14-L30】【F:docs/AgIO/bridge.md†L1-L31】
+- Keeps the AgIO Bridge enabled so legacy transports, MQTT-SN gateways, and v0 PGN bridges continue to operate, with Pumpkin Pi mirroring targets and status into bridge topics to maintain UI dashboards and mixed-fleet compatibility.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L14-L30】【F:docs/AgIO/README.md†L10-L76】
 - Implements retained authority tokens on `aog/v1/ctrl/authority/{group}`; CM5 holds authority by default, responds within 150 ms, and relinquishes control when external controllers request takeover, reverting to safe outputs if heartbeats or TTLs expire.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L19-L35】【F:docs/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L312-L337】【F:docs/AgIO/cm5.md†L33-L38】
 - Runs with PREEMPT_RT scheduling hints (FIFO ≥80, CPU pinning, `mlockall`) and fails fast when SHM ABI versions mismatch so deterministic behavior is preserved during upgrades.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L24-L69】【F:docs/AgIO/cm5.md†L3-L31】
 - Publishes version metadata and health summaries over MQTT so CI benches and operators can verify fast-path timing, HAL initialization, and authority state alongside existing AgIO diagnostics.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L71-L78】【F:docs/Plugins/pumpkin-pi.md†L54-L63】
 
 ## Consequences
-- ✅ Steering loops on CM5 meet the <2–5 ms latency target without bypassing observability or legacy transports, improving closed-loop stability under combined workloads.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L11-L33】【F:docs/AgIO/bridge.md†L1-L31】
+- ✅ Steering loops on CM5 meet the <2–5 ms latency target without bypassing observability or legacy transports, improving closed-loop stability under combined workloads.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L11-L33】【F:docs/AgIO/README.md†L10-L76】
 - ✅ External MCUs continue to join via AgIO transports and observe fast-path telemetry, reducing migration risk for mixed fleets.【F:docs/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L305-L339】
 - ⚠️ The SHM ABI requires strict versioning and startup validation; release engineering must coordinate NAV, steer-ctrl, and Pumpkin Pi updates to prevent mismatched rings.【F:docs/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L407-L409】【F:docs/Plugins/pumpkin-pi.md†L57-L63】
 - ⚠️ Real-time scheduling and capability grants (`cap_sys_nice`, CPU isolation) add operational steps for CM5 images, demanding dedicated deployment documentation and checks.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L24-L69】【F:docs/AgIO/cm5.md†L3-L31】
@@ -39,5 +39,5 @@ The legacy dev branch prototypes Linux bridges and PGN compatibility but still r
 - [Section 54 — CM5 Integrated Controller](../sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md)
 - [Pumpkin Pi Plugin Guide](../Plugins/pumpkin-pi.md)
 - [CM5 Integrated Controller Setup](../AgIO/cm5.md)
-- [Bridge Topology with Pumpkin Pi Fastpath](../AgIO/bridge.md)
+- [AgIO subsystem overview](../AgIO/README.md)
 - [NX Task Tracker — Section E](../../tasks.md)

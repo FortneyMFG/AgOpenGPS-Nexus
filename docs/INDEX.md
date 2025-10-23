@@ -25,10 +25,9 @@ related_tickets: []
 
 ## AgIO
 
-- [AgIO subsystem overview](AgIO/README.md) — transports, bridge adapters, and rollout tooling.
-- [AOG-Link bridge architecture](AgIO/aog-link-bridge-architecture-guide.md) — fastpath design and coexistence with legacy PGNs.
+- [AgIO subsystem overview](AgIO/README.md) — transports, bridge adapters, rollout workflows, and troubleshooting quick wins.
+- [External module message & PGN guide](AgIO/external-module-pgns.md) — framing, catalogue, and handshake expectations for AOG-Link v1 firmware.
 - [Transport rollout checklist](AgIO/aog-link-transport-rollout.md) — staged deployments and validation gates.
-- [Bridging workflow knowledge base](AgIO/bridging-workflow-knowledge-base.md) — troubleshooting heuristics and field notes.
 
 ## Plugin Platform
 

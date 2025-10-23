@@ -67,8 +67,8 @@ Following [ADR-023: Session/Job Model](../../sections/6X_Core_Domain_Services/62
 |-------|----------|---------------|
 | UI-Core | gRPC | [Service API contracts](../../sections/4X_Interprocess_Communications/41_Service_APIs_Contracts.md) |
 | Core-Plugin | gRPC | [Plugin architecture](../../../../Plugins/architecture.md) |
-| Core-Bridge | gRPC | [Bridge architecture guide](../../../../AgIO/bridge.md) |
-| Bridge-Hardware | AOG-Link | [AOG-Link Spec](../../../../AgIO/aog-link-bridge-architecture-guide.md) |
+| Core-Bridge | gRPC | [AgIO subsystem overview](../../../../AgIO/README.md) |
+| Bridge-Hardware | AOG-Link | [External module message & PGN guide](../../../../AgIO/external-module-pgns.md) |
 
 ## Data Integrity
 
@@ -100,4 +100,5 @@ As defined in [ADR-026: Performance Budgets](../../sections/9X_Frontends_Ops/96-
 - [Communications Requirements](../../sections/4X_Interprocess_Communications/42_Transports.md)
 - [Data Model Requirements](../../sections/3X_Data_Storage/32_Persistence_Formats.md)
 - [Threading, Scheduling & Timing requirements](../../sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md)
-- [AOG-Link bridge architecture](../../../../AgIO/aog-link-bridge-architecture-guide.md)
+- [AgIO subsystem overview](../../../../AgIO/README.md)
+- [External module message & PGN guide](../../../../AgIO/external-module-pgns.md)

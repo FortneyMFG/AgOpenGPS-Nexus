@@ -1,170 +1,69 @@
 # Developer Guide
 
-This guide covers development setup, building, testing, and contribution workflows for Nexus. For architecture details, refer to our [System Requirements Specification](../SRS/INDEX.md) and [Architecture Decision Records](../ADR/INDEX.md).
+This guide summarizes local environment setup, repeatable build commands, and key
+references for Nexus contributors. For architecture or product scope, start with the
+[SRS overview](../SRS/00_ReadMe.md) and the [documentation index](../INDEX.md).
 
-## Development Environment Setup
+## Prerequisites
 
-### Prerequisites
+Install the following tools before cloning the repository:
+
 - .NET 8 SDK
-- Visual Studio 2022+ or VS Code
-- Git
-- Docker (optional, for containerized testing)
+- Git 2.40+
+- Visual Studio 2022, VS Code, or another IDE with C# support
+- Docker Desktop (optional, for containerized testing and packaging)
 
-### Getting Started
-1. Clone the repository
-```powershell
+## Initial Setup
+
+```bash
+# Clone and enter the workspace
 git clone https://github.com/FortneyMFG/AgOpenGPS-Nexus.git
 cd AgOpenGPS-Nexus
-```
 
-2. Install dependencies
-```powershell
+# Restore dependencies
 dotnet restore
 ```
 
-3. Build the solution
-```powershell
-dotnet build
-```
+> Tip: Run `dotnet tool restore` if you add local tooling through `dotnet-tools.json`.
 
-## Project Structure
+## Build & Test Commands
 
-```text
-Nexus SourceCode/
-├── src/
-│   ├── Aog.Core/        # Core guidance engine
-│   ├── Aog.Agio/        # Hardware integration
-│   ├── Aog.Plugins/     # Plugin system
-│   └── Aog.UI.Avalonia/ # Desktop UI
-├── tests/
-│   ├── unit/           # Unit tests
-│   ├── integration/    # Integration tests
-│   └── simulation/     # Simulation tests
-└── tools/              # Development tools
-```
-
-## Build System
-
-### Local Build
-```powershell
+```bash
 # Full solution build
 dotnet build
 
-# Build specific project
-dotnet build src/Aog.Core
+# Build a specific project (example: core services)
+dotnet build "Nexus SourceCode/src/Aog.Core/Aog.Core.csproj"
 
-# Build with configuration
-dotnet build -c Release
-```
-
-### Test Execution
-```powershell
 # Run all tests
 dotnet test
 
-# Run specific test project
-dotnet test tests/unit/Aog.Core.Tests
-
-# Run with filter
+# Filter tests by category
 dotnet test --filter "Category=Integration"
-```
 
-### Simulation Testing
-```powershell
-# Run smoke tests
+# Simulation smoke tests (requires nexus CLI tooling)
 nexus sim smoke
-
-# Run full regression
-nexus sim regression
-
-# Run specific scenario
-nexus sim scenario guidance-calibration
 ```
 
-## Development Workflow
+Record the commands you execute in your PR summary and keep `tasks.md` in sync with
+status updates.
 
-1. **Task Selection**
-   - Choose task from `tasks.md`
-   - Create branch: `feat/NX-###-description`
+## Workflow Expectations
 
-2. **Development**
-   - Follow [coding standards](coding-standards.md)
-   - Maintain test coverage
-   - Update documentation
+1. Select a ready ticket from `tasks.md` and branch from `main` (`feat/NX-###-slug`).
+2. Design before coding—outline requirements or ADR updates as needed.
+3. Keep changes scoped; update documentation and validation artifacts alongside code.
+4. Run required checks (build, tests, smoke) and capture logs for reviewers.
+5. Reference the ticket ID in commit messages and pull requests.
 
-3. **Testing**
-   - Run unit tests
-   - Execute integration tests
-   - Verify simulation scenarios
+## Key References
 
-4. **Pull Request**
-   - Create PR with NX-### reference
-   - Include test results
-   - Add documentation updates
+- [Runtime baseline enforcement](../support/dotnet-runtime-baseline.md)
+- [Avalonia run modes](../ui/avalonia-run-modes.md)
+- [Plugin lease & manifest governance](../plugins/plugin-lease-manifest-governance.md)
+- [Guidance lane publishing contracts](../howto/guidance-lane-contracts.md)
+- [Plugin QA handshake checklist](../qa/plugin-qa-handshake.md)
+- [Linux core operations playbook](../Core/linux-core-operations-playbook.md)
 
-## Debugging
-
-### Local Debugging
-- VS Code launch configurations provided
-- Full source map support
-- Hot reload enabled
-
-### Remote Debugging
-- SSH debugging support
-- Remote symbol loading
-- Performance profiling
-
-## Performance Testing
-
-As specified in [ADR-026: Performance Budgets](../SRS/sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md):
-
-1. **Profiling**
-   - CPU usage monitoring
-   - Memory allocation tracking
-   - Network latency measurement
-
-2. **Benchmarking**
-   - Standard test scenarios
-   - Performance regression tests
-   - Load testing
-
-## Code Quality
-
-### Static Analysis
-- Code style enforcement
-- Security scanning
-- Dependency auditing
-
-### Testing Requirements
-- Unit test coverage: >80%
-- Integration test coverage: >60%
-- Performance test baseline
-
-## Contribution Process
-
-1. **Setup**
-   - Fork repository
-   - Configure development environment
-   - Review contribution guidelines
-
-2. **Development**
-   - Create feature branch
-   - Implement changes
-   - Add tests and docs
-
-3. **Review**
-   - Submit pull request
-   - Address feedback
-   - Update documentation
-
-4. **Integration**
-   - Pass CI checks
-   - Merge to develop
-   - Monitor deployment
-
-## Related Documentation
-
-- [Architecture Overview](../architecture/INDEX.md)
-- [Plugin Development](../plugins/INDEX.md)
-- [Testing Guide](testing.md)
-- [Contribution Guidelines](contributing.md)
+These references evolve with the platform—check the linked documents for the latest
+procedures and cross-link updates from your PRs.

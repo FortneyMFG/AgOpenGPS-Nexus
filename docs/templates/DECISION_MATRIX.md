@@ -1,28 +1,12 @@
-# Decision matrix: <Section>/<Family ID>
+# Decision Matrix Template (Retired)
 
-## Context
-- Section: [<Section name>](../SRS/sections/<file>.md)
-- Family ID: DS-<id> (exclusive) / CS-<id> (composable)
-- Prerequisites: Decisions that must land first (e.g., OS target).
+This standalone template has been merged into the
+[SRS section template — §[X.12] Decision Matrix](../SRS/03_SRS_Section_Template.md#x12-decision-matrix).
+Use that section when scoring approaches so the weighting, evidence, and decision summary
+remain alongside the owning requirements.
 
-## Options compared
-- O-<id>
-- O-<id>
+Additional guidance:
+- Capture candidate approaches in [§[X.10] Option Overview](../SRS/03_SRS_Section_Template.md#x10-option-overview).
+- Compare trade-offs in [§[X.11] Comparison Matrix](../SRS/03_SRS_Section_Template.md#x11-comparison-matrix).
 
-## Criteria & weights
-| Criterion | Weight | Rationale |
-|---|---|---|
-| Maintainability | 3 | e.g., Volunteer maintenance load |
-| Offline resilience | 2 | ... |
-
-## Scoring
-| Option | Maintainability | Offline resilience | … | Weighted total | Notes |
-|---|---|---|---|---|---|
-| O-<id> | 3 | 1 | … | 14 | Key trade-offs |
-
-> ⚠️ Keep this table neutral: use data, prototypes, or references. Final choices live in ADRs.
-
-## Follow-up items
-- Data we still need (benchmarks, licensing check, etc.).
-- Dependencies to validate.
-- Links to discussions.
+Legacy copies should be ported into the owning SRS section and then deleted to avoid drift.

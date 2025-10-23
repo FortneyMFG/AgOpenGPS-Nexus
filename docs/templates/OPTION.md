@@ -1,28 +1,10 @@
-# O-<id>: <Option name>
+# Option Template (Retired)
 
-## Summary
-What this is; where it’s used in the wild.
+Author option write-ups directly inside the
+[SRS section template — §[X.10] Option Overview](../SRS/03_SRS_Section_Template.md#x10-option-overview)
+and its related subsections for comparisons (§[X.11]) and scoring (§[X.12]). Keeping the
+context, trade-offs, and decision record together prevents stale duplicates across the
+docs/templates directory.
 
-## Details
-- Architecture outline / data flow
-- Dependencies / licenses
-- Performance notes (numbers if available)
-- Compatible with / blocked by other option families
-
-## Pros
-- …
-
-## Cons
-- …
-
-## Risks & mitigations
-- …
-
-## Borrowables
-Code/ideas we can reuse from AgOpenGPS/AgIO or elsewhere.
-
-## Rough effort
-S/M/L with 1–2 sentences.
-
-## References
-Links to threads, repos, benchmarks.
+When a detailed breakout is required, add a sibling Markdown file named with the
+section prefix (for example, `11-O2-GuidanceMesh.md`) and link it from §[X.10].

@@ -5,6 +5,7 @@ using Aog.UI.Avalonia.ViewModels.Shell;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Styling;
 using Avalonia.VisualTree;
 
 namespace Aog.UI.Avalonia.Controls;
@@ -31,7 +32,7 @@ public sealed class BlockTileButton : Button
             return;
         }
 
-        if (e.Source is IVisual visual && visual.GetVisualAncestors().OfType<Menu>().Any())
+        if (e.Source is Visual visual && visual.GetVisualAncestors().OfType<Menu>().Any())
         {
             return;
         }
@@ -65,7 +66,7 @@ public sealed class BlockTileButton : Button
             if (Math.Abs(delta.X) > DragThreshold || Math.Abs(delta.Y) > DragThreshold)
             {
                 _suppressClick = true;
-                IsPressed = false;
+                PseudoClasses.Set(":pressed", false);
             }
         }
     }

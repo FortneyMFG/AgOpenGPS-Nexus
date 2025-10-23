@@ -68,13 +68,13 @@
                   VerticalAlignment="Top"
                   Background="Transparent"
                   BorderThickness="0">
-              <Menu.IsVisible>
-                <MultiBinding Converter="{StaticResource BlockSettingsVisibilityConverter}">
-                  <Binding Path="HasSettings" />
-                  <Binding Path="DataContext.Layout.IsLocked"
-                           ElementName="BlockTiles" />
-                </MultiBinding>
-              </Menu.IsVisible>
+                <Menu.IsVisible>
+                  <MultiBinding Converter="{StaticResource BlockSettingsVisibilityConverter}">
+                    <Binding Path="HasSettings" />
+                    <Binding Path="DataContext.Layout.IsLocked"
+                             RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                  </MultiBinding>
+                </Menu.IsVisible>
               <MenuItem ItemsSource="{Binding SizeOptions}"
                         ToolTip.Tip="Adjust block size">
                 <MenuItem.Header>
@@ -90,11 +90,11 @@
                   </Border>
                 </MenuItem.Header>
                 <MenuItem.ItemTemplate>
-                  <DataTemplate x:DataType="vm:BlockSizeOptionViewModel">
-                    <MenuItem Header="{Binding Label}"
-                              Command="{Binding ApplyCommand}"
-                              IsCheckable="True"
-                              IsChecked="{Binding IsSelected}" />
+                    <DataTemplate x:DataType="vm:BlockSizeOptionViewModel">
+                      <MenuItem Header="{Binding Label}"
+                                Command="{Binding ApplyCommand}"
+                                ToggleType="CheckBox"
+                                IsChecked="{Binding IsSelected}" />
                   </DataTemplate>
                 </MenuItem.ItemTemplate>
               </MenuItem>

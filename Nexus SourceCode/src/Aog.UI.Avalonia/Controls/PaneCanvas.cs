@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using Aog.UI.Avalonia.Layout;
 using Avalonia;
 using Avalonia.Controls;
@@ -30,61 +30,41 @@ public sealed class PaneCanvas : Control
     {
         base.Render(context);
 
-        if (Layout is not { } layout || LayoutResult is not { } result)
+        if (Layout is not { } layout)
         {
             return;
         }
 
         DrawGrid(context, layout);
-        DrawPanes(context, result.Panes);
-        DrawDividers(context, result.Dividers);
     }
 
     private static void DrawGrid(DrawingContext context, ShellGridLayout layout)
     {
         var cell = layout.CellPx;
-        var gutter = layout.GutterPx;
-        if (layout.Columns <= 0 || layout.Rows <= 0)
+        if (layout.Columns <= 0 || layout.Rows <= 0 || cell <= 0)
         {
             return;
         }
 
-        var width = layout.ToPixelRect(0, 0, layout.Columns, 1).Width;
-        var height = layout.ToPixelRect(0, 0, 1, layout.Rows).Height;
+        var width = cell * layout.Columns;
+        var height = cell * layout.Rows;
 
-        var pen = new Pen(new SolidColorBrush(Color.FromArgb(32, 255, 255, 255)), 1);
+        var minorPen = new Pen(new SolidColorBrush(Color.FromArgb(32, 255, 255, 255)), 1);
+        var majorPen = new Pen(new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)), 2);
+        var minorPerMajor = Math.Max(1, layout.Columns / 10);
 
         for (var col = 0; col <= layout.Columns; col++)
         {
-            var x = col * (cell + gutter) - gutter / 2;
+            var x = col * cell;
+            var pen = col % minorPerMajor == 0 ? majorPen : minorPen;
             context.DrawLine(pen, new Point(x, 0), new Point(x, height));
         }
 
         for (var row = 0; row <= layout.Rows; row++)
         {
-            var y = row * (cell + gutter) - gutter / 2;
+            var y = row * cell;
+            var pen = row % minorPerMajor == 0 ? majorPen : minorPen;
             context.DrawLine(pen, new Point(0, y), new Point(width, y));
-        }
-    }
-
-    private static void DrawPanes(DrawingContext context, IReadOnlyList<PaneVisual> panes)
-    {
-        var fill = new SolidColorBrush(Color.FromArgb(24, 0, 128, 255));
-        var stroke = new Pen(new SolidColorBrush(Color.FromArgb(128, 0, 128, 255)), 1);
-
-        foreach (var pane in panes)
-        {
-            context.FillRectangle(fill, pane.Bounds);
-            context.DrawRectangle(stroke, pane.Bounds);
-        }
-    }
-
-    private static void DrawDividers(DrawingContext context, IReadOnlyList<PaneDividerVisual> dividers)
-    {
-        var stroke = new Pen(new SolidColorBrush(Color.FromArgb(160, 255, 255, 255)), 2);
-        foreach (var divider in dividers)
-        {
-            context.DrawRectangle(stroke, divider.Bounds);
         }
     }
 }

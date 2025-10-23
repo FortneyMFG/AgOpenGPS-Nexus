@@ -20,6 +20,7 @@
       <rendering:LockStateToTextConverter x:Key="LockTooltipConverter" />
       <rendering:SpacingToThicknessConverter x:Key="SpacingToThicknessConverter" />
       <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
+      <rendering:BlockSettingsVisibilityConverter x:Key="BlockSettingsVisibilityConverter" />
 
       <DataTemplate x:Key="ShellMenuItemTemplate"
                     x:DataType="workspace:ShellMenuItemViewModel">
@@ -66,17 +67,14 @@
             <Menu HorizontalAlignment="Right"
                   VerticalAlignment="Top"
                   Background="Transparent"
-                  BorderThickness="0"
-                  IsVisible="{Binding HasSettings}">
-              <Menu.Styles>
-                <Style Selector="Menu">
-                  <Style.Triggers>
-                    <DataTrigger Binding="{Binding DataContext.Layout.IsLocked, ElementName=BlockTiles}" Value="True">
-                      <Setter Property="IsVisible" Value="False" />
-                    </DataTrigger>
-                  </Style.Triggers>
-                </Style>
-              </Menu.Styles>
+                  BorderThickness="0">
+              <Menu.IsVisible>
+                <MultiBinding Converter="{StaticResource BlockSettingsVisibilityConverter}">
+                  <Binding Path="HasSettings" />
+                  <Binding Path="DataContext.Layout.IsLocked"
+                           ElementName="BlockTiles" />
+                </MultiBinding>
+              </Menu.IsVisible>
               <MenuItem ItemsSource="{Binding SizeOptions}"
                         ToolTip.Tip="Adjust block size">
                 <MenuItem.Header>

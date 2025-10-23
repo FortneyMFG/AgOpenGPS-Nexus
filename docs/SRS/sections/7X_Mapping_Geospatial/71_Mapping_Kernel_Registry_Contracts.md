@@ -1,4 +1,4 @@
-# 71 — Mapping Kernel Contracts
+# 71 — Mapping Kernel & Registry Contracts
 *(Status: Proposed)*
 
 **Author:** Codex
@@ -6,8 +6,8 @@
 **Version:** 0.1.0
 **Section ID:** 71
 **Editors:** Mapping & Geospatial Working Group
-**Last Updated:** 2025-10-20
-**Related Sections:** 62 — Job Lifecycle, 32 — Layer Registry & Persistence, 72 — Mapping Layers Plugin, 73 — Variable Mapping Rate Control
+**Last Updated:** 2025-10-24
+**Related Sections:** 32 — Persistence & Formats, 62 — Job Lifecycle, 63 — Layers Registry & Journal Contracts, 72 — Mapping Layers Plugin, 73 — Variable Mapping, 77 — Variable Rate Control
 **Upstream Dependencies:** ADR-009, ADR-010, ADR-030, ADR-040, ADR-041, ADR-044, ADR-047
 **Downstream Impacts:** Layer Registry schemas, Mapping plugins, Analytics & Reporting services
 

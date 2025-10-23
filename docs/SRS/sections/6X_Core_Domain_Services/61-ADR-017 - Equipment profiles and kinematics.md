@@ -107,7 +107,7 @@ or reproducible replay across rigs.
 
 ## 8) References
 
-* [Interprocess API requirements](../4X_Interprocess_Communications/41_Inter_Application_API.md)
+* [Interprocess API requirements](../4X_Interprocess_Communications/41_Service_APIs_Contracts.md)
 * [Control & automation requirements](61_Kinematics_Pose_Fusion.md)
 * [ADR-008 — Equipment hierarchy](61-ADR-008%20-%20Equipment%20Implement%20Toolbar%20Section%20hierarchy.md)
 * [ADR-033 — Guidance planner and autosteer orchestration](../6X_Core_Domain_Services/61-ADR-033%20-%20Guidance%20planner%20and%20autosteer%20orchestration.md)

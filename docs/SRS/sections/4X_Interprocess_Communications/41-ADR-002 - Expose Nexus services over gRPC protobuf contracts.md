@@ -9,8 +9,8 @@
 **Version:** 0.1.0
 **Supersedes:** _None_
 **Superseded by:** _None_
-**Related SRS:** [41 — Inter-Application API](41_Inter_Application_API.md)
-**Related Considerations:** [C3 - Typed API Bridge Strategy](41_Inter_Application_API.md#c3---typed-api-bridge-strategy)
+**Related SRS:** [41 — Service APIs & Contracts](41_Service_APIs_Contracts.md)
+**Related Considerations:** [C3 - Typed API Bridge Strategy](41_Service_APIs_Contracts.md#c3---typed-api-bridge-strategy)
 
 ---
 
@@ -69,7 +69,7 @@ automation components consume generated clients from the `Aog.Abstractions` pack
 ## 4) Rationale
 
 gRPC/protobuf offers deterministic contracts, built-in streaming, and tooling across languages while aligning with typed
-API goals captured in Section 41. Compatibility bridges outlined in [C3](41_Inter_Application_API.md#c3---typed-api-bridge-strategy)
+API goals captured in Section 41. Compatibility bridges outlined in [C3](41_Service_APIs_Contracts.md#c3---typed-api-bridge-strategy)
 ensure legacy PGNs remain usable, and the shared proto repository simplifies governance with CI linting.
 
 ---

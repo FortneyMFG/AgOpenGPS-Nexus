@@ -8,21 +8,21 @@
 **Editors:** Mapping Platform Working Group
 **Last Updated:** 2025-10-20
 **Related Sections:** 71 — Mapping Kernel Contracts, 72 — Mapping Layers Plugin, 75 — Tiling & Rendering Services, 94 — Extensibility Packaging Updates
-**Upstream Dependencies:** ADR-022 CRS Precision, ADR-044 Zone Drawing Framework, ADR-010 Layer Registry, Offline Sync Section 33
+**Upstream Dependencies:** §26 Units & Conventions, ADR-022 CRS Precision, ADR-044 Zone Drawing Framework, ADR-010 Layer Registry, Offline Sync Section 33
 **Downstream Impacts:** Plugin SDK, Registry automation, UI shells, Collaborative sync services
 
 ---
 
 ## 76.1 Purpose & Scope
 
-Establish policies and tooling that let third parties introduce new geospatial layer types, projections, and analytics while remaining compatible with Nexus Core registries, tiling services, and UI clients. The section governs CRS support, custom layer registration, editing, import/export, and capability discovery.
+Establish policies and tooling that let third parties introduce new geospatial layer types, projections, and analytics while remaining compatible with Nexus Core registries, tiling services, and UI clients. The section governs CRS utilities, custom layer registration, editing, import/export, and capability discovery aligned with global conventions in §26.
 
 ---
 
 ## 76.2 Context
 
-- CRS utilities and precision policies in ADR-022 define acceptable EPSG codes, unit conversions, and coordinate tolerances for all layers.【F:docs/SRS/sections/3X_Data_Storage/32-ADR-022 - CRS units and precision policy.md†L1-L44】
-- Mapping kernel contracts (Section 71) and Layer Registry schemas provide the authoritative catalog for built-in layers and provenance metadata.【F:docs/SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md†L1-L132】
+- CRS utilities and precision policies in §26/ADR-022 define acceptable EPSG codes, unit conversions, and coordinate tolerances for all layers.【F:docs/SRS/sections/2X_System_Architecture/26_Units_Conventions_Coordinate_Systems.md†L15-L64】【F:docs/SRS/sections/3X_Data_Storage/32-ADR-022 - CRS units and precision policy.md†L1-L44】
+- Mapping kernel contracts (Section 71) and Layer Registry schemas provide the authoritative catalog for built-in layers and provenance metadata.【F:docs/SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Registry_Contracts.md†L1-L132】
 - LayerEditService (ADR-044) delivers shared editing tools, journals, and undo/redo flows that plugins must extend for custom layers.【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-044 - Zone Drawing Framework.md†L29-L74】
 - Extensibility packaging (Section 94) governs plugin manifests, capability discovery, and compatibility metadata for UI and automation consumers.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L17-L120】
 
@@ -58,7 +58,7 @@ Establish policies and tooling that let third parties introduce new geospatial l
 
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|-----------|---------|-----------------|-----------------------------|
-| R-GEO-7600 | MUST | CRS Support | Provide CRS utilities (EPSG lookup, unit conversions, precision enforcement) aligned with ADR-022. | ADR-022 | CRS unit tests covering supported EPSG codes. |
+| R-GEO-7600 | MUST | CRS Support | Provide CRS utilities (EPSG lookup, unit conversions, precision enforcement) aligned with §26 and ADR-022. | ADR-022 | CRS unit tests covering supported EPSG codes. |
 | R-GEO-7601 | SHOULD | Layer Registration | Allow plugins to register custom schema definitions with validation hooks and provenance metadata. | Mapping plugin SRS | Registry integration tests ensuring custom schemas tile correctly. |
 | R-GEO-7602 | MUST | Editing Tooling | Extend LayerEditService to support custom geometry editors, attribute panels, and undo/redo for plugin layers. | ADR-044 | Editing automation verifying journal replay. |
 | R-GEO-7603 | SHOULD | Import/Export | Provide adapters to map custom layers to open formats while preserving provenance and schema versions. | Persistence formats | Import/export regression tests verifying metadata retention. |

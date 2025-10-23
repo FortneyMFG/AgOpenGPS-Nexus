@@ -113,7 +113,7 @@ complex toolbar relationships or provide stable IDs for telemetry and replay con
 
 ## 8) References
 
-* [Interprocess API requirements](../4X_Interprocess_Communications/41_Inter_Application_API.md)
+* [Interprocess API requirements](../4X_Interprocess_Communications/41_Service_APIs_Contracts.md)
 * [Control & automation requirements](61_Kinematics_Pose_Fusion.md)
 * [ADR-007 — PoseStream and SectionState Architecture](61-ADR-007%20-%20PoseStream%20and%20SectionState%20architecture.md)
 * [ADR-015 — Section Control & Grouping Semantics](61-ADR-015%20-%20Section%20control%20and%20grouping%20semantics.md)

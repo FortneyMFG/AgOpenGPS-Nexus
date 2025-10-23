@@ -1,16 +1,15 @@
-# 41 — Inter-Application API
+# 41 — Service APIs & Contracts
 *(Status: Proposed)*
 
 **Author:** Codex
 **Created:** 2025-10-20
-**Status:** Proposed
 **Version:** 0.1.0
 **Section ID:** 41
 **Editors:** Interprocess Communications Working Group
-**Last Updated:** 2025-10-20
-**Related Sections:** 21 — System Decomposition & Boundaries, 42 — Transports, 61 — Kinematics & Pose Fusion
+**Last Updated:** 2025-10-24
+**Related Sections:** 21 — System Decomposition & Boundaries, 22 — Process Model & Deployment Topologies, 23 — Threading, Scheduling & Timing, 42 — Transports, 43 — Channel Security, 63 — Layers Registry & Journal Contracts
 **Upstream Dependencies:** 1X — Platform Foundations, 2X — System Architecture
-**Downstream Impacts:** 5X — Hardware IO Device Layer, 7X — Mapping & Geospatial, 9X — Frontends & Ops
+**Downstream Impacts:** 5X — Hardware IO Device Layer, 7X — Mapping & Geospatial, 9X — Frontends & Ops, 97 — Simulation & Replay
 
 ---
 

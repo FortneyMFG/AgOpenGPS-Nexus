@@ -249,20 +249,13 @@
       </StackPanel>
     </Border>
 
-    <Grid Margin="0,12,0,0">
-      <Border Background="{DynamicResource ShellPanelBackgroundBrush}"
-              BorderBrush="{DynamicResource ShellPanelBorderBrush}"
-              BorderThickness="1"
-              CornerRadius="{DynamicResource ThemeRadiusMd}" />
-      <ContentControl Margin="16"
-                      Content="{Binding MainContent}" />
+    <Grid>
+      <ContentControl Content="{Binding MainContent}" />
       <controls:PaneCanvas Layout="{Binding Layout.Grid}"
                            LayoutResult="{Binding Layout.PaneLayout}"
-                           IsHitTestVisible="False"
-                           Margin="16" />
+                           IsHitTestVisible="False" />
       <ItemsControl ItemsSource="{Binding Layout.Blocks}"
                     ItemTemplate="{StaticResource BlockTileTemplate}"
-                    Margin="16"
                     Background="Transparent"
                     SizeChanged="OnViewportSizeChanged">
         <ItemsControl.ItemsPanel>

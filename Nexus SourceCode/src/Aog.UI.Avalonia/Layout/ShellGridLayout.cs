@@ -7,9 +7,9 @@ namespace Aog.UI.Avalonia.Layout;
 
 public sealed class ShellGridLayout
 {
-    public double CellPx { get; init; } = 56;
+    public double CellPx { get; set; } = 56;
 
-    public double GutterPx { get; init; } = 8;
+    public double GutterPx { get; set; } = 8;
 
     public int Columns { get; set; } = 1;
 

@@ -18,6 +18,10 @@ namespace Aog.UI.Avalonia.ViewModels.Shell;
 /// </summary>
 public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 {
+    private const int MajorGridColumns = 10;
+    private const int MinorDivisionsPerMajor = 2;
+    private const int MinorGridColumns = MajorGridColumns * MinorDivisionsPerMajor;
+
     private static readonly IReadOnlyDictionary<string, string> DefaultStatusMessages =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -134,17 +138,21 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     public void UpdateViewport(Size viewport)
     {
         Viewport = viewport;
+        Grid.GutterPx = 0;
+
         if (viewport.Width <= 0 || viewport.Height <= 0)
         {
-            Grid.Columns = Math.Max(1, Grid.Columns);
-            Grid.Rows = Math.Max(1, Grid.Rows);
+            Grid.Columns = MinorGridColumns;
+            Grid.Rows = Math.Max(MinorDivisionsPerMajor, Grid.Rows);
+            Grid.CellPx = 0;
             PaneLayout = PaneLayoutCompiler.Compile(Grid);
             return;
         }
 
-        var cell = Grid.CellPx + Grid.GutterPx;
-        Grid.Columns = Math.Max(1, (int)Math.Floor((viewport.Width + Grid.GutterPx) / cell));
-        Grid.Rows = Math.Max(1, (int)Math.Floor((viewport.Height + Grid.GutterPx) / cell));
+        var minorCell = viewport.Width / MinorGridColumns;
+        Grid.CellPx = minorCell;
+        Grid.Columns = MinorGridColumns;
+        Grid.Rows = Math.Max(MinorDivisionsPerMajor, (int)Math.Floor(viewport.Height / minorCell));
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
     }
 

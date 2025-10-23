@@ -29,7 +29,7 @@ The Genetics plugin manages variety, hybrid, and trait metadata. It fuses planti
 - Manifest should note optional dependencies on Crop and Variable Mapping for richer analytics.
 
 ## Related Resources
-- Existing agronomy briefs under `docs/Plugins/Genetics.md`.
+- Existing agronomy briefs under `docs/Plugins/briefs/Genetics.md`.
 - `docs/Plugins/official/VariableMapping.md` for how genetics drive prescription changes.
 - ADRs around data governance detail how sensitive genetics data is secured.
 

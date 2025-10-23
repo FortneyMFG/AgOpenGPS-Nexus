@@ -28,7 +28,7 @@ The Weather plugin ingests live and historical weather data, computes agronomic 
 - Manifest should document supported providers to assist operators.
 
 ## Related Resources
-- `docs/Plugins/Weather.md` (legacy guide) provides additional background.
+- `docs/Plugins/briefs/Weather.md` (legacy guide) provides additional background.
 - `docs/Plugins/official/Crop.md` and `FieldHealth.md` discuss how weather influences analytics.
 - ADRs around environmental data ingestion (forthcoming) will cover provider governance.
 

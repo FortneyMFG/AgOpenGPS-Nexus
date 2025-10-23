@@ -28,7 +28,7 @@ The Combine Yield plugin ingests harvester bus data, normalises yield measuremen
 - Include sample calibration profiles under `assets/calibration/` for quick-start onboarding.
 
 ## Related Resources
-- `docs/Plugins/Mapping.md` for layer registry semantics.
+- `docs/Plugins/briefs/Mapping.md` for layer registry semantics.
 - `docs/Plugins/tutorials/testing.md` for techniques to generate replay fixtures.
 - Agronomic ADRs covering yield normalisation and data quality checks.
 

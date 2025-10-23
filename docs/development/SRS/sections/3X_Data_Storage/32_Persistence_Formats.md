@@ -76,7 +76,7 @@ Assumptions:
 | R-32004 | MUST | Lifecycle & Retention | Document and enforce retention windows, compaction triggers, and archival workflows for jobs, telemetry, and layers. | R-DATA-013, R-DATA-023 | Retention planner integration tests; audit log review. 【F:docs/sections/3X_Data_Storage/34-ADR-025 - Data lifecycle and retention policy.md†L10-L58】 |
 | R-32005 | SHOULD | Performance | Provide indexed spatial queries and background maintenance jobs that meet CPU/IO budgets. | R-DATA-024, R-DATA-028 | Benchmark harness with ≤ 250 ms p95 zone lookups; maintenance job telemetry. 【F:docs/sections/7X_Mapping_Geospatial/72-ADR-027 - Spatial Constraints & Zone Policies.md†L13-L53】 |
 | R-32006 | SHOULD | Analytics & Extensions | Support plugin-owned schemas (yield, cost, genetics, risk, weather) with provenance linking back to jobs/sessions. | R-DATA-041…R-DATA-048 | Schema registry tests verifying plugin payload serialization and provenance references.【F:docs/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L21-L52】 |
-| R-32007 | MUST | Inventory & Reporting | Persist inventory ledger, regulatory exports, and report templates with deterministic manifests. | R-DATA-049…R-DATA-053 | CLI regression suite verifying manifest hashes and export fidelity.【F:docs/Plugins/Regulatory.md†L1-L140】 |
+| R-32007 | MUST | Inventory & Reporting | Persist inventory ledger, regulatory exports, and report templates with deterministic manifests. | R-DATA-049…R-DATA-053 | CLI regression suite verifying manifest hashes and export fidelity.【F:docs/Plugins/briefs/Regulatory.md†L1-L140】 |
 | R-32008 | SHOULD | Presets & Session Provenance | Record preset/layout selections, crop history, and session weather snapshots tied to job metadata. | R-DATA-032, R-DATA-041, R-DATA-042 | Session lifecycle tests validating provenance fields and snapshot serialization.【F:docs/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L7-L33】 |
 
 ### 32.5.2 Detailed Requirement Catalogue
@@ -123,8 +123,8 @@ Assumptions:
 | R-DATA-049 | SHOULD | Report Templates | Version report template manifests describing sections, data sources, output formats. 【F:docs/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L21-L52】 |
 | R-DATA-050 | MUST | Inventory Ledger | Define `InventoryLot.v1`, `InventoryTransaction.v1`, reconciliation policies capturing lot attributes. 【F:docs/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L15-L40】 |
 | R-DATA-051 | SHOULD | Inventory Provenance | Link inventory transactions to sessions, layers, work orders for traceability. 【F:docs/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L86-L109】【F:docs/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L15-L40】 |
-| R-DATA-052 | MUST | Soil & Lab Layers | Introduce canonical soil layer definitions with ingestion metadata and provenance. 【F:docs/Plugins/SoilLab.md†L1-L120】 |
-| R-DATA-053 | SHOULD | Regulatory Snapshots | Store regulatory exports as signed JSON referencing sessions, weather, applied products, operators. 【F:docs/Plugins/Regulatory.md†L1-L140】 |
+| R-DATA-052 | MUST | Soil & Lab Layers | Introduce canonical soil layer definitions with ingestion metadata and provenance. 【F:docs/Plugins/briefs/SoilLab.md†L1-L120】 |
+| R-DATA-053 | SHOULD | Regulatory Snapshots | Store regulatory exports as signed JSON referencing sessions, weather, applied products, operators. 【F:docs/Plugins/briefs/Regulatory.md†L1-L140】 |
 
 ### 32.5.3 Requirement Sources & Rationale
 

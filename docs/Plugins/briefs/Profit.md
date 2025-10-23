@@ -20,7 +20,7 @@ The Profit plugin aggregates cost records, yield-derived revenue, and profitabil
 
 - Maintain stock ledgers per SKU/lot with quantity on hand, committed work order quantities, and cost basis so Profit analytics can model true margins and purchasing forecasts.【F:docs/development/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L15-L40】
 - Support barcode/QR scanning for intake, transfers, and application reconciliation. When sessions close, the plugin posts `InventoryTransaction` entries keyed to `sessionId` and `workOrderId` to maintain traceability back to field work.【F:docs/development/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L86-L109】
-- Expose dashboards highlighting low stock, expiring lots, and discrepancies between planned vs. as-applied quantities. Operators must be able to adjust counts with audit notes that flow into regulatory exports.【F:docs/Plugins/Regulatory.md†L1-L140】
+- Expose dashboards highlighting low stock, expiring lots, and discrepancies between planned vs. as-applied quantities. Operators must be able to adjust counts with audit notes that flow into regulatory exports.【F:docs/Plugins/briefs/Regulatory.md†L1-L140】
 
 ## UX Requirements
 
@@ -31,7 +31,7 @@ The Profit plugin aggregates cost records, yield-derived revenue, and profitabil
 ## Exports & Reporting
 
 - Generate CSV/PDF summaries and GeoJSON overlays for Crop Report and Profit Summary templates, embedding provenance references for audit.【F:docs/development/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L21-L52】
-- Coordinate with analytics exports so profitability results feed into multi-machine dashboards without exposing sensitive data unless share profiles permit it.【F:docs/Plugins/MultiMachine.md†L1-L80】
+- Coordinate with analytics exports so profitability results feed into multi-machine dashboards without exposing sensitive data unless share profiles permit it.【F:docs/Plugins/briefs/MultiMachine.md†L1-L80】
 
 ## Compatibility Notes
 

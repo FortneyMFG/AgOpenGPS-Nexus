@@ -217,7 +217,7 @@ layer-aware diagnostics, and constraint alerting to keep automation explainable.
 | R-TH-000 | 64-O1 | 64-ADR-019 | `tes../UI/AgIOUdpMonitor.cs` | `SourceCode/AgIO/Source/Forms/FormUDPMonitor.cs` |
 | R-TH-004 | 64-O1, 64-O3 | 21-O6 | `tests/system/LinuxCoreHealthz.yml` | `Core/LinuxServiceHost` |
 | R-TH-022 | 64-O3 | 42-ADR-047 | `tests/sim/ConstraintAlertScenario.json` | `Core/ConstraintAlerts` |
-| R-TH-034 | 64-O3 | EquipmentHealth Program | `tests/integration/EquipmentHealthRecord.cs` | `docs/Plugins/EquipmentHealth.md` |
+| R-TH-034 | 64-O3 | EquipmentHealth Program | `tests/integration/EquipmentHealthRecord.cs` | `docs/Plugins/briefs/EquipmentHealth.md` |
 
 ---
 

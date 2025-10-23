@@ -31,5 +31,5 @@ The Planter Monitor plugin oversees row unit performance in real time. It calcul
 ## Related Resources
 - `docs/Plugins/official/TelemetryLogging.md` for telemetry persistence.
 - `docs/Plugins/official/VariableMapping.md` to understand how planter data feeds rate adjustments.
-- Existing documentation under `docs/Plugins/planter-monitor.md` (legacy) can provide additional history.
+- Existing documentation under `docs/Plugins/briefs/planter-monitor.md` (legacy) can provide additional history.
 

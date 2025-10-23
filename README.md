@@ -86,11 +86,11 @@ The Nexus roadmap upgrades the legacy UDP PGN (Coined AOG-Link V0) interface to 
 
 ## Plugin & Component Highlights
 
-- **AutoSteer & Guidance.** Closed-loop steering, lookahead tuning, and constraint gating run as plugins connected to Core routing. Refer to [docs/Plugins/AutoSteer.md](docs/Plugins/AutoSteer.md) and [docs/development/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md](docs/development/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md) for control theory and safety notes.
-- **Sections & Rate Control.** Section management, variable rate, and product control share the Layer Registry and telemetry feeds, with nanopb contracts ready for MCU modules. See [docs/Plugins/Sections.md](docs/Plugins/Sections.md) and [docs/Plugins/RateControl.md](docs/Plugins/RateControl.md).
-- **Mapping & Analytics.** Layer editing, replay, and telemetry logging use the TileStore, Layer Registry, and report builder services. Explore [docs/Plugins/Mapping.md](docs/Plugins/Mapping.md), [docs/Plugins/Replay.md](docs/Plugins/Replay.md), and [docs/Plugins/TelemetryLogging.md](docs/Plugins/TelemetryLogging.md).
-- **ISOBUS & External Devices.** The ISOBUS bridge, GNSS/IMU fusion, and device manager plugins coordinate identities and capabilities across the mesh; details are under [docs/Plugins/ISOBUS.md](docs/Plugins/ISOBUS.md) and [docs/Plugins/DeviceManager.md](docs/Plugins/DeviceManager.md).
-- **Simulation & Testing.** Deterministic simulation scenarios, Parquet telemetry logs, and replay fixtures keep regression coverage aligned with the SRS. Start with [docs/development/howto/simulation-scenarios.md](docs/development/howto/simulation-scenarios.md) and [docs/Plugins/Replay.md](docs/Plugins/Replay.md).
+- **AutoSteer & Guidance.** Closed-loop steering, lookahead tuning, and constraint gating run as plugins connected to Core routing. Refer to [docs/Plugins/official/AutoSteer.md](docs/Plugins/official/AutoSteer.md), [docs/Plugins/briefs/Guidance.md](docs/Plugins/briefs/Guidance.md), and [docs/development/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md](docs/development/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md) for control theory and safety notes.
+- **Sections & Rate Control.** Section management, variable rate, and product control share the Layer Registry and telemetry feeds, with nanopb contracts ready for MCU modules. See [docs/Plugins/official/Sections.md](docs/Plugins/official/Sections.md) and [docs/Plugins/briefs/RateControl.md](docs/Plugins/briefs/RateControl.md).
+- **Mapping & Analytics.** Layer editing, replay, and telemetry logging use the TileStore, Layer Registry, and report builder services. Explore [docs/Plugins/briefs/Mapping.md](docs/Plugins/briefs/Mapping.md), [docs/Plugins/briefs/Replay.md](docs/Plugins/briefs/Replay.md), and [docs/Plugins/briefs/TelemetryLogging.md](docs/Plugins/briefs/TelemetryLogging.md).
+- **ISOBUS & External Devices.** The ISOBUS bridge, GNSS/IMU fusion, and device manager plugins coordinate identities and capabilities across the mesh; details are under [docs/Plugins/official/Isobus.md](docs/Plugins/official/Isobus.md) and [docs/Plugins/briefs/DeviceManager.md](docs/Plugins/briefs/DeviceManager.md).
+- **Simulation & Testing.** Deterministic simulation scenarios, Parquet telemetry logs, and replay fixtures keep regression coverage aligned with the SRS. Start with [docs/development/howto/simulation-scenarios.md](docs/development/howto/simulation-scenarios.md) and [docs/Plugins/briefs/Replay.md](docs/Plugins/briefs/Replay.md).
 
 ## Repository Tour
 
@@ -102,8 +102,7 @@ The Nexus roadmap upgrades the legacy UDP PGN (Coined AOG-Link V0) interface to 
 │   ├── Plugins/           # Plugin architecture, catalogue, manifests
 │   ├── UI/                # Avalonia shell guidance and lifecycle docs
 │   ├── development/       # SRS, how-to guides, QA, training, glossary
-│   ├── INDEX.md           # Quick links into docs
-│   └── CONTRIBUTING-PLUGINS.md # Packaging and governance guidance
+│   └── README.md          # Quick links into docs
 ├── Nexus SourceCode/      # .NET 8 solution (Core, UI, plugins, tests)
 ├── schemas/               # JSON schemas for jobs, sessions, layers, mesh
 ├── tasks.md               # Backlog (NX-###) with automation guardrails
@@ -112,7 +111,7 @@ The Nexus roadmap upgrades the legacy UDP PGN (Coined AOG-Link V0) interface to 
 
 ## Getting Started
 
-1. Read `docs/INDEX.md` to see how the ADR roadmap, SRS sections, and how-to guides connect.
+1. Read `docs/README.md` to see how the ADR roadmap, SRS sections, and how-to guides connect.
 2. Choose an NX ticket from `tasks.md`, confirm the referenced ADR/SRS material, and align scope in `#nexus-dev`.
 3. Follow `AGENTS.md` for branch naming, ownership bands, and PR expectations—every change ties to one NX ticket.
 4. Keep documentation, schema, and test updates alongside code changes; deterministic storage and replay are core principles.
@@ -149,7 +148,7 @@ Reference `bundles/base.bundle.json` and `bundles/headless.bundle.json` for the 
 
 ## Additional Resources
 
-- [docs/INDEX.md](docs/INDEX.md) — curated links into ADRs, SRS sections, and plugin guides.
+- [docs/README.md](docs/README.md) — curated links into ADRs, SRS sections, and plugin guides.
 - [docs/development/SRS/NOTES.md](docs/development/SRS/NOTES.md) — narrative summary of the SRS with quick links into requirement sections.
 - [docs/development/SRS/sections](docs/development/SRS/sections) — Architecture Decision Records organized by SRS sections, including the [PoseStream roadmap](docs/development/SRS/sections/2X_System_Architecture/21-ADR-900%20-%20PoseStream,%20Layer,%20and%20Control%20Program%20Roadmap.md) for upcoming work.
 - [docs/development/howto/developer-setup.md](docs/development/howto/developer-setup.md) — step-by-step instructions for downloading release builds or running from source.

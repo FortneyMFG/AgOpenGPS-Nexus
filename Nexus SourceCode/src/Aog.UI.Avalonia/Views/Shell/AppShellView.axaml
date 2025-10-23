@@ -277,7 +277,8 @@
                                      Margin="{Binding Layout.TopSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
                                      IsHitTestVisible="False"
                                      IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
-        <ItemsControl ItemsSource="{Binding Layout.TopSidebarButtons}"
+        <ItemsControl x:Name="TopSidebarButtons"
+                      ItemsSource="{Binding Layout.TopSidebarButtons}"
                       ItemTemplate="{StaticResource SidebarButtonTemplate}"
                       Margin="{Binding Layout.TopSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
                       HorizontalAlignment="Stretch"
@@ -285,10 +286,15 @@
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <WrapPanel Orientation="Horizontal"
-                         Spacing="{Binding Layout.TopSidebarLayout.Spacing}"
                          HorizontalAlignment="Center" />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
+          <ItemsControl.Styles>
+            <Style Selector="#TopSidebarButtons ContentPresenter">
+              <Setter Property="Margin"
+                      Value="{Binding DataContext.Layout.TopSidebarLayout, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+            </Style>
+          </ItemsControl.Styles>
         </ItemsControl>
       </Grid>
 
@@ -313,23 +319,20 @@
         </ItemsControl>
       </Grid>
 
-      <Grid Grid.Row="1"
-            Grid.Column="1">
-        <ContentControl Content="{Binding MainContent}"
-                        Panel.ZIndex="0" />
-        <controls:PaneCanvas Layout="{Binding Layout.Grid}"
-                             LayoutResult="{Binding Layout.PaneLayout}"
-                             Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
-                             IsHitTestVisible="False"
-                             IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
-                             Panel.ZIndex="1" />
-        <ItemsControl x:Name="BlockTiles"
-                      ItemsSource="{Binding Layout.Blocks}"
-                      ItemTemplate="{StaticResource BlockTileTemplate}"
-                      Background="Transparent"
-                      Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
-                      SizeChanged="OnViewportSizeChanged"
-                      Panel.ZIndex="2">
+        <Grid Grid.Row="1"
+              Grid.Column="1">
+          <ContentControl Content="{Binding MainContent}" />
+          <controls:PaneCanvas Layout="{Binding Layout.Grid}"
+                               LayoutResult="{Binding Layout.PaneLayout}"
+                               Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                               IsHitTestVisible="False"
+                               IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+          <ItemsControl x:Name="BlockTiles"
+                        ItemsSource="{Binding Layout.Blocks}"
+                        ItemTemplate="{StaticResource BlockTileTemplate}"
+                        Background="Transparent"
+                        Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                        SizeChanged="OnViewportSizeChanged">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <controls:TiledPanel Layout="{Binding Layout.Grid}" />
@@ -377,7 +380,8 @@
                                      Margin="{Binding Layout.BottomSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
                                      IsHitTestVisible="False"
                                      IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
-        <ItemsControl ItemsSource="{Binding Layout.BottomSidebarButtons}"
+        <ItemsControl x:Name="BottomSidebarButtons"
+                      ItemsSource="{Binding Layout.BottomSidebarButtons}"
                       ItemTemplate="{StaticResource SidebarButtonTemplate}"
                       Margin="{Binding Layout.BottomSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
                       HorizontalAlignment="Stretch"
@@ -385,10 +389,15 @@
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <WrapPanel Orientation="Horizontal"
-                         Spacing="{Binding Layout.BottomSidebarLayout.Spacing}"
                          HorizontalAlignment="Center" />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
+          <ItemsControl.Styles>
+            <Style Selector="#BottomSidebarButtons ContentPresenter">
+              <Setter Property="Margin"
+                      Value="{Binding DataContext.Layout.BottomSidebarLayout, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource SpacingToThicknessConverter}}" />
+            </Style>
+          </ItemsControl.Styles>
         </ItemsControl>
       </Grid>
     </Grid>

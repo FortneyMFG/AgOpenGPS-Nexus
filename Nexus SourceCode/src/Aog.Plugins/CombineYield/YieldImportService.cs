@@ -40,9 +40,9 @@ public sealed class YieldImportService
             throw new ArgumentException("At least one measurement must be supplied.", nameof(request));
         }
 
-        var options = CloneOptions(request.Options ?? new CombineYieldOptions());
-        var provider = request.Timestamp.HasValue ? new FakeTimeProvider(request.Timestamp.Value) : _timeProvider;
-        var aggregator = new CombineYieldLayerAggregator(new InMemoryEventBus(), options, provider);
+    var options = CloneOptions(request.Options ?? new CombineYieldOptions());
+    var provider = _timeProvider;
+    var aggregator = new CombineYieldLayerAggregator(new InMemoryEventBus(), options, provider);
 
         foreach (var measurement in request.Measurements)
         {

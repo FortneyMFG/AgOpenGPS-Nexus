@@ -5,13 +5,15 @@ using System.Text.Json;
 using Nexus.Cli.Host.Output;
 using Nexus.Cli.Host.Plugins.Reflection;
 using Spectre.Console;
+using PluginCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
+using PluginCommandHandler = Nexus.Plugin.Cli.Abstractions.ICommandHandler;
 
 namespace Nexus.Cli.Host.Modules;
 
 /// <summary>
 /// Provides commands for interacting with plugin reflection endpoints.
 /// </summary>
-public sealed class PluginReflectionCommandModule : ICommandModule
+public sealed class PluginReflectionCommandModule : PluginCommandHandler
 {
     private readonly IPluginReflectionClient _client;
     private readonly IAnsiConsole _console;
@@ -23,7 +25,7 @@ public sealed class PluginReflectionCommandModule : ICommandModule
     }
 
     /// <inheritdoc />
-    public void Configure(CommandModuleContext context)
+    public void Configure(PluginCommandContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -33,7 +35,7 @@ public sealed class PluginReflectionCommandModule : ICommandModule
         context.RootCommand.AddCommand(pluginCommand);
     }
 
-    private Command CreateReflectCommand(CommandModuleContext context)
+    private Command CreateReflectCommand(PluginCommandContext context)
     {
         var command = new Command("reflect", "Query a plugin reflection endpoint and list contributed verbs.");
         var endpointOption = new Option<Uri>("--endpoint", "The gRPC endpoint hosting the plugin reflection service.")
@@ -124,6 +126,7 @@ public sealed class PluginReflectionCommandModule : ICommandModule
         };
 
         var json = JsonSerializer.Serialize(payload, options);
-        console.Out.WriteLine(json);
+        console.Out.Write(json);
+        console.Out.Write(Environment.NewLine);
     }
 }

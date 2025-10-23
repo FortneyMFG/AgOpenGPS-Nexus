@@ -1,0 +1,40 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels;assembly=Aog.UI.Avalonia"
+        mc:Ignorable="d"
+        x:Class="Aog.UI.Avalonia.Views.FieldOperations.MapToolsDialog"
+        x:DataType="vm:MapToolsDialogViewModel"
+        Title="Map Tools"
+        Width="360"
+        Height="320">
+  <Border Padding="16"
+          Background="{DynamicResource ShellPanelBackgroundBrush}">
+    <StackPanel Spacing="{DynamicResource ThemeSpacingMd}">
+      <TextBlock Text="Choose a map tool to launch legacy boundary and mapping workflows."
+                 TextWrapping="Wrap"
+                 Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding Tools}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:MapToolOptionViewModel">
+              <Button Command="{Binding Command}"
+                      HorizontalAlignment="Stretch"
+                      Margin="0,0,0,8">
+                <StackPanel Spacing="{DynamicResource ThemeSpacingXs}"
+                            HorizontalAlignment="Stretch">
+                  <TextBlock Text="{Binding Title}"
+                             FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding Description}"
+                             TextWrapping="Wrap"
+                             Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+                </StackPanel>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </StackPanel>
+  </Border>
+</Window>

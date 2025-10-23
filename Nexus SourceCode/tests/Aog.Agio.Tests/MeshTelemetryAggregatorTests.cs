@@ -26,7 +26,7 @@ public sealed class MeshTelemetryAggregatorTests
         await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "subscriber",
             "Test Subscriber",
-            subscribeProfile: new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("season-2025", "job-42", MeshDataTier.Presence | MeshDataTier.Trails, new[] { "presence", "trail" })
             })), CancellationToken.None);
@@ -47,9 +47,9 @@ public sealed class MeshTelemetryAggregatorTests
         await using var subscription = mesh
             .SubscribeAsync(new MeshSubscriptionRequest(
                 "subscriber",
-                seasonId: "season-2025",
-                jobId: "job-42",
-                tierMask: MeshDataTier.Presence | MeshDataTier.Trails), cts.Token)
+                SeasonId: "season-2025",
+                JobId: "job-42",
+                TierMask: MeshDataTier.Presence | MeshDataTier.Trails), cts.Token)
             .GetAsyncEnumerator(cts.Token);
 
         var pose = new Pose
@@ -125,7 +125,7 @@ public sealed class MeshTelemetryAggregatorTests
         await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "watcher",
             "Watcher",
-            subscribeProfile: new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("season", "job", MeshDataTier.Presence | MeshDataTier.Trails, new[] { "presence", "trail" })
             })), CancellationToken.None);
@@ -146,9 +146,9 @@ public sealed class MeshTelemetryAggregatorTests
         await using var subscription = mesh
             .SubscribeAsync(new MeshSubscriptionRequest(
                 "watcher",
-                seasonId: "season",
-                jobId: "job",
-                tierMask: MeshDataTier.Presence | MeshDataTier.Trails), cts.Token)
+                SeasonId: "season",
+                JobId: "job",
+                TierMask: MeshDataTier.Presence | MeshDataTier.Trails), cts.Token)
             .GetAsyncEnumerator(cts.Token);
 
         await aggregator.OnPoseAsync(CreatePose(clock, "season", "job", "session"), new LegacyPoseMetadata(), cts.Token);

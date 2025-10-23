@@ -86,9 +86,11 @@ public sealed record MeshSubscribeProfile(IReadOnlyList<MeshSubscribeGrant> Gran
 public sealed record MeshDeviceRegistration(
     string DeviceId,
     string Label,
-    IReadOnlyCollection<string>? Capabilities = null,
     MeshShareProfile? ShareProfile = null,
-    MeshSubscribeProfile? SubscribeProfile = null);
+    MeshSubscribeProfile? SubscribeProfile = null)
+{
+    public IReadOnlyCollection<string>? Capabilities { get; init; }
+}
 
 /// <summary>
 /// Represents a publish request performed by a device.

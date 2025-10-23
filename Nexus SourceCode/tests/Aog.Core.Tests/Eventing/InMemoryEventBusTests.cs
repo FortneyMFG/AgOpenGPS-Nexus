@@ -15,7 +15,7 @@ public class InMemoryEventBusTests
         var bus = new InMemoryEventBus();
         var received = 0;
 
-        bus.Subscribe<int>(message =>
+        bus.Subscribe<int>((message, _) =>
         {
             received = message;
             return ValueTask.CompletedTask;
@@ -33,13 +33,13 @@ public class InMemoryEventBusTests
         var first = 0;
         var second = 0;
 
-        bus.Subscribe<int>(message =>
+        bus.Subscribe<int>((message, _) =>
         {
             first = message;
             return ValueTask.CompletedTask;
         });
 
-        bus.Subscribe<int>(message =>
+        bus.Subscribe<int>((message, _) =>
         {
             second = message;
             return ValueTask.CompletedTask;
@@ -57,7 +57,7 @@ public class InMemoryEventBusTests
         var bus = new InMemoryEventBus();
         var callCount = 0;
 
-        var subscription = bus.Subscribe<int>(message =>
+        var subscription = bus.Subscribe<int>((_, _) =>
         {
             callCount++;
             return ValueTask.CompletedTask;
@@ -77,14 +77,14 @@ public class InMemoryEventBusTests
         var callCount = 0;
         var tcs = new TaskCompletionSource<bool>();
 
-        bus.Subscribe<int>(async (_, token) =>
+        bus.Subscribe<int>((_, token) =>
         {
             callCount++;
             tcs.TrySetResult(true);
-            await Task.Delay(TimeSpan.FromSeconds(10), token);
+            return new ValueTask(Task.Delay(TimeSpan.FromSeconds(10), token));
         });
 
-        bus.Subscribe<int>(_ =>
+        bus.Subscribe<int>((_, _) =>
         {
             callCount++;
             return ValueTask.CompletedTask;

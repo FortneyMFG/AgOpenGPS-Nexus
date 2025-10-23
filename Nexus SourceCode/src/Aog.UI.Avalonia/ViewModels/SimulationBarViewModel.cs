@@ -1,494 +1,720 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Aog.Core.Legacy;
 using Aog.Core.Replay;
 using Aog.Core.Simulation.Configuration;
+using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
 /// <summary>
-/// Presentation model for the simulation control bar rendered in the shell window.
+/// View-model powering the simulation transport bar rendered in the shell.
 /// </summary>
-public sealed class SimulationBarViewModel : ObservableObject, IDisposable
+public class SimulationBarViewModel : ObservableObject, IDisposable
 {
-    private readonly ReadOnlyCollection<SimulationPlaybackRateOptionViewModel> _playbackRates;
-    private readonly ObservableCollection<SimulationStreamRouteViewModel> _routes;
+    private const double PlaybackRateComparisonTolerance = 1e-6;
+    private const double MinPlaybackRate = 0.1;
+    private const double MaxPlaybackRate = 4.0;
+    private static readonly TimeSpan DefaultDuration = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan SeekDebounceDelay = TimeSpan.FromMilliseconds(50);
+
     private readonly SimulationConfiguration? _configuration;
-    private readonly TimeSpan _defaultDuration = TimeSpan.FromMinutes(5);
-    private readonly TimeSpan _duration;
-
-    private readonly DelegateCommand _togglePlaybackCommand;
     private readonly IReplayController? _replayController;
-    private readonly EventHandler<ReplayStateChangedEventArgs> _replayStateChangedHandler;
-    private readonly ReplayStateSubscription _replayStateSubscription;
-    private bool _disposed;
-    private ReplayState _state;
-    private double _selectedPlaybackRate;
-    private TimeSpan _position;
-    private double _seekFraction;
-    private bool _suppressSeekSync;
-    private string _activeScenarioTitle = "Scenario: configuration defaults";
-    private string _activeScenarioDescription = "Using routes from the loaded configuration.";
-    private string _activeScenarioOptions = "—";
+    private readonly ILogger<SimulationBarViewModel>? _logger;
+    private readonly ObservableCollection<SimulationPlaybackRateOptionViewModel> _playbackRates = new();
+    private readonly ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> _playbackRateView;
+    private readonly EventHandler<ReplayStateChangedEventArgs>? _stateChangedHandler;
+    private readonly IDispatcher _dispatcher;
 
-    public SimulationBarViewModel(SimulationConfiguration? configuration, IReplayController? replayController = null)
+    private SimulationPlaybackRateOptionViewModel? _selectedPlaybackRateOption;
+    private bool _disposed;
+    private bool _isPlaying;
+    private bool _isUpdatingFromController;
+    private double _seekFraction;
+    private TimeSpan _position;
+    private TimeSpan _duration = DefaultDuration;
+    private string _statusText = "Paused";
+    private string _playPauseLabel = "Play";
+    private string _positionDisplay = FormatPosition(TimeSpan.Zero, DefaultDuration);
+    private double _selectedPlaybackRateMultiplier = 1.0;
+    private string _selectedPlaybackRateLabel = FormatPlaybackRateLabel(1.0);
+    private string _activeScenarioTitle = "Scenario: configuration defaults";
+    private string _activeScenarioDescription = "Routes sourced from configuration.";
+    private string _activeScenarioOptions = DescribeOptions(null);
+    private IReadOnlyList<SimulationStreamRouteViewModel> _routes =
+        new ReadOnlyCollection<SimulationStreamRouteViewModel>(Array.Empty<SimulationStreamRouteViewModel>());
+    private CancellationTokenSource? _seekCancellationSource;
+    private SimulationBarState _state = SimulationBarState.CreateDefault();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SimulationBarViewModel"/> class.
+    /// </summary>
+    /// <param name="configuration">The configuration that seeds the transport routes.</param>
+    /// <param name="replayController">Optional replay controller used to manipulate playback.</param>
+    /// <param name="logger">Optional logger used to capture transport control failures.</param>
+    public SimulationBarViewModel(
+        SimulationConfiguration? configuration,
+        IReplayController? replayController = null,
+        ILogger<SimulationBarViewModel>? logger = null,
+        IDispatcher? dispatcher = null)
     {
         _configuration = configuration;
-        _duration = configuration?.Duration ?? _defaultDuration;
-
-        _togglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
-        _state = new ReplayState(isPlaying: false, position: TimeSpan.Zero, duration: _duration, playbackRate: 1.0);
-        _selectedPlaybackRate = _state.PlaybackRate;
-
-        _playbackRates = BuildPlaybackRateOptions();
-        var initialRoutes = configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>();
-        _routes = new ObservableCollection<SimulationStreamRouteViewModel>(
-            SimulationRouteViewModelBuilder.BuildRoutes(configuration, initialRoutes));
-
-        SyncPlaybackRateSelection(_selectedPlaybackRate);
-
         _replayController = replayController;
-        _replayStateChangedHandler = OnReplayStateChanged;
-        _replayStateSubscription = new ReplayStateSubscription(_replayController, _replayStateChangedHandler);
-        InitializeReplayControllerState();
-    }
+        _logger = logger;
+        _dispatcher = dispatcher ?? Dispatcher.UIThread;
 
-    /// <summary>
-    /// Gets the command that toggles between play and pause states.
-    /// </summary>
-    public DelegateCommand TogglePlaybackCommand => _togglePlaybackCommand;
+        TogglePlaybackCommand = new DelegateCommand(_ => TogglePlayback());
+        ToggleAutoResumeCommand = new DelegateCommand(_ => ToggleAutoResume());
 
-    /// <summary>
-    /// Gets the formatted label for the play/pause button.
-    /// </summary>
-    public string PlayPauseLabel => _state.IsPlaying ? "Pause" : "Play";
+        _playbackRateView = new ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel>(_playbackRates);
 
-    /// <summary>
-    /// Gets a short text summary of the current playback state.
-    /// </summary>
-    public string StatusText => _state.IsPlaying ? "Playing" : "Paused";
+        InitializePlaybackRates(configuration?.Options?.TimeScale ?? 1.0);
+        NotifyPlaybackRateProperties();
+        Routes = SimulationRouteViewModelBuilder.BuildRoutes(
+            configuration,
+            configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>());
+        ActiveScenarioOptions = DescribeOptions(configuration?.Options);
 
-    /// <summary>
-    /// Gets the available playback rate options.
-    /// </summary>
-    public IReadOnlyList<SimulationPlaybackRateOptionViewModel> PlaybackRates => _playbackRates;
-
-    /// <summary>
-    /// Gets the active playback rate.
-    /// </summary>
-    public double SelectedPlaybackRate
-    {
-        get => _selectedPlaybackRate;
-        private set
+        if (replayController is not null)
         {
-            if (!SetProperty(ref _selectedPlaybackRate, value))
-            {
-                return;
-            }
-
-            OnPropertyChanged(nameof(SelectedPlaybackRateLabel));
+            _stateChangedHandler = (_, args) => OnReplayStateChanged(args.State);
+            replayController.StateChanged += _stateChangedHandler;
+            OnReplayStateChanged(replayController.State);
         }
     }
 
-    /// <summary>
-    /// Gets the formatted label describing the selected playback rate.
-    /// </summary>
-    public string SelectedPlaybackRateLabel => $"{SelectedPlaybackRate * 100:0.#}%";
+    /// <summary>Raised when the playback command should toggle between play/pause.</summary>
+    public ICommand TogglePlaybackCommand { get; }
 
-    /// <summary>
-    /// Gets the total duration represented on the scrubber.
-    /// </summary>
-    public TimeSpan Duration => _state.Duration > TimeSpan.Zero ? _state.Duration : _defaultDuration;
+    /// <summary>Raised when the auto-resume command should toggle its enabled state.</summary>
+    public ICommand ToggleAutoResumeCommand { get; }
 
-    /// <summary>
-    /// Gets the formatted duration label.
-    /// </summary>
-    public string DurationDisplay => FormatTimestamp(Duration);
+    /// <summary>Gets the status text describing the current playback state.</summary>
+    public string StatusText
+    {
+        get => _statusText;
+        private set => SetProperty(ref _statusText, value);
+    }
 
-    /// <summary>
-    /// Gets the current playback position.
-    /// </summary>
+    /// <summary>Gets the label shown on the play/pause toggle button.</summary>
+    public string PlayPauseLabel
+    {
+        get => _playPauseLabel;
+        private set => SetProperty(ref _playPauseLabel, value);
+    }
+
+    /// <summary>Gets or sets the fractional playback position.</summary>
+    public double SeekFraction
+    {
+        get => _seekFraction;
+        set => UpdateSeekFraction(value, triggerSeek: true);
+    }
+
+    /// <summary>Gets the current playback position.</summary>
     public TimeSpan Position
     {
         get => _position;
         private set
         {
-            var clamped = Clamp(value, TimeSpan.Zero, Duration);
-            if (!SetProperty(ref _position, clamped))
+            if (SetProperty(ref _position, value))
             {
-                return;
-            }
-
-            OnPropertyChanged(nameof(PositionDisplay));
-
-            if (_replayController is null)
-            {
-                _state = _state with { Position = clamped };
-            }
-
-            var fraction = Duration.TotalSeconds <= 0
-                ? 0
-                : clamped.TotalSeconds / Duration.TotalSeconds;
-
-            if (Math.Abs(fraction - _seekFraction) > 0.0001)
-            {
-                _suppressSeekSync = true;
-                _seekFraction = fraction;
-                OnPropertyChanged(nameof(SeekFraction));
-                _suppressSeekSync = false;
+                PositionDisplay = FormatPosition(_position, Duration);
             }
         }
     }
 
-    /// <summary>
-    /// Gets a formatted label for the current playback position.
-    /// </summary>
-    public string PositionDisplay => FormatTimestamp(Position);
-
-    /// <summary>
-    /// Gets or sets the scrubber position as a normalized value between 0 and 1.
-    /// </summary>
-    public double SeekFraction
+    /// <summary>Gets the total replay duration.</summary>
+    public TimeSpan Duration
     {
-        get => _seekFraction;
-        set
+        get => _duration;
+        private set
         {
-            var clamped = Math.Clamp(value, 0, 1);
-            if (!SetProperty(ref _seekFraction, clamped) || _suppressSeekSync)
+            var validated = value > TimeSpan.Zero ? value : DefaultDuration;
+            if (SetProperty(ref _duration, validated))
             {
-                return;
-            }
-
-            var seconds = Duration.TotalSeconds * clamped;
-            var position = TimeSpan.FromSeconds(seconds);
-            Position = position;
-
-            if (_replayController is not null)
-            {
-                _ = _replayController.SeekAsync(position);
-            }
-            else
-            {
-                _state = _state with { Position = position };
+                PositionDisplay = FormatPosition(Position, validated);
             }
         }
     }
 
-    /// <summary>
-    /// Gets the collection of routed simulation streams.
-    /// </summary>
-    public IReadOnlyList<SimulationStreamRouteViewModel> Routes => _routes;
+    /// <summary>Gets the formatted display describing the playback position.</summary>
+    public string PositionDisplay
+    {
+        get => _positionDisplay;
+        private set => SetProperty(ref _positionDisplay, value);
+    }
+
+    /// <summary>Gets the available playback rates.</summary>
+    public ReadOnlyObservableCollection<SimulationPlaybackRateOptionViewModel> PlaybackRates => _playbackRateView;
 
     /// <summary>
-    /// Gets a short title describing the active scenario selection.
+    /// Gets the currently selected playback rate multiplier. Values are clamped between
+    /// <see cref="MinPlaybackRate"/> and <see cref="MaxPlaybackRate"/>.
     /// </summary>
+    public double SelectedPlaybackRate
+    {
+        get => _selectedPlaybackRateMultiplier;
+        private set => SetProperty(ref _selectedPlaybackRateMultiplier, value);
+    }
+
+    /// <summary>Gets a formatted label describing the selected playback rate.</summary>
+    public string SelectedPlaybackRateLabel
+    {
+        get
+        {
+            var option = _selectedPlaybackRateOption;
+            if (option is not null)
+            {
+                if (!string.IsNullOrWhiteSpace(option.Label))
+                {
+                    return option.Label;
+                }
+
+                // Fallback to formatted multiplier if no label
+                return FormatPlaybackRateLabel(ClampPlaybackRate(option.Multiplier));
+            }
+
+            // No option selected — use current multiplier (clamped)
+            return FormatPlaybackRateLabel(ClampPlaybackRate(_selectedPlaybackRateMultiplier));
+        }
+        private set => SetProperty(ref _selectedPlaybackRateLabel, value);
+    }
+
+    /// <summary>Gets the currently selected playback rate option.</summary>
+    public SimulationPlaybackRateOptionViewModel? SelectedPlaybackRateOption
+    {
+        get => _selectedPlaybackRateOption;
+        private set => SetProperty(ref _selectedPlaybackRateOption, value);
+    }
+
+
+    /// <summary>Gets or sets the friendly title describing the active scenario.</summary>
     public string ActiveScenarioTitle
     {
         get => _activeScenarioTitle;
         private set => SetProperty(ref _activeScenarioTitle, value);
     }
 
-    /// <summary>
-    /// Gets the description of the active scenario selection.
-    /// </summary>
+    /// <summary>Gets or sets the description surfaced for the active scenario.</summary>
     public string ActiveScenarioDescription
     {
         get => _activeScenarioDescription;
         private set => SetProperty(ref _activeScenarioDescription, value);
     }
 
-    /// <summary>
-    /// Gets a formatted summary of the options applied by the active scenario.
-    /// </summary>
+    /// <summary>Gets or sets the option summary displayed for the active scenario.</summary>
     public string ActiveScenarioOptions
     {
         get => _activeScenarioOptions;
         private set => SetProperty(ref _activeScenarioOptions, value);
     }
 
+    /// <summary>Gets the routed simulation streams.</summary>
+    public IReadOnlyList<SimulationStreamRouteViewModel> Routes
+    {
+        get => _routes;
+        private set => SetProperty(ref _routes, value);
+    }
+
+    /// <summary>Gets a value indicating whether auto resume is enabled for the active session.</summary>
+    public bool IsAutoResumeEnabled => _state.ReplaySession?.AutoResumeEnabled ?? false;
+
+    /// <summary>Updates the replay session tracked by the simulation bar.</summary>
+    /// <param name="session">Session snapshot published by the replay service.</param>
+    public void UpdateReplaySession(ReplaySessionState? session)
+    {
+        UpdateState(_state with { ReplaySession = session });
+    }
+
     /// <summary>
-    /// Applies the provided scenario, updating the routed streams and descriptive metadata.
+    /// PUBLIC API (added): safely set the selected playback rate from the outside.
+    /// Validates input and updates controller + UI.
     /// </summary>
-    /// <param name="scenario">Scenario definition to activate.</param>
+    public void SetSelectedPlaybackRate(double rate)
+    {
+        if (double.IsNaN(rate) || double.IsInfinity(rate))
+        {
+            throw new ArgumentOutOfRangeException(nameof(rate));
+        }
+
+        var clamped = ClampPlaybackRate(rate);
+        SelectPlaybackRate(clamped, updateController: true);
+    }
+
+    /// <summary>
+    /// Applies a scenario to the bar, updating playback rate and routing metadata.
+    /// </summary>
+    /// <param name="scenario">Scenario definition selected by the operator.</param>
     public void ApplyScenario(SimulationScenarioConfiguration scenario)
     {
         ArgumentNullException.ThrowIfNull(scenario);
 
-        UpdateRoutes(scenario.Routes);
+        Routes = SimulationRouteViewModelBuilder.BuildRoutes(_configuration, scenario.Routes);
         ActiveScenarioTitle = $"Scenario: {scenario.ScenarioId}";
         ActiveScenarioDescription = string.IsNullOrWhiteSpace(scenario.Description)
             ? "No description provided."
-            : scenario.Description!;
-        ActiveScenarioOptions = FormatScenarioOptions(scenario.Options);
+            : scenario.Description;
+        ActiveScenarioOptions = DescribeOptions(scenario.Options ?? _configuration?.Options);
+
+        var targetRate = scenario.Options?.TimeScale ?? _configuration?.Options?.TimeScale ?? 1.0;
+        SelectPlaybackRate(targetRate, updateController: true);
+        NotifyPlaybackRateProperties();
     }
 
     /// <summary>
-    /// Applies the routes produced by the legacy guidance import wizard.
+    /// Applies the result of a legacy import, updating routes and playback rate.
     /// </summary>
-    /// <param name="result">Import result to activate.</param>
+    /// <param name="result">Legacy import output containing a scenario.</param>
     public void ApplyLegacyImport(LegacyGuidanceImportResult result)
     {
         ArgumentNullException.ThrowIfNull(result);
+        ApplyScenario(result.Scenario);
 
-        UpdateRoutes(result.Scenario.Routes);
-        ActiveScenarioTitle = $"Legacy import: {result.FieldName}";
-        ActiveScenarioDescription = $"Imported {result.AbLines.Count} AB lines with {result.Boundary.Count} boundary points.";
-        ActiveScenarioOptions = FormatScenarioOptions(result.Scenario.Options);
+        SortPlaybackRates();
+        OnPropertyChanged(nameof(PlaybackRates));
     }
 
     /// <summary>
-    /// Reverts the routed streams to the configuration defaults.
+    /// Restores the routes and playback rate declared by the base configuration.
     /// </summary>
     public void ResetToConfigurationRoutes()
     {
-        var routes = _configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>();
-        UpdateRoutes(routes);
+        Routes = SimulationRouteViewModelBuilder.BuildRoutes(
+            _configuration,
+            _configuration?.Routes ?? Array.Empty<SimulationRouteConfiguration>());
         ActiveScenarioTitle = "Scenario: configuration defaults";
-        ActiveScenarioDescription = "Using routes from the loaded configuration.";
-        ActiveScenarioOptions = "—";
+        ActiveScenarioDescription = "Routes sourced from configuration.";
+        ActiveScenarioOptions = DescribeOptions(_configuration?.Options);
+
+        var targetRate = _configuration?.Options?.TimeScale ?? 1.0;
+        SelectPlaybackRate(targetRate, updateController: true);
+        NotifyPlaybackRateProperties();
     }
 
-    /// <summary>
-    /// Releases resources held by the view-model, including event subscriptions.
-    /// </summary>
+    /// <inheritdoc />
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (!disposing || _disposed)
+        if (_disposed)
         {
             return;
         }
 
         _disposed = true;
-        _replayStateSubscription.Dispose();
+
+        _seekCancellationSource?.Cancel();
+        _seekCancellationSource?.Dispose();
+        _seekCancellationSource = null;
+
+        if (_replayController is not null && _stateChangedHandler is not null)
+        {
+            _replayController.StateChanged -= _stateChangedHandler;
+        }
+    }
+
+    private void InitializePlaybackRates(double initialRate)
+    {
+        ExecuteOnDispatcher(() =>
+        {
+            _playbackRates.Clear();
+            _playbackRates.Add(new SimulationPlaybackRateOptionViewModel(0.5, OnPlaybackRateOptionSelected));
+            _playbackRates.Add(new SimulationPlaybackRateOptionViewModel(1.0, OnPlaybackRateOptionSelected));
+            _playbackRates.Add(new SimulationPlaybackRateOptionViewModel(2.0, OnPlaybackRateOptionSelected));
+            SortPlaybackRates();
+        });
+
+        SelectPlaybackRate(initialRate, updateController: false);
     }
 
     private void TogglePlayback()
     {
-        if (_replayController is not null)
+        if (_disposed)
         {
-            if (_state.IsPlaying)
-            {
-                _ = _replayController.PauseAsync();
-            }
-            else
-            {
-                _ = _replayController.PlayAsync();
-            }
-
             return;
         }
 
-        _state = _state with { IsPlaying = !_state.IsPlaying };
-        OnPropertyChanged(nameof(StatusText));
-        OnPropertyChanged(nameof(PlayPauseLabel));
-    }
-
-    private void InitializeReplayControllerState()
-    {
         if (_replayController is null)
         {
+            SetIsPlaying(!_isPlaying);
             return;
         }
 
-        var controllerState = NormalizeState(_replayController.State);
-        _state = controllerState;
-        SyncPlaybackRateSelection(controllerState.PlaybackRate);
-        Position = controllerState.Position;
-        _replayStateSubscription.EnsureSubscribed();
+        if (_isPlaying)
+        {
+            FireAndForget(() => _replayController.PauseAsync(), "Failed to pause playback.");
+        }
+        else
+        {
+            FireAndForget(() => _replayController.PlayAsync(), "Failed to start playback.");
+        }
     }
 
-    private ReadOnlyCollection<SimulationPlaybackRateOptionViewModel> BuildPlaybackRateOptions()
+    private void ToggleAutoResume()
     {
-        var options = new List<SimulationPlaybackRateOptionViewModel>();
-        void SelectOption(SimulationPlaybackRateOptionViewModel option)
+        if (_disposed || _state.ReplaySession is null)
         {
-            foreach (var candidate in options)
+            return;
+        }
+
+        var current = _state.ReplaySession.Value;
+        var updated = current with { AutoResumeEnabled = !current.AutoResumeEnabled };
+        UpdateState(_state with { ReplaySession = updated });
+    }
+
+private void UpdateState(SimulationBarState newState)
+{
+    if (_state.Equals(newState))
+    {
+        return;
+    }
+
+    var previousSession = _state.ReplaySession;
+    var previousAutoResumeEnabled = previousSession?.AutoResumeEnabled ?? false;
+    var previousHasSession = previousSession.HasValue;
+
+    _state = newState;
+
+    var currentSession = _state.ReplaySession;
+    var currentAutoResumeEnabled = currentSession?.AutoResumeEnabled ?? false;
+    var currentHasSession = currentSession.HasValue;
+
+    if (previousHasSession != currentHasSession || previousAutoResumeEnabled != currentAutoResumeEnabled)
+    {
+        OnPropertyChanged(nameof(IsAutoResumeEnabled));
+    }
+}
+
+private void OnPlaybackRateOptionSelected(SimulationPlaybackRateOptionViewModel option)
+{
+    if (option is null)
+    {
+        return;
+    }
+
+    SelectPlaybackRate(option.Rate, updateController: true);
+}
+
+private void SelectPlaybackRate(double rate, bool updateController)
+{
+    var effectiveRate = ClampPlaybackRate(rate);
+    var option = EnsurePlaybackRateOption(effectiveRate);
+
+    // Update selection state of all options
+    foreach (var r in _playbackRates)
+    {
+        r.IsSelected = Math.Abs(r.Rate - effectiveRate) < PlaybackRateComparisonTolerance;
+    }
+
+    // Keep scalar + label properties in sync (handle null labels defensively)
+    SelectedPlaybackRate = effectiveRate;
+    SelectedPlaybackRateLabel = option?.Label ?? $"{effectiveRate:0.##}x";
+
+    if (updateController && !_isUpdatingFromController && _replayController is not null)
+    {
+        FireAndForget(
+            () => _replayController.SetPlaybackRateAsync(effectiveRate),
+            "Failed to set playback rate.");
+    }
+}
+
+private static double ClampPlaybackRate(double rate)
+{
+    if (double.IsNaN(rate) || double.IsInfinity(rate))
+    {
+        return 1.0;
+    }
+
+    return Math.Clamp(rate, MinPlaybackRate, MaxPlaybackRate);
+}
+
+private SimulationPlaybackRateOptionViewModel EnsurePlaybackRateOption(double rate)
+{
+    var normalized = rate <= 0 ? 1.0 : rate;
+
+    var existing = _playbackRates.FirstOrDefault(
+        o => Math.Abs(o.Rate - normalized) < PlaybackRateComparisonTolerance);
+
+    if (existing is not null)
+    {
+        return existing;
+    }
+
+    var option = new SimulationPlaybackRateOptionViewModel(normalized, OnPlaybackRateOptionSelected);
+    _playbackRates.Add(option);
+    SortPlaybackRates();
+    OnPropertyChanged(nameof(PlaybackRates));
+    return option;
+}
+
+private void SortPlaybackRates()
+{
+    if (_playbackRates.Count < 2)
+    {
+        return;
+    }
+
+    var ordered = _playbackRates.OrderBy(o => o.Rate).ToList();
+    for (var targetIndex = 0; targetIndex < ordered.Count; targetIndex++)
+    {
+        var item = ordered[targetIndex];
+        var currentIndex = _playbackRates.IndexOf(item);
+        if (currentIndex != targetIndex)
+        {
+            _playbackRates.Move(currentIndex, targetIndex);
+        }
+    }
+}
+
+// Call this when a playback rate option is chosen (e.g., from the UI).
+    private void UpdateSelectedPlaybackRateOption(SimulationPlaybackRateOptionViewModel option)
+    {
+        if (option is null)
+        {
+            return;
+        }
+
+        if (ReferenceEquals(_selectedPlaybackRateOption, option))
+        {
+            // Ensure visual state is correct without re-firing callbacks.
+            option.SetSelected(true, suppressCallback: true);
+            // Still notify in case dependent bindings read through properties.
+            NotifyPlaybackRateProperties();
+            return;
+        }
+
+        _selectedPlaybackRateOption?.SetSelected(false, suppressCallback: true);
+        option.SetSelected(true, suppressCallback: true);
+        SelectedPlaybackRateOption = option;
+
+        NotifyPlaybackRateProperties();
+    }
+
+    private void NotifyPlaybackRateProperties()
+    {
+        OnPropertyChanged(nameof(SelectedPlaybackRate));
+        OnPropertyChanged(nameof(SelectedPlaybackRateLabel));
+        OnPropertyChanged(nameof(SelectedPlaybackRateOption));
+    }
+
+
+    private void UpdateSeekFraction(double value, bool triggerSeek)
+    {
+        var clamped = double.IsNaN(value) ? 0 : Math.Clamp(value, 0, 1);
+
+        if (!SetProperty(ref _seekFraction, clamped, nameof(SeekFraction)))
+        {
+            return;
+        }
+
+        if (_isUpdatingFromController)
+        {
+            return;
+        }
+
+        var newPosition = TimeSpan.FromTicks((long)(Duration.Ticks * clamped));
+        Position = newPosition;
+
+        if (triggerSeek)
+        {
+            ScheduleSeek(newPosition);
+        }
+    }
+
+    private void UpdateSeekFraction(TimeSpan position, bool triggerSeek)
+    {
+        if (Duration <= TimeSpan.Zero)
+        {
+            UpdateSeekFraction(0, triggerSeek);
+            return;
+        }
+
+        var fraction = Math.Clamp(position.TotalSeconds / Duration.TotalSeconds, 0, 1);
+        UpdateSeekFraction(fraction, triggerSeek);
+    }
+
+    private void OnReplayStateChanged(ReplayState state)
+    {
+        ExecuteOnDispatcher(() =>
+        {
+            _isUpdatingFromController = true;
+            try
             {
-                candidate.SetSelected(candidate == option, suppressCallback: true);
+                SetIsPlaying(state.IsPlaying);
+                Duration = state.Duration;
+                Position = state.Position;
+
+                UpdateSeekFraction(state.Position, triggerSeek: false);
+
+                // Normalize and clamp rate (0 or negative -> 1.0), then ensure option exists.
+                var normalizedRate = ClampPlaybackRate(state.PlaybackRate <= 0 ? 1.0 : state.PlaybackRate);
+                SelectedPlaybackRate = normalizedRate;
+
+                var option = EnsurePlaybackRateOption(normalizedRate);
+                UpdateSelectedPlaybackRateOption(option);
+
+                // Keep label consistent with option (fallback to formatted multiplier).
+                SelectedPlaybackRateLabel = option?.Label ?? FormatPlaybackRateLabel(normalizedRate);
+            }
+            finally
+            {
+                _isUpdatingFromController = false;
+            }
+        });
+    }
+
+
+    private void SetIsPlaying(bool isPlaying)
+    {
+        if (_isPlaying == isPlaying)
+        {
+            return;
+        }
+
+        _isPlaying = isPlaying;
+        StatusText = isPlaying ? "Playing" : "Paused";
+        PlayPauseLabel = isPlaying ? "Pause" : "Play";
+    }
+
+    private void FireAndForget(Func<ValueTask> operation, string failureMessage)
+    {
+        _ = Task.Run(
+            async () =>
+            {
+                try
+                {
+                    await operation().ConfigureAwait(false);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    _logger?.LogInformation(ex, failureMessage);
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, failureMessage);
+                }
+            });
+    }
+
+    private void ScheduleSeek(TimeSpan position)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        var controller = _replayController;
+        if (controller is null)
+        {
+            return;
+        }
+
+        var previous = _seekCancellationSource;
+        previous?.Cancel();
+
+        var current = new CancellationTokenSource();
+        _seekCancellationSource = current;
+
+        var token = current.Token;
+        FireAndForget(
+            () => DebouncedSeekAsync(controller, position, current, token),
+            "Failed to seek to requested position.");
+    }
+
+    private async ValueTask DebouncedSeekAsync(
+        IReplayController controller,
+        TimeSpan position,
+        CancellationTokenSource source,
+        CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(SeekDebounceDelay, token).ConfigureAwait(false);
+
+            if (_disposed || token.IsCancellationRequested)
+            {
+                return;
             }
 
-            OnPlaybackRateSelected(option.Rate);
+            await controller.SeekAsync(position, token).ConfigureAwait(false);
         }
-
-        foreach (var rate in new[] { 0.5, 1.0, 2.0 })
+        finally
         {
-            var label = FormatPlaybackRateLabel(rate);
-            options.Add(new SimulationPlaybackRateOptionViewModel(rate, SelectOption, label));
-        }
+            if (ReferenceEquals(_seekCancellationSource, source))
+            {
+                _seekCancellationSource = null;
+            }
 
-        return new ReadOnlyCollection<SimulationPlaybackRateOptionViewModel>(options);
+            source.Dispose();
+        }
+    }
+
+    private void ExecuteOnDispatcher(Action action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        if (_dispatcher.CheckAccess())
+        {
+            action();
+        }
+        else
+        {
+            _dispatcher.Post(action);
+        }
+    }
+
+    private static string FormatPosition(TimeSpan position, TimeSpan duration)
+    {
+        return $"{FormatTime(position)} / {FormatTime(duration)}";
+    }
+
+    private static string FormatTime(TimeSpan value)
+    {
+        return value.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
     }
 
     private static string FormatPlaybackRateLabel(double rate)
     {
-        return $"{rate:0.#}×";
+        return string.Format(CultureInfo.CurrentUICulture, "{0:0.##}×", rate);
     }
 
-    private void EnsureReplayControllerSubscription()
-    {
-        if (_replayController is null || _isReplayStateSubscribed)
-        {
-            return;
-        }
-
-        _replayController.StateChanged += OnReplayStateChanged;
-        _isReplayStateSubscribed = true;
-    }
-
-    private void UpdateRoutes(IEnumerable<SimulationRouteConfiguration> routes)
-    {
-        _routes.Clear();
-
-        if (routes is null)
-        {
-            return;
-        }
-
-        var built = SimulationRouteViewModelBuilder.BuildRoutes(_configuration, routes);
-        foreach (var route in built)
-        {
-            _routes.Add(route);
-        }
-    }
-
-    private static TimeSpan Clamp(TimeSpan value, TimeSpan minimum, TimeSpan maximum)
-    {
-        if (value < minimum)
-        {
-            return minimum;
-        }
-
-        if (value > maximum)
-        {
-            return maximum;
-        }
-
-        return value;
-    }
-
-    private void SyncPlaybackRateSelection(double rate)
-    {
-        foreach (var option in _playbackRates)
-        {
-            option.SetSelected(Math.Abs(option.Rate - rate) < 1e-6, suppressCallback: true);
-        }
-
-        SelectedPlaybackRate = rate;
-    }
-
-    private void OnPlaybackRateSelected(double rate)
-    {
-        SyncPlaybackRateSelection(rate);
-
-        if (_replayController is not null)
-        {
-            _ = _replayController.SetPlaybackRateAsync(rate);
-        }
-        else
-        {
-            _state = _state with { PlaybackRate = rate };
-        }
-    }
-
-    private void OnReplayStateChanged(object? sender, ReplayStateChangedEventArgs e)
-    {
-        var next = NormalizeState(e.State);
-        var playbackChanged = _state.IsPlaying != next.IsPlaying;
-        _state = next;
-
-        if (playbackChanged)
-        {
-            OnPropertyChanged(nameof(StatusText));
-            OnPropertyChanged(nameof(PlayPauseLabel));
-        }
-
-        SyncPlaybackRateSelection(_state.PlaybackRate);
-        Position = _state.Position;
-        OnPropertyChanged(nameof(Duration));
-        OnPropertyChanged(nameof(DurationDisplay));
-    }
-
-    private ReplayState NormalizeState(ReplayState state)
-    {
-        if (state.Duration <= TimeSpan.Zero)
-        {
-            state = state with { Duration = _defaultDuration };
-        }
-
-        return state;
-    }
-
-    private static string FormatTimestamp(TimeSpan value)
-    {
-        if (value.TotalHours >= 1)
-        {
-            return $"{(int)value.TotalHours:00}:{value.Minutes:00}:{value.Seconds:00}";
-        }
-
-        return $"{value.Minutes:00}:{value.Seconds:00}";
-    }
-
-    private static string FormatScenarioOptions(SimulationOptionsConfiguration? options)
+    private static string DescribeOptions(SimulationOptionsConfiguration? options)
     {
         if (options is null)
         {
-            return "—";
+            return "Options: (none)";
         }
 
         var parts = new List<string>();
+
         if (options.Seed.HasValue)
         {
-            parts.Add($"seed={options.Seed.Value}");
+            parts.Add(FormattableString.Invariant($"seed={options.Seed.Value}"));
         }
 
         if (options.TimeScale.HasValue)
         {
-            parts.Add($"timeScale={options.TimeScale.Value:0.###}");
+            parts.Add(FormattableString.Invariant($"timeScale={options.TimeScale.Value:0.###}"));
         }
 
-        return parts.Count == 0 ? "—" : string.Join(", ", parts);
+        return parts.Count == 0
+            ? "Options: (none)"
+            : "Options: " + string.Join(", ", parts);
     }
 
-    private sealed class ReplayStateSubscription : IDisposable
+    /// <summary>Snapshot of simulation bar state tracked for replay-aware interactions.</summary>
+    /// <param name="ReplaySession">Replay session currently surfaced in the UI.</param>
+    private readonly record struct SimulationBarState(ReplaySessionState? ReplaySession)
     {
-        private readonly IReplayController? _replayController;
-        private readonly EventHandler<ReplayStateChangedEventArgs> _handler;
-        private bool _isSubscribed;
-
-        public ReplayStateSubscription(IReplayController? replayController, EventHandler<ReplayStateChangedEventArgs> handler)
-        {
-            _replayController = replayController;
-            _handler = handler;
-        }
-
-        public void EnsureSubscribed()
-        {
-            if (_replayController is null || _isSubscribed)
-            {
-                return;
-            }
-
-            _replayController.StateChanged += _handler;
-            _isSubscribed = true;
-        }
-
-        public void Dispose()
-        {
-            if (_replayController is null || !_isSubscribed)
-            {
-                return;
-            }
-
-            _replayController.StateChanged -= _handler;
-            _isSubscribed = false;
-        }
+        public static SimulationBarState CreateDefault() => new(null);
     }
+
+    /// <summary>Represents replay session state surfaced by the simulation bar.</summary>
+    /// <param name="AutoResumeEnabled">Indicates whether auto resume is currently enabled.</param>
+    public readonly record struct ReplaySessionState(bool AutoResumeEnabled);
 }

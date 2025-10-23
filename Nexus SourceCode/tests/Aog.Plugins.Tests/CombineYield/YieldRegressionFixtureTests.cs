@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Aog.Core.Eventing;
+using Aog.Core.Layers;
 using Aog.Core.V1;
 using Aog.Plugins.CombineYield;
 using FluentAssertions;
@@ -130,7 +131,7 @@ public sealed class YieldRegressionFixtureTests
 
         metadata.Aggregation.Basis.Should().Be(expected.Aggregation.Basis, scenarioName);
         metadata.Aggregation.Scopes.Should().Equal(expected.Aggregation.Scopes, scenarioName);
-        metadata.Aggregation.Timestamp.Should().Be(expected.Aggregation.Timestamp, scenarioName);
+        metadata.Aggregation.UpdatedAt.Should().Be(expected.Aggregation.Timestamp, scenarioName);
 
         metadata.Aggregation.Bins.Should().NotBeNull(scenarioName);
         metadata.Aggregation.Bins.Scheme.Should().Be(expected.Aggregation.Bins.Scheme, scenarioName);

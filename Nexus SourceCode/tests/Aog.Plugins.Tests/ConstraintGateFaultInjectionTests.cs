@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
+using Aog.Core.Layers;
+using Aog.Core.Paths;
 using Aog.Core.Safety;
 using Aog.Core.V1;
 using Aog.Plugins.AutoSteer;

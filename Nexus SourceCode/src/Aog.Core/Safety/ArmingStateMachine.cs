@@ -108,7 +108,7 @@ public sealed class ArmingStateMachine
 
             if (previousValidity == isValid)
             {
-                return new ProfileValidityUpdateResult(previousValidity, _profileValid, changed: false, causedDisarm: false, previousState, _state);
+                return new ProfileValidityUpdateResult(previousValidity, _profileValid, false, false, previousState, _state);
             }
 
             _profileValid = isValid;
@@ -116,10 +116,10 @@ public sealed class ArmingStateMachine
             if (!isValid && _state == ArmingState.Armed)
             {
                 _state = ArmingState.Disarmed;
-                return new ProfileValidityUpdateResult(previousValidity, _profileValid, changed: true, causedDisarm: true, previousState, _state);
+                return new ProfileValidityUpdateResult(previousValidity, _profileValid, true, true, previousState, _state);
             }
 
-            return new ProfileValidityUpdateResult(previousValidity, _profileValid, changed: true, causedDisarm: false, previousState, _state);
+            return new ProfileValidityUpdateResult(previousValidity, _profileValid, true, false, previousState, _state);
         }
     }
 
@@ -150,7 +150,7 @@ public sealed class ArmingStateMachine
     public void EnsureCanEmitOutputs()
     {
         var result = EvaluateOutputs();
-        if (!result.Allowed)
+        if (!result.IsAllowed)
         {
             throw new InvalidOperationException(result.Reason ?? "Outputs are currently blocked.");
         }
@@ -208,7 +208,7 @@ public readonly record struct ProfileValidityUpdateResult(
 /// <summary>
 /// Represents the result of checking whether outputs are allowed.
 /// </summary>
-public readonly record struct OutputGateResult(bool Allowed, string? Reason)
+public readonly record struct OutputGateResult(bool IsAllowed, string? Reason)
 {
     public static OutputGateResult Allowed()
         => new(true, null);

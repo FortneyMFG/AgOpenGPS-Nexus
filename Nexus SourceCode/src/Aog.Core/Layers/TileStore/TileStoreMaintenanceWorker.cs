@@ -57,7 +57,7 @@ public sealed class TileStoreMaintenanceWorker
 
         _auditSink.Record(TileStoreAuditEntry.MaintenanceTriggered(_timeProvider.GetUtcNow(), status.LiveRatio, status.TotalRecords));
         var result = _store.Compact(cancellationToken);
-        return result.Compacted;
+        return result.WasCompacted;
     }
 
     private sealed class MaintenanceNullAuditSink : ITileStoreAuditSink

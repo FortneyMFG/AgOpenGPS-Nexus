@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Aog.Plugins;
 using Aog.Tools.PluginCompliance;
@@ -97,35 +98,44 @@ public sealed class CapabilityReportGeneratorTests : IDisposable
 
     private static string CreateManifest(string id, string name, string capability, string mode, int timeout, string recovery)
     {
-        return $"""
-        {{
-          "schemaVersion": "1.0.0",
-          "id": "{id}",
-          "name": "{name}",
-          "version": "1.0.0",
-          "requiredApis": {{
-            "core": ">=1.0.0"
-          }},
-          "supportedCapabilities": ["{capability}"],
-          "requiredTransports": ["core://sample"],
-          "minimumRuntimeVersion": "1.0.0",
-          "simProviders": [
-            {{
-              "providerId": "{capability}.provider",
-              "type": "Aog.Plugins.Sample.Provider",
-              "topics": ["{capability}"]
-            }}
-          ],
-          "leases": [
-            {{
-              "capability": "{capability}",
-              "mode": "{mode}",
-              "timeoutSeconds": {timeout},
-              "recovery": "{recovery}"
-            }}
-          ]
-        }}
-        """;
+        var manifest = new
+        {
+            schemaVersion = "1.0.0",
+            id,
+            name,
+            version = "1.0.0",
+            requiredApis = new
+            {
+                core = ">=1.0.0"
+            },
+            supportedCapabilities = new[] { capability },
+            requiredTransports = new[] { "core://sample" },
+            minimumRuntimeVersion = "1.0.0",
+            simProviders = new[]
+            {
+                new
+                {
+                    providerId = $"{capability}.provider",
+                    type = "Aog.Plugins.Sample.Provider",
+                    topics = new[] { capability }
+                }
+            },
+            leases = new[]
+            {
+                new
+                {
+                    capability,
+                    mode,
+                    timeoutSeconds = timeout,
+                    recovery
+                }
+            }
+        };
+
+        return JsonSerializer.Serialize(manifest, new JsonSerializerOptions
+        {
+            WriteIndented = true
+        });
     }
 
     private sealed class ManifestDirectory : IDisposable

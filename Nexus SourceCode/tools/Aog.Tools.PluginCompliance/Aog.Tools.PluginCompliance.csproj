@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Aog.Plugins/Aog.Plugins.csproj" />
+    <ProjectReference Include="../../src/Aog.Agio/Aog.Agio.csproj" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Aog.Tools.PluginCompliance.Tests" />

@@ -11,29 +11,23 @@ namespace Aog.Agio.Linux.Gpsd;
 public sealed class UnixDomainSocketGpsdConnectionFactory : IGpsdConnectionFactory
 {
     private readonly ILogger<UnixDomainSocketGpsdConnectionFactory> _logger;
-    private readonly GpsdClientOptions _options;
+    private readonly IOptionsMonitor<GpsdClientOptions> _options;
 
     public UnixDomainSocketGpsdConnectionFactory(
         ILogger<UnixDomainSocketGpsdConnectionFactory> logger,
-        IOptions<GpsdClientOptions> options)
+        IOptionsMonitor<GpsdClientOptions> options)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = (options ?? throw new ArgumentNullException(nameof(options))).Value ?? throw new ArgumentException("Options are required.", nameof(options));
+        _options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
     /// <inheritdoc />
     public async Task<Stream?> ConnectAsync(CancellationToken cancellationToken)
     {
-        var socketPath = _options.SocketPath;
+        var socketPath = _options.CurrentValue?.SocketPath;
         if (string.IsNullOrEmpty(socketPath))
         {
             _logger.LogDebug("gpsd socket path not configured; skipping connection attempt.");
-            return null;
-        }
-
-        if (!File.Exists(socketPath))
-        {
-            _logger.LogDebug("gpsd socket {SocketPath} does not exist.", socketPath);
             return null;
         }
 
@@ -42,6 +36,13 @@ public sealed class UnixDomainSocketGpsdConnectionFactory : IGpsdConnectionFacto
         {
             await socket.ConnectAsync(new UnixDomainSocketEndPoint(socketPath), cancellationToken).ConfigureAwait(false);
             return new NetworkStream(socket, ownsSocket: true);
+        }
+        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AccessDenied)
+        {
+            socket.Dispose();
+            throw new GpsdUnavailableException(
+                $"Failed to connect to gpsd socket '{socketPath}'. SocketError: {ex.SocketErrorCode}.",
+                ex);
         }
         catch (Exception ex)
         {

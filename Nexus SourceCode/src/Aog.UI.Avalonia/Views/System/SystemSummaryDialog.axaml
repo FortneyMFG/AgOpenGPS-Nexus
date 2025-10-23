@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels;assembly=Aog.UI.Avalonia"
+        xmlns:model="clr-namespace:Aog.UI.Avalonia.Models"
+        mc:Ignorable="d"
+        x:Class="Aog.UI.Avalonia.Views.System.SystemSummaryDialog"
+        x:DataType="vm:ISystemSummaryViewModel"
+        Title="System Summary"
+        Width="520"
+        Height="600">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="{DynamicResource ThemeSpacingMd}"
+                Margin="{DynamicResource ThemeSpacingLgThickness}">
+      <TextBlock Text="System Summary"
+                 FontSize="{DynamicResource ThemeFontSizeLg}"
+                 FontWeight="Bold" />
+      <TextBlock Text="{Binding PlatformDescription}"
+                 TextWrapping="Wrap"
+                 Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+
+      <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
+        <TextBlock Text="Map Layers"
+                   FontWeight="SemiBold" />
+        <ItemsControl ItemsSource="{Binding MapLayers}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="model:MapLayer">
+              <Border BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+                      BorderThickness="0,0,0,1"
+                      Padding="8,4">
+                <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
+                  <TextBlock Text="{Binding DisplayName}"
+                             FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding Style.Units}"
+                             FontSize="{DynamicResource ThemeFontSizeXs}"
+                             Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
+        <TextBlock Text="Guidance Tracks"
+                   FontWeight="SemiBold" />
+        <ItemsControl ItemsSource="{Binding GuidanceTracks}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="model:GuidanceTrack">
+              <Border BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+                      BorderThickness="0,0,0,1"
+                      Padding="8,4">
+                <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
+                  <TextBlock Text="{Binding Name}"
+                             FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding Thickness, StringFormat='Stroke: {0:0.0} px'}"
+                             FontSize="{DynamicResource ThemeFontSizeXs}"
+                             Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
+        <TextBlock Text="Themes"
+                   FontWeight="SemiBold" />
+        <ComboBox ItemsSource="{Binding AvailableThemes}"
+                  SelectedItem="{Binding SelectedTheme}"
+                  HorizontalAlignment="Stretch" />
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</Window>

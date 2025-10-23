@@ -7,10 +7,10 @@ public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        var builder = Host.CreateApplicationBuilder(args);
+        var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
         builder.Services.AddNxCliHost();
 
-        await using var host = builder.Build();
+        using var host = builder.Build();
 
         using var cancellation = new CancellationTokenSource();
         Console.CancelKeyPress += OnCancelKeyPress;

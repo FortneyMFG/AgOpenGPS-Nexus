@@ -85,7 +85,7 @@ public static class GrpcContractRegistry
         var set = new FileDescriptorSet();
         foreach (var file in visited.Values.OrderBy(d => d.Name, StringComparer.Ordinal))
         {
-            set.File.Add(file.Proto);
+            set.File.Add(file.ToProto());
         }
 
         return set;

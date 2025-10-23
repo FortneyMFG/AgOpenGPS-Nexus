@@ -30,6 +30,9 @@ public sealed class CoverageAnalyticsParityHarness
     /// <summary>
     /// Loads the supplied CSV files and computes the per-metric deltas.
     /// </summary>
+    /// <param name="legacyCsvPath">Path to the legacy CSV export.</param>
+    /// <param name="nexusCsvPath">Path to the Nexus CSV export.</param>
+    /// <returns>Parity report describing per-metric differences.</returns>
     public CoverageParityReport Compare(string legacyCsvPath, string nexusCsvPath)
     {
         if (legacyCsvPath is null)
@@ -45,11 +48,18 @@ public sealed class CoverageAnalyticsParityHarness
         var legacyMetrics = LoadMetrics(legacyCsvPath);
         var nexusMetrics = LoadMetrics(nexusCsvPath);
 
-        if (!legacyMetrics.Keys.SetEquals(nexusMetrics.Keys))
+        var missingFromNexus = legacyMetrics.Keys
+            .Except(nexusMetrics.Keys, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        var missingFromLegacy = nexusMetrics.Keys
+            .Except(legacyMetrics.Keys, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (missingFromNexus.Count > 0 || missingFromLegacy.Count > 0)
         {
-            var missingLegacy = string.Join(", ", legacyMetrics.Keys.Except(nexusMetrics.Keys));
-            var missingNexus = string.Join(", ", nexusMetrics.Keys.Except(legacyMetrics.Keys));
-            throw new InvalidDataException($"Metric mismatch. Legacy missing [{missingNexus}], Nexus missing [{missingLegacy}].");
+            var missingLegacyList = string.Join(", ", missingFromLegacy);
+            var missingNexusList = string.Join(", ", missingFromNexus);
+            throw new InvalidDataException($"Metric mismatch. Legacy missing [{missingLegacyList}], Nexus missing [{missingNexusList}].");
         }
 
         var differences = new List<CoverageMetricDifference>(legacyMetrics.Count);
@@ -102,6 +112,10 @@ public sealed class CoverageAnalyticsParityHarness
 /// </summary>
 public sealed class CoverageParityReport
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CoverageParityReport"/> class.
+    /// </summary>
+    /// <param name="metrics">Per-metric comparison results produced by the parity harness.</param>
     public CoverageParityReport(IReadOnlyList<CoverageMetricDifference> metrics)
     {
         Metrics = metrics ?? throw new ArgumentNullException(nameof(metrics));

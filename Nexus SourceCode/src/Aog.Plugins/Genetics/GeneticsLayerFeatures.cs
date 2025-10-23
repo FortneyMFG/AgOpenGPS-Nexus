@@ -7,7 +7,7 @@ namespace Aog.Plugins.Genetics;
 /// <summary>
 /// Canonical representation of a genetics plan feature aligned with <c>GeneticsPlan.v1</c>.
 /// </summary>
-public sealed record GeneticsPlanFeature
+public record GeneticsPlanFeature
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GeneticsPlanFeature"/> record.

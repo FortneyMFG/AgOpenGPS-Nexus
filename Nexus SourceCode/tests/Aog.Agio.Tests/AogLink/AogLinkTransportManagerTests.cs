@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Agio.AogLink;
-using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
@@ -22,9 +21,9 @@ public sealed class AogLinkTransportManagerTests
         await Task.Delay(10);
         await manager.StopAsync(CancellationToken.None);
 
-        enabled.StartCount.Should().Be(1);
-        enabled.StopCount.Should().Be(1);
-        disabled.StartCount.Should().Be(0);
+        Assert.Equal(1, enabled.StartCount);
+        Assert.Equal(1, enabled.StopCount);
+        Assert.Equal(0, disabled.StartCount);
     }
 
     private sealed class TestDriver : IAogLinkTransportDriver

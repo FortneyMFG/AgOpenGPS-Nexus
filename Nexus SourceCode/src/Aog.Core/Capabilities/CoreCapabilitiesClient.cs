@@ -11,6 +11,10 @@ public sealed class CoreCapabilitiesClient
 {
     private readonly CapabilityDescriptorFactory _factory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CoreCapabilitiesClient"/> class.
+    /// </summary>
+    /// <param name="factory">Factory used to build capability descriptors for the handshake.</param>
     public CoreCapabilitiesClient(CapabilityDescriptorFactory factory)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
@@ -19,6 +23,10 @@ public sealed class CoreCapabilitiesClient
     /// <summary>
     /// Creates a handshake request that advertises the provided capabilities.
     /// </summary>
+    /// <param name="nodeId">Unique identifier of the node issuing the handshake.</param>
+    /// <param name="capabilityNames">Canonical capability names the node exposes.</param>
+    /// <param name="sessionId">Identifier linking the handshake to an active session.</param>
+    /// <returns>A populated <see cref="HandshakeRequest"/> ready to send to Core.</returns>
     public HandshakeRequest BuildHandshake(string nodeId, IEnumerable<string> capabilityNames, string sessionId)
     {
         if (string.IsNullOrWhiteSpace(nodeId))
@@ -40,7 +48,7 @@ public sealed class CoreCapabilitiesClient
         {
             SessionId = sessionId,
             NodeId = nodeId,
-            Role = CapabilityRole.CapabilityRoleCore
+            Role = CapabilityRole.Core
         };
 
         var descriptors = _factory.Create(capabilityNames);
@@ -59,6 +67,12 @@ public sealed class CapabilityDescriptorFactory
     private readonly string? _defaultSummary;
     private readonly IReadOnlyDictionary<string, string> _defaultAttributes;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CapabilityDescriptorFactory"/> class.
+    /// </summary>
+    /// <param name="defaultVersion">Default semantic version applied when none is specified.</param>
+    /// <param name="defaultSummary">Default human-readable summary applied when none is specified.</param>
+    /// <param name="defaultAttributes">Optional attributes copied into generated descriptors when missing.</param>
     public CapabilityDescriptorFactory(
         string? defaultVersion = null,
         string? defaultSummary = null,
@@ -73,6 +87,8 @@ public sealed class CapabilityDescriptorFactory
     /// Generates descriptors for the provided capability names, skipping empty entries
     /// and de-duplicating on the canonical name.
     /// </summary>
+    /// <param name="capabilityNames">Capability names to materialize descriptors for.</param>
+    /// <returns>An enumerable sequence containing descriptors for each unique capability name.</returns>
     public IEnumerable<CapabilityDescriptor> Create(IEnumerable<string> capabilityNames)
     {
         if (capabilityNames is null)

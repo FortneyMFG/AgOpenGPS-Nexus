@@ -27,7 +27,7 @@ public sealed class AogLinkMeshBridge
 
     private readonly ILiveTelemetryMeshService _meshService;
     private readonly ILogger<AogLinkMeshBridge> _logger;
-    private readonly ConcurrentDictionary<uint, MeshDeviceRecord> _devices = new();
+    private readonly ConcurrentDictionary<uint, MeshDeviceCacheEntry> _devices = new();
 
     public AogLinkMeshBridge(ILiveTelemetryMeshService meshService, ILogger<AogLinkMeshBridge> logger)
     {
@@ -64,9 +64,11 @@ public sealed class AogLinkMeshBridge
         var registration = new MeshDeviceRegistration(
             deviceId,
             label,
-            capabilities,
-            PresenceShareProfile,
-            MeshSubscribeProfile.Empty);
+            ShareProfile: PresenceShareProfile,
+            SubscribeProfile: MeshSubscribeProfile.Empty)
+        {
+            Capabilities = capabilities.Length == 0 ? null : capabilities
+        };
 
         await _meshService.RegisterOrUpdateDeviceAsync(registration, cancellationToken).ConfigureAwait(false);
 
@@ -84,7 +86,12 @@ public sealed class AogLinkMeshBridge
         metadata["role"] = identity.Role.ToString();
         metadata["priority"] = identity.Priority.ToString();
 
-        var record = new MeshDeviceRecord(deviceId, metadata);
+        if (capabilities.Length > 0)
+        {
+            metadata["capabilities"] = string.Join(',', capabilities);
+        }
+
+        var record = new MeshDeviceCacheEntry(deviceId, metadata);
         _devices[source] = record;
 
         _logger.LogDebug("Registered mesh device {DeviceId} for AOG-Link node {Source}.", deviceId, source);
@@ -121,7 +128,7 @@ public sealed class AogLinkMeshBridge
         await _meshService.UpdatePresenceAsync(update, cancellationToken).ConfigureAwait(false);
     }
 
-    private async ValueTask<MeshDeviceRecord> EnsureDeviceRegisteredAsync(uint source, CancellationToken cancellationToken)
+    private async ValueTask<MeshDeviceCacheEntry> EnsureDeviceRegisteredAsync(uint source, CancellationToken cancellationToken)
     {
         if (_devices.TryGetValue(source, out var record))
         {
@@ -134,9 +141,8 @@ public sealed class AogLinkMeshBridge
         var registration = new MeshDeviceRegistration(
             deviceId,
             label,
-            capabilities: Array.Empty<string>(),
-            PresenceShareProfile,
-            MeshSubscribeProfile.Empty);
+            ShareProfile: PresenceShareProfile,
+            SubscribeProfile: MeshSubscribeProfile.Empty);
 
         await _meshService.RegisterOrUpdateDeviceAsync(registration, cancellationToken).ConfigureAwait(false);
 
@@ -145,11 +151,11 @@ public sealed class AogLinkMeshBridge
             ["registration"] = "inferred"
         };
 
-        var record = new MeshDeviceRecord(deviceId, metadata);
-        _devices[source] = record;
+        var cacheEntry = new MeshDeviceCacheEntry(deviceId, metadata);
+        _devices[source] = cacheEntry;
 
         _logger.LogDebug("Registered inferred mesh device {DeviceId} for AOG-Link node {Source}.", deviceId, source);
-        return record;
+        return cacheEntry;
     }
 
     private static string BuildDeviceId(uint source) => $"aog-link:{source}";
@@ -219,5 +225,5 @@ public sealed class AogLinkMeshBridge
         return metadata;
     }
 
-    private sealed record MeshDeviceRecord(string DeviceId, IReadOnlyDictionary<string, string> Metadata);
+    private sealed record MeshDeviceCacheEntry(string DeviceId, IReadOnlyDictionary<string, string> Metadata);
 }

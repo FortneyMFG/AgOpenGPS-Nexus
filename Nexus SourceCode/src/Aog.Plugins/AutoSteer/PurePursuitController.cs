@@ -63,14 +63,14 @@ public sealed class PurePursuitController
         if (distanceToTarget < 1e-9)
         {
             LastPreview = new PurePursuitPreview(
-                crossTrack,
-                headingErrorRadians: 0,
-                LookAheadDistance,
-                state.X,
-                state.Y,
-                state.HeadingRadians,
-                controllerOutput: 0,
-                targetCurvaturePerMeter: 0);
+                CrossTrackError: crossTrack,
+                HeadingErrorRadians: 0,
+                LookAheadDistanceMeters: LookAheadDistance,
+                TargetX: state.X,
+                TargetY: state.Y,
+                TargetHeading: state.HeadingRadians,
+                ControllerOutput: 0,
+                TargetCurvaturePerMeter: 0);
             return 0;
         }
 
@@ -80,14 +80,14 @@ public sealed class PurePursuitController
         var steering = Math.Atan(curvature * state.WheelbaseMeters);
 
         LastPreview = new PurePursuitPreview(
-            crossTrack,
-            headingError,
-            LookAheadDistance,
-            target.X,
-            target.Y,
-            headingToTarget,
-            controllerOutput: steering,
-            targetCurvaturePerMeter: curvature);
+            CrossTrackError: crossTrack,
+            HeadingErrorRadians: headingError,
+            LookAheadDistanceMeters: LookAheadDistance,
+            TargetX: target.X,
+            TargetY: target.Y,
+            TargetHeading: headingToTarget,
+            ControllerOutput: steering,
+            TargetCurvaturePerMeter: curvature);
 
         return Math.Clamp(steering, -SteeringAngleLimitRadians, SteeringAngleLimitRadians);
     }

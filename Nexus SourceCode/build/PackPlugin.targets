@@ -1,0 +1,60 @@
+<Project>
+  <UsingTask TaskName="Microsoft.Build.Tasks.ZipDirectory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" />
+  <PropertyGroup>
+    <PluginManifestPath Condition="'$(Manifest)'==''">$(ProjectDir)manifest.json</PluginManifestPath>
+    <PluginPackageId Condition="'$(PluginPackageId)'==''">$(ProjectName)</PluginPackageId>
+    <PluginPackageVersion Condition="'$(PluginPackageVersion)'==''">$(Version)</PluginPackageVersion>
+    <PluginPackageVersion Condition="'$(PluginPackageVersion)'==''">1.0.0</PluginPackageVersion>
+    <PluginStagingRoot>$(IntermediateOutputPath)plugin\</PluginStagingRoot>
+    <PluginLibDir>$(PluginStagingRoot)lib\</PluginLibDir>
+    <PluginAssetsDir>$(PluginStagingRoot)assets\</PluginAssetsDir>
+    <PluginNativeDir>$(PluginStagingRoot)native\</PluginNativeDir>
+    <PluginOutputDirectory Condition="'$(PluginOutputDirectory)'==''">$(MSBuildProjectDirectory)\..\..\artifacts\plugins\</PluginOutputDirectory>
+    <PluginPackageFile>$(PluginOutputDirectory)$(PluginPackageId)-$(PluginPackageVersion).zip</PluginPackageFile>
+  </PropertyGroup>
+
+  <Target Name="PackPlugin"
+          DependsOnTargets="Build"
+          Inputs="$(TargetPath);$(PluginManifestPath)"
+          Outputs="$(PluginPackageFile)">
+    <Error Condition="!Exists('$(PluginManifestPath)')" Text="Plugin manifest '$(PluginManifestPath)' was not found." />
+
+    <MakeDir Directories="$(PluginLibDir)" />
+    <MakeDir Directories="$(PluginAssetsDir)" Condition="1 == 1" />
+    <MakeDir Directories="$(PluginNativeDir)" Condition="1 == 1" />
+    <MakeDir Directories="$(PluginOutputDirectory)" />
+
+    <ItemGroup>
+      <_PluginLibFiles Include="$(TargetPath)" />
+      <_PluginLibFiles Include="$(TargetDir)$(TargetName).pdb" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+      <_PluginLibFiles Include="@(DebugSymbolsProjectOutputGroupOutputs)" Condition="'@(DebugSymbolsProjectOutputGroupOutputs)' != ''" />
+      <_PluginAssetFiles Include="$(ProjectDir)assets\**\*.*" Condition="Exists('$(ProjectDir)assets')" />
+      <_PluginNativeFiles Include="$(ProjectDir)native\**\*.*" Condition="Exists('$(ProjectDir)native')" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_PluginLibFiles)" DestinationFolder="$(PluginLibDir)" SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="@(_PluginAssetFiles)"
+          DestinationFiles="@(_PluginAssetFiles->'$(PluginAssetsDir)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true"
+          Condition="'@(_PluginAssetFiles)' != ''" />
+
+    <Copy SourceFiles="@(_PluginNativeFiles)"
+          DestinationFiles="@(_PluginNativeFiles->'$(PluginNativeDir)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true"
+          Condition="'@(_PluginNativeFiles)' != ''" />
+
+    <Copy SourceFiles="$(PluginManifestPath)" DestinationFiles="$(PluginStagingRoot)manifest.json" />
+
+    <ItemGroup>
+      <_ExistingZip Include="$(PluginPackageFile)" Condition="Exists('$(PluginPackageFile)')" />
+    </ItemGroup>
+    <Delete Files="@(_ExistingZip)" />
+
+    <Microsoft.Build.Tasks.ZipDirectory SourceDirectory="$(PluginStagingRoot)"
+                                        DestinationFile="$(PluginPackageFile)"
+                                        OverwriteExistingFile="true" />
+    <Message Importance="High" Text="Packed plugin: $(PluginPackageFile)" />
+  </Target>
+</Project>

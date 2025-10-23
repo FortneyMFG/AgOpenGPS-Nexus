@@ -1,0 +1,20 @@
+{
+  "id": "T01_rectangle",
+  "description": "65 ha rectangle, no holes",
+  "field": {
+    "origin_llh": [47.0000, -122.0000, 100.0],
+    "enu_epoch": "2025-01-01T00:00:00Z",
+    "outer": [[0.0, 0.0], [800.0, 0.0], [800.0, 812.5], [0.0, 812.5]],
+    "holes": []
+  },
+  "equipment": {
+    "width_nom": 12.0,
+    "min_turn_radius": 14.0
+  },
+  "planner": {
+    "headlands": {"count": 2, "width": 12.0, "smoothing": 2.0, "max_curv_per_m": 0.08},
+    "swaths": {"spacing": 12.0, "smoothing": 1.0, "max_curv_per_m": 0.05, "straightness_bias": 0.5},
+    "orientation": {"mode": "OPTIMAL"}
+  },
+  "seeds": {"planner_seed": "1337", "sequencer_seed": "4242"}
+}

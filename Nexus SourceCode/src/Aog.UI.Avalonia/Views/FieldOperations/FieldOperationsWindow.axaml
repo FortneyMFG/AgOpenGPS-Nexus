@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mapping="clr-namespace:Aog.UI.Avalonia.Mapping.Core"
+        x:Class="Aog.UI.Avalonia.Views.FieldOperations.FieldOperationsWindow"
+        Title="Field Operations">
+  <Grid>
+    <mapping:MapView x:Name="MapViewHost" />
+  </Grid>
+</Window>

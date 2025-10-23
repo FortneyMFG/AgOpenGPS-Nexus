@@ -291,7 +291,7 @@ public sealed class RadioBridgeTransport
                 frame.Flags.HasFlag(RadioBridgeFrameFlags.Compressed),
                 frame.Flags.HasFlag(RadioBridgeFrameFlags.ForwardErrorCorrection));
             PublicationReceived?.Invoke(message);
-            return RadioBridgeProcessResult.Publication(frame.Sequence, message);
+            return RadioBridgeProcessResult.Delivered(frame.Sequence, message);
         }
         catch (Exception)
         {
@@ -445,7 +445,7 @@ public readonly record struct RadioBridgeProcessResult(
     /// <summary>
     /// Result when a payload is delivered successfully.
     /// </summary>
-    public static RadioBridgeProcessResult Publication(ushort sequence, RadioBridgePublicationMessage publication) => new(RadioBridgeProcessStatus.PublicationDelivered, sequence, publication);
+    public static RadioBridgeProcessResult Delivered(ushort sequence, RadioBridgePublicationMessage publication) => new(RadioBridgeProcessStatus.PublicationDelivered, sequence, publication);
 
     /// <summary>
     /// Result when a payload fails to decode.

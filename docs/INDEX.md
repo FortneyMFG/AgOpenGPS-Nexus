@@ -1,92 +1,57 @@
+---
+owner: nexus-docs
+status: active
+last_reviewed: 2024-05-10
+related_tickets: []
+---
+
 # Nexus Documentation Index
 
-## Architecture Decisions
+## Orientation
 
-- [ADR Roadmap](ADR/ADR-roadmap.md) — status, dependencies, and icebox items for the 2025 program.
-- [ADR-040 — Season Organizers](ADR/ADR-040_SeasonOrganizers.md)
-- [ADR-041 — Job Sessions](ADR/ADR-041_JobSessions.md)
-- [ADR-043 — Multi-Field Job Envelopes](ADR/ADR-043_MultiFieldJobEnvelopes.md)
-- [ADR-044 — Zone & Layer Drawing Framework](ADR/ADR-044_ZoneDrawingFramework.md)
-- [ADR-045 — Crop Type Plugin & Layers](ADR/ADR-045_CropTypePlugin.md)
-- [ADR-046 — Genetics Plugin & Layers](ADR/ADR-046_GeneticsPlugin.md)
-- [ADR-047 — Live Telemetry Mesh](ADR/ADR-047_LiveTelemetryMesh.md)
-- [ADR-048 — RadioBridge](ADR/ADR-048_RadioBridge.md)
-- [ADR-049 — Yield & Analytics Plugin](ADR/ADR-049_YieldPlugin.md)
-- [ADR-050 — Cost & Profit Plugin](ADR/ADR-050_CostProfitPlugin.md)
-- [ADR-051 — Report Builder & Export System](ADR/ADR-051_ReportBuilder.md)
+- [Repository README](../README.md) — project overview, support channels, and release vision.
+- [System Requirements home](development/SRS/00_ReadMe.md) — how the SRS, options, and ADRs fit together.
+- [SRS section template](development/SRS/03_SRS_Section_Template.md) — single source for requirements, options, and decision matrices.
+- [Nexus glossary](development/GLOSSARY.md) — canonical terminology, including guidance-specific terms.
+- [Developer guide](development/INDEX.md) — workstation setup, workflows, and contributor checklists.
+- [Development documentation catalog](development/catalog.md) — theme-sorted index with summaries and audiences for every development resource.
 
-## System Requirements Specification
+## Core
 
-- [§02 Data Model — Farm → Field & Season → Job → Session](SRS/sections/02_DataModel.md)
-- [§03 Job Lifecycle & Session Management](SRS/sections/03_JobLifecycle.md)
-- [§03 Communications & Transports](SRS/sections/03_Comm_Transports.md)
-- [§04 Mapping & Layer Governance](SRS/sections/04_MappingLayers.md)
-- [§05 Frontends](SRS/sections/05_Frontends.md)
-- [§09 Control & Automation](SRS/sections/09_Control_Automation.md)
+- [Guidance orchestrator briefs](Core/guidance/README.md) — Live Field Builder through telemetry and hysteresis policies.
+- [Linux core operations playbook](Core/linux-core-operations-playbook.md) — deployment guardrails and troubleshooting.
+- [Core reference library](Core/reference/README.md) — data flow diagrams, layer registry notes, and migration studies.
+- [Support playbooks](Core/support/README.md) — runtime guardrails and operational procedures.
 
-## Plugin Guides
+## AgIO
 
-- [Mapping](plugins/Mapping.md)
-- [Variable Mapping / Prescription](plugins/VariableMapping.md)
-- [Rate Control](plugins/RateControl.md)
-- [Genetics](plugins/Genetics.md)
-- [Yield & Analytics](plugins/Yield.md)
-- [Profit](plugins/Profit.md)
-- [Multi-Machine](plugins/MultiMachine.md)
-- [ISOBUS Bridge](plugins/IsobusBridge.md)
-- [Telemetry Logging](plugins/TelemetryLogging.md)
-- [Replay](plugins/Replay.md)
-- [File I/O](plugins/FileIO.md)
-- Planned: [Soil & Lab Manager](plugins/SoilLab.md), [Map Composer & Print Studio](plugins/MapComposer.md), [3D Terrain & Drainage](plugins/Terrain3D.md)
+- [AgIO subsystem overview](AgIO/README.md) — transports, bridge adapters, and rollout tooling.
+- [AOG-Link bridge architecture](AgIO/aog-link-bridge-architecture-guide.md) — fastpath design and coexistence with legacy PGNs.
+- [Transport rollout checklist](AgIO/aog-link-transport-rollout.md) — staged deployments and validation gates.
+- [Bridging workflow knowledge base](AgIO/bridging-workflow-knowledge-base.md) — troubleshooting heuristics and field notes.
 
-## Schemas & Examples
+## Plugin Platform
 
-- [Season.v1.json](../schemas/Season.v1.json)
-- [Session.v1.json](../schemas/Session.v1.json)
-- [Job.v1.json](../schemas/Job.v1.json)
-- [Layer.v1.json](../schemas/Layer.v1.json)
-- [LayerEditEvent.v1.json](../schemas/LayerEditEvent.v1.json)
-- [schemas/examples](../schemas/examples) — sample payloads for validation
+- [Plugin architecture overview](Plugins/architecture.md)
+- [Official plugin catalogue](Plugins/official/README.md)
+- [Plugin lease & manifest governance](Plugins/plugin-lease-manifest-governance.md)
+- [Plugin runbook collection](Plugins/README.md) — guidance, analytics, mapping, and automation briefs.
 
-## Reference
+## UI
 
-- [CRS normalization matrix](reference/crs-normalization-matrix.md) — canonical storage,
-  processing, and audit expectations per ADR-022.
-- [Official plugin bundle capability matrix](reference/official-bundle-capability-matrix.md) —
-  lease posture and capability coverage for ADR-031 governance.
-- [Metadata-driven UI style guide](reference/metadata-driven-ui-style-guide.md) — layout and
-  theming guidance for ADR-034 dashboards, inspectors, and legends.
-- [Report template catalog](reference/report-template-catalog.md) —
-  versioned manifests, section contributors, and export governance for ADR-051.
+- [UI overview](UI/README.md) — Avalonia run modes, metadata-driven layout patterns, and lifecycle guidance.
+- [Sidebar layout overview](UI/sidebar-layout-overview.md) — shell navigation conventions and workspace expectations.
+- [Metadata-driven style guide](UI/metadata-driven-ui-style-guide.md) — theming, typography, and control inventories.
+- [UI session lifecycle](UI/ui-session-lifecycle.md) — orchestration between Core, UI hosts, and plugins.
 
-## Contribution Guides
+## Development & Operations
 
-- [AGENTS.md](../AGENTS.md) — repository conventions and task workflow.
-- [Plugin contribution guide](CONTRIBUTING-PLUGINS.md)
-- [tasks.md](../tasks.md) — active backlog with NX identifiers.
-
-## Operational Playbooks & How-To Guides
-
-- [Runtime baseline enforcement](support/dotnet-runtime-baseline.md) — .NET 8 guardrails and review checklist.
-- [Avalonia run modes](howto/avalonia-run-modes.md) — CompanionRemote, LocalInProc, and LocalOutOfProc configuration.
-- [Companion metadata parity](howto/companion-metadata-parity.md) — snapshot contract powering ADR-034 remote clients.
-- [Guidance lane publishing contracts](howto/guidance-lane-contracts.md) — ADR-033 lane geometry and preview payloads.
-- [AOG-Link transport rollout](howto/aog-link-transport-rollout.md) — Ethernet, RS-485, and CAN staging guidance.
-- [AOG-Link bridge architecture](howto/aog-link-bridge-architecture-guide.md) — visual layer breakdown and operator-facing explainer.
-- [Stanley controller parity harness](howto/stanley-controller-parity.md) — deterministic regression checks for the ported controller.
-- [Firmware-in-loop stability validation](howto/firmware-in-loop-stability.md) — dynamic look-ahead and constraint regression slice.
-- [Performance budget telemetry dashboards](howto/performance-budget-telemetry-dashboards.md) — ADR-026 dashboard provisioning and guardrails.
-- [RadioBridge provisioning kit](howto/radio/radiobridge-provisioning.md) — provisioning workflow for ELRS/LoRa bridges (NX-244).
-- [Season/session migration playbook](howto/season-session-migration-playbook.md) — ADR-040/041 rollout playbook.
-- [Mesh provisioning runbook](howto/mesh-provisioning-runbook.md) — ADR-047/048 connectivity rollout.
-- [Mesh retention & privacy operations guide](howto/mesh-retention-privacy-operations-guide.md) — ADR-047 retention planner playbook.
-- [Global guardrail regression checks](howto/global-guardrails.md) — retention, performance, and crash acceptance automation.
-- [Linux Core operations & observability](howto/linux-core-operations-playbook.md) — NX-462/463 systemd packaging, health signals, and replay validation.
-- [Composite simulation fabric GA](scenarios/composite-simulation-fabric.md) — SimClock/SimBus validation steps.
-- [gRPC contract governance](qa/grpc-contract-governance.md) — protobuf review and release gating.
-- [Plugin lease & manifest governance](plugins/plugin-lease-manifest-governance.md) — ADR-018 compliance checklist.
-- [Plugin manifest governance playbook](howto/plugin-manifest-governance.md) — ADR-031 release workflow and artefacts.
-- [Device Manager compatibility dashboard](howto/device-manager-compatibility-dashboard.md) — ADR-031 bundle health UI guide.
-- [Weather compliance export playbook](howto/weather-compliance-export.md) — ADR-053 reporting workflow for regulatory bundles.
-- [Plugin QA handshake checklist](qa/plugin-qa-handshake.md) — ADR-031 manifest validation process.
-- [Mesh security and penetration tests](qa/mesh-security-penetration-tests.md) — ADR-047/048 security validation plan.
+- [Project charter & guardrails](development/SRS/01_Project_Charter.md) — vision, scope, and stakeholders.
+- [System slices](development/SRS/02_System_Slices.md) — map active sections by domain (UI, guidance, IO, etc.).
+- [Active SRS sections](development/SRS/sections/) — normative requirements organized by slice.
+- [ADR template](development/SRS/05_ADR_Template.md) — structure for recording final decisions.
+- [How-to guides](development/howto/) — provisioning, telemetry, packaging, and governance runbooks.
+- [Testing guidelines](development/testing.md) — entry points into QA harnesses and training scenarios.
+- [Performance guidance](development/performance.md) — dashboards, budgets, and tuning checklists.
+- [QA practices](development/qa/) — contract governance, plugin validation, and regression plans.
+- [Training & scenarios](development/training/) — composite simulation drills and onboarding exercises.

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>Nexus.Sdk.AgIo</RootNamespace>
+    <PackageId>Nexus.Sdk.AgIo</PackageId>
+    <Description>AgIO extension contracts for Nexus plugins.</Description>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Nexus.Sdk.Core\Nexus.Sdk.Core.csproj" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.62.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.25.3" />
+  </ItemGroup>
+</Project>

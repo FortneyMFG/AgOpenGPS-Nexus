@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Aog.Agio.AogLink;
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +15,9 @@ public sealed class AogLinkNtripCorrectionSink : INtripCorrectionSink
     /// <summary>
     /// Initializes a new instance of the <see cref="AogLinkNtripCorrectionSink"/> class.
     /// </summary>
-    public AogLinkNtripCorrectionSink(IEnumerable<IAogLinkTransportDriver> drivers, ILogger<AogLinkNtripCorrectionSink> logger)
+    public AogLinkNtripCorrectionSink(
+        IEnumerable<IAogLinkTransportDriver> drivers,
+        ILogger<AogLinkNtripCorrectionSink> logger)
     {
         _drivers = drivers ?? throw new ArgumentNullException(nameof(drivers));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -58,13 +56,13 @@ public sealed class AogLinkNtripCorrectionSink : INtripCorrectionSink
 
         var sequence = (ushort)(Interlocked.Increment(ref _sequence) & 0xFFFF);
         var header = new AogLinkFrameHeader(
-            version: 1,
-            messageClass: AogLinkMessageCatalog.GnssClass,
-            messageType: AogLinkMessageCatalog.RtcmCorrectionsType,
-            sequence: sequence,
-            source: AogLinkMessageCatalog.NtripSourceAddress,
-            destination: AogLinkMessageCatalog.BroadcastDestinationAddress,
-            payloadLength: (ushort)payload.Length);
+            Version: 1,
+            MessageClass: AogLinkMessageCatalog.GnssClass,
+            MessageType: AogLinkMessageCatalog.RtcmCorrectionsType,
+            Sequence: sequence,
+            Source: AogLinkMessageCatalog.NtripSourceAddress,
+            Destination: AogLinkMessageCatalog.BroadcastDestinationAddress,
+            PayloadLength: (ushort)payload.Length);
 
         header.Validate(payload.Length);
 

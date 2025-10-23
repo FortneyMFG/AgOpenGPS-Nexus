@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
-using Parquet;
-using Parquet.Data;
-using Parquet.Schema;
+using System.Text.Json.Serialization.Metadata;
+using ParquetSchema = Parquet.Schema.ParquetSchema;
 
 namespace Aog.Tools.LegacyDataMigrator;
 
@@ -24,7 +17,8 @@ public sealed class LegacyDataMigrator
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
     };
 
     private static readonly DateTimeOffset FieldHealthBaseTimestamp = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -46,7 +40,7 @@ public sealed class LegacyDataMigrator
     /// <param name="options">Migration options.</param>
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
     /// <returns>Summary describing migrated artefacts.</returns>
-    public Task<LegacyMigrationReport> MigrateAsync(
+    public async Task<LegacyMigrationReport> MigrateAsync(
         LegacyMigrationOptions options,
         CancellationToken cancellationToken = default)
     {
@@ -62,7 +56,7 @@ public sealed class LegacyDataMigrator
             var posePath = Path.Combine(logsRoot, "pose.csv");
             if (File.Exists(posePath))
             {
-                report = report with { PoseCount = report.PoseCount + WritePose(posePath, options.OutputDirectory) };
+                report = report with { PoseCount = report.PoseCount + await WritePoseAsync(posePath, options.OutputDirectory) };
             }
             else
             {
@@ -72,7 +66,7 @@ public sealed class LegacyDataMigrator
             var imuPath = Path.Combine(logsRoot, "imu.csv");
             if (File.Exists(imuPath))
             {
-                report = report with { ImuCount = report.ImuCount + WriteImu(imuPath, options.OutputDirectory) };
+                report = report with { ImuCount = report.ImuCount + await WriteImuAsync(imuPath, options.OutputDirectory) };
             }
             else
             {
@@ -82,7 +76,7 @@ public sealed class LegacyDataMigrator
             var canPath = Path.Combine(logsRoot, "can.csv");
             if (File.Exists(canPath))
             {
-                report = report with { CanCount = report.CanCount + WriteCan(canPath, options.OutputDirectory) };
+                report = report with { CanCount = report.CanCount + await WriteCanAsync(canPath, options.OutputDirectory) };
             }
             else
             {
@@ -92,7 +86,7 @@ public sealed class LegacyDataMigrator
             var sectionsPath = Path.Combine(logsRoot, "sections.csv");
             if (File.Exists(sectionsPath))
             {
-                report = report with { SectionCount = report.SectionCount + WriteSections(sectionsPath, options.OutputDirectory) };
+                report = report with { SectionCount = report.SectionCount + await WriteSectionsAsync(sectionsPath, options.OutputDirectory) };
             }
             else
             {
@@ -102,7 +96,7 @@ public sealed class LegacyDataMigrator
             var pluginPath = Path.Combine(logsRoot, "plugin.csv");
             if (File.Exists(pluginPath))
             {
-                report = report with { PluginCount = report.PluginCount + WritePlugin(pluginPath, options.OutputDirectory) };
+                report = report with { PluginCount = report.PluginCount + await WritePluginAsync(pluginPath, options.OutputDirectory) };
             }
             else
             {
@@ -112,7 +106,7 @@ public sealed class LegacyDataMigrator
             var weatherPath = Path.Combine(logsRoot, "weather.csv");
             if (File.Exists(weatherPath))
             {
-                report = report with { WeatherCount = report.WeatherCount + WriteWeather(weatherPath, options.OutputDirectory) };
+                report = report with { WeatherCount = report.WeatherCount + await WriteWeatherAsync(weatherPath, options.OutputDirectory) };
             }
             else
             {
@@ -184,7 +178,7 @@ public sealed class LegacyDataMigrator
             report = AppendSkipped(report, yieldPath + " (missing)");
         }
 
-        return Task.FromResult(report);
+        return report;
     }
 
     private static LegacyMigrationReport AppendSkipped(LegacyMigrationReport report, string path)
@@ -622,7 +616,7 @@ public sealed class LegacyDataMigrator
         return Convert.ToHexString(hash)[..8].ToLowerInvariant();
     }
 
-    private static int WritePose(string filePath, string outputDirectory)
+    private static async Task<int> WritePoseAsync(string filePath, string outputDirectory)
     {
         var rows = LegacyPoseCsvParser.Parse(filePath);
         if (rows.Count == 0)
@@ -631,30 +625,30 @@ public sealed class LegacyDataMigrator
         }
 
         var schema = TelemetrySchemas.Pose.Schema;
-        using var stream = CreateParquetStream(outputDirectory, "pose.parquet");
-        using var writer = new ParquetWriter(schema, stream);
-        using var rowGroup = writer.CreateRowGroup(rows.Count);
+        await using var stream = CreateParquetStream(outputDirectory, "pose.parquet");
+        using var writer = await ParquetWriter.CreateAsync(schema, stream).ConfigureAwait(false);
+        using var rowGroup = writer.CreateRowGroup();
 
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.Sequence, rows.Select(r => r.Sequence).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.Frame, rows.Select(r => r.Frame).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.Source, rows.Select(r => r.Source).ToArray()));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Pose.JobId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Pose.SeasonId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Pose.SessionId, rows.Count));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.LatitudeDeg, rows.Select(r => r.LatitudeDeg).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.LongitudeDeg, rows.Select(r => r.LongitudeDeg).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.AltitudeM, rows.Select(r => r.AltitudeM).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.HeadingRad, rows.Select(r => r.HeadingRad).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.RollRad, rows.Select(r => r.RollRad).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.PitchRad, rows.Select(r => r.PitchRad).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.SpeedMps, rows.Select(r => r.SpeedMps).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Pose.YawRateRadps, rows.Select(r => r.YawRateRadps).ToArray()));
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.Timestamp, rows.Select(r => r.TimestampUtc).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.Frame, rows.Select(r => r.Frame).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.Source, rows.Select(r => r.Source).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Pose.JobId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Pose.SeasonId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Pose.SessionId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.LatitudeDeg, rows.Select(r => r.LatitudeDeg).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.LongitudeDeg, rows.Select(r => r.LongitudeDeg).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.AltitudeM, rows.Select(r => r.AltitudeM).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.HeadingRad, rows.Select(r => r.HeadingRad).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.RollRad, rows.Select(r => r.RollRad).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.PitchRad, rows.Select(r => r.PitchRad).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.SpeedMps, rows.Select(r => r.SpeedMps).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Pose.YawRateRadps, rows.Select(r => r.YawRateRadps).ToArray())).ConfigureAwait(false);
 
         return rows.Count;
     }
 
-    private static int WriteImu(string filePath, string outputDirectory)
+    private static async Task<int> WriteImuAsync(string filePath, string outputDirectory)
     {
         var rows = LegacyImuCsvParser.Parse(filePath);
         if (rows.Count == 0)
@@ -662,32 +656,32 @@ public sealed class LegacyDataMigrator
             return 0;
         }
 
-        using var stream = CreateParquetStream(outputDirectory, "imu.parquet");
-        using var writer = new ParquetWriter(TelemetrySchemas.Imu.Schema, stream);
-        using var rowGroup = writer.CreateRowGroup(rows.Count);
+        await using var stream = CreateParquetStream(outputDirectory, "imu.parquet");
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Imu.Schema, stream).ConfigureAwait(false);
+        using var rowGroup = writer.CreateRowGroup();
 
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.Sequence, rows.Select(r => r.Sequence).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.Frame, rows.Select(r => r.Frame).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.Source, rows.Select(r => r.Source).ToArray()));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Imu.JobId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Imu.SeasonId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Imu.SessionId, rows.Count));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.AccelXMps2, rows.Select(r => r.AccelXMps2).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.AccelYMps2, rows.Select(r => r.AccelYMps2).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.AccelZMps2, rows.Select(r => r.AccelZMps2).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.GyroXRadps, rows.Select(r => r.GyroXRadps).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.GyroYRadps, rows.Select(r => r.GyroYRadps).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.GyroZRadps, rows.Select(r => r.GyroZRadps).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.MagXUt, rows.Select(r => r.MagXUt).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.MagYUt, rows.Select(r => r.MagYUt).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.MagZUt, rows.Select(r => r.MagZUt).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Imu.TemperatureC, rows.Select(r => r.TemperatureC).ToArray()));
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.Timestamp, rows.Select(r => r.TimestampUtc).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.Frame, rows.Select(r => r.Frame).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.Source, rows.Select(r => r.Source).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Imu.JobId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Imu.SeasonId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Imu.SessionId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.AccelXMps2, rows.Select(r => r.AccelXMps2).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.AccelYMps2, rows.Select(r => r.AccelYMps2).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.AccelZMps2, rows.Select(r => r.AccelZMps2).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.GyroXRadps, rows.Select(r => r.GyroXRadps).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.GyroYRadps, rows.Select(r => r.GyroYRadps).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.GyroZRadps, rows.Select(r => r.GyroZRadps).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.MagXUt, rows.Select(r => r.MagXUt).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.MagYUt, rows.Select(r => r.MagYUt).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.MagZUt, rows.Select(r => r.MagZUt).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Imu.TemperatureC, rows.Select(r => r.TemperatureC).ToArray())).ConfigureAwait(false);
 
         return rows.Count;
     }
 
-    private static int WriteCan(string filePath, string outputDirectory)
+    private static async Task<int> WriteCanAsync(string filePath, string outputDirectory)
     {
         var rows = LegacyCanCsvParser.Parse(filePath);
         if (rows.Count == 0)
@@ -695,26 +689,26 @@ public sealed class LegacyDataMigrator
             return 0;
         }
 
-        using var stream = CreateParquetStream(outputDirectory, "can.parquet");
-        using var writer = new ParquetWriter(TelemetrySchemas.Can.Schema, stream);
-        using var rowGroup = writer.CreateRowGroup(rows.Count);
+        await using var stream = CreateParquetStream(outputDirectory, "can.parquet");
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Can.Schema, stream).ConfigureAwait(false);
+        using var rowGroup = writer.CreateRowGroup();
 
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.Sequence, rows.Select(r => r.Sequence).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.Frame, rows.Select(r => r.Frame).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.Source, rows.Select(r => r.Source).ToArray()));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Can.JobId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Can.SeasonId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Can.SessionId, rows.Count));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.ArbitrationId, rows.Select(r => r.ArbitrationId).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.Payload, rows.Select(r => r.Payload).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.IsExtendedId, rows.Select(r => r.IsExtendedId).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Can.IsRemoteRequest, rows.Select(r => r.IsRemoteRequest).ToArray()));
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Can.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Can.Timestamp, rows.Select(r => r.TimestampUtc).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Can.Frame, rows.Select(r => r.Frame).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Can.Source, rows.Select(r => r.Source).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Can.JobId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Can.SeasonId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Can.SessionId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Can.ArbitrationId, rows.Select(r => r.ArbitrationId).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Can.Payload, rows.Select(r => r.Payload).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Can.IsExtendedId, rows.Select(r => r.IsExtendedId).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Can.IsRemoteRequest, rows.Select(r => r.IsRemoteRequest).ToArray())).ConfigureAwait(false);
 
         return rows.Count;
     }
 
-    private static int WriteSections(string filePath, string outputDirectory)
+    private static async Task<int> WriteSectionsAsync(string filePath, string outputDirectory)
     {
         var rows = LegacySectionCsvParser.Parse(filePath);
         if (rows.Count == 0)
@@ -722,24 +716,24 @@ public sealed class LegacyDataMigrator
             return 0;
         }
 
-        using var stream = CreateParquetStream(outputDirectory, "io.parquet");
-        using var writer = new ParquetWriter(TelemetrySchemas.Io.Schema, stream);
-        using var rowGroup = writer.CreateRowGroup(rows.Count);
+        await using var stream = CreateParquetStream(outputDirectory, "io.parquet");
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Io.Schema, stream).ConfigureAwait(false);
+        using var rowGroup = writer.CreateRowGroup();
 
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.Sequence, rows.Select(r => r.Sequence).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.Frame, rows.Select(r => r.Frame).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.Source, rows.Select(r => r.Source).ToArray()));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Io.JobId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Io.SeasonId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Io.SessionId, rows.Count));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.SectionCount, rows.Select(r => r.SectionCount).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Io.Mask, rows.Select(r => r.Mask).ToArray()));
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Io.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Io.Timestamp, rows.Select(r => r.TimestampUtc).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Io.Frame, rows.Select(r => r.Frame).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Io.Source, rows.Select(r => r.Source).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Io.JobId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Io.SeasonId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Io.SessionId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Io.SectionCount, rows.Select(r => r.SectionCount).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Io.Mask, rows.Select(r => r.Mask).ToArray())).ConfigureAwait(false);
 
         return rows.Count;
     }
 
-    private static int WritePlugin(string filePath, string outputDirectory)
+    private static async Task<int> WritePluginAsync(string filePath, string outputDirectory)
     {
         var rows = LegacyPluginCsvParser.Parse(filePath);
         if (rows.Count == 0)
@@ -747,24 +741,24 @@ public sealed class LegacyDataMigrator
             return 0;
         }
 
-        using var stream = CreateParquetStream(outputDirectory, "plugin.parquet");
-        using var writer = new ParquetWriter(TelemetrySchemas.Plugin.Schema, stream);
-        using var rowGroup = writer.CreateRowGroup(rows.Count);
+        await using var stream = CreateParquetStream(outputDirectory, "plugin.parquet");
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Plugin.Schema, stream).ConfigureAwait(false);
+        using var rowGroup = writer.CreateRowGroup();
 
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Sequence, rows.Select(r => r.Sequence).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Source, rows.Select(r => r.Source).ToArray()));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Plugin.JobId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Plugin.SeasonId, rows.Count));
-        rowGroup.WriteColumn(CreateEmptyStringColumn(TelemetrySchemas.Plugin.SessionId, rows.Count));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.PluginId, rows.Select(r => r.PluginId).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Topic, rows.Select(r => r.Topic).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Plugin.Payload, rows.Select(r => r.Payload).ToArray()));
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Plugin.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Plugin.Timestamp, rows.Select(r => r.TimestampUtc).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Plugin.Source, rows.Select(r => r.Source).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Plugin.JobId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Plugin.SeasonId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(CreateEmptyStringColumn(TelemetrySchemas.Plugin.SessionId, rows.Count)).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Plugin.PluginId, rows.Select(r => r.PluginId).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Plugin.Topic, rows.Select(r => r.Topic).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Plugin.Payload, rows.Select(r => r.Payload).ToArray())).ConfigureAwait(false);
 
         return rows.Count;
     }
 
-    private static int WriteWeather(string filePath, string outputDirectory)
+    private static async Task<int> WriteWeatherAsync(string filePath, string outputDirectory)
     {
         var rows = LegacyWeatherCsvParser.Parse(filePath);
         if (rows.Count == 0)
@@ -772,31 +766,31 @@ public sealed class LegacyDataMigrator
             return 0;
         }
 
-        using var stream = CreateParquetStream(outputDirectory, "weather.parquet");
-        using var writer = new ParquetWriter(TelemetrySchemas.Weather.Schema, stream);
-        using var rowGroup = writer.CreateRowGroup(rows.Count);
+        await using var stream = CreateParquetStream(outputDirectory, "weather.parquet");
+        using var writer = await ParquetWriter.CreateAsync(TelemetrySchemas.Weather.Schema, stream).ConfigureAwait(false);
+        using var rowGroup = writer.CreateRowGroup();
 
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.Sequence, rows.Select(r => r.Sequence).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.Timestamp, rows.Select(r => r.TimestampUtc).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.Source, rows.Select(r => r.Source).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.TemperatureC, rows.Select(r => r.TemperatureC).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.HumidityPct, rows.Select(r => r.HumidityPct).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WindKph, rows.Select(r => r.WindKph).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WindDirectionDeg, rows.Select(r => r.WindDirectionDeg).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WindGustKph, rows.Select(r => r.WindGustKph).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.RainfallMm, rows.Select(r => r.RainfallMm).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.PressureKpa, rows.Select(r => r.PressureKpa).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.DewPointC, rows.Select(r => r.DewPointC).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.WetBulbC, rows.Select(r => r.WetBulbC).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.DeltaTC, rows.Select(r => r.DeltaTC).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.EvapotranspirationMm, rows.Select(r => r.EvapotranspirationMm).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.SolarIrradianceWm2, rows.Select(r => r.SolarIrradianceWm2).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.UvIndex, rows.Select(r => r.UvIndex).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.CloudCoverPct, rows.Select(r => r.CloudCoverPct).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.VisibilityKm, rows.Select(r => r.VisibilityKm).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.SoilTempC, rows.Select(r => r.SoilTempC).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.SoilMoisturePct, rows.Select(r => r.SoilMoisturePct).ToArray()));
-        rowGroup.WriteColumn(new DataColumn(TelemetrySchemas.Weather.LeafWetnessPct, rows.Select(r => r.LeafWetnessPct).ToArray()));
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.Sequence, rows.Select(r => r.Sequence).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.Timestamp, rows.Select(r => r.TimestampUtc).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.Source, rows.Select(r => r.Source).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.TemperatureC, rows.Select(r => r.TemperatureC).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.HumidityPct, rows.Select(r => r.HumidityPct).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.WindKph, rows.Select(r => r.WindKph).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.WindDirectionDeg, rows.Select(r => r.WindDirectionDeg).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.WindGustKph, rows.Select(r => r.WindGustKph).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.RainfallMm, rows.Select(r => r.RainfallMm).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.PressureKpa, rows.Select(r => r.PressureKpa).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.DewPointC, rows.Select(r => r.DewPointC).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.WetBulbC, rows.Select(r => r.WetBulbC).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.DeltaTC, rows.Select(r => r.DeltaTC).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.EvapotranspirationMm, rows.Select(r => r.EvapotranspirationMm).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.SolarIrradianceWm2, rows.Select(r => r.SolarIrradianceWm2).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.UvIndex, rows.Select(r => r.UvIndex).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.CloudCoverPct, rows.Select(r => r.CloudCoverPct).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.VisibilityKm, rows.Select(r => r.VisibilityKm).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.SoilTempC, rows.Select(r => r.SoilTempC).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.SoilMoisturePct, rows.Select(r => r.SoilMoisturePct).ToArray())).ConfigureAwait(false);
+        await rowGroup.WriteColumnAsync(new DataColumn(TelemetrySchemas.Weather.LeafWetnessPct, rows.Select(r => r.LeafWetnessPct).ToArray())).ConfigureAwait(false);
 
         return rows.Count;
     }
@@ -922,7 +916,9 @@ public sealed class LegacyMigrationOptions
     }
 
     internal string ResolveLogsDirectory()
-        => Path.GetFullPath(Path.IsPathRooted(LogsDirectoryName) ? LogsDirectoryName : Path.Combine(InputDirectory, LogsDirectoryName));
+    {
+        return Path.GetFullPath(Path.IsPathRooted(LogsDirectoryName) ? LogsDirectoryName : Path.Combine(InputDirectory, LogsDirectoryName));
+    }
 
     internal string ResolveFieldHistoryPath()
         => Path.GetFullPath(Path.IsPathRooted(FieldHistoryFileName) ? FieldHistoryFileName : Path.Combine(InputDirectory, FieldHistoryFileName));
@@ -946,7 +942,7 @@ public sealed record LegacyMigrationReport(
     IReadOnlyList<string> SkippedFiles = null!)
 {
     public LegacyMigrationReport(string outputDirectory)
-        : this(outputDirectory, 0, 0, 0, 0, 0, 0, 0, 0, 0, Array.Empty<string>())
+        : this(outputDirectory, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Array.Empty<string>())
     {
     }
 };
@@ -1536,7 +1532,7 @@ internal static class TelemetrySchemas
     internal static class Pose
     {
         public static readonly DataField<ulong> Sequence = new("sequence");
-        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, true);
         public static readonly DataField<string?> Frame = new("frame");
         public static readonly DataField<string?> Source = new("source");
         public static readonly DataField<string?> JobId = new("job_id");
@@ -1550,7 +1546,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<double> PitchRad = new("pitch_rad");
         public static readonly DataField<double> SpeedMps = new("speed_mps");
         public static readonly DataField<double> YawRateRadps = new("yaw_rate_radps");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Frame,
@@ -1571,7 +1567,7 @@ internal static class TelemetrySchemas
     internal static class Imu
     {
         public static readonly DataField<ulong> Sequence = new("sequence");
-        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, true);
         public static readonly DataField<string?> Frame = new("frame");
         public static readonly DataField<string?> Source = new("source");
         public static readonly DataField<string?> JobId = new("job_id");
@@ -1587,7 +1583,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<double> MagYUt = new("mag_y_ut");
         public static readonly DataField<double> MagZUt = new("mag_z_ut");
         public static readonly DataField<double> TemperatureC = new("temperature_c");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Frame,
@@ -1610,7 +1606,7 @@ internal static class TelemetrySchemas
     internal static class Can
     {
         public static readonly DataField<ulong> Sequence = new("sequence");
-        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, true);
         public static readonly DataField<string?> Frame = new("frame");
         public static readonly DataField<string?> Source = new("source");
         public static readonly DataField<string?> JobId = new("job_id");
@@ -1620,7 +1616,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<byte[]?> Payload = new("payload");
         public static readonly DataField<bool> IsExtendedId = new("is_extended_id");
         public static readonly DataField<bool> IsRemoteRequest = new("is_remote_request");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Frame,
@@ -1637,7 +1633,7 @@ internal static class TelemetrySchemas
     internal static class Io
     {
         public static readonly DataField<ulong> Sequence = new("sequence");
-        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, true);
         public static readonly DataField<string?> Frame = new("frame");
         public static readonly DataField<string?> Source = new("source");
         public static readonly DataField<string?> JobId = new("job_id");
@@ -1645,7 +1641,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<string?> SessionId = new("session_id");
         public static readonly DataField<uint> SectionCount = new("section_count");
         public static readonly DataField<uint> Mask = new("mask");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Frame,
@@ -1660,7 +1656,7 @@ internal static class TelemetrySchemas
     internal static class Plugin
     {
         public static readonly DataField<ulong> Sequence = new("sequence");
-        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, true);
         public static readonly DataField<string?> Source = new("source");
         public static readonly DataField<string?> JobId = new("job_id");
         public static readonly DataField<string?> SeasonId = new("season_id");
@@ -1668,7 +1664,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<string> PluginId = new("plugin_id");
         public static readonly DataField<string> Topic = new("topic");
         public static readonly DataField<byte[]?> Payload = new("payload");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Source,
@@ -1683,7 +1679,7 @@ internal static class TelemetrySchemas
     internal static class Weather
     {
         public static readonly DataField<ulong> Sequence = new("sequence");
-        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, hasNulls: true);
+        public static readonly DateTimeDataField Timestamp = new("timestamp_utc", DateTimeFormat.DateAndTime, true);
         public static readonly DataField<string?> Source = new("source");
         public static readonly DataField<double?> TemperatureC = new("temperature_c");
         public static readonly DataField<double?> HumidityPct = new("humidity_pct");
@@ -1703,7 +1699,7 @@ internal static class TelemetrySchemas
         public static readonly DataField<double?> SoilTempC = new("soil_temp_c");
         public static readonly DataField<double?> SoilMoisturePct = new("soil_moisture_pct");
         public static readonly DataField<double?> LeafWetnessPct = new("leaf_wetness_pct");
-        public static readonly Schema Schema = new(
+        public static readonly ParquetSchema Schema = new(
             Sequence,
             Timestamp,
             Source,

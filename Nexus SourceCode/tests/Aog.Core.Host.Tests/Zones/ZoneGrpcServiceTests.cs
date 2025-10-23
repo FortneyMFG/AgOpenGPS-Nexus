@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
 using Aog.Core.Host.Zones;
@@ -150,16 +149,16 @@ public sealed class ZoneGrpcServiceTests
     {
         var ring = new[]
         {
-            new ZoneCoordinate(originX, originY),
-            new ZoneCoordinate(originX + size, originY),
-            new ZoneCoordinate(originX + size, originY + size),
-            new ZoneCoordinate(originX, originY + size),
-            new ZoneCoordinate(originX, originY),
+            new Aog.Core.Zones.ZoneCoordinate(originX, originY),
+            new Aog.Core.Zones.ZoneCoordinate(originX + size, originY),
+            new Aog.Core.Zones.ZoneCoordinate(originX + size, originY + size),
+            new Aog.Core.Zones.ZoneCoordinate(originX, originY + size),
+            new Aog.Core.Zones.ZoneCoordinate(originX, originY),
         };
 
-        var polygon = new ZonePolygon(new ZoneLinearRing(ring));
-        var buffers = new ZoneBuffers(1, 2);
-        return new ZoneDefinition(zoneId, ZoneType.Headland, zoneId, priority, enabled, polygon, buffers);
+        var polygon = new Aog.Core.Zones.ZonePolygon(new Aog.Core.Zones.ZoneLinearRing(ring));
+        var buffers = new Aog.Core.Zones.ZoneBuffers(1, 2);
+        return new ZoneDefinition(zoneId, Aog.Core.Zones.ZoneType.Headland, zoneId, priority, enabled, polygon, buffers);
     }
 
     private static (double OriginX, double OriginY, double Size) GetZoneDimensions(ZoneDefinition zone)
@@ -182,13 +181,14 @@ public sealed class ZoneGrpcServiceTests
             "ipv4:127.0.0.1",
             null,
             null,
-            null,
-            _ => Task.CompletedTask);
+            _ => Task.CompletedTask,
+            () => new WriteOptions(),
+            _ => { });
     }
 
     private sealed class RecordingStreamWriter<T> : IServerStreamWriter<T>
     {
-        private readonly Channel<T> _channel = Channel.CreateUnbounded<T>(new UnboundedChannelOptions
+        private readonly System.Threading.Channels.Channel<T> _channel = System.Threading.Channels.Channel.CreateUnbounded<T>(new System.Threading.Channels.UnboundedChannelOptions
         {
             SingleReader = false,
             SingleWriter = false,

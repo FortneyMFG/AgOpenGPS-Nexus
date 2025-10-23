@@ -161,7 +161,7 @@ public sealed class CoreEndpointResolver : ICoreEndpointResolver
         }
 
         var original = uri.ToString();
-        var lastSlash = original.LastIndexOf('/', StringComparison.Ordinal);
+        var lastSlash = original.LastIndexOf('/');
         if (lastSlash >= 0 && lastSlash < original.Length - 1)
         {
             return original[(lastSlash + 1)..];

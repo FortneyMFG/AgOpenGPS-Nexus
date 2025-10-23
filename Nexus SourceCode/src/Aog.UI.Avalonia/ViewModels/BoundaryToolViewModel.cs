@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Input;
 using Avalonia;
+using Avalonia.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -13,13 +14,26 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// </summary>
 public sealed class BoundaryToolViewModel : ObservableObject
 {
+    private const int OperationHistoryLimit = 12;
+
     private readonly ObservableCollection<BoundaryPolygonViewModel> _polygons;
     private readonly ReadOnlyObservableCollection<BoundaryPolygonViewModel> _polygonsView;
     private readonly ObservableCollection<BoundaryOperationViewModel> _operationJournal;
     private readonly ReadOnlyObservableCollection<BoundaryOperationViewModel> _operationJournalView;
+
+    private readonly DelegateCommand _simplifySelectedCommand;
+    private readonly DelegateCommand _mergeWithNextCommand;
+    private readonly DelegateCommand _captureBoundaryCommand;
+    private readonly DelegateCommand _exportShapefileCommand;
+    private readonly DelegateCommand _toggleLockCommand;
+    private readonly DelegateCommand _toggleVisibilityCommand;
+    private readonly DelegateCommand _startRecordingCommand;
+    private readonly DelegateCommand _stopRecordingCommand;
+
     private BoundaryPolygonViewModel? _selectedPolygon;
     private string _statusMessage = string.Empty;
     private DateTimeOffset? _lastOperation;
+    private bool _autoCloseBoundary;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BoundaryToolViewModel"/> class.
@@ -45,17 +59,23 @@ public sealed class BoundaryToolViewModel : ObservableObject
         BoundaryAreaHectares = boundaryAreaHectares;
         ExclusionAreaHectares = exclusionAreaHectares;
 
-        _polygons = new ObservableCollection<BoundaryPolygonViewModel>((polygons ?? Array.Empty<BoundaryPolygonViewModel>()).ToList());
+        _polygons = new ObservableCollection<BoundaryPolygonViewModel>(
+            (polygons ?? Array.Empty<BoundaryPolygonViewModel>()).ToList());
         _polygonsView = new ReadOnlyObservableCollection<BoundaryPolygonViewModel>(_polygons);
+
         _operationJournal = new ObservableCollection<BoundaryOperationViewModel>();
         _operationJournalView = new ReadOnlyObservableCollection<BoundaryOperationViewModel>(_operationJournal);
 
-        SimplifySelectedCommand = new DelegateCommand(_ => SimplifySelected(), _ => SelectedPolygon?.CanSimplify == true);
-        MergeWithNextCommand = new DelegateCommand(_ => MergeWithNext(), _ => CanMergeSelected());
-        CaptureBoundaryCommand = new DelegateCommand(_ => CaptureBoundary());
-        ExportShapefileCommand = new DelegateCommand(_ => ExportShapefile(), _ => _polygons.Count > 0);
-        ToggleLockCommand = new DelegateCommand(_ => ToggleLock(), _ => SelectedPolygon is not null);
-        ToggleVisibilityCommand = new DelegateCommand(_ => ToggleVisibility(), _ => SelectedPolygon is not null);
+        _simplifySelectedCommand = new DelegateCommand(_ => SimplifySelected(), _ => SelectedPolygon?.CanSimplify == true);
+        _mergeWithNextCommand = new DelegateCommand(_ => MergeWithNext(), _ => CanMergeSelected());
+        _captureBoundaryCommand = new DelegateCommand(_ => CaptureBoundary());
+        _exportShapefileCommand = new DelegateCommand(_ => ExportShapefile(), _ => _polygons.Count > 0);
+        _toggleLockCommand = new DelegateCommand(_ => ToggleLock(), _ => SelectedPolygon is not null);
+        _toggleVisibilityCommand = new DelegateCommand(_ => ToggleVisibility(), _ => SelectedPolygon is not null);
+        _startRecordingCommand = new DelegateCommand(_ => StartRecording());
+        _stopRecordingCommand = new DelegateCommand(_ => StopRecording());
+
+        UpdateCommandStates();
     }
 
     /// <summary>Gets the display name for the active field.</summary>
@@ -81,7 +101,7 @@ public sealed class BoundaryToolViewModel : ObservableObject
         {
             if (SetProperty(ref _selectedPolygon, value))
             {
-                RaiseCommandCanExecuteChanged();
+                UpdateCommandStates();
             }
         }
     }
@@ -100,26 +120,39 @@ public sealed class BoundaryToolViewModel : ObservableObject
         private set => SetProperty(ref _statusMessage, value);
     }
 
+    /// <summary>Gets or sets whether the boundary should be auto-closed.</summary>
+    public bool AutoCloseBoundary
+    {
+        get => _autoCloseBoundary;
+        set => SetProperty(ref _autoCloseBoundary, value);
+    }
+
+    /// <summary>Gets the command that starts boundary capture.</summary>
+    public DelegateCommand StartRecordingCommand => _startRecordingCommand;
+
+    /// <summary>Gets the command that stops boundary capture.</summary>
+    public DelegateCommand StopRecordingCommand => _stopRecordingCommand;
+
     /// <summary>Gets the command that simplifies the selected polygon.</summary>
-    public ICommand SimplifySelectedCommand { get; }
+    public DelegateCommand SimplifySelectedCommand => _simplifySelectedCommand;
 
     /// <summary>Gets the command that merges the selected polygon with the next compatible polygon.</summary>
-    public ICommand MergeWithNextCommand { get; }
+    public DelegateCommand MergeWithNextCommand => _mergeWithNextCommand;
 
-    /// <summary>Gets the command that captures the current boundary geometry.</summary>
-    public ICommand CaptureBoundaryCommand { get; }
+    /// <summary>Gets the command that captures a live boundary.</summary>
+    public DelegateCommand CaptureBoundaryCommand => _captureBoundaryCommand;
 
     /// <summary>Gets the command that exports the boundary to a shapefile.</summary>
-    public ICommand ExportShapefileCommand { get; }
+    public DelegateCommand ExportShapefileCommand => _exportShapefileCommand;
 
     /// <summary>Gets the command that toggles the lock state for the selected polygon.</summary>
-    public ICommand ToggleLockCommand { get; }
+    public DelegateCommand ToggleLockCommand => _toggleLockCommand;
 
     /// <summary>Gets the command that toggles visibility for the selected polygon.</summary>
-    public ICommand ToggleVisibilityCommand { get; }
+    public DelegateCommand ToggleVisibilityCommand => _toggleVisibilityCommand;
 
     /// <summary>
-    /// Creates a sample boundary tool view-model for design-time usage.
+    /// Creates a sample view-model instance for design-time usage.
     /// </summary>
     public static BoundaryToolViewModel CreateSample()
     {
@@ -159,12 +192,32 @@ public sealed class BoundaryToolViewModel : ObservableObject
                 coverageShare: 0.08),
         };
 
-        return new BoundaryToolViewModel("East Ridge", 28.42, 2.6, polygons)
+        var viewModel = new BoundaryToolViewModel("East Ridge", 28.42, 2.6, polygons)
         {
-            SelectedPolygon = polygons.FirstOrDefault(),
-            StatusMessage = "Captured boundary from recorded coverage at 14:32.",
-            LastOperation = DateTimeOffset.UtcNow.AddMinutes(-12),
+            AutoCloseBoundary = true,
         };
+
+        viewModel.SelectedPolygon = polygons.FirstOrDefault();
+
+        var timestamp = DateTimeOffset.UtcNow.AddMinutes(-12);
+        viewModel._operationJournal.Add(new BoundaryOperationViewModel("Captured", "Field Boundary", "Imported from recorded coverage.", timestamp));
+        viewModel.LastOperation = timestamp;
+        viewModel.StatusMessage = "Captured boundary from recorded coverage at 14:32.";
+        viewModel.UpdateCommandStates();
+
+        return viewModel;
+    }
+
+    private void StartRecording()
+    {
+        StatusMessage = "Started recording boundary capture.";
+        RecordOperation("Start", "Recording", "Began capturing new boundary.");
+    }
+
+    private void StopRecording()
+    {
+        StatusMessage = "Stopped recording boundary capture.";
+        RecordOperation("Stop", "Recording", "Stopped boundary capture.");
     }
 
     private void SimplifySelected()
@@ -174,11 +227,12 @@ public sealed class BoundaryToolViewModel : ObservableObject
             return;
         }
 
-        var removed = SelectedPolygon.Simplify();
-        RecordOperation("Simplified", SelectedPolygon.DisplayName, $"Removed {removed} vertices using 2.5 m tolerance.");
-        StatusMessage = $"Simplified '{SelectedPolygon.DisplayName}' and removed {removed} vertices.";
-        LastOperation = DateTimeOffset.UtcNow;
-        RaiseCommandCanExecuteChanged();
+        var removedVertices = SelectedPolygon.Simplify();
+        RecordOperation("Simplified", SelectedPolygon.DisplayName, $"Removed {removedVertices} vertices.");
+        StatusMessage = removedVertices > 0
+            ? $"Simplified '{SelectedPolygon.DisplayName}' (removed {removedVertices} vertices)."
+            : $"'{SelectedPolygon.DisplayName}' already optimal.";
+        UpdateCommandStates();
     }
 
     private bool CanMergeSelected()
@@ -188,8 +242,15 @@ public sealed class BoundaryToolViewModel : ObservableObject
             return false;
         }
 
-        var candidateIndex = _polygons.IndexOf(SelectedPolygon);
-        return candidateIndex >= 0 && _polygons.Skip(candidateIndex + 1).Any(p => p.IsInclusion == SelectedPolygon.IsInclusion);
+        var currentIndex = _polygons.IndexOf(SelectedPolygon);
+        if (currentIndex < 0)
+        {
+            return false;
+        }
+
+        return _polygons
+            .Skip(currentIndex + 1)
+            .Any(p => p.IsInclusion == SelectedPolygon.IsInclusion);
     }
 
     private void MergeWithNext()
@@ -199,13 +260,15 @@ public sealed class BoundaryToolViewModel : ObservableObject
             return;
         }
 
-        var candidateIndex = _polygons.IndexOf(SelectedPolygon);
-        if (candidateIndex < 0)
+        var currentIndex = _polygons.IndexOf(SelectedPolygon);
+        if (currentIndex < 0)
         {
             return;
         }
 
-        var partner = _polygons.Skip(candidateIndex + 1).FirstOrDefault(p => p.IsInclusion == SelectedPolygon.IsInclusion);
+        var partner = _polygons
+            .Skip(currentIndex + 1)
+            .FirstOrDefault(p => p.IsInclusion == SelectedPolygon.IsInclusion);
         if (partner is null)
         {
             return;
@@ -213,35 +276,35 @@ public sealed class BoundaryToolViewModel : ObservableObject
 
         SelectedPolygon.MergeWith(partner);
         _polygons.Remove(partner);
+
         RecordOperation("Merged", SelectedPolygon.DisplayName, $"Merged with '{partner.DisplayName}'.");
         StatusMessage = $"Merged '{SelectedPolygon.DisplayName}' with '{partner.DisplayName}'.";
-        LastOperation = DateTimeOffset.UtcNow;
-        RaiseCommandCanExecuteChanged();
+        UpdateCommandStates();
     }
 
     private void CaptureBoundary()
     {
         var newPolygon = new BoundaryPolygonViewModel(
-            displayName: $"Capture {_polygons.Count + 1}",
+            $"Capture {_polygons.Count + 1}",
             isInclusion: true,
             areaHectares: 0.42,
             perimeterMeters: 138,
             vertexCount: 58,
             centroid: new Point(-6 + _polygons.Count, 4 + _polygons.Count),
             coverageShare: 0.21);
+
         _polygons.Add(newPolygon);
         SelectedPolygon = newPolygon;
-        RecordOperation("Captured", newPolygon.DisplayName, "Created from live coverage capture.");
+
+        RecordOperation("Capture", newPolygon.DisplayName, "Created from live coverage capture.");
         StatusMessage = $"Captured '{newPolygon.DisplayName}' from live coverage.";
-        LastOperation = DateTimeOffset.UtcNow;
-        RaiseCommandCanExecuteChanged();
+        UpdateCommandStates();
     }
 
     private void ExportShapefile()
     {
-        RecordOperation("Exported", FieldName, "Exported boundary package to SHP/PRJ pair.");
-        StatusMessage = "Exported shapefile package to disk.";
-        LastOperation = DateTimeOffset.UtcNow;
+        RecordOperation("Export", FieldName, "Exported boundary package to SHP/PRJ pair.");
+        StatusMessage = "Exported boundary shapefile package to disk.";
     }
 
     private void ToggleLock()
@@ -253,9 +316,9 @@ public sealed class BoundaryToolViewModel : ObservableObject
 
         SelectedPolygon.IsLocked = !SelectedPolygon.IsLocked;
         var state = SelectedPolygon.IsLocked ? "locked" : "unlocked";
+
         RecordOperation("Lock", SelectedPolygon.DisplayName, $"Polygon {state}.");
         StatusMessage = $"{SelectedPolygon.DisplayName} is now {state}.";
-        LastOperation = DateTimeOffset.UtcNow;
     }
 
     private void ToggleVisibility()
@@ -267,44 +330,31 @@ public sealed class BoundaryToolViewModel : ObservableObject
 
         SelectedPolygon.IsVisible = !SelectedPolygon.IsVisible;
         var state = SelectedPolygon.IsVisible ? "visible" : "hidden";
+
         RecordOperation("Visibility", SelectedPolygon.DisplayName, $"Polygon marked {state}.");
         StatusMessage = $"{SelectedPolygon.DisplayName} marked {state}.";
-        LastOperation = DateTimeOffset.UtcNow;
     }
 
     private void RecordOperation(string action, string subject, string detail)
     {
         var entry = new BoundaryOperationViewModel(action, subject, detail, DateTimeOffset.UtcNow);
         _operationJournal.Insert(0, entry);
-        while (_operationJournal.Count > 12)
+
+        while (_operationJournal.Count > OperationHistoryLimit)
         {
             _operationJournal.RemoveAt(_operationJournal.Count - 1);
         }
 
-        OnPropertyChanged(nameof(OperationJournal));
+        LastOperation = entry.Timestamp;
     }
 
-    private void RaiseCommandCanExecuteChanged()
+    private void UpdateCommandStates()
     {
-        if (SimplifySelectedCommand is DelegateCommand simplify)
-        {
-            simplify.RaiseCanExecuteChanged();
-        }
-
-        if (MergeWithNextCommand is DelegateCommand merge)
-        {
-            merge.RaiseCanExecuteChanged();
-        }
-
-        if (ToggleLockCommand is DelegateCommand toggleLock)
-        {
-            toggleLock.RaiseCanExecuteChanged();
-        }
-
-        if (ToggleVisibilityCommand is DelegateCommand toggleVisibility)
-        {
-            toggleVisibility.RaiseCanExecuteChanged();
-        }
+        _simplifySelectedCommand.RaiseCanExecuteChanged();
+        _mergeWithNextCommand.RaiseCanExecuteChanged();
+        _exportShapefileCommand.RaiseCanExecuteChanged();
+        _toggleLockCommand.RaiseCanExecuteChanged();
+        _toggleVisibilityCommand.RaiseCanExecuteChanged();
     }
 }
 
@@ -313,6 +363,9 @@ public sealed class BoundaryToolViewModel : ObservableObject
 /// </summary>
 public sealed class BoundaryPolygonViewModel : ObservableObject
 {
+    private static readonly IBrush InclusionBrush = new SolidColorBrush(Color.FromUInt32(0xFF4CC2FF));
+    private static readonly IBrush ExclusionBrush = new SolidColorBrush(Color.FromUInt32(0xFFFFAA5C));
+
     private readonly double _originalPerimeter;
     private readonly int _originalVertexCount;
     private bool _isLocked;
@@ -373,6 +426,9 @@ public sealed class BoundaryPolygonViewModel : ObservableObject
 
     /// <summary>Gets a display string describing how the polygon is used.</summary>
     public string ModeDisplay => IsInclusion ? "Inclusion boundary" : "Exclusion zone";
+
+    /// <summary>Gets the brush used to render the polygon indicator.</summary>
+    public IBrush FillBrush => IsInclusion ? InclusionBrush : ExclusionBrush;
 
     /// <summary>Gets the polygon area in hectares.</summary>
     public double AreaHectares

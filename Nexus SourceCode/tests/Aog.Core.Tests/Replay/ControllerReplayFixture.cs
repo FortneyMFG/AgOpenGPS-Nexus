@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Core.Eventing;
 using Aog.Core.Logging;
 using Aog.Core.Replay;
 using Aog.Core.V1;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
 namespace Aog.Core.Tests.Replay;
@@ -68,7 +68,7 @@ internal static class ControllerReplayFixture
         {
             Header = CreateHeader(sequence++, "vehicle", "can", startTimestamp + TimeSpan.FromSeconds(2)),
             ArbitrationId = 0x18FF51,
-            Payload = ByteString.CopyFrom(new byte[] { 0x10, 0x20, 0x30, 0x40 }),
+            Payload = new byte[] { 0x10, 0x20, 0x30, 0x40 },
             IsExtendedId = true,
             IsRemoteRequest = false
         };
@@ -88,7 +88,7 @@ internal static class ControllerReplayFixture
             Header = CreateHeader(sequence++, "controller", "sim", startTimestamp + TimeSpan.FromSeconds(4)),
             PluginId = "controllers.guidance",
             Topic = "command",
-            Payload = ByteString.CopyFromUtf8(guidancePayload)
+            Payload = Encoding.UTF8.GetBytes(guidancePayload)
         };
         await bus.PublishAsync(guidanceCommand).ConfigureAwait(false);
 
@@ -98,7 +98,7 @@ internal static class ControllerReplayFixture
             Header = CreateHeader(sequence++, "controller", "sim", startTimestamp + TimeSpan.FromSeconds(5)),
             PluginId = "controllers.sections",
             Topic = "state",
-            Payload = ByteString.CopyFromUtf8(sectionsPayload)
+            Payload = Encoding.UTF8.GetBytes(sectionsPayload)
         };
         await bus.PublishAsync(sectionsCommand).ConfigureAwait(false);
 

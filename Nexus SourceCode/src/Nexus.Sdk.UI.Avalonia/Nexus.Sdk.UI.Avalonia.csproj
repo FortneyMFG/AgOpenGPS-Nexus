@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>Nexus.Sdk.UI</RootNamespace>
+    <PackageId>Nexus.Sdk.UI.Avalonia</PackageId>
+    <Description>UI extension contracts for Nexus Avalonia-based plugins.</Description>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Nexus.Sdk.Core\Nexus.Sdk.Core.csproj" />
+    <PackageReference Include="Avalonia" Version="11.3.7" />
+  </ItemGroup>
+</Project>

@@ -40,9 +40,11 @@ public sealed class RadioBridgeLoraAdapterTests
             await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
                 "publisher",
                 "Publisher",
-                Array.Empty<string>(),
-                new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
-                new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) })), CancellationToken.None);
+                ShareProfile: new MeshShareProfile(new[] { new MeshShareGrant("*", "*", MeshDataTier.All) }),
+                SubscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("*", "*", MeshDataTier.All) }))
+            {
+                Capabilities = Array.Empty<string>()
+            }, CancellationToken.None);
 
             await mesh.PublishAsync(new MeshPublishRequest(
                 "publisher",
@@ -96,9 +98,11 @@ public sealed class RadioBridgeLoraAdapterTests
             await mesh.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
                 "observer",
                 "Observer",
-                Array.Empty<string>(),
-                new MeshShareProfile(new[] { new MeshShareGrant("system", "radio-lora", MeshDataTier.All) }),
-                new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("system", "radio-lora", MeshDataTier.All) })), CancellationToken.None);
+                ShareProfile: new MeshShareProfile(new[] { new MeshShareGrant("system", "radio-lora", MeshDataTier.All) }),
+                SubscribeProfile: new MeshSubscribeProfile(new[] { new MeshSubscribeGrant("system", "radio-lora", MeshDataTier.All) }))
+            {
+                Capabilities = Array.Empty<string>()
+            }, CancellationToken.None);
 
             var diagnostics = mesh.SubscribeAsync(new MeshSubscriptionRequest("observer", "system", "radio-lora"));
             clock.Advance(TimeSpan.FromSeconds(1));

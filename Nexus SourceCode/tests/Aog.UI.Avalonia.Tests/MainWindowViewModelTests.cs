@@ -1,22 +1,33 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Aog.Core.Legacy;
+using Aog.Core.Paths;
+using Aog.Core.Simulation.Configuration;
 using Aog.Core.V1;
+using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Telemetry;
 using Aog.UI.Avalonia.Theming;
 using Aog.UI.Avalonia.ViewModels;
+using Aog.UI.Avalonia.ViewModels.Shell;
+using Aog.UI.Avalonia.Plugins;
 using Avalonia.Media;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Aog.UI.Avalonia.Tests;
 
 public sealed class MainWindowViewModelTests
 {
+    private static readonly DateTimeOffset SeedTimestamp = new(2024, 04, 01, 12, 00, 00, TimeSpan.Zero);
+
     [Fact]
     public void SimulationGraphSummary_ExposesEmbeddedGraph()
     {
@@ -86,6 +97,21 @@ public sealed class MainWindowViewModelTests
         viewModel.SteerDashboard.Series.Should().NotBeEmpty();
         viewModel.SteerDashboard.Series.SelectMany(series => series.Values).Should().NotBeEmpty();
         viewModel.SteerDashboard.TuningParameters.Should().NotBeEmpty();
+        viewModel.SteerDashboard.TuningEvents.Should().HaveCount(3);
+        viewModel.SteerDashboard.TuningEvents.Select(evt => evt.Timestamp)
+            .Should()
+            .Equal(
+                SeedTimestamp.AddMinutes(-1),
+                SeedTimestamp.AddMinutes(-2),
+                SeedTimestamp.AddMinutes(-5));
+        viewModel.SteerDashboard.TuningEvents.Select(evt => evt.Description)
+            .Should()
+            .Contain(new[]
+            {
+                "Adjusted P gain to 0.30 based on headland drift",
+                "Applied adaptive integral clamp after curve pass",
+                "Saved preset 'Spring Wheat 2024'",
+            });
         viewModel.ReplayTimeline.Bookmarks.Should().NotBeEmpty();
         viewModel.ReplayTimeline.SpeedSamples.Should().HaveCountGreaterThan(10);
     }
@@ -115,7 +141,7 @@ public sealed class MainWindowViewModelTests
         var viewModel = CreateViewModel();
 
         viewModel.FieldHealthSeverity.Should().NotBeNull();
-        viewModel.FieldHealthSeverity.LayerDisplayName.Should().Contain("Flood", StringComparison.OrdinalIgnoreCase);
+        viewModel.FieldHealthSeverity.LayerDisplayName.Should().ContainEquivalentOf("Flood");
         viewModel.FieldHealthSeverity.Entries.Should().HaveCountGreaterThan(3);
         viewModel.FieldHealthSeverity.Entries.Select(entry => entry.Severity)
             .Should().Contain(new[] { "Critical", "High", "Moderate", "Low", "None" });
@@ -144,9 +170,10 @@ public sealed class MainWindowViewModelTests
 
         snapshot.Dashboard.Series.Should().HaveCount(viewModel.SteerDashboard.Series.Count);
         var sourceSeries = viewModel.SteerDashboard.Series.Single(series => series.Id == "autosteer.crossTrack");
-        var snapshotSeries = snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack");
-        snapshotSeries.Values.Should().Equal(sourceSeries.Values);
-        snapshotSeries.StrokeColor.Should().Be(((ISolidColorBrush)sourceSeries.Stroke).Color.ToString());
+        snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack")
+            .Values.Should().Equal(sourceSeries.Values);
+        snapshot.Dashboard.Series.Single(series => series.Id == "autosteer.crossTrack")
+            .StrokeColor.Should().Be(((ISolidColorBrush)sourceSeries.Stroke).Color.ToString());
 
         snapshot.Dashboard.TuningParameters.Select(parameter => parameter.Id)
             .Should().BeEquivalentTo(viewModel.SteerDashboard.TuningParameters.Select(parameter => parameter.Id));
@@ -232,6 +259,34 @@ public sealed class MainWindowViewModelTests
     }
 
     [Fact]
+    public void ShellMenuItemTooltip_IncludesLocalOffset()
+    {
+        var originalTz = Environment.GetEnvironmentVariable("TZ");
+        try
+        {
+            Environment.SetEnvironmentVariable("TZ", "Asia/Seoul");
+            TimeZoneInfo.ClearCachedData();
+
+            var viewModel = CreateViewModel(out _);
+            var profileItem = viewModel.ShellMenuBar.FileMenu.Items.First();
+
+            profileItem.Command!.Execute(null);
+
+            var tooltip = profileItem.Tooltip;
+            tooltip.Should().Contain("Last invoked");
+
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTimeOffset.UtcNow);
+            var expectedOffset = string.Format(CultureInfo.InvariantCulture, "{0:+00\\:00;-00\\:00}", offset);
+            tooltip.Should().Contain(expectedOffset);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("TZ", originalTz);
+            TimeZoneInfo.ClearCachedData();
+        }
+    }
+
+    [Fact]
     public void TopToolbar_TogglesUpdateState()
     {
         var viewModel = CreateViewModel(out var dispatcher);
@@ -255,7 +310,65 @@ public sealed class MainWindowViewModelTests
             .Should().Contain("GPS");
     }
 
-    private static MainWindowViewModel CreateViewModel() => CreateViewModel(out _);
+    [Fact]
+    public void LegacyImportScenario_UpdatesScenarioCollection()
+    {
+        var viewModel = CreateViewModel();
+
+        var baselineCount = viewModel.CreateScenarioEditorViewModel().Scenarios.Count;
+        var importResult = CreateSampleLegacyImportResult();
+        var wizard = viewModel.CreateLegacyImportWizardViewModel();
+
+        SetImportResult(wizard, importResult);
+
+        wizard.TryApplyRoutes().Should().BeTrue();
+
+        var updatedEditor = viewModel.CreateScenarioEditorViewModel();
+        updatedEditor.Scenarios.Select(scenario => scenario.ScenarioId)
+            .Should().Contain(importResult.Scenario.ScenarioId);
+        updatedEditor.Scenarios.Should().HaveCount(baselineCount + 1);
+
+        SetImportResult(wizard, importResult);
+        wizard.TryApplyRoutes().Should().BeTrue();
+
+        var dedupedEditor = viewModel.CreateScenarioEditorViewModel();
+        dedupedEditor.Scenarios.Select(scenario => scenario.ScenarioId)
+            .Count(id => id == importResult.Scenario.ScenarioId)
+            .Should().Be(1);
+    }
+
+    private static MainWindowViewModel CreateViewModel() 
+    {
+        var connectionStore = new InMemoryConnectionSettingsStore();
+        var runModeService = new TestRunModeService();
+        var connection = new ConnectionSettingsViewModel(connectionStore, runModeService);
+        var preferencesStore = new InMemoryUiPreferencesStore();
+        var preferencesService = new UiPreferencesService(preferencesStore);
+        var catalog = new BlockCatalog(new IBlockProvider[] { new CoreBlockProvider() });
+        var layoutStore = new BlockLayoutStore(preferencesService, catalog);
+        var themeManager = new TestThemeManager();
+        var telemetryService = new TestCrashTelemetryService();
+        var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
+        var dispatcher = new RecordingShellCommandDispatcher();
+        var layout = new BlockLayoutViewModel(layoutStore, catalog, dispatcher, preferencesService);
+        var shell = new AppShellViewModel(layout);
+        var pluginRegistry = new PluginRegistry();
+        var pluginHost = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
+        var timeProvider = new FixedTimeProvider(SeedTimestamp);
+
+        return new MainWindowViewModel(
+            connection,
+            null,
+            preferencesService,
+            themeManager,
+            dispatcher,
+            pluginRegistry,
+            pluginHost,
+            shell,
+            telemetryViewModel,
+            timeProvider,
+            NullLogger<MainWindowViewModel>.Instance);
+    }
 
     private static MainWindowViewModel CreateViewModel(out RecordingShellCommandDispatcher dispatcher)
     {
@@ -264,11 +377,42 @@ public sealed class MainWindowViewModelTests
         var connection = new ConnectionSettingsViewModel(connectionStore, runModeService);
         var preferencesStore = new InMemoryUiPreferencesStore();
         var preferencesService = new UiPreferencesService(preferencesStore);
+        var catalog = new BlockCatalog(new IBlockProvider[] { new CoreBlockProvider() });
+        var layoutStore = new BlockLayoutStore(preferencesService, catalog);
         var themeManager = new TestThemeManager();
         var telemetryService = new TestCrashTelemetryService();
         var telemetryViewModel = new TelemetryPrivacyViewModel(telemetryService);
         dispatcher = new RecordingShellCommandDispatcher();
-        return new MainWindowViewModel(connection, null, preferencesService, themeManager, dispatcher, telemetryViewModel);
+        var layout = new BlockLayoutViewModel(layoutStore, catalog, dispatcher, preferencesService);
+        var shell = new AppShellViewModel(layout);
+        var pluginRegistry = new PluginRegistry();
+        var pluginHost = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
+
+        // Deterministic time for tests that assert relative timestamps.
+        var timeProvider = new FixedTimeProvider(SeedTimestamp);
+
+        return new MainWindowViewModel(
+            connection,
+            null,
+            preferencesService,
+            themeManager,
+            dispatcher,
+            pluginRegistry,
+            pluginHost,
+            shell,
+            telemetryViewModel,
+            timeProvider,
+            NullLogger<MainWindowViewModel>.Instance);
+    }
+
+    // Deterministic TimeProvider for stable tests.
+    private sealed class FixedTimeProvider : TimeProvider
+    {
+        private readonly DateTimeOffset _utcNow;
+
+        public FixedTimeProvider(DateTimeOffset utcNow) => _utcNow = utcNow;
+
+        public override DateTimeOffset GetUtcNow() => _utcNow;
     }
 
     private sealed class InMemoryConnectionSettingsStore : IConnectionSettingsStore
@@ -281,6 +425,78 @@ public sealed class MainWindowViewModelTests
         {
             _settings = settings.Clone();
         }
+    }
+
+    private class FakePreferencesService : IUiPreferencesService
+    {
+        private readonly UiPreferences _preferences;
+
+        public FakePreferencesService(UiPreferences preferences)
+        {
+            _preferences = preferences;
+        }
+
+        public UiPreferences GetPreferences() => _preferences.Clone();
+
+        public void UpdateTheme(UiTheme theme) { }
+
+        public void UpdateWindowPlacement(WindowPlacement placement) { }
+
+        public void UpdateTelemetryOptIn(bool isOptedIn) { }
+
+        public void UpdateRunMode(AvaloniaRunMode mode) { }
+
+        public void UpdateShellLayout(ShellLayoutPreferences layout)
+        {
+            _preferences.ShellLayout = layout.Clone();
+        }
+    }
+
+    private static void SetImportResult(LegacyImportWizardViewModel wizard, LegacyGuidanceImportResult result)
+    {
+        var field = typeof(LegacyImportWizardViewModel).GetField("_result", BindingFlags.Instance | BindingFlags.NonPublic);
+        if (field is null)
+        {
+            throw new InvalidOperationException("LegacyImportWizardViewModel._result field not found.");
+        }
+
+        field.SetValue(wizard, result);
+    }
+
+    private static LegacyGuidanceImportResult CreateSampleLegacyImportResult()
+    {
+        var abLines = new[]
+        {
+            new LegacyAbLinePlanar(
+                "Alpha",
+                new GeographicCoordinate(51.0, -114.0),
+                new GeographicCoordinate(51.001, -114.0),
+                new PlanarPoint(0, 0),
+                new PlanarPoint(10, 0),
+                0,
+                10),
+        };
+
+        var boundary = new[]
+        {
+            new PlanarPoint(0, 0),
+            new PlanarPoint(10, 0),
+            new PlanarPoint(10, 5),
+            new PlanarPoint(0, 5),
+        };
+
+        var scenario = new SimulationScenarioConfiguration(
+            "legacy:sample",
+            "Imported guidance",
+            new[] { new SimulationRouteConfiguration("pose", "legacy/udp/main_gps", "hardware") },
+            options: null);
+
+        return new LegacyGuidanceImportResult(
+            "SampleField",
+            new GeographicCoordinate(51.0, -114.0),
+            abLines,
+            boundary,
+            scenario);
     }
 
     private sealed class InMemoryUiPreferencesStore : IUiPreferencesStore
@@ -309,7 +525,7 @@ public sealed class MainWindowViewModelTests
         {
             _mode = mode;
             ModeChanged?.Invoke(this, new AvaloniaRunModeChangedEventArgs(mode));
-            return Task.FromResult(new RunModeChangeResult(mode, requiresRestart: false));
+            return Task.FromResult(new RunModeChangeResult(mode, false));
         }
     }
 
@@ -325,6 +541,7 @@ public sealed class MainWindowViewModelTests
             {
                 CurrentTheme = theme;
                 ThemeChanged?.Invoke(this, theme);
+            }
         }
     }
 
@@ -338,7 +555,6 @@ public sealed class MainWindowViewModelTests
             return ValueTask.FromResult(true);
         }
     }
-}
 
     private sealed class TestCrashTelemetryService : ICrashTelemetryService
     {
@@ -369,5 +585,10 @@ public sealed class MainWindowViewModelTests
         }
 
         public IReadOnlyList<CrashReportSummary> UploadPendingReports() => Array.Empty<CrashReportSummary>();
+    }
+
+    private sealed class NullServiceProvider : IServiceProvider
+    {
+        public object? GetService(Type serviceType) => null;
     }
 }

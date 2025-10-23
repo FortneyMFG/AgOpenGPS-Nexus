@@ -35,7 +35,7 @@ public sealed class AogLinkTranslatorTests
         var ack = new CommandAck
         {
             AcknowledgedSequence = envelope.Header.Sequence,
-            Status = AckStatus.AckStatusOk,
+            Status = AckStatus.Ok,
         };
 
         Assert.True(translator.TryHandleAck(ack, out var acknowledged));
@@ -65,7 +65,7 @@ public sealed class AogLinkTranslatorTests
 
     private static AogLinkTranslator CreateTranslator(TimeProvider? timeProvider = null)
     {
-        var identity = new AogLinkNodeIdentity("bridge", "0.1.0", NodeRole.NodeRoleHost, NodePriority.NodePriorityHigh);
+        var identity = new AogLinkNodeIdentity("bridge", "0.1.0", NodeRole.Host, NodePriority.High);
         return new AogLinkTranslator(identity, timeProvider ?? TimeProvider.System, NullLogger<AogLinkTranslator>.Instance);
     }
 }

@@ -115,7 +115,7 @@ public sealed class MeshRetentionStoreTests
             store.Record(publication);
         }
 
-        var query = new MeshRetentionQuery(seasonId: "season:a", tierMask: MeshDataTier.Coverage);
+        var query = new MeshRetentionQuery(SeasonId: "season:a", TierMask: MeshDataTier.Coverage);
         var results = store.Query(query);
 
         results.Should().HaveCount(1);

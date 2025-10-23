@@ -5,9 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <Deterministic>true</Deterministic>
+    <AvaloniaVersion>11.3.7</AvaloniaVersion>
     <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' and '$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-    <RepositoryRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</RepositoryRootDir>
-    <ContractsArtifactsDir>$(RepositoryRootDir)$(DirectorySeparatorChar)artifacts$(DirectorySeparatorChar)nuget</ContractsArtifactsDir>
+    <ContractsArtifactsDir>$(MSBuildThisFileDirectory)../artifacts/nuget</ContractsArtifactsDir>
     <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ContractsArtifactsDir)</RestoreAdditionalProjectSources>
     <AogAbstractionsBaseVersion>0.1.0</AogAbstractionsBaseVersion>
     <AogAbstractionsPackageVersion>0.1.*</AogAbstractionsPackageVersion>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Aog.Plugins.CostProfit;
+using Microsoft.Extensions.Time.Testing;
 using FluentAssertions;
 using Xunit;
 
@@ -95,8 +96,8 @@ public sealed class CostEntryOrchestrationServiceTests
         var drafts = new List<CostEntryDraft>
         {
             new(scope, CostCategory.Seed, 300m, "USD", "ops", recordId: "cost-batch-1"),
-            new(scope, CostCategory.Fertilizer, 180m, "USD", "ops", externalReference: "ERP-456"),
-            new(scope, CostCategory.Fertilizer, 180m, "USD", "ops", externalReference: "ERP-456")
+            new(scope, CostCategory.Chemistry, 180m, "USD", "ops", externalReference: "ERP-456"),
+            new(scope, CostCategory.Chemistry, 180m, "USD", "ops", externalReference: "ERP-456")
         };
 
         var records = service.ImportBatch(drafts);

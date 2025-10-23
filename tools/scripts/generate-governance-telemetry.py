@@ -444,8 +444,8 @@ def main() -> None:
     root = repo_root_from_script()
 
     tasks_path = root / "tasks.md"
-    manifest_root = root / "docs/plugins/manifests"
-    minutes_root = root / "docs/ADR/reviews"
+    manifest_root = root / "docs/development/SRS/appendices/samples/plugins"
+    minutes_root = root / "docs/development/SRS/sections/2X_System_Architecture/reviews"
 
     program_board = parse_program_board(tasks_path, args.section)
     dependency_digest = build_dependency_digest(manifest_root)

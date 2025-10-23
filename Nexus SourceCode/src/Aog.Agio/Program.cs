@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+
 using GenericHost = Microsoft.Extensions.Hosting.Host;
 
 namespace Aog.Agio;
@@ -43,8 +44,14 @@ public static class Program
         GenericHost.CreateDefaultBuilder(args ?? Array.Empty<string>())
             .ConfigureAppConfiguration((_, configurationBuilder) =>
             {
-                configurationBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                configurationBuilder.AddEnvironmentVariables(prefix: "NEXUS_");
+                Microsoft.Extensions.Configuration.JsonConfigurationExtensions.AddJsonFile(
+                    configurationBuilder,
+                    "appsettings.json",
+                    optional: true,
+                    reloadOnChange: true);
+                Microsoft.Extensions.Configuration.EnvironmentVariablesExtensions.AddEnvironmentVariables(
+                    configurationBuilder,
+                    prefix: "NEXUS_");
             })
             .UseSerilog((context, services, loggerConfiguration) =>
             {
@@ -95,6 +102,10 @@ public static class Program
                 services
                     .AddOptions<MeshTelemetryAggregatorOptions>()
                     .BindConfiguration("AgioHost:Mesh")
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
+                services
                     .AddOptions<LegacyMeshOptions>()
                     .BindConfiguration("AgioHost:LegacyMesh")
                     .ValidateDataAnnotations()

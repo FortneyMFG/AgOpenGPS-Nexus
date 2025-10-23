@@ -10,7 +10,7 @@ namespace Aog.UI.Avalonia.ViewModels;
 /// </summary>
 public sealed class SectionsPanelViewModel : ObservableObject
 {
-    private const int MaxSectionCount = 8;
+    private const int MaxSectionCount = 16;
 
     private readonly SectionToggleViewModel[] _sections;
     private int _sectionCount = MaxSectionCount;
@@ -174,7 +174,8 @@ public sealed class SectionsPanelViewModel : ObservableObject
             return 0;
         }
 
-        if (count >= 32)
+        const int bitWidth = sizeof(uint) * 8;
+        if (count >= bitWidth)
         {
             return mask;
         }

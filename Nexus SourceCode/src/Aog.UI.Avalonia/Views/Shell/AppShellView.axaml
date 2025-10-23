@@ -2,2269 +2,283 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
+             xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
+             xmlns:workspace="clr-namespace:Aog.UI.Avalonia.ViewModels"
              xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
-             xmlns:views="clr-namespace:Aog.UI.Avalonia.Views.Shell"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
-             x:DataType="vm:MainWindowViewModel"
+             xmlns:model="clr-namespace:Aog.UI.Avalonia.Models"
+             xmlns:mapping="clr-namespace:Aog.UI.Avalonia.Views.Mapping"
+             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
-
-  <DockPanel>
-    <Border DockPanel.Dock="Top"
-            Background="{DynamicResource ThemeBackgroundBrush}"
-            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-            BorderThickness="0,0,0,1"
-            Padding="12,8">
-      <Menu>
-        <views:FileMenuView DataContext="{Binding ShellMenuBar.FileMenu}"/>
-        <views:FieldMenuView DataContext="{Binding ShellMenuBar.FieldMenu}"/>
-        <views:ToolsMenuView DataContext="{Binding ShellMenuBar.ToolsMenu}"/>
-      </Menu>
-    </Border>
-
-    <Border DockPanel.Dock="Top"
-            Padding="12,8"
-            Background="{DynamicResource ThemeBackgroundBrush}"
-            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-            BorderThickness="0,0,0,1"
-            IsVisible="{Binding IsTopToolbarVisible}">
-      <views:TopToolbarView DataContext="{Binding TopToolbar}"/>
-    </Border>
-
-    <Border DockPanel.Dock="Bottom"
-            Background="{DynamicResource ThemeBackgroundBrush}"
-            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-            BorderThickness="0,1,0,0"
-            Padding="12,8">
-      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
-        <views:StatusStripView DataContext="{Binding StatusStrip}"/>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-          <ToggleSwitch Content="Top toolbar"
-                        IsChecked="{Binding IsTopToolbarVisible, Mode=TwoWay}"/>
-          <ToggleSwitch Content="Right panels"
-                        IsChecked="{Binding IsRightSidebarVisible, Mode=TwoWay}"/>
-        </StackPanel>
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <TextBlock Text="Theme" VerticalAlignment="Center"/>
-          <ComboBox ItemsSource="{Binding AvailableThemes}"
-                    SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
-                    Width="140"/>
-        </StackPanel>
-      </Grid>
-    </Border>
-
-    <Grid Margin="24">
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
-      </Grid.RowDefinitions>
-
-    <!-- Header -->
-    <Grid VerticalAlignment="Center">
-      <TextBlock Text="{Binding Title}" FontSize="28" FontWeight="Bold"/>
-    </Grid>
-
-    <!-- Content -->
-    <Grid Grid.Row="1" ColumnSpacing="24" Margin="0,24,0,0">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="{Binding MainWorkspaceColumnWidth}"/>
-        <ColumnDefinition Width="{Binding RightSidebarColumnWidth}"/>
-      </Grid.ColumnDefinitions>
-      <!-- Left: Map -->
-      <Border Grid.Column="0"
-              CornerRadius="12"
-              Background="{DynamicResource ThemeBackgroundBrush}"
-              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-              BorderThickness="1">
-        <Grid>
-          <controls:MapView VehiclePose="{Binding VehiclePose}"
-                            Layers="{Binding MapLayers}"
-                            GuidanceTracks="{Binding GuidanceTracks}"/>
-
-          <Border HorizontalAlignment="Left"
-                  VerticalAlignment="Top"
-                  Margin="16"
-                  Padding="16"
-                  MaxWidth="360"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  CornerRadius="10"
-                  DataContext="{Binding ZoneEditorToolbar}">
-            <StackPanel Spacing="12">
-              <StackPanel Spacing="4">
-                <TextBlock Text="Zone editor" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding ActiveLayerDisplayName}" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding SessionStatusDisplay}"
-                           TextWrapping="Wrap"
-                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-              </StackPanel>
-
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Start session" Command="{Binding StartSessionCommand}" MinWidth="110"/>
-                <Button Content="Commit edit" Command="{Binding CommitSessionCommand}" MinWidth="110"/>
-                <Button Content="Cancel" Command="{Binding CancelSessionCommand}" MinWidth="80"/>
-              </StackPanel>
-
-              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <Button Content="Undo" Command="{Binding UndoCommand}" MinWidth="80"/>
-                <Button Content="Redo" Command="{Binding RedoCommand}" MinWidth="80"/>
-                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding UndoCount, StringFormat=Undo: {0}}"
-                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding RedoCount, StringFormat=Redo: {0}}"
-                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-              </StackPanel>
-
-              <StackPanel Spacing="6">
-                <TextBlock Text="Tools" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding Tools}">
-                  <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                      <WrapPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                  </ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ZoneEditorToolOptionViewModel">
-                      <Border Margin="0,4,8,4"
-                              Padding="8"
-                              CornerRadius="8"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                              BorderThickness="1">
-                        <StackPanel Spacing="4">
-                          <Button Content="{Binding DisplayName}"
-                                  Command="{Binding SelectCommand}"
-                                  HorizontalAlignment="Stretch"
-                                  MinWidth="120">
-                            <Button.Styles>
-                              <Style Selector="Button">
-                                <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                  <Setter Property="Background" Value="#FF2D5D9F"/>
-                                  <Setter Property="Foreground" Value="White"/>
-                                </DataTrigger>
-                              </Style>
-                            </Button.Styles>
-                          </Button>
-                          <TextBlock Text="{Binding Description}"
-                                     FontSize="11"
-                                     TextWrapping="Wrap"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          <TextBlock Text="{Binding Shortcut, StringFormat=Shortcut: {0}}"
-                                     FontSize="10"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </StackPanel>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-
-              <StackPanel Spacing="6">
-                <TextBlock Text="Snapping &amp; inspectors" FontWeight="SemiBold"/>
-                <ToggleSwitch Content="Snap to field boundaries"
-                              IsChecked="{Binding SnapToFieldBoundaries, Mode=TwoWay}"/>
-                <ToggleSwitch Content="Snap to guidance lines"
-                              IsChecked="{Binding SnapToGuidance, Mode=TwoWay}"/>
-                <ToggleSwitch Content="Show attribute inspector"
-                              IsChecked="{Binding ShowAttributePanel, Mode=TwoWay}"/>
-              </StackPanel>
-
-              <Border Padding="8"
-                      CornerRadius="8"
-                      Background="{DynamicResource ThemeBackgroundBrush}"
-                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                      BorderThickness="1">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="Committed edits" FontWeight="SemiBold"/>
-                  <ScrollViewer MaxHeight="160">
-                    <ItemsControl ItemsSource="{Binding JournalEntries}">
-                      <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:ZoneEditorJournalEntryViewModel">
-                          <Border Padding="8"
-                                  Margin="0,4"
-                                  CornerRadius="6"
-                                  Background="{DynamicResource ThemeBackgroundBrush}"
-                                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                                  BorderThickness="1">
-                            <StackPanel Spacing="4">
-                              <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="{Binding Sequence, StringFormat=#{0}}"
-                                           FontWeight="SemiBold"/>
-                                <TextBlock Text="{Binding Tool}" FontWeight="SemiBold"/>
-                                <TextBlock Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}"
-                                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                              </StackPanel>
-                              <TextBlock Text="{Binding OperationSummary}" FontWeight="SemiBold"/>
-                              <TextBlock Text="{Binding DetailSummary}"
-                                         Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                         TextWrapping="Wrap"/>
-                            </StackPanel>
-                          </Border>
-                        </DataTemplate>
-                      </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                  </ScrollViewer>
-                </StackPanel>
-              </Border>
-
-              <TextBlock Text="{Binding StatusMessage}"
-                         TextWrapping="Wrap"
-                         Foreground="{DynamicResource ThemeForegroundBrush}"/>
-            </StackPanel>
-          </Border>
-
-          <Border HorizontalAlignment="Right"
-                  VerticalAlignment="Top"
-                  Margin="16"
-                  Padding="14"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  CornerRadius="10">
-            <StackPanel Spacing="10">
-              <TextBlock Text="Field tools" FontSize="16" FontWeight="SemiBold"/>
-              <TextBlock Text="Launch dialogs for boundary editing, flag management, and pose adjustments." TextWrapping="Wrap"
-                         Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-              <Button Content="Boundary tool" Click="OnOpenBoundaryTool" MinWidth="160"/>
-              <Button Content="Flag manager" Click="OnOpenFlagManager" MinWidth="160"/>
-              <Button Content="Shift position" Click="OnOpenShiftPosition" MinWidth="160"/>
-            </StackPanel>
-          </Border>
-        </Grid>
-      </Border>
-
-      <!-- Right: Info + Controls -->
-      <ScrollViewer Grid.Column="1" IsVisible="{Binding IsRightSidebarVisible}">
-        <StackPanel Spacing="16">
-          <TextBlock Text="{Binding PlatformDescription}" TextWrapping="Wrap"/>
-          <TextBlock Text="Use the mouse wheel to zoom and drag with the left mouse button to pan the map." TextWrapping="Wrap"/>
-          <TextBlock Text="The highlighted dot shows the current vehicle position and heading." TextWrapping="Wrap"/>
-
-          <!-- Device Manager compatibility -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding DeviceManagerCompatibility}"
-                  x:DataType="vm:DeviceManagerCompatibilityViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Spacing="4">
-                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                  <TextBlock Text="Device Manager compatibility" FontSize="20" FontWeight="SemiBold"/>
-                  <Border Padding="8,2"
-                          CornerRadius="6"
-                          Background="{DynamicResource ThemeBackgroundBrush}"
-                          BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                          BorderThickness="1">
-                    <TextBlock Text="{Binding SummaryTitle}" FontWeight="SemiBold"/>
-                  </Border>
-                </StackPanel>
-                <TextBlock Text="{Binding SummaryDescription}" TextWrapping="Wrap"/>
-                <TextBlock Text="{Binding DataSourceSummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-              </StackPanel>
-
-              <ItemsControl ItemsSource="{Binding Plugins}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:DeviceManagerCompatibilityPluginViewModel">
-                    <Border Padding="12"
-                            Margin="0,4"
-                            CornerRadius="8"
-                            Background="{DynamicResource ThemeBackgroundBrush}"
-                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                            BorderThickness="1">
-                      <StackPanel Spacing="8">
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                          <StackPanel Spacing="4">
-                            <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding PluginId}"
-                                       FontFamily="Consolas, Courier New, monospace"
-                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          </StackPanel>
-                          <StackPanel Grid.Column="1" Spacing="4" HorizontalAlignment="Right">
-                            <TextBlock Text="{Binding Version}"
-                                       FontFamily="Consolas, Courier New, monospace"
-                                       HorizontalAlignment="Right"/>
-                            <TextBlock Text="{Binding StateDisplay}"
-                                       HorizontalAlignment="Right"
-                                       FontWeight="SemiBold">
-                              <TextBlock.Styles>
-                                <Style Selector="TextBlock">
-                                  <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                                  <DataTrigger Binding="{Binding State}" Value="Warning">
-                                    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
-                                  </DataTrigger>
-                                  <DataTrigger Binding="{Binding State}" Value="Blocked">
-                                    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                                  </DataTrigger>
-                                </Style>
-                              </TextBlock.Styles>
-                            </TextBlock>
-                          </StackPanel>
-                        </Grid>
-
-                        <StackPanel Spacing="4">
-                          <TextBlock Text="Capabilities" FontWeight="SemiBold"/>
-                          <ItemsControl ItemsSource="{Binding Capabilities}">
-                            <ItemsControl.ItemsPanel>
-                              <ItemsPanelTemplate>
-                                <WrapPanel Spacing="6"/>
-                              </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                              <DataTemplate>
-                                <Border Padding="6,2"
-                                        CornerRadius="6"
-                                        Background="{DynamicResource ThemeBackgroundBrush}"
-                                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                                        BorderThickness="1"
-                                        Margin="0,2">
-                                  <TextBlock Text="{Binding}"
-                                             FontFamily="Consolas, Courier New, monospace"/>
-                                </Border>
-                              </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                          </ItemsControl>
-                        </StackPanel>
-
-                        <StackPanel Spacing="6">
-                          <TextBlock Text="Compatibility signals" FontWeight="SemiBold"/>
-                          <ItemsControl ItemsSource="{Binding Issues}">
-                            <ItemsControl.ItemTemplate>
-                              <DataTemplate x:DataType="vm:DeviceManagerCompatibilityIssueViewModel">
-                                <Border Padding="8"
-                                        CornerRadius="6"
-                                        Margin="0,2"
-                                        Background="{DynamicResource ThemeBackgroundBrush}"
-                                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                                        BorderThickness="1">
-                                  <StackPanel Spacing="4">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                      <Border Padding="6,2"
-                                              CornerRadius="6"
-                                              Background="{DynamicResource ThemeBackgroundBrush}"
-                                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                                              BorderThickness="1">
-                                        <TextBlock Text="{Binding ClassificationDisplay}" FontSize="11" FontWeight="SemiBold"/>
-                                      </Border>
-                                      <TextBlock Text="{Binding KindDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                                      <TextBlock Text="{Binding Identifier}"
-                                                 FontFamily="Consolas, Courier New, monospace"
-                                                 Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                                    </StackPanel>
-                                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
-                                  </StackPanel>
-                                </Border>
-                              </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            <ItemsControl.Styles>
-                              <Style Selector="ItemsControl">
-                                <Setter Property="IsVisible" Value="False"/>
-                                <DataTrigger Binding="{Binding HasIssues}" Value="True">
-                                  <Setter Property="IsVisible" Value="True"/>
-                                </DataTrigger>
-                              </Style>
-                            </ItemsControl.Styles>
-                          </ItemsControl>
-                          <TextBlock Text="No outstanding issues." Foreground="{DynamicResource ThemeForegroundLowBrush}">
-                            <TextBlock.Styles>
-                              <Style Selector="TextBlock">
-                                <Setter Property="IsVisible" Value="False"/>
-                                <DataTrigger Binding="{Binding HasIssues}" Value="False">
-                                  <Setter Property="IsVisible" Value="True"/>
-                                </DataTrigger>
-                              </Style>
-                            </TextBlock.Styles>
-                          </TextBlock>
-                        </StackPanel>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
-
-          <!-- Diagnostics workspace -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding DiagnosticsWorkspace}"
-                  x:DataType="vm:DiagnosticsWorkspaceViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Spacing="4">
-                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                  <TextBlock Text="Diagnostics workspace" FontSize="20" FontWeight="SemiBold"/>
-                  <Border Padding="8,2"
-                          CornerRadius="6"
-                          Background="{DynamicResource ThemeBackgroundBrush}"
-                          BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                          BorderThickness="1">
-                    <TextBlock Text="{Binding LastUpdatedDisplay}" FontSize="11"/>
-                  </Border>
-                </StackPanel>
-                <TextBlock Text="{Binding OverallSummary}" TextWrapping="Wrap"/>
-                <TextBlock Text="{Binding ConnectionSummary}"
-                           TextWrapping="Wrap"
-                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-              </StackPanel>
-
-              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                <StackPanel Spacing="6">
-                  <TextBlock Text="GPS" FontWeight="SemiBold"/>
-                  <StackPanel Spacing="2" DataContext="{Binding Gps}" x:DataType="vm:GpsDiagnosticsViewModel">
-                    <TextBlock Text="{Binding FixQuality}" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding PositionDisplay}"
-                               FontFamily="Consolas, Courier New, monospace"/>
-                    <TextBlock Text="{Binding AltitudeDisplay}"
-                               Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                    <TextBlock Text="{Binding SpeedDisplay}"
-                               Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                    <TextBlock Text="{Binding HeadingDisplay}"
-                               Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                    <TextBlock Text="{Binding CorrectionSummary}"
-                               Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  </StackPanel>
-                </StackPanel>
-
-                <StackPanel Grid.Column="1" Spacing="6">
-                  <TextBlock Text="Telemetry &amp; device health" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding TelemetrySummary}" TextWrapping="Wrap"/>
-                  <TextBlock Text="{Binding DeviceHealthSummary}" TextWrapping="Wrap"/>
-                </StackPanel>
-              </Grid>
-
-              <StackPanel Spacing="6">
-                <TextBlock Text="Network channels" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding NetworkChannelCollection}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:DiagnosticsChannelViewModel">
-                      <Border Padding="10"
-                              Margin="0,4"
-                              CornerRadius="8"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                              BorderThickness="1">
-                        <Border.Styles>
-                          <Style Selector="Border">
-                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsChannelHealth.Degraded}">
-                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsChannelHealth.Offline}">
-                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
-                            </DataTrigger>
-                          </Style>
-                        </Border.Styles>
-                        <StackPanel Spacing="4">
-                          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Transport}"
-                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                            <TextBlock Text="{Binding Endpoint}"
-                                       FontFamily="Consolas, Courier New, monospace"
-                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          </StackPanel>
-                          <StackPanel Orientation="Horizontal" Spacing="12">
-                            <TextBlock Text="{Binding StatusDisplay}" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding PacketLossPercent, StringFormat=Loss {0:0.0}%}"
-                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          </StackPanel>
-                        </StackPanel>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-
-              <StackPanel Spacing="6">
-                <TextBlock Text="AGiO loops" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding LoopCollection}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:AgioLoopViewModel">
-                      <Border Padding="10"
-                              Margin="0,4"
-                              CornerRadius="8"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                              BorderThickness="1">
-                        <Border.Styles>
-                          <Style Selector="Border">
-                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsLoopHealth.Warning}">
-                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Health}" Value="{x:Static vm:DiagnosticsLoopHealth.Degraded}">
-                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
-                            </DataTrigger>
-                          </Style>
-                        </Border.Styles>
-                        <StackPanel Spacing="4">
-                          <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="{Binding LoopId}" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Description}"
-                                       TextWrapping="Wrap"
-                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          </StackPanel>
-                          <TextBlock Text="{Binding StatusDisplay}"
-                                     FontFamily="Consolas, Courier New, monospace"/>
-                        </StackPanel>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-
-              <StackPanel Spacing="6">
-                <TextBlock Text="Serial profiles" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding SerialProfileCollection}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:AgioSerialProfileViewModel">
-                      <Border Padding="10"
-                              Margin="0,4"
-                              CornerRadius="8"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                              BorderThickness="1">
-                        <Border.Styles>
-                          <Style Selector="Border">
-                            <DataTrigger Binding="{Binding IsActive}" Value="True">
-                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
-                            </DataTrigger>
-                          </Style>
-                        </Border.Styles>
-                        <StackPanel Spacing="4">
-                          <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="{Binding DeviceLabel}" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Port}"
-                                       FontFamily="Consolas, Courier New, monospace"/>
-                          </StackPanel>
-                          <TextBlock Text="{Binding ConfigurationDisplay}"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          <TextBlock Text="{Binding Handshake}"
-                                     TextWrapping="Wrap"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          <TextBlock Text="{Binding Notes}"
-                                     TextWrapping="Wrap"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </StackPanel>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-
-              <StackPanel Spacing="6">
-                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                  <TextBlock Text="Recent events" FontWeight="SemiBold"/>
-                  <Border Padding="6,2"
-                          CornerRadius="6"
-                          Background="{DynamicResource ThemeBackgroundBrush}"
-                          BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                          BorderThickness="1">
-                    <TextBlock Text="{Binding LogSummary}"
-                               FontSize="11"
-                               TextWrapping="Wrap"/>
-                  </Border>
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding EventCollection}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:DiagnosticsEventViewModel">
-                      <Border Padding="10"
-                              Margin="0,4"
-                              CornerRadius="8"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                              BorderThickness="1">
-                        <Border.Styles>
-                          <Style Selector="Border">
-                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Warning}">
-                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Error}">
-                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static vm:DiagnosticsEventSeverity.Critical}">
-                              <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
-                            </DataTrigger>
-                          </Style>
-                        </Border.Styles>
-                        <StackPanel Spacing="4">
-                          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding TimestampDisplay}"
-                                       FontFamily="Consolas, Courier New, monospace"
-                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                            <Border Padding="6,2"
-                                    CornerRadius="6"
-                                    Background="{DynamicResource ThemeBackgroundBrush}"
-                                    BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                                    BorderThickness="1">
-                              <TextBlock Text="{Binding SeverityDisplay}" FontSize="11" FontWeight="SemiBold"/>
-                            </Border>
-                            <TextBlock Text="{Binding Source}" FontWeight="SemiBold"/>
-                          </StackPanel>
-                          <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
-                          <TextBlock Text="{Binding Remediation}"
-                                     TextWrapping="Wrap"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}">
-                            <TextBlock.Styles>
-                              <Style Selector="TextBlock">
-                                <Setter Property="IsVisible" Value="True"/>
-                                <DataTrigger Binding="{Binding Remediation}" Value="">
-                                  <Setter Property="IsVisible" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Remediation}" Value="{x:Null}">
-                                  <Setter Property="IsVisible" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Remediation}" Value="{x:Static sys:String.Empty}">
-                                  <Setter Property="IsVisible" Value="False"/>
-                                </DataTrigger>
-                              </Style>
-                            </TextBlock.Styles>
-                          </TextBlock>
-                        </StackPanel>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-            </StackPanel>
-          </Border>
-
-          <!-- Profit analytics -->
-          <!-- Layout diff viewer -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding ProfitAnalytics}"
-                  x:DataType="vm:ProfitAnalyticsViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Spacing="4">
-                <TextBlock Text="Profit analytics" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding ScopeSummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                <TextBlock Text="{Binding LayerId}" FontSize="12" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                <TextBlock Text="{Binding LastUpdatedDisplay}" FontSize="12" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-              </StackPanel>
-
-              <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="16">
-                <StackPanel Spacing="4">
-                  <TextBlock Text="Revenue" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding TotalRevenueDisplay}" FontSize="18" FontWeight="SemiBold"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Spacing="4">
-                  <TextBlock Text="Costs" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding TotalCostDisplay}" FontSize="18" FontWeight="SemiBold"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2" Spacing="4">
-                  <TextBlock Text="Net profit" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding NetProfitDisplay}" FontSize="18" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding MarginDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="3" Spacing="4">
-                  <TextBlock Text="Avg profit / ha" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding AverageProfitPerHectareDisplay}" FontSize="18" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding PositiveShareDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-              </Grid>
-
-              <StackPanel Spacing="4">
-                <TextBlock Text="Legend" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding Legend}">
-                  <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                      <UniformGrid Columns="3"/>
-                    </ItemsPanelTemplate>
-                  </ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ProfitLegendBandViewModel">
-                      <Border Padding="10" Margin="2"
-                              CornerRadius="6"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                              BorderThickness="1">
-                        <StackPanel Spacing="4">
-                          <Border Height="12" CornerRadius="4" Background="{Binding SwatchBrush}"/>
-                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
-                          <TextBlock Text="{Binding RangeDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </StackPanel>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-
-              <StackPanel Spacing="4">
-                <TextBlock Text="Hotspots" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding Breakdowns}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ProfitBreakdownViewModel">
-                      <Border Padding="12" Margin="0,4"
-                              CornerRadius="8"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                              BorderThickness="1">
-                        <Grid ColumnDefinitions="2*,*,*,*,*,*" ColumnSpacing="12">
-                          <TextBlock Text="{Binding ZoneName}" FontWeight="SemiBold"/>
-                          <TextBlock Grid.Column="1" Text="{Binding AreaDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          <TextBlock Grid.Column="2" Text="{Binding RevenueDisplay}"/>
-                          <TextBlock Grid.Column="3" Text="{Binding CostDisplay}"/>
-                          <TextBlock Grid.Column="4" Text="{Binding ProfitDisplay}" Foreground="{Binding ProfitBrush}" FontWeight="SemiBold"/>
-                          <TextBlock Grid.Column="5" Text="{Binding ProfitPerHectareDisplay}" Foreground="{Binding ProfitBrush}"/>
-                          <TextBlock Grid.Column="6" Text="{Binding MarginDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </Grid>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-
-              <StackPanel Spacing="4" IsVisible="{Binding HasAlerts}">
-                <TextBlock Text="Alerts" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding Alerts}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="x:String">
-                      <Border Padding="8" Margin="0,2"
-                              CornerRadius="6"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                              BorderThickness="1">
-                        <TextBlock Text="{Binding}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                  DataContext="{Binding LayoutDiff}"
-                  x:DataType="vm:LayoutDiffViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <TextBlock Text="Layout diff &amp; rollback" FontSize="20" FontWeight="SemiBold"/>
-                <Border Padding="8,2"
-                        CornerRadius="6"
-                        Background="{DynamicResource ThemeBackgroundBrush}"
-                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                        BorderThickness="1">
-                  <TextBlock Text="{Binding Candidate.ModeDisplay}" FontSize="12" FontWeight="SemiBold"/>
-                </Border>
-                <Border Padding="8,2"
-                        CornerRadius="6"
-                        Background="{DynamicResource ThemeBackgroundBrush}"
-                        BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                        BorderThickness="1"
-                        IsVisible="{Binding HasLinkedPreset}">
-                  <TextBlock Text="{Binding LinkedPresetName, StringFormat=Preset: {0}}" FontSize="12" FontWeight="SemiBold"/>
-                </Border>
-              </StackPanel>
-
-              <TextBlock Text="{Binding LayoutDisplayName}" FontSize="16" FontWeight="SemiBold"/>
-              <TextBlock Text="{Binding Candidate.Summary}" TextWrapping="Wrap"/>
-
-              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                <StackPanel Spacing="4">
-                  <TextBlock Text="Baseline" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding Baseline.VersionDisplay}" FontSize="13" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding Baseline.ModeDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding Baseline.UpdatedAtDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding Baseline.UpdatedByDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding Baseline.Summary}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Spacing="4">
-                  <TextBlock Text="Candidate" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding Candidate.VersionDisplay}" FontSize="13" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding Candidate.ModeDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding Candidate.UpdatedAtDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding Candidate.UpdatedByDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding Candidate.Summary}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-              </Grid>
-
-              <ItemsControl ItemsSource="{Binding Changes}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:LayoutDiffEntryViewModel">
-                    <Border Padding="12" Margin="0,4"
-                            CornerRadius="8"
-                            Background="{DynamicResource ThemeBackgroundBrush}"
-                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                            BorderThickness="1">
-                      <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                          <Border Padding="6,2"
-                                  CornerRadius="6"
-                                  Background="{DynamicResource ThemeBackgroundBrush}"
-                                  BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                                  BorderThickness="1">
-                            <TextBlock Text="{Binding ChangeKindDisplay}" FontSize="11" FontWeight="SemiBold"/>
-                          </Border>
-                          <TextBlock Text="{Binding ElementName}" FontWeight="SemiBold"/>
-                          <TextBlock Text="{Binding ImpactDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
-                        <Border Padding="8" CornerRadius="6" Background="#0F000000" IsVisible="{Binding HasRollbackNote}">
-                          <TextBlock Text="{Binding RollbackNote}" FontSize="11" TextWrapping="Wrap"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </Border>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-
-              <Border Padding="12" CornerRadius="8" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1">
-                <StackPanel Spacing="4">
-                  <TextBlock Text="{Binding ComparisonSummary}" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap">
-                    <TextBlock.Styles>
-                      <Style Selector="TextBlock">
-                        <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                        <DataTrigger Binding="{Binding IsRollbackPending}" Value="True">
-                          <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                        </DataTrigger>
-                      </Style>
-                    </TextBlock.Styles>
-                  </TextBlock>
-                  <TextBlock Text="{Binding BreakingChangeCount, StringFormat=High impact changes: {0}}"
-                             Foreground="{DynamicResource ThemeAccentBrush}">
-                    <TextBlock.Styles>
-                      <Style Selector="TextBlock">
-                        <Setter Property="IsVisible" Value="False"/>
-                        <DataTrigger Binding="{Binding HasBreakingChanges}" Value="True">
-                          <Setter Property="IsVisible" Value="True"/>
-                        </DataTrigger>
-                      </Style>
-                    </TextBlock.Styles>
-                  </TextBlock>
-                  <TextBlock Text="No high-impact changes detected." Foreground="{DynamicResource ThemeForegroundLowBrush}">
-                    <TextBlock.Styles>
-                      <Style Selector="TextBlock">
-                        <Setter Property="IsVisible" Value="False"/>
-                        <DataTrigger Binding="{Binding HasBreakingChanges}" Value="False">
-                          <Setter Property="IsVisible" Value="True"/>
-                        </DataTrigger>
-                      </Style>
-                    </TextBlock.Styles>
-                  </TextBlock>
-                </StackPanel>
-              </Border>
-
-              <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right">
-                <Button Content="Apply candidate" Command="{Binding ApplyCandidateCommand}" MinWidth="140"/>
-                <Button Content="Rollback to baseline" Command="{Binding RollbackCommand}" MinWidth="160"/>
-              </StackPanel>
-            </StackPanel>
-          </Border>
-
-          <!-- Mesh sharing panel -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding MeshSharePanel}"
-                  x:DataType="vm:MeshSharePanelViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Spacing="4">
-                <TextBlock Text="Mesh sharing" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-              </StackPanel>
-
-              <ItemsControl ItemsSource="{Binding Devices}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:MeshDeviceAccessViewModel">
-                    <Border Padding="12" Margin="0,4"
-                            CornerRadius="10"
-                            Background="{DynamicResource ThemeBackgroundBrush}"
-                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                            BorderThickness="1">
-                      <StackPanel Spacing="8">
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                          <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
-                          <TextBlock Text="{Binding DeviceId}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                          <TextBlock Text="{Binding PresenceDisplay}" FontWeight="SemiBold"/>
-                          <TextBlock Text="{Binding LastSeenDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding CapabilitySummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-
-                        <StackPanel Spacing="4" IsVisible="{Binding HasShareGrants}">
-                          <TextBlock Text="Shares" FontWeight="SemiBold"/>
-                          <ItemsControl ItemsSource="{Binding ShareGrants}">
-                            <ItemsControl.ItemTemplate>
-                              <DataTemplate x:DataType="vm:MeshAccessGrantViewModel">
-                                <Border Padding="8" Margin="0,2"
-                                        CornerRadius="6"
-                                        Background="{DynamicResource ThemeBackgroundBrush}"
-                                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                                        BorderThickness="1">
-                                  <StackPanel Spacing="2">
-                                    <TextBlock Text="{Binding ScopeDisplay}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding TierDisplay}"/>
-                                    <TextBlock Text="{Binding LayerDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding Note}" Foreground="{DynamicResource ThemeForegroundLowBrush}" FontSize="11" TextWrapping="Wrap" IsVisible="{Binding HasNote}"/>
-                                  </StackPanel>
-                                </Border>
-                              </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                          </ItemsControl>
-                        </StackPanel>
-
-                        <StackPanel Spacing="4" IsVisible="{Binding HasSubscribeGrants}">
-                          <TextBlock Text="Subscriptions" FontWeight="SemiBold"/>
-                          <ItemsControl ItemsSource="{Binding SubscribeGrants}">
-                            <ItemsControl.ItemTemplate>
-                              <DataTemplate x:DataType="vm:MeshAccessGrantViewModel">
-                                <Border Padding="8" Margin="0,2"
-                                        CornerRadius="6"
-                                        Background="{DynamicResource ThemeBackgroundBrush}"
-                                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                                        BorderThickness="1">
-                                  <StackPanel Spacing="2">
-                                    <TextBlock Text="{Binding ScopeDisplay}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding TierDisplay}"/>
-                                    <TextBlock Text="{Binding LayerDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding Note}" Foreground="{DynamicResource ThemeForegroundLowBrush}" FontSize="11" TextWrapping="Wrap" IsVisible="{Binding HasNote}"/>
-                                  </StackPanel>
-                                </Border>
-                              </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                          </ItemsControl>
-                        </StackPanel>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
-
-          <!-- Radio provisioning panel -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-<!-- Radio provisioning (operational: queue, profiles, audit) -->
-<Border Padding="16" CornerRadius="12"
-        Background="{DynamicResource ThemeBackgroundBrush}"
-        BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-        BorderThickness="1"
-        DataContext="{Binding RadioProvisioningPanel}"
-        x:DataType="vm:RadioProvisioningPanelViewModel">
-  <StackPanel Spacing="12">
-    <StackPanel Spacing="4">
-      <TextBlock Text="Radio provisioning" FontSize="20" FontWeight="SemiBold"/>
-      <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-      <TextBlock Text="{Binding NextActionDisplay}" TextWrapping="Wrap"/>
-    </StackPanel>
-
-    <StackPanel Spacing="6" IsVisible="{Binding HasDevices}">
-      <TextBlock Text="Provisioning queue" FontWeight="SemiBold"/>
-      <ItemsControl ItemsSource="{Binding Devices}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:RadioProvisioningDeviceViewModel">
-            <Border Padding="12" Margin="0,4"
-                    CornerRadius="10"
-                    Background="{DynamicResource ThemeBackgroundBrush}"
-                    BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                    BorderThickness="1">
-              <StackPanel Spacing="6">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding DeviceId}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding StatusDisplay}" FontWeight="SemiBold">
-                    <TextBlock.Styles>
-                      <Style Selector="TextBlock">
-                        <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
-                        <DataTrigger Binding="{Binding RequiresAttention}" Value="True">
-                          <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                        </DataTrigger>
-                      </Style>
-                    </TextBlock.Styles>
-                  </TextBlock>
-                </StackPanel>
-
-                <TextBlock Text="{Binding TransportDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                <TextBlock Text="{Binding SignalDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                <TextBlock Text="{Binding TopicGrantSummary}" TextWrapping="Wrap"/>
-
-                <ItemsControl ItemsSource="{Binding Steps}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:RadioProvisioningStepViewModel">
-                      <Border Padding="10" Margin="0,3"
-                              CornerRadius="8"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                              BorderThickness="1">
-                        <StackPanel Spacing="4">
-                          <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding StatusDisplay}">
-                              <TextBlock.Styles>
-                                <Style Selector="TextBlock">
-                                  <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
-                                  <DataTrigger Binding="{Binding IsInProgress}" Value="True">
-                                    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                                  </DataTrigger>
-                                  <DataTrigger Binding="{Binding IsError}" Value="True">
-                                    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                                  </DataTrigger>
-                                </Style>
-                              </TextBlock.Styles>
-                            </TextBlock>
-                            <TextBlock Text="{Binding TimestampDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          </StackPanel>
-                          <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                        </StackPanel>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <TextBlock Text="{Binding Note}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap" IsVisible="{Binding HasNote}"/>
-              </StackPanel>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </StackPanel>
-
-    <StackPanel Spacing="4" IsVisible="{Binding HasProfiles}">
-      <TextBlock Text="Provisioned keysets" FontWeight="SemiBold"/>
-      <ItemsControl ItemsSource="{Binding Profiles}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:RadioProvisioningProfileViewModel">
-            <Border Padding="10" Margin="0,3"
-                    CornerRadius="8"
-                    Background="{DynamicResource ThemeBackgroundBrush}"
-                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                    BorderThickness="1">
-              <StackPanel Spacing="4">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding CreatedAtDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-                <TextBlock Text="{Binding TransportDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                <TextBlock Text="{Binding ScopeDisplay}" TextWrapping="Wrap"/>
-                <TextBlock Text="{Binding FingerprintDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                <TextBlock Text="{Binding ReliabilityDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-              </StackPanel>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </StackPanel>
-
-    <StackPanel Spacing="4" IsVisible="{Binding HasAuditEntries}">
-      <TextBlock Text="Recent events" FontWeight="SemiBold"/>
-      <ItemsControl ItemsSource="{Binding AuditTrail}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:RadioProvisioningAuditEntryViewModel">
-            <Border Padding="10" Margin="0,3"
-                    CornerRadius="8"
-                    Background="{DynamicResource ThemeBackgroundBrush}"
-                    BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                    BorderThickness="1">
-              <StackPanel Spacing="4">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Text="{Binding Summary}" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding SeverityDisplay}">
-                    <TextBlock.Styles>
-                      <Style Selector="TextBlock">
-                        <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
-                        <DataTrigger Binding="{Binding IsWarning}" Value="True">
-                          <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                        </DataTrigger>
-                      </Style>
-                    </TextBlock.Styles>
-                  </TextBlock>
-                  <TextBlock Text="{Binding TimestampDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-                <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-              </StackPanel>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </StackPanel>
-  </StackPanel>
-</Border>
-
-<!-- Radio provisioning (flow/guidance: stages, steps, profile fields) -->
-<Border Padding="16" CornerRadius="12"
-        Background="{DynamicResource ThemeBackgroundBrush}"
-        BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-        BorderThickness="1"
-        DataContext="{Binding RadioProvisioning}"
-        x:DataType="vm:RadioProvisioningFlowViewModel">
-  <StackPanel Spacing="12">
-    <StackPanel Spacing="4">
-      <TextBlock Text="Radio provisioning (guide)" FontSize="20" FontWeight="SemiBold"/>
-      <TextBlock Text="{Binding Summary}" TextWrapping="Wrap"/>
-      <TextBlock Text="{Binding SecurityNote}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeAccentBrush}"/>
-      <TextBlock Text="{Binding DocumentationSummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-    </StackPanel>
-
-    <ItemsControl ItemsSource="{Binding Stages}">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate x:DataType="vm:RadioProvisioningStageViewModel">
-          <Border Padding="12" Margin="0,4"
-                  CornerRadius="8"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                  BorderThickness="1">
-            <StackPanel Spacing="8">
-              <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold"/>
-              <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-              <TextBlock Text="{Binding Callout}" Foreground="{DynamicResource ThemeForegroundLowBrush}" FontStyle="Italic">
-                <TextBlock.Styles>
-                  <Style Selector="TextBlock">
-                    <Setter Property="IsVisible" Value="False"/>
-                    <DataTrigger Binding="{Binding HasCallout}" Value="True">
-                      <Setter Property="IsVisible" Value="True"/>
-                    </DataTrigger>
-                  </Style>
-                </TextBlock.Styles>
-              </TextBlock>
-
-              <ItemsControl ItemsSource="{Binding Steps}" Margin="0,4,0,0">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:RadioProvisioningStepViewModel">
-                    <StackPanel Margin="0,4" Spacing="4">
-                      <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="•" FontWeight="Bold" VerticalAlignment="Top"/>
-                        <TextBlock Text="{Binding PrimaryText}" TextWrapping="Wrap"/>
-                      </StackPanel>
-                      <TextBlock Text="{Binding SecondaryText}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap">
-                        <TextBlock.Styles>
-                          <Style Selector="TextBlock">
-                            <Setter Property="IsVisible" Value="False"/>
-                            <DataTrigger Binding="{Binding HasSecondaryText}" Value="True">
-                              <Setter Property="IsVisible" Value="True"/>
-                            </DataTrigger>
-                          </Style>
-                        </TextBlock.Styles>
-                      </TextBlock>
-
-                      <Border Padding="8" Margin="22,0,0,0"
-                              CornerRadius="6"
-                              Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                              BorderThickness="1">
-                        <Border.Styles>
-                          <Style Selector="Border">
-                            <Setter Property="IsVisible" Value="False"/>
-                            <DataTrigger Binding="{Binding HasCommand}" Value="True">
-                              <Setter Property="IsVisible" Value="True"/>
-                            </DataTrigger>
-                          </Style>
-                        </Border.Styles>
-                        <TextBlock Text="{Binding Command}"
-                                   TextWrapping="Wrap"
-                                   FontFamily="Consolas, Courier New, monospace"
-                                   xml:space="preserve"/>
-                      </Border>
-                    </StackPanel>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
-
-    <StackPanel Spacing="8">
-      <TextBlock Text="Provisioning profile fields" FontSize="16" FontWeight="SemiBold"/>
-      <TextBlock Text="{Binding ProfileSchemaSummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-      <ItemsControl ItemsSource="{Binding ProfileFields}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:RadioProvisioningProfileFieldViewModel">
-            <Border Padding="10" Margin="0,4"
-                    CornerRadius="8"
-                    Background="{DynamicResource ThemeBackgroundBrush}"
-                    BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                    BorderThickness="1">
-              <StackPanel Spacing="4">
-                <TextBlock Text="{Binding Field}" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding Description}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-              </StackPanel>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </StackPanel>
-  </StackPanel>
-</Border>
-
-                        </StackPanel>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-            </StackPanel>
-          </Border>
-
-          <!-- Layer legend -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding LayerLegend}" x:DataType="vm:LayerLegendViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Spacing="4">
-                <TextBlock Text="Layer legend" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="Legend entries derive from the layer registry metadata and update automatically when plugins publish new layers." TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-              </StackPanel>
-
-              <ItemsControl ItemsSource="{Binding Entries}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:LayerLegendEntryViewModel">
-                    <Border Padding="12"
-                            Margin="0,4"
-                            CornerRadius="8"
-                            Background="{DynamicResource ThemeBackgroundBrush}"
-                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                            BorderThickness="1">
-                      <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                          <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
-                          <Border Padding="6,2"
-                                  CornerRadius="6"
-                                  Background="{DynamicResource ThemeBackgroundBrush}"
-                                  BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                                  BorderThickness="1">
-                            <TextBlock Text="{Binding ModeDisplay}" FontSize="11" FontWeight="SemiBold"/>
-                          </Border>
-                        </StackPanel>
-                        <Border Height="16" CornerRadius="6" Background="{Binding GradientBrush}"/>
-                        <TextBlock Text="{Binding RangeDisplay}" FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
-
-          <!-- Field health severity -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding FieldHealthSeverity}" x:DataType="vm:FieldHealthSeverityPanelViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Spacing="4">
-                <TextBlock Text="Field health severity" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-              </StackPanel>
-
-              <WrapPanel Orientation="Horizontal">
-                <StackPanel Margin="0,0,24,8">
-                  <TextBlock Text="Layer" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding LayerDisplayName}" FontWeight="SemiBold"/>
-                </StackPanel>
-                <StackPanel Margin="0,0,24,8">
-                  <TextBlock Text="Impacted area" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding TotalAreaDisplay}" FontWeight="SemiBold"/>
-                </StackPanel>
-                <StackPanel Margin="0,0,24,8">
-                  <TextBlock Text="Last scouted" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding LastSurveyedDisplay}" FontWeight="SemiBold"/>
-                </StackPanel>
-                <StackPanel Margin="0,0,24,8">
-                  <TextBlock Text="Observer" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding ObserverDisplay}" FontWeight="SemiBold"/>
-                </StackPanel>
-                <StackPanel Margin="0,0,24,8">
-                  <TextBlock Text="History filters" FontSize="11" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding FilterSummary}" FontWeight="SemiBold"/>
-                </StackPanel>
-              </WrapPanel>
-
-              <ItemsControl ItemsSource="{Binding Entries}" IsVisible="{Binding HasEntries}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <StackPanel Spacing="8"/>
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:FieldHealthSeverityEntryViewModel">
-                    <Border Padding="12"
-                            CornerRadius="8"
-                            Background="{DynamicResource ThemeBackgroundBrush}"
-                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                            BorderThickness="1">
-                      <StackPanel Spacing="8">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                          <Border Width="16"
-                                  Height="16"
-                                  CornerRadius="4"
-                                  Background="{Binding SwatchBrush}"/>
-                          <StackPanel>
-                            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          </StackPanel>
-                        </StackPanel>
-                        <TextBlock Text="{Binding AreaImpactDisplay}" FontSize="11" FontWeight="SemiBold" IsVisible="{Binding HasAreaImpact}"/>
-                        <TextBlock Text="{Binding RecommendedAction}" TextWrapping="Wrap"/>
-                        <TextBlock Text="{Binding Notes}" TextWrapping="Wrap" Foreground="{DynamicResource ThemeForegroundLowBrush}" IsVisible="{Binding HasNotes}"/>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
-
-          <!-- Layer inspector -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding LayerInspector}" x:DataType="vm:LayerInspectorViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <TextBlock Text="Layer inspector" FontSize="20" FontWeight="SemiBold"/>
-                <Border Padding="6,2"
-                        CornerRadius="6"
-                        Background="{DynamicResource ThemeBackgroundBrush}"
-                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                        BorderThickness="1">
-                  <TextBlock Text="{Binding ModeDisplay}" FontSize="11" FontWeight="SemiBold"/>
-                </Border>
-              </StackPanel>
-
-              <StackPanel Spacing="4">
-                <TextBlock Text="{Binding LayerName}" FontSize="16" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding Description}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-              </StackPanel>
-
-              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                <Border Padding="12" CornerRadius="8" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
-                  <StackPanel Spacing="4">
-                    <TextBlock Text="Value" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding ValueDisplay}" FontSize="18" FontWeight="SemiBold"/>
-                    <TextBlock Text="Target" FontWeight="SemiBold" Margin="0,8,0,0"/>
-                    <TextBlock Text="{Binding TargetDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  </StackPanel>
-                </Border>
-
-                <Border Grid.Column="1" Padding="12" CornerRadius="8" Background="{DynamicResource ThemeBackgroundBrush}" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
-                  <StackPanel Spacing="4">
-                    <TextBlock Text="Quality" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding QualityDisplay}" FontSize="16" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding RateAvailabilityDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                    <TextBlock Text="Sample weight" FontWeight="SemiBold" Margin="0,8,0,0"/>
-                    <TextBlock Text="{Binding WeightDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  </StackPanel>
-                </Border>
-              </Grid>
-
-              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                <StackPanel Spacing="4">
-                  <TextBlock Text="Last sample" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding TimestampDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding LocationDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Spacing="4">
-                  <TextBlock Text="Source" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding SourceDisplay}" TextWrapping="Wrap"/>
-                </StackPanel>
-              </Grid>
-
-              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                <StackPanel Spacing="6">
-                  <TextBlock Text="Transport metadata" FontWeight="SemiBold"/>
-                  <ItemsControl ItemsSource="{Binding TransportMetadata}" Margin="0,4,0,0">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:LayerInspectorFieldViewModel">
-                        <StackPanel Spacing="2">
-                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
-                          <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
-                          <TextBlock Text="{Binding Description}"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                     FontSize="11"
-                                     TextWrapping="Wrap"
-                                     IsVisible="{Binding HasDescription}"/>
-                        </StackPanel>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
-                </StackPanel>
-
-                <StackPanel Grid.Column="1" Spacing="6">
-                  <TextBlock Text="Payload metadata" FontWeight="SemiBold"/>
-                  <ItemsControl ItemsSource="{Binding PayloadMetadata}" Margin="0,4,0,0">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:LayerInspectorFieldViewModel">
-                        <StackPanel Spacing="2">
-                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
-                          <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
-                          <TextBlock Text="{Binding Description}"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                     FontSize="11"
-                                     TextWrapping="Wrap"
-                                     IsVisible="{Binding HasDescription}"/>
-                        </StackPanel>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
-                </StackPanel>
-              </Grid>
-            </StackPanel>
-          </Border>
-
-          <!-- Zone policies -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding ZonePolicyPanel}" x:DataType="vm:ZoneConstraintPolicyViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Spacing="4">
-                <TextBlock Text="Zone policies" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding PolicySummary}" TextWrapping="Wrap"/>
-              </StackPanel>
-
-              <ItemsControl ItemsSource="{Binding Toggles}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:ZoneConstraintToggleViewModel">
-                    <Border Padding="12"
-                            Margin="0,4"
-                            CornerRadius="8"
-                            Background="{DynamicResource ThemeBackgroundBrush}"
-                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                            BorderThickness="1">
-                      <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                          <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
-                          <ToggleSwitch Content="{Binding EnforcementDisplay}"
-                                        IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
-                        <TextBlock Text="{Binding BufferSummary}"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        <TextBlock Text="{Binding PolicySummary}"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                   TextWrapping="Wrap"/>
-                        <TextBlock Text="{Binding OverridePolicyHint}"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                   TextWrapping="Wrap"
-                                   IsVisible="{Binding HasOverridePolicyHint}"/>
-                        <TextBlock Text="{Binding OverrideStatusDisplay}"
-                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                   TextWrapping="Wrap"/>
-                        <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding SupportsManualOverride}">
-                          <Button Content="Apply override"
-                                  Command="{Binding ApplyOverrideCommand}"
-                                  MinWidth="120"/>
-                          <Button Content="Clear override"
-                                  Command="{Binding ClearOverrideCommand}"
-                                  MinWidth="120"/>
-                        </StackPanel>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-
-              <Border Padding="12"
-                      CornerRadius="8"
-                      Background="{DynamicResource ThemeBackgroundBrush}"
-                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                      BorderThickness="1">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="Override history" FontWeight="SemiBold"/>
-                  <ItemsControl ItemsSource="{Binding OverrideHistory}" IsVisible="{Binding HasOverrideHistory}">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:ZoneOverrideEventViewModel">
-                        <Border Padding="8"
-                                Margin="0,4"
-                                CornerRadius="6"
-                                Background="{DynamicResource ThemeBackgroundBrush}"
-                                BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                                BorderThickness="1">
-                          <StackPanel Spacing="4">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                              <TextBlock Text="{Binding ZoneTypeDisplay}" FontWeight="SemiBold"/>
-                              <TextBlock Text="{Binding ActionDisplay}" FontWeight="SemiBold"/>
-                              <TextBlock Text="{Binding TimestampDisplay}"
-                                         Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                              <TextBlock Text="{Binding ExpiryDisplay}"
-                                         Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                            </StackPanel>
-                            <TextBlock Text="{Binding DetailDisplay}"
-                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                       TextWrapping="Wrap"/>
-                          </StackPanel>
-                        </Border>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
-                  <TextBlock Text="No overrides recorded." Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                             HorizontalAlignment="Center" IsVisible="{Binding HasNoOverrideHistory}"/>
-                </StackPanel>
-              </Border>
-
-              <TextBlock Text="{Binding StatusMessage}"
-                         TextWrapping="Wrap"
-                         Foreground="{DynamicResource ThemeForegroundBrush}"/>
-            </StackPanel>
-          </Border>
-
-          <!-- Zone import/export -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding ZoneImportExportPanel}" x:DataType="vm:ZoneImportExportPanelViewModel">
-            <StackPanel Spacing="12">
-              <StackPanel Spacing="4">
-                <TextBlock Text="Zone import &amp; export" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap"/>
-              </StackPanel>
-
-              <ItemsControl ItemsSource="{Binding Workflows}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:ZoneImportWorkflowViewModel">
-                    <Border Padding="12"
-                            Margin="0,4"
-                            CornerRadius="8"
-                            Background="{DynamicResource ThemeBackgroundBrush}"
-                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                            BorderThickness="1">
-                      <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                          <TextBlock Text="{Binding WorkflowName}" FontWeight="SemiBold"/>
-                          <Border Padding="6,2"
-                                  CornerRadius="6"
-                                  Background="{DynamicResource ThemeBackgroundBrush}"
-                                  BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                                  BorderThickness="1">
-                            <TextBlock Text="{Binding WorkflowTypeDisplay}" FontSize="11" FontWeight="SemiBold"/>
-                          </Border>
-                        </StackPanel>
-                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
-                        <TextBlock Text="{Binding TransportSummary}"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                   TextWrapping="Wrap"/>
-                        <TextBlock Text="{Binding PolicySummary}"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                   TextWrapping="Wrap"/>
-                        <ProgressBar Minimum="0" Maximum="1" Value="{Binding Progress}" Height="6"/>
-                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                          <TextBlock Text="{Binding StatusDisplay}"/>
-                          <TextBlock Text="{Binding LastRunDisplay, StringFormat=Last run: {0}}"
-                                     Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                          <Button Content="{Binding ActionLabel}"
-                                  Command="{Binding ExecuteCommand}"
-                                  MinWidth="140"/>
-                        </StackPanel>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-
-              <Border Padding="12"
-                      CornerRadius="8"
-                      Background="{DynamicResource ThemeBackgroundBrush}"
-                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                      BorderThickness="1">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="Activity log" FontWeight="SemiBold"/>
-                  <ItemsControl ItemsSource="{Binding ActivityLog}" IsVisible="{Binding HasActivity}">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:ZoneTransferEventViewModel">
-                        <Border Padding="8"
-                                Margin="0,4"
-                                CornerRadius="6"
-                                Background="{DynamicResource ThemeBackgroundBrush}"
-                                BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                                BorderThickness="1">
-                          <StackPanel Spacing="4">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                              <TextBlock Text="{Binding WorkflowName}" FontWeight="SemiBold"/>
-                              <TextBlock Text="{Binding ActionDisplay}" FontWeight="SemiBold"/>
-                              <TextBlock Text="{Binding TimestampDisplay}"
-                                         Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                            </StackPanel>
-                            <TextBlock Text="{Binding Detail}"
-                                       Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                                       TextWrapping="Wrap"/>
-                          </StackPanel>
-                        </Border>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
-                  <TextBlock Text="No zone transfers recorded yet."
-                             Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                             HorizontalAlignment="Center"
-                             IsVisible="{Binding HasNoActivity}"/>
-                </StackPanel>
-              </Border>
-            </StackPanel>
-          </Border>
-
-          <!-- Season navigator -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1">
-            <StackPanel DataContext="{Binding SeasonNavigator}" Spacing="16">
-              <StackPanel Spacing="8">
-                <TextBlock Text="Season navigator" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="Switch between season contexts to drill into participating farms and job timelines." TextWrapping="Wrap"/>
-              </StackPanel>
-
-              <StackPanel Orientation="Horizontal" Spacing="12">
-                <TextBox Width="220"
-                         Watermark="Search seasons, farms, or jobs"
-                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <ToggleSwitch Content="Active seasons only"
-                              IsChecked="{Binding ShowOnlyActiveSeasons, Mode=TwoWay}"/>
-              </StackPanel>
-
-              <Grid ColumnDefinitions="2*,3*" ColumnSpacing="16">
-                <Border CornerRadius="8"
-                        BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                        BorderThickness="1">
-                  <Grid>
-                    <ListBox ItemsSource="{Binding Seasons}"
-                             SelectedItem="{Binding SelectedSeason, Mode=TwoWay}"
-                             Margin="4"
-                             MinHeight="200">
-                      <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:SeasonSummaryViewModel">
-                          <Border Padding="12"
-                                  Margin="0,4"
-                                  CornerRadius="8"
-                                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                                  BorderThickness="1"
-                                  Background="{DynamicResource ThemeBackgroundBrush}">
-                            <StackPanel Spacing="6">
-                              <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-                                <Border Padding="6,2"
-                                        CornerRadius="6"
-                                        Background="{DynamicResource ThemeBackgroundBrush}"
-                                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                                        BorderThickness="1">
-                                  <TextBlock Text="{Binding StatusDisplay}" FontSize="11" FontWeight="SemiBold"/>
-                                </Border>
-                              </StackPanel>
-                              <TextBlock Text="{Binding DateRangeDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                              <TextBlock Text="{Binding FarmListDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                              <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="{Binding JobCountDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                                <TextBlock Text="{Binding LastUpdatedDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                              </StackPanel>
-                            </StackPanel>
-                          </Border>
-                        </DataTemplate>
-                      </ListBox.ItemTemplate>
-                    </ListBox>
-
-                    <TextBlock Text="No seasons match your filters."
-                               Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               IsVisible="{Binding IsEmpty}"/>
-                  </Grid>
-                </Border>
-
-                <ContentControl Grid.Column="1" Content="{Binding SelectedSeason}">
-                  <ContentControl.ContentTemplate>
-                    <DataTemplate x:DataType="vm:SeasonSummaryViewModel">
-                      <StackPanel Spacing="16">
-                        <StackPanel Spacing="4">
-                          <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="SemiBold"/>
-                            <Border Padding="8,2"
-                                    CornerRadius="6"
-                                    Background="{DynamicResource ThemeBackgroundBrush}"
-                                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                                    BorderThickness="1">
-                              <TextBlock Text="{Binding StatusDisplay}" FontWeight="SemiBold" FontSize="12"/>
-                            </Border>
-                          </StackPanel>
-                          <TextBlock Text="{Binding DateRangeDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                          <TextBlock Text="{Binding FarmListDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap"/>
-                          <TextBlock Text="{Binding Notes}" TextWrapping="Wrap"/>
-                          <TextBlock Text="{Binding CreatedByDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </StackPanel>
-
-                        <Grid ColumnDefinitions="2*,3*" ColumnSpacing="16">
-                          <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                                  BorderThickness="1"
-                                  CornerRadius="8"
-                                  Padding="4"
-                                  MinHeight="200">
-                            <ListBox ItemsSource="{Binding Jobs}"
-                                     SelectedItem="{Binding SelectedJob, Mode=TwoWay}">
-                              <ListBox.ItemTemplate>
-                                <DataTemplate x:DataType="vm:SeasonJobViewModel">
-                                  <Border Padding="12"
-                                          Margin="0,4"
-                                          CornerRadius="8"
-                                          BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                                          BorderThickness="1"
-                                          Background="{DynamicResource ThemeBackgroundBrush}">
-                                    <StackPanel Spacing="4">
-                                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-                                      <TextBlock Text="{Binding Subtitle}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                                      <TextBlock Text="{Binding ActivitySummary}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                                    </StackPanel>
-                                  </Border>
-                                </DataTemplate>
-                              </ListBox.ItemTemplate>
-                            </ListBox>
-                          </Border>
-
-                          <ContentControl Grid.Column="1" Content="{Binding SelectedJob}">
-                            <ContentControl.ContentTemplate>
-                              <DataTemplate x:DataType="vm:SeasonJobViewModel">
-                                <Border Padding="16"
-                                        CornerRadius="8"
-                                        BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                                        BorderThickness="1"
-                                        Background="{DynamicResource ThemeBackgroundBrush}">
-                                  <StackPanel Spacing="8">
-                                    <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding Subtitle}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                                    <TextBlock Text="{Binding ActivitySummary}" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding ScheduleDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                                    <TextBlock Text="{Binding LastWorkedDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                                    <TextBlock Text="{Binding Notes}" TextWrapping="Wrap"/>
-                                  </StackPanel>
-                                </Border>
-                              </DataTemplate>
-                            </ContentControl.ContentTemplate>
-                          </ContentControl>
-                        </Grid>
-                      </StackPanel>
-                    </DataTemplate>
-                  </ContentControl.ContentTemplate>
-                </ContentControl>
-              </Grid>
-            </StackPanel>
-          </Border>
-
-          <!-- Crop quick-select -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding CropQuickSelect}" x:DataType="vm:CropQuickSelectViewModel">
-            <StackPanel Spacing="16">
-              <StackPanel Spacing="8">
-                <TextBlock Text="Crop quick-select" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding PanelDescription}" TextWrapping="Wrap"
-                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-              </StackPanel>
-
-              <Border Padding="12" CornerRadius="10"
-                      Background="{DynamicResource ThemeBackgroundBrush}"
-                      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                      BorderThickness="1">
-                <StackPanel Spacing="4">
-                  <TextBlock Text="{Binding ActiveFieldDisplay}" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding SeasonContextDisplay}"
-                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding CurrentPlanDisplay}"
-                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                  <TextBlock Text="{Binding LastActionDisplay}"
-                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-              </Border>
-
-              <StackPanel Spacing="4">
-                <TextBlock Text="{Binding SelectionStatus}" FontWeight="SemiBold"/>
-                <TextBlock Text="{Binding SelectionDetails}" TextWrapping="Wrap"
-                           Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-              </StackPanel>
-
-              <ItemsControl ItemsSource="{Binding Groups}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:CropQuickSelectGroupViewModel">
-                    <StackPanel Spacing="8">
-                      <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold"/>
-                      <TextBlock Text="{Binding Description}" TextWrapping="Wrap"
-                                 Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-
-                      <ItemsControl ItemsSource="{Binding Options}">
-                        <ItemsControl.ItemsPanel>
-                          <ItemsPanelTemplate>
-                            <WrapPanel Spacing="12"/>
-                          </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                          <DataTemplate x:DataType="vm:CropQuickSelectOptionViewModel">
-                            <Border Margin="0,0,12,12" Padding="0"
-                                    CornerRadius="10"
-                                    BorderThickness="1.5"
-                                    BorderBrush="{Binding AccentBrush}">
-                              <Border.Styles>
-                                <Style Selector="Border">
-                                  <Setter Property="Background" Value="{Binding AccentBackgroundBrush}"/>
-                                  <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                    <Setter Property="Background" Value="{Binding AccentBrush}"/>
-                                  </DataTrigger>
-                                </Style>
-                              </Border.Styles>
-
-                              <Button Command="{Binding SelectCommand}"
-                                      Background="Transparent"
-                                      BorderBrush="Transparent"
-                                      Padding="12"
-                                      HorizontalContentAlignment="Stretch"
-                                      MinWidth="220">
-                                <Button.Styles>
-                                  <Style Selector="Button">
-                                    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                      <Setter Property="Foreground" Value="White"/>
-                                    </DataTrigger>
-                                  </Style>
-                                </Button.Styles>
-
-                                <StackPanel Spacing="6">
-                                  <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="{Binding Crop}" FontSize="16" FontWeight="SemiBold"/>
-                                    <Border Background="{Binding AccentBrush}" Opacity="0.85"
-                                            CornerRadius="4" Padding="6,2"
-                                            IsVisible="{Binding HasTag}">
-                                      <TextBlock Text="{Binding TagLabel}" FontSize="10" FontWeight="SemiBold" Foreground="White"/>
-                                    </Border>
-                                  </StackPanel>
-
-                                  <TextBlock Text="{Binding Variety}" FontWeight="SemiBold"
-                                             FontSize="13"
-                                             IsVisible="{Binding HasVariety}"/>
-
-                                  <TextBlock Text="{Binding SeasonWindow}"
-                                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-
-                                  <TextBlock Text="{Binding RotationSummary}" TextWrapping="Wrap"
-                                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-
-                                  <TextBlock Text="{Binding Notes}" TextWrapping="Wrap"
-                                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                                </StackPanel>
-                              </Button>
-                            </Border>
-                          </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                      </ItemsControl>
-                    </StackPanel>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
-
-          <!-- Simulation controls -->
-          <Border Padding="16" CornerRadius="8"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1">
-            <!-- 6 rows: 0..5 used below -->
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
-              <TextBlock Text="Simulation controls" FontWeight="SemiBold"/>
-
-              <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
-                <StackPanel>
-                  <TextBlock Text="{Binding SimulationBar.ActiveScenarioTitle}" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding SimulationBar.ActiveScenarioDescription}" TextWrapping="Wrap"/>
-                  <TextBlock Text="{Binding SimulationBar.ActiveScenarioOptions, StringFormat=Options: {0}}"
-                             Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                </StackPanel>
-
-                <Button Grid.Column="1"
-                        Content="Edit scenarios..."
-                        Padding="12,4"
-                        HorizontalAlignment="Right"
-                        Click="OnOpenScenarioEditor"/>
-              </Grid>
-
-              <Button Grid.Row="2"
-                      Content="Import legacy guidance..."
-                      Padding="12,4"
-                      HorizontalAlignment="Left"
-                      Click="OnOpenLegacyImportWizard"/>
-
-              <!-- Transport + playback rates -->
-              <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                <Button Content="{Binding SimulationBar.PlayPauseLabel}"
-                        Command="{Binding SimulationBar.TogglePlaybackCommand}"
-                        MinWidth="96"/>
-                <TextBlock Text="{Binding SimulationBar.StatusText}" VerticalAlignment="Center"/>
-
-                <ItemsControl ItemsSource="{Binding SimulationBar.PlaybackRates}" Margin="16,0,0,0">
-                  <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                      <StackPanel Orientation="Horizontal" Spacing="8"/>
-                    </ItemsPanelTemplate>
-                  </ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                      <RadioButton Content="{Binding Label}"
-                                   IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                   Command="{Binding SelectCommand}"
-                                   GroupName="PlaybackRates"
-                                   Padding="12,4"
-                                   HorizontalAlignment="Center"/>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <TextBlock Text="{Binding SimulationBar.SelectedPlaybackRateLabel}"
-                           Margin="16,0,0,0"
-                           VerticalAlignment="Center"/>
-              </StackPanel>
-
-              <!-- Scrubber -->
-              <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalAlignment="Center">
-                <TextBlock Text="{Binding SimulationBar.PositionDisplay}" VerticalAlignment="Center"/>
-                <Slider Grid.Column="1"
-                        Minimum="0" Maximum="1"
-                        Value="{Binding SimulationBar.SeekFraction}"
-                        SmallChange="0.01" LargeChange="0.1"/>
-                <TextBlock Grid.Column="2"
-                           Text="{Binding SimulationBar.DurationDisplay}"
-                           VerticalAlignment="Center"/>
-              </Grid>
-
-              <!-- Stream routing -->
-              <StackPanel Grid.Row="5" Margin="0,4,0,0" Spacing="8">
-                <TextBlock Text="Stream routing" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding SimulationBar.Routes}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                      <Grid ColumnDefinitions="2*,3*,2*" Margin="0,4,0,4" ColumnSpacing="8">
-                        <TextBlock Text="{Binding Stream}" VerticalAlignment="Center"/>
-                        <ComboBox Grid.Column="1"
-                                  ItemsSource="{Binding AvailableSources}"
-                                  SelectedItem="{Binding SelectedSource, Mode=TwoWay}"
-                                  MinWidth="160"/>
-                        <ComboBox Grid.Column="2"
-                                  ItemsSource="{Binding AvailableModes}"
-                                  SelectedItem="{Binding SelectedMode, Mode=TwoWay}"
-                                  MinWidth="140"/>
-                      </Grid>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-            </Grid>
-          </Border>
-
-          <!-- Plugin panels -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1">
-            <StackPanel Spacing="16">
-              <StackPanel Spacing="8" DataContext="{Binding SteerPanel}" x:DataType="vm:SteerPanelViewModel">
-                <TextBlock Text="Steer" FontSize="20" FontWeight="SemiBold"/>
-                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                  <ToggleSwitch Content="Enable" IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
-                  <TextBlock Text="Target" VerticalAlignment="Center"/>
-                  <Slider Width="160"
-                          Minimum="{Binding MinimumWheelAngleDegrees}"
-                          Maximum="{Binding MaximumWheelAngleDegrees}"
-                          Value="{Binding TargetWheelAngleDegrees, Mode=TwoWay}"
-                          SmallChange="0.5"
-                          LargeChange="2"/>
-                  <TextBlock Text="{Binding TargetWheelAngleDegrees, StringFormat='{}{0:F1}°'}"
-                             VerticalAlignment="Center"/>
-                </StackPanel>
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                  <StackPanel>
-                    <TextBlock Text="Feed-forward" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding FeedForward, StringFormat='{}{0:F2}'}"/>
-                  </StackPanel>
-                  <StackPanel Grid.Column="1">
-                    <TextBlock Text="Controller output" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding ControllerOutput, StringFormat='{}{0:F2}'}"/>
-                  </StackPanel>
-                </Grid>
-              </StackPanel>
-
-              <StackPanel Spacing="8" DataContext="{Binding SectionsPanel}" x:DataType="vm:SectionsPanelViewModel">
-                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                  <TextBlock Text="Sections" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                  <ToggleSwitch Content="Auto" IsChecked="{Binding IsAutoEnabled, Mode=TwoWay}"/>
-                  <TextBlock Text="{Binding MaskDisplay}" Foreground="{DynamicResource ThemeForegroundLowBrush}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding Sections}">
-                  <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                      <WrapPanel Spacing="8"/>
-                    </ItemsPanelTemplate>
-                  </ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:SectionToggleViewModel">
-                      <ToggleButton Content="{Binding Label}"
-                                    IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                                    Width="72"
-                                    HorizontalAlignment="Center"
-                                    IsVisible="{Binding IsVisible}"/>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-
-              <StackPanel Spacing="8" DataContext="{Binding PlanterPanel}" x:DataType="vm:PlanterPanelViewModel">
-                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                  <TextBlock Text="Planter" FontSize="20" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource ThemeForegroundLowBrush}" TextWrapping="Wrap" MaxWidth="320"/>
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding Rows}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:PlanterRowViewModel">
-                      <Border Padding="8" Margin="0,0,0,6" Background="{DynamicResource ThemeBackgroundBrush}"
-                              BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="4">
-                        <Grid ColumnDefinitions="Auto,*,*,*,*,*,*" ColumnSpacing="8">
-                          <TextBlock Text="{Binding RowLabel}" FontWeight="SemiBold"/>
-                          <TextBlock Grid.Column="1" Text="{Binding TargetPopulationDisplay}"/>
-                          <TextBlock Grid.Column="2" Text="{Binding ActualPopulationDisplay}"/>
-                          <TextBlock Grid.Column="3" Text="{Binding PopulationErrorDisplay}"/>
-                          <TextBlock Grid.Column="4" Text="{Binding SkipRateDisplay}"/>
-                          <TextBlock Grid.Column="5" Text="{Binding DoubleRateDisplay}"/>
-                          <TextBlock Grid.Column="6" Text="{Binding QualityDisplay}" FontWeight="SemiBold"/>
-                        </Grid>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-
-              <StackPanel Spacing="12" DataContext="{Binding SteerDashboard}" x:DataType="vm:SteerDashboardViewModel">
-                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                  <TextBlock Text="Autosteer dashboard" FontSize="20" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding Status}" Foreground="#99000000"/>
-                </StackPanel>
-
-                <StackPanel Spacing="12">
-                  <ItemsControl ItemsSource="{Binding Series}">
-                    <ItemsControl.ItemsPanel>
-                      <ItemsPanelTemplate>
-                        <WrapPanel Spacing="12"/>
-                      </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:DashboardSeriesViewModel">
-                        <StackPanel MinWidth="180" Width="220" Spacing="4">
-                          <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
-                          <controls:Sparkline Values="{Binding Values}"
-                                              Height="60"
-                                              Stroke="{Binding Stroke}"
-                                              Fill="{Binding Fill}"
-                                              StrokeThickness="{Binding StrokeThickness}"/>
-                          <TextBlock Text="{Binding Units}" Foreground="{DynamicResource ThemeForegroundLowBrush}"/>
-                        </StackPanel>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
-
-                  <StackPanel Spacing="8">
-                    <TextBlock Text="Tuning" FontWeight="SemiBold"/>
-                    <ItemsControl ItemsSource="{Binding TuningParameters}">
-                      <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                          <StackPanel Spacing="6"/>
-                        </ItemsPanelTemplate>
-                      </ItemsControl.ItemsPanel>
-                      <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:DashboardTuningParameterViewModel">
-                          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
-                            <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1"
-                                    Minimum="{Binding Minimum}"
-                                    Maximum="{Binding Maximum}"
-                                    Value="{Binding Value, Mode=TwoWay}"
-                                    SmallChange="{Binding Step}"
-                                    LargeChange="{Binding Step}"/>
-                            <TextBlock Grid.Column="2"
-                                       Text="{Binding DisplayValue}"
-                                       VerticalAlignment="Center"/>
-                          </Grid>
-                        </DataTemplate>
-                      </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <TextBlock Text="{Binding GainSummary}" Foreground="#99000000"/>
-
-                    <StackPanel>
-                      <TextBlock Text="Recent tuning events" FontWeight="SemiBold"/>
-                      <ItemsControl ItemsSource="{Binding TuningEvents}" Margin="0,4,0,0">
-                        <ItemsControl.ItemTemplate>
-                          <DataTemplate x:DataType="vm:SteerTuningEventViewModel">
-                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                              <TextBlock Text="{Binding DisplayTimestamp}" FontFamily="Consolas, Courier New, monospace"/>
-                              <TextBlock Grid.Column="1" Text="{Binding Description}" TextWrapping="Wrap"/>
-                            </Grid>
-                          </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                      </ItemsControl>
-                    </StackPanel>
-                  </StackPanel>
-                </StackPanel>
-              </StackPanel>
-            </StackPanel>
-          </Border>
-
-          <!-- Replay analysis timeline -->
-          <Border Padding="16" CornerRadius="12" Background="#0F000000" BorderBrush="#19000000" BorderThickness="1" DataContext="{Binding ReplayTimeline}" x:DataType="vm:ReplayTimelineViewModel">
-            <StackPanel Spacing="12">
-              <TextBlock Text="Replay analysis timeline" FontSize="20" FontWeight="SemiBold"/>
-              <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                <StackPanel>
-                  <TextBlock Text="Speed (m/s)" FontWeight="SemiBold"/>
-                  <controls:Sparkline Values="{Binding SpeedSamples}" Height="70" Stroke="#FF11C98D" Fill="#2011C98D"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1">
-                  <TextBlock Text="Heading change (°)" FontWeight="SemiBold"/>
-                  <controls:Sparkline Values="{Binding HeadingSamples}" Height="70" Stroke="#FF35A1FF" Fill="#2035A1FF"/>
-                </StackPanel>
-              </Grid>
-
-              <ItemsControl ItemsSource="{Binding Bookmarks}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="vm:ReplayTimelineBookmarkViewModel">
-                    <Border Padding="8" Margin="0,0,0,6" Background="#05000000" BorderBrush="#19000000" BorderThickness="1" CornerRadius="4">
-                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <TextBlock Text="{Binding TimestampDisplay}" FontFamily="Consolas, Courier New, monospace"/>
-                        <StackPanel Grid.Column="1" Spacing="2">
-                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
-                          <TextBlock Text="{Binding Notes}" TextWrapping="Wrap"/>
-                        </StackPanel>
-                      </Grid>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-
-              <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="12" HorizontalAlignment="Right">
-                <Button Content="Export CSV" Command="{Binding ExportCsvCommand}" MinWidth="100"/>
-                <Button Grid.Column="1" Content="Export GeoJSON" Command="{Binding ExportGeoJsonCommand}" MinWidth="120"/>
-              </Grid>
-              <TextBlock Text="{Binding ExportStatus}" Foreground="#99000000" TextWrapping="Wrap"/>
-            </StackPanel>
-          </Border>
-
-          <!-- Privacy & telemetry -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1"
-                  DataContext="{Binding TelemetryPrivacy}">
-            <StackPanel Spacing="12">
-              <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                <TextBlock Text="Crash telemetry" FontSize="20" FontWeight="SemiBold"/>
-                <ToggleSwitch Content="Share reports" IsChecked="{Binding IsTelemetryOptedIn, Mode=TwoWay}"/>
-              </StackPanel>
-
-              <TextBlock Text="{Binding PendingReportSummary}" TextWrapping="Wrap"/>
-
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Upload pending"
-                        Command="{Binding UploadReportsCommand}"
-                        IsEnabled="{Binding HasPendingReports}"/>
-                <Button Content="Clear pending"
-                        Command="{Binding ClearReportsCommand}"
-                        IsEnabled="{Binding HasPendingReports}"/>
-              </StackPanel>
-
-              <TextBlock Text="{Binding StatusMessage}" IsVisible="{Binding HasStatusMessage}" TextWrapping="Wrap"/>
-            </StackPanel>
-          </Border>
-
-          <!-- Simulation graph summary -->
-          <Border Padding="16" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1">
-            <Grid RowDefinitions="Auto,*" RowSpacing="8">
-              <TextBlock Text="Embedded simulation provider graph" FontWeight="SemiBold"/>
-              <TextBox Text="{Binding SimulationGraphSummary}"
-                       IsReadOnly="True"
-                       AcceptsReturn="True"
+             x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
+             x:DataType="vm:AppShellViewModel"
+             d:DesignWidth="1280"
+             d:DesignHeight="720">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <rendering:IconKeyToBitmapConverter x:Key="BlockIconConverter" />
+      <rendering:LockStateToBitmapConverter x:Key="LockStateIconConverter" />
+      <rendering:LockStateToTextConverter x:Key="LockTooltipConverter" />
+
+      <DataTemplate x:Key="ShellMenuItemTemplate"
+                    x:DataType="workspace:ShellMenuItemViewModel">
+        <MenuItem Header="{Binding Header}"
+                  Command="{Binding Command}"
+                  IsEnabled="{Binding IsEnabled}"
+                  ToolTip.Tip="{Binding Tooltip}"
+                  ItemsSource="{Binding Children}">
+          <MenuItem.ItemTemplate>
+            <StaticResource ResourceKey="ShellMenuItemTemplate" />
+          </MenuItem.ItemTemplate>
+        </MenuItem>
+      </DataTemplate>
+
+      <DataTemplate x:Key="ToolbarItemTemplate"
+                    x:DataType="workspace:TopToolbarItemViewModel">
+        <Button Command="{Binding Command}"
+                ToolTip.Tip="{Binding Tooltip}"
+                Classes.toolbar="True"
+                Classes.toggle="{Binding IsToggle}"
+                Classes.active="{Binding IsChecked}">
+          <TextBlock Text="{Binding DisplayName}" />
+        </Button>
+      </DataTemplate>
+
+      <DataTemplate x:Key="BlockTileTemplate"
+                    x:DataType="vm:BlockItemViewModel">
+        <Button Command="{Binding InvokeCommand}"
+                ToolTip.Tip="{Binding Label}"
+                Classes.sidebar="True">
+          <StackPanel HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Spacing="4">
+            <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
+                   Width="32"
+                   Height="32"
+                   Stretch="Uniform" />
+            <TextBlock Text="{Binding Label}"
                        TextWrapping="Wrap"
-                       MinHeight="160"
-                       FontFamily="Consolas, Courier New, monospace"/>
-            </Grid>
-          </Border>
+                       TextAlignment="Center" />
+          </StackPanel>
+        </Button>
+      </DataTemplate>
+    </ResourceDictionary>
+  </UserControl.Resources>
 
-          <!-- Connection settings -->
-          <Border Padding="20" CornerRadius="12"
-                  Background="{DynamicResource ThemeBackgroundBrush}"
-                  BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-                  BorderThickness="1">
-            <StackPanel Spacing="16" DataContext="{Binding Connection}" x:DataType="vm:ConnectionSettingsViewModel">
-              <StackPanel Spacing="4">
-                <TextBlock Text="Connection settings" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="Configure how Nexus connects to AGiO and chooses GPS sources."
-                           Foreground="{DynamicResource ThemeForegroundLowBrush}"
-                           TextWrapping="Wrap"/>
-              </StackPanel>
+  <UserControl.DataTemplates>
+    <DataTemplate x:DataType="workspace:MappingWorkspaceViewModel">
+      <mapping:MappingWorkspaceView />
+    </DataTemplate>
+  </UserControl.DataTemplates>
 
-              <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12" ColumnSpacing="12">
-                <TextBlock Grid.Column="0" Grid.Row="0" Text="AGiO endpoint" VerticalAlignment="Center"/>
-                <TextBox   Grid.Column="1" Grid.Row="0"
-                           Text="{Binding AgioEndpoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                           Watermark="e.g. http://localhost:50051"/>
+  <UserControl.Styles>
+    <Style Selector="Button.toolbar">
+      <Setter Property="Background" Value="{DynamicResource ShellChromeBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+      <Setter Property="Padding" Value="{DynamicResource ShellToolbarButtonPadding}" />
+      <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusSm}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
+    </Style>
 
-                <TextBlock Grid.Column="0" Grid.Row="1" Text="Backend" VerticalAlignment="Center"/>
-                <ComboBox  Grid.Column="1" Grid.Row="1"
-                           Items="{Binding AvailableBackends}"
-                           SelectedItem="{Binding SelectedBackend, Mode=TwoWay}"/>
+    <Style Selector="Button.toolbar:hover">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentMutedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+    </Style>
 
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="Run mode" VerticalAlignment="Center"/>
-                <ComboBox  Grid.Column="1" Grid.Row="2"
-                           Items="{Binding AvailableRunModes}"
-                           SelectedItem="{Binding SelectedRunMode, Mode=TwoWay}"/>
+    <Style Selector="Button.toolbar.active">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
+      <Setter Property="Foreground" Value="#FFFFFFFF" />
+    </Style>
 
-                <TextBlock Grid.Column="0" Grid.Row="3" Text="GPS source policy" VerticalAlignment="Center"/>
-                <ComboBox  Grid.Column="1" Grid.Row="3"
-                           Items="{Binding AvailableGpsSourcePolicies}"
-                           SelectedItem="{Binding SelectedGpsSourcePolicy, Mode=TwoWay}"/>
-              </Grid>
+    <Style Selector="Button.sidebar">
+      <Setter Property="Background" Value="{DynamicResource ShellChromeBackgroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusSm}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="8" />
+    </Style>
 
-              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                <TextBlock x:Name="StatusText" Text="{Binding StatusMessage}" VerticalAlignment="Center" TextWrapping="Wrap">
-                  <TextBlock.Styles>
-                    <Style Selector="TextBlock#StatusText">
-                      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                      <DataTrigger Binding="{Binding HasError}" Value="True">
-                        <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-                      </DataTrigger>
-                    </Style>
-                  </TextBlock.Styles>
-                </TextBlock>
+    <Style Selector="Button.sidebar:hover">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentMutedBrush}" />
+      <Setter Property="Foreground" Value="#FFFFFFFF" />
+    </Style>
 
-                <Button Grid.Column="1"
-                        Content="Save settings"
-                        Command="{Binding SaveCommand}"
-                        MinWidth="140"
-                        HorizontalAlignment="Right"/>
-              </Grid>
-            </StackPanel>
-          </Border>
-        </StackPanel>
-      </ScrollViewer>
+    <Style Selector="Button.sidebar:pressed">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
+      <Setter Property="Foreground" Value="#FFFFFFFF" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="Focusable" Value="False" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock:hover">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentMutedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentMutedBrush}" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock:checked">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock Image">
+      <Setter Property="Width" Value="20" />
+      <Setter Property="Height" Value="20" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock:checked Image">
+      <Setter Property="Opacity" Value="0.9" />
+    </Style>
+  </UserControl.Styles>
+
+  <UserControl.DataTemplates>
+    <DataTemplate x:DataType="workspace:BoundaryToolViewModel">
+      <controls:BoundaryViewControl />
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <DockPanel LastChildFill="True">
+    <Border DockPanel.Dock="Top"
+            Background="{DynamicResource ShellChromeBackgroundBrush}"
+            BorderBrush="{DynamicResource ShellChromeBorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="{DynamicResource ShellChromePadding}">
+      <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
+        <Menu Background="Transparent">
+          <MenuItem Header="{Binding Host.ShellMenuBar.FileMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.FileMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.FieldMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.FieldMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.ToolsMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.ToolsMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.SettingsMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.SettingsMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.ServicesMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.ServicesMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.PluginsMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.PluginsMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+        </Menu>
+
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="{DynamicResource ThemeSpacingLg}"
+              VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal"
+                      Spacing="{DynamicResource ThemeSpacingSm}"
+                      VerticalAlignment="Center">
+            <Border Background="{DynamicResource ThemeSurfaceBrush}"
+                    BorderBrush="{DynamicResource ShellChromeBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource ThemeRadiusSm}"
+                    Padding="8,4">
+              <TextBlock Text="AgOpenGPS"
+                         FontWeight="Bold"
+                         Foreground="{DynamicResource ThemeForegroundBrush}"
+                         FontSize="{DynamicResource ThemeFontSizeLg}" />
+            </Border>
+            <TextBlock Text="Nexus"
+                       FontSize="{DynamicResource ThemeFontSizeLg}"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+          </StackPanel>
+
+          <ItemsControl Grid.Column="1"
+                        ItemsSource="{Binding Host.TopToolbar.Items}"
+                        ItemTemplate="{StaticResource ToolbarItemTemplate}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Spacing="{DynamicResource ThemeSpacingSm}" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+
+          <StackPanel Grid.Column="2"
+                      Orientation="Horizontal"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      Spacing="8">
+            <ToggleButton Classes="layout-lock"
+                          IsChecked="{Binding Layout.IsLocked}"
+                          ToolTip.Tip="{Binding Layout.IsLocked, Converter={StaticResource LockTooltipConverter}}">
+              <Image Source="{Binding Layout.IsLocked, Converter={StaticResource LockStateIconConverter}}"
+                     Width="20"
+                     Height="20"
+                     Stretch="Uniform" />
+            </ToggleButton>
+            <TextBlock Text="{Binding StatusText}"
+                       Foreground="{DynamicResource ThemeAccentMutedBrush}"
+                       VerticalAlignment="Center" />
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <Grid Margin="0,12,0,0">
+      <Border Background="{DynamicResource ShellPanelBackgroundBrush}"
+              BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource ThemeRadiusMd}" />
+      <ContentControl Margin="16"
+                      Content="{Binding MainContent}" />
+      <controls:PaneCanvas Layout="{Binding Layout.Grid}"
+                           LayoutResult="{Binding Layout.PaneLayout}"
+                           IsHitTestVisible="False"
+                           Margin="16" />
+      <ItemsControl ItemsSource="{Binding Layout.Blocks}"
+                    ItemTemplate="{StaticResource BlockTileTemplate}"
+                    Margin="16"
+                    Background="Transparent"
+                    SizeChanged="OnViewportSizeChanged">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <controls:TiledPanel Layout="{Binding Layout.Grid}" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemContainerStyle>
+          <Style Selector="ContentPresenter">
+            <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
+            <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
+            <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />
+            <Setter Property="controls:TiledPanel.ColumnSpan" Value="{Binding Tile.ColSpan}" />
+          </Style>
+        </ItemsControl.ItemContainerStyle>
+      </ItemsControl>
     </Grid>
-  </Grid>
-</DockPanel>
+  </DockPanel>
 </UserControl>

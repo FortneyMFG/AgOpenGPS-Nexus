@@ -15,7 +15,7 @@ namespace Aog.Agio.Linux;
 public sealed class LinuxAgioBackend : IAgioBackend
 {
     /// <inheritdoc />
-    public string Name => "Linux Serial & SocketCAN";
+    public string Name => "Linux Serial, gpsd & SocketCAN";
 
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
@@ -25,7 +25,10 @@ public sealed class LinuxAgioBackend : IAgioBackend
             throw new ArgumentNullException(nameof(services));
         }
 
-        services.AddOptions<NmeaSerialPortScanOptions>();
+        services.AddSingleton(TimeProvider.System);
+        services
+            .AddOptions<NmeaSerialPortScanOptions>()
+            .BindConfiguration("AgioHost:Linux:Serial:Scan");
         services
             .AddOptions<LinuxSerialPortEnumeratorOptions>()
             .BindConfiguration("AgioHost:Linux:Serial");
@@ -34,7 +37,9 @@ public sealed class LinuxAgioBackend : IAgioBackend
             .AddOptions<GpsdClientOptions>()
             .BindConfiguration("AgioHost:Linux:Gpsd");
 
-        services.AddOptions<SocketCanOptions>();
+        services
+            .AddOptions<SocketCanOptions>()
+            .BindConfiguration("AgioHost:Linux:SocketCan");
 
         services.AddSingleton<NmeaSentenceParser>();
         services.AddSingleton<ISerialPortEnumerator, LinuxSerialPortEnumerator>();

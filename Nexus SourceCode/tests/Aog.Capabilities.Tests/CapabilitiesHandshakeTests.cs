@@ -33,7 +33,7 @@ public sealed class CapabilitiesHandshakeTests
 
         Assert.Equal("session-123", response.SessionId);
         Assert.Equal("agio-host", response.NodeId);
-        Assert.Equal(CapabilityRole.CapabilityRoleAgio, response.Role);
+        Assert.Equal(CapabilityRole.Agio, response.Role);
 
         Assert.Collection(response.AcceptedCapabilities,
             descriptor => Assert.Equal("nav.pose", descriptor.Name));
@@ -50,7 +50,7 @@ public sealed class CapabilitiesHandshakeTests
         {
             SessionId = "session-456",
             NodeId = "core-host",
-            Role = CapabilityRole.CapabilityRoleCore,
+            Role = CapabilityRole.Core,
         };
 
         request.Capabilities.Add(new CapabilityDescriptor
@@ -109,6 +109,7 @@ public sealed class CapabilitiesHandshakeTests
 
     private static ServerCallContext CreateContext()
     {
+        WriteOptions? writeOptions = null;
         return TestServerCallContext.Create(
             method: "capabilities.v1.CapabilitiesService/Handshake",
             host: null,
@@ -118,7 +119,8 @@ public sealed class CapabilitiesHandshakeTests
             peer: "ipv4:127.0.0.1",
             authContext: null,
             contextPropagationToken: null,
-            responseTrailers: null,
-            writeHeadersFunc: _ => Task.CompletedTask);
+            writeHeadersFunc: _ => Task.CompletedTask,
+            writeOptionsGetter: () => writeOptions ?? new WriteOptions(),
+            writeOptionsSetter: options => writeOptions = options);
     }
 }

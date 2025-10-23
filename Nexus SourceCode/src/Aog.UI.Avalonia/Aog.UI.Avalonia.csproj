@@ -5,25 +5,49 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <UseWPF>false</UseWPF>
     <UseWindowsForms>false</UseWindowsForms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
   <ItemGroup>
-    <AvaloniaResource Include="**/*.axaml" />
+    <Compile Remove="**/backup/*" />
+    <AvaloniaXaml Remove="**/backup/*" />
+    <None Include="**/backup/*" />
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="Resources/*.json" />
+    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Resources\Icons\**" />
   </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.6" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.6" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.6" Condition="'$(Configuration)' == 'Debug'" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.6" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6" />
-    <PackageReference Include="SkiaSharp.Views.Avalonia" Version="2.88.3" />
+    <EmbeddedResource Include="Resources\**\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.7" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Native" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Skia" Version="11.3.7" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="SkiaSharp" Version="2.88.9" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="../Aog.Core/Aog.Core.csproj" />
     <ProjectReference Include="../Aog.Plugins/Aog.Plugins.csproj" />
+    <ProjectReference Include="../Nexus.Sdk.Core/Nexus.Sdk.Core.csproj" />
+    <ProjectReference Include="../Nexus.Sdk.UI.Avalonia/Nexus.Sdk.UI.Avalonia.csproj" />
+    <ProjectReference Include="../Nexus.Plugin.Manifest/Nexus.Plugin.Manifest.csproj" />
   </ItemGroup>
 </Project>

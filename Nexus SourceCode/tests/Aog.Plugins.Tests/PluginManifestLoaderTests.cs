@@ -104,6 +104,39 @@ public sealed class PluginManifestLoaderTests
         await act.Should().ThrowAsync<InvalidDataException>();
     }
 
+    [Theory]
+    [InlineData("\"\"")]
+    [InlineData("\"   \"")]
+    [InlineData("null")]
+    public async Task LoadAsync_BlankRequiredTransports_Throws(string transportLiteral)
+    {
+        var json = string.Format("""
+        {{
+          "schemaVersion": "1.0.0",
+          "id": "org.agopengps.plugins.blanktransport",
+          "name": "Blank Transport Plugin",
+          "version": "1.0.0",
+          "requiredApis": {{ "core": ">=1.0.0" }},
+          "supportedCapabilities": ["blank.transport"],
+          "requiredTransports": [{0}],
+          "minimumRuntimeVersion": "1.0.0",
+          "simProviders": [
+            {{
+              "providerId": "blank.sim",
+              "type": "Aog.Plugins.Blank.Provider",
+              "topics": ["topic"]
+            }}
+          ]
+        }}
+        """, transportLiteral);
+
+        await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        var act = async () => await _loader.LoadAsync(stream);
+
+        await act.Should().ThrowAsync<InvalidDataException>()
+            .WithMessage("*transport names must be non-empty*");
+    }
+
     [Fact]
     public async Task LoadAsync_Path_ReadsManifestFromDisk()
     {

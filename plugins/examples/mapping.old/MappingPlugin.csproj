@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>MappingPlugin</AssemblyName>
+    <RootNamespace>MappingPlugin</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Nexus SourceCode\src\Nexus.Sdk.Core\Nexus.Sdk.Core.csproj" />
+    <ProjectReference Include="..\..\..\Nexus SourceCode\src\Nexus.Sdk.UI.Avalonia\Nexus.Sdk.UI.Avalonia.csproj" />
+    <ProjectReference Include="..\..\..\Nexus SourceCode\src\Aog.UI.Avalonia\Aog.UI.Avalonia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.7" />
+      </ItemGroup>
+
+  <ItemGroup>
+    <None Include="manifest.json" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Views\MapSurfaceView.axaml" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PluginDeploymentDir>$([System.IO.Path]::GetFullPath('..\..\..\Nexus SourceCode\src\Aog.UI.Avalonia\bin\$(Configuration)\net8.0\plugins\org.agopengps.mapping\1.0.0', '$(MSBuildProjectDirectory)'))</PluginDeploymentDir>
+  </PropertyGroup>
+
+  <Target Name="DeployPlugin" AfterTargets="Build">
+    <Message Importance="High" Text="Deploying MappingPlugin to $(PluginDeploymentDir)" />
+    <RemoveDir Directories="$(PluginDeploymentDir)" Condition="Exists('$(PluginDeploymentDir)')" />
+    <MakeDir Directories="$(PluginDeploymentDir)\lib" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginDeploymentDir)\lib" />
+    <Copy SourceFiles="manifest.json" DestinationFiles="$(PluginDeploymentDir)\manifest.json" />
+  </Target>
+</Project>
+
+
+
+
+
+

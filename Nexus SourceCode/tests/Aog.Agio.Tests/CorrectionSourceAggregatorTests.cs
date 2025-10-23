@@ -272,24 +272,46 @@ public sealed class CorrectionSourceAggregatorTests
 
     private sealed class RecordingTimeProvider : TimeProvider
     {
-        private DateTimeOffset _utcNow = DateTimeOffset.UtcNow;
-
         public List<TimeSpan> Delays { get; } = new();
 
-        public override DateTimeOffset GetUtcNow() => _utcNow;
+        public override DateTimeOffset GetUtcNow() => DateTimeOffset.UtcNow;
 
         public override long GetTimestamp() => Stopwatch.GetTimestamp();
 
-        public override TimeSpan GetElapsedTime(long startingTimestamp) => TimeProvider.System.GetElapsedTime(startingTimestamp);
-
-        public override TimeSpan GetElapsedTime(long startingTimestamp, long endingTimestamp) =>
-            TimeProvider.System.GetElapsedTime(startingTimestamp, endingTimestamp);
-
-        public override ValueTask Delay(TimeSpan delay, CancellationToken cancellationToken = default)
+        public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
         {
-            Delays.Add(delay);
-            cancellationToken.ThrowIfCancellationRequested();
-            return ValueTask.CompletedTask;
+            Delays.Add(dueTime);
+            return new CallbackTimer(callback, state);
+        }
+
+        private sealed class CallbackTimer : ITimer
+        {
+            private readonly TimerCallback _callback;
+            private readonly object? _state;
+
+            public CallbackTimer(TimerCallback callback, object? state)
+            {
+                _callback = callback ?? throw new ArgumentNullException(nameof(callback));
+                _state = state;
+                _callback(_state);
+            }
+
+            public bool Change(TimeSpan dueTime, TimeSpan period)
+            {
+                if (dueTime == Timeout.InfiniteTimeSpan)
+                {
+                    return true;
+                }
+
+                _callback(_state);
+                return true;
+            }
+
+            public void Dispose()
+            {
+            }
+
+            public ValueTask DisposeAsync() => ValueTask.CompletedTask;
         }
     }
 }

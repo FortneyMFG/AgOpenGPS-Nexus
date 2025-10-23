@@ -1,7 +1,7 @@
 using Aog.Agio.Nmea;
 using Aog.Agio.Serial;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace Aog.Agio.Linux.Tests;
@@ -11,7 +11,7 @@ public sealed class LinuxNmeaAutoScannerTests
     [Fact]
     public async Task ScanAsync_FindsDeviceWithValidSentences()
     {
-        var timeProvider = new ManualTimeProvider(new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero));
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero));
         var enumerator = new FakeSerialPortEnumerator("/dev/ttyUSB0");
         var parser = new NmeaSentenceParser();
 
@@ -29,7 +29,7 @@ public sealed class LinuxNmeaAutoScannerTests
             },
             () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
 
-        var options = Options.Create(new NmeaSerialPortScanOptions
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
         {
             ProbeDuration = TimeSpan.FromSeconds(2),
             ReadTimeout = TimeSpan.FromMilliseconds(50),
@@ -37,7 +37,7 @@ public sealed class LinuxNmeaAutoScannerTests
             MaxReadAttemptsPerPort = 25,
         });
 
-        var scanner = new NmeaAutoScanner(
+        using var scanner = new NmeaAutoScanner(
             enumerator,
             sessionFactory,
             parser,
@@ -59,11 +59,11 @@ public sealed class LinuxNmeaAutoScannerTests
     [Fact]
     public async Task ScanAsync_ReturnsNullWhenNoDevicesProduceSentences()
     {
-        var timeProvider = new ManualTimeProvider(DateTimeOffset.UnixEpoch);
+        var timeProvider = new FakeTimeProvider(DateTimeOffset.UnixEpoch);
         var enumerator = new FakeSerialPortEnumerator("/dev/ttyACM0");
         var parser = new NmeaSentenceParser();
         var sessionFactory = new FakeSerialPortSessionFactory(new Dictionary<(string Port, int Baud), IEnumerable<string>>(), () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
-        var options = Options.Create(new NmeaSerialPortScanOptions
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
         {
             ProbeDuration = TimeSpan.FromSeconds(1),
             ReadTimeout = TimeSpan.FromMilliseconds(50),
@@ -71,7 +71,7 @@ public sealed class LinuxNmeaAutoScannerTests
             MaxReadAttemptsPerPort = 5,
         });
 
-        var scanner = new NmeaAutoScanner(
+        using var scanner = new NmeaAutoScanner(
             enumerator,
             sessionFactory,
             parser,
@@ -165,20 +165,4 @@ public sealed class LinuxNmeaAutoScannerTests
         }
     }
 
-    private sealed class ManualTimeProvider : TimeProvider
-    {
-        private DateTimeOffset _current;
-
-        public ManualTimeProvider(DateTimeOffset start)
-        {
-            _current = start;
-        }
-
-        public override DateTimeOffset GetUtcNow() => _current;
-
-        public void Advance(TimeSpan delta)
-        {
-            _current += delta;
-        }
-    }
 }

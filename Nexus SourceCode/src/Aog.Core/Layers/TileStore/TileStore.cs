@@ -63,7 +63,7 @@ public sealed class TileStore : ILayerControllerTileSink, IDisposable
         _timeProvider = options.TimeProvider ?? TimeProvider.System;
         _storePath = options.Path;
         Directory.CreateDirectory(_storePath);
-        _manifestPath = Path.Combine(_storePath, ManifestFileName);
+        _manifestPath = System.IO.Path.Combine(_storePath, ManifestFileName);
         _serializerOptions = CreateSerializerOptions();
 
         _manifest = ReadManifest();
@@ -403,7 +403,7 @@ public sealed class TileStore : ILayerControllerTileSink, IDisposable
         var payload = JsonSerializer.Serialize(tile, _serializerOptions);
         var bytes = Utf8NoBom.GetBytes(payload);
         stream.Write(bytes, 0, bytes.Length);
-        stream.WriteByte((byte)\n);
+        stream.WriteByte((byte)'\n');
         if (flush)
         {
             stream.Flush(true);
@@ -525,7 +525,7 @@ public sealed record TileStoreSegmentStatistics(string FileName, long TotalRecor
 
 /// <summary>Result returned by <see cref="TileStore.Compact"/>.</summary>
 public sealed record TileStoreCompactionResult(
-    bool Compacted,
+    bool WasCompacted,
     int RemovedSegmentCount,
     long TotalRecords,
     long LiveRecords)

@@ -47,8 +47,8 @@ public sealed class LegacyCompatibilityBridge
                     NodeId = announcement.VendorId,
                     FirmwareVersion = announcement.FirmwareVersion,
                     HardwareModel = ((LegacyDeviceMcu)announcement.McuId).ToString(),
-                    Priority = NodePriority.NodePriorityDefault,
-                    Role = NodeRole.NodeRoleController,
+                    Priority = NodePriority.Default,
+                    Role = NodeRole.Controller,
                 },
                 SessionId = 0,
             };
@@ -65,8 +65,9 @@ public sealed class LegacyCompatibilityBridge
         if (_steerCodec.TryDecodeSteerState(datagram, out var steerState, out var steerMetadata))
         {
             StampHeader(steerState, "legacy/pgn/steer_state", "vehicle");
-            steerState.HeadingErrorRad = LegacyAngles.DegreesToRadians(steerMetadata.HeadingDeg);
+            steerState.SetLegacyHeadingDegrees(steerMetadata.HeadingDeg);
             steerState.LateralErrorM = 0;
+            steerState.HeadingErrorRad = 0;
 
             envelope.Header = BuildTelemetryHeader(MessageType.LinkMessageTypeTelemetrySteerState, steerState.CalculateSize());
             envelope.SteerState = steerState;
@@ -76,12 +77,13 @@ public sealed class LegacyCompatibilityBridge
         if (_steerCodec.TryDecodeSteerCommand(datagram, out var steerCmd, out var steerCommandMetadata, out var sectionMask))
         {
             StampHeader(steerCmd, "legacy/pgn/steer_cmd", "vehicle");
-            steerCmd.Enable = steerCommandMetadata.GuidanceStatus != 0;
+            const byte EngagedBit = 0x01;
+            steerCmd.Enable = (steerCommandMetadata.GuidanceStatus & EngagedBit) != 0;
 
             envelope.Header = BuildCommandHeader(MessageType.LinkMessageTypeCommandSteer, steerCmd.CalculateSize(), needsAck: true);
             envelope.SteerCommand = steerCmd;
 
-            if (sectionMask.SectionCount > 0)
+            if (sectionMask.Mask != 0)
             {
                 StampHeader(sectionMask, "legacy/pgn/sections", "implement");
                 envelope.SectionMask = sectionMask;

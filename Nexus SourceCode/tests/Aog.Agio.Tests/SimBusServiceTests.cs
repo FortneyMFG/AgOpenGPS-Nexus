@@ -80,6 +80,7 @@ public sealed class SimBusServiceTests
 
     private static ServerCallContext CreateContext(CancellationToken token, string method)
     {
+        WriteOptions? writeOptions = null;
         return TestServerCallContext.Create(
             method: method,
             host: null,
@@ -89,8 +90,9 @@ public sealed class SimBusServiceTests
             peer: "ipv4:127.0.0.1",
             authContext: null,
             contextPropagationToken: null,
-            responseTrailers: null,
-            writeHeadersFunc: _ => Task.CompletedTask);
+            writeHeadersFunc: _ => Task.CompletedTask,
+            writeOptionsGetter: () => writeOptions ?? new WriteOptions(),
+            writeOptionsSetter: options => writeOptions = options);
     }
 
     private sealed class RecordingStreamWriter<T> : IServerStreamWriter<T>

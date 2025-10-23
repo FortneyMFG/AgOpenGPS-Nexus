@@ -87,11 +87,12 @@ public sealed class ReportBuilderService : IReportBuilderService
         Dictionary<string, IReportSectionContributor> contributorSnapshot;
         lock (_mutex)
         {
-            if (!_templates.TryGetValue(templateId, out template))
+            if (!_templates.TryGetValue(templateId, out var resolvedTemplate))
             {
                 throw new KeyNotFoundException($"Report template '{templateId}' is not registered.");
             }
 
+            template = resolvedTemplate;
             contributorSnapshot = new Dictionary<string, IReportSectionContributor>(_contributors, StringComparer.OrdinalIgnoreCase);
         }
 

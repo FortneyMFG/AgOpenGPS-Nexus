@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Channels;
-using System.Threading.Tasks;
-using Aog.Core.Jobs;
 
 namespace Aog.Plugins.JobTasks;
 
@@ -21,7 +15,7 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
     private readonly SemaphoreSlim _mutex = new(1, 1);
     private readonly Dictionary<string, JobState> _jobs = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, HashSet<string>> _seasonIndex = new(StringComparer.OrdinalIgnoreCase);
-    private readonly List<Channel<JobSessionEvent>> _watchers = new();
+    private readonly List<System.Threading.Channels.Channel<JobSessionEvent>> _watchers = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JobSeasonSessionOrchestrator"/> class.
@@ -33,7 +27,7 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
     }
 
     /// <inheritdoc />
-    public async Task TrackJobAsync(JobMetadata job, CancellationToken cancellationToken = default)
+    public async Task TrackJobAsync(Aog.Core.Jobs.JobMetadata job, CancellationToken cancellationToken = default)
     {
         if (job is null)
         {
@@ -395,9 +389,10 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
                 JobSessionState.Active,
                 now,
                 now,
-                endedAt: null,
+                null,
+
                 sanitized.WorkOrderId,
-                sanitized.ActiveOperators,
+                sanitized.ActiveOperators ?? Array.Empty<string>(),
                 sanitized.Notes);
 
             state.Sessions.Add(session);
@@ -522,12 +517,15 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
             return Array.Empty<string>();
         }
 
-        return operators
+        var normalized = operators
             .Select(o => o?.Trim())
             .Where(o => !string.IsNullOrEmpty(o))
+            .Select(o => o!)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(o => o, StringComparer.OrdinalIgnoreCase)
             .ToArray();
+
+        return normalized;
     }
 
     private static string? SanitizeOptionalString(string? value)
@@ -547,7 +545,7 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
     }
 
     private async IAsyncEnumerable<JobSessionEvent> ReadEventsAsync(
-        Channel<JobSessionEvent> channel,
+        System.Threading.Channels.Channel<JobSessionEvent> channel,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         using var registration = cancellationToken.Register(() => channel.Writer.TryComplete());
@@ -587,7 +585,7 @@ public sealed class JobSeasonSessionOrchestrator : IJobSeasonSessionOrchestrator
             return;
         }
 
-        Channel<JobSessionEvent>[] watchers;
+        System.Threading.Channels.Channel<JobSessionEvent>[] watchers;
         lock (_watchers)
         {
             watchers = _watchers.ToArray();

@@ -14,7 +14,7 @@ public sealed class ZoneImportWorkflowViewModel : ObservableObject
     private readonly string _resultSummaryTemplate;
 
     private bool _isBusy;
-    private double _progress;
+    private double _exportProgress;
     private string _statusDisplay;
     private DateTimeOffset? _lastRun;
 
@@ -85,11 +85,20 @@ public sealed class ZoneImportWorkflowViewModel : ObservableObject
     public string LastRunDisplay => _lastRun?.ToLocalTime().ToString("HH:mm:ss") ?? "—";
 
     /// <summary>Gets or sets the progress value between 0 and 1.</summary>
-    public double Progress
+    public double ExportProgress
     {
-        get => _progress;
-        private set => SetProperty(ref _progress, value);
+        get => _exportProgress;
+        private set
+        {
+            if (SetProperty(ref _exportProgress, value))
+            {
+                OnPropertyChanged(nameof(ExportProgressPercent));
+            }
+        }
     }
+
+    /// <summary>Gets the export progress as a percentage.</summary>
+    public double ExportProgressPercent => ExportProgress * 100d;
 
     /// <summary>Gets a value indicating whether the workflow is running.</summary>
     public bool IsBusy
@@ -115,14 +124,14 @@ public sealed class ZoneImportWorkflowViewModel : ObservableObject
         }
 
         IsBusy = true;
-        Progress = 0.25;
+        ExportProgress = 0.25;
         StatusDisplay = "Validating CRS and schema...";
 
         var now = _clock();
         var action = IsExport ? "Export completed" : "Import completed";
         var detail = string.Format(_resultSummaryTemplate, _sampleFeatureCount, now.ToLocalTime().ToString("HH:mm"));
 
-        Progress = 1.0;
+        ExportProgress = 1.0;
         _lastRun = now;
         StatusDisplay = detail;
         OnPropertyChanged(nameof(LastRunDisplay));

@@ -57,7 +57,8 @@ public sealed class GeneticsLayerIngestPipelineTests
         feature.Geometry.AreaSquareMeters.Should().BeApproximately(100, 1e-6);
 
         pipeline.TryGetPlan("Field #1", out var retrieved).Should().BeTrue();
-        retrieved.Should().BeSameAs(feature);
+        retrieved.Should().NotBeNull();
+        retrieved!.Should().BeSameAs(feature);
 
         var plans = pipeline.GetPlanFeatures();
         plans.Should().ContainSingle().Which.FeatureId.Should().Be("geneticsPlan:field-1");

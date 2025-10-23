@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using Aog.Agio.Legacy;
 using Aog.Core.V1;
 using Xunit;
@@ -43,6 +44,21 @@ public sealed class LegacyPoseCodecTests
 
         var checksum = ComputeChecksum(frame);
         Assert.Equal(checksum, frame[^1]);
+    }
+
+    [Fact]
+    public void EncodePose_DefaultsSourceAddressWhenMetadataMissing()
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = 40.0,
+            LongitudeDeg = -86.0,
+        };
+
+        var frame = codec.EncodePose(pose);
+
+        Assert.Equal(LegacyPoseCodec.MainAntennaSourceAddress, frame[2]);
     }
 
     [Fact]
@@ -98,6 +114,61 @@ public sealed class LegacyPoseCodecTests
     }
 
     [Fact]
+    public void TryDecodePose_DefaultsHeadingToZeroWhenBothHeadingsInvalid()
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = 10,
+            LongitudeDeg = 20,
+            HeadingRad = 1.0,
+        };
+
+        var frame = codec.EncodePose(pose);
+        var payload = frame.AsSpan(5, LegacyPoseCodec.MainAntennaPayloadLength);
+
+        BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(16, 4), float.NaN);
+        BinaryPrimitives.WriteSingleLittleEndian(payload.Slice(20, 4), float.PositiveInfinity);
+
+        frame[^1] = ComputeChecksum(frame);
+
+        Assert.True(codec.TryDecodePose(frame, out var decodedPose, out _));
+        Assert.Equal(0d, decodedPose.HeadingRad);
+    }
+
+    [Theory]
+    [MemberData(nameof(TryDecodePose_SanitizesLatLonData))]
+    public void TryDecodePose_SanitizesLatLon(double encodedLatitude, double encodedLongitude, double expectedLatitude, double expectedLongitude)
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = 1d,
+            LongitudeDeg = 1d,
+        };
+
+        var frame = codec.EncodePose(pose);
+        var payload = frame.AsSpan(5, LegacyPoseCodec.MainAntennaPayloadLength);
+
+        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(0, 8), encodedLongitude);
+        BinaryPrimitives.WriteDoubleLittleEndian(payload.Slice(8, 8), encodedLatitude);
+
+        frame[^1] = ComputeChecksum(frame);
+
+        Assert.True(codec.TryDecodePose(frame, out var decodedPose, out _));
+        Assert.Equal(expectedLatitude, decodedPose.LatitudeDeg, 6);
+        Assert.Equal(expectedLongitude, decodedPose.LongitudeDeg, 6);
+    }
+
+    public static TheoryData<double, double, double, double> TryDecodePose_SanitizesLatLonData => new()
+    {
+        { double.NaN,               12.5d,  0d,    12.5d },
+        { 44.1d,    double.PositiveInfinity, 44.1d, 0d   },
+        { 95d,                 -181d,       90d,  -180d },
+        { -120d,                540d,      -90d,   180d },
+    };
+
+    [Fact]
     public void TryDecodePose_ReturnsFalseForInvalidChecksum()
     {
         var codec = new LegacyPoseCodec();
@@ -108,6 +179,70 @@ public sealed class LegacyPoseCodecTests
         Assert.False(codec.TryDecodePose(frame, out var decodedPose, out var metadata));
         Assert.NotNull(decodedPose);
         Assert.NotNull(metadata);
+    }
+
+    [Theory]
+    [MemberData(nameof(EncodePose_CoercesInvalidLatLonData))]
+    public void EncodePose_CoercesInvalidLatLon(double latitude, double longitude, double expectedLatitude, double expectedLongitude)
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = latitude,
+            LongitudeDeg = longitude,
+        };
+
+        var frame = codec.EncodePose(pose);
+
+        Assert.True(codec.TryDecodePose(frame, out var decodedPose, out _));
+        Assert.Equal(expectedLatitude, decodedPose.LatitudeDeg, 6);
+        Assert.Equal(expectedLongitude, decodedPose.LongitudeDeg, 6);
+    }
+
+    public static TheoryData<double, double, double, double> EncodePose_CoercesInvalidLatLonData => new()
+    {
+        { double.NaN,               12.5d,  0d,    12.5d },   // non-finite -> 0
+        { 44.1d,    double.PositiveInfinity, 44.1d, 0d   },   // non-finite -> 0
+        { 95d,                 -181d,       90d,  -180d },    // clamp / wrap
+        { -120d,                540d,      -90d,   180d },    // clamp / wrap
+    };
+
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    [InlineData(double.NegativeInfinity)]
+    public void EncodePose_NormalizesNonFiniteInputs(double invalidValue)
+    {
+        var codec = new LegacyPoseCodec();
+        var pose = new Pose
+        {
+            LatitudeDeg = 0,
+            LongitudeDeg = 0,
+            HeadingRad = invalidValue,
+            SpeedMps = invalidValue,
+            RollRad = invalidValue,
+            AltitudeM = invalidValue,
+            PitchRad = invalidValue,
+            YawRateRadps = invalidValue,
+        };
+
+        var frame = codec.EncodePose(pose);
+
+        // Main antenna payload begins at byte 5
+        var payload = frame.AsSpan(5, LegacyPoseCodec.MainAntennaPayloadLength);
+
+        // Float fields zeroed (offsets as established in existing tests/codec)
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(16, 4))); // Heading
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(20, 4))); // Speed
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(24, 4))); // Roll
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(28, 4))); // Altitude
+        Assert.Equal(0f, BinaryPrimitives.ReadSingleLittleEndian(payload.Slice(32, 4))); // Pitch
+
+        // Integer-scaled extras zeroed
+        Assert.Equal(0, BinaryPrimitives.ReadUInt16LittleEndian(payload.Slice(43, 2)));  // (reserved/flags)
+        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(45, 2)));   // YawRate (scaled)
+        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(47, 2)));   // IMU roll
+        Assert.Equal(0, BinaryPrimitives.ReadInt16LittleEndian(payload.Slice(49, 2)));   // IMU pitch
     }
 
     private static byte ComputeChecksum(ReadOnlySpan<byte> frame)

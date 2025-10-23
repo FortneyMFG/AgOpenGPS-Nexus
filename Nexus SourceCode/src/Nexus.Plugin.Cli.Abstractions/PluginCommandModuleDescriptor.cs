@@ -1,7 +1,7 @@
 namespace Nexus.Plugin.Cli.Abstractions;
 
 /// <summary>
-/// Describes metadata about a plugin CLI adapter supplied to a command module.
+/// Describes metadata about a plugin CLI adapter supplied to a command handler.
 /// </summary>
 /// <param name="PluginId">The manifest identifier of the plugin.</param>
 /// <param name="PluginName">The human-friendly name of the plugin.</param>

@@ -157,8 +157,10 @@ public sealed class GeneticsExportPipeline
         string? sessionId,
         DateTimeOffset? appliedAt,
         string? barcode,
-        IReadOnlyList<GeneticsChangeLogEntry> changeLog)
+        IReadOnlyList<GeneticsChangeLogEntry>? changeLog)
     {
+        var entries = changeLog ?? Array.Empty<GeneticsChangeLogEntry>();
+
         writer.WriteStartObject();
         writer.WriteString("type", "Feature");
         writer.WriteString("id", feature.FeatureId);
@@ -223,11 +225,11 @@ public sealed class GeneticsExportPipeline
 
         writer.WriteNumber("areaSquareMeters", feature.Geometry.AreaSquareMeters);
 
-        if (changeLog.Count > 0)
+        if (entries.Count > 0)
         {
             writer.WritePropertyName("changeLog");
             writer.WriteStartArray();
-            foreach (var entry in changeLog)
+            foreach (var entry in entries)
             {
                 writer.WriteStartObject();
                 writer.WriteString("changedAt", entry.ChangedAt.ToString("O", CultureInfo.InvariantCulture));
@@ -365,12 +367,16 @@ public sealed class GeneticsExportPipeline
             new XAttribute("id", feature.FeatureId),
             new XAttribute("zoneId", feature.ZoneId),
             new XAttribute("layerId", feature.LayerId),
-            new XAttribute("jobId", feature.JobId),
             new XAttribute("sessionId", feature.SessionId),
             new XAttribute("brand", feature.Brand),
             new XAttribute("product", feature.Product),
             new XAttribute("appliedAt", feature.AppliedAt.ToString("O", CultureInfo.InvariantCulture)),
             new XAttribute("areaSquareMeters", feature.Geometry.AreaSquareMeters.ToString("0.###", CultureInfo.InvariantCulture)));
+
+        if (!string.IsNullOrEmpty(feature.JobId))
+        {
+            element.Add(new XAttribute("jobId", feature.JobId));
+        }
 
         if (!string.IsNullOrEmpty(feature.TraitStack))
         {

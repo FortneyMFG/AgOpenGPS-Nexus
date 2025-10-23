@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 
@@ -226,6 +227,10 @@ public sealed class CoverageExportVerifier
 /// </summary>
 public sealed class CoverageShapefileReport
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CoverageShapefileReport"/> class.
+    /// </summary>
+    /// <param name="differences">Polygon comparison results produced by the verifier.</param>
     public CoverageShapefileReport(IReadOnlyList<CoverageShapeDifference> differences)
     {
         Differences = differences ?? throw new ArgumentNullException(nameof(differences));

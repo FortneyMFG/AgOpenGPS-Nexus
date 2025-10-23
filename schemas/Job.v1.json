@@ -4,7 +4,16 @@
   "title": "Job.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "farmId", "fieldIds", "operation"],
+  "required": [
+    "id",
+    "name",
+    "farmId",
+    "fieldIds",
+    "operation",
+    "createdBy",
+    "createdAt",
+    "lastModifiedAt"
+  ],
   "properties": {
     "schemaVersion": {
       "type": "string",

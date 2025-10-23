@@ -1,6 +1,7 @@
 using Aog.UI.Avalonia.Rendering;
 using Avalonia;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using Xunit;
 
@@ -60,20 +61,47 @@ public class MapViewportTests
         var screenPoint = viewport.WorldToScreen(focusPoint);
         screenPoint.Should().BeApproximately(new Point(size.Width / 2, size.Height / 2), 1e-6);
     }
+
+    [Fact]
+    public void ZoomAt_ClampsScaleWithinConfiguredBounds()
+    {
+        var viewport = new MapViewport(minScale: 0.2, maxScale: 5.0);
+        var cursor = new Point(100, 100);
+        var worldAtCursor = viewport.ScreenToWorld(cursor);
+
+        viewport.ZoomAt(cursor, 0.01);
+        viewport.Scale.Should().BeApproximately(0.2, 1e-6);
+        viewport.ScreenToWorld(cursor).Should().BeApproximately(worldAtCursor, 1e-6);
+
+        viewport.ZoomAt(cursor, 100);
+        viewport.Scale.Should().BeApproximately(5.0, 1e-6);
+        viewport.ScreenToWorld(cursor).Should().BeApproximately(worldAtCursor, 1e-6);
+    }
 }
 
 internal static class PointAssertionsExtensions
 {
-    public static AndConstraint<ObjectAssertions<Point>> BeApproximately(
-        this ObjectAssertions<Point> assertions,
+    public static AndConstraint<ObjectAssertions> BeApproximately(
+        this ObjectAssertions assertions,
         Point expected,
         double precision)
     {
-        var subject = assertions.Subject;
+        Point subject;
+
+        if (assertions.Subject is Point point)
+        {
+            subject = point;
+        }
+        else
+        {
+            Execute.Assertion
+                .FailWith("Expected {context:Point} to be {0} but found {1}.", expected, assertions.Subject);
+            return new AndConstraint<ObjectAssertions>(assertions);
+        }
 
         subject.X.Should().BeApproximately(expected.X, precision);
         subject.Y.Should().BeApproximately(expected.Y, precision);
 
-        return new AndConstraint<ObjectAssertions<Point>>(assertions);
+        return new AndConstraint<ObjectAssertions>(assertions);
     }
 }

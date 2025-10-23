@@ -34,7 +34,7 @@ public sealed class KinematicsProfileEditorViewModel : ObservableObject
         _clock = clock ?? (() => DateTimeOffset.UtcNow);
         _profileId = "profile.default";
         _schemaVersion = AxleCentricProfileLoader.SupportedSchemaVersion;
-        _compatibilityMinimumCoreVersion = "1.0";
+    _compatibilityMinimumCoreVersion = "1.2";
         _compatibilitySchemaVersion = AxleCentricProfileLoader.SupportedSchemaVersion;
         _validationMessages = Array.Empty<AxleIngestionMessage>();
 
@@ -190,7 +190,7 @@ public sealed class KinematicsProfileEditorViewModel : ObservableObject
         viewModel.Axles.Add(new KinematicsAxleViewModel("tractor.steer", AxleNodeRole.Steer, curvatureLimit: 0.4, slipLimit: 0.08));
         viewModel.Axles.Add(new KinematicsAxleViewModel("implement.toolbar", AxleNodeRole.Implement, curvatureLimit: null, slipLimit: 0.12));
 
-        viewModel.Joints.Add(new KinematicsJointViewModel("tractor.drive", "tractor.steer", AxleJointType.Articulation));
+        viewModel.Joints.Add(new KinematicsJointViewModel("tractor.drive", "tractor.steer", AxleJointType.Articulated));
         viewModel.Joints.Add(new KinematicsJointViewModel("tractor.steer", "implement.toolbar", AxleJointType.Rigid));
 
         viewModel.Modes.Add(new KinematicsModeViewModel("field", curvatureLimit: 0.4, slipLimit: 0.1, DriveDirectionPolicy.Bidirectional));

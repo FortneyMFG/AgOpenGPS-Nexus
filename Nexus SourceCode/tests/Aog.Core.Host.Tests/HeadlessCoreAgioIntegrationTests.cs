@@ -74,7 +74,7 @@ public sealed class HeadlessCoreAgioIntegrationTests
             var response = service.LastResponse;
             Assert.NotNull(response);
             Assert.Equal("agio-test", response!.NodeId);
-            Assert.Equal(CapabilityRole.CapabilityRoleAgio, response.Role);
+            Assert.Equal(CapabilityRole.Agio, response.Role);
             Assert.Empty(response.Rejections);
             Assert.Collection(
                 response.AcceptedCapabilities,
@@ -90,7 +90,6 @@ public sealed class HeadlessCoreAgioIntegrationTests
             }
 
             await server.ShutdownAsync();
-            server.Dispose();
         }
     }
 
@@ -127,7 +126,7 @@ public sealed class HeadlessCoreAgioIntegrationTests
             {
                 SessionId = request.SessionId,
                 NodeId = "agio-test",
-                Role = CapabilityRole.CapabilityRoleAgio
+                Role = CapabilityRole.Agio
             };
 
             foreach (var capability in request.Capabilities)

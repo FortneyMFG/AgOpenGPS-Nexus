@@ -1,7 +1,7 @@
 # Aog.Core.Mesh
 
 The mesh package hosts the in-memory implementation of the live telemetry mesh core
-service defined in [ADR-047](../../../docs/ADR/ADR-047_LiveTelemetryMesh.md).
+service defined in [ADR-047](../../../docs/development/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md).
 `LiveTelemetryMeshService` exposes registration, publication, subscription, and presence
 management primitives that mirror the pub/sub overlay described in the ADR.
 

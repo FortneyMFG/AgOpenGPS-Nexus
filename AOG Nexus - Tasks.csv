@@ -121,6 +121,7 @@ NX-119,FALSE,TRUE,NX-117,,AOG-Link ⇄ PGN compatibility bridge for legacy devic
 NX-120,FALSE,TRUE,NX-116,,AOG-Link Ethernet/UDP driver with multicast and command retries
 NX-121,FALSE,TRUE,NX-116,,AOG-Link RS-485/serial driver using COBS + CRC and slot scheduling
 NX-122,FALSE,TRUE,NX-116,,AOG-Link CAN/CAN-FD driver implementing AOG-CAN ID layout and segmentation
+NX-123,FALSE,TRUE,,,README experiment narrative refresh _(Done)_
 NX-124,FALSE,TRUE,,,Add ZoneService requirements and constraint policies
 NX-125,FALSE,TRUE,,,"Document layer boundaries for AgIO, Core, and plugins"
 NX-126,FALSE,TRUE,,,Mapping plugin architecture ADR
@@ -298,9 +299,10 @@ NX-335,FALSE,TRUE,NX-296,,Legacy multi-field envelope translator — ADR-043 mul
 NX-336,FALSE,TRUE,"NX-269, NX-304",,Legacy telemetry remap to new layers — ADR-049/052 telemetry parity
 NX-337,FALSE,TRUE,NX-274,,Legacy weather log migration utilities — ADR-053 weather parity
 NX-341,FALSE,TRUE,,,Produce zipped release artifacts for Windows and Linux builds
-NX-342,FALSE,TRUE,,,docs/howto/developer-setup.md
+NX-342,FALSE,TRUE,,,docs/development/howto/developer-setup.md
+NX-343,FALSE,TRUE,,,UI modernization AI prompt bundle
 NX-401,FALSE,TRUE,,,Simulation catalog atomic provider registration
-NX-410,FALSE,TRUE,,,Legacy UI asset migration workbook per docs/plans/ui-shell-and-plugin-integration.md
+NX-410,FALSE,TRUE,,,Legacy UI asset migration workbook per docs/Core/reference/agvalonia/ui-shell-and-plugin-integration.md
 NX-411,FALSE,TRUE,NX-410,,Shell and navigation port from V6 and AgValonia per artifacts/ui-core-spec.md
 NX-412,FALSE,TRUE,NX-411,,Map canvas and field operations UI port aligned with artifacts/ui-inventory.json
 NX-413,FALSE,TRUE,NX-412,,Job and field lifecycle dialogs port aligned with artifacts/ui-backlog.json
@@ -309,6 +311,7 @@ NX-415,FALSE,TRUE,"NX-412, NX-413",,Plugin UI surfaces for guidance device analy
 NX-416,FALSE,TRUE,NX-415,,Diagnostics and AgIO workspace port aligned with artifacts/ui-core-spec.md
 NX-417,FALSE,TRUE,"NX-416, NX-301",,Simulation shell and companion parity automation aligned with metadata-driven style guide
 NX-418,FALSE,TRUE,NX-417,,Documentation QA and release readiness aligned with artifacts/ui-screenshots/README.md
+NX-419,FALSE,TRUE,,,"Settings, hotkeys, and appearance consolidation _(Done)_ — Aligns with artifacts/ui-theme-tokens.json"
 NX-452,FALSE,TRUE,NX-414,,Core ingestion service for axle-centric profiles — ADR-067 runtime ingestion
 NX-453,FALSE,TRUE,NX-452,,Automation integration for axle-centric limits — ADR-067 planner/controller wiring
 NX-454,FALSE,TRUE,NX-453,,Calibration workflows & fixtures — ADR-067 calibration suite delivery
@@ -316,6 +319,73 @@ NX-455,FALSE,TRUE,NX-454,,Documentation & preset libraries for axle-centric rigs
 NX-462,FALSE,TRUE,,,Linux Core service packaging & systemd units — O-BACKEND-6 packaging
 NX-463,FALSE,TRUE,NX-462,,Linux Core operations & observability playbook — ADR-068 diagnostics + SRS §10
 NX-464,FALSE,TRUE,"NX-462, NX-463",,Headless Core + AGiO integration validation — ADR-068 replay + O-BACKEND-6 smoke
+NX-512,FALSE,FALSE,,,README Nexus guide expansion _(In Progress)_ — docs/README.md narrative refresh
+NX-514,FALSE,TRUE,,,Nexus CLI SRS & ADR alignment _(Done)_ — SRS §18 Command Line Interface
+NX-600,FALSE,TRUE,NX-060,,NX CLI Plugin backlog update
+NX-601,FALSE,TRUE,NX-600,,NX CLI Plugin host scaffold
+NX-602,FALSE,TRUE,NX-601,,NX CLI Plugin endpoint resolver & core status
+NX-603,FALSE,TRUE,NX-601,,NX CLI Plugin output modes & completions
+NX-604,FALSE,TRUE,NX-603,,NX CLI Plugin discovery & adapter loader
+NX-605,FALSE,TRUE,NX-604,,Publish Nexus.Plugin.Cli.Abstractions
+NX-606,FALSE,TRUE,NX-605,,NX CLI Plugin sample verbs
+NX-607,FALSE,TRUE,NX-605,,NX CLI Plugin gRPC reflection client
+NX-608,FALSE,TRUE,"NX-606, NX-607",,NX CLI Plugin packaging pipeline
+NX-609,FALSE,TRUE,NX-608,,NX CLI Plugin docs & completions kit
+NX-610,FALSE,TRUE,NX-190,,"ADR governance automation for program board telemetry, dependency digests, and review minutes"
+NX-611,FALSE,TRUE,NX-190,,"PoseStreamService and SectionState roadmap delivery for ADR-007 services, schemas, and replay fixtures"
+NX-612,FALSE,TRUE,NX-190,,"TileStore durability, compaction, and crash-safety rollout per ADR-009"
+NX-613,FALSE,TRUE,NX-190,,"Layer registry, imagery renderer cache, and fusion QA expansion from ADR-010 through ADR-013"
+NX-614,FALSE,TRUE,NX-190,,"Prescription import/export suite, control semantics updates, and CAN guardrails from ADR-014 through ADR-016"
+NX-615,FALSE,TRUE,NX-190,,"Kinematics editor, plugin permission gate, provenance DAG, and identity UX per ADR-017 through ADR-024"
+NX-616,FALSE,TRUE,NX-190,,"Retention planners, performance dashboards, and CI acceptance hooks from ADR-025 and ADR-026"
+NX-620,FALSE,TRUE,,,V6 guidance row/edge-case study docs _(Done)_ — v6 guidance extraction notes (sections 90/95/99)
+NX-671,FALSE,TRUE,,,gpsd disable toggle for Linux backend _(Done)_ — Allows operators to opt out of gpsd monitoring when the daemon is not present
+NX-673,FALSE,TRUE,,,"Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests"
+NX-701,FALSE,TRUE,,,SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
+NX-742,FALSE,TRUE,,,SocketCAN channel backpressure guardrails
+NX-910,FALSE,FALSE,,,Job manifest cross-drive fallback fix
+NX-915,FALSE,FALSE,,,gpsd TPV null field handling regression test
+NX-921,FALSE,TRUE,,,NMEA parser timestamp bounds check _(Done)_ — Guard invalid hh/mm/ss values before constructing TimeOnly
+NX-922,FALSE,TRUE,,,NuGet local feed path normalization _(Done)_ — Ensure artifacts/nuget source resolves cross-platform
+NX-923,FALSE,TRUE,,,Simulation bar replay error logging _(Done)_ — Ensure playback commands surface controller failures
+NX-925,FALSE,TRUE,,,Plugin manifest requiredTransports validation _(Done)_
+NX-931,FALSE,TRUE,,,SimulationBar replay subscription cleanup _(Done)_ — Remove legacy EnsureReplayControllerSubscription helper
+NX-932,FALSE,FALSE,,,gpsd monitor restart on socket availability
+NX-933,FALSE,TRUE,,,Linux serial scan configuration binding
+NX-934,FALSE,FALSE,,,Legacy UDP section mask snapshot fix
+NX-935,FALSE,TRUE,,,Legacy pose codec default source fallback _(Done)_ — Default main antenna source address when metadata is omitted
+NX-936,TRUE,FALSE,,,Legacy shapefile multi-part boundary import fix
+NX-937,TRUE,FALSE,,,Legacy pose codec non-finite guard
+NX-938,FALSE,FALSE,,,Legacy steer command speed encoding fix
+NX-939,TRUE,FALSE,,,Legacy pose lat/lon sanitization
+NX-940,TRUE,FALSE,,,Legacy steer angle saturation clamp
+NX-941,FALSE,TRUE,,,Simulation bar playback rate reset _(Done)_ — Reset configuration default when reverting routes
+NX-942,FALSE,FALSE,,,Planter panel stale row cleanup regression
+NX-943,FALSE,FALSE,,,Legacy steer command guidance status disable fix
+NX-944,TRUE,FALSE,,,Legacy steer command source override
+NX-945,TRUE,FALSE,,,Legacy frame checksum length guard
+NX-946,TRUE,FALSE,,,Planter panel row index overflow guard
+NX-947,TRUE,FALSE,,,NuGet dependency alignment for .NET restore
+NX-948,FALSE,FALSE,,,MainWindow deterministic dashboard seeding
+NX-952,TRUE,FALSE,,,Aog.Agio.Windows targeting pack restore guard
+NX-953,FALSE,TRUE,,,SocketCAN burst tolerance for transient backpressure
+NX-954,FALSE,TRUE,,,Simulation route mode case-insensitive selection _(Done)_ — Mirror SelectedMode setter canonicalization and tests
+NX-955,FALSE,TRUE,,,Field feedback aggregator JSONL regression fix _(Done)_ — Restore newline-delimited parsing and unit coverage
+NX-956,FALSE,TRUE,,,SocketCAN reconnect delay clamp _(Done)_ — Guard zero/negative delays by restoring the default backoff
+NX-959,TRUE,FALSE,,,Linux NMEA scan hot reload
+NX-960,FALSE,TRUE,,,".NET 8 toolchain regression sweep _(Done)_ — Restore CLI, protobuf, and Parquet compatibility after SDK updates"
+NX-963,FALSE,TRUE,,,Legacy pose dual heading sanitization fix _(Done)_ — Guard secondary heading against non-finite values
+NX-967,FALSE,TRUE,,,Linux serial enumerator canonical dedupe
+NX-971,FALSE,FALSE,,,Linux NMEA VTG null speed log fix
+NX-980,FALSE,TRUE,,,Sections panel sixteen-toggle support _(Done)_ — Expand UI and tests for 16-section masks
+NX-986,TRUE,FALSE,,,Linux serial symlink deduplication fix
+NX-987,FALSE,FALSE,,,Simulation bar playback rate label multiplier — Format selected rate using multiplier notation
+NX-988,FALSE,FALSE,,,Parquet.Net v5 compatibility fixes
+NX-989,FALSE,FALSE,,,SocketCAN pump cancellation regression fix
+NX-990,FALSE,TRUE,,,TimeProvider registration for NMEA auto scanner
+NX-991,FALSE,TRUE,,,Simulation bar cancellation logging suppression _(Done)_ — Ignore replay controller cancellations in transport bar
+NX-997,FALSE,TRUE,,,Linux NMEA stream switch logging
+NX-998,FALSE,FALSE,,,Guidance Orchestrator plugin SRS/ADR scaffolding — ADR-069 Guidance Orchestrator
 NX-PP-000,FALSE,TRUE,NX-115,,Ingest Pumpkin Pi codex brief
 NX-PP-001,FALSE,TRUE,NX-PP-000,,Write SRS §8A CM5 Integrated (AgIO-bypass)
 NX-PP-002,FALSE,TRUE,NX-PP-001,,Add ADR for SHM fastpath + HAL
@@ -335,20 +405,3 @@ NX-PP-015,FALSE,TRUE,"NX-PP-006, NX-PP-005",,Bench fastpath latency
 NX-PP-016,FALSE,TRUE,NX-PP-015,,TTL expiry safe-neutral test
 NX-PP-017,FALSE,TRUE,NX-PP-015,,Broker restart resilience test
 NX-PP-018,FALSE,TRUE,"NX-PP-015, NX-PP-017",,External MCU coexistence test
-NX-600,FALSE,TRUE,NX-060,,NX CLI Plugin backlog update
-NX-601,FALSE,TRUE,NX-600,,NX CLI Plugin host scaffold
-NX-602,FALSE,TRUE,NX-601,,NX CLI Plugin endpoint resolver & core status
-NX-603,FALSE,TRUE,NX-601,,NX CLI Plugin output modes & completions
-NX-604,FALSE,TRUE,NX-603,,NX CLI Plugin discovery & adapter loader
-NX-605,FALSE,TRUE,NX-604,,Publish Nexus.Plugin.Cli.Abstractions
-NX-606,FALSE,TRUE,NX-605,,NX CLI Plugin sample verbs
-NX-607,FALSE,TRUE,NX-605,,NX CLI Plugin gRPC reflection client
-NX-608,FALSE,TRUE,"NX-606, NX-607",,NX CLI Plugin packaging pipeline
-NX-609,FALSE,TRUE,NX-608,,NX CLI Plugin docs & completions kit
-NX-610,FALSE,TRUE,NX-190,,"ADR governance automation for program board telemetry, dependency digests, and review minutes"
-NX-611,FALSE,TRUE,NX-190,,"PoseStreamService and SectionState roadmap delivery for ADR-007 services, schemas, and replay fixtures"
-NX-612,FALSE,TRUE,NX-190,,"TileStore durability, compaction, and crash-safety rollout per ADR-009"
-NX-613,FALSE,TRUE,NX-190,,"Layer registry, imagery renderer cache, and fusion QA expansion from ADR-010 through ADR-013"
-NX-614,FALSE,TRUE,NX-190,,"Prescription import/export suite, control semantics updates, and CAN guardrails from ADR-014 through ADR-016"
-NX-615,FALSE,TRUE,NX-190,,"Kinematics editor, plugin permission gate, provenance DAG, and identity UX per ADR-017 through ADR-024"
-NX-616,FALSE,TRUE,NX-190,,"Retention planners, performance dashboards, and CI acceptance hooks from ADR-025 and ADR-026"

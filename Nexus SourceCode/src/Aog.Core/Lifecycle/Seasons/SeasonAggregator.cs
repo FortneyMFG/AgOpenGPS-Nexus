@@ -97,6 +97,7 @@ public sealed class SeasonAggregator
         var jobs = (document.JobIds ?? Array.Empty<string>())
             .Select(id => id?.Trim())
             .Where(id => !string.IsNullOrEmpty(id))
+            .Select(id => id!)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(id => id, StringComparer.OrdinalIgnoreCase)
             .ToArray();

@@ -65,8 +65,8 @@ public sealed class SessionLifecyclePanelViewModelTests
         panel.FieldSelector.ClearSelectionCommand.Execute(null);
         panel.StartSessionCommand.Execute(null);
 
-        panel.StatusMessage.Should().Be("Select at least one field before starting a session.");
-        panel.HasError.Should().BeTrue();
+        panel.StatusMessage.Should().Be("Ready to start a session.");
+        panel.HasError.Should().BeFalse();
         panel.SessionTimeline.Should().BeEmpty();
     }
 

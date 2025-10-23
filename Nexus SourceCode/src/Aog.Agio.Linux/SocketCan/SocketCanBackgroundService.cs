@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SocketCANSharp;
 using SocketCANSharp.Network;
+using ProtoCanFrame = Aog.Core.V1.CanFrame;
+using SocketCanFrame = SocketCANSharp.CanFrame;
 
 namespace Aog.Agio.Linux.SocketCan;
 
@@ -22,6 +24,8 @@ public sealed class SocketCanBackgroundService : BackgroundService
     private readonly IOptionsMonitor<SocketCanOptions> _options;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<SocketCanBackgroundService> _logger;
+    private static readonly TimeSpan MaxReconnectBackoff = TimeSpan.FromMinutes(1);
+
     private long _sequence;
 
     public SocketCanBackgroundService(
@@ -41,36 +45,73 @@ public sealed class SocketCanBackgroundService : BackgroundService
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var reconnectAttempt = 0;
+
         while (!stoppingToken.IsCancellationRequested)
         {
             var options = SnapshotOptions(_options.CurrentValue);
+            if (string.IsNullOrWhiteSpace(options.InterfaceName))
+            {
+                _logger.LogInformation(
+                    "SocketCAN monitor disabled. Configure AgioHost:Linux:SocketCan:InterfaceName to enable.");
+
+                var enabled = await WaitForInterfaceAsync(stoppingToken).ConfigureAwait(false);
+                if (!enabled)
+                {
+                    break;
+                }
+
+                continue;
+            }
+
             ISocketCanClient? client = null;
             var reconfigured = false;
+            var nextDelay = options.ReconnectDelay;
             using var reconfigureCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             using var changeRegistration = _options.OnChange((updated, _) =>
             {
-                if (!stoppingToken.IsCancellationRequested && RequiresRestart(options, updated))
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                var sanitized = SnapshotOptions(updated);
+                if (updated is not null && string.IsNullOrWhiteSpace(updated.SourcePrefix))
+                {
+                    _logger.LogWarning(
+                        "SocketCAN SourcePrefix update was empty. Defaulting to {SourcePrefix}.",
+                        sanitized.SourcePrefix);
+                }
+
+                if (RequiresRestart(options, sanitized))
                 {
                     reconfigured = true;
                     reconfigureCts.Cancel();
+                    reconnectAttempt = 0;
                 }
             });
             try
             {
                 client = await _clientFactory.CreateAsync(options, reconfigureCts.Token).ConfigureAwait(false);
                 _logger.LogInformation("SocketCAN interface {Interface} connected.", client.InterfaceName);
+                reconnectAttempt = 0;
+                nextDelay = options.ReconnectDelay;
                 await PumpAsync(client, options, reconfigureCts.Token).ConfigureAwait(false);
             }
             catch (SocketCanInterfaceNotFoundException ex) when (!stoppingToken.IsCancellationRequested)
             {
+                reconnectAttempt++;
+                nextDelay = CalculateBackoffDelay(options.ReconnectDelay, reconnectAttempt);
                 _logger.LogWarning(
                     "SocketCAN interface {Interface} not found. Retrying in {Delay}.",
                     ex.InterfaceName,
-                    options.ReconnectDelay);
+                    nextDelay);
             }
             catch (SocketCanException ex) when (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogError(ex, "SocketCAN error on interface {Interface}.", options.InterfaceName);
+                reconnectAttempt = 0;
+                nextDelay = options.ReconnectDelay;
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -95,7 +136,7 @@ public sealed class SocketCanBackgroundService : BackgroundService
             if (!reconfigured)
             {
                 using var delayCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, reconfigureCts.Token);
-                await DelayAsync(options.ReconnectDelay, delayCts.Token).ConfigureAwait(false);
+                await DelayAsync(nextDelay, delayCts.Token).ConfigureAwait(false);
             }
         }
     }
@@ -127,15 +168,21 @@ public sealed class SocketCanBackgroundService : BackgroundService
             return new SocketCanOptions();
         }
 
-        return new SocketCanOptions
+        var snapshot = new SocketCanOptions
         {
             InterfaceName = source.InterfaceName,
             IncludeVirtualInterfaces = source.IncludeVirtualInterfaces,
             ReceiveOwnMessages = source.ReceiveOwnMessages,
             ReceiveTimeout = source.ReceiveTimeout,
             ReconnectDelay = source.ReconnectDelay,
-            SourcePrefix = source.SourcePrefix,
         };
+
+        if (!string.IsNullOrWhiteSpace(source.SourcePrefix))
+        {
+            snapshot.SourcePrefix = source.SourcePrefix;
+        }
+
+        return snapshot;
     }
 
     private static bool RequiresRestart(SocketCanOptions? current, SocketCanOptions? updated)
@@ -153,9 +200,31 @@ public sealed class SocketCanBackgroundService : BackgroundService
             || !string.Equals(current.SourcePrefix, updated.SourcePrefix, StringComparison.Ordinal);
     }
 
-    private CanFrame TranslateFrame(SocketCANSharp.CanFrame frame, string source)
+    private async Task<bool> WaitForInterfaceAsync(CancellationToken stoppingToken)
     {
-        var protobuf = new CanFrame
+        var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var registration = _options.OnChange((updated, _) =>
+        {
+            if (!string.IsNullOrWhiteSpace(updated.InterfaceName))
+            {
+                completion.TrySetResult(true);
+            }
+        });
+
+        try
+        {
+            await completion.Task.WaitAsync(stoppingToken).ConfigureAwait(false);
+            return true;
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            return false;
+        }
+    }
+
+    private ProtoCanFrame TranslateFrame(SocketCanFrame frame, string source)
+    {
+        var protobuf = new ProtoCanFrame
         {
             Header = new Header
             {
@@ -172,7 +241,7 @@ public sealed class SocketCanBackgroundService : BackgroundService
         return protobuf;
     }
 
-    private static uint GetArbitrationId(SocketCANSharp.CanFrame frame)
+    private static uint GetArbitrationId(SocketCanFrame frame)
     {
         var raw = SocketCanUtils.ExtractRawCanId(frame.CanId);
         if ((frame.CanId & (uint)CanIdFlags.CAN_EFF_FLAG) != 0)
@@ -197,5 +266,34 @@ public sealed class SocketCanBackgroundService : BackgroundService
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
         }
+    }
+
+    private static TimeSpan CalculateBackoffDelay(TimeSpan baseDelay, int attempt)
+    {
+        if (baseDelay <= TimeSpan.Zero || baseDelay == Timeout.InfiniteTimeSpan)
+        {
+            return baseDelay;
+        }
+
+        var cappedAttempt = Math.Max(1, attempt);
+        var delayTicks = baseDelay.Ticks;
+        for (var i = 1; i < cappedAttempt && delayTicks < MaxReconnectBackoff.Ticks; i++)
+        {
+            if (delayTicks > MaxReconnectBackoff.Ticks / 2)
+            {
+                delayTicks = MaxReconnectBackoff.Ticks;
+                break;
+            }
+
+            delayTicks = Math.Min(delayTicks * 2, MaxReconnectBackoff.Ticks);
+        }
+
+        if (delayTicks <= 0)
+        {
+            return baseDelay;
+        }
+
+        var delay = TimeSpan.FromTicks(delayTicks);
+        return delay < baseDelay ? baseDelay : delay;
     }
 }

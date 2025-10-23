@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Core.Testing" Version="2.59.0" />
+    <PackageReference Include="Grpc.Core.Testing" Version="2.46.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="xunit" Version="2.5.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.1" />
@@ -24,5 +24,11 @@
     <None Include="TestData\teensy_bridge_session1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\Aog.Agio.Linux\Serial\LinuxSerialPortEnumeratorOptions.cs">
+      <Link>Linked\LinuxSerialPortEnumeratorOptions.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

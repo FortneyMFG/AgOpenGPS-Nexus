@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Aog.Bridge.Host.AogLink.Legacy;
 using Aog.Bridge.Host.AogLink.Transports;
 using Aog.Link.V1;
+using Aog.Protos.Capabilities.V1;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -161,7 +162,7 @@ public sealed class AogLinkGateway : IAogLinkGateway
 
     private async Task RespondToDiscoveryAsync(DiscoveryAnnounce announce, CancellationToken cancellationToken)
     {
-        var response = _translator.CreateDiscoveryResponse(announce, Array.Empty<nexus.capabilities.v1.CapabilityDescriptor>());
+        var response = _translator.CreateDiscoveryResponse(announce, Enumerable.Empty<CapabilityDescriptor>());
         await SendAsync(response, cancellationToken).ConfigureAwait(false);
     }
 

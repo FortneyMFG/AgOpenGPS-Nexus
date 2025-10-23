@@ -8,6 +8,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
+using PluginJobSessionState = Aog.Plugins.JobTasks.JobSessionState;
+
 namespace Aog.Plugins.Tests.JobTasks;
 
 public sealed class JobTasksPersistenceTests
@@ -44,7 +46,7 @@ public sealed class JobTasksPersistenceTests
 
         var session = new JobSessionSnapshot(
             "session:1",
-            JobSessionState.Active,
+            PluginJobSessionState.Active,
             createdAt.AddMinutes(5),
             updatedAt,
             "Morning session",
@@ -155,6 +157,51 @@ public sealed class JobTasksPersistenceTests
         snapshot.Layout.DataDirectory.Should().Be(Path.Combine(expectedRoot, "data"));
         snapshot.Layout.ResumeFile.Should().Be(Path.Combine(expectedRoot, "Resume.txt"));
         snapshot.Layout.AttachmentsDirectory.Should().Be(Path.Combine(expectedRoot, "attachments"));
+    }
+
+    [Fact]
+    public async Task LoadAsync_RebasesManifestFromDifferentDriveIntoTargetRoot()
+    {
+        using var temp = new TemporaryDirectory();
+        var jobRoot = Path.Combine(temp.DirectoryPath, "Jobs", "TargetCDrive");
+        Directory.CreateDirectory(jobRoot);
+
+        var manifestPath = Path.Combine(jobRoot, "job.json");
+        var manifestJson = """
+        {
+            "schemaVersion": "1.0.0",
+            "jobId": "job:d-drive",
+            "displayName": "D Drive Manifest",
+            "slug": "d-drive-manifest",
+            "state": "active",
+            "createdAt": "2024-02-02T00:00:00Z",
+            "updatedAt": "2024-02-02T00:00:00Z",
+            "context": {
+                "farmId": "farm:delta",
+                "fieldIds": ["field:two"]
+            },
+            "paths": {
+                "jobRoot": "D:\\Archive\\SeasonA\\Job42",
+                "dataDir": "D:\\Archive\\SeasonA\\Job42\\data",
+                "resumeFile": "E:\\ColdStorage\\Job42\\Resume.txt",
+                "attachmentsDir": "E:\\ColdStorage\\Job42\\attachments"
+            },
+            "sessions": []
+        }
+        """;
+
+        await File.WriteAllTextAsync(manifestPath, manifestJson);
+
+        var persistence = new JobTasksPersistence();
+        var snapshot = await persistence.LoadAsync(jobRoot);
+
+        var expectedRoot = Path.GetFullPath(jobRoot);
+        snapshot.Layout.JobRoot.Should().Be(expectedRoot);
+        snapshot.Layout.DataDirectory.Should().Be(Path.Combine(expectedRoot, "data"));
+        snapshot.Layout.ResumeFile.Should().Be(Path.Combine(expectedRoot, "Resume.txt"));
+        snapshot.Layout.AttachmentsDirectory.Should().Be(Path.Combine(expectedRoot, "attachments"));
+        snapshot.Layout.ResumeFile.StartsWith(expectedRoot, StringComparison.Ordinal).Should().BeTrue();
+        snapshot.Layout.AttachmentsDirectory.StartsWith(expectedRoot, StringComparison.Ordinal).Should().BeTrue();
     }
 
     private sealed class TemporaryDirectory : IDisposable

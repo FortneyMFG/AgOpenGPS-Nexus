@@ -1,0 +1,5 @@
+using System.Numerics;
+
+namespace Aog.UI.Avalonia.Mapping.Vector.Styles;
+
+public sealed record LineSymbolizer(float WidthMeters, float Opacity, Vector4 Rgba);

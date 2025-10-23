@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -83,8 +82,6 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
         {
             var offset = index * CanFdPayloadBytes;
             var length = Math.Min(CanFdPayloadBytes, payload.Length - offset);
-            var slice = payload.AsSpan(offset, length);
-
             var buffer = new byte[length + 6];
             buffer[0] = envelope.Header?.Version is { } version ? (byte)version : (byte)1;
             buffer[1] = (byte)(sequence >> 8);
@@ -92,7 +89,7 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
             buffer[3] = (byte)fragmentCount;
             buffer[4] = (byte)index;
             buffer[5] = ConvertFlags(envelope.Header?.Flags, fragmented: true);
-            slice.CopyTo(buffer.AsSpan(6));
+            Array.Copy(payload, offset, buffer, 6, length);
 
             await _bus.SendAsync(new AogCanFrame(identifier, buffer), cancellationToken).ConfigureAwait(false);
         }
@@ -144,8 +141,8 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
 
         if (!fragmented && frame.Data.Length >= 6)
         {
-            var payload = frame.Data.AsSpan(5);
-            var envelope = LinkEnvelope.Parser.ParseFrom(payload.ToArray());
+            var payloadLength = frame.Data.Length - 6;
+            var envelope = LinkEnvelope.Parser.ParseFrom(frame.Data, 6, payloadLength);
             envelope.Header = ApplyHeaderFromIdentifier(frame.Identifier, envelope.Header);
             await _inbound.Writer.WriteAsync(envelope, cancellationToken).ConfigureAwait(false);
             return;
@@ -153,10 +150,8 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
 
         var fragmentCount = frame.Data[3];
         var fragmentIndex = frame.Data[4];
-        var payloadSlice = frame.Data.AsSpan(6);
-
         var collector = _fragments.GetOrAdd(sequence, _ => new FragmentCollector(fragmentCount));
-        collector.Add(fragmentIndex, payloadSlice);
+        collector.Add(fragmentIndex, frame.Data[6..]);
 
         if (!collector.IsComplete)
         {
@@ -165,9 +160,9 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
 
         _fragments.TryRemove(sequence, out _);
         var combined = collector.Combine();
-        var envelope = LinkEnvelope.Parser.ParseFrom(combined);
-        envelope.Header = ApplyHeaderFromIdentifier(frame.Identifier, envelope.Header);
-        await _inbound.Writer.WriteAsync(envelope, cancellationToken).ConfigureAwait(false);
+        var reassembledEnvelope = LinkEnvelope.Parser.ParseFrom(combined);
+        reassembledEnvelope.Header = ApplyHeaderFromIdentifier(frame.Identifier, reassembledEnvelope.Header);
+        await _inbound.Writer.WriteAsync(reassembledEnvelope, cancellationToken).ConfigureAwait(false);
     }
 
     private static AogCanFrame BuildSingleFrame(FrameHeader? header, byte[] payload, uint identifier)
@@ -177,7 +172,7 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
         var sequence = header?.Sequence ?? 0;
         buffer[1] = (byte)(sequence >> 8);
         buffer[2] = (byte)(sequence & 0xFF);
-        var length = (ushort)(header?.PayloadLength ?? payload.Length);
+        var length = (ushort)(header?.PayloadLength ?? (uint)payload.Length);
         buffer[3] = (byte)(length >> 8);
         buffer[4] = (byte)(length & 0xFF);
         buffer[5] = ConvertFlags(header?.Flags, fragmented: false);
@@ -204,7 +199,7 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
             value |= 0x40;
         }
 
-        var priority = (byte)(flags?.Priority ?? NodePriority.NodePriorityDefault);
+        var priority = (byte)(flags?.Priority ?? NodePriority.Default);
         value |= (byte)(priority << 3);
         return value;
     }
@@ -216,7 +211,7 @@ public sealed class CanAogLinkTransport : Aog.Bridge.Host.AogLink.Transports.IAo
             return 0;
         }
 
-        var priority = (uint)(header.Flags?.Priority ?? NodePriority.NodePriorityDefault) & 0x07;
+        var priority = (uint)(header.Flags?.Priority ?? NodePriority.Default) & 0x07;
         var cls = (uint)header.MessageClass & 0x03;
         var type = (uint)header.MessageType & 0x3FF;
         var destination = (uint)(header.Destination & 0x7F);

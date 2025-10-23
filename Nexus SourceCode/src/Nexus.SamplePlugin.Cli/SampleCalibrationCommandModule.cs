@@ -1,18 +1,21 @@
 using System.CommandLine;
-using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
 using System.Linq;
 using System.Text.Json;
-using Nexus.Plugin.Cli.Abstractions;
+using CliCommandContext = Nexus.Plugin.Cli.Abstractions.CommandContext;
+using CliCommandHandler = Nexus.Plugin.Cli.Abstractions.ICommandHandler;
+using PluginCommandModuleDescriptor = Nexus.Plugin.Cli.Abstractions.PluginCommandModuleDescriptor;
+using CliInvocationContext = System.CommandLine.Invocation.InvocationContext;
 
 namespace Nexus.SamplePlugin.Cli;
 
 /// <summary>
 /// Provides sample <c>nx sample</c> verbs for calibration and sniff workflows.
 /// </summary>
-public sealed class SampleCalibrationCommandModule : ICommandModule
+public sealed class SampleCalibrationCommandModule : CliCommandHandler
 {
     /// <inheritdoc />
-    public void Configure(CommandModuleContext context)
+    public void Configure(CliCommandContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -28,7 +31,7 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
         context.RootCommand.AddCommand(pluginCommand);
     }
 
-    private static Command CreateCalibrateCommand(CommandModuleContext context)
+    private static Command CreateCalibrateCommand(CliCommandContext context)
     {
         var command = new Command("calibrate", "Calibrate the sample grain flow sensor using static weight checks.");
 
@@ -46,7 +49,7 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
         command.AddOption(gainOption);
         command.AddOption(dryRunOption);
 
-        command.SetHandler((InvocationContext invocationContext) =>
+        command.SetHandler(invocationContext =>
         {
             var offset = invocationContext.ParseResult.GetValueForOption(offsetOption);
             var gain = invocationContext.ParseResult.GetValueForOption(gainOption);
@@ -72,18 +75,18 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
                     WriteIndented = outputMode == "json",
                 });
 
-                invocationContext.Console.Out.WriteLine(json);
+                invocationContext.Console.WriteLine(json);
             }
             else
             {
-                invocationContext.Console.Out.WriteLine($"Applying calibration: offset={offset:F3} kg/s, gain={gain:F3}.");
+                invocationContext.Console.WriteLine($"Applying calibration: offset={offset:F3} kg/s, gain={gain:F3}.");
                 if (dryRun)
                 {
-                    invocationContext.Console.Out.WriteLine("Dry-run enabled, coefficients were not persisted.");
+                    invocationContext.Console.WriteLine("Dry-run enabled, coefficients were not persisted.");
                 }
                 else
                 {
-                    invocationContext.Console.Out.WriteLine("Calibration persisted to the plugin state cache.");
+                    invocationContext.Console.WriteLine("Calibration persisted to the plugin state cache.");
                 }
             }
         });
@@ -107,20 +110,20 @@ public sealed class SampleCalibrationCommandModule : ICommandModule
         command.AddOption(durationOption);
         command.AddOption(outputOption);
 
-        command.SetHandler((InvocationContext invocationContext) =>
+        command.SetHandler(invocationContext =>
         {
             var duration = invocationContext.ParseResult.GetValueForOption(durationOption);
             var file = invocationContext.ParseResult.GetValueForOption(outputOption);
 
-            invocationContext.Console.Out.WriteLine(
+            invocationContext.Console.WriteLine(
                 $"Sniffing raw samples for {duration} second(s). Output will be appended to '{file}'.");
-            invocationContext.Console.Out.WriteLine("Use the bundled Jupyter notebook to visualize captured flow curves.");
+            invocationContext.Console.WriteLine("Use the bundled Jupyter notebook to visualize captured flow curves.");
         });
 
         return command;
     }
 
-    private static string ResolveOutputMode(CommandModuleContext context, InvocationContext invocationContext)
+    private static string ResolveOutputMode(CliCommandContext context, CliInvocationContext invocationContext)
     {
         if (context.OutputOption is null)
         {

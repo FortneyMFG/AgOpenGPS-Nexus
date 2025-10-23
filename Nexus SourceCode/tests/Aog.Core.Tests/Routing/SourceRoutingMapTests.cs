@@ -17,7 +17,7 @@ public sealed class SourceRoutingMapTests
         var map = new SourceRoutingMap(bus);
         var changes = new List<StreamRouteChangedEvent>();
 
-        bus.Subscribe<StreamRouteChangedEvent>(message =>
+        bus.Subscribe<StreamRouteChangedEvent>((message, _) =>
         {
             changes.Add(message);
             return ValueTask.CompletedTask;
@@ -62,7 +62,7 @@ public sealed class SourceRoutingMapTests
         var map = new SourceRoutingMap(bus);
         var changes = new List<StreamRouteChangedEvent>();
 
-        bus.Subscribe<StreamRouteChangedEvent>(message =>
+        bus.Subscribe<StreamRouteChangedEvent>((message, _) =>
         {
             changes.Add(message);
             return ValueTask.CompletedTask;
@@ -116,7 +116,7 @@ public sealed class SourceRoutingMapTests
         var map = new SourceRoutingMap(bus);
         var changes = new List<StreamRouteChangedEvent>();
 
-        bus.Subscribe<StreamRouteChangedEvent>(message =>
+        bus.Subscribe<StreamRouteChangedEvent>((message, _) =>
         {
             changes.Add(message);
             return ValueTask.CompletedTask;
@@ -149,7 +149,7 @@ public sealed class SourceRoutingMapTests
         var map = new SourceRoutingMap(bus);
         var changes = new List<StreamRouteChangedEvent>();
 
-        bus.Subscribe<StreamRouteChangedEvent>(message =>
+        bus.Subscribe<StreamRouteChangedEvent>((message, _) =>
         {
             changes.Add(message);
             return ValueTask.CompletedTask;

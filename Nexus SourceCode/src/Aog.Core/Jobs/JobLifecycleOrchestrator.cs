@@ -58,9 +58,9 @@ public sealed class JobLifecycleOrchestrator : IJobLifecycleOrchestrator, IDispo
                 sanitized.MountImmediately ? JobLifecycleState.Mounted : JobLifecycleState.Planned,
                 timestamp,
                 timestamp,
-                activeSessionId: null,
+                null,
                 sanitized.Context,
-                sanitized.Tags);
+                sanitized.Tags ?? Array.Empty<string>());
 
             var record = new JobRecord(metadata);
             _jobs.Add(jobId, record);
@@ -261,7 +261,7 @@ public sealed class JobLifecycleOrchestrator : IJobLifecycleOrchestrator, IDispo
         }
 
         var fieldIds = request.Context.FieldIds?.Where(id => !string.IsNullOrWhiteSpace(id))
-            .Select(id => id.Trim())
+            .Select(id => id!.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray() ?? Array.Empty<string>();
 
@@ -272,7 +272,7 @@ public sealed class JobLifecycleOrchestrator : IJobLifecycleOrchestrator, IDispo
 
         var tags = request.Tags?
             .Where(tag => !string.IsNullOrWhiteSpace(tag))
-            .Select(tag => tag.Trim())
+            .Select(tag => tag!.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray() ?? Array.Empty<string>();
 

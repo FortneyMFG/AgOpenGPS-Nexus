@@ -11,7 +11,7 @@ public sealed class FieldFeedbackAggregator
     public static JsonSerializerOptions SerializerOptions { get; } = new()
     {
         PropertyNameCaseInsensitive = true,
-        WriteIndented = true,
+        WriteIndented = false,
     };
 
     public FieldFeedbackReport Aggregate(string inputDirectory, int? windowDays, DateTimeOffset? now)
@@ -97,24 +97,9 @@ public sealed class FieldFeedbackAggregator
     {
         if (string.Equals(Path.GetExtension(path), ".jsonl", StringComparison.OrdinalIgnoreCase))
         {
-            foreach (var line in File.ReadLines(path))
+            foreach (var evt in ReadJsonLines(path))
             {
-                if (string.IsNullOrWhiteSpace(line))
-                {
-                    continue;
-                }
-
-                try
-                {
-                    if (JsonSerializer.Deserialize<FieldFeedbackEvent>(line, SerializerOptions) is { } evt)
-                    {
-                        yield return evt;
-                    }
-                }
-                catch (JsonException)
-                {
-                    // Ignore malformed rows so a single bad upload does not break aggregation.
-                }
+                yield return evt;
             }
 
             yield break;
@@ -143,6 +128,34 @@ public sealed class FieldFeedbackAggregator
                 yield return evt;
             }
         }
+    }
+
+    private static IReadOnlyList<FieldFeedbackEvent> ReadJsonLines(string path)
+    {
+        var events = new List<FieldFeedbackEvent>();
+
+        foreach (var line in File.ReadLines(path))
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            try
+            {
+                var evt = JsonSerializer.Deserialize<FieldFeedbackEvent>(line, SerializerOptions);
+                if (evt is not null)
+                {
+                    events.Add(evt);
+                }
+            }
+            catch (JsonException)
+            {
+                // Skip malformed payloads so a single bad upload does not break aggregation.
+            }
+        }
+
+        return events;
     }
 
     private static SeverityLevel NormalizeSeverity(string? severity)

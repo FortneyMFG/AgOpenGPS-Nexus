@@ -31,7 +31,7 @@ public sealed class FieldHealthReportSectionContributorTests
         var result = await contributor.PrepareAsync(context, CancellationToken.None);
 
         result.IsReady.Should().BeFalse();
-        result.Reason.Should().Contain("Field health observations", StringComparison.OrdinalIgnoreCase);
+        result.Reason.IndexOf("Field health observations", StringComparison.OrdinalIgnoreCase).Should().BeGreaterThanOrEqualTo(0);
         result.Diagnostics.Should().ContainKey("reason").WhoseValue.Should().Be("no-data");
     }
 
@@ -51,7 +51,7 @@ public sealed class FieldHealthReportSectionContributorTests
         var result = await contributor.RenderAsync(sectionContext, CancellationToken.None);
 
         result.Status.Should().Be(ReportSectionStatus.Success);
-        result.Message.Should().Contain("summary", StringComparison.OrdinalIgnoreCase);
+        result.Message.IndexOf("summary", StringComparison.OrdinalIgnoreCase).Should().BeGreaterThanOrEqualTo(0);
         result.Payload.Should().BeOfType<FieldHealthReportPayload>();
 
         var payload = (FieldHealthReportPayload)result.Payload!;

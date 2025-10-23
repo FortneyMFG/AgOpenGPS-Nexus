@@ -40,12 +40,12 @@ public sealed record ReportTemplate
         Sections = (sections ?? throw new ArgumentNullException(nameof(sections)))
             .Select(s => s ?? throw new ArgumentException("Template sections cannot contain null entries.", nameof(sections)))
             .ToArray();
-        if (Sections.Length == 0)
+        if (Sections.Count == 0)
         {
             throw new ArgumentException("Report templates must declare at least one section.", nameof(sections));
         }
 
-        if (Sections.Select(s => s.SectionId).Distinct(StringComparer.OrdinalIgnoreCase).Count() != Sections.Length)
+        if (Sections.Select(s => s.SectionId).Distinct(StringComparer.OrdinalIgnoreCase).Count() != Sections.Count)
         {
             throw new ArgumentException("Report templates cannot contain duplicate section identifiers.", nameof(sections));
         }
@@ -53,12 +53,12 @@ public sealed record ReportTemplate
         Outputs = (outputs ?? throw new ArgumentNullException(nameof(outputs)))
             .Select(o => o ?? throw new ArgumentException("Template outputs cannot contain null entries.", nameof(outputs)))
             .ToArray();
-        if (Outputs.Length == 0)
+        if (Outputs.Count == 0)
         {
             throw new ArgumentException("Report templates must declare at least one output format.", nameof(outputs));
         }
 
-        if (Outputs.Select(o => o.Format).Distinct(StringComparer.OrdinalIgnoreCase).Count() != Outputs.Length)
+        if (Outputs.Select(o => o.Format).Distinct(StringComparer.OrdinalIgnoreCase).Count() != Outputs.Count)
         {
             throw new ArgumentException("Report templates cannot contain duplicate output formats.", nameof(outputs));
         }

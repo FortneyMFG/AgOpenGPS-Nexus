@@ -1,0 +1,73 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="ThemeColorSurface">#FFFFFFFF</Color>
+      <Color x:Key="ThemeColorSurfaceAlt">#FFF3F6FB</Color>
+      <Color x:Key="ThemeColorText">#FF1F2933</Color>
+      <Color x:Key="ThemeColorAccent">#FF1D9BF0</Color>
+      <Color x:Key="ThemeColorAccentMuted">#FF7CC4FF</Color>
+      <Color x:Key="ThemeColorSuccess">#FF2DCB74</Color>
+      <Color x:Key="ThemeColorWarning">#FFF7B529</Color>
+      <Color x:Key="ThemeColorDanger">#FFE5484D</Color>
+      <SolidColorBrush x:Key="ThemeSurfaceBrush" Color="#FFFFFFFF" />
+      <SolidColorBrush x:Key="ThemeSurfaceAltBrush" Color="#FFF3F6FB" />
+      <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FF1F2933" />
+      <SolidColorBrush x:Key="ThemeAccentBrush" Color="#FF1D9BF0" />
+      <SolidColorBrush x:Key="ThemeAccentMutedBrush" Color="#FF7CC4FF" />
+      <SolidColorBrush x:Key="ThemeSuccessBrush" Color="#FF2DCB74" />
+      <SolidColorBrush x:Key="ThemeWarningBrush" Color="#FFF7B529" />
+      <SolidColorBrush x:Key="ThemeDangerBrush" Color="#FFE5484D" />
+      <SolidColorBrush x:Key="ShellChromeBackgroundBrush" Color="#FF1F2D3D" />
+      <SolidColorBrush x:Key="ShellChromeBorderBrush" Color="#FF2D3E52" />
+      <SolidColorBrush x:Key="ShellPanelBackgroundBrush" Color="#FFFFFFFF" />
+      <SolidColorBrush x:Key="ShellPanelBorderBrush" Color="#FFD1D8E0" />
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <Color x:Key="ThemeColorSurface">#FF131722</Color>
+      <Color x:Key="ThemeColorSurfaceAlt">#FF1F2534</Color>
+      <Color x:Key="ThemeColorText">#FFF8FAFC</Color>
+      <Color x:Key="ThemeColorAccent">#FF5AB9FF</Color>
+      <Color x:Key="ThemeColorAccentMuted">#FF94D2FF</Color>
+      <Color x:Key="ThemeColorSuccess">#FF4ADE80</Color>
+      <Color x:Key="ThemeColorWarning">#FFFACC15</Color>
+      <Color x:Key="ThemeColorDanger">#FFF87171</Color>
+      <SolidColorBrush x:Key="ThemeSurfaceBrush" Color="#FF131722" />
+      <SolidColorBrush x:Key="ThemeSurfaceAltBrush" Color="#FF1F2534" />
+      <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FFF8FAFC" />
+      <SolidColorBrush x:Key="ThemeAccentBrush" Color="#FF5AB9FF" />
+      <SolidColorBrush x:Key="ThemeAccentMutedBrush" Color="#FF94D2FF" />
+      <SolidColorBrush x:Key="ThemeSuccessBrush" Color="#FF4ADE80" />
+      <SolidColorBrush x:Key="ThemeWarningBrush" Color="#FFFACC15" />
+      <SolidColorBrush x:Key="ThemeDangerBrush" Color="#FFF87171" />
+      <SolidColorBrush x:Key="ShellChromeBackgroundBrush" Color="#FF0F1722" />
+      <SolidColorBrush x:Key="ShellChromeBorderBrush" Color="#FF243042" />
+      <SolidColorBrush x:Key="ShellPanelBackgroundBrush" Color="#FF101820" />
+      <SolidColorBrush x:Key="ShellPanelBorderBrush" Color="#FF1F2D3D" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <x:Double x:Key="ThemeFontSizeXs">10</x:Double>
+  <x:Double x:Key="ThemeFontSizeSm">12</x:Double>
+  <x:Double x:Key="ThemeFontSizeMd">14</x:Double>
+  <x:Double x:Key="ThemeFontSizeLg">18</x:Double>
+  <x:Double x:Key="ThemeFontSizeXl">24</x:Double>
+
+  <x:Double x:Key="ThemeSpacingXs">4</x:Double>
+  <x:Double x:Key="ThemeSpacingSm">8</x:Double>
+  <x:Double x:Key="ThemeSpacingMd">12</x:Double>
+  <x:Double x:Key="ThemeSpacingLg">16</x:Double>
+  <x:Double x:Key="ThemeSpacingXl">24</x:Double>
+
+  <Thickness x:Key="ThemeSpacingSmThickness">8</Thickness>
+  <Thickness x:Key="ThemeSpacingMdThickness">12</Thickness>
+  <Thickness x:Key="ThemeSpacingLgThickness">16</Thickness>
+  <Thickness x:Key="ThemeSpacingXlThickness">24</Thickness>
+
+  <CornerRadius x:Key="ThemeRadiusSm">4</CornerRadius>
+  <CornerRadius x:Key="ThemeRadiusMd">8</CornerRadius>
+  <CornerRadius x:Key="ThemeRadiusLg">12</CornerRadius>
+
+  <Thickness x:Key="ShellChromePadding">8,10</Thickness>
+  <Thickness x:Key="ShellToolbarButtonPadding">12,6</Thickness>
+</ResourceDictionary>

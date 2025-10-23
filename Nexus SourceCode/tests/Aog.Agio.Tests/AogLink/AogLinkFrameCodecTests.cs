@@ -1,6 +1,5 @@
 using System;
 using Aog.Agio.AogLink;
-using FluentAssertions;
 using Xunit;
 
 namespace Aog.Agio.Tests.AogLink;
@@ -17,8 +16,8 @@ public sealed class AogLinkFrameCodecTests
         var encoded = AogLinkFrameCodec.Encode(frame);
         var decoded = AogLinkFrameCodec.Decode(encoded);
 
-        decoded.Header.Should().Be(header);
-        decoded.Payload.ToArray().Should().Equal(payload);
+        Assert.Equal(header, decoded.Header);
+        Assert.Equal(payload, decoded.Payload.ToArray());
     }
 
     [Fact]
@@ -30,7 +29,6 @@ public sealed class AogLinkFrameCodecTests
         var encoded = AogLinkFrameCodec.Encode(frame);
         encoded[^1] = 0; // corrupt length by truncating payload
 
-        var act = () => AogLinkFrameCodec.Decode(encoded);
-        act.Should().Throw<InvalidOperationException>();
+        Assert.Throws<InvalidOperationException>(() => AogLinkFrameCodec.Decode(encoded));
     }
 }

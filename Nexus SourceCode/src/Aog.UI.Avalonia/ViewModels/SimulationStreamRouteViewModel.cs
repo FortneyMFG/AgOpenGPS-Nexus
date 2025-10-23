@@ -40,12 +40,12 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         Stream = stream;
         _availableSources = availableSources;
         _availableModes = availableModes;
-        _selectedSource = ContainsIgnoreCase(availableSources, selectedSource)
-            ? selectedSource
-            : availableSources[0];
-        _selectedMode = ContainsIgnoreCase(availableModes, mode)
-            ? mode
-            : availableModes[0];
+
+        var normalizedSource = Normalize(selectedSource, _availableSources);
+        _selectedSource = normalizedSource ?? selectedSource ?? _availableSources[0];
+
+        var normalizedMode = Normalize(mode, _availableModes);
+        _selectedMode = normalizedMode ?? mode ?? _availableModes[0];
     }
 
     /// <summary>
@@ -71,17 +71,18 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         get => _selectedSource;
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Equals(_selectedSource, StringComparison.Ordinal))
+            if (string.IsNullOrWhiteSpace(value))
             {
                 return;
             }
 
-            if (!ContainsIgnoreCase(_availableSources, value))
+            var canonicalSource = Normalize(value, _availableSources);
+            if (canonicalSource is null || canonicalSource.Equals(_selectedSource, StringComparison.Ordinal))
             {
                 return;
             }
 
-            SetProperty(ref _selectedSource, value);
+            SetProperty(ref _selectedSource, canonicalSource);
         }
     }
 
@@ -93,17 +94,19 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         get => _selectedMode;
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Equals(_selectedMode, StringComparison.Ordinal))
+            if (string.IsNullOrWhiteSpace(value))
             {
                 return;
             }
 
-            if (!ContainsIgnoreCase(_availableModes, value))
+            var canonicalMode = Normalize(value, _availableModes);
+
+            if (canonicalMode is null || canonicalMode.Equals(_selectedMode, StringComparison.Ordinal))
             {
                 return;
             }
 
-            SetProperty(ref _selectedMode, value);
+            SetProperty(ref _selectedMode, canonicalMode);
         }
     }
 
@@ -115,8 +118,14 @@ public sealed class SimulationStreamRouteViewModel : ObservableObject
         return new SimulationRouteConfiguration(Stream, SelectedSource, SelectedMode);
     }
 
-    private static bool ContainsIgnoreCase(IEnumerable<string> source, string value)
+    private static string? Normalize(string? proposed, IReadOnlyList<string> canon)
     {
-        return source.Any(candidate => candidate.Equals(value, StringComparison.OrdinalIgnoreCase));
+        if (proposed is null)
+        {
+            return null;
+        }
+
+        return canon.FirstOrDefault(candidate =>
+            string.Equals(candidate, proposed, StringComparison.OrdinalIgnoreCase));
     }
 }

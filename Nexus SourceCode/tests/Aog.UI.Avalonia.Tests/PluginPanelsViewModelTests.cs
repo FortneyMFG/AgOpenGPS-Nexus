@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Aog.Core.V1;
 using Aog.UI.Avalonia.ViewModels;
@@ -52,6 +53,35 @@ public sealed class PluginPanelsViewModelTests
     }
 
     [Fact]
+    public void SectionsPanel_RendersAllSixteenSections()
+    {
+        var viewModel = new SectionsPanelViewModel();
+        const uint rawMask = 0b1010_1100_1111_0001;
+        var mask = new SectionMask { SectionCount = 16, Mask = rawMask };
+
+        viewModel.ApplySectionMask(mask);
+
+        viewModel.SectionCount.Should().Be(16);
+        viewModel.CurrentMask.Should().Be(rawMask);
+        viewModel.Sections.Should().HaveCount(16);
+
+        for (var index = 0; index < 16; index++)
+        {
+            viewModel.Sections[index].IsVisible.Should().BeTrue($"Section {index} should be visible");
+
+            var expectedState = (rawMask & (1u << index)) != 0;
+            viewModel.Sections[index].IsEnabled.Should().Be(expectedState, $"Section {index} should reflect the mask");
+        }
+
+        // Toggle the last section manually and ensure the mask updates correctly.
+        viewModel.Sections[15].IsEnabled = false;
+
+        viewModel.IsAutoEnabled.Should().BeFalse();
+        viewModel.CurrentMask.Should().Be(rawMask & ~(1u << 15));
+        viewModel.Sections[15].IsEnabled.Should().BeFalse();
+    }
+
+    [Fact]
     public void PlanterPanel_AppliesStatusesAndSummarises()
     {
         var viewModel = new PlanterPanelViewModel();
@@ -70,5 +100,60 @@ public sealed class PluginPanelsViewModelTests
         viewModel.Summary.Should().Contain("Rows: 3");
         viewModel.Summary.Should().Contain("Skips 1");
         viewModel.Summary.Should().Contain("Doubles 1");
+    }
+
+    [Fact]
+    public void PlanterPanel_IgnoresOutOfRangeRowIndexes()
+    {
+        var viewModel = new PlanterPanelViewModel();
+        var statuses = new List<PlanterRowStatus>
+        {
+            new() { RowIndex = uint.MaxValue, TargetPopulationPerMeter = 12, ActualPopulationPerMeter = 12, Quality = PlanterRowQuality.Ok },
+            new() { RowIndex = 0,           TargetPopulationPerMeter = 10, ActualPopulationPerMeter = 10, Quality = PlanterRowQuality.Ok },
+        };
+
+        viewModel.ApplyRowStatuses(statuses);
+
+        viewModel.Rows.Should().HaveCount(1);
+        viewModel.Rows[0].RowIndex.Should().Be(0);
+        viewModel.Summary.Should().Contain("Rows: 1");
+        viewModel.Summary.Should().Contain("Ignored 1 invalid update");
+    }
+
+    [Fact]
+    public void PlanterPanel_SkipsNullStatuses()
+    {
+        var viewModel = new PlanterPanelViewModel();
+        var initialStatus = new PlanterRowStatus
+        {
+            RowIndex = 0,
+            TargetPopulationPerMeter = 12,
+            ActualPopulationPerMeter = 12,
+            Quality = PlanterRowQuality.Ok,
+        };
+
+        viewModel.ApplyRowStatuses(new[] { initialStatus });
+
+        var existingRow = viewModel.Rows[0];
+        var updateBatch = new List<PlanterRowStatus>
+        {
+            null!,
+            new()
+            {
+                RowIndex = 0,
+                TargetPopulationPerMeter = 12,
+                ActualPopulationPerMeter = 11,
+                SkipRate = 0.1,
+                Quality = PlanterRowQuality.Skip,
+            },
+        };
+
+        Action apply = () => viewModel.ApplyRowStatuses(updateBatch);
+
+        apply.Should().NotThrow();
+        viewModel.Rows.Should().ContainSingle();
+        viewModel.Rows[0].Should().BeSameAs(existingRow);
+        viewModel.Rows[0].Quality.Should().Be(PlanterRowQuality.Skip);
+        viewModel.Rows[0].SkipRate.Should().BeApproximately(0.1, 1e-6);
     }
 }

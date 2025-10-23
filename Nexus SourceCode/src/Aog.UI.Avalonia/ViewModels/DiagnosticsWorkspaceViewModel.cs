@@ -111,14 +111,7 @@ public sealed class DiagnosticsWorkspaceViewModel
     public string TelemetrySummary
     {
         get
-        {
-            if (Telemetry.IsTelemetryOptedIn)
-            {
-                return Telemetry.PendingReportSummary;
-            }
-
-            return "Telemetry uploads are disabled. Enable telemetry to upload crash reports.";
-        }
+        => Telemetry.PendingReportSummary;
     }
 
     /// <summary>Gets a device health summary derived from the Device Manager card.</summary>

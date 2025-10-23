@@ -114,7 +114,7 @@ public sealed class WeatherIngestPipelineTests
 
         var flushed = await pipeline.FlushAsync();
         flushed.Should().NotBeNull();
-        flushed!.CapturedAt.Should().BeGreaterOrEqualTo(baseTime.AddMinutes(5));
+        flushed!.CapturedAt.Should().BeOnOrAfter(baseTime.AddMinutes(5));
         flushed.RainfallMm.Should().Be(0.8);
     }
 

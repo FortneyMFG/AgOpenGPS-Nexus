@@ -1,12 +1,8 @@
-using System;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Aog.Tools.LegacyDataMigrator;
 using FluentAssertions;
 using Parquet;
-using Parquet.Data;
+using Parquet.File;
+using Parquet.Schema;
 using Xunit;
 
 namespace Aog.Tools.LegacyDataMigrator.Tests;
@@ -18,7 +14,7 @@ public sealed class LegacyDataMigratorTests
     [Fact]
     public async Task MigrateAsync_WritesTelemetryAndHistory()
     {
-        var legacyPath = Path.Combine(AppContext.BaseDirectory, SampleLegacyPath);
+        var legacyPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", SampleLegacyPath));
         using var temp = new TempDirectory();
 
         var migrator = new LegacyDataMigrator();
@@ -42,43 +38,43 @@ public sealed class LegacyDataMigratorTests
 
         var posePath = Path.Combine(temp.Path, "pose.parquet");
         File.Exists(posePath).Should().BeTrue();
-        using (var reader = ParquetReader.Create(File.OpenRead(posePath)))
+        using (var reader = OpenReader(posePath))
         {
             reader.RowGroupCount.Should().Be(1);
             var schema = reader.Schema;
             using var rowGroup = reader.OpenRowGroupReader(0);
-            var latitudeField = (DataField<double>)schema.DataFields.Single(f => f.Name == "latitude_deg");
-            var speedField = (DataField<double>)schema.DataFields.Single(f => f.Name == "speed_mps");
-            var latitudes = (double[])rowGroup.ReadColumn(latitudeField).Data;
-            var speeds = (double[])rowGroup.ReadColumn(speedField).Data;
+            var latitudeField = schema.DataFields.Single(f => f.Name == "latitude_deg");
+            var speedField = schema.DataFields.Single(f => f.Name == "speed_mps");
+            var latitudes = ReadColumn(rowGroup, latitudeField).Cast<double>().ToArray();
+            var speeds = ReadColumn(rowGroup, speedField).Cast<double>().ToArray();
 
             latitudes.Should().ContainInOrder(45.123, 45.124);
             speeds.Should().Contain(new[] { 5.5, 5.6 });
         }
 
         var canPath = Path.Combine(temp.Path, "can.parquet");
-        using (var reader = ParquetReader.Create(File.OpenRead(canPath)))
+        using (var reader = OpenReader(canPath))
         {
             reader.RowGroupCount.Should().Be(1);
             var schema = reader.Schema;
             using var rowGroup = reader.OpenRowGroupReader(0);
-            var payloadField = (DataField<byte[]?>)schema.DataFields.Single(f => f.Name == "payload");
-            var payloads = (byte[]?[])rowGroup.ReadColumn(payloadField).Data;
+            var payloadField = schema.DataFields.Single(f => f.Name == "payload");
+            var payloads = ReadColumn(rowGroup, payloadField).Cast<byte[]?>().ToArray();
             payloads.Should().HaveCount(1);
             payloads[0].Should().BeEquivalentTo(new byte[] { 0x0A, 0xFF });
         }
 
         var weatherPath = Path.Combine(temp.Path, "weather.parquet");
         File.Exists(weatherPath).Should().BeTrue();
-        using (var reader = ParquetReader.Create(File.OpenRead(weatherPath)))
+        using (var reader = OpenReader(weatherPath))
         {
             reader.RowGroupCount.Should().Be(1);
             var schema = reader.Schema;
             using var rowGroup = reader.OpenRowGroupReader(0);
-            var temperatureField = (DataField<double?>)schema.DataFields.Single(f => f.Name == "temperature_c");
-            var rainfallField = (DataField<double?>)schema.DataFields.Single(f => f.Name == "rainfall_mm");
-            var temperatures = (double?[])rowGroup.ReadColumn(temperatureField).Data;
-            var rainfall = (double?[])rowGroup.ReadColumn(rainfallField).Data;
+            var temperatureField = schema.DataFields.Single(f => f.Name == "temperature_c");
+            var rainfallField = schema.DataFields.Single(f => f.Name == "rainfall_mm");
+            var temperatures = ReadColumn(rowGroup, temperatureField).Cast<double?>().ToArray();
+            var rainfall = ReadColumn(rowGroup, rainfallField).Cast<double?>().ToArray();
 
             temperatures.Should().Equal(new double?[] { 12.5, 13.1 });
             rainfall.Should().Equal(new double?[] { 0.3, 0.8 });
@@ -162,13 +158,32 @@ public sealed class LegacyDataMigratorTests
     [Fact]
     public async Task ProgramMain_ReturnsZeroOnSuccess()
     {
-        var legacyPath = Path.Combine(AppContext.BaseDirectory, SampleLegacyPath);
+        var legacyPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", SampleLegacyPath));
         using var tempOutput = new TempDirectory();
 
         var exitCode = await Program.Main(new[] { "migrate", "--input", legacyPath, "--output", tempOutput.Path });
         exitCode.Should().Be(0);
 
         Directory.EnumerateFiles(tempOutput.Path).Should().Contain(file => file.EndsWith("pose.parquet", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static ParquetReader OpenReader(string path)
+    {
+        return ParquetReader
+            .CreateAsync(path, parquetOptions: null, cancellationToken: CancellationToken.None)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
+    }
+
+    private static Array ReadColumn(ParquetRowGroupReader rowGroup, DataField field)
+    {
+        return rowGroup
+            .ReadColumnAsync(field, CancellationToken.None)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult()
+            .Data;
     }
 
     private sealed class TempDirectory : IDisposable

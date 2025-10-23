@@ -39,7 +39,7 @@ public sealed class CoreStatusPresenter
 
     private static void RenderHuman(CoreStatusSummary summary, IAnsiConsole console)
     {
-        console.Write(new Rule("[bold green]Nexus Core status[/]") { Alignment = Justify.Left });
+        console.Write(new Rule("[bold green]Nexus Core status[/]") { Justification = Justify.Left });
 
         var finalAttempt = summary.FinalAttempt;
         var statusTable = new Table().Border(TableBorder.Rounded).Expand();

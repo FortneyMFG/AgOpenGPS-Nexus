@@ -8,6 +8,7 @@ using Nexus.Cli.Host.Modules;
 using Nexus.Cli.Host.Output;
 using Nexus.Cli.Host.Plugins.Reflection;
 using Nexus.Plugin.Cli.Abstractions;
+using Spectre.Console;
 using Spectre.Console.Testing;
 using Xunit;
 
@@ -31,11 +32,11 @@ public sealed class PluginReflectionCommandModuleTests
 
         var services = new ServiceCollection();
         services.AddSingleton<IPluginReflectionClient>(client);
-        services.AddSingleton<IAnsiConsole>(console);
+        services.AddSingleton<IAnsiConsole>(_ => console);
         await using var provider = services.BuildServiceProvider();
 
         var root = new RootCommand();
-        var context = new CommandModuleContext(root, provider, OutputOptions.ModeOption);
+        var context = new CommandContext(root, provider, OutputOptions.ModeOption);
         var module = new PluginReflectionCommandModule(client, console);
         module.Configure(context);
 
@@ -55,12 +56,12 @@ public sealed class PluginReflectionCommandModuleTests
 
         var services = new ServiceCollection();
         services.AddSingleton<IPluginReflectionClient>(client);
-        services.AddSingleton<IAnsiConsole>(console);
+        services.AddSingleton<IAnsiConsole>(_ => console);
         await using var provider = services.BuildServiceProvider();
 
         var root = new RootCommand();
         root.AddGlobalOption(OutputOptions.ModeOption);
-        var context = new CommandModuleContext(root, provider, OutputOptions.ModeOption);
+        var context = new CommandContext(root, provider, OutputOptions.ModeOption);
         var module = new PluginReflectionCommandModule(client, console);
         module.Configure(context);
 

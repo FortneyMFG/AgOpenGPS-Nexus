@@ -13,6 +13,6 @@ public static class InvocationContextExtensions
     public static CancellationToken GetCancellationTokenSafe(this InvocationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
-        return System.CommandLine.InvocationExtensions.GetCancellationToken(context);
+        return context.GetCancellationToken();
     }
 }

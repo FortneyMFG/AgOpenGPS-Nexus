@@ -1,0 +1,224 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
+             xmlns:workspace="clr-namespace:Aog.UI.Avalonia.ViewModels"
+             xmlns:views="clr-namespace:Aog.UI.Avalonia.Views.Shell"
+             xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
+             xmlns:model="clr-namespace:Aog.UI.Avalonia.Models"
+             mc:Ignorable="d"
+             x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
+             x:DataType="vm:AppShellViewModel"
+             d:DesignWidth="1280"
+             d:DesignHeight="720">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <DataTemplate x:Key="ShellMenuItemTemplate"
+                    x:DataType="workspace:ShellMenuItemViewModel">
+        <MenuItem Header="{Binding Header}"
+                  Command="{Binding Command}"
+                  IsEnabled="{Binding IsEnabled}"
+                  ToolTip.Tip="{Binding Tooltip}"
+                  ItemsSource="{Binding Children}">
+          <MenuItem.ItemTemplate>
+            <StaticResource ResourceKey="ShellMenuItemTemplate" />
+          </MenuItem.ItemTemplate>
+        </MenuItem>
+      </DataTemplate>
+
+      <DataTemplate x:Key="ToolbarItemTemplate"
+                    x:DataType="workspace:TopToolbarItemViewModel">
+        <Button Command="{Binding Command}"
+                ToolTip.Tip="{Binding Tooltip}"
+                Classes.toolbar="True"
+                Classes.toggle="{Binding IsToggle}"
+                Classes.active="{Binding IsChecked}">
+          <TextBlock Text="{Binding DisplayName}" />
+        </Button>
+      </DataTemplate>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="Button.toolbar">
+      <Setter Property="Background" Value="{DynamicResource ShellChromeBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+      <Setter Property="Padding" Value="{DynamicResource ShellToolbarButtonPadding}" />
+      <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusSm}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
+    </Style>
+
+    <Style Selector="Button.toolbar:hover">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentMutedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Button.toolbar.active">
+      <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
+      <Setter Property="Foreground" Value="#FFFFFFFF" />
+    </Style>
+  </UserControl.Styles>
+
+  <UserControl.DataTemplates>
+    <DataTemplate x:DataType="workspace:BoundaryToolViewModel">
+      <controls:BoundaryViewControl />
+    </DataTemplate>
+
+    <DataTemplate x:DataType="workspace:MainWindowViewModel">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="{DynamicResource ThemeSpacingMd}">
+          <TextBlock Text="System Summary"
+                     FontSize="{DynamicResource ThemeFontSizeMd}"
+                     FontWeight="Bold" />
+          <TextBlock Text="{Binding PlatformDescription}"
+                     TextWrapping="Wrap"
+                     Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+
+          <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
+            <TextBlock Text="Map Layers"
+                       FontWeight="SemiBold" />
+            <ItemsControl ItemsSource="{Binding MapLayers}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="model:MapLayer">
+                  <Border BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+                          BorderThickness="0,0,0,1"
+                          Padding="8,4">
+                    <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
+                      <TextBlock Text="{Binding DisplayName}"
+                                 FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Style.Units}"
+                                 FontSize="{DynamicResource ThemeFontSizeXs}"
+                                 Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+
+          <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
+            <TextBlock Text="Guidance Tracks"
+                       FontWeight="SemiBold" />
+            <ItemsControl ItemsSource="{Binding GuidanceTracks}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="model:GuidanceTrack">
+                  <Border BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+                          BorderThickness="0,0,0,1"
+                          Padding="8,4">
+                    <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
+                      <TextBlock Text="{Binding Name}"
+                                 FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Thickness, StringFormat='Stroke: {0:0.0} px'}"
+                                 FontSize="{DynamicResource ThemeFontSizeXs}"
+                                 Foreground="{DynamicResource ThemeAccentMutedBrush}" />
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+
+          <StackPanel Spacing="{DynamicResource ThemeSpacingXs}">
+            <TextBlock Text="Themes"
+                       FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding AvailableThemes}"
+                      SelectedItem="{Binding SelectedTheme}"
+                      HorizontalAlignment="Stretch" />
+          </StackPanel>
+        </StackPanel>
+      </ScrollViewer>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <DockPanel LastChildFill="True">
+    <Border DockPanel.Dock="Top"
+            Background="{DynamicResource ShellChromeBackgroundBrush}"
+            Padding="{DynamicResource ShellChromePadding}">
+      <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
+        <Menu Background="Transparent">
+          <MenuItem Header="{Binding Host.ShellMenuBar.FileMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.FileMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.FieldMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.FieldMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.ToolsMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.ToolsMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+          <MenuItem Header="{Binding Host.ShellMenuBar.ServicesMenu.Header}"
+                    ItemsSource="{Binding Host.ShellMenuBar.ServicesMenu.Items}">
+            <MenuItem.ItemTemplate>
+              <StaticResource ResourceKey="ShellMenuItemTemplate" />
+            </MenuItem.ItemTemplate>
+          </MenuItem>
+        </Menu>
+
+        <StackPanel Orientation="Horizontal"
+                    Spacing="12"
+                    VerticalAlignment="Center">
+          <TextBlock Text="AgOpenGPS Nexus"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource ThemeForegroundBrush}"
+                     FontSize="{DynamicResource ThemeFontSizeLg}"
+                     Margin="0,0,16,0"
+                     VerticalAlignment="Center" />
+          <ItemsControl ItemsSource="{Binding Host.TopToolbar.Items}"
+                        ItemTemplate="{StaticResource ToolbarItemTemplate}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal"
+                            Spacing="{DynamicResource ThemeSpacingSm}" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+          <TextBlock Text="{Binding StatusText}"
+                     Foreground="{DynamicResource ThemeAccentMutedBrush}"
+                     Margin="16,0,0,0"
+                     VerticalAlignment="Center" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Border DockPanel.Dock="Bottom"
+            Background="{DynamicResource ShellChromeBackgroundBrush}"
+            BorderBrush="{DynamicResource ShellChromeBorderBrush}"
+            BorderThickness="0,1,0,0"
+            Padding="8,4">
+      <views:StatusStripView DataContext="{Binding StatusStrip}" />
+    </Border>
+
+    <Grid Margin="12"
+          RowDefinitions="*"
+          ColumnDefinitions="*,340">
+      <Border Background="{DynamicResource ShellPanelBackgroundBrush}"
+              BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource ThemeRadiusMd}"
+              Padding="16"
+              Margin="0,0,12,0">
+        <ContentControl Content="{Binding MainContent}" />
+      </Border>
+
+      <Border Grid.Column="1"
+              Background="{DynamicResource ShellPanelBackgroundBrush}"
+              BorderBrush="{DynamicResource ShellPanelBorderBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource ThemeRadiusMd}"
+              Padding="16">
+        <ContentControl Content="{Binding Host}" />
+      </Border>
+    </Grid>
+  </DockPanel>
+</UserControl>

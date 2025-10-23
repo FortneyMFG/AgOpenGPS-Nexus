@@ -23,6 +23,9 @@
     <ProjectReference Include="..\..\tools\Aog.Tools.LegacyDataMigrator\Aog.Tools.LegacyDataMigrator.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\LegacyField\Flags.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Data\LegacyField\field-history.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

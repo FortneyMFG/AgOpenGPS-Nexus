@@ -10,6 +10,10 @@ public sealed class AxleAutomationIntegrator
 {
     private readonly IAutomationModeSink _sink;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AxleAutomationIntegrator"/> class.
+    /// </summary>
+    /// <param name="sink">Sink that receives computed automation mode limits.</param>
     public AxleAutomationIntegrator(IAutomationModeSink sink)
     {
         _sink = sink ?? throw new ArgumentNullException(nameof(sink));
@@ -18,6 +22,8 @@ public sealed class AxleAutomationIntegrator
     /// <summary>
     /// Applies the specified mode to the automation sink.
     /// </summary>
+    /// <param name="profile">Kinematic profile describing available automation modes.</param>
+    /// <param name="mode">Identifier of the mode to publish.</param>
     public void ApplyMode(AxleCentricProfile profile, string mode)
     {
         if (profile is null)
@@ -50,6 +56,10 @@ public sealed class AxleAutomationIntegrator
 /// </summary>
 public interface IAutomationModeSink
 {
+    /// <summary>
+    /// Publishes an updated snapshot of automation mode limits.
+    /// </summary>
+    /// <param name="snapshot">Snapshot describing the currently selected mode.</param>
     void PublishModeLimits(AutomationModeSnapshot snapshot);
 }
 

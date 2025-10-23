@@ -47,17 +47,17 @@ public sealed class FieldStateStore
     /// <summary>
     /// Begins a new coverage patch for the specified field.
     /// </summary>
-    public void BeginCoveragePatch(string fieldId, PlanarPoint left, PlanarPoint right)
+    public void BeginCoveragePatch(string fieldId, Aog.Core.Paths.PlanarPoint left, Aog.Core.Paths.PlanarPoint right)
     {
-        GetField(fieldId).Coverage.BeginPatch(left, right);
+        GetField(fieldId).Coverage.BeginPatch(left.ToCoverage(), right.ToCoverage());
     }
 
     /// <summary>
     /// Adds a sample to the active coverage patch for the specified field.
     /// </summary>
-    public double AddCoverageSample(string fieldId, PlanarPoint left, PlanarPoint right, bool includeInUserTotals = true)
+    public double AddCoverageSample(string fieldId, Aog.Core.Paths.PlanarPoint left, Aog.Core.Paths.PlanarPoint right, bool includeInUserTotals = true)
     {
-        return GetField(fieldId).Coverage.AddSample(left, right, includeInUserTotals);
+        return GetField(fieldId).Coverage.AddSample(left.ToCoverage(), right.ToCoverage(), includeInUserTotals);
     }
 
     /// <summary>

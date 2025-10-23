@@ -8,6 +8,7 @@ using Aog.Core.V1;
 using Aog.Plugins.TelemetryLogging;
 using FluentAssertions;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace Aog.Plugins.Tests;

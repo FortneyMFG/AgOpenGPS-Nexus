@@ -19,7 +19,7 @@ public sealed class SocketCanOptions
     /// </summary>
     public static readonly TimeSpan DefaultReceiveTimeout = TimeSpan.FromMilliseconds(200);
 
-    private string _interfaceName = "can0";
+    private string? _interfaceName = "can0";
     private string _sourcePrefix = "linux/socketcan";
     private TimeSpan _reconnectDelay = DefaultReconnectDelay;
     private TimeSpan _receiveTimeout = DefaultReceiveTimeout;
@@ -27,13 +27,25 @@ public sealed class SocketCanOptions
     /// <summary>
     /// Gets or sets the SocketCAN interface name to bind (for example, <c>can0</c> or <c>vcan0</c>).
     /// </summary>
-    [Required]
-    public string InterfaceName
+    public string? InterfaceName
     {
         get => _interfaceName;
-        set => _interfaceName = string.IsNullOrWhiteSpace(value)
-            ? throw new ValidationException("Interface name is required.")
-            : value;
+        set
+        {
+            if (value is null || value.Length == 0)
+            {
+                _interfaceName = null;
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ValidationException(
+                    "Interface name cannot contain only whitespace. Assign null or empty to disable SocketCAN.");
+            }
+
+            _interfaceName = value;
+        }
     }
 
     /// <summary>
@@ -44,15 +56,23 @@ public sealed class SocketCanOptions
 
     /// <summary>
     /// Gets or sets the time to wait before retrying after a failure to connect or read from the CAN interface.
+    /// Values less than or equal to zero fall back to <see cref="DefaultReconnectDelay"/>.
     /// </summary>
     public TimeSpan ReconnectDelay
     {
         get => _reconnectDelay;
         set
         {
-            if (value < TimeSpan.Zero && value != Timeout.InfiniteTimeSpan)
+            if (value == Timeout.InfiniteTimeSpan)
             {
-                throw new ValidationException("Reconnect delay cannot be negative.");
+                _reconnectDelay = value;
+                return;
+            }
+
+            if (value <= TimeSpan.Zero)
+            {
+                _reconnectDelay = DefaultReconnectDelay;
+                return;
             }
 
             _reconnectDelay = value;

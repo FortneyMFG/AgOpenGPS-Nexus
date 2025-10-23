@@ -21,16 +21,24 @@ public class CoreStatusCommandModuleTests
         var endpoint = new CoreEndpoint(CoreTransportKind.Tcp, "https://127.0.0.1:5157", "test");
         var status = new CoreStatusResult(endpoint, CoreStatusState.Healthy, TimeSpan.FromMilliseconds(12), "Connected", DateTimeOffset.UtcNow);
 
-        await using var host = await CreateHostAsync(console, status);
-        var application = host.Services.GetRequiredService<NxApplication>();
+        var host = await CreateHostAsync(console, status);
+        try
+        {
+            var application = host.Services.GetRequiredService<NxApplication>();
 
-        var exitCode = await application.InvokeAsync(new[] { "core", "status" }, CancellationToken.None);
+            var exitCode = await application.InvokeAsync(new[] { "core", "status" }, CancellationToken.None);
 
-        exitCode.Should().Be(0);
-        var output = console.Output.ToString();
-        output.Should().Contain("Nexus Core status");
-        output.Should().Contain("Healthy");
-        output.Should().Contain("Connected");
+            exitCode.Should().Be(0);
+            var output = console.Output.ToString();
+            output.Should().Contain("Nexus Core status");
+            output.Should().Contain("Healthy");
+            output.Should().Contain("Connected");
+        }
+        finally
+        {
+            await host.StopAsync();
+            host.Dispose();
+        }
     }
 
     [Fact]
@@ -40,20 +48,28 @@ public class CoreStatusCommandModuleTests
         var endpoint = new CoreEndpoint(CoreTransportKind.Tcp, "https://127.0.0.1:5157", "test");
         var status = new CoreStatusResult(endpoint, CoreStatusState.Healthy, TimeSpan.FromMilliseconds(20), "Connected", DateTimeOffset.UtcNow);
 
-        await using var host = await CreateHostAsync(console, status);
-        var application = host.Services.GetRequiredService<NxApplication>();
+        var host = await CreateHostAsync(console, status);
+        try
+        {
+            var application = host.Services.GetRequiredService<NxApplication>();
 
-        var exitCode = await application.InvokeAsync(new[] { "core", "status", "--output", "json" }, CancellationToken.None);
+            var exitCode = await application.InvokeAsync(new[] { "core", "status", "--output", "json" }, CancellationToken.None);
 
-        exitCode.Should().Be(0);
-        var payload = console.Output.ToString().Trim();
-        payload.Should().StartWith("{");
+            exitCode.Should().Be(0);
+            var payload = console.Output.ToString().Trim();
+            payload.Should().StartWith("{");
 
-        using var document = JsonDocument.Parse(payload);
-        document.RootElement.TryGetProperty("FinalState", out var finalState).Should().BeTrue();
-        finalState.GetString().Should().Be("Healthy");
-        document.RootElement.TryGetProperty("Attempts", out var attempts).Should().BeTrue();
-        attempts.GetArrayLength().Should().Be(1);
+            using var document = JsonDocument.Parse(payload);
+            document.RootElement.TryGetProperty("FinalState", out var finalState).Should().BeTrue();
+            finalState.GetString().Should().Be("Healthy");
+            document.RootElement.TryGetProperty("Attempts", out var attempts).Should().BeTrue();
+            attempts.GetArrayLength().Should().Be(1);
+        }
+        finally
+        {
+            await host.StopAsync();
+            host.Dispose();
+        }
     }
 
     [Fact]
@@ -63,20 +79,28 @@ public class CoreStatusCommandModuleTests
         var endpoint = new CoreEndpoint(CoreTransportKind.Tcp, "https://127.0.0.1:5157", "test");
         var status = new CoreStatusResult(endpoint, CoreStatusState.Unavailable, null, "Failed", DateTimeOffset.UtcNow);
 
-        await using var host = await CreateHostAsync(console, status);
-        var application = host.Services.GetRequiredService<NxApplication>();
+        var host = await CreateHostAsync(console, status);
+        try
+        {
+            var application = host.Services.GetRequiredService<NxApplication>();
 
-        var exitCode = await application.InvokeAsync(new[] { "core", "status" }, CancellationToken.None);
+            var exitCode = await application.InvokeAsync(new[] { "core", "status" }, CancellationToken.None);
 
-        exitCode.Should().Be(2);
-        console.Output.ToString().Should().Contain("Failed");
+            exitCode.Should().Be(2);
+            console.Output.ToString().Should().Contain("Failed");
+        }
+        finally
+        {
+            await host.StopAsync();
+            host.Dispose();
+        }
     }
 
     private static async Task<IHost> CreateHostAsync(TestConsole console, CoreStatusResult status)
     {
-        var builder = Host.CreateApplicationBuilder(Array.Empty<string>());
+        var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(Array.Empty<string>());
         builder.Services.AddNxCliHost();
-        builder.Services.AddSingleton<IAnsiConsole>(console);
+        builder.Services.AddSingleton<IAnsiConsole>(_ => console);
         builder.Services.AddSingleton<ICoreEndpointResolver>(new StubEndpointResolver(status.Endpoint));
         builder.Services.AddSingleton<ICoreStatusProbe>(new StubCoreStatusProbe(status));
 

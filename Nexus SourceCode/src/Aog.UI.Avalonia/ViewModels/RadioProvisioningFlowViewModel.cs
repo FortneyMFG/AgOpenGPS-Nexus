@@ -50,7 +50,7 @@ public sealed class RadioProvisioningFlowViewModel
             new(
                 "Prepare the workstation",
                 "Confirm the provisioning kit prerequisites are satisfied before minting device profiles.",
-                new List<RadioProvisioningStepViewModel>
+                new List<RadioProvisioningGuideStepViewModel>
                 {
                     new("Install the .NET 8.0 SDK on the provisioning workstation."),
                     new(
@@ -62,20 +62,22 @@ public sealed class RadioProvisioningFlowViewModel
             new(
                 "Generate a provisioning profile",
                 "Use the RadioBridge tooling to mint the per-device JSON profile that stores identifiers, capabilities, and keys.",
-                new List<RadioProvisioningStepViewModel>
+                new List<RadioProvisioningGuideStepViewModel>
                 {
                     new(
                         "Run the provisioning command for the device you are onboarding.",
                         "Override --output to write directly to a secure share or omit it to stream the JSON to stdout.",
-                        "dotnet run -- provision \\
-    --device-id bridge.lora.alpha \\
-    --label \"LoRa Bridge Alpha\" \\
-    --radio-kind lora \\
-    --capability radio \\
-    --capability bridge \\
-    --capability lora \\
-    --key-bytes 16 \\
-    --output /secure-share/radio/bridge.lora.alpha.json"),
+                        """
+                        dotnet run -- provision \
+                            --device-id bridge.lora.alpha \
+                            --label "LoRa Bridge Alpha" \
+                            --radio-kind lora \
+                            --capability radio \
+                            --capability bridge \
+                            --capability lora \
+                            --key-bytes 16 \
+                            --output /secure-share/radio/bridge.lora.alpha.json
+                        """.Trim()),
                     new(
                         "Deterministic keys are supported for lab fixtures via --key 0123456789ABCDEF when needed."),
                     new(
@@ -84,7 +86,7 @@ public sealed class RadioProvisioningFlowViewModel
             new(
                 "Configure the AGiO host",
                 "Copy the profile onto the device running Aog.Agio and wire it into the RadioBridge adapter options.",
-                new List<RadioProvisioningStepViewModel>
+                new List<RadioProvisioningGuideStepViewModel>
                 {
                     new(
                         "Place the provisioning profile on the host, for example /opt/nexus/radio/bridge.lora.alpha.json, with restricted permissions."),
@@ -98,16 +100,24 @@ public sealed class RadioProvisioningFlowViewModel
             new(
                 "Validate the deployment",
                 "Run through the validation checklist to confirm the bridge negotiates correctly with the mesh.",
-                new List<RadioProvisioningStepViewModel>
+                new List<RadioProvisioningGuideStepViewModel>
                 {
-                    new(
-                        "Execute the RadioBridge transport tests to verify retry logic and Hamming decoding remain healthy.",
-                        null,
-                        "dotnet test tests/Aog.Core.Tests --filter RadioBridgeTransportTests"),
-                    new(
-                        "Inspect mesh diagnostics for the device and confirm radio.kind, radio.fec, RSSI, and retry counters are reported."),
-                    new(
-                        "Replay a sample mesh publication or coverage topic and verify frames reach the radio modem or simulator.")
+                    new RadioProvisioningGuideStepViewModel(
+                        primaryText: "Execute the RadioBridge transport tests to verify retry logic and Hamming decoding remain healthy.",
+                        detail: "Run the automated RadioBridge transport tests to validate retry handling and Hamming decoding before promoting the bridge to production.",
+                        status: RadioProvisioningStepStatus.Pending,
+                        updatedAt: null,
+                        command: "dotnet test tests/Aog.Core.Tests --filter RadioBridgeTransportTests"),
+                    new RadioProvisioningGuideStepViewModel(
+                        primaryText: "Inspect mesh diagnostics for the device and confirm radio.kind, radio.fec, RSSI, and retry counters are reported.",
+                        detail: "Review the mesh diagnostics dashboard to ensure the bridge is emitting radio metadata and reliability counters in real time.",
+                        status: RadioProvisioningStepStatus.Pending,
+                        updatedAt: null),
+                    new RadioProvisioningGuideStepViewModel(
+                        primaryText: "Replay a sample mesh publication or coverage topic and verify frames reach the radio modem or simulator.",
+                        detail: "Replay a known-good publication through the mesh to confirm frames traverse the bridge and reach the modem or simulator endpoints.",
+                        status: RadioProvisioningStepStatus.Pending,
+                        updatedAt: null)
                 })
         };
 
@@ -124,7 +134,7 @@ public sealed class RadioProvisioningFlowViewModel
         return new RadioProvisioningFlowViewModel(
             summary: "Provision RadioBridge devices with repeatable tooling that aligns with ADR-048.",
             securityNote: "Keep provisioning JSON files in a secured location; treat keys as secrets and rotate them via the same workflow.",
-            documentationSummary: "Full guide: docs/howto/radio/radiobridge-provisioning.md",
+            documentationSummary: "Full guide: docs/development/howto/radio/radiobridge-provisioning.md",
             profileSchemaSummary: "Provisioning profiles follow the RadioBridgeProvisioningProfile contract shipped with the tooling.",
             stages: stages,
             profileFields: profileFields);
@@ -139,7 +149,7 @@ public sealed class RadioProvisioningStageViewModel
     public RadioProvisioningStageViewModel(
         string title,
         string description,
-        IReadOnlyList<RadioProvisioningStepViewModel> steps,
+        IReadOnlyList<RadioProvisioningGuideStepViewModel> steps,
         string? callout = null)
     {
         Title = title ?? throw new ArgumentNullException(nameof(title));
@@ -158,7 +168,7 @@ public sealed class RadioProvisioningStageViewModel
     public string? Callout { get; }
 
     /// <summary>Gets the step collection belonging to the stage.</summary>
-    public IReadOnlyList<RadioProvisioningStepViewModel> Steps { get; }
+    public IReadOnlyList<RadioProvisioningGuideStepViewModel> Steps { get; }
 
     /// <summary>Gets a value indicating whether the stage exposes a callout.</summary>
     public bool HasCallout => !string.IsNullOrWhiteSpace(Callout);
@@ -167,13 +177,27 @@ public sealed class RadioProvisioningStageViewModel
 /// <summary>
 /// Represents a single provisioning step surfaced in the UI.
 /// </summary>
-public sealed class RadioProvisioningStepViewModel
+public sealed class RadioProvisioningGuideStepViewModel
 {
-    public RadioProvisioningStepViewModel(string primaryText, string? secondaryText = null, string? command = null)
+    public RadioProvisioningGuideStepViewModel(string primaryText, string? secondaryText = null, string? command = null)
     {
         PrimaryText = primaryText ?? throw new ArgumentNullException(nameof(primaryText));
         SecondaryText = secondaryText;
         Command = command;
+        Status = RadioProvisioningStepStatus.Pending;
+        UpdatedAt = null;
+    }
+
+    public RadioProvisioningGuideStepViewModel(
+        string primaryText,
+        string detail,
+        RadioProvisioningStepStatus status,
+        DateTimeOffset? updatedAt,
+        string? command = null)
+        : this(primaryText, detail, command)
+    {
+        Status = status;
+        UpdatedAt = updatedAt;
     }
 
     /// <summary>Gets the primary description for the step.</summary>
@@ -184,6 +208,12 @@ public sealed class RadioProvisioningStepViewModel
 
     /// <summary>Gets an optional command or configuration snippet.</summary>
     public string? Command { get; }
+
+    /// <summary>Gets the provisioning status associated with the guide step.</summary>
+    public RadioProvisioningStepStatus Status { get; private set; }
+
+    /// <summary>Gets the last time the guide step status was updated, if available.</summary>
+    public DateTimeOffset? UpdatedAt { get; private set; }
 
     /// <summary>Gets a value indicating whether a secondary note should be rendered.</summary>
     public bool HasSecondaryText => !string.IsNullOrWhiteSpace(SecondaryText);

@@ -39,7 +39,9 @@ public sealed class SocketCanNetworkInterfaceProvider : ICanNetworkInterfaceProv
     /// <inheritdoc />
     public IReadOnlyList<CanNetworkInterface> GetAll(bool includeVirtualInterfaces)
     {
-        return CanNetworkInterface.GetAllInterfaces(includeVirtualInterfaces);
+        return CanNetworkInterface
+            .GetAllInterfaces(includeVirtualInterfaces)
+            .ToList();
     }
 }
 
@@ -65,15 +67,21 @@ public sealed class SocketCanClientFactory : ISocketCanClientFactory
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        var interfaceName = options.InterfaceName;
+        if (string.IsNullOrWhiteSpace(interfaceName))
+        {
+            throw new InvalidOperationException("SocketCAN interface is not configured.");
+        }
+
         var interfaces = _interfaceProvider.GetAll(options.IncludeVirtualInterfaces);
         var selected = interfaces.FirstOrDefault(iface => string.Equals(
             iface?.Name,
-            options.InterfaceName,
+            interfaceName,
             StringComparison.OrdinalIgnoreCase));
 
         if (selected is null)
         {
-            throw new SocketCanInterfaceNotFoundException(options.InterfaceName);
+            throw new SocketCanInterfaceNotFoundException(interfaceName);
         }
 
         var socket = new RawCanSocket();
@@ -176,7 +184,7 @@ internal sealed class SocketCanClient : ISocketCanClient
 
         try
         {
-            var bytesRead = _socket.Read(out var frame);
+            var bytesRead = _socket.Read(out CanFrame frame);
             if (bytesRead <= 0)
             {
                 return SocketCanFrameReadResult.Timeout();

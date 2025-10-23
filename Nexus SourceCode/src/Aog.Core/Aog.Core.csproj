@@ -4,6 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -19,9 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Parquet.Net" Version="5.5.3" />
-    <PackageReference Include="NetTopologySuite" Version="2.5.0" />
-    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.5.0" />
+    <PackageReference Include="Parquet.Net" Version="5.2.0" />
+    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
   </ItemGroup>
 </Project>

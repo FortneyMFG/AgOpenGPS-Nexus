@@ -1,8 +1,9 @@
 using System.Linq;
-using Aog.UI.Avalonia;
+using Aog.UI.Avalonia.App;
 using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.ViewModels;
+using Aog.UI.Avalonia.Views.Main;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -18,7 +19,7 @@ public class AvaloniaUiShellServiceCollectionExtensionsTests
 
         services.AddAvaloniaUiShell();
 
-        services.Should().ContainSingle(descriptor => descriptor.ServiceType == typeof(App))
+        services.Should().ContainSingle(descriptor => descriptor.ServiceType == typeof(NexusApp))
             .Which.Lifetime.Should().Be(ServiceLifetime.Singleton);
         services.Should().ContainSingle(descriptor => descriptor.ServiceType == typeof(MainWindow))
             .Which.Lifetime.Should().Be(ServiceLifetime.Singleton);
@@ -43,7 +44,7 @@ public class AvaloniaUiShellServiceCollectionExtensionsTests
         services.AddAvaloniaUiShell();
         services.AddAvaloniaUiShell();
 
-        services.Count(descriptor => descriptor.ServiceType == typeof(App)).Should().Be(1);
+        services.Count(descriptor => descriptor.ServiceType == typeof(NexusApp)).Should().Be(1);
         services.Count(descriptor => descriptor.ServiceType == typeof(MainWindow)).Should().Be(1);
         services.Count(descriptor => descriptor.ServiceType == typeof(MainWindowViewModel)).Should().Be(1);
         services.Count(descriptor => descriptor.ServiceType == typeof(ConnectionSettingsViewModel)).Should().Be(1);

@@ -3,8 +3,10 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Aog.Core.V1;
+using Aog.Protos.Agio.V1;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Aog.Agio.Linux.SocketCan;
 
@@ -17,10 +19,12 @@ public sealed class SocketCanBusService : CanBusService.CanBusServiceBase
     private static readonly TimeSpan SlowSubscriberTimeout = TimeSpan.FromSeconds(1);
 
     private readonly ISocketCanFrameSource _source;
+    private readonly ILogger<SocketCanBusService> _logger;
 
-    public SocketCanBusService(ISocketCanFrameSource source)
+    public SocketCanBusService(ISocketCanFrameSource source, ILogger<SocketCanBusService> logger)
     {
         _source = source ?? throw new ArgumentNullException(nameof(source));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <inheritdoc />
@@ -41,32 +45,40 @@ public sealed class SocketCanBusService : CanBusService.CanBusServiceBase
             throw new ArgumentNullException(nameof(context));
         }
 
-        using var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
-        var queue = Channel.CreateBounded<CanFrame>(new BoundedChannelOptions(SubscriberQueueCapacity)
-        {
-            AllowSynchronousContinuations = false,
-            FullMode = BoundedChannelFullMode.DropWrite,
-            SingleReader = true,
-            SingleWriter = true,
-        });
-
-        var pumpTask = PumpFramesAsync(queue, cancellationSource);
-        var writeTask = WriteFramesAsync(queue, responseStream, cancellationSource);
+        var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
 
         try
         {
-            await Task.WhenAll(pumpTask, writeTask).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException) when (cancellationSource.IsCancellationRequested)
-        {
+            var queue = Channel.CreateBounded<CanFrame>(new BoundedChannelOptions(SubscriberQueueCapacity)
+            {
+                AllowSynchronousContinuations = false,
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = true,
+                SingleWriter = true,
+            });
+
+            var pumpTask = PumpFramesAsync(queue, cancellationSource, context);
+            var writeTask = WriteFramesAsync(queue, responseStream, cancellationSource);
+
+            try
+            {
+                await Task.WhenAll(pumpTask, writeTask).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationSource.IsCancellationRequested)
+            {
+            }
+            finally
+            {
+                queue.Writer.TryComplete();
+            }
         }
         finally
         {
-            queue.Writer.TryComplete();
+            cancellationSource.Dispose();
         }
     }
 
-    private async Task PumpFramesAsync(Channel<CanFrame> queue, CancellationTokenSource cancellationSource)
+    private async Task PumpFramesAsync(Channel<CanFrame> queue, CancellationTokenSource cancellationSource, ServerCallContext context)
     {
         try
         {
@@ -78,10 +90,26 @@ public sealed class SocketCanBusService : CanBusService.CanBusServiceBase
                 }
 
                 var waitTask = queue.Writer.WaitToWriteAsync(cancellationSource.Token).AsTask();
-                var completed = await Task.WhenAny(waitTask, Task.Delay(SlowSubscriberTimeout)).ConfigureAwait(false);
+                Task completed;
+                Task delayTask = Task.Delay(SlowSubscriberTimeout, cancellationSource.Token);
+
+                try
+                {
+                    completed = await Task.WhenAny(waitTask, delayTask).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (cancellationSource.IsCancellationRequested)
+                {
+                    break;
+                }
 
                 if (completed != waitTask)
                 {
+                    if (delayTask.IsCanceled)
+                    {
+                        break;
+                    }
+
+                    LogSlowSubscriberEvicted(context, frame, "Writer wait timed out");
                     cancellationSource.Cancel();
                     break;
                 }
@@ -98,11 +126,14 @@ public sealed class SocketCanBusService : CanBusService.CanBusServiceBase
 
                 if (!canWrite)
                 {
+                    LogSlowSubscriberEvicted(context, frame, "Writer channel completed while waiting to write");
+                    cancellationSource.Cancel();
                     break;
                 }
 
                 if (!queue.Writer.TryWrite(frame))
                 {
+                    LogSlowSubscriberEvicted(context, frame, "Writer remained saturated after wait");
                     cancellationSource.Cancel();
                     break;
                 }
@@ -115,6 +146,15 @@ public sealed class SocketCanBusService : CanBusService.CanBusServiceBase
         {
             queue.Writer.TryComplete();
         }
+    }
+
+    private void LogSlowSubscriberEvicted(ServerCallContext context, CanFrame frame, string reason)
+    {
+        _logger.LogWarning(
+            "SocketCAN subscriber {Peer} evicted due to slow consumption ({Reason}). Last attempted frame arbitration ID {ArbitrationId}.",
+            context.Peer,
+            reason,
+            frame.ArbitrationId);
     }
 
     private static async Task WriteFramesAsync(

@@ -194,7 +194,7 @@ public abstract class RadioBridgeAdapterBase<TOptions> : IHostedService, IDispos
         while (!cancellationToken.IsCancellationRequested)
         {
             var waitTask = _sendSignal.WaitAsync(cancellationToken);
-            var delayTask = _timeProvider.Delay(_options.SendInterval, cancellationToken).AsTask();
+            var delayTask = Task.Delay(_options.SendInterval, _timeProvider, cancellationToken);
             var completed = await Task.WhenAny(waitTask, delayTask).ConfigureAwait(false);
 
             if (completed == waitTask)
@@ -291,7 +291,7 @@ public abstract class RadioBridgeAdapterBase<TOptions> : IHostedService, IDispos
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            await _timeProvider.Delay(_options.DiagnosticsInterval, cancellationToken).ConfigureAwait(false);
+            await Task.Delay(_options.DiagnosticsInterval, _timeProvider, cancellationToken).ConfigureAwait(false);
             await PublishDiagnosticsAsync(cancellationToken).ConfigureAwait(false);
         }
     }
@@ -419,9 +419,11 @@ public abstract class RadioBridgeAdapterBase<TOptions> : IHostedService, IDispos
         var registration = new MeshDeviceRegistration(
             _options.DeviceId,
             _options.DeviceLabel,
-            capabilities,
-            new MeshShareProfile(shareGrants),
-            new MeshSubscribeProfile(subscribeGrants));
+            ShareProfile: new MeshShareProfile(shareGrants),
+            SubscribeProfile: new MeshSubscribeProfile(subscribeGrants))
+        {
+            Capabilities = capabilities
+        };
 
         await _meshService.RegisterOrUpdateDeviceAsync(registration, cancellationToken).ConfigureAwait(false);
     }

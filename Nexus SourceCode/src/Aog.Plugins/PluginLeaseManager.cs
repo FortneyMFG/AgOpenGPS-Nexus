@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Aog.Plugins;
@@ -20,9 +21,13 @@ public sealed class PluginLeaseManager
     }
 
     /// <summary>Attempts to acquire a lease for the capability defined in the manifest.</summary>
-    public bool TryAcquireLease(string pluginId, string capability, DateTimeOffset now, out PluginLeaseHandle handle)
+    public bool TryAcquireLease(
+        string pluginId,
+        string capability,
+        DateTimeOffset now,
+        [MaybeNullWhen(false)] out PluginLeaseHandle handle)
     {
-        handle = default;
+        handle = default!;
 
         if (!_manifests.TryGetValue(pluginId, out var manifest))
         {

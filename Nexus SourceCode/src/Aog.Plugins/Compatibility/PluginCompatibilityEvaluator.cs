@@ -393,7 +393,7 @@ public sealed class PluginCompatibilityEvaluator
         {
             if (!capabilityProviders.TryGetValue(requirement.Id, out var providers) || providers.Count == 0)
             {
-                var message = string.Format(
+                var capabilityMessage = string.Format(
                     CultureInfo.InvariantCulture,
                     "Capability '{0}' range '{1}' is unavailable.",
                     requirement.Id,
@@ -404,7 +404,7 @@ public sealed class PluginCompatibilityEvaluator
                     requirement.Id,
                     requirement.Classification,
                     MapClassificationToState(requirement.Classification),
-                    message));
+                    capabilityMessage));
                 continue;
             }
 
@@ -486,7 +486,7 @@ public sealed class PluginCompatibilityEvaluator
         {
             if (!profileProviders.TryGetValue(requirement.Id, out var providers) || providers.Count == 0)
             {
-                var message = string.Format(
+                var profileMessage = string.Format(
                     CultureInfo.InvariantCulture,
                     "Profile '{0}' range '{1}' is unavailable.",
                     requirement.Id,
@@ -497,7 +497,7 @@ public sealed class PluginCompatibilityEvaluator
                     requirement.Id,
                     requirement.Classification,
                     MapClassificationToState(requirement.Classification),
-                    message));
+                    profileMessage));
                 continue;
             }
 

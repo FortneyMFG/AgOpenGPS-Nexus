@@ -26,7 +26,8 @@ public sealed class FieldStateStoreTests
         var snapshot = store.GetCoverageSnapshot("field-1");
         Assert.Equal(100, snapshot.TotalAreaSquareMeters, 3);
         Assert.Equal(100, snapshot.UserAreaSquareMeters, 3);
-        Assert.Equal(1, snapshot.CoveragePercent, 3);
+        Assert.True(snapshot.CoveragePercent.HasValue);
+        Assert.Equal(1, snapshot.CoveragePercent.Value, 3);
         Assert.Equal(1, snapshot.PatchCount);
     }
 
@@ -166,7 +167,8 @@ public sealed class FieldStateStoreTests
             {
                 Assert.Equal("zone-boundary", first.ZoneId);
                 Assert.Equal(ZoneType.Boundary, first.Type);
-                Assert.Equal(14400, first.AreaSquareMeters, 3);
+                Assert.True(first.AreaSquareMeters.HasValue);
+                Assert.Equal(14400, first.AreaSquareMeters.Value, 3);
                 Assert.True(first.Enabled);
             },
             second =>
@@ -179,7 +181,8 @@ public sealed class FieldStateStoreTests
             {
                 Assert.Equal("zone-keepout", third.ZoneId);
                 Assert.Equal(ZoneType.KeepOut, third.Type);
-                Assert.Equal(400, third.AreaSquareMeters, 3);
+                Assert.True(third.AreaSquareMeters.HasValue);
+                Assert.Equal(400, third.AreaSquareMeters.Value, 3);
             });
     }
 
@@ -224,7 +227,8 @@ public sealed class FieldStateStoreTests
 
         var snapshot = Assert.Single(store.GetZoneSnapshots("field-1"));
         Assert.Equal(ZoneType.Headland, snapshot.Type);
-        Assert.Equal(80 * 80 - 20 * 20, snapshot.AreaSquareMeters, 3);
+        Assert.True(snapshot.AreaSquareMeters.HasValue);
+        Assert.Equal(80 * 80 - 20 * 20, snapshot.AreaSquareMeters.Value, 3);
         Assert.Single(snapshot.Geometry.Holes);
         Assert.Equal(5, snapshot.Geometry.OuterBoundary.Count);
     }

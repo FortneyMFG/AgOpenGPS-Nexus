@@ -27,8 +27,8 @@ public sealed class CrossTrackReplayHarnessTests
             var playbackBus = new InMemoryEventBus();
             using var harness = new CrossTrackReplayHarness(playbackBus, scenario.Start, scenario.End);
 
-            var timeProvider = new ManualTimeProvider();
-            timeProvider.SetUtcNow(scenario.StartTimestamp);
+            var timeProvider = new FakeTimeProvider();
+            timeProvider.SetUtcNow(new DateTimeOffset(scenario.StartTimestamp, TimeSpan.Zero));
 
             var replayOptions = new TelemetryReplayOptions
             {
@@ -127,7 +127,7 @@ public sealed class CrossTrackReplayHarnessTests
     }
 
     private static async Task AdvanceUntilAsync(
-        ManualTimeProvider provider,
+        FakeTimeProvider provider,
         Func<bool> predicate,
         TimeSpan step,
         int maxSteps = 200)
@@ -163,13 +163,13 @@ public sealed class CrossTrackReplayHarnessTests
         }
     }
 
-    private readonly record struct CrossTrackScenario(
+    public readonly record struct CrossTrackScenario(
         GeoCoordinate Start,
         GeoCoordinate End,
         int SampleCount,
         DateTime StartTimestamp);
 
-    private readonly record struct GeoCoordinate(double LatitudeDeg, double LongitudeDeg);
+    public readonly record struct GeoCoordinate(double LatitudeDeg, double LongitudeDeg);
 
     private sealed class CrossTrackReplayHarness : IDisposable
     {
@@ -282,7 +282,7 @@ public sealed class CrossTrackReplayHarnessTests
             return Math.Atan2(east, north);
         }
 
-        private readonly record struct CrossTrackSample(TimeSpan Offset, double ErrorMeters);
+        public readonly record struct CrossTrackSample(TimeSpan Offset, double ErrorMeters);
 
         public readonly record struct CrossTrackSummary(
             CrossTrackSample[] Samples,

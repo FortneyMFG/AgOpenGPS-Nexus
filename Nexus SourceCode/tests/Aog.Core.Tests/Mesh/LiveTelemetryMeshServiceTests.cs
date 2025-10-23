@@ -22,15 +22,17 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             " device:alpha ",
             "  Harvester  ",
-            new[] { "presence", "Presence" },
-            new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant(" season:2025 ", " job:123 ", MeshDataTier.Presence, new[] { "presence" })
             }),
-            new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("*", "*", MeshDataTier.Presence)
-            })),
+            }))
+        {
+            Capabilities = new[] { "presence", "Presence" }
+        },
             CancellationToken.None);
 
         await service.UpdatePresenceAsync(new MeshPresenceUpdate(
@@ -61,7 +63,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "device:beta",
             "Sprayer",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence, new[] { "presence" })
             })),
@@ -73,7 +75,7 @@ public sealed class LiveTelemetryMeshServiceTests
             MeshDataTier.Coverage,
             new byte[] { 0x01 });
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.PublishAsync(request));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.PublishAsync(request).AsTask());
     }
 
     [Fact]
@@ -85,7 +87,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "publisher",
             "Combine",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence | MeshDataTier.Coverage, new[] { "presence", "coverage" })
             })),
@@ -94,7 +96,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "subscriber",
             "Scout",
-            subscribeProfile: new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("season:2025", "job:alpha", MeshDataTier.Coverage, new[] { "coverage" })
             })),
@@ -104,9 +106,9 @@ public sealed class LiveTelemetryMeshServiceTests
         await using var watcher = service
             .SubscribeAsync(new MeshSubscriptionRequest(
                 "subscriber",
-                seasonId: "season:2025",
-                jobId: "job:alpha",
-                tierMask: MeshDataTier.Coverage), cts.Token)
+                SeasonId: "season:2025",
+                JobId: "job:alpha",
+                TierMask: MeshDataTier.Coverage), cts.Token)
             .GetAsyncEnumerator(cts.Token);
 
         var payload = new byte[] { 0x10, 0x20, 0x30 };
@@ -136,7 +138,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "device:gamma",
             "Tractor",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:beta", MeshDataTier.Presence, new[] { "presence" })
             })),
@@ -168,12 +170,12 @@ public sealed class LiveTelemetryMeshServiceTests
             "ghost",
             topic,
             MeshDataTier.Coverage,
-            ReadOnlyMemory<byte>.Empty)));
+            ReadOnlyMemory<byte>.Empty)).AsTask());
 
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "device:alpha",
             "Combine",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence, new[] { "presence" })
             })),
@@ -183,7 +185,7 @@ public sealed class LiveTelemetryMeshServiceTests
             "device:alpha",
             topic,
             MeshDataTier.Coverage,
-            ReadOnlyMemory<byte>.Empty)));
+            ReadOnlyMemory<byte>.Empty)).AsTask());
 
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "device:beta",
@@ -194,9 +196,9 @@ public sealed class LiveTelemetryMeshServiceTests
         {
             await foreach (var _ in service.SubscribeAsync(new MeshSubscriptionRequest(
                 "device:beta",
-                seasonId: "season:2025",
-                jobId: "job:alpha",
-                tierMask: MeshDataTier.Coverage), CancellationToken.None))
+                SeasonId: "season:2025",
+                JobId: "job:alpha",
+                TierMask: MeshDataTier.Coverage), CancellationToken.None))
             {
             }
         });
@@ -205,8 +207,8 @@ public sealed class LiveTelemetryMeshServiceTests
         {
             await foreach (var _ in service.SubscribeAsync(new MeshSubscriptionRequest(
                 "ghost",
-                seasonId: "season:2025",
-                jobId: "job:alpha"), CancellationToken.None))
+                SeasonId: "season:2025",
+                JobId: "job:alpha"), CancellationToken.None))
             {
             }
         });
@@ -214,12 +216,12 @@ public sealed class LiveTelemetryMeshServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdatePresenceAsync(new MeshPresenceUpdate(
             "device:alpha",
             new MeshSessionDescriptor("season:2025", "job:alpha"),
-            new MeshPose(45.0, -96.0))));
+            new MeshPose(45.0, -96.0))).AsTask());
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() => service.UpdatePresenceAsync(new MeshPresenceUpdate(
             "ghost",
             new MeshSessionDescriptor("season:2025", "job:alpha"),
-            new MeshPose(40.0, -90.0))));
+            new MeshPose(40.0, -90.0))).AsTask());
 
         var diagnostics = service.GetDiagnostics();
 
@@ -253,7 +255,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "publisher",
             "Combine",
-            shareProfile: new MeshShareProfile(new[]
+            ShareProfile: new MeshShareProfile(new[]
             {
                 new MeshShareGrant("season:2025", "job:alpha", MeshDataTier.Presence | MeshDataTier.Coverage, new[] { "presence", "coverage" })
             })),
@@ -262,7 +264,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.RegisterOrUpdateDeviceAsync(new MeshDeviceRegistration(
             "subscriber",
             "Scout",
-            subscribeProfile: new MeshSubscribeProfile(new[]
+            SubscribeProfile: new MeshSubscribeProfile(new[]
             {
                 new MeshSubscribeGrant("season:2025", "job:alpha", MeshDataTier.Coverage, new[] { "coverage" })
             })),
@@ -271,9 +273,9 @@ public sealed class LiveTelemetryMeshServiceTests
         await using var watcher = service
             .SubscribeAsync(new MeshSubscriptionRequest(
                 "subscriber",
-                seasonId: "season:2025",
-                jobId: "job:alpha",
-                tierMask: MeshDataTier.Coverage), CancellationToken.None)
+                SeasonId: "season:2025",
+                JobId: "job:alpha",
+                TierMask: MeshDataTier.Coverage), CancellationToken.None)
             .GetAsyncEnumerator();
 
         var payload = new byte[] { 0x2A };

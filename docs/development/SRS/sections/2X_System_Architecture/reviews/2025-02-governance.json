@@ -1,0 +1,58 @@
+{
+  "meeting_date": "2025-02-17",
+  "meeting_type": "Architecture Governance Review",
+  "summary": "Monthly sync covering the ADR roadmap, plugin manifest dependencies, and telemetry publishing cadence.",
+  "attendees": [
+    "Core Owner",
+    "Plugins Owner",
+    "UI Owner",
+    "QA Steward"
+  ],
+  "decisions": [
+    {
+      "id": "ADR-031",
+      "title": "Manifest governance automation",
+      "status": "ratified",
+      "notes": "Signed digests move to a weekly cadence and must surface resolver deltas in telemetry exports."
+    },
+    {
+      "id": "ADR-roadmap",
+      "title": "Roadmap sync telemetry",
+      "status": "acknowledged",
+      "notes": "Program board automation feeds NX backlog dashboards starting with NX-610."
+    }
+  ],
+  "action_items": [
+    {
+      "id": "NX-610-1",
+      "owner": "Plugins Owner",
+      "description": "Backfill dependency digests for controller plugins into the governance artifact store.",
+      "status": "open",
+      "due_date": "2025-03-03"
+    },
+    {
+      "id": "NX-610-2",
+      "owner": "QA Steward",
+      "description": "Attach governance telemetry JSON to the March review minutes for regression tracking.",
+      "status": "in_progress",
+      "due_date": "2025-03-07"
+    },
+    {
+      "id": "NX-208-followup",
+      "owner": "Core Owner",
+      "description": "Confirm the UI compatibility dashboard ingests the manifest digest summaries without regression.",
+      "status": "completed",
+      "completed_date": "2025-02-20"
+    }
+  ],
+  "links": [
+    {
+      "label": "Roadmap",
+      "url": "docs/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md"
+    },
+    {
+      "label": "Dependency Map",
+      "url": "docs/Plugins/nexus-plugin-dependency-map.md"
+    }
+  ]
+}

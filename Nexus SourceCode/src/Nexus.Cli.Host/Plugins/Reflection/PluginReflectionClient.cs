@@ -74,9 +74,9 @@ public sealed class PluginReflectionClient : IPluginReflectionClient
 
         var kind = option.ValueKind switch
         {
-            OptionValueKind.OptionValueKindBool => PluginVerbOptionKind.Bool,
-            OptionValueKind.OptionValueKindDouble => PluginVerbOptionKind.Double,
-            OptionValueKind.OptionValueKindInt32 => PluginVerbOptionKind.Int32,
+            OptionValueKind.Bool => PluginVerbOptionKind.Bool,
+            OptionValueKind.Double => PluginVerbOptionKind.Double,
+            OptionValueKind.Int32 => PluginVerbOptionKind.Int32,
             _ => PluginVerbOptionKind.String,
         };
 

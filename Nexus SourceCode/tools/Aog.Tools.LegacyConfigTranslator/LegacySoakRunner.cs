@@ -67,7 +67,7 @@ public sealed class LegacySoakRunner
                 LatitudeDeg = 51.0 + i * 1e-6,
                 LongitudeDeg = -114.0 + i * 1e-6,
                 HeadingRad = (i % 360) * Math.PI / 180.0,
-                SpeedMetresPerSecond = 5.0 + (i % 5) * 0.2,
+                SpeedMps = 5.0 + (i % 5) * 0.2,
             };
 
             var metadata = new LegacyPoseMetadata

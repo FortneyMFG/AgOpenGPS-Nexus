@@ -35,8 +35,8 @@ public sealed class AogLinkMeshBridgeTests
                     NodeId = 42,
                     HardwareModel = "AGIO-MCU",
                     FirmwareVersion = "1.2.3",
-                    Role = NodeRole.NodeRoleController,
-                    Priority = NodePriority.NodePriorityDefault,
+                    Role = NodeRole.Controller,
+                    Priority = NodePriority.Default,
                 },
             },
         };
@@ -135,7 +135,7 @@ public sealed class AogLinkMeshBridgeTests
 
         public IAsyncEnumerable<MeshPublication> SubscribeAsync(MeshSubscriptionRequest request, CancellationToken cancellationToken = default)
         {
-            return AsyncEnumerable.Empty<MeshPublication>();
+            return System.Linq.AsyncEnumerable.Empty<MeshPublication>();
         }
 
         public ValueTask UpdatePresenceAsync(MeshPresenceUpdate update, CancellationToken cancellationToken = default)
@@ -147,6 +147,17 @@ public sealed class AogLinkMeshBridgeTests
         public IReadOnlyList<MeshPresenceSnapshot> ListPresence(string? seasonId = null, string? jobId = null)
         {
             return Array.Empty<MeshPresenceSnapshot>();
+        }
+
+        public MeshDiagnosticsSnapshot GetDiagnostics()
+        {
+            return new MeshDiagnosticsSnapshot(
+                DateTimeOffset.UtcNow,
+                Registrations.Count,
+                0,
+                PresenceUpdates.Count,
+                new MeshDiagnosticsAclSnapshot(0, 0, 0, 0, 0, 0),
+                new MeshDiagnosticsTrafficSnapshot(0, 0, 0, 0, 0, 0));
         }
     }
 }

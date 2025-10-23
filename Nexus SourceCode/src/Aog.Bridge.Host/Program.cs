@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog;
 using GenericHost = Microsoft.Extensions.Hosting.Host;
 
@@ -67,8 +68,8 @@ public static class Program
                     return new AogLinkNodeIdentity(
                         options.NodeId,
                         options.FirmwareVersion,
-                        NodeRole.NodeRoleHost,
-                        NodePriority.NodePriorityHigh);
+                        NodeRole.Host,
+                        NodePriority.High);
                 });
 
                 services.AddSingleton<AogLinkTranslator>();

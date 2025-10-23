@@ -65,7 +65,7 @@ public sealed class CostEntryOrchestrationService
             var recordId = ResolveRecordIdentifier(draft.RecordId);
             if (_recordsById.ContainsKey(recordId))
             {
-                throw new InvalidOperationException(string.Create(
+                throw new InvalidOperationException(string.Format(
                     CultureInfo.InvariantCulture,
                     "Cost record '{0}' has already been captured.",
                     recordId));

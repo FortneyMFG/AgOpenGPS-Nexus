@@ -37,7 +37,11 @@ public static class Program
             }
 
             using var stream = File.Create(outputPath);
-            JsonSerializer.Serialize(stream, report, FieldFeedbackAggregator.SerializerOptions);
+            var serializerOptions = new JsonSerializerOptions(FieldFeedbackAggregator.SerializerOptions)
+            {
+                WriteIndented = true,
+            };
+            JsonSerializer.Serialize(stream, report, serializerOptions);
             Console.WriteLine(outputPath);
             return 0;
         }

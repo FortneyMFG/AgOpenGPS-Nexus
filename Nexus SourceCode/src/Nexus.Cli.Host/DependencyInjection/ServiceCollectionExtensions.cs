@@ -32,9 +32,9 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IPluginCommandModuleLoader, PluginCommandModuleLoader>();
         services.TryAddSingleton<IPluginReflectionClient, PluginReflectionClient>();
 
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandModule, HostInfoCommandModule>());
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandModule, CoreCommandModule>());
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandModule, PluginReflectionCommandModule>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandHandler, HostInfoCommandModule>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandHandler, CoreCommandModule>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ICommandHandler, PluginReflectionCommandModule>());
 
         services.AddSingleton<RootCommandFactory>();
         services.AddSingleton(provider => provider.GetRequiredService<RootCommandFactory>().Create());

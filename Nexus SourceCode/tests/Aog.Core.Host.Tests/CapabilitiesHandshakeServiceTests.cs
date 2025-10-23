@@ -37,14 +37,14 @@ public sealed class CapabilitiesHandshakeServiceTests
         var factory = new CapabilityDescriptorFactory(
             coreOptions.DefaultCapabilityVersion,
             coreOptions.DefaultCapabilitySummary,
-            coreOptions.DefaultCapabilityAttributes);
+            new Dictionary<string, string>(coreOptions.DefaultCapabilityAttributes));
         var requestClient = new CoreCapabilitiesClient(factory);
 
         var response = new HandshakeResponse
         {
             SessionId = "session-response",
             NodeId = "agio-1",
-            Role = CapabilityRole.CapabilityRoleAgio,
+            Role = CapabilityRole.Agio,
         };
 
         response.AcceptedCapabilities.Add(new CapabilityDescriptor { Name = "nav.pose" });

@@ -66,7 +66,7 @@ public sealed class WindowsLocationPosePublisherTests
         var options = new WindowsLocationPoseOptions { DefaultAltitudeM = 42 };
         var geolocator = new FakeGeolocator(initial);
         var collector = new PoseCollector();
-        using var publisher = new WindowsLocationPosePublisher(geolocator, collector.PublishAsync, options);
+        await using var publisher = new WindowsLocationPosePublisher(geolocator, collector.PublishAsync, options);
 
         await publisher.StartAsync(CancellationToken.None);
 
@@ -98,7 +98,7 @@ public sealed class WindowsLocationPosePublisherTests
         double? speedMps,
         DateTimeOffset timestamp)
     {
-        var coordinate = new WinRtGeocoordinate(latitude, longitude, altitude, accuracy: 5, headingDeg, speedMps);
+        var coordinate = new WinRtGeocoordinate(latitude, longitude, altitude, 5, headingDeg, speedMps);
         return new WinRtGeoposition(timestamp, coordinate);
     }
 

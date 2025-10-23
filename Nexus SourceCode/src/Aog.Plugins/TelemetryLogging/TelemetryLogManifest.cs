@@ -1,16 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text.Json.Serialization;
-using Aog.Core.Replay;
 
 namespace Aog.Plugins.TelemetryLogging;
 
 /// <summary>
 /// Describes a captured telemetry session and the files required to replay it.
 /// </summary>
-public sealed class TelemetryLogManifest
+public sealed record TelemetryLogManifest
 {
     /// <summary>
     /// Gets the current schema version written by the telemetry logging plugin.
@@ -118,17 +113,17 @@ public sealed class TelemetryLogManifest
             throw new ArgumentException("Root directory must be provided.", nameof(rootDirectory));
         }
 
-        return Path.GetFullPath(Path.Combine(rootDirectory, Directory ?? string.Empty));
+        return System.IO.Path.GetFullPath(System.IO.Path.Combine(rootDirectory, Directory ?? string.Empty));
     }
 
     /// <summary>
-    /// Creates <see cref="TelemetryReplayOptions"/> that reference the recorded files.
+    /// Creates <see cref="Aog.Core.Replay.TelemetryReplayOptions"/> that reference the recorded files.
     /// </summary>
     /// <param name="rootDirectory">Root directory configured for telemetry logging.</param>
-    public TelemetryReplayOptions CreateReplayOptions(string rootDirectory)
+    public Aog.Core.Replay.TelemetryReplayOptions CreateReplayOptions(string rootDirectory)
     {
         var inputDirectory = ResolveSessionDirectory(rootDirectory);
-        return new TelemetryReplayOptions
+        return new Aog.Core.Replay.TelemetryReplayOptions
         {
             InputDirectory = inputDirectory,
             PoseFileName = Files.Pose,
@@ -142,12 +137,19 @@ public sealed class TelemetryLogManifest
     /// <summary>
     /// Normalises metadata after deserialization, ensuring optional collections are populated.
     /// </summary>
-    public void Normalise()
+    public TelemetryLogManifest Normalise()
     {
-        FieldIds = FieldIds?.Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => id.Trim()).ToList()
+        var normalizedFieldIds = FieldIds?.Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => id.Trim()).ToList()
             ?? new List<string>();
-        JobTags = JobTags?.Where(tag => !string.IsNullOrWhiteSpace(tag)).Select(tag => tag.Trim()).ToList()
+        var normalizedJobTags = JobTags?.Where(tag => !string.IsNullOrWhiteSpace(tag)).Select(tag => tag.Trim()).ToList()
             ?? new List<string>();
-        Files ??= new TelemetryLogFileNames();
+        var normalizedFiles = Files ?? new TelemetryLogFileNames();
+        
+        return this with
+        {
+            FieldIds = normalizedFieldIds,
+            JobTags = normalizedJobTags,
+            Files = normalizedFiles
+        };
     }
 }

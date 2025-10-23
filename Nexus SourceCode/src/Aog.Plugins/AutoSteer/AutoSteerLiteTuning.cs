@@ -198,6 +198,7 @@ public sealed class AutoSteerLiteTuningState
     /// <param name="crossTrackErrorMeters">Signed cross-track error (metres) at the controller pivot axle.</param>
     /// <param name="speedMetersPerSecond">Current vehicle speed (m/s).</param>
     /// <param name="distanceTravelledMeters">Distance travelled since the previous update (metres).</param>
+    /// <param name="constraintContext">Optional constraint context that modifies the computed look-ahead.</param>
     public double Update(
         double crossTrackErrorMeters,
         double speedMetersPerSecond,

@@ -6,12 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\proto\capabilities.proto" GrpcServices="Client;Server" ProtoRoot="..\proto" />
-    <Protobuf Include="..\proto\core.proto" GrpcServices="None" ProtoRoot="..\proto" />
-    <Protobuf Include="..\proto\agio_sim.proto" GrpcServices="Client;Server" ProtoRoot="..\proto" />
-    <Protobuf Include="..\proto\aog_link.proto" GrpcServices="None" ProtoRoot="..\proto" />
-    <Protobuf Include="..\proto\guidance.proto" GrpcServices="None" ProtoRoot="..\proto" />
-    <Protobuf Include="..\proto\nexus\cli\reflection.proto" GrpcServices="Client" ProtoRoot="..\proto" />
+    <Protobuf Include="../../proto/capabilities.proto" GrpcServices="Client;Server" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/core.proto" GrpcServices="Client;Server" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/agio_sim.proto" GrpcServices="Client;Server" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/aog_link.proto" GrpcServices="None" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/guidance.proto" GrpcServices="None" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/nanopb.proto" GrpcServices="None" ProtoRoot="../../proto" />
+    <Protobuf Include="../../proto/nexus/cli/reflection.proto" GrpcServices="Client" ProtoRoot="../../proto" />
 
   </ItemGroup>
 
@@ -20,5 +21,6 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.59.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.59.0" />
     <PackageReference Include="Grpc.Tools" Version="2.59.0" PrivateAssets="All" />
+    <PackageReference Include="Avalonia" Version="11.3.7" />
   </ItemGroup>
 </Project>

@@ -96,5 +96,5 @@ Monthly sync covering the ADR roadmap, plugin manifest dependencies, and telemet
 - [x] NX-208-followup — Core Owner: Confirm the UI compatibility dashboard ingests the manifest digest summaries without regression. (completed 2025-02-20)
 
 **Links**
-- [Roadmap](docs/ADR/ADR-roadmap.md)
-- [Dependency Map](docs/plugins/nexus-plugin-dependency-map.md)
+- [Roadmap](docs/development/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md)
+- [Dependency Map](docs/Plugins/nexus-plugin-dependency-map.md)

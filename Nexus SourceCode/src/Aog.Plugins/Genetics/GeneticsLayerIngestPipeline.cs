@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
-using Aog.Core.Paths;
+using PlanarPoint = Aog.Core.Paths.PlanarPoint;
 
 namespace Aog.Plugins.Genetics;
 
@@ -293,7 +290,7 @@ public sealed class GeneticsLayerIngestPipeline
     /// <summary>
     /// Attempts to retrieve a plan feature by zone identifier.
     /// </summary>
-    public bool TryGetPlan(string zoneId, out GeneticsPlanFeature feature)
+    public bool TryGetPlan(string zoneId, [NotNullWhen(true)] out GeneticsPlanFeature? feature)
     {
         var zoneKey = CreateStableKey(NormalizeRequired(zoneId, nameof(zoneId)));
         lock (_sync)
@@ -305,14 +302,14 @@ public sealed class GeneticsLayerIngestPipeline
             }
         }
 
-        feature = null!;
+        feature = null;
         return false;
     }
 
     /// <summary>
     /// Attempts to retrieve an as-applied feature by zone and session identifier.
     /// </summary>
-    public bool TryGetVariety(string zoneId, string sessionId, out GeneticsVarietyFeature feature)
+    public bool TryGetVariety(string zoneId, string sessionId, [NotNullWhen(true)] out GeneticsVarietyFeature? feature)
     {
         var zoneKey = CreateStableKey(NormalizeRequired(zoneId, nameof(zoneId)));
         var sessionKey = CreateStableKey(NormalizeRequired(sessionId, nameof(sessionId)));
@@ -325,7 +322,7 @@ public sealed class GeneticsLayerIngestPipeline
             }
         }
 
-        feature = null!;
+        feature = null;
         return false;
     }
 
@@ -674,7 +671,7 @@ public sealed class GeneticsLayerIngestPipeline
         using var sha = SHA256.Create();
         var bytes = Encoding.UTF8.GetBytes(value);
         var hash = sha.ComputeHash(bytes);
-        var hex = Convert.ToHexString(hash).ToLowerInvariant(CultureInfo.InvariantCulture);
+    var hex = Convert.ToHexString(hash).ToLowerInvariant();
         return hex[..12];
     }
 
@@ -700,7 +697,8 @@ public sealed class GeneticsLayerIngestPipeline
             .ToList();
 
         var varietySummaries = _varieties.Values
-            .GroupBy(variety => new VarietyKey(variety.JobId, variety.Brand, variety.Product, variety.TraitStack, variety.Lot, variety.Treatment, variety.Barcode), VarietyKey.Comparer)
+            .Where(variety => !string.IsNullOrWhiteSpace(variety.JobId))
+            .GroupBy(variety => new VarietyKey(variety.JobId!, variety.Brand, variety.Product, variety.TraitStack, variety.Lot, variety.Treatment, variety.Barcode), VarietyKey.Comparer)
             .Select(group => new GeneticsVarietyAnalytics(
                 group.Key.JobId,
                 group.Key.Brand,
@@ -874,9 +872,9 @@ public sealed class GeneticsLayerIngestPipeline
         {
             public bool Equals(VarietyKey x, VarietyKey y)
             {
-                return string.Equals(x.JobId, y.JobId, StringComparer.Ordinal)
-                    && string.Equals(x.Brand, y.Brand, StringComparer.Ordinal)
-                    && string.Equals(x.Product, y.Product, StringComparer.Ordinal)
+                return string.Equals(x.JobId, y.JobId, StringComparison.Ordinal)
+                    && string.Equals(x.Brand, y.Brand, StringComparison.Ordinal)
+                    && string.Equals(x.Product, y.Product, StringComparison.Ordinal)
                     && string.Equals(x.TraitStack, y.TraitStack, StringComparison.Ordinal)
                     && string.Equals(x.Lot, y.Lot, StringComparison.Ordinal)
                     && string.Equals(x.Treatment, y.Treatment, StringComparison.Ordinal)
@@ -886,13 +884,13 @@ public sealed class GeneticsLayerIngestPipeline
             public int GetHashCode(VarietyKey obj)
             {
                 var hash = new HashCode();
-                hash.Add(obj.JobId, StringComparer.Ordinal);
-                hash.Add(obj.Brand, StringComparer.Ordinal);
-                hash.Add(obj.Product, StringComparer.Ordinal);
-                hash.Add(obj.TraitStack, StringComparer.Ordinal);
-                hash.Add(obj.Lot, StringComparer.Ordinal);
-                hash.Add(obj.Treatment, StringComparer.Ordinal);
-                hash.Add(obj.Barcode, StringComparer.Ordinal);
+                hash.Add(obj.JobId?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Brand?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Product?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.TraitStack?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Lot?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Treatment?.ToUpperInvariant() ?? string.Empty);
+                hash.Add(obj.Barcode?.ToUpperInvariant() ?? string.Empty);
                 return hash.ToHashCode();
             }
         }

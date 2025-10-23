@@ -28,16 +28,6 @@ public sealed record class JobSessionSnapshot(
     IReadOnlyDictionary<string, JsonElement>? Extensions = null);
 
 /// <summary>
-/// Enumerates the lifecycle states supported for job sessions.
-/// </summary>
-public enum JobSessionState
-{
-    Active,
-    Paused,
-    Completed
-}
-
-/// <summary>
 /// Aggregated telemetry describing a session.
 /// </summary>
 /// <param name="AreaHectares">Area covered during the session.</param>

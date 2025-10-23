@@ -3,7 +3,7 @@
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels"
              x:Class="Aog.UI.Avalonia.Views.Shell.StatusStripView"
              x:DataType="vm:StatusStripViewModel">
-  <ItemsControl Items="{Binding Indicators}">
+  <ItemsControl ItemsSource="{Binding Indicators}">
     <ItemsControl.ItemsPanel>
       <ItemsPanelTemplate>
         <StackPanel Orientation="Horizontal" Spacing="16"/>
@@ -11,23 +11,27 @@
     </ItemsControl.ItemsPanel>
     <ItemsControl.ItemTemplate>
       <DataTemplate x:DataType="vm:ShellStatusIndicatorViewModel">
-        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-          <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+        <StackPanel Orientation="Horizontal"
+                    Spacing="{DynamicResource ThemeSpacingSm}"
+                    VerticalAlignment="Center">
+          <TextBlock Text="{Binding Label}"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource ThemeForegroundBrush}"/>
           <TextBlock Text="{Binding Value}">
             <TextBlock.Styles>
               <Style Selector="TextBlock">
                 <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-                <DataTrigger Binding="{Binding Level}" Value="Warning">
-                  <Setter Property="Foreground" Value="#F7B529"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Level}" Value="Critical">
-                  <Setter Property="Foreground" Value="#E5484D"/>
-                </DataTrigger>
+              </Style>
+              <Style Selector="TextBlock.Warning">
+                <Setter Property="Foreground" Value="{DynamicResource ThemeWarningBrush}"/>
+              </Style>
+              <Style Selector="TextBlock.Critical">
+                <Setter Property="Foreground" Value="{DynamicResource ThemeDangerBrush}"/>
               </Style>
             </TextBlock.Styles>
-            <TextBlock.ToolTip>
-              <ToolTip Content="{Binding Description}"/>
-            </TextBlock.ToolTip>
+            <ToolTip.Tip>
+              <TextBlock Text="{Binding Tooltip}"/>
+            </ToolTip.Tip>
           </TextBlock>
         </StackPanel>
       </DataTemplate>

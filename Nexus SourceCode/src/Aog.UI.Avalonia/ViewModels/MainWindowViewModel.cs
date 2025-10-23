@@ -8,24 +8,34 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Aog.Core.Layers;
 using Aog.Core.Legacy;
+using Aog.Core.Machines.Axle;
 using Aog.Core.Replay;
 using Aog.Core.Simulation;
 using Aog.Core.Simulation.Configuration;
 using Aog.Core.V1;
+using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Models;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Theming;
+using Aog.UI.Avalonia.ViewModels.Shell;
+using Aog.UI.Avalonia.Plugins;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
+using Avalonia.Threading;
+using Aog.UI.Avalonia.Views;
+using Aog.UI.Avalonia.Views.FieldOperations;
+using Avalonia.Platform;
+using Microsoft.Extensions.Logging;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
 /// <summary>
 /// Provides presentation data for the bootstrap shell window.
 /// </summary>
-public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
+public class MainWindowViewModel : INotifyPropertyChanged, IDisposable, IFieldOperationsDialogHost, ISystemSummaryViewModel
 {
     private const string SimulationResourceName = "Aog.UI.Avalonia.Resources.SimulationSample.json";
 
@@ -35,6 +45,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private readonly IUiPreferencesService _preferencesService;
     private readonly IThemeManager _themeManager;
     private readonly ShellLayoutPreferences _shellLayout;
+    private readonly TimeProvider _timeProvider;
+    private readonly ILogger<MainWindowViewModel> _logger;
     private bool _disposed;
 
     private UiTheme _selectedTheme;
@@ -44,6 +56,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private bool _isTopToolbarVisible;
     private bool _isRightSidebarVisible;
 
+    /// <summary>Gets the shell view-model that drives the surface layout.</summary>
+    public AppShellViewModel Shell { get; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="MainWindowViewModel"/> class.
     /// </summary>
@@ -52,23 +67,35 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     /// <param name="preferencesService">Service for persisting UI preferences.</param>
     /// <param name="themeManager">The theme manager used to apply theme changes.</param>
     /// <param name="telemetryPrivacy">Telemetry opt-in view-model.</param>
+    /// <param name="timeProvider">Provider used to generate deterministic timestamps.</param>
     public MainWindowViewModel(
         ConnectionSettingsViewModel connectionSettings,
         IReplayController? replayController,
         IUiPreferencesService preferencesService,
         IThemeManager themeManager,
         IShellCommandDispatcher commandDispatcher,
-        TelemetryPrivacyViewModel telemetryPrivacy)
+        Plugins.PluginRegistry pluginRegistry,
+        Plugins.PluginHost pluginHost,
+        AppShellViewModel shell,
+        TelemetryPrivacyViewModel telemetryPrivacy,
+        TimeProvider timeProvider,
+        ILogger<MainWindowViewModel> logger)
     {
         ArgumentNullException.ThrowIfNull(connectionSettings);
         ArgumentNullException.ThrowIfNull(preferencesService);
         ArgumentNullException.ThrowIfNull(themeManager);
         ArgumentNullException.ThrowIfNull(commandDispatcher);
+        ArgumentNullException.ThrowIfNull(shell);
         ArgumentNullException.ThrowIfNull(telemetryPrivacy);
+        ArgumentNullException.ThrowIfNull(timeProvider);
+        ArgumentNullException.ThrowIfNull(logger);
 
         _connectionSettings = connectionSettings;
         _preferencesService = preferencesService;
         _themeManager = themeManager;
+        _timeProvider = timeProvider;
+        _logger = logger;
+        Shell = shell;
 
         TelemetryPrivacy = telemetryPrivacy;
 
@@ -91,9 +118,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         SteerDashboard = new SteerDashboardViewModel();
         SectionsPanel = new SectionsPanelViewModel();
         PlanterPanel = new PlanterPanelViewModel();
-        ReplayTimeline = new ReplayTimelineViewModel();
+        ReplayTimeline = new ReplayTimelineViewModel(timeProvider);
 
-        var layerEditJournal = new LayerEditEventJournalService(TimeProvider.System);
+        var layerEditJournal = new LayerEditEventJournalService(_timeProvider);
         ZoneEditorToolbar = new ZoneEditorToolbarViewModel(layerEditJournal);
         ZonePolicyPanel = new ZoneConstraintPolicyViewModel();
         ZoneImportExportPanel = new ZoneImportExportPanelViewModel();
@@ -101,6 +128,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _mapLayers = BuildSampleLayers();
         _guidanceTracks = BuildSampleGuidance();
         LayerLegend = LayerLegendViewModel.FromLayers(_mapLayers);
+        DefaultEquipmentProfile = LoadDefaultEquipmentProfile();
+        MappingWorkspace = new MappingWorkspaceViewModel(_mapLayers, _guidanceTracks, VehiclePose, LayerLegend, DefaultEquipmentProfile);
         LayerInspector = BuildSampleInspector(_mapLayers);
         MeshSharePanel = MeshSharePanelViewModel.CreateSample();
         FieldHealthSeverity = FieldHealthSeverityPanelViewModel.CreateSample();
@@ -123,14 +152,29 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         AvailableThemes = Enum.GetValues<UiTheme>();
         var preferences = _preferencesService.GetPreferences();
         _shellLayout = preferences.ShellLayout.Clone();
-        _isTopToolbarVisible = _shellLayout.IsTopToolbarVisible;
-        _isRightSidebarVisible = _shellLayout.IsRightSidebarVisible;
+        _isTopToolbarVisible = _shellLayout.ShowTopToolbar;
+        _isRightSidebarVisible = _shellLayout.ShowRightSidebar;
         _selectedTheme = preferences.Theme;
         _themeManager.ApplyTheme(_selectedTheme);
 
-        ShellMenuBar = new ShellMenuBarViewModel(commandDispatcher);
+        ArgumentNullException.ThrowIfNull(pluginRegistry);
+        ArgumentNullException.ThrowIfNull(pluginHost);
+
+        ShellMenuBar = new ShellMenuBarViewModel(commandDispatcher, pluginRegistry, pluginHost);
         TopToolbar = new TopToolbarViewModel(commandDispatcher);
         StatusStrip = BuildStatusStrip();
+        Shell.StatusStrip = StatusStrip;
+        Shell.Host = this;
+        if (Shell.MainContent is null)
+        {
+            Shell.MainContent = MappingWorkspace;
+            Shell.CurrentView = MappingWorkspace;
+        }
+        if (string.IsNullOrWhiteSpace(Shell.StatusText) || Shell.StatusText == "Ready")
+        {
+            Shell.StatusText = Title;
+        }
+        Shell.Layout.SetCommandInterceptor(HandleBlockCommand);
     }
 
     /// <summary>Raised when a property value changes.</summary>
@@ -153,6 +197,12 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     /// <summary>Gets a sample vehicle pose used to seed the map view.</summary>
     public VehiclePose VehiclePose { get; } = new(10, 15, 45);
+
+    /// <summary>Gets the primary mapping workspace view-model.</summary>
+    public MappingWorkspaceViewModel MappingWorkspace { get; }
+
+    /// <summary>Gets the default equipment profile applied when the UI boots.</summary>
+    public AxleCentricProfile? DefaultEquipmentProfile { get; }
 
     /// <summary>Gets the connection settings view-model.</summary>
     public ConnectionSettingsViewModel Connection => _connectionSettings;
@@ -177,7 +227,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
             _isTopToolbarVisible = value;
             OnPropertyChanged();
-            _shellLayout.IsTopToolbarVisible = value;
+            _shellLayout.ShowTopToolbar = value;
             PersistShellLayout();
         }
     }
@@ -195,7 +245,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
             _isRightSidebarVisible = value;
             OnPropertyChanged();
-            _shellLayout.IsRightSidebarVisible = value;
+            _shellLayout.ShowRightSidebar = value;
             PersistShellLayout();
             OnPropertyChanged(nameof(MainWorkspaceColumnWidth));
             OnPropertyChanged(nameof(RightSidebarColumnWidth));
@@ -203,12 +253,11 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     }
 
     /// <summary>Gets the grid length applied to the main workspace column.</summary>
-    public GridLength MainWorkspaceColumnWidth =>
-        IsRightSidebarVisible ? new GridLength(3, GridUnitType.Star) : new GridLength(1, GridUnitType.Star);
+    public GridLength MainWorkspaceColumnWidth => new GridLength(1, GridUnitType.Star);
 
     /// <summary>Gets the grid length applied to the right sidebar column.</summary>
     public GridLength RightSidebarColumnWidth =>
-        IsRightSidebarVisible ? new GridLength(2, GridUnitType.Star) : new GridLength(0);
+        IsRightSidebarVisible ? new GridLength(420) : new GridLength(0);
 
     /// <summary>Gets a summary of the embedded simulation configuration.</summary>
     public string SimulationGraphSummary { get; }
@@ -269,6 +318,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>Gets the guidance tracks rendered on the map.</summary>
     public IReadOnlyList<GuidanceTrack> GuidanceTracks => _guidanceTracks;
 
+    /// <summary>Gets the sample boundary tool view-model surfaced in the shell workspace.</summary>
+    public BoundaryToolViewModel BoundaryTool { get; } = BoundaryToolViewModel.CreateSample();
+
     /// <summary>Gets the zone editor toolbar view-model powering map editing affordances.</summary>
     public ZoneEditorToolbarViewModel ZoneEditorToolbar { get; }
 
@@ -299,6 +351,129 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>Gets the diagnostics workspace view-model surfaced in the sidebar.</summary>
     public DiagnosticsWorkspaceViewModel DiagnosticsWorkspace { get; }
 
+    private bool HandleBlockCommand(BlockDefinition definition)
+    {
+        if (definition is null)
+        {
+            return false;
+        }
+
+        switch (definition.Id.Value)
+        {
+            case "Cmd.MapTools":
+                ShowMapToolsMenu();
+                Shell.StatusText = "Opening map tools menu.";
+                return true;
+            case "Cmd.Guidance":
+                Shell.StatusText = "Guidance tools coming soon.";
+                return true;
+            case "Cmd.Equipment":
+                Shell.StatusText = "Equipment presets live under Settings -> Equipment.";
+                return true;
+            case "Cmd.Coverage":
+                Shell.StatusText = "Coverage layers currently visible.";
+                return true;
+            case "Cmd.Hydraulics":
+                Shell.StatusText = "Hydraulic controls locked in design mode.";
+                return true;
+            case "Cmd.AbLines":
+                Shell.StatusText = "AB line editor integration in progress.";
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void ShowMapToolsMenu()
+    {
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            MapToolsDialog? dialog = null;
+            var viewModel = new MapToolsDialogViewModel(
+                this,
+                () => dialog?.Close());
+            dialog = new MapToolsDialog(viewModel)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            };
+
+            var owner = TryGetMainWindow();
+            if (owner is not null)
+            {
+                _ = dialog.ShowDialog(owner);
+            }
+            else
+            {
+                dialog.Show();
+            }
+        });
+    }
+
+    internal void OpenBoundaryEditor()
+    {
+        Shell.StatusText = "Boundary editor opened.";
+        Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            var dialog = new BoundaryWindow(CreateBoundaryToolViewModel())
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            };
+
+            var owner = TryGetMainWindow();
+            if (owner is not null)
+            {
+                await dialog.ShowDialog(owner).ConfigureAwait(false);
+            }
+            else
+            {
+                dialog.Show();
+            }
+        });
+    }
+
+    internal void OpenFlagManager()
+    {
+        Shell.StatusText = "Flag manager opened.";
+        Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            var dialog = new FlagManagerDialog(CreateFlagManagerDialogViewModel())
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            };
+
+            var owner = TryGetMainWindow();
+            if (owner is not null)
+            {
+                await dialog.ShowDialog(owner).ConfigureAwait(false);
+            }
+            else
+            {
+                dialog.Show();
+            }
+        });
+    }
+
+    internal void ShowHeadlandPlannerNotice()
+    {
+        Shell.StatusText = "Headland planner integration is in progress.";
+    }
+
+    void IFieldOperationsDialogHost.OpenBoundaryEditor() => OpenBoundaryEditor();
+
+    void IFieldOperationsDialogHost.OpenFlagManager() => OpenFlagManager();
+
+    void IFieldOperationsDialogHost.ShowHeadlandPlannerNotice() => ShowHeadlandPlannerNotice();
+
+    private static Window? TryGetMainWindow()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+        {
+            return lifetime.MainWindow;
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// Creates a scenario editor view-model that can update the simulation routes.
     /// </summary>
@@ -320,6 +495,19 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         return new LegacyImportWizardViewModel(service, result =>
         {
             SimulationBar.ApplyLegacyImport(result);
+            var scenario = result.Scenario;
+            var existingIndex = _scenarioDefinitions.FindIndex(
+                definition => string.Equals(definition.ScenarioId, scenario.ScenarioId, StringComparison.Ordinal));
+
+            if (existingIndex >= 0)
+            {
+                _scenarioDefinitions[existingIndex] = scenario;
+            }
+            else
+            {
+                _scenarioDefinitions.Add(scenario);
+            }
+
             return true;
         });
     }
@@ -369,6 +557,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _disposed = true;
         _connectionSettings.Dispose();
         SimulationBar.Dispose();
+        ReplayTimeline.Dispose();
     }
 
     private static SimulationConfiguration? TryLoadSimulationConfiguration(out string summary)
@@ -507,9 +696,10 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
             .ToArray();
 
         SteerDashboard.ApplyHistoricalSamples(crossTrack, wheelAngles, controllerOutputs);
-        SteerDashboard.RecordTuningEvent(DateTimeOffset.Now.AddMinutes(-5), "Adjusted P gain to 0.30 based on headland drift");
-        SteerDashboard.RecordTuningEvent(DateTimeOffset.Now.AddMinutes(-2), "Applied adaptive integral clamp after curve pass");
-        SteerDashboard.RecordTuningEvent(DateTimeOffset.Now.AddMinutes(-1), "Saved preset 'Spring Wheat 2024'");
+        var seedTimestamp = _timeProvider.GetUtcNow();
+        SteerDashboard.RecordTuningEvent(seedTimestamp.AddMinutes(-5), "Adjusted P gain to 0.30 based on headland drift");
+        SteerDashboard.RecordTuningEvent(seedTimestamp.AddMinutes(-2), "Applied adaptive integral clamp after curve pass");
+        SteerDashboard.RecordTuningEvent(seedTimestamp.AddMinutes(-1), "Saved preset 'Spring Wheat 2024'");
 
         var bookmarks = new[]
         {
@@ -667,6 +857,50 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
             payloadMetadata);
 
         return inspector;
+    }
+
+    private AxleCentricProfile? LoadDefaultEquipmentProfile()
+    {
+        try
+        {
+            var assetUri = new Uri("avares://Aog.UI.Avalonia/Resources/Kinematics/default-tractor.v1.json");
+            using var stream = AssetLoader.Open(assetUri);
+            using var reader = new StreamReader(stream);
+            var json = reader.ReadToEnd();
+
+            var loader = new AxleCentricProfileLoader();
+            var result = loader.Load(json);
+            var hasErrors = false;
+
+            foreach (var message in result.Messages)
+            {
+                switch (message.Severity)
+                {
+                    case AxleIngestionSeverity.Error:
+                        hasErrors = true;
+                        _logger.LogWarning("Default equipment profile validation error {Code}: {Message}", message.Code, message.Message);
+                        break;
+                    case AxleIngestionSeverity.Warning:
+                        _logger.LogInformation("Default equipment profile warning {Code}: {Message}", message.Code, message.Message);
+                        break;
+                    default:
+                        _logger.LogDebug("Default equipment profile note {Code}: {Message}", message.Code, message.Message);
+                        break;
+                }
+            }
+
+            if (hasErrors || result.Profile is null)
+            {
+                return null;
+            }
+
+            return result.Profile;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load default tractor equipment profile.");
+            return null;
+        }
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

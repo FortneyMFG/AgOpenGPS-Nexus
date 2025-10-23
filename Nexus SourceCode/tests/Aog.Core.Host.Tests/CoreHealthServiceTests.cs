@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -17,7 +13,7 @@ public sealed class CoreHealthServiceTests
         var logger = new TestLogger<CoreHealthService>();
         var optionsMonitor = new MutableOptionsMonitor<CoreHealthOptions>(new CoreHealthOptions
         {
-            IntervalSeconds = 2
+            IntervalSeconds = 2,
         });
         var timeProvider = new TestTimeProvider();
         var service = new CoreHealthService(logger, optionsMonitor, timeProvider);
@@ -26,26 +22,28 @@ public sealed class CoreHealthServiceTests
 
         try
         {
-            await service.StartAsync(cts.Token);
+            await service.StartAsync(cts.Token).ConfigureAwait(false);
 
-            var firstDelay = await timeProvider.WaitForDelayAsync(cts.Token);
+            var firstDelay = await timeProvider.WaitForDelayAsync(cts.Token).ConfigureAwait(false);
             Assert.Equal(TimeSpan.FromSeconds(2), firstDelay.Delay);
 
             optionsMonitor.Update(new CoreHealthOptions { IntervalSeconds = 5 });
             firstDelay.Complete();
 
-            var secondDelay = await timeProvider.WaitForDelayAsync(cts.Token);
+            var secondDelay = await timeProvider.WaitForDelayAsync(cts.Token).ConfigureAwait(false);
             Assert.Equal(TimeSpan.FromSeconds(5), secondDelay.Delay);
-            Assert.Contains(logger.Messages, message => message.Contains("Core host health interval updated to 5s.", StringComparison.Ordinal));
+            Assert.Contains(
+                logger.Messages,
+                message => message.Contains("Core host health interval updated to 5s.", StringComparison.Ordinal));
 
             secondDelay.Complete();
 
             // Allow the service to schedule the next delay so StopAsync can cancel it cleanly.
-            _ = await timeProvider.WaitForDelayAsync(cts.Token);
+            _ = await timeProvider.WaitForDelayAsync(cts.Token).ConfigureAwait(false);
         }
         finally
         {
-            await service.StopAsync(CancellationToken.None);
+            await service.StopAsync(CancellationToken.None).ConfigureAwait(false);
             service.Dispose();
         }
     }
@@ -55,6 +53,7 @@ public sealed class CoreHealthServiceTests
         private sealed class NullScope : IDisposable
         {
             public static NullScope Instance { get; } = new();
+
             public void Dispose()
             {
             }
@@ -67,7 +66,12 @@ public sealed class CoreHealthServiceTests
 
         public bool IsEnabled(LogLevel logLevel) => true;
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
         {
             Messages.Add(formatter(state, exception));
         }
@@ -159,27 +163,17 @@ public sealed class CoreHealthServiceTests
         private readonly ConcurrentQueue<DelayRequest> _requests = new();
         private readonly SemaphoreSlim _signal = new(0);
 
-        public override ValueTask Delay(TimeSpan delay, CancellationToken cancellationToken = default)
+        public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
         {
-            var request = new DelayRequest(delay);
+            var request = new DelayRequest(dueTime, callback, state);
             _requests.Enqueue(request);
             _signal.Release();
-
-            if (cancellationToken.CanBeCanceled)
-            {
-                cancellationToken.Register(static state =>
-                {
-                    var tuple = (Tuple<DelayRequest, CancellationToken>)state!;
-                    tuple.Item1.TryCancel(tuple.Item2);
-                }, Tuple.Create(request, cancellationToken));
-            }
-
-            return new ValueTask(request.Task);
+            return new TestTimer(request);
         }
 
         public async Task<DelayRequest> WaitForDelayAsync(CancellationToken cancellationToken = default)
         {
-            await _signal.WaitAsync(cancellationToken);
+            await _signal.WaitAsync(cancellationToken).ConfigureAwait(false);
 
             if (_requests.TryDequeue(out var request))
             {
@@ -191,20 +185,72 @@ public sealed class CoreHealthServiceTests
 
         public sealed class DelayRequest
         {
+            private readonly TimerCallback _callback;
+            private readonly object? _state;
             private readonly TaskCompletionSource<bool> _tcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            public DelayRequest(TimeSpan delay)
+            internal DelayRequest(TimeSpan delay, TimerCallback callback, object? state)
             {
                 Delay = delay;
+                _callback = callback;
+                _state = state;
             }
 
-            public TimeSpan Delay { get; }
+            public TimeSpan Delay { get; private set; }
 
             public Task Task => _tcs.Task;
 
-            public void Complete() => _tcs.TrySetResult(true);
+            internal void UpdateDelay(TimeSpan delay) => Delay = delay;
 
-            public void TryCancel(CancellationToken token) => _tcs.TrySetCanceled(token);
+            public void Complete()
+            {
+                _callback(_state);
+                _tcs.TrySetResult(true);
+            }
+
+            public bool TryCancel(CancellationToken cancellationToken)
+            {
+                return _tcs.TrySetCanceled(cancellationToken);
+            }
+        }
+
+        private sealed class TestTimer : ITimer
+        {
+            private DelayRequest _request;
+            private bool _disposed;
+
+            public TestTimer(DelayRequest request)
+            {
+                _request = request;
+            }
+
+            public bool Change(TimeSpan dueTime, TimeSpan period)
+            {
+                if (_disposed)
+                {
+                    return false;
+                }
+
+                _request.UpdateDelay(dueTime);
+                return true;
+            }
+
+            public void Dispose()
+            {
+                DisposeAsync().GetAwaiter().GetResult();
+            }
+
+            public ValueTask DisposeAsync()
+            {
+                if (_disposed)
+                {
+                    return ValueTask.CompletedTask;
+                }
+
+                _disposed = true;
+                _request.TryCancel(CancellationToken.None);
+                return ValueTask.CompletedTask;
+            }
         }
     }
 }

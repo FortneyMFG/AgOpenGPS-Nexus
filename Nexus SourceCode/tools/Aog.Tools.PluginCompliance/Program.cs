@@ -61,7 +61,7 @@ internal static class Program
     private static async Task<int> RunLintAsync(string repoRoot, string[] args)
     {
         var parameters = new List<string>(args);
-        var manifestRoot = ResolveOptionPath(parameters, repoRoot, "--manifests", Path.Combine(repoRoot, "docs", "plugins", "manifests"));
+        var manifestRoot = ResolveOptionPath(parameters, repoRoot, "--manifests", Path.Combine(repoRoot, "docs", "development", "SRS", "appendices", "samples", "plugins"));
         var baselineRoot = ResolveOptionPath(parameters, repoRoot, "--baselines", Path.Combine(repoRoot, "Nexus SourceCode", "tests", "Aog.Plugins.Tests", "Compatibility", "Baselines"));
 
         if (parameters.Count > 0)
@@ -90,7 +90,7 @@ internal static class Program
     private static async Task<int> RunCapabilitiesAsync(string repoRoot, string[] args)
     {
         var parameters = new List<string>(args);
-        var manifestRoot = ResolveOptionPath(parameters, repoRoot, "--manifests", Path.Combine(repoRoot, "docs", "plugins", "manifests"));
+        var manifestRoot = ResolveOptionPath(parameters, repoRoot, "--manifests", Path.Combine(repoRoot, "docs", "development", "SRS", "appendices", "samples", "plugins"));
         var pluginFilter = ExtractOptionValue(parameters, "--plugin");
         var format = ExtractOptionValue(parameters, "--format") ?? "json";
         var outputPath = ExtractOptionValue(parameters, "--output");
@@ -140,7 +140,22 @@ internal static class Program
         };
         options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 
-        await using var destination = ResolveOutputStream(outputPath);
+        if (string.IsNullOrWhiteSpace(outputPath))
+        {
+            await using var stdout = Console.OpenStandardOutput();
+            await JsonSerializer.SerializeAsync(stdout, entries, options).ConfigureAwait(false);
+            await stdout.FlushAsync().ConfigureAwait(false);
+            return;
+        }
+
+        var fullPath = Path.GetFullPath(outputPath);
+        var directory = Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        await using var destination = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true);
         await JsonSerializer.SerializeAsync(destination, entries, options).ConfigureAwait(false);
         await destination.FlushAsync().ConfigureAwait(false);
     }
@@ -178,23 +193,6 @@ internal static class Program
 
             File.WriteAllText(resolved, text + Environment.NewLine);
         }
-    }
-
-    private static FileStream ResolveOutputStream(string? outputPath)
-    {
-        if (string.IsNullOrWhiteSpace(outputPath))
-        {
-            return Console.OpenStandardOutput();
-        }
-
-        var fullPath = Path.GetFullPath(outputPath);
-        var directory = Path.GetDirectoryName(fullPath);
-        if (!string.IsNullOrEmpty(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        return new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None);
     }
 
     private static string ResolveOptionPath(ICollection<string> parameters, string repoRoot, string optionName, string defaultPath)
@@ -284,7 +282,7 @@ internal static class Program
         Console.WriteLine("  capabilities        Emit capability and lease data from manifests.");
         Console.WriteLine();
         Console.WriteLine("Options:");
-        Console.WriteLine("  --manifests <path>  Override manifest root (default: docs/plugins/manifests).");
+        Console.WriteLine("  --manifests <path>  Override manifest root (default: docs/development/SRS/appendices/samples/plugins).");
         Console.WriteLine("  --baselines <path>  Override baseline root when linting.");
         Console.WriteLine("  --plugin <id|name>  Filter capabilities report to a specific plugin.");
         Console.WriteLine("  --format <type>     Capabilities output format (json, text). Default: json.");

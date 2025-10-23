@@ -57,8 +57,7 @@ internal sealed class PluginManifestComplianceChecker
 
             try
             {
-                await using var stream = File.OpenRead(manifestPath);
-                manifest = await _loader.LoadAsync(stream, cancellationToken).ConfigureAwait(false);
+                manifest = await _loader.LoadAsync(manifestPath, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is InvalidDataException or JsonException or ArgumentException)
             {

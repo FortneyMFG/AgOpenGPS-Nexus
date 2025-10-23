@@ -1,0 +1,119 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Aog.UI.Avalonia.ViewModels"
+             xmlns:controls="clr-namespace:Aog.UI.Avalonia.Mapping.Core"
+             x:Class="Aog.UI.Avalonia.Views.Mapping.MappingWorkspaceView"
+             x:CompileBindings="True"
+             x:DataType="vm:MappingWorkspaceViewModel"
+             d:DesignWidth="1280"
+             d:DesignHeight="720"
+             Focusable="True"
+             mc:Ignorable="d">
+  <Grid>
+    <controls:MapView x:Name="MapViewport" />
+
+    <Border HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Margin="16"
+            Background="#BF1F2933"
+            CornerRadius="8"
+            Padding="12"
+            Width="260">
+      <StackPanel Spacing="12">
+        <TextBlock Text="Layer Legend"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Foreground="White" />
+        <ItemsControl ItemsSource="{Binding Legend.Entries}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:LayerLegendEntryViewModel">
+              <StackPanel Spacing="4">
+                <TextBlock Text="{Binding DisplayName}"
+                           FontWeight="SemiBold"
+                           Foreground="White" />
+                <Border Height="12"
+                        CornerRadius="6"
+                        Background="{Binding GradientBrush}" />
+                <TextBlock Text="{Binding RangeDisplay}"
+                           Foreground="#E6FFFFFF"
+                           FontSize="12" />
+                <TextBlock Text="{Binding ModeDisplay}"
+                           Foreground="#CC9FB3C8"
+                           FontSize="12" />
+                <TextBlock Text="{Binding Description}"
+                           Foreground="#B3FFFFFF"
+                           FontSize="11"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding HasDescription}" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </Border>
+
+    <Border HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="16"
+            Background="#BF1F2933"
+            CornerRadius="8"
+            Padding="12"
+            Width="280">
+      <StackPanel Spacing="8">
+        <TextBlock Text="Equipment Profile"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Foreground="White" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Profile:"
+                     Foreground="#E6FFFFFF"
+                     FontSize="12" />
+          <TextBlock Text="{Binding EquipmentProfile.ProfileId, FallbackValue=Not loaded}"
+                     Foreground="#FFFFFFFF"
+                     FontSize="12" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Axles:"
+                     Foreground="#E6FFFFFF"
+                     FontSize="12" />
+          <TextBlock Text="{Binding EquipmentProfile.Axles.Count, FallbackValue=0}"
+                     Foreground="#FFFFFFFF"
+                     FontSize="12" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Modes:"
+                     Foreground="#E6FFFFFF"
+                     FontSize="12" />
+          <TextBlock Text="{Binding EquipmentProfile.Modes.Count, FallbackValue=0}"
+                     Foreground="#FFFFFFFF"
+                     FontSize="12" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Border HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Background="#CC1F2933"
+            CornerRadius="12"
+            Padding="24"
+            IsVisible="{Binding IsEmpty}">
+      <TextBlock Text="No layers are currently available."
+                 FontSize="18"
+                 FontWeight="SemiBold"
+                 Foreground="#E6FFFFFF" />
+    </Border>
+
+    <Border HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Margin="16"
+            Background="#BF1F2933"
+            CornerRadius="8"
+            Padding="10">
+      <TextBlock Text="Controls: W/S move • A/D steer • Shift boosts • R resets pose"
+                 Foreground="#E6FFFFFF"
+                 FontSize="12" />
+    </Border>
+  </Grid>
+</UserControl>

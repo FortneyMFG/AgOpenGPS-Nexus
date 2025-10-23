@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>Nexus.Plugin</RootNamespace>
+    <PackageId>Nexus.Plugin.Manifest</PackageId>
+    <Description>Plugin manifest models and validation helpers for Nexus zip plugins.</Description>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Nexus.Sdk.Core\Nexus.Sdk.Core.csproj" />
+  </ItemGroup>
+</Project>

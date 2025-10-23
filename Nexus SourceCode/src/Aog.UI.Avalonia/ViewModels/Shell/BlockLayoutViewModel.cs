@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Layout;
@@ -212,7 +213,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         for (var i = 0; i < _instances.Count; i++)
         {
             var instance = _instances[i];
-            if (!_catalog.TryResolve(instance.DefinitionId, out var definition))
+            var definition = _catalog.Get(instance.DefinitionId);
+            if (definition is null)
             {
                 continue;
             }
@@ -278,9 +280,22 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             : $"{definition.Label} activated.";
     }
 
-    private Task DispatchCommandAsync(string commandKey)
+    private async Task DispatchCommandAsync(string commandKey)
     {
-        return _commandDispatcher.DispatchAsync(commandKey);
+        if (string.IsNullOrWhiteSpace(commandKey))
+        {
+            return;
+        }
+
+        var separatorIndex = commandKey.IndexOf('.');
+        if (separatorIndex <= 0 || separatorIndex >= commandKey.Length - 1)
+        {
+            return;
+        }
+
+        var injectionPoint = commandKey[..separatorIndex];
+        var commandId = commandKey[(separatorIndex + 1)..];
+        await _commandDispatcher.DispatchAsync(injectionPoint, commandId, CancellationToken.None).ConfigureAwait(false);
     }
 
     private void Save()

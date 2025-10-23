@@ -17,5 +17,9 @@ the right material.
 | [`training/`](training/) | Simulation drills and scenario libraries used for onboarding. |
 | [`GLOSSARY.md`](GLOSSARY.md) | Canonical terminology shared across teams. |
 
+Manifest authors should start with the
+[Plugin Manifest Workflow](howto/plugin-manifest-workflow.md) for governance
+roles, lint commands, capability exports, and escalation guidance.
+
 Link changes back to the appropriate SRS section and capture workflow
 impacts in `tasks.md` when updating these resources.

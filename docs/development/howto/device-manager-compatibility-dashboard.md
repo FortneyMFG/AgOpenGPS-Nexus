@@ -14,9 +14,8 @@ steps for each plugin.
    dependency schema before publishing capability data.
 2. **Capability export feed.** `./tools/scripts/nexus.sh plugin capabilities`
    produces the lease and capability catalogue that the dashboard ingests to
-   map compatibility issues to affected subsystems. See
-   [Plugin Manifest Compliance & Capability Reporting](plugin-manifest-compliance.md)
-   for usage.
+  map compatibility issues to affected subsystems. See the consolidated
+  [Plugin Manifest Workflow](plugin-manifest-workflow.md) for usage.
 3. **Compatibility digests.** Signed digests generated during bundle releases
    capture dependency ranges and hard/soft/suggest classifications. The
    dashboard stores the latest digest locally so it can compare live manifests

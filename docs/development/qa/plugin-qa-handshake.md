@@ -8,7 +8,7 @@ leases, or runtime compatibility.
 ## Prerequisites
 
 - Manifest lint and capability export logs attached to the pull request per the
-  [Plugin Manifest Governance Playbook](../howto/plugin-manifest-governance.md).
+  [Plugin Manifest Workflow](../howto/plugin-manifest-workflow.md).
 - Updated dependency map entries landed or queued in
   [docs/Plugins/nexus-plugin-dependency-map.md](../Plugins/nexus-plugin-dependency-map.md).
 - Simulation fixtures prepared for any new capabilities or degraded-mode paths.

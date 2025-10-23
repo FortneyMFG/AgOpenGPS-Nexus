@@ -59,22 +59,24 @@ public sealed class PaneCanvas : Control
             return;
         }
 
-        var width = cell * layout.Columns;
-        var height = cell * layout.Rows;
+        var gutter = layout.GutterPx;
+        var step = cell + gutter;
+        var width = layout.Columns * cell + Math.Max(0, layout.Columns - 1) * gutter;
+        var height = layout.Rows * cell + Math.Max(0, layout.Rows - 1) * gutter;
 
         var majorStep = Math.Max(1, layout.Columns / MajorGridColumns);
         var rowMajorStep = Math.Max(1, layout.Rows / MajorGridColumns);
 
         for (var col = 0; col <= layout.Columns; col++)
         {
-            var x = col * cell;
+            var x = col * step;
             var pen = col % majorStep == 0 ? MajorGridPen : MinorGridPen;
             context.DrawLine(pen, new Point(x, 0), new Point(x, height));
         }
 
         for (var row = 0; row <= layout.Rows; row++)
         {
-            var y = row * cell;
+            var y = row * step;
             var pen = row % rowMajorStep == 0 ? MajorGridPen : MinorGridPen;
             context.DrawLine(pen, new Point(0, y), new Point(width, y));
         }
@@ -82,7 +84,7 @@ public sealed class PaneCanvas : Control
 
     private static void DrawPanels(DrawingContext context, PaneLayoutResult layout)
     {
-        foreach (var pane in layout.Panes)
+        foreach (var pane in layout.Panels)
         {
             if (pane.Bounds.Width <= 0 || pane.Bounds.Height <= 0)
             {

@@ -117,6 +117,7 @@ public sealed class ShellLayoutPreferences
                 Rows = Grid?.Rows ?? 1,
                 RootPane = ClonePane(Grid?.RootPane),
                 Tiles = Grid?.Tiles is { Count: > 0 } tiles ? CloneTiles(tiles) : new List<Layout.TileSpec>(),
+                Panels = Grid?.Panels is { Count: > 0 } panels ? ClonePanels(panels) : new List<Layout.PanelSpec>(),
             },
             LeftSidebar = (LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
             RightSidebar = (RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
@@ -173,6 +174,35 @@ public sealed class ShellLayoutPreferences
                 PaneId = tile.PaneId,
                 Anchor = tile.Anchor,
                 Offset = tile.Offset,
+            });
+        }
+
+        return clone;
+    }
+
+    private static List<Layout.PanelSpec> ClonePanels(IEnumerable<Layout.PanelSpec> panels)
+    {
+        var clone = new List<Layout.PanelSpec>();
+        foreach (var panel in panels)
+        {
+            if (panel is null)
+            {
+                continue;
+            }
+
+            clone.Add(new Layout.PanelSpec
+            {
+                Id = panel.Id,
+                Left = panel.Left,
+                Bottom = panel.Bottom,
+                Right = panel.Right,
+                Top = panel.Top,
+                LeftUsesGridSize = panel.LeftUsesGridSize,
+                BottomUsesGridSize = panel.BottomUsesGridSize,
+                RightUsesGridSize = panel.RightUsesGridSize,
+                TopUsesGridSize = panel.TopUsesGridSize,
+                Anchor = panel.Anchor,
+                Offset = panel.Offset,
             });
         }
 

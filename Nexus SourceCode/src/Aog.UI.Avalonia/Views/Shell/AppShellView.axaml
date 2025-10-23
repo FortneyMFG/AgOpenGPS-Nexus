@@ -47,21 +47,62 @@
 
       <DataTemplate x:Key="BlockTileTemplate"
                     x:DataType="vm:BlockItemViewModel">
-        <Button Command="{Binding InvokeCommand}"
-                ToolTip.Tip="{Binding Label}"
-                Classes.block-tile="True">
-          <StackPanel HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
-                      Spacing="4">
-            <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
-                   Width="32"
-                   Height="32"
-                   Stretch="Uniform" />
-            <TextBlock Text="{Binding Label}"
-                       TextWrapping="Wrap"
-                       TextAlignment="Center" />
-          </StackPanel>
-        </Button>
+        <controls:BlockTileButton Command="{Binding InvokeCommand}"
+                                  ToolTip.Tip="{Binding Label}"
+                                  Classes.block-tile="True">
+          <Grid>
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="4">
+              <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
+                     Width="32"
+                     Height="32"
+                     Stretch="Uniform" />
+              <TextBlock Text="{Binding Label}"
+                         TextWrapping="Wrap"
+                         TextAlignment="Center" />
+            </StackPanel>
+
+            <Menu HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Background="Transparent"
+                  BorderThickness="0"
+                  IsVisible="{Binding HasSettings}">
+              <Menu.Styles>
+                <Style Selector="Menu">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding DataContext.Layout.IsLocked, ElementName=BlockTiles}" Value="True">
+                      <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Menu.Styles>
+              <MenuItem ItemsSource="{Binding SizeOptions}"
+                        ToolTip.Tip="Adjust block size">
+                <MenuItem.Header>
+                  <Border Background="{DynamicResource ShellChromeBorderBrush}"
+                          BorderBrush="{DynamicResource ShellChromeBorderBrush}"
+                          BorderThickness="1"
+                          CornerRadius="{DynamicResource ThemeRadiusSm}"
+                          Padding="4"
+                          Margin="0">
+                    <TextBlock Text="⚙"
+                               FontSize="14"
+                               FontWeight="Bold" />
+                  </Border>
+                </MenuItem.Header>
+                <MenuItem.ItemTemplate>
+                  <DataTemplate x:DataType="vm:BlockSizeOptionViewModel">
+                    <MenuItem Header="{Binding Label}"
+                              Command="{Binding ApplyCommand}"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsSelected}" />
+                  </DataTemplate>
+                </MenuItem.ItemTemplate>
+              </MenuItem>
+            </Menu>
+          </Grid>
+        </controls:BlockTileButton>
       </DataTemplate>
 
     </ResourceDictionary>

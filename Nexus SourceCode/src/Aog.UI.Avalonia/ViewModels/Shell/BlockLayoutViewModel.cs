@@ -78,6 +78,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         TopSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         BottomSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         BuildInitialCollections();
+        SnapTilesToGrid();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
         RebuildSidebars();
     }
@@ -185,6 +186,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             Grid.Columns = MinorGridColumns;
             Grid.Rows = Math.Max(MinorDivisionsPerMajor, Grid.Rows);
             Grid.CellPx = 0;
+            SnapTilesToGrid();
             PaneLayout = PaneLayoutCompiler.Compile(Grid);
             return;
         }
@@ -193,6 +195,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Grid.CellPx = minorCell;
         Grid.Columns = MinorGridColumns;
         Grid.Rows = Math.Max(MinorDivisionsPerMajor, (int)Math.Floor(viewport.Height / minorCell));
+        SnapTilesToGrid();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
     }
 
@@ -298,6 +301,44 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     {
         var validIds = new HashSet<string>(Blocks.Select(b => b.TileId), StringComparer.OrdinalIgnoreCase);
         Grid.Tiles.RemoveAll(tile => !validIds.Contains(tile.Id));
+    }
+
+    private void SnapTilesToGrid()
+    {
+        if (Grid is null)
+        {
+            return;
+        }
+
+        var columns = Math.Max(1, Grid.Columns);
+        var rows = Math.Max(1, Grid.Rows);
+
+        foreach (var block in Blocks)
+        {
+            var tile = block.Tile;
+            var desiredColSpan = Math.Max(1, (int)Math.Round(block.WidthUnits * MinorDivisionsPerMajor));
+            var desiredRowSpan = Math.Max(1, (int)Math.Round(block.HeightUnits * MinorDivisionsPerMajor));
+
+            if (desiredColSpan > columns)
+            {
+                desiredColSpan = columns;
+            }
+
+            if (desiredRowSpan > rows)
+            {
+                desiredRowSpan = rows;
+            }
+
+            tile.ColSpan = desiredColSpan;
+            tile.RowSpan = desiredRowSpan;
+
+            var maxColumn = Math.Max(0, columns - desiredColSpan);
+            var maxRow = Math.Max(0, rows - desiredRowSpan);
+
+            tile.Col = Math.Clamp(tile.Col, 0, maxColumn);
+            tile.Row = Math.Clamp(tile.Row, 0, maxRow);
+            tile.Offset = (0, 0);
+        }
     }
 
     private void RefreshCommandStates()

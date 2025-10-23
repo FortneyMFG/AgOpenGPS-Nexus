@@ -71,7 +71,7 @@ public sealed class ShellGridLayout
         var spanRows = Math.Max(0, top - bottom);
         if (spanColumns == 0 || spanRows == 0)
         {
-            return Rect.Empty;
+            return default;
         }
 
         return ToPixelRect(left, bottom, spanColumns, spanRows);
@@ -208,7 +208,7 @@ public sealed class PanelSpec
 
         if (right <= left || top <= bottom)
         {
-            return Rect.Empty;
+            return default;
         }
 
         var baseCol = Math.Clamp(left, 0, Math.Max(0, columns - 1));

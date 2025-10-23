@@ -54,7 +54,7 @@ public static class PaneLayoutCompiler
                 panels.Add(new PanelVisual(leaf.Id, rect));
                 break;
             case SplitPane split:
-                CompileSplit(layout, split, bounds, panes, dividers);
+                CompileSplit(layout, split, bounds, panels, dividers);
                 break;
         }
     }
@@ -63,7 +63,7 @@ public static class PaneLayoutCompiler
         ShellGridLayout layout,
         SplitPane split,
         TileSpec bounds,
-        List<PanelVisual> panes,
+        List<PanelVisual> panels,
         List<PanelDividerVisual> dividers)
     {
         if (split.Children.Count == 0)
@@ -100,7 +100,7 @@ public static class PaneLayoutCompiler
                 ColSpan = split.Orientation == Orientation.Horizontal ? span : bounds.ColSpan,
             };
 
-            CompileNode(layout, split.Children[i], childBounds, panes, dividers);
+            CompileNode(layout, split.Children[i], childBounds, panels, dividers);
 
             if (split.Orientation == Orientation.Horizontal)
             {

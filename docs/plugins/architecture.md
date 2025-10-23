@@ -1,6 +1,6 @@
 # Nexus Zip Plugin Architecture
 
-This document is the authoritative reference for how Nexus discovers, loads, and manages zip-based plugins. It complements the high-level roadmap in `nexus-zip-plugin-architecture-brief.md` and the developer quick starts under `docs/plugins/tutorials/`.
+This document is the authoritative reference for how Nexus discovers, loads, and manages zip-based plugins. It complements the platform overview in [SRS Appendix — Nexus Plugin Architecture](../SRS/appendices/Nexus_Plugin_Architecture.md) and the developer quick starts under `docs/plugins/tutorials/`.
 
 ---
 

@@ -11,7 +11,6 @@ related_tickets: []
 
 - [Repository README](../README.md) — project overview, support channels, and release vision.
 - [System Requirements home](development/SRS/00_ReadMe.md) — how the SRS, options, and ADRs fit together.
-- [SRS section template](development/SRS/03_SRS_Section_Template.md) — single source for requirements, options, and decision matrices.
 - [Nexus glossary](development/GLOSSARY.md) — canonical terminology, including guidance-specific terms.
 - [Developer guide](development/INDEX.md) — workstation setup, workflows, and contributor checklists.
 - [Development documentation catalog](development/catalog.md) — theme-sorted index with summaries and audiences for every development resource.

@@ -5,23 +5,23 @@ namespace Aog.UI.Avalonia.Layout;
 
 public sealed class PaneLayoutResult
 {
-    public PaneLayoutResult(IReadOnlyList<PaneVisual> panes, IReadOnlyList<PaneDividerVisual> dividers)
+    public PaneLayoutResult(IReadOnlyList<PanelVisual> panels, IReadOnlyList<PanelDividerVisual> dividers)
     {
-        Panes = panes;
+        Panels = panels;
         Dividers = dividers;
     }
 
-    public IReadOnlyList<PaneVisual> Panes { get; }
+    public IReadOnlyList<PanelVisual> Panels { get; }
 
-    public IReadOnlyList<PaneDividerVisual> Dividers { get; }
+    public IReadOnlyList<PanelDividerVisual> Dividers { get; }
 }
 
-public sealed record PaneVisual(LeafPane Pane, AvaloniaRect Bounds);
+public sealed record PanelVisual(string Id, AvaloniaRect Bounds);
 
-public enum PaneDividerOrientation
+public enum PanelDividerOrientation
 {
     Horizontal,
     Vertical,
 }
 
-public sealed record PaneDividerVisual(PaneDividerOrientation Orientation, AvaloniaRect Bounds);
+public sealed record PanelDividerVisual(PanelDividerOrientation Orientation, AvaloniaRect Bounds, string PanelId);

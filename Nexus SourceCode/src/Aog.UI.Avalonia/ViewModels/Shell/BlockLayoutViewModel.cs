@@ -21,7 +21,7 @@ namespace Aog.UI.Avalonia.ViewModels.Shell;
 public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 {
     private const int MajorGridColumns = 10;
-    private const int MinorDivisionsPerMajor = 2;
+    private const int MinorDivisionsPerMajor = 1;
     private const int MinorGridColumns = MajorGridColumns * MinorDivisionsPerMajor;
 
     private static readonly IReadOnlyDictionary<string, string> DefaultStatusMessages =
@@ -41,6 +41,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private readonly IBlockLayoutStore _layoutStore;
     private readonly IBlockCatalog _catalog;
     private readonly IShellCommandDispatcher _commandDispatcher;
+    private readonly IUiPreferencesService _preferencesService;
     private readonly List<BlockInstance> _instances;
     private Func<BlockDefinition, bool>? _commandInterceptor;
     private Action<string> _statusReporter;
@@ -59,6 +60,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
         _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
         ArgumentNullException.ThrowIfNull(preferencesService);
+        _preferencesService = preferencesService;
         _statusReporter = statusReporter ?? (_ => { });
 
         var storedInstances = _layoutStore.Load().ToList();
@@ -66,6 +68,9 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
         var preferences = preferencesService.GetPreferences().ShellLayout ?? new ShellLayoutPreferences();
         Grid = preferences.Grid ?? new ShellGridLayout();
+        Grid.Tiles ??= new List<TileSpec>();
+        Grid.Panels ??= new List<PanelSpec>();
+        EnsureDefaultPanels();
         LeftSidebarLayout = (preferences.LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone();
         RightSidebarLayout = (preferences.RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone();
         TopSidebarLayout = (preferences.TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone();
@@ -187,6 +192,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             Grid.Rows = Math.Max(MinorDivisionsPerMajor, Grid.Rows);
             Grid.CellPx = 0;
             SnapTilesToGrid();
+            EnsureDefaultPanels();
             PaneLayout = PaneLayoutCompiler.Compile(Grid);
             return;
         }
@@ -196,6 +202,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Grid.Columns = MinorGridColumns;
         Grid.Rows = Math.Max(MinorDivisionsPerMajor, (int)Math.Floor(viewport.Height / minorCell));
         SnapTilesToGrid();
+        EnsureDefaultPanels();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
     }
 
@@ -253,7 +260,6 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             return;
         }
 
-        var workspaceIndex = 0;
         for (var i = 0; i < _instances.Count; i++)
         {
             var instance = _instances[i];
@@ -268,7 +274,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
                 continue;
             }
 
-            var tile = EnsureTile(instance, workspaceIndex++);
+            var tile = EnsureTile(instance);
             var item = new BlockItemViewModel(instance, definition, this, tile);
             Blocks.Add(item);
         }
@@ -276,7 +282,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         TrimOrphanedTiles();
     }
 
-    private TileSpec EnsureTile(BlockInstance instance, int index)
+    private TileSpec EnsureTile(BlockInstance instance)
     {
         var tileId = instance.InstanceId.Value.ToString();
         var tile = Grid.Tiles.FirstOrDefault(t => string.Equals(t.Id, tileId, StringComparison.OrdinalIgnoreCase));
@@ -285,14 +291,15 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             return tile;
         }
 
-        var row = index % Math.Max(1, Grid.Rows);
-        var column = (index / Math.Max(1, Grid.Rows)) * 2;
         tile = new TileSpec
         {
             Id = tileId,
-            Row = row,
-            Col = column,
+            Row = 0,
+            Col = 0,
         };
+        tile.Anchor = GetDefaultAnchor(instance.Region);
+        tile.Offset = (0, 0);
+        tile.PaneAttached = false;
         Grid.Tiles.Add(tile);
         return tile;
     }
@@ -335,6 +342,13 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             var maxColumn = Math.Max(0, columns - desiredColSpan);
             var maxRow = Math.Max(0, rows - desiredRowSpan);
 
+            if (!tile.PaneAttached)
+            {
+                var (anchorCol, anchorRow) = ResolveAnchorPosition(tile, columns, rows, desiredColSpan, desiredRowSpan);
+                tile.Col = anchorCol;
+                tile.Row = anchorRow;
+            }
+
             tile.Col = Math.Clamp(tile.Col, 0, maxColumn);
             tile.Row = Math.Clamp(tile.Row, 0, maxRow);
             tile.Offset = (0, 0);
@@ -346,6 +360,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         foreach (var item in Blocks)
         {
             item.RefreshCommandStates();
+            item.RefreshSettingsState();
         }
     }
 
@@ -431,6 +446,161 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private void Save()
     {
         _layoutStore.Save(_instances);
+        var preferences = _preferencesService.GetPreferences();
+        var layout = preferences.ShellLayout ?? new ShellLayoutPreferences();
+        layout.Grid = Grid;
+        _preferencesService.UpdateShellLayout(layout);
+    }
+
+    private void EnsureDefaultPanels()
+    {
+        if (Grid.Panels.Count > 0)
+        {
+            return;
+        }
+
+        Grid.Panels.Add(new PanelSpec
+        {
+            Id = "panel.map",
+            Left = 1,
+            Bottom = 1,
+            Right = -1,
+            RightUsesGridSize = true,
+            TopUsesGridSize = true,
+            Anchor = RelativeAnchor.BottomLeft,
+        });
+    }
+
+    private static (int col, int row) ResolveAnchorPosition(
+        TileSpec tile,
+        int columns,
+        int rows,
+        int colSpan,
+        int rowSpan)
+    {
+        var maxColumn = Math.Max(0, columns - colSpan);
+        var maxRow = Math.Max(0, rows - rowSpan);
+
+        var col = tile.Anchor switch
+        {
+            RelativeAnchor.TopLeft => 0,
+            RelativeAnchor.TopCenter => (columns - colSpan) / 2,
+            RelativeAnchor.TopRight => maxColumn,
+            RelativeAnchor.MiddleLeft => 0,
+            RelativeAnchor.Center => (columns - colSpan) / 2,
+            RelativeAnchor.MiddleRight => maxColumn,
+            RelativeAnchor.BottomLeft => 0,
+            RelativeAnchor.BottomCenter => (columns - colSpan) / 2,
+            RelativeAnchor.BottomRight => maxColumn,
+            _ => 0,
+        };
+
+        var row = tile.Anchor switch
+        {
+            RelativeAnchor.TopLeft => maxRow,
+            RelativeAnchor.TopCenter => maxRow,
+            RelativeAnchor.TopRight => maxRow,
+            RelativeAnchor.MiddleLeft => (rows - rowSpan) / 2,
+            RelativeAnchor.Center => (rows - rowSpan) / 2,
+            RelativeAnchor.MiddleRight => (rows - rowSpan) / 2,
+            RelativeAnchor.BottomLeft => 0,
+            RelativeAnchor.BottomCenter => 0,
+            RelativeAnchor.BottomRight => 0,
+            _ => 0,
+        };
+
+        col = Math.Clamp(col + tile.Offset.dx, 0, maxColumn);
+        row = Math.Clamp(row + tile.Offset.dy, 0, maxRow);
+        return (col, row);
+    }
+
+    private static RelativeAnchor GetDefaultAnchor(BlockRegion region)
+    {
+        return region switch
+        {
+            BlockRegion.Left or BlockRegion.LeftSub => RelativeAnchor.BottomLeft,
+            BlockRegion.Right => RelativeAnchor.BottomRight,
+            BlockRegion.Top => RelativeAnchor.TopCenter,
+            BlockRegion.Bottom => RelativeAnchor.BottomCenter,
+            _ => RelativeAnchor.Center,
+        };
+    }
+
+    internal IReadOnlyList<BlockSizeOptionViewModel> CreateSizeOptions(BlockItemViewModel block)
+    {
+        if (block is null)
+        {
+            return Array.Empty<BlockSizeOptionViewModel>();
+        }
+
+        var options = new List<BlockSizeOptionViewModel>();
+        foreach (var (size, label) in EnumerateCandidateSizes())
+        {
+            if (!SupportsSize(block.Definition, size))
+            {
+                continue;
+            }
+
+            options.Add(new BlockSizeOptionViewModel(block, size, label, ApplyBlockSize));
+        }
+
+        var current = block.Instance.SizeOverride;
+        if (current.HasValue && options.All(option => option.Size != current.Value))
+        {
+            var label = current.Value.ToString();
+            options.Add(new BlockSizeOptionViewModel(block, current.Value, label, ApplyBlockSize));
+        }
+
+        return options;
+    }
+
+    internal void ApplyBlockSize(BlockItemViewModel block, BlockSize size)
+    {
+        if (block is null)
+        {
+            return;
+        }
+
+        var preferred = block.Definition.PreferredSize;
+        block.Instance.SizeOverride = size == preferred ? null : size;
+        SnapTilesToGrid();
+        block.RefreshSettingsState();
+        Save();
+    }
+
+    internal void MoveBlock(BlockItemViewModel block, int column, int row)
+    {
+        if (block is null)
+        {
+            return;
+        }
+
+        var tile = block.Tile;
+        var columns = Math.Max(1, Grid.Columns);
+        var rows = Math.Max(1, Grid.Rows);
+        var maxColumn = Math.Max(0, columns - tile.ColSpan);
+        var maxRow = Math.Max(0, rows - tile.RowSpan);
+        tile.Col = Math.Clamp(column, 0, maxColumn);
+        tile.Row = Math.Clamp(row, 0, maxRow);
+        tile.PaneAttached = true;
+        Save();
+    }
+
+    private static IEnumerable<(BlockSize size, string label)> EnumerateCandidateSizes()
+    {
+        yield return (BlockSize.Tile1x1, "1 x 1");
+        yield return (BlockSize.Tile2x1, "2 x 1");
+        yield return (BlockSize.Tile1x2, "1 x 2");
+        yield return (BlockSize.Tile2x2, "2 x 2");
+    }
+
+    private static bool SupportsSize(BlockDefinition definition, BlockSize size)
+    {
+        return size switch
+        {
+            BlockSize.Tile1x2 or BlockSize.Tile2x2 => definition.SupportsFullHeight,
+            _ => true,
+        };
     }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null)

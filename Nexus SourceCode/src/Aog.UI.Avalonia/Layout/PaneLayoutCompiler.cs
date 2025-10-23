@@ -15,12 +15,17 @@ public static class PaneLayoutCompiler
             throw new ArgumentNullException(nameof(layout));
         }
 
-        var panes = new List<PaneVisual>();
-        var dividers = new List<PaneDividerVisual>();
+        if (layout.Panels is { Count: > 0 })
+        {
+            return CompilePanels(layout);
+        }
+
+        var panels = new List<PanelVisual>();
+        var dividers = new List<PanelDividerVisual>();
 
         if (layout.RootPane is null)
         {
-            return new PaneLayoutResult(panes, dividers);
+            return new PaneLayoutResult(panels, dividers);
         }
 
         var rootRect = new TileSpec
@@ -31,21 +36,22 @@ public static class PaneLayoutCompiler
             ColSpan = Math.Max(1, layout.Columns),
         };
 
-        CompileNode(layout, layout.RootPane, rootRect, panes, dividers);
-        return new PaneLayoutResult(panes, dividers);
+        CompileNode(layout, layout.RootPane, rootRect, panels, dividers);
+        return new PaneLayoutResult(panels, dividers);
     }
 
     private static void CompileNode(
         ShellGridLayout layout,
         PaneNode node,
         TileSpec bounds,
-        List<PaneVisual> panes,
-        List<PaneDividerVisual> dividers)
+        List<PanelVisual> panels,
+        List<PanelDividerVisual> dividers)
     {
         switch (node)
         {
             case LeafPane leaf:
-                panes.Add(new PaneVisual(leaf, layout.ToPixelRect(bounds.Col, bounds.Row, bounds.ColSpan, bounds.RowSpan)));
+                var rect = layout.ToPixelRect(bounds.Col, bounds.Row, bounds.ColSpan, bounds.RowSpan);
+                panels.Add(new PanelVisual(leaf.Id, rect));
                 break;
             case SplitPane split:
                 CompileSplit(layout, split, bounds, panes, dividers);
@@ -57,8 +63,8 @@ public static class PaneLayoutCompiler
         ShellGridLayout layout,
         SplitPane split,
         TileSpec bounds,
-        List<PaneVisual> panes,
-        List<PaneDividerVisual> dividers)
+        List<PanelVisual> panes,
+        List<PanelDividerVisual> dividers)
     {
         if (split.Children.Count == 0)
         {
@@ -100,13 +106,13 @@ public static class PaneLayoutCompiler
             {
                 cursorCol += span;
                 var rect = CreateVerticalDivider(layout, cursorCol, bounds.Row, bounds.RowSpan);
-                dividers.Add(new PaneDividerVisual(PaneDividerOrientation.Vertical, rect));
+                dividers.Add(new PanelDividerVisual(PanelDividerOrientation.Vertical, rect, split.Id));
             }
             else
             {
                 cursorRow += span;
                 var rect = CreateHorizontalDivider(layout, bounds.Col, cursorRow, bounds.ColSpan);
-                dividers.Add(new PaneDividerVisual(PaneDividerOrientation.Horizontal, rect));
+                dividers.Add(new PanelDividerVisual(PanelDividerOrientation.Horizontal, rect, split.Id));
             }
         }
 
@@ -114,6 +120,50 @@ public static class PaneLayoutCompiler
         {
             dividers.RemoveAt(dividers.Count - 1);
         }
+    }
+
+    private static PaneLayoutResult CompilePanels(ShellGridLayout layout)
+    {
+        var panels = new List<PanelVisual>();
+        var dividers = new List<PanelDividerVisual>();
+
+        foreach (var panel in layout.Panels)
+        {
+            if (panel is null)
+            {
+                continue;
+            }
+
+            var bounds = panel.ToPixelRect(layout);
+            if (bounds.Width <= 0 || bounds.Height <= 0)
+            {
+                continue;
+            }
+
+            panels.Add(new PanelVisual(panel.Id, bounds));
+            dividers.AddRange(CreatePanelDividers(layout, panel, bounds));
+        }
+
+        return new PaneLayoutResult(panels, dividers);
+    }
+
+    private static IEnumerable<PanelDividerVisual> CreatePanelDividers(
+        ShellGridLayout layout,
+        PanelSpec panel,
+        AvaloniaRect bounds)
+    {
+        var thickness = Math.Max(2, (int)Math.Round(layout.GutterPx <= 0 ? layout.CellPx * 0.05 : layout.GutterPx));
+        var verticalThickness = Math.Min(thickness, Math.Max(1, (int)Math.Round(bounds.Width)));
+        var horizontalThickness = Math.Min(thickness, Math.Max(1, (int)Math.Round(bounds.Height)));
+        var dividers = new List<PanelDividerVisual>
+        {
+            new(PanelDividerOrientation.Vertical, new AvaloniaRect(bounds.X, bounds.Y, verticalThickness, bounds.Height), panel.Id),
+            new(PanelDividerOrientation.Vertical, new AvaloniaRect(bounds.Right - verticalThickness, bounds.Y, verticalThickness, bounds.Height), panel.Id),
+            new(PanelDividerOrientation.Horizontal, new AvaloniaRect(bounds.X, bounds.Y, bounds.Width, horizontalThickness), panel.Id),
+            new(PanelDividerOrientation.Horizontal, new AvaloniaRect(bounds.X, bounds.Bottom - horizontalThickness, bounds.Width, horizontalThickness), panel.Id),
+        };
+
+        return dividers;
     }
 
     private static int[] AllocateSpans(int total, double[] ratios, int count)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Input;
 using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Layout;
@@ -25,6 +26,7 @@ public sealed class BlockItemViewModel
 
         _invokeCommand = new DelegateCommand(_ => _owner.Invoke(this), _ => _owner.CanInteract(this));
         _deleteCommand = new DelegateCommand(_ => _owner.Delete(this), _ => _owner.CanDelete(this));
+        SizeOptions = _owner.CreateSizeOptions(this);
     }
 
     /// <summary>Gets the underlying block instance for this tile.</summary>
@@ -71,6 +73,15 @@ public sealed class BlockItemViewModel
     /// <summary>Gets the tile metadata used to position the block on the global grid.</summary>
     public TileSpec Tile => _tile;
 
+    /// <summary>Gets the owning layout view-model.</summary>
+    internal BlockLayoutViewModel Owner => _owner;
+
+    /// <summary>Gets a collection of size adjustment options for the block.</summary>
+    public IReadOnlyList<BlockSizeOptionViewModel> SizeOptions { get; }
+
+    /// <summary>Gets a value indicating whether the block exposes additional settings.</summary>
+    public bool HasSettings => SizeOptions.Count > 0;
+
     /// <summary>Gets a value indicating whether the block originates from a canonical definition.</summary>
     public bool IsCanonical => Instance.Origin == BlockOrigin.Canonical;
 
@@ -90,5 +101,13 @@ public sealed class BlockItemViewModel
     {
         _invokeCommand.RaiseCanExecuteChanged();
         _deleteCommand.RaiseCanExecuteChanged();
+    }
+
+    internal void RefreshSettingsState()
+    {
+        foreach (var option in SizeOptions)
+        {
+            option.Refresh();
+        }
     }
 }

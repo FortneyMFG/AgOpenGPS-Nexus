@@ -22,10 +22,10 @@ public class TiledPanel : Panel
         AvaloniaProperty.RegisterAttached<TiledPanel, Control, int>("Column", 0, false, BindingMode.TwoWay);
 
     public static readonly AttachedProperty<int> RowSpanProperty =
-        AvaloniaProperty.RegisterAttached<TiledPanel, Control, int>("RowSpan", 2, false, BindingMode.TwoWay);
+        AvaloniaProperty.RegisterAttached<TiledPanel, Control, int>("RowSpan", 1, false, BindingMode.TwoWay);
 
     public static readonly AttachedProperty<int> ColumnSpanProperty =
-        AvaloniaProperty.RegisterAttached<TiledPanel, Control, int>("ColumnSpan", 2, false, BindingMode.TwoWay);
+        AvaloniaProperty.RegisterAttached<TiledPanel, Control, int>("ColumnSpan", 1, false, BindingMode.TwoWay);
 
     public TiledPanel()
     {

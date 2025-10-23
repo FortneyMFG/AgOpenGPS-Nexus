@@ -71,8 +71,7 @@
                 <Menu.IsVisible>
                   <MultiBinding Converter="{StaticResource BlockSettingsVisibilityConverter}">
                     <Binding Path="HasSettings" />
-                    <Binding Path="DataContext.Layout.IsLocked"
-                             RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                    <Binding Path="IsLayoutLocked" />
                   </MultiBinding>
                 </Menu.IsVisible>
               <MenuItem ItemsSource="{Binding SizeOptions}"

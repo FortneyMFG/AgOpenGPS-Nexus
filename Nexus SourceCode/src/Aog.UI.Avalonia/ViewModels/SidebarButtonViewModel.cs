@@ -1,4 +1,5 @@
 using System;
+using Avalonia;
 
 namespace Aog.UI.Avalonia.ViewModels;
 
@@ -22,4 +23,7 @@ public sealed class SidebarButtonViewModel
 
     /// <summary>Gets the command invoked when the button is pressed.</summary>
     public DelegateCommand Command { get; }
+
+    /// <summary>Gets or sets the margin applied when rendering the button.</summary>
+    public Thickness Margin { get; set; }
 }

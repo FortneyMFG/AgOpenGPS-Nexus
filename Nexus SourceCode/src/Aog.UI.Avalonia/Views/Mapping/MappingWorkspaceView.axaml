@@ -11,116 +11,144 @@
              d:DesignHeight="720"
              Focusable="True"
              mc:Ignorable="d">
-  <Grid>
-    <controls:MapView x:Name="MapViewport" />
+  <Grid RowDefinitions="*,Auto"
+        ColumnDefinitions="Auto,*,Auto"
+        RowSpacing="16"
+        ColumnSpacing="16">
+    <Border Grid.Row="0"
+            Grid.Column="0"
+            CornerRadius="8"
+            Background="#191F2933"
+            Width="320" />
 
-    <Grid Margin="16"
-          RowDefinitions="Auto,*,Auto"
-          ColumnDefinitions="Auto,*,Auto"
-          RowSpacing="16"
-          ColumnSpacing="16">
-      <Border Grid.Row="0"
-              Grid.Column="0"
-              Background="#BF1F2933"
-              CornerRadius="8"
-              Padding="12"
-              Width="260">
-        <StackPanel Spacing="12">
-          <TextBlock Text="Layer Legend"
-                     FontSize="16"
-                     FontWeight="Bold"
-                     Foreground="White" />
-          <ItemsControl ItemsSource="{Binding Legend.Entries}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="vm:LayerLegendEntryViewModel">
-                <StackPanel Spacing="4">
-                  <TextBlock Text="{Binding DisplayName}"
-                             FontWeight="SemiBold"
-                             Foreground="White" />
-                  <Border Height="12"
-                          CornerRadius="6"
-                          Background="{Binding GradientBrush}" />
-                  <TextBlock Text="{Binding RangeDisplay}"
-                             Foreground="#E6FFFFFF"
-                             FontSize="12" />
-                  <TextBlock Text="{Binding ModeDisplay}"
-                             Foreground="#CC9FB3C8"
-                             FontSize="12" />
-                  <TextBlock Text="{Binding Description}"
-                             Foreground="#B3FFFFFF"
-                             FontSize="11"
-                             TextWrapping="Wrap"
-                             IsVisible="{Binding HasDescription}" />
-                </StackPanel>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </StackPanel>
-      </Border>
+    <Border Grid.Row="0"
+            Grid.Column="1"
+            CornerRadius="12"
+            Background="#FF101820">
+      <Grid>
+        <controls:MapView x:Name="MapViewport" />
 
-      <Border Grid.Row="0"
-              Grid.Column="2"
-              Background="#BF1F2933"
-              CornerRadius="8"
-              Padding="12"
-              Width="280">
-        <StackPanel Spacing="8">
-          <TextBlock Text="Equipment Profile"
-                     FontSize="16"
-                     FontWeight="Bold"
-                     Foreground="White" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Profile:"
+        <Grid Margin="16"
+              RowDefinitions="Auto,*,Auto"
+              ColumnDefinitions="Auto,*,Auto"
+              RowSpacing="16"
+              ColumnSpacing="16">
+          <Border Grid.Row="0"
+                  Grid.Column="0"
+                  Background="#BF1F2933"
+                  CornerRadius="8"
+                  Padding="12"
+                  Width="260">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Layer Legend"
+                         FontSize="16"
+                         FontWeight="Bold"
+                         Foreground="White" />
+              <ItemsControl ItemsSource="{Binding Legend.Entries}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:LayerLegendEntryViewModel">
+                    <StackPanel Spacing="4">
+                      <TextBlock Text="{Binding DisplayName}"
+                                 FontWeight="SemiBold"
+                                 Foreground="White" />
+                      <Border Height="12"
+                              CornerRadius="6"
+                              Background="{Binding GradientBrush}" />
+                      <TextBlock Text="{Binding RangeDisplay}"
+                                 Foreground="#E6FFFFFF"
+                                 FontSize="12" />
+                      <TextBlock Text="{Binding ModeDisplay}"
+                                 Foreground="#CC9FB3C8"
+                                 FontSize="12" />
+                      <TextBlock Text="{Binding Description}"
+                                 Foreground="#B3FFFFFF"
+                                 FontSize="11"
+                                 TextWrapping="Wrap"
+                                 IsVisible="{Binding HasDescription}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Row="0"
+                  Grid.Column="2"
+                  Background="#BF1F2933"
+                  CornerRadius="8"
+                  Padding="12"
+                  Width="280">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Equipment Profile"
+                         FontSize="16"
+                         FontWeight="Bold"
+                         Foreground="White" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Profile:"
+                           Foreground="#E6FFFFFF"
+                           FontSize="12" />
+                <TextBlock Text="{Binding EquipmentProfile.ProfileId, FallbackValue=Not loaded}"
+                           Foreground="#FFFFFFFF"
+                           FontSize="12" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Axles:"
+                           Foreground="#E6FFFFFF"
+                           FontSize="12" />
+                <TextBlock Text="{Binding EquipmentProfile.Axles.Count, FallbackValue=0}"
+                           Foreground="#FFFFFFFF"
+                           FontSize="12" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Modes:"
+                           Foreground="#E6FFFFFF"
+                           FontSize="12" />
+                <TextBlock Text="{Binding EquipmentProfile.Modes.Count, FallbackValue=0}"
+                           Foreground="#FFFFFFFF"
+                           FontSize="12" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Row="1"
+                  Grid.Column="1"
+                  Background="#CC1F2933"
+                  CornerRadius="12"
+                  Padding="24"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  IsVisible="{Binding IsEmpty}">
+            <TextBlock Text="No layers are currently available."
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Foreground="#E6FFFFFF" />
+          </Border>
+
+          <Border Grid.Row="2"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="3"
+                  Background="#BF1F2933"
+                  CornerRadius="8"
+                  Padding="10"
+                  HorizontalAlignment="Left">
+            <TextBlock Text="Controls: W/S move • A/D steer • Shift boosts • R resets pose"
                        Foreground="#E6FFFFFF"
                        FontSize="12" />
-            <TextBlock Text="{Binding EquipmentProfile.ProfileId, FallbackValue=Not loaded}"
-                       Foreground="#FFFFFFFF"
-                       FontSize="12" />
-          </StackPanel>
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Axles:"
-                       Foreground="#E6FFFFFF"
-                       FontSize="12" />
-            <TextBlock Text="{Binding EquipmentProfile.Axles.Count, FallbackValue=0}"
-                       Foreground="#FFFFFFFF"
-                       FontSize="12" />
-          </StackPanel>
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Modes:"
-                       Foreground="#E6FFFFFF"
-                       FontSize="12" />
-            <TextBlock Text="{Binding EquipmentProfile.Modes.Count, FallbackValue=0}"
-                       Foreground="#FFFFFFFF"
-                       FontSize="12" />
-          </StackPanel>
-        </StackPanel>
-      </Border>
+          </Border>
+        </Grid>
+      </Grid>
+    </Border>
 
-      <Border Grid.Row="1"
-              Grid.Column="1"
-              Background="#CC1F2933"
-              CornerRadius="12"
-              Padding="24"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              IsVisible="{Binding IsEmpty}">
-        <TextBlock Text="No layers are currently available."
-                   FontSize="18"
-                   FontWeight="SemiBold"
-                   Foreground="#E6FFFFFF" />
-      </Border>
+    <Border Grid.Row="0"
+            Grid.Column="2"
+            CornerRadius="8"
+            Background="#191F2933"
+            Width="320" />
 
-      <Border Grid.Row="2"
-              Grid.Column="0"
-              Grid.ColumnSpan="3"
-              Background="#BF1F2933"
-              CornerRadius="8"
-              Padding="10"
-              HorizontalAlignment="Left">
-        <TextBlock Text="Controls: W/S move • A/D steer • Shift boosts • R resets pose"
-                   Foreground="#E6FFFFFF"
-                   FontSize="12" />
-      </Border>
-    </Grid>
+    <Border Grid.Row="1"
+            Grid.Column="1"
+            CornerRadius="8"
+            Background="#191F2933"
+            Height="200" />
   </Grid>
 </UserControl>

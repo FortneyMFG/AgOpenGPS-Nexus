@@ -1,6 +1,6 @@
 # In-Tree Plugins (Reference Implementation)
 
-This directory contains the source for the **official Nexus plugins** that currently build in-tree. Each plugin will ultimately migrate to the zip-packaged model described in `docs/plugins/architecture.md`, but the code here remains as reference implementations and test fixtures while the packaging pipeline is finalized.
+This directory contains the source for the **official Nexus plugins** that currently build in-tree. Each plugin will ultimately migrate to the zip-packaged model described in `docs/Plugins/architecture.md`, but the code here remains as reference implementations and test fixtures while the packaging pipeline is finalized.
 
 ---
 
@@ -32,7 +32,7 @@ Until a plugin has fully transitioned, the in-tree version remains the canonical
 
 ## Coding Guidelines
 
-- Follow the contracts documented in `docs/plugins/official/<plugin>.md`.
+- Follow the contracts documented in `docs/Plugins/official/<plugin>.md`.
 - Keep pure business logic decoupled from UI and transport services; this makes migration to zip packages straightforward.
 - Write deterministic unit tests in `tests/Aog.Plugins.Tests/**` to ensure behavior parity after migration.
 - Avoid `static` state; everything should be scoped through dependency injection to ease unloading in the zip world.
@@ -51,5 +51,5 @@ Future work will move these shared pieces into the `Nexus.Sdk.*` packages to dec
 
 ## Documentation
 
-Each official plugin has a dedicated reference card in `docs/plugins/official/`. The cards call out the key classes housed here and link to relevant tests and manifests.
+Each official plugin has a dedicated reference card in `docs/Plugins/official/`. The cards call out the key classes housed here and link to relevant tests and manifests.
 

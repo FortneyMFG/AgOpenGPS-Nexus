@@ -5,8 +5,8 @@
 > supervised under systemd, surface health signals demanded by SRS §10, and
 > reuse ADR-068 replay tooling for diagnostics. Normative health and
 > observability requirements reside in
-> [SRS Section 64 — Telemetry Health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
-> and [ADR-068 Layer Controllers](../SRS/sections/2X_System_Architecture/21-ADR-068%20-%20Layer%20Controllers%20%26%20Aggregation%20Runtime.md).
+> [SRS Section 64 — Telemetry Health](../development/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
+> and [ADR-068 Layer Controllers](../development/SRS/sections/2X_System_Architecture/21-ADR-068%20-%20Layer%20Controllers%20%26%20Aggregation%20Runtime.md).
 
 ## 1. Prerequisites
 
@@ -16,7 +16,7 @@
   (`aog-core.service`, `aog-agio.service`) with hardened defaults.【F:tools/packaging/linux/build-packages.sh†L1-L214】【F:tools/packaging/linux/systemd/aog-core.service†L1-L27】
 - Ensure the host satisfies O-BACKEND-6: Ubuntu/Debian or RPM-based distro with
   .NET 8 runtime, writable `/var/lib/aog` for state, and `/etc/aog` for
-  configuration overrides.【F:docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L33】
+  configuration overrides.【F:docs/development/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L6-L33】
 - Confirm access to the `nexus` release bundle if you need to cross-check
   appsettings defaults or plugin payloads.【F:SERVICES.md†L9-L46】
 
@@ -143,7 +143,7 @@ AGiO journal. Investigate persistent warnings before fielding builds on SBCs.
 
 - Use `journalctl --since "-1 day" -u aog-core -o json` to export structured
   health logs and attach them to support tickets, satisfying the telemetry
-  readiness goals in SRS §10.【F:docs/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L1-L37】
+  readiness goals in SRS §10.【F:docs/development/SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L1-L37】
 - Mirror `/var/log/aog` and replay bundles from `/var/lib/aog` onto a support
   workstation when diagnosing issues offline. Packaging keeps permissions owned
   by `aogsvc` to preserve provenance when copying across systems.【F:tools/packaging/linux/build-packages.sh†L231-L269】

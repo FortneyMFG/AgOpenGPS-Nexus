@@ -5,7 +5,7 @@ The Nexus plugin system enables extensible functionality while maintaining secur
 ## Key Concepts
 
 ### Plugin Architecture
-- **Zip Packages**: Plugins are distributed as zip archives containing `manifest.json`, managed assemblies, and optional assets. See the [Zip Plugin Architecture](../plugins/architecture.md) for the authoritative contract.
+- **Zip Packages**: Plugins are distributed as zip archives containing `manifest.json`, managed assemblies, and optional assets. See the [Zip Plugin Architecture](../Plugins/architecture.md) for the authoritative contract.
 - **Contract-First Design**: All plugins communicate through protobuf/gRPC contracts shipped with the Nexus SDK.
 - **Capability-Based Security**: Plugins declare leases, permissions, and dependency requirements in the manifest so the host can enforce policy before activation.
 - **Deterministic Execution**: Simulation and replay harnesses guarantee deterministic outcomes for automated testing.
@@ -30,19 +30,19 @@ graph TD
 ## Development Guide
 
 ### Quick Start
-1. [Setting Up the Development Environment](../development/setup.md)
-2. [Creating Your First Plugin](../plugins/tutorials/first-plugin.md)
-3. [Testing and Validation](../plugins/tutorials/testing.md)
-4. [Packaging & Distribution](../plugins/architecture.md#packaging-checklist)
+1. [Setting Up the Development Environment](../development/INDEX.md#initial-setup)
+2. [Creating Your First Plugin](../Plugins/tutorials/first-plugin.md)
+3. [Testing and Validation](../development/testing.md)
+4. [Packaging & Distribution](../Plugins/architecture.md#packaging-checklist)
 
 ### Key Resources
-- [Zip Plugin Architecture](../plugins/architecture.md)
+- [Zip Plugin Architecture](../Plugins/architecture.md)
 - [Core Integration Guide](../../Nexus SourceCode/src/Aog.Core/PLUGINS.md)
 - [UI Integration Guide](../../Nexus SourceCode/src/Aog.UI.Avalonia/PLUGINS.md)
-- [Official Plugin Cards](../plugins/official/README.md)
-- [Plugin Manifest Reference](../reference/plugin-manifest.md)
-- [Security Guidelines](../plugins/security.md)
-- [Performance Budgets](../plugins/performance.md)
+- [Official Plugin Cards](../Plugins/official/README.md)
+- [Plugin Manifest Governance](../development/howto/plugin-manifest-governance.md)
+- [Plugin Security Guide](../Plugins/security.md)
+- [Performance Budgets](../Plugins/performance.md)
 
 ## Plugin Dependencies
 
@@ -61,6 +61,6 @@ graph TD
 ## Related Documentation
 - [Zip Plugin Architecture ADR (forthcoming)](../ADR/)
 - [Plugin Contribution Guide](../CONTRIBUTING-PLUGINS.md)
-- [Layer Registry Guide](../plugins/layer-registry.md)
-- [Performance Guidelines](../reference/performance.md)
-- [Official Plugin Cards](../plugins/official/README.md)
+- [Layer Registry Guide](../Core/reference/layer-registry-handshake.md)
+- [Performance Guidelines](../Plugins/performance.md)
+- [Official Plugin Cards](../Plugins/official/README.md)

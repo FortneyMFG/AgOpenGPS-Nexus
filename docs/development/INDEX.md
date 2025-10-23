@@ -2,7 +2,7 @@
 
 This guide summarizes local environment setup, repeatable build commands, and key
 references for Nexus contributors. For architecture or product scope, start with the
-[SRS overview](../SRS/00_ReadMe.md) and the [documentation index](../INDEX.md).
+[SRS overview](SRS/00_ReadMe.md) and the [documentation index](../INDEX.md).
 
 ## Prerequisites
 
@@ -58,11 +58,11 @@ status updates.
 
 ## Key References
 
-- [Runtime baseline enforcement](../support/dotnet-runtime-baseline.md)
-- [Avalonia run modes](../ui/avalonia-run-modes.md)
-- [Plugin lease & manifest governance](../plugins/plugin-lease-manifest-governance.md)
-- [Guidance lane publishing contracts](../howto/guidance-lane-contracts.md)
-- [Plugin QA handshake checklist](../qa/plugin-qa-handshake.md)
+- [Runtime baseline enforcement](../Core/support/dotnet-runtime-baseline.md)
+- [Avalonia run modes](../UI/avalonia-run-modes.md)
+- [Plugin lease & manifest governance](../Plugins/plugin-lease-manifest-governance.md)
+- [Guidance lane publishing contracts](howto/guidance-lane-contracts.md)
+- [Plugin QA handshake checklist](qa/plugin-qa-handshake.md)
 - [Linux core operations playbook](../Core/linux-core-operations-playbook.md)
 
 These references evolve with the platform—check the linked documents for the latest

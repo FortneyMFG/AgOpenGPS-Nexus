@@ -9,7 +9,8 @@
 //  2. Use command line switches to nanopb_generator.py
 //  3. Use [(nanopb).option = value] in your <protofile>.proto file
 //
-// For detailed documentation, refer to "Generator options" in docs/reference.md
+// For detailed documentation, refer to "Generator options" in the nanopb manual:
+// https://jpa.kapsi.fi/nanopb/docs/reference.html
 
 syntax = "proto2";
 import "google/protobuf/descriptor.proto";

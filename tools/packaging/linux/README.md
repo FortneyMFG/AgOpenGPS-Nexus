@@ -1,7 +1,7 @@
 # Linux Core service packaging (NX-462)
 
 This directory contains the packaging assets for the headless Linux "AOG Core"
-service described by [O-BACKEND-6](../../../docs/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md).
+service described by [O-BACKEND-6](../../../docs/development/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md).
 The `build-packages.sh` helper builds `.deb` and `.rpm` installers that:
 
 - Publish the Core and AGiO hosts for a chosen runtime (default `linux-x64`).

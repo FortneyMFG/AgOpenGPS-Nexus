@@ -225,8 +225,8 @@ These models inherit socket, GPIO, and CAN bindings from §52 while observing th
 | Protocol | Transport | Primary Use Case | Canonical Reference |
 |----------|-----------|------------------|---------------------|
 | PGN v0 | UDP / Serial | Legacy AIO controllers and bench validation | [AgIO PGN baseline](../../references/AgIO_PGN_Baseline.md) |
-| AOG-Link v1 | Serial / CAN / Shared memory | Modern MCU integrations plus CM5 fast-path mirroring | [AOG-Link bridge architecture](../../../AgIO/aog-link-bridge-architecture-guide.md) |
-| MQTT / MQTT-SN | Network | Remote telemetry, distributed sensors, authority hand-offs | [AgIO bridging knowledge base](../../../AgIO/bridging-workflow-knowledge-base.md) |
+| AOG-Link v1 | Serial / CAN / Shared memory | Modern MCU integrations plus CM5 fast-path mirroring | [AgIO subsystem overview](../../../AgIO/README.md) |
+| MQTT / MQTT-SN | Network | Remote telemetry, distributed sensors, authority hand-offs | [AgIO subsystem overview — deployment workflows](../../../AgIO/README.md#deployment-workflows) |
 
 Protocol support remains schema-driven; new transports must document capability bindings, watchdog behaviour, and lease semantics before entering the catalog described in §53.
 

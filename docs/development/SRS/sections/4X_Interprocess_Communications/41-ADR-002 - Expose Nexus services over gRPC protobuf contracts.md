@@ -63,28 +63,28 @@ automation components consume generated clients from the `Aog.Abstractions` pack
    - Phase 1: Publish telemetry, guidance, and registry contracts with bridge shims for existing PGNs.
    - Phase 2: Enable plugin onboarding and capability leasing over gRPC with dual-stack support in AgIO/Bridge.
    - Phase 3: Deprecate PGN-first paths once operational metrics meet ADR thresholds, maintaining bridge fallbacks per
-     the AOG-Link Bridge Architecture Guide.
+     the AgIO subsystem overview.
 
 ---
 
 ## 3) Consequences
 
-> **Related Guides:** [AOG-Link Bridge Architecture Guide](../../../AgIO/aog-link-bridge-architecture-guide.md), Section 4 — Deployment Playbooks.
+> **Related Guides:** [AgIO subsystem overview](../../../AgIO/README.md), Section 4 — Deployment Playbooks.
 
 **Positive Impacts**
 
 - **Runtime:** Strongly typed, versioned contracts shared across Core, UI, and automation enable deterministic streaming
   semantics aligned with simulation timing.
-- **Operational:** Language-agnostic clients reduce bespoke tooling, and bridge operators can follow the AOG-Link Bridge
-  Architecture Guide for rollout sequencing and observability.
+- **Operational:** Language-agnostic clients reduce bespoke tooling, and bridge operators can follow the AgIO subsystem
+  overview for rollout sequencing and observability.
 - **Governance:** Centralized proto governance with CI enforcement clarifies ownership and simplifies change review.
 
 **Negative / Mitigated Impacts**
 
 - **Runtime:** Adds hosting overhead relative to raw sockets — mitigated by reusing ASP.NET Core gRPC infrastructure and
-  bridge-side connection pooling documented in the bridge guide.
+  bridge-side connection pooling documented in the AgIO overview.
 - **Operational:** Bridge compatibility testing expands release checklists — mitigated by deterministic replay harnesses
-  and operational runbooks referenced from the bridge guide.
+  and operational runbooks referenced from the AgIO overview.
 - **Governance:** Contract governance requires cross-team review cadences — mitigated through ADR checkpoints and
   versioning policies captured in Section 41 of the SRS.
 

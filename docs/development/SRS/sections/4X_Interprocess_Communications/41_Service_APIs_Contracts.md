@@ -28,7 +28,7 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 - Plugins and third-party tools need predictable versioning, schema discovery, and capability negotiation mechanisms.
 - Legacy PGN clients must remain functional throughout the migration to typed contracts.
 
-> **Related Guides:** [AOG-Link Bridge Architecture Guide](../../../AgIO/aog-link-bridge-architecture-guide.md), deployment playbooks in `/docs/ops/`.
+> **Related Guides:** [AgIO subsystem overview](../../../AgIO/README.md), deployment playbooks in `/docs/ops/`.
 
 ---
 

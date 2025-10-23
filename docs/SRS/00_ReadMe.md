@@ -12,7 +12,7 @@ Think of the SRS as the map and the ADRs as the signposts we install along the r
 
 ### Quick start for new readers
 
-1. Skim the [Vision & Non-goals](01_Vision_NonGoals.md) to understand the product direction and deliberate omissions.
+1. Skim the [Project charter & vision guardrails](01_Project_Charter.md) to understand the product direction and deliberate omissions.
 2. Jump to the [System slices](02_System_Slices.md) index and find the area that matches your question (e.g., UI, hardware IO, guidance).
 3. Open the corresponding section under [`sections/`](sections/) to see requirements (`R-` IDs), open questions (`Q-` IDs), and option stubs (`O-` IDs).
 4. Follow links into ADRs when you need the final decision, implementation guardrails, or rollout notes.
@@ -24,7 +24,7 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 |------|---------|------------|
 
 ## How this SRS is organized
-- **Vision & Non-goals** capture what the next release aspires to solve and what is intentionally out-of-scope.
+- **Project charter & vision guardrails** capture what the next release aspires to solve and what is intentionally out-of-scope.
 - **System slices** map every focus area (OS, UI, comms, storage, etc.) to an individual
   section document under [`sections/`](sections/).
 - **Sections** collect requirements and enumerate options. They are intentionally decision-neutral—decisions live in Architecture Decision Records (ADRs).
@@ -37,7 +37,7 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 ## Document index
 
 ### Core overview
-- [Vision & Non-goals](01_Vision_NonGoals.md)
+- [Project charter & vision guardrails](01_Project_Charter.md)
 - [System slices](02_System_Slices.md)
 - [Working notes](NOTES.md)
 
@@ -232,7 +232,7 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-OS-003 | O-OS-3, O-OS-5 | Screen helper (legacy baseline) | ADR-OS-002 (TBD) |
 | R-OS-004 | O-OS-5, O-OS-6 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-OS-003 (TBD) |
 | R-OS-005 | O-OS-5, O-OS-6 | [Linux Core option](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md) | ADR-OS-003 (TBD) |
-| R-OS-006 | O-OS-3, O-OS-5, O-OS-6 | [Baseline assumptions](01_Vision_NonGoals.md) | ADR-OS-004 (TBD) |
+| R-OS-006 | O-OS-3, O-OS-5, O-OS-6 | [Baseline assumptions](01_Project_Charter.md#104-baseline-field-assumptions) | ADR-OS-004 (TBD) |
 
 ### Section 13 — UI Framework & UX Language
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |

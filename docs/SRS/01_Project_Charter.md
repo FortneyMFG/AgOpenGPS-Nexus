@@ -2,7 +2,7 @@
 *(Status: Draft for Steering Review)*
 
 ## Document Control
-- **Version:** 0.3.0
+- **Version:** 0.3.1
 - **Authors:** Nexus Program Office (Codex)
 - **License:** GPLv3
 - **Reviewers:** Platform Foundations Working Group, UI Working Group, Release Working Group
@@ -14,7 +14,13 @@
   - `sections/1X_Platform_Foundations/11_OS_Support.md`
   - `sections/1X_Platform_Foundations/12_Development_Language_Runtime.md`
   - `sections/1X_Platform_Foundations/13_UI_Framework_UX.md`
-- **Related Options & ADRs:** `sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md`, `sections/1X_Platform_Foundations/11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md`, `sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md`
+- **Related Options & ADRs:**
+  - `sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md`
+  - `sections/1X_Platform_Foundations/11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md`
+  - `sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md`
+  - `sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md`
+  - `sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md`
+  - `sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md`
 
 ---
 
@@ -36,6 +42,16 @@ Key outcomes this charter commits to delivering:
 - Preserves or intentionally rationalises core v6 capabilities (guidance accuracy, autosteer behaviour, implement management) validated through automated and field testing.
 - Documents clean boundaries between Core logic, AgIO services, and UI shells so teams can extend the system with confidence.
 - Reduces contribution friction by providing clear onboarding guides, repeatable builds, and community-supported governance.
+
+This vision extends the guiding principles captured during the initial visioning cycle:
+- Deliver a modernized AgOpenGPS experience that keeps offline field work resilient while enabling collaborative planning and telemetry.
+- Preserve the community-driven spirit: modular, inspectable, and friendly to tinkering.
+- Scale from hobby farms to commercial operations through configurable modules instead of forks.
+
+### Strategic Objectives
+- Reduce friction deploying to mixed Windows/Linux fleets.
+- Unlock richer guidance and automation through consistent data models and APIs.
+- Improve UX clarity for operators and integrators with multi-monitor and remote touch layouts.
 
 ---
 
@@ -72,6 +88,13 @@ Key outcomes this charter commits to delivering:
 
 ---
 
+### Success Measures
+- Community consensus on each critical architecture slice captured in ADRs.
+- Reference implementations for headless + remote UI scenarios validated in field tests.
+- Contributor onboarding reduced to <1 hour setup on supported OS baselines.
+
+---
+
 ## 5. Non-Goals (Out of Scope for Foundation Phase)
 The foundation phase explicitly excludes:
 - Cloud sync, AgShare integration, or other remote data services beyond establishing extensible interfaces.
@@ -79,6 +102,11 @@ The foundation phase explicitly excludes:
 - Fleet coordination, ISO certification, or regulatory compliance deliverables.
 - Large-scale refactors of existing hardware firmware unless required for cross-platform parity.
 - Backward compatibility with v5 or earlier data formats outside published migration tooling.
+
+The vision guardrails also reaffirm that we are not:
+- Rewriting proven algorithms without demonstrated benefit.
+- Supporting proprietary, license-restricted toolchains that exclude community contributors.
+- Guaranteeing certification for regulated markets in the first iteration.
 
 Feature candidates deferred from this phase must be captured in the enhancement backlog with clear dependencies on the new foundation.
 
@@ -155,6 +183,11 @@ Feature candidates deferred from this phase must be captured in the enhancement 
 - Windows 10/11 and supported Linux distributions maintain API stability required by Avalonia and device drivers.
 - Community endorses the foundation-first roadmap and defers feature requests until guardrails lift.
 
+### 10.4 Baseline Field Assumptions
+- **GNSS Accuracy:** Sub-5 cm RTK guidance accuracy for auto-steer workloads, with fallbacks documented for WAAS/EGNOS-grade receivers.
+- **Compute:** Quad-core 2.0 GHz CPU (x86_64 or ARM64), 8 GB RAM, and GPU supporting OpenGL 3.3 with 2 GB VRAM to sustain 60 FPS rendering and replay diagnostics.
+- **Latency Envelope:** Control loops expect <100 ms end-to-end latency; monitoring dashboards tolerate up to 500 ms while buffering offline.
+
 ---
 
 ## 11. Risks & Mitigations
@@ -215,6 +248,7 @@ Feature candidates deferred from this phase must be captured in the enhancement 
 ## Appendix A — Revision History
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
+| 0.3.1 | 2025-10-22 | Consolidated charter with vision guardrails and baseline assumptions. | Nexus Program Office (Codex) |
 | 0.1.0 | 2025-10-20 | Initial draft aligning with SRS foundations. | Nexus Program Office (Codex+Jon Fortney) |
 | 0.2.0 | 2025-10-21 | Community review update incorporating steering feedback. | Next Program Office (Markus Nuuja) |
 | 0.3.0 | 2025-10-22 | Expanded goals, scope, and governance based on Next charter lessons learned. | Nexus Program Office (Codex+Jon Fortney) |

@@ -216,7 +216,7 @@ Feature candidates deferred from this phase must be captured in the enhancement 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 0.1.0 | 2025-10-20 | Initial draft aligning with SRS foundations. | Nexus Program Office (Codex+Jon Fortney) |
-| 0.2.0 | 2025-10-21 | Community review update incorporating steering feedback. | Nexus Program Office (Markus Nuuja) |
+| 0.2.0 | 2025-10-21 | Community review update incorporating steering feedback. | Next Program Office (Markus Nuuja) |
 | 0.3.0 | 2025-10-22 | Expanded goals, scope, and governance based on Next charter lessons learned. | Nexus Program Office (Codex+Jon Fortney) |
 
 *End of document.*

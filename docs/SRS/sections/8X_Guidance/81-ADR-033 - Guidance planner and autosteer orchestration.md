@@ -87,7 +87,7 @@ Alternatives relying on legacy ad-hoc planners fail to satisfy zone policies, te
 ## 7) References
 
 - [Control & automation requirements](../6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
-- [Interprocess API requirements](../4X_Interprocess_Communications/41_Inter_Application_API.md)
+- [Interprocess API requirements](../4X_Interprocess_Communications/41_Service_APIs_Contracts.md)
 - [Extensibility & plugin requirements](../9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 - [ADR-027 — Spatial constraints and zone policies](../ADR/ADR-027-spatial-constraints.md)
 - [ADR-068 — Layer controllers and aggregation runtime](../ADR/ADR-068-layer-controllers-runtime.md)

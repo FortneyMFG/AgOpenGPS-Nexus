@@ -6,16 +6,16 @@
 **Version:** 0.1.0  
 **Section ID:** 94  
 **Editors:** Frontend & Operations Working Group  
-**Last Updated:** 2025-10-20  
-**Related Sections:** 11 — OS Support, 21 — System Architecture, 62 — Job Lifecycle, 72 — Zone Drawing Framework  
+**Last Updated:** 2025-10-24
+**Related Sections:** 11 — OS Support, 21 — System Architecture, 62 — Job Lifecycle, 72 — Zone Drawing Framework, 97 — Simulation & Replay
 **Upstream Dependencies:** 1X — Platform Foundations, 5X — Hardware IO Device Layer  
-**Downstream Impacts:** Plugin catalog, packaging pipelines, simulation ecosystem, security policies
+**Downstream Impacts:** Plugin catalog, packaging pipelines, security policies, manifest governance
 
 ---
 
 ## 94.1 Purpose & Scope
 
-Define the extensibility surface, packaging policies, and update workflows that allow Nexus contributors to add functionality without forking core executables. This section establishes plugin APIs, manifest governance, simulation integration, and distribution rules so official and community modules remain safe, maintainable, and deterministic across Windows and Linux deployments.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L19-L83】
+Define the extensibility surface, packaging policies, and update workflows that allow Nexus contributors to add functionality without forking core executables. This section establishes plugin APIs, manifest governance, and distribution rules so official and community modules remain safe, maintainable, and deterministic across Windows and Linux deployments.【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L19-L83】
 
 ---
 
@@ -23,7 +23,7 @@ Define the extensibility surface, packaging policies, and update workflows that 
 
 - Legacy AgOpenGPS relies on shared libraries and multiple executables that contributors modify directly.  
 - Metadata-driven dashboards and zone editing demand declarative plugin contracts across UI, telemetry, and analytics.  
-- Simulation, ISOBUS integration, and remote deployments require deterministic manifests and capability discovery to remain safe.  
+- ISOBUS integration and remote deployments require deterministic manifests and capability discovery to remain safe.
 - Packaging updates must cover MSI, deb/rpm, and plugin bundles distributed via catalog UI (§91) and CLI (§93).
 
 ---
@@ -34,7 +34,7 @@ Define the extensibility surface, packaging policies, and update workflows that 
 |---------------|-----------------|------------------------|---------------------------|--------------------|
 | Extensibility | Fork core executables to add features. | Merge burden and divergent safety posture. | Managed plugin API with manifest governance. | Legacy repos; ADR-031 governance |
 | Packaging | Manual installers per executable. | No plugin catalog or compatibility matrix. | Versioned plugin bundles validated via dependency map. | Plugin dependency map【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】 |
-| Simulation | Standalone ModSim utilities. | No shared clock or deterministic replay integration. | Composite SimBus with manifest-declared providers. | Simulation blueprint notes |
+| Packaging QA | Manual installers per executable. | No plugin catalog or compatibility matrix. | Versioned plugin bundles validated via dependency map. | Plugin dependency map【F:docs/plugins/nexus-plugin-dependency-map.md†L1-L421】 |
 
 ---
 
@@ -45,7 +45,6 @@ Define the extensibility surface, packaging policies, and update workflows that 
 | Plugin Manifest | Declarative description of capabilities, dependencies, and lifecycle hooks loaded by the plugin host. |
 | Capability Registry | Authoritative list of topics, layers, and services available for plugin consumption/production. |
 | Official Bundle | Curated set of first-party plugins distributed with Nexus releases under ADR-031 governance. |
-| SimBus | Shared publish/subscribe fabric enabling deterministic simulation topics aligned with SimClock. |
 
 ---
 
@@ -76,12 +75,10 @@ Define the extensibility surface, packaging policies, and update workflows that 
 | R-EXT-083 | SHOULD | Financial Hooks | Allow plugins to submit `CostRecord` entries and consume profit overlays for automation. | Cost & profit ADR【F:docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md†L21-L52】 | Financial integration tests |
 | R-EXT-084 | SHOULD | Report Builder | Expose report hooks so plugins contribute sections with declared dependencies. | ADR-051 report builder【F:docs/SRS/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L21-L52】 | Report contribution tests |
 
-### 94.5.3 Simulation & ISOBUS Integration
+### 94.5.3 ISOBUS Integration
 
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|----------|---------|-----------------|-----------------------------|
-| R-EXT-030 | SHOULD | Simulation Providers | Allow plugins to register simulation providers on shared SimBus. | Simulation blueprint | SimBus integration tests |
-| R-EXT-031 | SHOULD | Deterministic Sim | Require simulation providers to follow SimClock and seeded RNG for consistent replay. | Simulation blueprint | Deterministic replay suite |
 | R-EXT-100 | MUST | ISOBUS Transport Plugin | Ship ISOBUS communications plugin registering as transport provider in managed manifest. | Hardware IO abstractions【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L16-L54】 | ISOBUS plugin acceptance |
 | R-EXT-101 | MUST | ISO 11783 Normalization | Normalize ISO 11783 PGNs into Layer/Telemetry registries for consistent topic IDs. | ISOBUS references【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L4-L134】 | Telemetry registry tests |
 | R-EXT-102 | SHOULD | Diagnostics Surface | Expose plugin diagnostics (bus load, address claims, faults) via standard health contract. | Plugin health guidelines | Diagnostics UI regression |
@@ -128,7 +125,7 @@ Define the extensibility surface, packaging policies, and update workflows that 
 
 ## 94.6 Acceptance Criteria & Verification
 
-Extensibility features must pass manifest schema validation, dependency solver tests, lifecycle telemetry checks, and simulation determinism suites. Packaging pipelines verify Windows/Linux bundles and plugin catalog metadata before release.
+Extensibility features must pass manifest schema validation, dependency solver tests, lifecycle telemetry checks, and packaging smoke runs. Packaging pipelines verify Windows/Linux bundles and plugin catalog metadata before release.
 
 ### 94.6.1 Requirement-to-Verification Map
 
@@ -146,7 +143,7 @@ Extensibility features must pass manifest schema validation, dependency solver t
 
 - Plugin manifests must remain backward-compatible across patch releases or provide migration scripts documented in release notes.  
 - Packaging must adhere to OS security policies (code signing, notarization, repository trust).  
-- Simulation providers cannot bypass safety gating or command channels defined in §95 Security & Permissions.
+- Update orchestrators must respect §95 security gates and staged rollout approvals.
 
 ---
 
@@ -164,9 +161,9 @@ Extensibility features must pass manifest schema validation, dependency solver t
 |----|----------------|-------------|
 | C1 | Managed plugin runtime | Favor .NET 8 `AssemblyLoadContext` loader with shared gRPC contracts for cross-platform parity.【F:docs/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】 |
 | C2 | Plugin catalog UX | Provide catalog UI + CLI surfaces for installing, updating, and auditing plugins with dependency visualization. |
-| C3 | Composite simulation | Implement SimClock/SimBus pattern for deterministic replay and hardware-in-loop testing. |
-| C4 | Community onboarding | Offer templates, documentation, and review processes to encourage safe third-party contributions. |
-| C5 | Governance transparency | Publish compatibility matrices, provider selection logs, and security attestations for operator trust. |
+| C3 | Update Orchestration | Deliver safe update flows with staged rollouts, catalog gating, and rollback hooks. |
+| C4 | Community Onboarding | Offer templates, documentation, and review processes to encourage safe third-party contributions. |
+| C5 | Governance Transparency | Publish compatibility matrices, provider selection logs, and security attestations for operator trust. |
 
 ### 94.9.1 Assumptions & Preconditions
 
@@ -189,7 +186,7 @@ No alternative extensibility proposals are under evaluation; modernization focus
 | Maintainability | Low — forks diverge quickly. | High — governed manifests and shared runtime. |
 | Safety | Medium — bespoke changes risk bypassing checks. | High — permission gates and audit trails. |
 | Deployment | Manual rebuilds per change. | Catalog-driven updates with compatibility checks. |
-| Simulation Support | External ModSim utilities. | Integrated SimBus with deterministic replay. |
+| Update Agility | Manual packaging flows. | Catalog + CLI orchestrate staged rollouts. |
 | Operator Control | Limited toggles. | Enable/disable plugins per deployment profile. |
 
 ---
@@ -203,14 +200,14 @@ No alternative extensibility proposals are under evaluation; modernization focus
 ## 94.13 Evaluation & Verification
 
 - Run dependency solver against official bundle combinations before each release.  
-- Execute simulation replay suites to confirm SimBus determinism and plugin interoperability.  
+- Run catalog smoke tests on Windows/Linux bundles, verifying staged rollout metadata.
 - Perform security audits on manifest signing, permission gates, and remote plugin policies.
 
 **Acceptance Criteria**
 
 - All **MUST** requirements pass automated validation and manual sign-off.  
 - Plugin catalog publishes compatibility matrix with traceable provenance.  
-- Simulation providers demonstrate deterministic replay under composite scenarios.
+- Catalog publishes staged rollout metadata with rollback paths validated.
 
 ---
 
@@ -226,7 +223,7 @@ No alternative extensibility proposals are under evaluation; modernization focus
 
 - Contributors favor managed plugin runtime to reduce merge debt while keeping safety boundaries.  
 - Operators request transparent compatibility matrices before enabling new bundles.  
-- Simulation stakeholders advocate for shared SimBus to avoid duplicate ModSim efforts and ensure deterministic QA.
+- QA stakeholders advocate for tighter catalog + §97 simulation integration to keep replay fixtures discoverable.
 
 ### 94.15.1 Section Change Log
 
@@ -271,7 +268,7 @@ Draws on OSGi-style module governance, semantic versioning (SemVer 2.0.0), and I
 - **Manifest & lifecycle** — The plugin advertises itself as an `IsoBusTransport` provider, exposes configuration for CAN adapter selection and PGN filters, and follows the shared plugin lifecycle hooks so it can be hot-reloaded in desktop and headless deployments.【F:docs/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L16-L54】
 - **Routing integration** — PGNs decoded by the plugin populate LayerDefinitions, SectionControllers, and Gauge topics that already exist for UDP transports, ensuring mixed-transport rigs see a single authoritative topic namespace.【F:docs/SRS/references/ISOBUS_Section_Control.md†L1-L33】【F:docs/SRS/sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md†L4-L134】
 - **Diagnostics & UI hooks** — Health metrics (bus utilization, last-frame timestamps, device address-claim status) and implement metadata (section labels, DDIs, rate controller presence) feed into the plugin health UI surfaces defined in Section 16, enabling dashboards to highlight wiring faults or mismatched implement profiles.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog†L7-L58】【F:docs/SRS/appendices/GaugeId_Registry.md†L12-L20】
-- **Simulation parity** — When the plugin runs in simulation mode it must respect the SimClock and deterministic replay requirements so PGN playback sequences can be validated alongside hardware captures, aligning with the composite simulation blueprint outlined above.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L48-L80】
+- **Simulation parity** — When the plugin runs in simulation mode it must follow §97 Simulation & Replay policies so PGN playback sequences can be validated alongside hardware captures.【F:docs/SRS/sections/9X_Frontends_Ops/97_Simulation_Replay.md†L1-L120】
 
 ## Open questions
 - Which features are safe to expose via scripting vs. compiled plugins?

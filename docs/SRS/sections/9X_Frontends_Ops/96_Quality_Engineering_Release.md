@@ -6,9 +6,9 @@
 **Version:** 0.1.0  
 **Section ID:** 96  
 **Editors:** Frontend & Operations Working Group  
-**Last Updated:** 2025-10-20  
-**Related Sections:** 21 — System Architecture, 62 — Job Lifecycle, 91 — UI Shell & Layout, 94 — Extensibility & Packaging Updates  
-**Upstream Dependencies:** 1X — Platform Foundations, 2X — System Architecture  
+**Last Updated:** 2025-10-24
+**Related Sections:** 21 — System Architecture, 62 — Job Lifecycle, 91 — UI Shell & Layout, 94 — Extensibility & Packaging Updates, 97 — Simulation & Replay
+**Upstream Dependencies:** 1X — Platform Foundations, 2X — System Architecture, 97 — Simulation & Replay
 **Downstream Impacts:** Release cadence, operator confidence, regulatory traceability, CI infrastructure
 
 ---
@@ -22,7 +22,7 @@ Define the validation, build, and release expectations for Nexus frontends and o
 ## 96.2 Context
 
 - Legacy releases rely on manual `dotnet publish` steps and ad-hoc zip packaging.  
-- Deterministic replay datasets and feature flags must govern metadata-heavy layer rollouts.  
+- Deterministic replay datasets from §97 and feature flags must govern metadata-heavy layer rollouts.
 - Linux Core pilots require multi-architecture CI coverage and packaging parity with Windows installers.  
 - Provenance records and SBOMs become essential for regulatory and agronomic traceability.
 

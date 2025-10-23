@@ -53,6 +53,7 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 - [22 — Process Model & Deployment Topologies](sections/2X_System_Architecture/22_Process_Model_Deployment.md)
 - [23 — Threading, Scheduling & Timing](sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md)
 - [24 — Configuration & Environment](sections/2X_System_Architecture/24_Configuration_Environment.md)
+- [26 — Units, Conventions & Coordinate Systems](sections/2X_System_Architecture/26_Units_Conventions_Coordinate_Systems.md)
 
 #### 3X — Data & Storage
 - [31 — Domain Data Model](sections/3X_Data_Storage/31_Domain_Data_Model.md)
@@ -61,7 +62,7 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 - [34 — Backup, Retention & Archival](sections/3X_Data_Storage/34_Backup_Retention_Archival.md)
 
 #### 4X — Interprocess & Communications
-- [41 — Inter-Application API](sections/4X_Interprocess_Communications/41_Inter_Application_API.md)
+- [41 — Service APIs & Contracts](sections/4X_Interprocess_Communications/41_Service_APIs_Contracts.md)
 - [42 — Transports](sections/4X_Interprocess_Communications/42_Transports.md)
 - [43 — Channel Security](sections/4X_Interprocess_Communications/43_Channel_Security.md)
 
@@ -79,12 +80,13 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 - [64 — Telemetry & Health](sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
 
 #### 7X — Mapping & Geospatial
-- [71 — Mapping Kernel Contracts](sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md)
+- [71 — Mapping Kernel & Registry Contracts](sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Registry_Contracts.md)
 - [72 — Mapping Layers Plugin](sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
-- [73 — Variable Mapping & Variable Rate Control](sections/7X_Mapping_Geospatial/73_Variable_Mapping_Rate_Control.md)
+- [73 — Variable Mapping](sections/7X_Mapping_Geospatial/73_Variable_Mapping.md)
 - [74 — Monitoring Systems](sections/7X_Mapping_Geospatial/74_Monitoring_Systems.md)
 - [75 — Tiling & Rendering Services](sections/7X_Mapping_Geospatial/75_Tiling_Rendering_Services.md)
 - [76 — Geospatial Extensibility](sections/7X_Mapping_Geospatial/76_Geospatial_Extensibility.md)
+- [77 — Variable Rate Control](sections/7X_Mapping_Geospatial/77_Variable_Rate_Control.md)
 
 #### 8X — Guidance
 - [81 — Guidance Orchestrator](sections/8X_Guidance/81_Guidance_Orchestrator.md)
@@ -98,6 +100,7 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 - [94 — Extensibility, Packaging & Updates](sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 - [95 — Security & Permissions](sections/9X_Frontends_Ops/95_Security_Permissions.md)
 - [96 — Quality Engineering & Release](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md)
+- [97 — Simulation & Replay](sections/9X_Frontends_Ops/97_Simulation_Replay.md)
 
 ### Option catalog
 #### 1X — Platform Foundations
@@ -116,7 +119,7 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 - [O-HW-7 – MultiSteer Configurator](sections/6X_Core_Domain_Services/61-O7%20-%20Multi-steer%20equipment%20configurator%20primitives.md)
 
 #### 6X — Core Domain Services
-- [C2 – Versioned Layer Registries](sections/4X_Interprocess_Communications/41_Inter_Application_API.md#c2---versioned-layer-registries)
+- [C2 – Versioned Layer Registries](sections/4X_Interprocess_Communications/41_Service_APIs_Contracts.md#c2---versioned-layer-registries)
 - [O-BACKEND-4 – Layer Controllers](sections/2X_System_Architecture/21-O5%20-%20Layer%20controllers%20with%20aggregation%20pipelines.md)
 - [O-TELE-4 – Layer Diagnostics](sections/6X_Core_Domain_Services/64-O5%20-%20Layer%20diagnostics%20and%20health%20monitoring.md)
 
@@ -304,18 +307,18 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 | R-HW-013 | O-HW-5, O-HW-6 | [Safety interlocks](sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md) | ADR-HW-008 (TBD) |
 | R-HW-014 | O-HW-5, O-HW-6 | [Certification placeholders](sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md) | ADR-HW-008 (TBD) |
 
-### Section 41 — Inter-Application API
+### Section 41 — Service APIs & Contracts
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |
 |-------------|----------------------|----------------------|-----------------|
 | R-API-000 | O-API-0 | PGN designer (legacy baseline) | ADR-API-001 (TBD) |
 | R-API-001 | O-API-0 | UDP monitor (legacy baseline) | ADR-API-001 (TBD) |
 | R-API-002 | O-API-0 | NTRIP settings (legacy baseline) | ADR-API-002 (TBD) |
-| R-API-003 | C2, C3 | [Schema policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-003 (TBD) |
-| R-API-010 | C2 | [Versioned registries](sections/4X_Interprocess_Communications/41_Inter_Application_API.md#c2---versioned-layer-registries) | ADR-API-004 (TBD) |
-| R-API-011 | C2 | [Versioned registries](sections/4X_Interprocess_Communications/41_Inter_Application_API.md#c2---versioned-layer-registries) | ADR-API-004 (TBD) |
+| R-API-003 | C2, C3 | [Schema policy](sections/4X_Interprocess_Communications/41_Service_APIs_Contracts.md) | ADR-API-003 (TBD) |
+| R-API-010 | C2 | [Versioned registries](sections/4X_Interprocess_Communications/41_Service_APIs_Contracts.md#c2---versioned-layer-registries) | ADR-API-004 (TBD) |
+| R-API-011 | C2 | [Versioned registries](sections/4X_Interprocess_Communications/41_Service_APIs_Contracts.md#c2---versioned-layer-registries) | ADR-API-004 (TBD) |
 | R-API-004 | C3 | [PGN bridge](sections/4X_Interprocess_Communications/42_Transports.md#c3---typed-facade--compatibility-bridge) | ADR-API-005 (TBD) |
-| R-API-005 | C3 | [Handshake notes](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-006 (TBD) |
-| R-API-012 | C2, C4 | [Release management policy](sections/4X_Interprocess_Communications/41_Inter_Application_API.md) | ADR-API-007 (TBD) |
+| R-API-005 | C3 | [Handshake notes](sections/4X_Interprocess_Communications/41_Service_APIs_Contracts.md) | ADR-API-006 (TBD) |
+| R-API-012 | C2, C4 | [Release management policy](sections/4X_Interprocess_Communications/41_Service_APIs_Contracts.md) | ADR-API-007 (TBD) |
 
 ### Section 32 — Persistence & Formats
 | Requirement | Options / Workstreams | References & tooling | ADR placeholder |

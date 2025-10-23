@@ -28,4 +28,4 @@ handshake.
 
 ## References
 - [ADR-052 — Field Health Plugin](../SRS/sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md)
-- [Layer registry overview](../SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Contracts.md)
+- [Layer registry overview](../SRS/sections/7X_Mapping_Geospatial/71_Mapping_Kernel_Registry_Contracts.md)

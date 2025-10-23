@@ -29,6 +29,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-1317 Platform foundations doc accessibility sweep _(Done)_ — Refresh 1X sections to guide non-technical readers
 - [x] NX-1318 Nexus project charter baseline _(Done)_ — Author charter aligning 1X platform foundations with modernization goals (version 0.3.0 refresh)
 - [x] NX-1319 Section 21 decomposition narrative refresh _(Done)_ — Clarify plugin-vs-core trade-offs, task alignment, and SDK topology in SRS §21
+- [x] NX-1321 SRS slices restructure _(Done)_ — Refresh system slices map, rename §41, split §73/§77, add units & simulation sections
 - [ ] NX-1014 Contract baseline generator tooling resilience — Ensure baseline generator works without direct project references
 
 - [x] NX-610 Governance telemetry automation _(Done)_ — ADR roadmap program board, dependency digests, and review minutes publishing

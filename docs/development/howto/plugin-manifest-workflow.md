@@ -1,3 +1,12 @@
+---
+owner: plugin-governance
+status: active
+last_reviewed: 2024-05-10
+related_tickets:
+  - NX-031
+  - NX-032
+---
+
 # Plugin Manifest Workflow
 
 ADR-031 established lease enforcement and governance for the official Nexus plugin

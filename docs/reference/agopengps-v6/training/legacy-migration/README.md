@@ -2,7 +2,7 @@
 
 This package equips instructors with classroom and hands-on material for
 teaching the legacy-to-Nexus migration workflow. Pair it with the
-[legacy migration guide](../../howto/legacy-migration-guide.md) when planning a
+[legacy migration guide](../../legacy-migration-guide.md) when planning a
 field rollout.
 
 ## Contents

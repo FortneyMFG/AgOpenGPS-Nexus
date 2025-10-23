@@ -21,7 +21,7 @@ offset and then replays the samples through the `TelemetryReplayController`.
   replay duration so future slices (section arbiter, guidance preview) can plug
   into the same assertions.
 - **Legacy parity:** Compare outputs against the
-  [`legacy-auto-run`](../scenarios/legacy-auto-run/README.md) soak logs to ensure
+  [`legacy-auto-run`](../reference/agopengps-v6/scenarios/legacy-auto-run/README.md) soak logs to ensure
   replay behaviour remains aligned with historical UDP harness results.
 
 ## Running the test

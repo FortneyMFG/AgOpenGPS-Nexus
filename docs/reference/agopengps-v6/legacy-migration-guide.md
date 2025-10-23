@@ -57,7 +57,7 @@ migration before touching production hardware.
 
 ## Training set contents
 
-The `docs/training/legacy-migration` folder packages a turnkey curriculum for
+The `docs/reference/agopengps-v6/training/legacy-migration` folder packages a turnkey curriculum for
 teaching the workflow above:
 
 - **Agenda:** 90-minute classroom plus 60-minute hands-on lab covering tooling,

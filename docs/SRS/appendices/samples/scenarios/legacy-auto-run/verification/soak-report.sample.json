@@ -1,0 +1,23 @@
+{
+  "startedAtUtc": "2024-05-01T12:00:00Z",
+  "durationRequestedSeconds": 30.0,
+  "durationElapsedSeconds": 0.35,
+  "udp": {
+    "poseFrames": 30,
+    "steerCommandFrames": 30,
+    "steerStateFrames": 30,
+    "sectionFrames": 30,
+    "discoveryFrames": 1,
+    "totalFrames": 121,
+    "targetRatePerStreamHz": 10.0,
+    "effectiveRateHz": 345.7,
+    "poseSpacingStats": {"samples": 30, "minMilliseconds": 3.0, "maxMilliseconds": 3.0},
+    "steerStateSpacingStats": {"samples": 30, "minMilliseconds": 3.0, "maxMilliseconds": 3.0}
+  },
+  "serial": {
+    "framesEncoded": 45,
+    "framesDecoded": 45,
+    "decodeFailures": 0,
+    "effectiveRateHz": 128.6
+  }
+}

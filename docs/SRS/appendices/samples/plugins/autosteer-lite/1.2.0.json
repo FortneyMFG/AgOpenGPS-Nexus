@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.plugins.autosteer-lite",
+  "name": "AutoSteer Lite",
+  "version": "1.2.0",
+  "description": "Pure pursuit steering controllers bundled with deterministic simulation providers for lab validation.",
+  "requiredApis": {
+    "core": ">=1.0.0",
+    "sim": ">=1.0.0"
+  },
+  "settings": {
+    "defaultMode": "pure-pursuit",
+    "maxLookAheadMeters": 12.5
+  },
+  "supportedCapabilities": [
+    "guidance.control",
+    "guidance.telemetry"
+  ],
+  "requiredTransports": [
+    "AOG-Link",
+    "core://guidance"
+  ],
+  "minimumRuntimeVersion": "1.0.0",
+  "simProviders": [
+    {
+      "providerId": "autosteer.controller",
+      "type": "Aog.Plugins.Autosteer.ControllerProvider",
+      "topics": ["guidance.autosteer.command"],
+      "description": "Generates steering commands using a tuned pure pursuit loop.",
+      "settings": {
+        "lookAheadSeconds": 0.8,
+        "maxRateDegPerSecond": 28.0
+      }
+    },
+    {
+      "providerId": "autosteer.vehicle",
+      "type": "Aog.Plugins.Autosteer.VehicleProvider",
+      "topics": ["vehicle.autosteer.pose", "vehicle.autosteer.velocity"],
+      "description": "Deterministic bicycle model to exercise controller tuning.",
+      "settings": {
+        "wheelbaseMeters": 2.8,
+        "latencyMs": 40
+      }
+    },
+    {
+      "providerId": "autosteer.imu",
+      "type": "Aog.Plugins.Autosteer.ImuProvider",
+      "topics": ["imu.autosteer"],
+      "description": "IMU synthesizer aligned with the bundled vehicle model.",
+      "settings": {
+        "noise": {
+          "ax": 0.03,
+          "ay": 0.03,
+          "yawRate": 0.5
+        }
+      }
+    }
+  ],
+  "leases": [
+    {
+      "capability": "guidance.control",
+      "mode": "Exclusive",
+      "timeoutSeconds": 5,
+      "recovery": "FailSafe"
+    },
+    {
+      "capability": "guidance.telemetry",
+      "mode": "Shared",
+      "timeoutSeconds": 10,
+      "recovery": "GracefulDegradation"
+    }
+  ]
+}

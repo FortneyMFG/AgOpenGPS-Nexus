@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.plugins.file-io",
+  "name": "File IO",
+  "version": "1.0.0",
+  "description": "Imports and exports agronomic surfaces, job bundles, and provenance manifests.",
+  "requiredApis": {
+    "core": ">=1.0.0",
+    "storage": ">=1.0.0"
+  },
+  "settings": {
+    "defaultCellSizeMeters": 12.0,
+    "defaultExportFormat": "geojson"
+  },
+  "supportedCapabilities": [
+    "fileio.import",
+    "fileio.export"
+  ],
+  "requiredTransports": [
+    "storage://local",
+    "core://storage"
+  ],
+  "minimumRuntimeVersion": "1.0.0",
+  "simProviders": [
+    {
+      "providerId": "fileio.surfaceImporter",
+      "type": "Aog.Plugins.FileIO.SurfaceImportProvider",
+      "topics": ["fileio.surface.imported"],
+      "description": "Normalises delimited agronomic grids into Nexus layer documents.",
+      "settings": {
+        "supportedFormats": ["csv", "tsv"],
+        "autoDetectSeparator": true
+      }
+    },
+    {
+      "providerId": "fileio.surfaceExporter",
+      "type": "Aog.Plugins.FileIO.SurfaceExportProvider",
+      "topics": ["fileio.surface.exported"],
+      "description": "Publishes GeoJSON exports and audit manifests for imported surfaces.",
+      "settings": {
+        "exportFormats": ["geojson"],
+        "includeBbox": true
+      }
+    }
+  ],
+  "leases": [
+    {
+      "capability": "fileio.import",
+      "mode": "Shared",
+      "timeoutSeconds": 15,
+      "recovery": "GracefulDegradation"
+    },
+    {
+      "capability": "fileio.export",
+      "mode": "Shared",
+      "timeoutSeconds": 15,
+      "recovery": "GracefulDegradation"
+    }
+  ]
+}

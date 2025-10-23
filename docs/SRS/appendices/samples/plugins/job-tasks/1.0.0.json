@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "org.agopengps.plugins.job-tasks",
+  "name": "Job Tasks",
+  "version": "1.0.0",
+  "description": "Manages job lifecycle persistence, TaskService work orders, and resume autosave.",
+  "requiredApis": {
+    "core": ">=1.0.0"
+  },
+  "settings": {
+    "autosaveIntervalSeconds": 60,
+    "resumeFileName": "Resume.txt"
+  },
+  "simProviders": [
+    {
+      "providerId": "jobTasks.sessionAutosave",
+      "type": "Aog.Plugins.JobTasks.Simulation.SessionAutosaveProvider",
+      "topics": ["jobTasks.autosave"],
+      "description": "Simulates session save/resume events for regression scenarios.",
+      "settings": {
+        "intervalSeconds": 120
+      }
+    }
+  ]
+}

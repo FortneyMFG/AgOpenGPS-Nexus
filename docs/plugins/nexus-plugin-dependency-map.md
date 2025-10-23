@@ -9,11 +9,11 @@
 - **Type codes** — `runtime`, `data`, `transport`, `ui`, `hardware`, `build` correspond to runtime contract, data contract, transport/channel, UI surface, physical IO, or build-time artifacts.
 - **Version** — Semantic version or tagged contract range expected by the dependency.
 - **Relationship codes** — `P` (peerOf), `X` (conflictsWith), `R` (replaces), `E` (extends) annotate higher-order relationships enforced by the resolver when multiple providers exist.
-- **Profiles & features** — Capability entries reference manifest `provides.capabilities[].features` and `provides.profiles[]` values so conformance-attested providers can substitute for the official implementations without aliases.【F:docs/SRS/appendices/plugin_manifest.schema.json†L153-L308】
+- **Profiles & features** — Capability entries reference manifest `provides.capabilities[].features` and `provides.profiles[]` values so conformance-attested providers can substitute for the official implementations without aliases.【F:docs/SRS/appendices/schemas/plugin_manifest.schema.json†L153-L308】
 
 ### Equivalency & Provider Selection
 
-- **Conformance profiles.** Plugins that implement `provides.profiles` must ship CI attestations proving the declared profile/feature matrix before the bundle treats them as eligible replacements.【F:docs/SRS/appendices/plugin_manifest.schema.json†L309-L332】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L25-L74】
+- **Conformance profiles.** Plugins that implement `provides.profiles` must ship CI attestations proving the declared profile/feature matrix before the bundle treats them as eligible replacements.【F:docs/SRS/appendices/schemas/plugin_manifest.schema.json†L309-L332】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L25-L74】
 - **Deterministic resolver.** Core evaluates `requires.capabilities`, `requires.profiles`, and relationship hints (`peerOf`, `conflictsWith`, `replaces`, `extends`) before selecting providers, quarantining conflicts, and surfacing downgrade states when only soft matches exist.【F:docs/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L24-L32】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L49-L83】
 - **Policy overlays.** Administrators can pin preferred providers or enable multi-provider mode using a TOML DSL that flows with the manifest bundle:
 
@@ -200,7 +200,7 @@ Legend: `H` = Hard, `S` = Soft, `G` = Suggest. Types abbreviated (`rt` runtime, 
 
 ### mapping
 - **Provides:** Field boundaries, AB lines, coverage layers, headlands streams over `core://mapping`.
-- **Profiles:** `aog.mapping.v1/core`, `aog.mapping.v1/tiles` (CI attested) plus `mapping:vector` capability features for offline pyramid support so certified replacements can stand in for the official provider.【F:docs/SRS/appendices/plugin_manifest.schema.json†L153-L308】
+- **Profiles:** `aog.mapping.v1/core`, `aog.mapping.v1/tiles` (CI attested) plus `mapping:vector` capability features for offline pyramid support so certified replacements can stand in for the official provider.【F:docs/SRS/appendices/schemas/plugin_manifest.schema.json†L153-L308】
 - **Hard dependencies:** Core runtime store (`^1.0.0`).
 - **Soft dependencies:** File IO for shapefile/GeoJSON import, Job Tasks for autosave/resume, Telemetry Logging for coverage replay hooks.
 - **Transports:** gRPC endpoint `core://mapping` (server).

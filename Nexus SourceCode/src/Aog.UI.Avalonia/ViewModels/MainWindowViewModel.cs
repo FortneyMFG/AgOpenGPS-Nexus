@@ -54,7 +54,10 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable, IFieldOp
     private readonly IReadOnlyList<MapLayer> _mapLayers;
     private readonly IReadOnlyList<GuidanceTrack> _guidanceTracks;
     private bool _isTopToolbarVisible;
+    private bool _isLeftSidebarVisible;
     private bool _isRightSidebarVisible;
+    private bool _isTopSidebarVisible;
+    private bool _isBottomSidebarVisible;
 
     /// <summary>Gets the shell view-model that drives the surface layout.</summary>
     public AppShellViewModel Shell { get; }
@@ -153,7 +156,10 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable, IFieldOp
         var preferences = _preferencesService.GetPreferences();
         _shellLayout = preferences.ShellLayout.Clone();
         _isTopToolbarVisible = _shellLayout.ShowTopToolbar;
+        _isLeftSidebarVisible = _shellLayout.ShowLeftSidebar;
         _isRightSidebarVisible = _shellLayout.ShowRightSidebar;
+        _isTopSidebarVisible = _shellLayout.ShowTopSidebar;
+        _isBottomSidebarVisible = _shellLayout.ShowBottomSidebar;
         _selectedTheme = preferences.Theme;
         _themeManager.ApplyTheme(_selectedTheme);
 
@@ -232,6 +238,24 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable, IFieldOp
         }
     }
 
+    /// <summary>Gets or sets whether the left sidebar is visible.</summary>
+    public bool IsLeftSidebarVisible
+    {
+        get => _isLeftSidebarVisible;
+        set
+        {
+            if (_isLeftSidebarVisible == value)
+            {
+                return;
+            }
+
+            _isLeftSidebarVisible = value;
+            OnPropertyChanged();
+            _shellLayout.ShowLeftSidebar = value;
+            PersistShellLayout();
+        }
+    }
+
     /// <summary>Gets or sets whether the right sidebar panels are visible.</summary>
     public bool IsRightSidebarVisible
     {
@@ -249,6 +273,42 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable, IFieldOp
             PersistShellLayout();
             OnPropertyChanged(nameof(MainWorkspaceColumnWidth));
             OnPropertyChanged(nameof(RightSidebarColumnWidth));
+        }
+    }
+
+    /// <summary>Gets or sets whether the top sidebar strip is visible.</summary>
+    public bool IsTopSidebarVisible
+    {
+        get => _isTopSidebarVisible;
+        set
+        {
+            if (_isTopSidebarVisible == value)
+            {
+                return;
+            }
+
+            _isTopSidebarVisible = value;
+            OnPropertyChanged();
+            _shellLayout.ShowTopSidebar = value;
+            PersistShellLayout();
+        }
+    }
+
+    /// <summary>Gets or sets whether the bottom sidebar strip is visible.</summary>
+    public bool IsBottomSidebarVisible
+    {
+        get => _isBottomSidebarVisible;
+        set
+        {
+            if (_isBottomSidebarVisible == value)
+            {
+                return;
+            }
+
+            _isBottomSidebarVisible = value;
+            OnPropertyChanged();
+            _shellLayout.ShowBottomSidebar = value;
+            PersistShellLayout();
         }
     }
 

@@ -28,6 +28,8 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 - Plugins and third-party tools need predictable versioning, schema discovery, and capability negotiation mechanisms.
 - Legacy PGN clients must remain functional throughout the migration to typed contracts.
 
+> **Related Guides:** [AOG-Link Bridge Architecture Guide](../../../AgIO/aog-link-bridge-architecture-guide.md), deployment playbooks in `/docs/ops/`.
+
 ---
 
 ## 41.3 Legacy Comparison
@@ -64,52 +66,62 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 
 ## 41.5 Requirements
 
+### 41.5.1 Core Telemetry Contracts
+
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|-----------|---------|----------------|-----------------------------|
-| R-API-000 | MUST | Compatibility | Maintain the existing PGN catalog for steer, machine, relay, and section messaging. | C1 | Regression replay of legacy PGN payloads over bridge.
-| R-API-001 | MUST | Diagnostics | Expose UDP/PGN monitor tooling for inspectors and third-party clients. | C1 | CLI tool decodes ≥ 30 PGNs/s with checksum validation.
-| R-API-002 | SHOULD | Configuration | Continue surfacing GNSS correction settings until equivalent typed API lands. | C1 | Feature parity checklist between PGN and typed surfaces.
-| R-API-003 | SHOULD | Versioning | Provide compatibility guidance for protobuf/JSON schemas alongside PGNs. | C2 | Version matrix published and enforced in CI lint.
-| R-API-004 | SHOULD | Bridge | Publish canonical PGN reference and bridge hooks for typed APIs. | C3 | Bridge integration tests cover ≥ 95% PGN catalog.
-| R-API-005 | MAY | Discovery | Document handshake messages for capability discovery across processes. | C3 | gRPC discovery endpoint coverage in contract tests.
-| R-API-010 | MUST | Metadata | Publish versioned layer definitions, quality rules, and schema hashes. | C2 | Registry diff detection triggers on hash mismatch in CI.
-| R-API-011 | SHOULD | Integrity | Reserve ID ranges, enforce monotonic timestamps, and fail on schema mismatch. | C2 | Contract tests confirm rejection on hash mismatch.
-| R-API-012 | SHOULD | Governance | Adopt semantic versioning, deprecation periods, and compatibility tests. | C2 | Release checklist with version gating automation.
-| R-GEO-000 | MUST | Geometry | Provide canonical equipment hierarchy with stable IDs and offsets. | C2 | Schema published with integration test verifying IDs.
-| R-GEO-001 | SHOULD | Control Semantics | Document SectionGroup semantics and overrides for deterministic gating. | C2 | Behavior verified in control simulator.
-| R-GEO-002 | SHOULD | Discovery | Expose manifest metadata so plugins populate control/visualization surfaces. | C3 | Plugin manifest validation suite passes baseline cases.
-| R-API-020 | MUST | Capabilities | Provide Capabilities gRPC service for plugin registration and leasing. | C3 | Integration tests validate lease renewal and rejection flows.
-| R-API-021 | MUST | Service Catalog | Publish typed gRPC contracts for Pose, Equipment, SectionControl, LayerRegistry, TileQuery, Config, EventBus, Guidance, and Health. | C3 | Contract proto repo with lint + backward compatibility checks.
-| R-API-022 | SHOULD | Negotiation | Include feature flags and semantic versions in plugin manifests. | C3 | Manifest schema validated against compatibility rules.
-| R-API-023 | SHOULD | UI Contracts | Define declarative schema for plugin UI contributions consumed by frontend APIs. | C4 | UI schema contract tests ensure layout metadata loads.
-| R-API-024 | SHOULD | Audit | Require audit metadata on control-affecting RPCs. | C4 | Audit log integration test ensures identity + timestamp captured.
+| R-CORE-001 | MUST | Compatibility | Maintain the existing PGN catalog for steer, machine, relay, and section messaging. | C1 | Regression replay of legacy PGN payloads over bridge. |
+| R-CORE-002 | MUST | Diagnostics | Expose UDP/PGN monitor tooling for inspectors and third-party clients. | C1 | CLI tool decodes ≥ 30 PGNs/s with checksum validation. |
+| R-CORE-003 | SHOULD | Versioning | Provide compatibility guidance for protobuf/JSON schemas alongside PGNs. | C2 | Version matrix published and enforced in CI lint. |
+| R-CORE-004 | SHOULD | Bridge | Publish canonical PGN reference and bridge hooks for typed APIs. | C3 | Bridge integration tests cover ≥ 95% PGN catalog. |
 
-### 41.5.1 Requirement Sources & Rationale
+### 41.5.2 Control & Guidance Services
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|-----------|---------|----------------|-----------------------------|
+| R-CTRL-001 | SHOULD | Configuration | Continue surfacing GNSS correction settings until equivalent typed API lands. | C1 | Feature parity checklist between PGN and typed surfaces. |
+| R-CTRL-002 | MUST | Capabilities | Provide Capabilities gRPC service for plugin registration and leasing. | C3 | Integration tests validate lease renewal and rejection flows. |
+| R-CTRL-003 | MUST | Service Catalog | Publish typed gRPC contracts for Pose, Equipment, SectionControl, LayerRegistry, TileQuery, Config, EventBus, Guidance, and Health. | C3 | Contract proto repo with lint + backward compatibility checks. |
+| R-CTRL-004 | SHOULD | Audit | Require audit metadata on control-affecting RPCs. | C4 | Audit log integration test ensures identity + timestamp captured. |
+| R-CTRL-005 | MUST | Geometry | Provide canonical equipment hierarchy with stable IDs and offsets. | C2 | Schema published with integration test verifying IDs. |
+| R-CTRL-006 | SHOULD | Control Semantics | Document SectionGroup semantics and overrides for deterministic gating. | C2 | Behavior verified in control simulator. |
+
+### 41.5.3 Plugin & Registry Surfaces
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|-----------|---------|----------------|-----------------------------|
+| R-REG-001 | MUST | Metadata | Publish versioned layer definitions, quality rules, and schema hashes. | C2 | Registry diff detection triggers on hash mismatch in CI. |
+| R-REG-002 | SHOULD | Integrity | Reserve ID ranges, enforce monotonic timestamps, and fail on schema mismatch. | C2 | Contract tests confirm rejection on hash mismatch. |
+| R-REG-003 | SHOULD | Governance | Adopt semantic versioning, deprecation periods, and compatibility tests. | C2 | Release checklist with version gating automation. |
+| R-REG-004 | SHOULD | Discovery | Expose manifest metadata so plugins populate control/visualization surfaces. | C3 | Plugin manifest validation suite passes baseline cases. |
+| R-REG-005 | MAY | Negotiation | Document handshake messages for capability discovery across processes. | C3 | gRPC discovery endpoint coverage in contract tests. |
+| R-REG-006 | SHOULD | UI Contracts | Define declarative schema for plugin UI contributions consumed by frontend APIs. | C4 | UI schema contract tests ensure layout metadata loads. |
+| R-REG-007 | SHOULD | Manifest Flags | Include feature flags and semantic versions in plugin manifests. | C3 | Manifest schema validated against compatibility rules. |
+
+### 41.5.4 Requirement Sources & Rationale
 
 | Req ID | Source (issue/discussion/standard) | Rationale (one line) |
 |--------|-------------------------------------|----------------------|
-| R-API-000 | Legacy PGN workflow; community field logs | Preserve compatibility during transition. |
-| R-API-004 | Bridge working group discussions | Typed APIs must not strand existing hardware. |
-| R-API-010 | Layer registry proposals | Shared schema prevents drift between firmware/UI. |
-| R-API-020 | Plugin lifecycle review | Enforce consistent capability negotiation. |
-| R-API-024 | Safety and audit reviews | Command traces must be attributable. |
-
----
+| R-CORE-001 | Legacy PGN workflow; community field logs | Preserve compatibility during transition. |
+| R-CORE-004 | Bridge working group discussions | Typed APIs must not strand existing hardware. |
+| R-CTRL-002 | Plugin lifecycle review | Enforce consistent capability negotiation. |
+| R-CTRL-004 | Safety and audit reviews | Command traces must be attributable. |
+| R-REG-001 | Layer registry proposals | Shared schema prevents drift between firmware/UI. |
 
 ## 41.6 Acceptance Criteria & Verification
 
-- Regression replay suite MUST validate PGN ↔ typed API parity across at least three representative field logs.
-- Contract code generation pipelines MUST block incompatible protobuf/schema changes without explicit version increments.
-- Plugin onboarding checklist MUST verify capability registration, manifest validation, and audit logging before approval.
+- Regression replay suite MUST validate PGN ↔ typed API parity across at least three representative field logs (see §41.5.1 R-CORE-001–R-CORE-004).
+- Contract code generation pipelines MUST block incompatible protobuf/schema changes without explicit version increments (see §41.5.2 R-CTRL-003 and §41.5.3 R-REG-003).
+- Plugin onboarding checklist MUST verify capability registration, manifest validation, and audit logging before approval (see §41.5.2 R-CTRL-002 and R-CTRL-004, plus §41.5.3 R-REG-004–R-REG-007).
 
 ### 41.6.1 Requirement-to-Verification Map
 
 | Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
 |--------|--------------------|---------------------|---------------------|
-| R-API-000 | Replay harness | `/tests/replay/pgn_bridge/` | 100% PGN diff coverage, zero checksum errors. |
-| R-API-010 | CI lint | `/tools/registry-lint/` | Schema hash drift detected within one CI cycle. |
-| R-API-021 | Contract tests | `/tests/contracts/grpc/` | Backward compatibility gate passes on PR merges. |
-| R-API-024 | Integration tests | `/tests/integration/audit_logging/` | All control RPCs emit audit trail entries. |
+| R-CORE-001 | Replay harness | `/tests/replay/pgn_bridge/` | 100% PGN diff coverage, zero checksum errors. |
+| R-REG-001 | CI lint | `/tools/registry-lint/` | Schema hash drift detected within one CI cycle. |
+| R-CTRL-003 | Contract tests | `/tests/contracts/grpc/` | Backward compatibility gate passes on PR merges. |
+| R-CTRL-004 | Integration tests | `/tests/integration/audit_logging/` | All control RPCs emit audit trail entries. |
 
 ---
 

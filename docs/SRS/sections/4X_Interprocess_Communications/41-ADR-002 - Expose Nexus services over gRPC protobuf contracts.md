@@ -24,6 +24,15 @@ consistent surface while AgIO/Bridge services isolate hardware integration detai
 Contributors also want determinism, versioning, and compatibility bridges while introducing new transports, ensuring that
 legacy PGNs remain authoritative during migration phases.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L76-L205】
 
+**Problem.**
+
+- Typed contract governance lacks a single owner, making it easy for UI, Core, and plugin teams to drift while introducing
+  new protobuf packages.
+- Replay tooling cannot deterministically validate PGN ↔ gRPC translations, leaving regression coverage and audit trails
+  fragmented across repos.
+- Bridge operators must juggle legacy PGNs and proto evolution without a defined compatibility horizon, risking
+  unexpected field regressions during migration windows.
+
 ```mermaid
 flowchart LR
   A[Legacy PGN transports] --> B[gRPC / protobuf evaluation]
@@ -44,25 +53,46 @@ automation components consume generated clients from the `Aog.Abstractions` pack
 * **Boundary:** MCU transports remain defined by ADR-006 (AOG-Link) with PGN compatibility bridged by AgIO/Bridge.
 * **Implementation Level:** Design + code; shared proto repository with automated linting and CI verification.
 
+### Implementation Sketch
+
+1. **Repository & packages.** Consolidate `.proto` files under `Nexus SourceCode/proto/` with language-specific stubs
+   published from `Aog.Abstractions`; mirror bridge adapters in `tools/bridge/` for compatibility fixtures.
+2. **CI gates.** Enforce buf/protoc linting, backward-compatibility checks, and deterministic generation in CI; require
+   bridge replay suites to execute on every contract change.
+3. **Rollout phases.**
+   - Phase 1: Publish telemetry, guidance, and registry contracts with bridge shims for existing PGNs.
+   - Phase 2: Enable plugin onboarding and capability leasing over gRPC with dual-stack support in AgIO/Bridge.
+   - Phase 3: Deprecate PGN-first paths once operational metrics meet ADR thresholds, maintaining bridge fallbacks per
+     the AOG-Link Bridge Architecture Guide.
+
 ---
 
 ## 3) Consequences
 
-**Positive Impacts:**
+> **Related Guides:** [AOG-Link Bridge Architecture Guide](../../../AgIO/aog-link-bridge-architecture-guide.md), Section 4 — Deployment Playbooks.
 
-* Strongly typed, versioned contracts shared across all components.
-* Enables streaming APIs with flow control aligned to simulation and telemetry needs.
-* Supports language-agnostic clients for future integrations beyond .NET.
+**Positive Impacts**
 
-**Negative / Mitigated Impacts:**
+- **Runtime:** Strongly typed, versioned contracts shared across Core, UI, and automation enable deterministic streaming
+  semantics aligned with simulation timing.
+- **Operational:** Language-agnostic clients reduce bespoke tooling, and bridge operators can follow the AOG-Link Bridge
+  Architecture Guide for rollout sequencing and observability.
+- **Governance:** Centralized proto governance with CI enforcement clarifies ownership and simplifies change review.
 
-* Adds hosting overhead relative to raw sockets — mitigated by reusing ASP.NET Core gRPC infrastructure.
-* Requires contract governance to avoid breaking changes — addressed through ADR reviews and semantic versioning.
+**Negative / Mitigated Impacts**
 
-**Follow-up Actions:**
+- **Runtime:** Adds hosting overhead relative to raw sockets — mitigated by reusing ASP.NET Core gRPC infrastructure and
+  bridge-side connection pooling documented in the bridge guide.
+- **Operational:** Bridge compatibility testing expands release checklists — mitigated by deterministic replay harnesses
+  and operational runbooks referenced from the bridge guide.
+- **Governance:** Contract governance requires cross-team review cadences — mitigated through ADR checkpoints and
+  versioning policies captured in Section 41 of the SRS.
 
-* Define protobuf packages and namespaces for the first wave of contracts (NX-003).
-* Implement Bridge translation between gRPC services, AOG-Link datagrams, and legacy PGNs (NX-120 series).
+**Follow-up Actions**
+
+- Define protobuf packages and namespaces for the first wave of contracts (NX-003).
+- Implement Bridge translation between gRPC services, AOG-Link datagrams, and legacy PGNs (NX-120 series) using the
+  rollout phases enumerated above.
 
 ---
 

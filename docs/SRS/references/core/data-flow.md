@@ -1,11 +1,11 @@
 # Data Flow Architecture
 
-This document describes how data flows through the Nexus system, as specified in [SRS Communications Requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md) and implemented through [ADR-002: gRPC Contracts](../SRS/sections/4X_Interprocess_Communications/41-ADR-002 - Expose Nexus services over gRPC protobuf contracts.md).
+This document describes how data flows through the Nexus system, as specified in [SRS Communications Requirements](../../sections/4X_Interprocess_Communications/42_Transports.md) and implemented through [ADR-002: gRPC Contracts](../../sections/4X_Interprocess_Communications/41-ADR-002 - Expose Nexus services over gRPC protobuf contracts.md).
 
 ## Core Data Streams
 
 ### PoseStream
-As defined in [ADR-007: PoseStream Architecture](../SRS/sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md):
+As defined in [ADR-007: PoseStream Architecture](../../sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md):
 
 ```mermaid
 graph LR
@@ -49,13 +49,13 @@ graph TD
 ## Data Storage
 
 ### Vector Tile Store
-As specified in [ADR-009: Vector Tile Storage](../SRS/sections/3X_Data_Storage/32-ADR-009 - PoseStream vector logs and layer TileStore persistence.md):
+As specified in [ADR-009: Vector Tile Storage](../../sections/3X_Data_Storage/32-ADR-009 - PoseStream vector logs and layer TileStore persistence.md):
 - Efficient spatial indexing
 - Compressed storage format
 - Real-time update capability
 
 ### Session Data
-Following [ADR-023: Session/Job Model](../SRS/sections/6X_Core_Domain_Services/62-ADR-023 - Session and job model with provenance graph.md):
+Following [ADR-023: Session/Job Model](../../sections/6X_Core_Domain_Services/62-ADR-023 - Session and job model with provenance graph.md):
 - Job records
 - Equipment configurations
 - Operation logs
@@ -65,10 +65,10 @@ Following [ADR-023: Session/Job Model](../SRS/sections/6X_Core_Domain_Services/6
 
 | Layer | Protocol | Documentation |
 |-------|----------|---------------|
-| UI-Core | gRPC | [Contract Reference](../reference/grpc-contracts.md) |
+| UI-Core | gRPC | [Contract Reference](../../reference/grpc-contracts.md) |
 | Core-Plugin | gRPC | [Plugin API](../plugins/reference/api.md) |
-| Core-Bridge | gRPC | [Bridge Protocol](../reference/bridge-protocol.md) |
-| Bridge-Hardware | AOG-Link | [AOG-Link Spec](../reference/aog-link-spec.md) |
+| Core-Bridge | gRPC | [Bridge Protocol](../../reference/bridge-protocol.md) |
+| Bridge-Hardware | AOG-Link | [AOG-Link Spec](../../reference/aog-link-spec.md) |
 
 ## Data Integrity
 
@@ -86,7 +86,7 @@ Following [ADR-023: Session/Job Model](../SRS/sections/6X_Core_Domain_Services/6
 
 ## Performance Characteristics
 
-As defined in [ADR-026: Performance Budgets](../SRS/sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md):
+As defined in [ADR-026: Performance Budgets](../../sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md):
 
 | Metric | Target | Notes |
 |--------|--------|-------|
@@ -97,7 +97,7 @@ As defined in [ADR-026: Performance Budgets](../SRS/sections/9X_Frontends_Ops/96
 
 ## Related Documentation
 
-- [Communications Requirements](../SRS/sections/4X_Interprocess_Communications/42_Transports.md)
-- [Data Model Requirements](../SRS/sections/3X_Data_Storage/32_Persistence_Formats.md)
-- [Threading, Scheduling & Timing requirements](../SRS/sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md)
-- [Protocol Specifications](../reference/protocols/INDEX.md)
+- [Communications Requirements](../../sections/4X_Interprocess_Communications/42_Transports.md)
+- [Data Model Requirements](../../sections/3X_Data_Storage/32_Persistence_Formats.md)
+- [Threading, Scheduling & Timing requirements](../../sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md)
+- [Protocol Specifications](../../reference/protocols/INDEX.md)

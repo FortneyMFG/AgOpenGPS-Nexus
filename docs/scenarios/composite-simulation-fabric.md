@@ -5,7 +5,7 @@
 ## Fabric Components
 
 - **SimClock.** Provides deterministic time progression with pause/step controls. All providers subscribe to the shared clock.
-- **SimBus topics.** Canonical topics cover pose, guidance, section states, implement IO, GNSS, IMU, and telemetry logs. Providers publish/subscribe using strongly typed contracts documented in the [capability registry](../Core/capability-registry.md).
+- **SimBus topics.** Canonical topics cover pose, guidance, section states, implement IO, GNSS, IMU, and telemetry logs. Providers publish/subscribe using strongly typed contracts documented in the [capability registry](../SRS/references/core/capability-registry.md).
 - **Provider bundles.** Core ships ground truth, GNSS/IMU noise, implement physics, and environment/weather providers with seeded random generators.
 - **Replay bridge.** Converts captured telemetry logs into SimBus events for regression comparison, complementing the [legacy auto-run scenario](legacy-auto-run/README.md) for UDP regression coverage.
 

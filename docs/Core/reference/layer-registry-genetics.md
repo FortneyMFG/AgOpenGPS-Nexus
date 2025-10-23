@@ -27,9 +27,9 @@ metadata via the registry handshake.
   advertise `requiresSession=true` for the variety layer during the registry handshake.【F:docs/development/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md†L17-L52】【F:docs/Core/reference/layer-registry-handshake.md†L8-L64】
 - **Change logs.** Barcode or lot updates recorded in `changeLog[]` enable downstream
   analytics to reconcile mid-session swaps and support audit reports referencing
-  `LayerEditEvent` journals.【F:schemas/GeneticsVariety.v1.json†L52-L108】【F:docs/Plugins/Genetics.md†L9-L34】
+  `LayerEditEvent` journals.【F:schemas/GeneticsVariety.v1.json†L52-L108】【F:docs/Plugins/briefs/Genetics.md†L9-L34】
 
 ## References
 - [ADR-046 — Genetics Plugin & Layers](../development/SRS/sections/7X_Mapping_Geospatial/72-ADR-046 - Genetics Plugin & Layers.md)
 - [Layer Registry Hash Handshake (Draft)](layer-registry-handshake.md)
-- [Genetics Plugin Requirements](../Plugins/Genetics.md)
+- [Genetics Plugin Requirements](../Plugins/briefs/Genetics.md)

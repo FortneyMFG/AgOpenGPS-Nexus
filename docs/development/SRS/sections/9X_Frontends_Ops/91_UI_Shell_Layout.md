@@ -83,7 +83,7 @@ Define the Nexus UI shell, layout system, and companion experiences that operato
 | R-FE-074 | SHOULD | Analytics Overlays | Provide toggles and accessible legends for crop, genetics, yield, profit, risk, and weather overlays. | Mapping plugin ADRs【F:docs/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L29-L71】【F:docs/sections/7X_Mapping_Geospatial/72-ADR-049 - Yield & Analytics Plugin.md†L21-L52】【F:docs/sections/7X_Mapping_Geospatial/72-ADR-052 - Field Health & Risk Plugin.md†L21-L44】【F:docs/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L21-L49】 | Visualization regression pack |
 | R-FE-075 | SHOULD | Weather Timeline | Present weather timelines with charting widgets and compliance alerts. | Weather plugin ADR-053【F:docs/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L21-L49】 | Weather timeline UI tests |
 | R-FE-076 | SHOULD | Report Builder | Provide report generation flow with preview and dependency readiness. | ADR-051 report builder【F:docs/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L21-L52】 | Report builder integration tests |
-| R-FE-077 | SHOULD | Print Studio | Deliver print view with map composer templates, legends, and scale bars. | Map Composer guide【F:docs/Plugins/MapComposer.md†L1-L160】 | Print preview regression checklist |
+| R-FE-077 | SHOULD | Print Studio | Deliver print view with map composer templates, legends, and scale bars. | Map Composer guide【F:docs/Plugins/briefs/MapComposer.md†L1-L160】 | Print preview regression checklist |
 
 ### 91.5.3 Remote & Companion Experiences
 
@@ -99,8 +99,8 @@ Define the Nexus UI shell, layout system, and companion experiences that operato
 | R-FE-061 | SHOULD | Offline Resilience | Provide offline cache for boundaries, guidance, and coverage with resync. | ADR-003 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L24-L31】 | Offline cache soak tests |
 | R-FE-062 | MUST | Run Mode Switching | Expose `RunMode` toggles to swap `ICoreTransport` implementations without altering view models. | ADR-003 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L24-L42】 | Mode-switch integration tests |
 | R-FE-063 | SHOULD | Feature Gating | Introduce feature flags for mobile deployments while sharing project codebase. | ADR-003 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L33-L42】 | Feature flag configuration tests |
-| R-FE-094 | SHOULD | Sync Dashboard | Provide read-only web dashboard using mirrored `/Seasons/` folders without control actions. | Sync dashboard concept【F:docs/Plugins/SyncDashboard.md†L1-L150】 | Sync dashboard smoke tests |
-| R-FE-095 | SHOULD | Plugin Marketplace | Add plugin catalog UI with manifest validation, compatibility badges, and install workflows. | Plugin catalog design notes【F:docs/Plugins/PluginCatalog.md†L1-L160】 | Marketplace integration tests |
+| R-FE-094 | SHOULD | Sync Dashboard | Provide read-only web dashboard using mirrored `/Seasons/` folders without control actions. | Sync dashboard concept【F:docs/Plugins/briefs/SyncDashboard.md†L1-L150】 | Sync dashboard smoke tests |
+| R-FE-095 | SHOULD | Plugin Marketplace | Add plugin catalog UI with manifest validation, compatibility badges, and install workflows. | Plugin catalog design notes【F:docs/Plugins/briefs/PluginCatalog.md†L1-L160】 | Marketplace integration tests |
 
 ### 91.5.4 Spatial Constraints & Editing
 

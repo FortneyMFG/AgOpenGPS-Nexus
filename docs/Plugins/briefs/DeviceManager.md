@@ -7,7 +7,7 @@ The Device Manager plugin provides a consolidated inventory of Nexus-connected h
 ## Core responsibilities
 
 - Maintain an authoritative list of connected controllers, sensors, and bridges with firmware, serial, and transport metadata for each device.
-- Surface real-time health telemetry (faults, warnings, lifecycle events) and persist recent history to support predictive maintenance workflows outlined in the Equipment Health concept note.【F:docs/Plugins/EquipmentHealth.md†L1-L160】
+- Surface real-time health telemetry (faults, warnings, lifecycle events) and persist recent history to support predictive maintenance workflows outlined in the Equipment Health concept note.【F:docs/Plugins/briefs/EquipmentHealth.md†L1-L160】
 - Broker firmware rollouts by mapping device identities to curated update feeds so operators can apply patches directly from the Nexus UI.
 
 ## Simulation providers

@@ -76,7 +76,7 @@ Specify expectations for Nexus mapping plugins that render coverage, agronomic o
 
 ### 72.5.2 Layer Catalog Participation
 
-- Crop type, genetics, yield, profit, risk, weather, soil, terrain, drainage, and advisor layers MUST align with registry schema definitions published alongside plugin ADRs.【F:docs/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L29-L71】【F:docs/Plugins/Terrain3D.md†L1-L140】
+- Crop type, genetics, yield, profit, risk, weather, soil, terrain, drainage, and advisor layers MUST align with registry schema definitions published alongside plugin ADRs.【F:docs/sections/7X_Mapping_Geospatial/72-ADR-045 - Crop Type Plugin & Layers.md†L29-L71】【F:docs/Plugins/briefs/Terrain3D.md†L1-L140】
 - Imports via NX-113 normalization flow MUST record source hashes, operator IDs, and transforms prior to persistence to maintain provenance DAG integrity.
 
 ---

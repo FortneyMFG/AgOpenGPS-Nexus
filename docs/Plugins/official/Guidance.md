@@ -28,7 +28,7 @@ The Guidance plugin produces guidance tracks, lane plans, and turn strategies us
 - Bundle sample field boundary fixtures under `assets/fixtures/` for testing.
 
 ## Related Resources
-- `docs/Plugins/AutoSteer.md` for downstream consumers.
+- `docs/Plugins/official/AutoSteer.md` for downstream consumers.
 - `docs/Plugins/official/Sections.md` for how headland planning interacts with sections.
 - ADRs on guidance algorithms provide theoretical background and tuning parameters.
 

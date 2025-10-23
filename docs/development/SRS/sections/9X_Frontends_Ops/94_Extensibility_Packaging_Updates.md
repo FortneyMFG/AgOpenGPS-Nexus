@@ -62,10 +62,10 @@ Define the extensibility surface, packaging policies, and update workflows that 
 
 #### Core Plugin Bands
 
-1. **Guidance & control** — AutoSteer, Section Control, Rate Control, and future guidance orchestrators feed arbitration pipelines and control loops.【F:docs/Plugins/Guidance.md†L10-L92】【F:docs/development/SRS/appendices/samples/plugins/sections/1.1.0.json†L1-L122】
-2. **Data & analytics** — Mapping, telemetry logging, crop/coverage analytics, and profit analysis expose dashboards and reports without modifying Core binaries.【F:docs/Plugins/Analytics.md†L9-L86】【F:docs/development/SRS/appendices/samples/plugins/telemetry-logging/1.0.0.json†L1-L88】
-3. **Hardware integration** — ISOBUS Bridge, Device Manager, and AgIO sidecars bridge physical transports into capability-aware services while maintaining watchdog compliance.【F:docs/Plugins/IsobusBridge.md†L1-L112】【F:docs/development/SRS/appendices/samples/plugins/device-manager/1.0.0.json†L1-L124】
-4. **Operational workflows** — Job Tasks, File IO, compatibility evaluators, and Sync Dashboard streamline setup, migration, and reporting for operators and support teams.【F:docs/Plugins/JobTasks.md†L9-L72】【F:docs/development/SRS/appendices/samples/plugins/file-io/1.0.0.json†L1-L110】
+1. **Guidance & control** — AutoSteer, Section Control, Rate Control, and future guidance orchestrators feed arbitration pipelines and control loops.【F:docs/Plugins/briefs/Guidance.md†L10-L92】【F:docs/development/SRS/appendices/samples/plugins/sections/1.1.0.json†L1-L122】
+2. **Data & analytics** — Mapping, telemetry logging, crop/coverage analytics, and profit analysis expose dashboards and reports without modifying Core binaries.【F:docs/Plugins/briefs/Analytics.md†L9-L86】【F:docs/development/SRS/appendices/samples/plugins/telemetry-logging/1.0.0.json†L1-L88】
+3. **Hardware integration** — ISOBUS Bridge, Device Manager, and AgIO sidecars bridge physical transports into capability-aware services while maintaining watchdog compliance.【F:docs/Plugins/briefs/IsobusBridge.md†L1-L112】【F:docs/development/SRS/appendices/samples/plugins/device-manager/1.0.0.json†L1-L124】
+4. **Operational workflows** — Job Tasks, File IO, compatibility evaluators, and Sync Dashboard streamline setup, migration, and reporting for operators and support teams.【F:docs/Plugins/briefs/JobTasks.md†L9-L72】【F:docs/development/SRS/appendices/samples/plugins/file-io/1.0.0.json†L1-L110】
 
 #### Developer Quick Start
 

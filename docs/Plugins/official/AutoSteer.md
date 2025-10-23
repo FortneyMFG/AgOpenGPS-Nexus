@@ -26,7 +26,7 @@ The AutoSteer plugin implements Nexus’ closed-loop steering controller. It tra
 - Ensure the manifest requests the `sections.control` capability only when headland avoidance integration is enabled.
 
 ## Related Resources
-- `docs/Plugins/Guidance.md` for upstream data flow.
+- `docs/Plugins/briefs/Guidance.md` for upstream data flow.
 - `docs/development/SRS/sections/3X_Data_Storage/32-ADR-010 - Layer registry and variable-rate framework.md` for how steering interacts with variable rate overlays.
 - `docs/Plugins/tutorials/testing.md` for guidance on replay-based validation.
 

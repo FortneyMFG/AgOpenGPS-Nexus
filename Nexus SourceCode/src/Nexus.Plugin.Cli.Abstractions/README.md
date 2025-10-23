@@ -27,7 +27,7 @@ register your command handlers in the plugin manifest:
 
 Implement the `ICommandHandler` interface and use the provided
 `CommandContext` to attach command trees to the CLI host. For guidance on
-wiring adapters into plugin manifests, see `docs/Plugins/CLIExtensions.md`.
+wiring adapters into plugin manifests, see `docs/Plugins/briefs/CLIExtensions.md`.
 
 ## Local development
 

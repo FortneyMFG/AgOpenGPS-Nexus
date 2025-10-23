@@ -29,7 +29,7 @@ The Telemetry Logging plugin records high-frequency telemetry streams (pose, ste
 - Include retention policy defaults under `assets/settings/telemetry.json`.
 
 ## Related Resources
-- `docs/Plugins/Replay.md` for playback workflow.
+- `docs/Plugins/briefs/Replay.md` for playback workflow.
 - `docs/Plugins/architecture.md` describes how telemetry manifests are consumed by the host.
 - `docs/Plugins/official/AutoSteer.md`, `Sections.md`, etc., all rely on telemetry logging for diagnostics.
 

@@ -9,8 +9,8 @@ Telemetry logging plugins capture session-scoped data for replay, analytics, and
 - Record telemetry topics (PoseStream, rate, section state, layer edits, mesh presence) using deterministic timestamping aligned with SimClock/SimBus expectations from ADR-004.【F:docs/development/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L21-L78】
 - Persist logs in an append-only format with integrity hashes and session IDs. Store metadata for quick indexing (start/end timestamps, job/field IDs, active plugins).
 - Stamp `jobId`, `sessionId`, and `seasonId` columns on every telemetry record so provenance survives export and replay boundaries per ADR-040/ADR-041.
-- Integrate with the multi-machine mesh to capture collaborative events, ensuring share profiles govern whether remote data is included.【F:docs/Plugins/MultiMachine.md†L1-L80】
-- Capture equipment hour counters, fault codes, and implement usage metrics needed by the Equipment Health plugin, tagging logs with machine IDs so maintenance schedules stay accurate.【F:docs/Plugins/EquipmentHealth.md†L1-L160】
+- Integrate with the multi-machine mesh to capture collaborative events, ensuring share profiles govern whether remote data is included.【F:docs/Plugins/briefs/MultiMachine.md†L1-L80】
+- Capture equipment hour counters, fault codes, and implement usage metrics needed by the Equipment Health plugin, tagging logs with machine IDs so maintenance schedules stay accurate.【F:docs/Plugins/briefs/EquipmentHealth.md†L1-L160】
 - Record work order checkpoints (start, pause, checklist updates) so contractor billing and proof-of-work exports can replay crew progress.【F:docs/development/SRS/sections/6X_Core_Domain_Services/62-ADR-041 - Job Sessions Lifecycle.md†L46-L55】
 
 ## Session Artifacts

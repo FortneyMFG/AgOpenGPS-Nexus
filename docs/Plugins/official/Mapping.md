@@ -28,7 +28,7 @@ The Mapping plugin is the cornerstone of spatial data management in Nexus. It re
 - Consider bundling sample fields under `assets/fixtures/` to facilitate integration testing.
 
 ## Related Resources
-- `docs/Plugins/Mapping.md` (legacy deep-dive) and ADRs referencing layer registry design.
+- `docs/Plugins/briefs/Mapping.md` (legacy deep-dive) and ADRs referencing layer registry design.
 - `docs/Plugins/official/Sections.md`, `VariableMapping.md`, and `CombineYield.md` rely heavily on mapping outputs.
-- Replay documentation (`docs/Plugins/Replay.md`) explains how mapping data participates in simulations.
+- Replay documentation (`docs/Plugins/briefs/Replay.md`) explains how mapping data participates in simulations.
 

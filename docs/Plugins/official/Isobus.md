@@ -29,7 +29,7 @@ The ISOBUS plugin bridges Nexus with ISO 11783 task controllers, enabling sectio
 - Include DBC/PGN metadata under `assets/profiles/` for OEM-specific mappings when required.
 
 ## Related Resources
-- `docs/Plugins/TelemetryLogging.md` for capturing ISOBUS telemetry.
+- `docs/Plugins/briefs/TelemetryLogging.md` for capturing ISOBUS telemetry.
 - `docs/development/SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md` details the broader communications architecture.
-- Existing ISOBUS bridge brief under `docs/Plugins/IsobusBridge.md` provides historical context.
+- Existing ISOBUS bridge brief under `docs/Plugins/briefs/IsobusBridge.md` provides historical context.
 

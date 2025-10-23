@@ -34,7 +34,7 @@ Capture the fast-path, authority, deployment, and observability expectations tha
 
 | Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
 |--------------|-----------------|-----------------------|---------------------------|--------------------|
-| Control Path | UDP/serial routed through AgIO on external PCs. | Additional hops introduce latency and jitter. | Shared-memory fast path with mirrored telemetry for observers. | Pumpkin Pi brief【F:docs/Plugins/pumpkin-pi.md†L1-L55】 |
+| Control Path | UDP/serial routed through AgIO on external PCs. | Additional hops introduce latency and jitter. | Shared-memory fast path with mirrored telemetry for observers. | Pumpkin Pi brief【F:docs/Plugins/briefs/pumpkin-pi.md†L1-L55】 |
 | Authority | Manual overrides; no retained lease tokens. | Competing controllers risk conflicting outputs. | MQTT authority tokens with TTL + acknowledgement semantics. | AOG-Link spec【F:docs/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L120-L220】 |
 | Scheduling | Mixed workloads on Windows tablets. | Unpredictable jitter under CPU load. | PREEMPT_RT kernels, CPU affinity, and locked memory on CM5. | CM5 guidance【F:docs/AgIO/cm5.md†L6-L33】 |
 
@@ -82,7 +82,7 @@ Capture the fast-path, authority, deployment, and observability expectations tha
 
 ## 54.6 Architecture Overview
 
-- **Process Layout:** Distinguish host/broker services (Core gRPC, adapters, MQTT) from real-time control services (GPS ingest, steer-ctrl, HAL). Pumpkin Pi supervises the fast path and telemetry mirroring.【F:docs/Plugins/pumpkin-pi.md†L1-L55】
+- **Process Layout:** Distinguish host/broker services (Core gRPC, adapters, MQTT) from real-time control services (GPS ingest, steer-ctrl, HAL). Pumpkin Pi supervises the fast path and telemetry mirroring.【F:docs/Plugins/briefs/pumpkin-pi.md†L1-L55】
 - **Data Paths:** Navigation publishes `SteerTarget` into shared memory, triggers eventfd wake-ups, and mirrors payloads to MQTT topics (`aog/v1/bus/nav/steer_target`). External controllers continue to consume UDP/serial PGNs through AgIO.【F:docs/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L180-L220】
 - **Authority:** Retained MQTT tokens arbitrate actuator control; Pumpkin Pi acknowledges or relinquishes control within TTL budgets.【F:docs/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L200-L240】
 

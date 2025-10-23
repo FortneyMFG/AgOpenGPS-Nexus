@@ -29,6 +29,6 @@ The Cost & Profit plugin tracks operational costs, revenue, and profitability me
 
 ## Related Resources
 - `docs/Plugins/official/VariableMapping.md` for upstream rate inputs.
-- `docs/Plugins/TelemetryLogging.md` for how raw telemetry is archived.
+- `docs/Plugins/briefs/TelemetryLogging.md` for how raw telemetry is archived.
 - Financial ADRs (forthcoming) will cover accounting integrations.
 

@@ -4,9 +4,10 @@
 ## Document Control
 - **Version:** 0.3.0
 - **Authors:** Nexus Program Office (Codex)
+- **License:** GPLv3
 - **Reviewers:** Platform Foundations Working Group, UI Working Group, Release Working Group
 - **Approval Authority:** Nexus Program Steering Committee
-- **Review Cycle:** Quarterly, or ad-hoc when scope/assumptions shift materially
+- **Review Cycle:** Ad-hoc when scope/assumptions shift materially
 - **Created:** 2025-10-20
 - **Last Updated:** 2025-10-22
 - **Related Specifications:**
@@ -18,7 +19,7 @@
 ---
 
 ## 1. Executive Summary
-AgOpenGPS Nexus rebuilds the platform foundations so operators can rely on familiar guidance workflows while the community advances to a modern, cross-platform stack. The charter emphasises disciplined parity with AgOpenGPS v6, investment in build/test automation, and governance that keeps contributions focused on stability before feature expansion. The guiding principle is **"Modernize the foundations without abandoning today's operators."**
+AgOpenGPS Nexus rebuilds the platform foundations so operators can rely on familiar guidance workflows while the community advances to a modern, cross-platform stack. The charter emphasises disciplined parity with AgOpenGPS v6, investment in build/test automation, and governance that keeps contributions focused on stability before feature expansion.
 
 Key outcomes this charter commits to delivering:
 - Unified runtimes, packaging, and UI shells for Windows and Linux environments aligned with SRS §11 and §13.
@@ -53,7 +54,6 @@ Key outcomes this charter commits to delivering:
 
 ### 3.3 Foundation-First Guardrails
 - Focus on runtime, architecture, and tooling upgrades before adding user-visible features.
-- Permit backend or infrastructure additions when they unlock future capabilities but do not expose incomplete UI flows.
 - Capture deviations from v6 behaviour in ADRs with mitigation plans before adoption.
 
 ---
@@ -74,7 +74,6 @@ Key outcomes this charter commits to delivering:
 
 ## 5. Non-Goals (Out of Scope for Foundation Phase)
 The foundation phase explicitly excludes:
-- New implement types, guidance algorithms, or telemetry visualisations beyond v6 parity requirements.
 - Cloud sync, AgShare integration, or other remote data services beyond establishing extensible interfaces.
 - Mobile-native clients (iOS/Android); support is limited to remote desktop or thin-client experiences.
 - Fleet coordination, ISO certification, or regulatory compliance deliverables.
@@ -104,7 +103,7 @@ Feature candidates deferred from this phase must be captured in the enhancement 
 ## 7. Key Deliverables
 | Deliverable | Description | Acceptance Criteria |
 |-------------|-------------|---------------------|
-| D1 — Nexus Core Library | Cross-platform business logic assembly encapsulating guidance, GNSS, and field management. | ≥80% unit test coverage, deterministic simulation runs recorded. |
+| D1 — Nexus Core Library | Cross-platform business logic assembly encapsulating kinematics, GNSS, and field management. | ≥80% unit test coverage, deterministic simulation runs recorded. |
 | D2 — AgIO Services | Hardware abstraction services for Windows/Linux deployments. | Parity validation for prioritized GNSS receivers and autosteer controllers; restartable service model documented. |
 | D3 — Avalonia UI Shell | Cross-platform desktop UI replicating v6 workflows with accessibility updates. | Operator advisory group sign-off; 60 FPS benchmark on reference hardware. |
 | D4 — Packaging Matrix | Installers, Linux packages, containers/AppImages with automated smoke tests. | Successful deployment on fresh OS images; CI artifacts signed and archived. |
@@ -133,13 +132,7 @@ Feature candidates deferred from this phase must be captured in the enhancement 
 ## 9. Milestones & High-Level Timeline
 | Milestone | Target Window | Description | Key Dependencies |
 |-----------|---------------|-------------|------------------|
-| M1 — Charter Ratification | Q4 FY25 Week 3 | Approve charter, publish in SRS repo, assign accountable owners. | Steering Committee availability |
-| M2 — Cross-Platform Runtime Baseline | Q4 FY25 Week 6 | Validate unified runtime, Avalonia parity demos, and dual-OS CI artifacts. | ADR-001 execution, CI readiness |
-| M3 — Headless Core Packaging | Q1 FY26 Week 2 | Deliver Linux systemd units, container images, and remote client smoke tests. | M2 completion, infrastructure readiness |
-| M4 — Governance Playbooks GA | Q1 FY26 Week 6 | Publish contract, manifest, and release governance checklists with automation hooks. | ADR-002 alignment, Release WG tooling |
-| M5 — Operator Readiness Review | Q2 FY26 Week 1 | Validate documentation, training assets, and field feedback prior to GA. | M1–M4 completion, advisory group input |
 
-Milestones will be revisited each quarterly review to adjust sequencing or scope as risks evolve.
 
 ---
 
@@ -172,7 +165,7 @@ Milestones will be revisited each quarterly review to adjust sequencing or scope
 | R3 | Volunteer capacity drops or burns out. | High | Critical | Rotate module leads, scope work into two-week increments, celebrate progress openly. |
 | R4 | Scope creep undermines foundation focus. | High | High | Enforce ADR/charter guardrails, maintain enhancement backlog, reaffirm non-goals publicly. |
 | R5 | Data migration introduces regressions. | Low | High | Develop migration tooling early with reversible paths; keep v6 installs supported during transition. |
-| R6 | UI/UX regressions erode operator trust. | Medium | High | Maintain operator advisory group, run usability reviews, allow parallel WinForms fallback during pilot. |
+| R6 | UI/UX regressions erode operator trust. | Medium | High | Maintain operator advisory group, run usability reviews |
 | R7 | CI/CD costs or complexity exceed budget. | Low | Medium | Optimise pipelines, leverage FOSS credits, prioritise essential matrix coverage. |
 | R8 | Legal/licensing issues surface in dependencies. | Very Low | High | Audit third-party components, maintain MIT/GPL compatibility, secure legal consultation when needed. |
 
@@ -222,8 +215,8 @@ Milestones will be revisited each quarterly review to adjust sequencing or scope
 ## Appendix A — Revision History
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 0.1.0 | 2025-10-20 | Initial draft aligning with SRS foundations. | Nexus Program Office (Codex) |
-| 0.2.0 | 2025-10-21 | Community review update incorporating steering feedback. | Nexus Program Office (Markus) |
-| 0.3.0 | 2025-10-22 | Expanded goals, scope, and governance based on Next charter lessons learned. | Nexus Program Office (Codex) |
+| 0.1.0 | 2025-10-20 | Initial draft aligning with SRS foundations. | Nexus Program Office (Codex+Jon Fortney) |
+| 0.2.0 | 2025-10-21 | Community review update incorporating steering feedback. | Nexus Program Office (Markus Nuuja) |
+| 0.3.0 | 2025-10-22 | Expanded goals, scope, and governance based on Next charter lessons learned. | Nexus Program Office (Codex+Jon Fortney) |
 
 *End of document.*

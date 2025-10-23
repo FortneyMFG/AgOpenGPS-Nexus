@@ -104,7 +104,7 @@ The tool prints the absolute path to the generated archive and respects optional
 
 ## Mesh presence integration
 
-The AGiO host publishes live pose telemetry onto the [ADR-047](../../../docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md)
+The AGiO host publishes live pose telemetry onto the [ADR-047](../../../docs/development/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md)
 mesh by default. `MeshTelemetryAggregator` listens to decoded pose samples, registers the
 host as a mesh device, and emits presence heartbeats plus trail snapshots at a configurable
 interval. Configure the bridge under `AgioHost:Mesh` to customise the device identifier,
@@ -131,7 +131,7 @@ published on `aog/live/{season}/{job}/trail` with `MeshDataTier.Trails` permissi
 ## RadioBridge ELRS adapter
 
 The RadioBridge ELRS adapter (NX-236/NX-239) forwards mesh publications over ELRS or simulated
-radio links using the transport defined in [ADR-048](../../../docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md).
+radio links using the transport defined in [ADR-048](../../../docs/development/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md).
 Enable the adapter by configuring `AgioHost:RadioBridge:Elrs`:
 
 ```json
@@ -200,4 +200,4 @@ slower retry cadence tuned for low-bitrate radios. Configure the adapter via
 
 Diagnostics for the LoRa adapter follow the same topic layout as ELRS but include additional
 fields indicating the configured send interval and whether FEC is active. This documentation
-bundle pairs with the provisioning kit described in [RadioBridge provisioning](../../docs/howto/radio/radiobridge-provisioning.md).
+bundle pairs with the provisioning kit described in [RadioBridge provisioning](../../docs/Core/howto/radio/radiobridge-provisioning.md).

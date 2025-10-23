@@ -6,7 +6,7 @@ Nexus is the living laboratory for a community effort to see how far we can take
 
 ## Start Here
 
-- **Review the SRS first if requirements are your focus.** Head over to the [SRS overview](docs/SRS/00_ReadMe.md) to explore Jon's proposed structure, requirements, and ADR trail. The draft began as a single place to capture every note Jon collected while researching AgOpenGPS. It has since been reorganized so the community can adopt, modify, or replace sections rather than starting from scratch.
+- **Review the SRS first if requirements are your focus.** Head over to the [SRS overview](docs/development/SRS/00_ReadMe.md) to explore Jon's proposed structure, requirements, and ADR trail. The draft began as a single place to capture every note Jon collected while researching AgOpenGPS. It has since been reorganized so the community can adopt, modify, or replace sections rather than starting from scratch.
 - **Remember the experiment's origin story.** The SRS and ADR bundle was prepared so we could hand a "finished" spec to AI helpers and learn how far automated development could go. You are encouraged to critique the assumptions, update requirements, and document revisions as Nexus transitions from experiment to shared roadmap.
 
 ## Why "Nexus"?
@@ -86,11 +86,11 @@ The Nexus roadmap upgrades the legacy UDP PGN (Coined AOG-Link V0) interface to 
 
 ## Plugin & Component Highlights
 
-- **AutoSteer & Guidance.** Closed-loop steering, lookahead tuning, and constraint gating run as plugins connected to Core routing. Refer to [docs/plugins/AutoSteer.md](docs/plugins/AutoSteer.md) and [docs/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md](docs/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md) for control theory and safety notes.
-- **Sections & Rate Control.** Section management, variable rate, and product control share the Layer Registry and telemetry feeds, with nanopb contracts ready for MCU modules. See [docs/plugins/Sections.md](docs/plugins/Sections.md) and [docs/plugins/RateControl.md](docs/plugins/RateControl.md).
-- **Mapping & Analytics.** Layer editing, replay, and telemetry logging use the TileStore, Layer Registry, and report builder services. Explore [docs/plugins/Mapping.md](docs/plugins/Mapping.md), [docs/plugins/Replay.md](docs/plugins/Replay.md), and [docs/plugins/TelemetryLogging.md](docs/plugins/TelemetryLogging.md).
-- **ISOBUS & External Devices.** The ISOBUS bridge, GNSS/IMU fusion, and device manager plugins coordinate identities and capabilities across the mesh; details are under [docs/plugins/ISOBUS.md](docs/plugins/ISOBUS.md) and [docs/plugins/DeviceManager.md](docs/plugins/DeviceManager.md).
-- **Simulation & Testing.** Deterministic simulation scenarios, Parquet telemetry logs, and replay fixtures keep regression coverage aligned with the SRS. Start with [docs/howto/simulation-scenarios.md](docs/howto/simulation-scenarios.md) and [docs/plugins/Replay.md](docs/plugins/Replay.md).
+- **AutoSteer & Guidance.** Closed-loop steering, lookahead tuning, and constraint gating run as plugins connected to Core routing. Refer to [docs/Plugins/AutoSteer.md](docs/Plugins/AutoSteer.md) and [docs/development/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md](docs/development/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md) for control theory and safety notes.
+- **Sections & Rate Control.** Section management, variable rate, and product control share the Layer Registry and telemetry feeds, with nanopb contracts ready for MCU modules. See [docs/Plugins/Sections.md](docs/Plugins/Sections.md) and [docs/Plugins/RateControl.md](docs/Plugins/RateControl.md).
+- **Mapping & Analytics.** Layer editing, replay, and telemetry logging use the TileStore, Layer Registry, and report builder services. Explore [docs/Plugins/Mapping.md](docs/Plugins/Mapping.md), [docs/Plugins/Replay.md](docs/Plugins/Replay.md), and [docs/Plugins/TelemetryLogging.md](docs/Plugins/TelemetryLogging.md).
+- **ISOBUS & External Devices.** The ISOBUS bridge, GNSS/IMU fusion, and device manager plugins coordinate identities and capabilities across the mesh; details are under [docs/Plugins/ISOBUS.md](docs/Plugins/ISOBUS.md) and [docs/Plugins/DeviceManager.md](docs/Plugins/DeviceManager.md).
+- **Simulation & Testing.** Deterministic simulation scenarios, Parquet telemetry logs, and replay fixtures keep regression coverage aligned with the SRS. Start with [docs/Core/howto/simulation-scenarios.md](docs/Core/howto/simulation-scenarios.md) and [docs/Plugins/Replay.md](docs/Plugins/Replay.md).
 
 ## Repository Tour
 
@@ -114,7 +114,7 @@ The Nexus roadmap upgrades the legacy UDP PGN (Coined AOG-Link V0) interface to 
 2. Choose an NX ticket from `tasks.md`, confirm the referenced ADR/SRS material, and align scope in `#nexus-dev`.
 3. Follow `AGENTS.md` for branch naming, ownership bands, and PR expectations—every change ties to one NX ticket.
 4. Keep documentation, schema, and test updates alongside code changes; deterministic storage and replay are core principles.
-5. When you are ready to run the stack, follow the [developer setup quick start](docs/howto/developer-setup.md) for packaging downloads or local builds.
+5. When you are ready to run the stack, follow the [developer setup quick start](docs/Core/howto/developer-setup.md) for packaging downloads or local builds.
 
 ## Installing from Release
 
@@ -148,10 +148,10 @@ Reference `bundles/base.bundle.json` and `bundles/headless.bundle.json` for the 
 ## Additional Resources
 
 - [docs/INDEX.md](docs/INDEX.md) — curated links into ADRs, SRS sections, and plugin guides.
-- [docs/SRS/NOTES.md](docs/SRS/NOTES.md) — narrative summary of the SRS with quick links into requirement sections.
-- [docs/SRS/sections](docs/SRS/sections) — Architecture Decision Records organized by SRS sections, including the [PoseStream roadmap](docs/SRS/sections/2X_System_Architecture/21-ADR-900%20-%20PoseStream,%20Layer,%20and%20Control%20Program%20Roadmap.md) for upcoming work.
-- [docs/howto/developer-setup.md](docs/howto/developer-setup.md) — step-by-step instructions for downloading release builds or running from source.
-- [docs/howto/simulation-scenarios.md](docs/howto/simulation-scenarios.md) — deterministic sim walkthroughs for validation and QA.
+- [docs/development/SRS/NOTES.md](docs/development/SRS/NOTES.md) — narrative summary of the SRS with quick links into requirement sections.
+- [docs/development/SRS/sections](docs/development/SRS/sections) — Architecture Decision Records organized by SRS sections, including the [PoseStream roadmap](docs/development/SRS/sections/2X_System_Architecture/21-ADR-900%20-%20PoseStream,%20Layer,%20and%20Control%20Program%20Roadmap.md) for upcoming work.
+- [docs/Core/howto/developer-setup.md](docs/Core/howto/developer-setup.md) — step-by-step instructions for downloading release builds or running from source.
+- [docs/Core/howto/simulation-scenarios.md](docs/Core/howto/simulation-scenarios.md) — deterministic sim walkthroughs for validation and QA.
 - [docs/templates/ui-modernization-ai-prompts.md](docs/templates/ui-modernization-ai-prompts.md) — examples of AI prompt bundles used in Nexus development.
 
 Nexus continues to evolve in public. The ADR and SRS trail markers are meant to keep the community aligned, even when the AI prototypes the next chapter.

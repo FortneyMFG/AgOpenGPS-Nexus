@@ -1,6 +1,6 @@
 # CM5/Pi5 Quick Start Guide
 
-This guide walks through setting up a Compute Module 5 or Raspberry Pi 5 deployment of Nexus. For detailed hardware requirements, see [OS Support Requirements](../../SRS/sections/1X_Platform_Foundations/11_OS_Support.md).
+This guide walks through setting up a Compute Module 5 or Raspberry Pi 5 deployment of Nexus. For detailed hardware requirements, see [OS Support Requirements](../../development/SRS/sections/1X_Platform_Foundations/11_OS_Support.md).
 
 ## Hardware Requirements
 
@@ -29,7 +29,7 @@ graph TD
 ```
 
 ### 2. Interface Connections
-Following [ADR-006: AOG-Link MCU](../../SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md):
+Following [ADR-006: AOG-Link MCU](../../development/SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md):
 
 | Interface | Connection | Usage |
 |-----------|------------|--------|
@@ -147,7 +147,7 @@ nexus-diag report
 
 ## Performance Optimization
 
-As specified in [ADR-026: Performance Budgets](../../SRS/sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md):
+As specified in [ADR-026: Performance Budgets](../../development/SRS/sections/9X_Frontends_Ops/96-ADR-026 - Performance budgets and instrumentation.md):
 
 1. **CPU Settings**
    - Governor: performance
@@ -173,7 +173,7 @@ As specified in [ADR-026: Performance Budgets](../../SRS/sections/9X_Frontends_O
 
 ## Related Documentation
 
-- [Hardware Requirements](../../SRS/sections/1X_Platform_Foundations/11_OS_Support.md)
-- [Threading, Scheduling & Timing requirements](../../SRS/sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md)
+- [Hardware Requirements](../../development/SRS/sections/1X_Platform_Foundations/11_OS_Support.md)
+- [Threading, Scheduling & Timing requirements](../../development/SRS/sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md)
 - [Safety Guidelines](../../user/safety/INDEX.md)
 - [Maintenance Guide](../../user/maintenance/cm5.md)

@@ -118,7 +118,7 @@ dotnet run --project "tools/Aog.Tools.Qa/Aog.Tools.Qa.csproj" -- dashboard aggre
 dotnet run --project "tools/Aog.Tools.Qa/Aog.Tools.Qa.csproj" -- report generate --metrics tools/qa/metrics --checklist tools/qa/checklists/completed-sample.json --faults out/fault-schedule.json --output out/post-run.md
 ```
 
-See `docs/qa` for task-specific guidance and sample inputs.
+See `docs/development/qa` for task-specific guidance and sample inputs.
 
 ## Testing
 

@@ -2,8 +2,8 @@
 
 These pages act as AgIO runbooks and operational checklists. Formal
 requirements, protocol fields, and transport compatibility matrices now
-live in the [SRS AgIO references](../SRS/references/AgIO_PGN_Baseline.md)
-and [Section 53 — AOG-Link Compatibility](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md).
+live in the [SRS AgIO references](../development/SRS/references/AgIO_PGN_Baseline.md)
+and [Section 53 — AOG-Link Compatibility](../development/SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md).
 Use this folder when you need deployment steps or troubleshooting flows;
 follow the linked SRS sections for normative specs.
 
@@ -45,12 +45,12 @@ flowchart TD
 
 ## Plugin Touchpoints
 - Transport adapters such as
-  [Pumpkin Pi](../plugins/pumpkin-pi.md) and
-  [ISOBUS Bridge](../plugins/IsobusBridge.md) bind to AgIO leases for
+  [Pumpkin Pi](../Plugins/pumpkin-pi.md) and
+  [ISOBUS Bridge](../Plugins/IsobusBridge.md) bind to AgIO leases for
   deterministic hardware access.
 - Device orchestration plugins leverage discovery and inventory feeds
   published by AgIO — see the
-  [Device Manager guide](../plugins/DeviceManager.md) and
+  [Device Manager guide](../Plugins/DeviceManager.md) and
   [Multi-Machine synchronization docs](../Core/multi-machine-sync.md).
 - Core automation plugins depend on AgIO telemetry mirrors for health
   and authority status before issuing control outputs.

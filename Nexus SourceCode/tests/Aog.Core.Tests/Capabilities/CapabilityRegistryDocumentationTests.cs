@@ -29,7 +29,7 @@ public sealed class CapabilityRegistryDocumentationTests
 
         Assert.True(
             missing.Length == 0,
-            $"Missing capability documentation entries for: {string.Join(", ", missing)}. Update docs/SRS/references/core/capability-registry.md under the contracts freeze process before merging.");
+            $"Missing capability documentation entries for: {string.Join(", ", missing)}. Update docs/development/SRS/references/core/capability-registry.md under the contracts freeze process before merging.");
     }
 
     private static ISet<string> ParseDocumentedCapabilities(string documentationPath)

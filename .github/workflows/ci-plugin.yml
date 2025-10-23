@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'plugins/guidance-orchestrator/**'
-      - 'docs/guidance/**'
+      - 'docs/Core/guidance/**'
       - 'schemas/guidance-orchestrator/**'
       - 'tools/sim-harness/**'
       - '.github/workflows/ci-plugin.yml'
@@ -12,7 +12,7 @@ on:
     branches: [ main ]
     paths:
       - 'plugins/guidance-orchestrator/**'
-      - 'docs/guidance/**'
+      - 'docs/Core/guidance/**'
       - 'schemas/guidance-orchestrator/**'
       - 'tools/sim-harness/**'
       - '.github/workflows/ci-plugin.yml'

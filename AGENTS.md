@@ -128,7 +128,7 @@ PR and `tasks.md`.
 ## 10. Quick Reference
 
 - Issue tracker: `tasks.md` (ordered by section).
-- Specs: `docs/SRS` (including `docs/SRS/sections` for ADRs).
+- Specs: `docs/development/SRS` (including `docs/development/SRS/sections` for ADRs).
 - Plugin manifests and leases: `/Nexus SourceCode/src/Aog.Plugins`.
 - Mapping UI stack: `/Nexus SourceCode/src/Aog.UI.Avalonia/Controls`, `/Views/Mapping`,
   `/Rendering`, `/Models`.

@@ -14,4 +14,4 @@ The Guidance Orchestrator turns live driving into Fields2Cover plans and determi
 - `tests/` — unit + integration tests (pending).
 - `appsettings.example.json` — configuration defaults.
 
-Refer to [`docs/guidance`](../../docs/guidance/01_live-field-builder.md) for design notes.
+Refer to [`docs/Core/guidance`](../../docs/Core/guidance/01_live-field-builder.md) for design notes.

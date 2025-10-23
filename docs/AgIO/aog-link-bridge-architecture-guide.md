@@ -5,8 +5,8 @@
 This guide walks through the practical view of the Bridge stack so engineers,
 integrators, and support teams can explain how gRPC services, AOG-Link v1, and
 the transport adapters cooperate. Pair it with the
-[SRS transport compatibility section](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md)
-and the [AgIO PGN reference](../SRS/references/AgIO_PGN_Baseline.md) for the
+[SRS transport compatibility section](../development/SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md)
+and the [AgIO PGN reference](../development/SRS/references/AgIO_PGN_Baseline.md) for the
 normative protocol frames and ACK semantics.
 
 ## 1. Layered view at a glance

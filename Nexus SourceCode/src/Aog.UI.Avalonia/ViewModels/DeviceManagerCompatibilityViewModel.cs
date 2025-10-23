@@ -75,7 +75,7 @@ public sealed class DeviceManagerCompatibilityViewModel
             if (manifests.Count > 0)
             {
                 var report = evaluator.Evaluate(manifests, environment);
-                var source = string.Format(CultureInfo.InvariantCulture, "Loaded {0} manifest(s) from docs/plugins/manifests.", manifests.Count);
+                var source = string.Format(CultureInfo.InvariantCulture, "Loaded {0} manifest(s) from docs/Plugins/manifests.", manifests.Count);
                 return new DeviceManagerCompatibilityViewModel(report, source);
             }
         }

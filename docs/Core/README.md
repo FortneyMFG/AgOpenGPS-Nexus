@@ -2,9 +2,16 @@
 
 This directory now houses Core runbooks and operational guides. The
 authoritative requirements, data contracts, and determinism budgets live
-in the SRS — start with the [Core data flow reference](../SRS/references/core/data-flow.md)
-and [Section 21 — System Decomposition & Boundaries](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md).
+in the SRS — start with the [Core data flow reference](../development/SRS/references/core/data-flow.md)
+and [Section 21 — System Decomposition & Boundaries](../development/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md).
 Use these pages for procedures; consult the SRS for normative details.
+
+## Directory map
+
+- [`guidance/`](guidance/) — delivery briefs and orchestration playbooks tied to ADR-004 and related SRS slices.
+- [`howto/`](howto/) — operational runbooks and provisioning guides referenced by development QA checklists.
+- [`reference/`](reference/) — parity studies, migration notes, and report catalogs aligned with the Core SRS.
+- [`support/`](support/) — customer-facing escalation paths and retention policies coordinated with release operations.
 
 The Core runtime orchestrates deterministic scheduling, capability
 exchange, and orchestration services that connect plugins, UI shells, and
@@ -29,10 +36,10 @@ flowchart TD
   multi-machine coordination workflows.
 
 ## Feature Highlights
-- **Data flow contracts:** The [Core data flow overview](../SRS/references/core/data-flow.md)
+- **Data flow contracts:** The [Core data flow overview](../development/SRS/references/core/data-flow.md)
   summarizes how pose, control, and analytics streams move between
   services.
-- **Capability registry:** [Capability registry reference](../SRS/references/core/capability-registry.md)
+- **Capability registry:** [Capability registry reference](../development/SRS/references/core/capability-registry.md)
   captures the identifiers shared across Core, AgIO, and plugins.
 - **Operations playbooks:** [Linux Core operations](linux-core-operations-playbook.md)
   and [performance budget dashboards](performance-budget-telemetry-dashboards.md)
@@ -41,19 +48,19 @@ flowchart TD
   documents how Core instances coordinate state across head units.
 
 ## Plugin Touchpoints
-- [Core Lifecycle plugin](../plugins/CoreLifecycle.md) manages host
+- [Core Lifecycle plugin](../Plugins/CoreLifecycle.md) manages host
   startup, shutdown, and rolling upgrades across clusters.
-- [Telemetry Logging](../plugins/TelemetryLogging.md) and
-  [Automation Engine](../plugins/AutomationEngine.md) plugins rely on
+- [Telemetry Logging](../Plugins/TelemetryLogging.md) and
+  [Automation Engine](../Plugins/AutomationEngine.md) plugins rely on
   Core’s event bus and scheduling primitives.
 - Guidance and control plugins such as
-  [Autosteer](../plugins/Guidance.md) and
-  [Rate Control](../plugins/RateControl.md) consume capability and
+  [Autosteer](../Plugins/Guidance.md) and
+  [Rate Control](../Plugins/RateControl.md) consume capability and
   telemetry feeds negotiated through Core.
 
 ## Additional References
-- [Core data flow](../SRS/references/core/data-flow.md)
-- [Capability registry](../SRS/references/core/capability-registry.md)
+- [Core data flow](../development/SRS/references/core/data-flow.md)
+- [Capability registry](../development/SRS/references/core/capability-registry.md)
 - [Linux operations playbook](linux-core-operations-playbook.md)
 - [Multi-machine synchronization](multi-machine-sync.md)
 - [Performance budget dashboards](performance-budget-telemetry-dashboards.md)

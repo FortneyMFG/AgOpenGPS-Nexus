@@ -1,11 +1,11 @@
 # Security Model
 
-This document outlines Nexus's security architecture and implementation, following the requirements specified in our [Security & Permissions requirements](../SRS/sections/9X_Frontends_Ops/95_Security_Permissions.md).
+This document outlines Nexus's security architecture and implementation, following the requirements specified in our [Security & Permissions requirements](../development/SRS/sections/9X_Frontends_Ops/95_Security_Permissions.md).
 
 ## Core Security Principles
 
 ### 1. Capability-Based Access
-As defined in [ADR-018: Plugin API](../SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md):
+As defined in [ADR-018: Plugin API](../development/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md):
 
 ```mermaid
 graph TD
@@ -16,7 +16,7 @@ graph TD
 ```
 
 ### 2. Hardware Control Safety
-Following [ADR-024: Discovery & Identity](../SRS/sections/4X_Interprocess_Communications/42-ADR-024 - Discovery and identity services.md):
+Following [ADR-024: Discovery & Identity](../development/SRS/sections/4X_Interprocess_Communications/42-ADR-024 - Discovery and identity services.md):
 
 - Authenticated device identity
 - Signed command validation
@@ -77,7 +77,7 @@ Following [ADR-024: Discovery & Identity](../SRS/sections/4X_Interprocess_Commun
 ## Audit & Monitoring
 
 ### Logging
-As specified in [ADR-019: Provenance & Audit](../SRS/sections/6X_Core_Domain_Services/64-ADR-019 - Provenance audit and QA governance.md):
+As specified in [ADR-019: Provenance & Audit](../development/SRS/sections/6X_Core_Domain_Services/64-ADR-019 - Provenance audit and QA governance.md):
 - Security events
 - Access attempts
 - Configuration changes
@@ -142,7 +142,7 @@ As specified in [ADR-019: Provenance & Audit](../SRS/sections/6X_Core_Domain_Ser
 
 ## Related Documentation
 
-- [Security & Permissions requirements](../SRS/sections/9X_Frontends_Ops/95_Security_Permissions.md)
-- [Plugin Security Guide](../plugins/security.md)
+- [Security & Permissions requirements](../development/SRS/sections/9X_Frontends_Ops/95_Security_Permissions.md)
+- [Plugin Security Guide](../Plugins/security.md)
 - [Hardware Security](../deployment/security.md)
-- [Security Compliance](../reference/security-compliance.md)
+- [Security Compliance](../Core/reference/security-compliance.md)

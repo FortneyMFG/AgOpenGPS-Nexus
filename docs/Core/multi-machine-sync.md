@@ -12,8 +12,8 @@ fleet. Treat them like configuration rather than DRM. Pair this workflow with th
 [offline update channel guide](installer-update-channels.md) so staged media and nightly
 sync archives stay aligned with the channel assignments you deploy. Normative policies
 for collaborative sessions and lifecycle events live in the
-[SRS UI layout section](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) and
-[Job Sessions lifecycle ADR](../SRS/sections/6X_Core_Domain_Services/62-ADR-041%20-%20Job%20Sessions%20Lifecycle.md).
+[SRS UI layout section](../development/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) and
+[Job Sessions lifecycle ADR](../development/SRS/sections/6X_Core_Domain_Services/62-ADR-041%20-%20Job%20Sessions%20Lifecycle.md).
 
 ## Workflow roles and artifacts
 
@@ -24,7 +24,7 @@ for collaborative sessions and lifecycle events live in the
 | Satellite machines | Consume sync snapshots and contribute their own coverage and guidance updates back to the anchor. | `%PROGRAMDATA%/AgOpenGPS/Nexus/fleet/machine-<id>.json`, `%PROGRAMDATA%/AgOpenGPS/Nexus/sync/inbox/`. |
 
 The dealer toolkit from NX-087 already creates the staging folder that travels with the
-installer.【F:docs/howto/dealer-deployment-toolkit.md†L1-L54】 Extend that bundle with a
+installer.【F:docs/Core/howto/dealer-deployment-toolkit.md†L1-L54】 Extend that bundle with a
 `fleet/` directory that holds one machine manifest per cab and a `sync/` directory
 containing the initial field profiles you want preloaded. The
 [season/session migration playbook](season-session-migration-playbook.md) offers scripts
@@ -33,22 +33,22 @@ for translating legacy machine profiles before you drop them into the sync seed.
 ## Pre-flight checklist
 
 Complete these items before leaving the staging bench. Doing so keeps the
-[legacy migration guide](../reference/agopengps-v6/legacy-migration-guide.md) workflow aligned with the synced
+[legacy migration guide](reference/agopengps-v6/legacy-migration-guide.md) workflow aligned with the synced
 machine identities when you upgrade existing fleets:
 
 1. Generate the machine manifest files from the toolkit helper (`dealer-toolkit fleet export`).
    Name them `machine-<serial>.json` so they line up with the stickers on each cab
    controller.
 2. Drop the manifest files into `fleet/` alongside the Nexus installers in the dealer
-   toolkit output.【F:docs/howto/dealer-deployment-toolkit.md†L13-L54】 The same tool writes
+   toolkit output.【F:docs/Core/howto/dealer-deployment-toolkit.md†L13-L54】 The same tool writes
    `fleet/manifest.json`, which simply lists every machine ID and which one should start as
    the anchor.
 3. Export translated machine profiles (`legacy-tool translate`) and any baseline guidance
-   lines into `sync/seed/` so every machine starts with identical data.【F:docs/howto/dealer-deployment-toolkit.md†L38-L54】 Use
+   lines into `sync/seed/` so every machine starts with identical data.【F:docs/Core/howto/dealer-deployment-toolkit.md†L38-L54】 Use
    the [Pi simulation helper](pi-sim.md) when you need to verify legacy AB lines before
    travelling.
 4. Print the delivery checklist from the toolkit bundle and annotate which manifest goes
-   with which physical machine to avoid swapping identities in the field.【F:docs/howto/dealer-deployment-toolkit.md†L30-L54】
+   with which physical machine to avoid swapping identities in the field.【F:docs/Core/howto/dealer-deployment-toolkit.md†L30-L54】
 
 ## Step 1 — Configure the lead machine
 
@@ -62,7 +62,7 @@ machine identities when you upgrade existing fleets:
    that the anchor ID matches `fleet/manifest.json`, and writes
    `fleet/manifest.cache.json` summarising the configured fleet. Confirm the log shows the
    anchor machine as `FleetAnchorConfirmed` before proceeding. Capture a snapshot for the
-   [dealer escalation playbook](../support/dealer-escalation-process.md) so support teams can
+   [dealer escalation playbook](support/dealer-escalation-process.md) so support teams can
    quickly audit fleet assignments if issues arise.
 4. Seed the sync area by copying the contents of `sync/seed/` into
    `%PROGRAMDATA%/AgOpenGPS/Nexus/sync/inbox/`. The Core service will ingest the inbox and
@@ -75,7 +75,7 @@ machine identities when you upgrade existing fleets:
    `%PROGRAMDATA%/AgOpenGPS/Nexus/fleet/`. Leave the anchor's manifest untouched.
 2. Start Nexus Core and watch for the `FleetMachineRegistered` entry. The log also records
    the serial so you can double-check the right file landed on the right machine. Record the
-   timestamp alongside your [field feedback telemetry snapshot](../support/field-feedback-telemetry.md)
+   timestamp alongside your [field feedback telemetry snapshot](support/field-feedback-telemetry.md)
    so weekly rollups show which rigs received fresh identities.
 3. Delete the copied manifest file from the portable media after registration to avoid
    accidentally reusing it on another fleet.
@@ -98,7 +98,7 @@ stick) between machines.
   into the next nightly snapshot.
 
 Preview fleets participating in the
-[community preview program](../support/community-preview-program.md) should attach the
+[community preview program](support/community-preview-program.md) should attach the
 sync drop timestamps to their weekly survey so telemetry comparisons account for when rigs
 received updated guidance or coverage archives.
 

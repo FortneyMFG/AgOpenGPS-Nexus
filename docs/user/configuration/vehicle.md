@@ -23,7 +23,7 @@ This guide covers vehicle setup and configuration in Nexus. For hardware-specifi
 ```
 
 ### Implement Settings
-Following [ADR-008: Equipment Hierarchy](../../SRS/sections/6X_Core_Domain_Services/61-ADR-008 - Equipment Implement Toolbar Section hierarchy.md):
+Following [ADR-008: Equipment Hierarchy](../../development/SRS/sections/6X_Core_Domain_Services/61-ADR-008 - Equipment Implement Toolbar Section hierarchy.md):
 
 ```json
 {
@@ -59,7 +59,7 @@ Following [ADR-008: Equipment Hierarchy](../../SRS/sections/6X_Core_Domain_Servi
 ## Guidance Configuration
 
 ### AutoSteer Settings
-As defined in [ADR-033: Guidance & AutoSteer](../../SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md):
+As defined in [ADR-033: Guidance & AutoSteer](../../development/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md):
 
 | Parameter | Range | Description |
 |-----------|-------|-------------|
@@ -187,7 +187,7 @@ As defined in [ADR-033: Guidance & AutoSteer](../../SRS/sections/8X_Guidance/81-
 
 ## Related Documentation
 
-- [Equipment Requirements](../../SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
-- [Control Requirements](../../SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
+- [Equipment Requirements](../../development/SRS/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
+- [Control Requirements](../../development/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
 - [Calibration Guide](../maintenance/calibration.md)
 - [Operation Manual](../operation/INDEX.md)

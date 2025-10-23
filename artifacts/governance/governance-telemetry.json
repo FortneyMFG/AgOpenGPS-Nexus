@@ -816,11 +816,11 @@
         "links": [
           {
             "label": "Roadmap",
-            "url": "docs/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md"
+            "url": "docs/development/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md"
           },
           {
             "label": "Dependency Map",
-            "url": "docs/plugins/nexus-plugin-dependency-map.md"
+            "url": "docs/Plugins/nexus-plugin-dependency-map.md"
           }
         ]
       }

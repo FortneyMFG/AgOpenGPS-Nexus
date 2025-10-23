@@ -18,8 +18,9 @@ public sealed class BooleanNegationConverter : IValueConverter
             return !flag;
         }
 
-        if (value is bool? nullable)
+        if (value is bool?)
         {
+            var nullable = (bool?)value;
             return !(nullable ?? false);
         }
 

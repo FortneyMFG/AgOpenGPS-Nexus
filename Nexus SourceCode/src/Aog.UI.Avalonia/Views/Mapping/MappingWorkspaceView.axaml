@@ -14,7 +14,7 @@
   <Grid>
     <controls:MapView x:Name="MapViewport" />
 
-    <Grid Padding="16"
+    <Grid Margin="16"
           RowDefinitions="Auto,*,Auto"
           ColumnDefinitions="Auto,*,Auto"
           RowSpacing="16"

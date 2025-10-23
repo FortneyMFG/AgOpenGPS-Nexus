@@ -1,7 +1,7 @@
 # ADR-034: Metadata-driven dashboards and inspector surfaces
 
 ## Status
-Drafting (target review window: 2025-11-28 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** UI Shell (Dashboards), Mapping, Variable Mapping, Telemetry Logging, Device Manager
 

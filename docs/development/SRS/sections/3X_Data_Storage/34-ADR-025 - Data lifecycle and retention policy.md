@@ -1,7 +1,7 @@
 # ADR-025: Data lifecycle and retention policy
 
 ## Status
-Drafting (target review window: 2025-12-22 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** Mapping, Variable Mapping, Telemetry Logging, Job Tasks, UI Shell
 

@@ -1,7 +1,7 @@
 # ADR-010: Layer registry and variable-rate framework
 
 ## Status
-Drafting (target review window: 2025-11-05 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** Mapping, Variable Mapping, Rate Control, Section Control, Planter Monitor, Telemetry Logging
 

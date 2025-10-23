@@ -1,7 +1,7 @@
 # ADR-012: Multi-session and multi-PoseStream fusion
 
 ## Status
-Drafting (target review window: 2025-11-19 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** Mapping, Variable Mapping, Telemetry Logging, Job Tasks
 

@@ -4,8 +4,8 @@
 
 **Authors:** @architecture-wg
 **Reviewers:** @nexus-specs, @program-management
-**Created:** 2025-01-05
-**Last Updated:** 2025-02-14
+**Created:** -
+**Last Updated:** -
 **Supersedes:** —
 **Superseded by:** —
 **Related SRS:** `21_System_Decomposition_Boundaries.md`
@@ -140,8 +140,8 @@ graph TD
 
 | Date | Change | Author | PR / Issue |
 |------|--------|--------|------------|
-| 2025-01-05 | Initial roadmap ADR created. | @architecture-wg | #0000 |
-| 2025-02-14 | Reformatted to ADR template; added risk/governance details. | @architecture-wg | #0000 |
+| - | Initial roadmap ADR created. | @architecture-wg | #0000 |
+| - | Reformatted to ADR template; added risk/governance details. | @architecture-wg | #0000 |
 
 ---
 

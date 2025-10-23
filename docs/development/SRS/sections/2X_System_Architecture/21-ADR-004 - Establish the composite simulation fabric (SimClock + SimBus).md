@@ -4,8 +4,8 @@
 
 **Authors:** @simulation-wg
 **Reviewers:** @nexus-specs, @core-architects
-**Created:** 2024-08-22
-**Last Updated:** 2025-02-14
+**Created:** -
+**Last Updated:** -
 **Supersedes:** —
 **Superseded by:** —
 **Related SRS:** `21_System_Decomposition_Boundaries.md`
@@ -132,7 +132,7 @@ graph TD
 
 * **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.9; `23_Threading_Scheduling_Timing.md` — §23.5, §23.9.
 * **Prior ADRs:** None.
-* **External References:** Replay datasets 2024-H2, Simulation WG minutes (2024-09-18).
+* **External References:** Replay datasets 2024-H2, Simulation WG minutes (-).
 
 ---
 
@@ -140,8 +140,8 @@ graph TD
 
 | Date | Change | Author | PR / Issue |
 |------|--------|--------|------------|
-| 2024-08-22 | Initial decision drafted. | @simulation-wg | #0000 |
-| 2025-02-14 | Reformatted to ADR template; added governance details. | @simulation-wg | #0000 |
+| - | Initial decision drafted. | @simulation-wg | #0000 |
+| - | Reformatted to ADR template; added governance details. | @simulation-wg | #0000 |
 
 ---
 

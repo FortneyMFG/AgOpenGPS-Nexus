@@ -161,7 +161,7 @@ Contributors view deterministic scheduling as prerequisite for Linux deployments
 
 | Date | Summary | PR / Issue |
 |------|---------|------------|
-| 2025-02-14 | Reformatted to SRS v2 template with verification table. | #0000 |
+| - | Reformatted to SRS v2 template with verification table. | #0000 |
 
 ---
 

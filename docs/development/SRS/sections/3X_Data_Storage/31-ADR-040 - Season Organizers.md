@@ -1,7 +1,7 @@
 # ADR-040 — Season Organizers
 
-- **Status:** Accepted — 2025-05-17 architecture guild review
-- **Date:** 2025-03-18
+- **Status:** Accepted — - architecture guild review
+- **Date:** -
 - **Author(s):** Nexus architecture guild
 - **NX Task:** NX-131 Field job session lifecycle ADR
 
@@ -28,7 +28,7 @@ cached analytics and register interest in seasonal overlays before sessions begi
 {
   "id": "season:2025",
   "name": "2025 Crop Year",
-  "dateRange": {"start": "2025-01-01", "end": "2025-12-31"},
+  "dateRange": {"start": "-", "end": "-"},
   "jobIds": ["job:2025-plant-soy", "job:2025-spray-1"],
   "notes": "",
   "optimizerState": null,

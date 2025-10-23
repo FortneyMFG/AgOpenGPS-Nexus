@@ -1,7 +1,7 @@
 # ADR-011: Mapping and visualization imagery pipeline
 
 ## Status
-Drafting (target review window: 2025-11-12 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** Mapping, UI Shell (Avalonia/Web), Telemetry Logging
 

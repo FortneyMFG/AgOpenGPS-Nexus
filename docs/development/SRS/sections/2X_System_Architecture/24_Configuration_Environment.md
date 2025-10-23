@@ -160,7 +160,7 @@ Reliable configuration management is viewed as prerequisite for remote deploymen
 
 | Date | Summary | PR / Issue |
 |------|---------|------------|
-| 2025-02-14 | Reformatted to SRS v2 template and added verification plan. | #0000 |
+| - | Reformatted to SRS v2 template and added verification plan. | #0000 |
 
 ---
 

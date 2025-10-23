@@ -1,7 +1,7 @@
 ---
 owner: plugin-governance
 status: active
-last_reviewed: 2024-05-10
+last_reviewed: -
 related_tickets:
   - NX-031
   - NX-032

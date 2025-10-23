@@ -1,7 +1,7 @@
 # ADR-043 — Multi-Field Job Envelopes
 
-- **Status:** Accepted — 2025-05-17 lifecycle & mapping review
-- **Date:** 2025-03-18
+- **Status:** Accepted — - lifecycle & mapping review
+- **Date:** -
 - **Author(s):** Nexus architecture guild
 - **NX Task:** NX-131 Field job session lifecycle ADR
 

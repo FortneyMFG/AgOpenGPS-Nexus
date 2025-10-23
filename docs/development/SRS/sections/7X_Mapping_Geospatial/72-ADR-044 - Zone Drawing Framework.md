@@ -1,7 +1,7 @@
 # ADR-044 — Zone Drawing Framework
 
 - **Status:** Drafting
-- **Date:** 2025-03-19
+- **Date:** -
 - **Author(s):** Nexus architecture guild
 - **NX Task:** NX-190 Comprehensive ADR portfolio review
 

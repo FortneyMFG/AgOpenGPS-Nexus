@@ -1,6 +1,6 @@
 # Report Template Catalog (ADR-051)
 
-*Updated: 2025-03-19 UTC*
+*Updated: - UTC*
 
 ## Overview
 

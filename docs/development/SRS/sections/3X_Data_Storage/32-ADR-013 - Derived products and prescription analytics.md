@@ -1,7 +1,7 @@
 # ADR-013: Derived products and prescription analytics
 
 ## Status
-Drafting (target review window: 2025-12-02 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** Variable Mapping, Mapping, Rate Control, Telemetry Logging, Job Tasks
 

@@ -1,7 +1,7 @@
 # ADR-022: CRS, units, and precision policy
 
 ## Status
-Drafting (target review window: 2025-12-20 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** Mapping, Variable Mapping, Rate Control, Telemetry Logging, File IO
 

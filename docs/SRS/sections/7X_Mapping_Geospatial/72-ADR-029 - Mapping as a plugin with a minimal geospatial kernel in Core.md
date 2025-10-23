@@ -12,7 +12,7 @@ capability and determinism guarantees codified below.
 
 
 ## Context
-Guidance, section control, and variable-rate features all require spatial queries, yet many rigs operate without GNSS hardware or only need speed-based automation. Today the legacy mapping stack is bundled into the runtime, coupling UI overlays, layer math, and file import pipelines to Core releases.【F:docs/aog-v6-mapping-brief.md†L10-L53】 The team also wants to iterate on new layer formats (ISOXML, GeoJSON, GeoTIFF) and mapping algorithms without breaking Core’s determinism guarantees or bloating deployments that run headless. A dedicated ADR is needed to define the split between a lean geospatial kernel that ships with Core and pluggable mapping engines that can evolve independently.
+Guidance, section control, and variable-rate features all require spatial queries, yet many rigs operate without GNSS hardware or only need speed-based automation. Today the legacy mapping stack is bundled into the runtime, coupling UI overlays, layer math, and file import pipelines to Core releases.【F:docs/SRS/references/aog-v6-mapping-brief.md†L10-L53】 The team also wants to iterate on new layer formats (ISOXML, GeoJSON, GeoTIFF) and mapping algorithms without breaking Core’s determinism guarantees or bloating deployments that run headless. A dedicated ADR is needed to define the split between a lean geospatial kernel that ships with Core and pluggable mapping engines that can evolve independently.
 
 ## Decision
 Create a two-part architecture:
@@ -83,7 +83,7 @@ Services:
 - **Partial capability gaps:** If a plugin lacks optional capabilities (e.g., raster but not vector), presets and JobsService entries annotate the missing features and downgrade dependent automations. For example, a VRC preset shows "Variable rate paused — mapping:raster missing" while maintaining baseline/manual rates until the capability becomes available again.
 
 ## Consequences
-- **Pros:** Optional mapping footprint for headless rigs, swappable engines for specialized workflows, isolated failures, and faster iteration on GIS features without Core releases.【F:docs/aog-v6-mapping-brief.md†L55-L97】
+- **Pros:** Optional mapping footprint for headless rigs, swappable engines for specialized workflows, isolated failures, and faster iteration on GIS features without Core releases.【F:docs/SRS/references/aog-v6-mapping-brief.md†L55-L97】
 - **Cons & mitigations:** IPC latency managed through shared monotonic timebase/frame IDs; protobuf version drift mitigated by contracts freeze/versioning; debugging supported by standardized replay taps; state fan-out handled via Core’s event bus and capability registry.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L6-L28】【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md†L12-L34】
 
 ## Follow-up work

@@ -3,7 +3,10 @@
 > **Audience:** Operators and support engineers deploying the headless Linux
 > "AOG Core" service alongside AGiO hardware bridges. The goal is to keep rigs
 > supervised under systemd, surface health signals demanded by SRS §10, and
-> reuse ADR-068 replay tooling for diagnostics.
+> reuse ADR-068 replay tooling for diagnostics. Normative health and
+> observability requirements reside in
+> [SRS Section 64 — Telemetry Health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
+> and [ADR-068 Layer Controllers](../SRS/sections/2X_System_Architecture/21-ADR-068%20-%20Layer%20Controllers%20%26%20Aggregation%20Runtime.md).
 
 ## 1. Prerequisites
 

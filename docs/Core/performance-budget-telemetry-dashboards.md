@@ -4,7 +4,9 @@ ADR-026 establishes Nexus performance budgets so CI, operators, and plugin teams
 can catch regressions before they impact autonomy. NX-323 delivers the telemetry
 side of that plan: a canonical set of dashboards built on the instrumentation
 landed in NX-231 and the ADR-026 metric catalog. This guide documents how to
-provision, validate, and maintain those dashboards across environments.
+provision, validate, and maintain those dashboards across environments. For the
+official thresholds and instrumentation contracts, refer to
+[ADR-026 in the SRS](../SRS/sections/9X_Frontends_Ops/96-ADR-026%20-%20Performance%20budgets%20and%20instrumentation.md).
 
 ## Audience & prerequisites
 

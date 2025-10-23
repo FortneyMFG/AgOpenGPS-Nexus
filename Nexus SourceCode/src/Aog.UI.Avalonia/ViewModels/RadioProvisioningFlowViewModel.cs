@@ -134,7 +134,7 @@ public sealed class RadioProvisioningFlowViewModel
         return new RadioProvisioningFlowViewModel(
             summary: "Provision RadioBridge devices with repeatable tooling that aligns with ADR-048.",
             securityNote: "Keep provisioning JSON files in a secured location; treat keys as secrets and rotate them via the same workflow.",
-            documentationSummary: "Full guide: docs/howto/radio/radiobridge-provisioning.md",
+            documentationSummary: "Full guide: docs/development/howto/radio/radiobridge-provisioning.md",
             profileSchemaSummary: "Provisioning profiles follow the RadioBridgeProvisioningProfile contract shipped with the tooling.",
             stages: stages,
             profileFields: profileFields);

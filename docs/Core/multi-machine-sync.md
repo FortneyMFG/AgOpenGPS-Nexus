@@ -12,8 +12,8 @@ fleet. Treat them like configuration rather than DRM. Pair this workflow with th
 [offline update channel guide](installer-update-channels.md) so staged media and nightly
 sync archives stay aligned with the channel assignments you deploy. Normative policies
 for collaborative sessions and lifecycle events live in the
-[SRS UI layout section](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) and
-[Job Sessions lifecycle ADR](../SRS/sections/6X_Core_Domain_Services/62-ADR-041%20-%20Job%20Sessions%20Lifecycle.md).
+[SRS UI layout section](../development/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) and
+[Job Sessions lifecycle ADR](../development/SRS/sections/6X_Core_Domain_Services/62-ADR-041%20-%20Job%20Sessions%20Lifecycle.md).
 
 ## Workflow roles and artifacts
 
@@ -24,7 +24,7 @@ for collaborative sessions and lifecycle events live in the
 | Satellite machines | Consume sync snapshots and contribute their own coverage and guidance updates back to the anchor. | `%PROGRAMDATA%/AgOpenGPS/Nexus/fleet/machine-<id>.json`, `%PROGRAMDATA%/AgOpenGPS/Nexus/sync/inbox/`. |
 
 The dealer toolkit from NX-087 already creates the staging folder that travels with the
-installer.【F:docs/howto/dealer-deployment-toolkit.md†L1-L54】 Extend that bundle with a
+installer.【F:docs/development/howto/dealer-deployment-toolkit.md†L1-L54】 Extend that bundle with a
 `fleet/` directory that holds one machine manifest per cab and a `sync/` directory
 containing the initial field profiles you want preloaded. The
 [season/session migration playbook](season-session-migration-playbook.md) offers scripts
@@ -40,15 +40,15 @@ machine identities when you upgrade existing fleets:
    Name them `machine-<serial>.json` so they line up with the stickers on each cab
    controller.
 2. Drop the manifest files into `fleet/` alongside the Nexus installers in the dealer
-   toolkit output.【F:docs/howto/dealer-deployment-toolkit.md†L13-L54】 The same tool writes
+   toolkit output.【F:docs/development/howto/dealer-deployment-toolkit.md†L13-L54】 The same tool writes
    `fleet/manifest.json`, which simply lists every machine ID and which one should start as
    the anchor.
 3. Export translated machine profiles (`legacy-tool translate`) and any baseline guidance
-   lines into `sync/seed/` so every machine starts with identical data.【F:docs/howto/dealer-deployment-toolkit.md†L38-L54】 Use
+   lines into `sync/seed/` so every machine starts with identical data.【F:docs/development/howto/dealer-deployment-toolkit.md†L38-L54】 Use
    the [Pi simulation helper](pi-sim.md) when you need to verify legacy AB lines before
    travelling.
 4. Print the delivery checklist from the toolkit bundle and annotate which manifest goes
-   with which physical machine to avoid swapping identities in the field.【F:docs/howto/dealer-deployment-toolkit.md†L30-L54】
+   with which physical machine to avoid swapping identities in the field.【F:docs/development/howto/dealer-deployment-toolkit.md†L30-L54】
 
 ## Step 1 — Configure the lead machine
 

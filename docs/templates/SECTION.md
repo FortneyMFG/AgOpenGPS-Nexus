@@ -1,6 +1,6 @@
 # Section Template (Retired)
 
-Use the consolidated [SRS section template](../SRS/03_SRS_Section_Template.md) for
+Use the consolidated [SRS section template](../development/SRS/03_SRS_Section_Template.md) for
 new or updated Nexus requirements. It already includes placeholders for:
 
 - Purpose, context, and legacy comparison (§[X.1]–§[X.3])

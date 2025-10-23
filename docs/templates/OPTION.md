@@ -1,7 +1,7 @@
 # Option Template (Retired)
 
 Author option write-ups directly inside the
-[SRS section template — §[X.10] Option Overview](../SRS/03_SRS_Section_Template.md#x10-option-overview)
+[SRS section template — §[X.10] Option Overview](../development/SRS/03_SRS_Section_Template.md#x10-option-overview)
 and its related subsections for comparisons (§[X.11]) and scoring (§[X.12]). Keeping the
 context, trade-offs, and decision record together prevents stale duplicates across the
 docs/templates directory.

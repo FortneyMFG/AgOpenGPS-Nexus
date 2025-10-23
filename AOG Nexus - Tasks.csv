@@ -299,10 +299,10 @@ NX-335,FALSE,TRUE,NX-296,,Legacy multi-field envelope translator — ADR-043 mul
 NX-336,FALSE,TRUE,"NX-269, NX-304",,Legacy telemetry remap to new layers — ADR-049/052 telemetry parity
 NX-337,FALSE,TRUE,NX-274,,Legacy weather log migration utilities — ADR-053 weather parity
 NX-341,FALSE,TRUE,,,Produce zipped release artifacts for Windows and Linux builds
-NX-342,FALSE,TRUE,,,docs/howto/developer-setup.md
+NX-342,FALSE,TRUE,,,docs/development/howto/developer-setup.md
 NX-343,FALSE,TRUE,,,UI modernization AI prompt bundle
 NX-401,FALSE,TRUE,,,Simulation catalog atomic provider registration
-NX-410,FALSE,TRUE,,,Legacy UI asset migration workbook per docs/reference/agvalonia/ui-shell-and-plugin-integration.md
+NX-410,FALSE,TRUE,,,Legacy UI asset migration workbook per docs/Core/reference/agvalonia/ui-shell-and-plugin-integration.md
 NX-411,FALSE,TRUE,NX-410,,Shell and navigation port from V6 and AgValonia per artifacts/ui-core-spec.md
 NX-412,FALSE,TRUE,NX-411,,Map canvas and field operations UI port aligned with artifacts/ui-inventory.json
 NX-413,FALSE,TRUE,NX-412,,Job and field lifecycle dialogs port aligned with artifacts/ui-backlog.json

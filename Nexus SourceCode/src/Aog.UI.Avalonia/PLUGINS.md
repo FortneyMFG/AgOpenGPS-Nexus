@@ -152,5 +152,5 @@ Plugins should provide deterministic block IDs and avoid mutating descriptors af
 - Use the Plugin Manager panel (`View > Plugin Manager`) to inspect resolved descriptors and dependency trees.
 - The diagnostics sidebar exposes loaded ALC counts; unloading a plugin should decrement the count by one.
 
-For examples, review the official plugin guides in `docs/plugins/official/` and the `fe.hello` example plugin under `plugins/examples/`.
+For examples, review the official plugin guides in `docs/Plugins/official/` and the `fe.hello` example plugin under `plugins/examples/`.
 

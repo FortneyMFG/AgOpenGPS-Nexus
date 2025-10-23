@@ -1,7 +1,7 @@
 # Cost & Profit Plugin Building Blocks
 
 These building blocks bootstrap the ingestion pipeline outlined in
-[ADR-050](../../../docs/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md) by normalizing cost
+[ADR-050](../../../docs/development/SRS/sections/7X_Mapping_Geospatial/72-ADR-050 - Cost & Profit Plugin.md) by normalizing cost
 entries and tracking material ledger balances.
 
 - `CostRecord`, `CostScope`, and `CostCategory` capture normalized cost events

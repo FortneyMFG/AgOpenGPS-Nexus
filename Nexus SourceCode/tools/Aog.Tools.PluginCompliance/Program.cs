@@ -282,7 +282,7 @@ internal static class Program
         Console.WriteLine("  capabilities        Emit capability and lease data from manifests.");
         Console.WriteLine();
         Console.WriteLine("Options:");
-        Console.WriteLine("  --manifests <path>  Override manifest root (default: docs/plugins/manifests).");
+        Console.WriteLine("  --manifests <path>  Override manifest root (default: docs/Plugins/manifests).");
         Console.WriteLine("  --baselines <path>  Override baseline root when linting.");
         Console.WriteLine("  --plugin <id|name>  Filter capabilities report to a specific plugin.");
         Console.WriteLine("  --format <type>     Capabilities output format (json, text). Default: json.");

@@ -95,5 +95,5 @@ Contracts are versioned; the host refuses to activate plugins compiled against i
 5. Release all resources in `ShutdownAsync`.
 6. Validate your manifest and package with `PackPlugin`.
 
-For concrete examples, review the official plugin cards in `docs/plugins/official/` and the sample implementation in `plugins/examples/fe.hello`.
+For concrete examples, review the official plugin cards in `docs/Plugins/official/` and the sample implementation in `plugins/examples/fe.hello`.
 

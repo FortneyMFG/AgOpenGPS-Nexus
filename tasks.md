@@ -145,6 +145,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-246 GNSS correction services bootstrap _(Done)_ — ADR-066 GNSS correction services
 - [x] NX-671 gpsd disable toggle for Linux backend _(Done)_ — Allows operators to opt out of gpsd monitoring when the daemon is not present
 - [x] NX-701 SocketCAN timeout handling fix _(Done)_ — Avoid double delay after read timeouts
+- [x] NX-910 SocketCAN tests skip without CAP_NET_ADMIN _(Done)_ — Document capability requirement and skip when privilege is missing
 - [x] NX-673 Linux backend multi-stack wiring _(Done)_ — Registers serial, gpsd, and SocketCAN services together with docs/tests
 - [x] NX-956 SocketCAN reconnect delay clamp _(Done)_ — Guard zero/negative delays by restoring the default backoff
 - [x] NX-935 Legacy pose codec default source fallback _(Done)_ — Default main antenna source address when metadata is omitted

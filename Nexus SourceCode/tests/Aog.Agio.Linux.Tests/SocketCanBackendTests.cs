@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -16,11 +17,26 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using SocketCANSharp;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Aog.Agio.Linux.Tests;
 
+/// <summary>
+///     Tests for the SocketCAN background service and channel wiring.
+/// </summary>
+/// <remarks>
+///     These tests require Linux with the <c>CAP_NET_ADMIN</c> capability in order to manage virtual CAN interfaces.
+///     Run the suite from a shell that has been granted the capability (for example,
+///     <c>sudo setcap cap_net_admin+ep $(command -v dotnet)</c>) or inside a container started with
+///     <c>--cap-add NET_ADMIN</c>.
+/// </remarks>
 public sealed class SocketCanBackendTests
 {
+    public SocketCanBackendTests()
+    {
+        SkipIfSocketCanPrivilegesMissing();
+    }
+
     [Fact]
     public async Task BackgroundService_PublishesTranslatedFrames()
     {
@@ -655,10 +671,59 @@ public sealed class SocketCanBackendTests
             ReconnectDelay = template.ReconnectDelay,
         };
 
-        var field = typeof(SocketCanOptions).GetField("_sourcePrefix", BindingFlags.Instance | BindingFlags.NonPublic);
-        field?.SetValue(clone, sourcePrefix);
+    private static readonly Lazy<bool> s_hasSocketCanPrivileges = new(CheckSocketCanPrivileges);
 
-        return clone;
+    private static void SkipIfSocketCanPrivilegesMissing()
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            throw new SkipException("SocketCAN backend tests require Linux.");
+        }
+
+        if (!s_hasSocketCanPrivileges.Value)
+        {
+            throw new SkipException(
+                "SocketCAN backend tests require CAP_NET_ADMIN. Run `sudo setcap cap_net_admin+ep $(command -v dotnet)` " +
+                "or execute the suite in an environment started with --cap-add NET_ADMIN.");
+        }
+    }
+
+    private static bool CheckSocketCanPrivileges()
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            return true;
+        }
+
+        const string statusPath = "/proc/self/status";
+        const int capNetAdminBit = 12;
+
+        try
+        {
+            foreach (var line in File.ReadLines(statusPath))
+            {
+                const string prefix = "CapEff:";
+                if (!line.StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                var hex = line.Substring(prefix.Length).Trim();
+                if (hex.Length == 0)
+                {
+                    break;
+                }
+
+                var mask = Convert.ToUInt64(hex, 16);
+                return (mask & (1UL << capNetAdminBit)) != 0;
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or FormatException or OverflowException)
+        {
+            return false;
+        }
+
+        return false;
     }
 
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)

@@ -6,16 +6,16 @@ run scenario plus sample verification logs captured with the soak harness.
 
 ## Files
 
-- [`legacy-auto-run.json`](legacy-auto-run.json) — scenario definitions that bind the Nexus
+- [`legacy-auto-run.json`](../../../../development/SRS/appendices/samples/scenarios/legacy-auto-run/legacy-auto-run.json) — scenario definitions that bind the Nexus
   runtime to legacy UDP pose, steering, and section streams.
-- [`verification/soak-report.sample.json`](verification/soak-report.sample.json) — example
+- [`verification/soak-report.sample.json`](../../../../development/SRS/appendices/samples/scenarios/legacy-auto-run/verification/soak-report.sample.json) — example
   output from `legacy-tool soak --seconds 30` showing balanced frame counts.
 - [`verification/checklist.md`](verification/checklist.md) — operator checklist used after the
   soak run.
 
 ## Usage
 
-1. Import `legacy-auto-run.json` via **Simulation → Edit scenarios…** and choose
+1. Import `docs/development/SRS/appendices/samples/scenarios/legacy-auto-run/legacy-auto-run.json` via **Simulation → Edit scenarios…** and choose
    the `legacy-auto-run` preset to bind the legacy streams to the Nexus runtime.
 2. Run the soak harness (`legacy-tool soak --seconds 30 --output soak.json`) on
    the bench rig and confirm the totals match the sample report.
@@ -23,7 +23,7 @@ run scenario plus sample verification logs captured with the soak harness.
 
 ## Verification logs
 
-Sample soak report ([`verification/soak-report.sample.json`](verification/soak-report.sample.json)):
+Sample soak report ([`verification/soak-report.sample.json`](../../../../development/SRS/appendices/samples/scenarios/legacy-auto-run/verification/soak-report.sample.json)):
 
 ```json
 {

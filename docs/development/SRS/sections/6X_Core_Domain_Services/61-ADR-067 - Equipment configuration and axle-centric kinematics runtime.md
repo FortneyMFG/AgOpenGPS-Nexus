@@ -100,6 +100,67 @@ needed for automation safety and planner guardrails.
 * Telemetry topics mirror configurator blueprint and include capability summaries for planners and diagnostics.
 * Definition of Done gates demand lossless round-trips, latency/overshoot budgets, and slip/accuracy metrics across fixtures.
 
+### 6.1 Operational Playbook
+
+The runtime ships with an end-to-end workflow that operators and engineers follow when onboarding axle-centric profiles:
+
+1. **Profile ingestion.** `AxleCentricProfileLoader` canonicalises JSON exports, enforces schema and compatibility guards, injects deterministic seeds, and emits `KIN-###` errors with health telemetry so support can confirm the active configuration without collecting files manually.【F:docs/development/SRS/appendices/samples/examples/articulated-tractor.v1.json†L1-L32】
+2. **Automation integration.** `AxleAutomationIntegrator` pushes curvature limits, slip budgets, drive-direction policies, and deterministic seeds into planners and controllers via `AutomationModeSnapshot`, avoiding duplicated Ackermann maths in downstream modules.【F:docs/development/SRS/sections/8X_Guidance/81-ADR-033 - Guidance planner and autosteer orchestration.md†L19-L68】
+3. **Calibration workflows.** `CalibrationWorkflows` implements Ackermann validation, hitch zeroing, slip sanity checks, and transport lock verification, returning typed records that UI/CLI tooling can surface consistently. Acceptance budgets mirror the verification gates captured in §7.【F:docs/development/SRS/sections/6X_Core_Domain_Services/61-ADR-067 - Equipment configuration and axle-centric kinematics runtime.md†L188-L210】
+4. **Documentation & presets.** Preset bundles under `artifacts/presets/axle-centric/` capture canonical hashes, deterministic seeds, and per-mode limits so simulation fixtures and fleet rollouts stay aligned. Support references `/machine/health`, `/planner/limits`, and `/calibration/status` telemetry topics when troubleshooting rigs.
+
+#### 6.1.1 Sample Configuration Snippets
+
+Profiles exported from the configurator include vehicle geometry, implement metadata, and controller settings that map directly to runtime services.
+
+```json
+{
+  "vehicle": {
+    "name": "John Deere 6R",
+    "type": "tractor",
+    "wheelbase": 2.8,
+    "turnRadius": 4.5,
+    "antennaOffset": { "y": 1.5 }
+  }
+}
+```
+
+```json
+{
+  "implement": {
+    "type": "planter",
+    "width": 12.0,
+    "sections": [
+      { "id": 1, "width": 3.0, "offset": -4.5 },
+      { "id": 2, "width": 3.0, "offset": -1.5 },
+      { "id": 3, "width": 3.0, "offset": 1.5 },
+      { "id": 4, "width": 3.0, "offset": 4.5 }
+    ]
+  }
+}
+```
+
+```json
+{
+  "guidance": {
+    "controller": { "p_gain": 2.5, "i_gain": 0.1, "d_gain": 0.5, "lookahead": 2.8 },
+    "limits": { "max_steer_angle": 35.0, "max_steer_rate": 25.0, "min_speed": 0.5, "max_speed": 20.0 }
+  }
+}
+```
+
+```json
+{
+  "sections": {
+    "overlap": 0.15,
+    "lookAhead": 2.0,
+    "coverage": { "minimum": 0.98, "target": 1.0, "maximum": 1.02 }
+  }
+}
+```
+
+These snippets align with the articulated tractor example in Appendix samples and provide a quick reference when validating ingestion against calibration requirements.
+
 ---
 
 ## 7) Verification

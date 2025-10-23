@@ -61,7 +61,7 @@ internal static class Program
     private static async Task<int> RunLintAsync(string repoRoot, string[] args)
     {
         var parameters = new List<string>(args);
-        var manifestRoot = ResolveOptionPath(parameters, repoRoot, "--manifests", Path.Combine(repoRoot, "docs", "plugins", "manifests"));
+        var manifestRoot = ResolveOptionPath(parameters, repoRoot, "--manifests", Path.Combine(repoRoot, "docs", "development", "SRS", "appendices", "samples", "plugins"));
         var baselineRoot = ResolveOptionPath(parameters, repoRoot, "--baselines", Path.Combine(repoRoot, "Nexus SourceCode", "tests", "Aog.Plugins.Tests", "Compatibility", "Baselines"));
 
         if (parameters.Count > 0)
@@ -90,7 +90,7 @@ internal static class Program
     private static async Task<int> RunCapabilitiesAsync(string repoRoot, string[] args)
     {
         var parameters = new List<string>(args);
-        var manifestRoot = ResolveOptionPath(parameters, repoRoot, "--manifests", Path.Combine(repoRoot, "docs", "plugins", "manifests"));
+        var manifestRoot = ResolveOptionPath(parameters, repoRoot, "--manifests", Path.Combine(repoRoot, "docs", "development", "SRS", "appendices", "samples", "plugins"));
         var pluginFilter = ExtractOptionValue(parameters, "--plugin");
         var format = ExtractOptionValue(parameters, "--format") ?? "json";
         var outputPath = ExtractOptionValue(parameters, "--output");
@@ -282,7 +282,7 @@ internal static class Program
         Console.WriteLine("  capabilities        Emit capability and lease data from manifests.");
         Console.WriteLine();
         Console.WriteLine("Options:");
-        Console.WriteLine("  --manifests <path>  Override manifest root (default: docs/Plugins/manifests).");
+        Console.WriteLine("  --manifests <path>  Override manifest root (default: docs/development/SRS/appendices/samples/plugins).");
         Console.WriteLine("  --baselines <path>  Override baseline root when linting.");
         Console.WriteLine("  --plugin <id|name>  Filter capabilities report to a specific plugin.");
         Console.WriteLine("  --format <type>     Capabilities output format (json, text). Default: json.");

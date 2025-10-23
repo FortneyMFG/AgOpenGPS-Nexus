@@ -49,10 +49,21 @@ Define the security posture and permission model for Nexus frontends and operati
 
 ---
 
-> **Requirement Grammar (RFC-2119):**  
-> - **MUST / MUST NOT** = mandatory; verification required.  
-> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.  
+> **Requirement Grammar (RFC-2119):**
+> - **MUST / MUST NOT** = mandatory; verification required.
+> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.
 > - **MAY** = optional; document enabling conditions.
+
+### 95.4.1 Security Model Overview
+
+- **Capability-gated access.** Plugins request scoped leases (`steering.command`, `pose.read`, `settings.write`, etc.) within their manifests; the host enforces these scopes before exposing APIs or hardware endpoints.【F:docs/development/SRS/appendices/samples/plugins/sections/1.1.0.json†L65-L122】【F:docs/development/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L120-L186】
+- **Hardware control safeguards.** Discovery and identity services authenticate devices, validate signed commands, and track watchdog status so authority transfers remain deterministic.【F:docs/development/SRS/sections/4X_Interprocess_Communications/42-ADR-024 - Discovery and identity services.md†L13-L76】【F:docs/development/SRS/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L63-L78】
+- **Role-aligned permission levels.** Operators map Monitor, Operate, Configure, and Manage roles to scope bundles, enabling shared rigs to enforce least privilege while preserving offline access.【F:docs/development/SRS/sections/9X_Frontends_Ops/95_Security_Permissions.md†L45-L88】
+- **Authentication surfaces.** Local sessions integrate with OS user accounts and hardware security keys, while remote clients rely on mTLS or OIDC tokens with session lifetimes aligned to §43 channel policies.【F:docs/development/SRS/sections/4X_Interprocess_Communications/43_Channel_Security.md†L1-L115】【F:docs/development/SRS/sections/9X_Frontends_Ops/93_Command_Line_Interface.md†L67-L144】
+- **Data protection.** Config stores encrypt sensitive values, manifests may require signing, and telemetry pipelines transport security events for centralized monitoring and alerts.【F:docs/development/SRS/sections/3X_Data_Storage/33_Offline_First_Sync.md†L123-L179】【F:docs/development/SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L186-L211】
+- **Audit & monitoring.** Provenance services capture security events (access attempts, configuration edits, hardware commands) and drive alerting when violations occur, satisfying ADR-019 obligations.【F:docs/development/SRS/sections/6X_Core_Domain_Services/64-ADR-019 - Provenance audit and QA governance.md†L21-L86】
+
+The JSON samples and configuration snippets in Appendix profiles demonstrate how manifests and deployment descriptors encode these policies, giving implementers concrete templates while keeping the SRS as the canonical security specification.
 
 ## 95.5 Requirements
 

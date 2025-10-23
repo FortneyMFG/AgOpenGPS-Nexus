@@ -48,10 +48,31 @@ Define the extensibility surface, packaging policies, and update workflows that 
 
 ---
 
-> **Requirement Grammar (RFC-2119):**  
-> - **MUST / MUST NOT** = mandatory; verification required.  
-> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.  
+> **Requirement Grammar (RFC-2119):**
+> - **MUST / MUST NOT** = mandatory; verification required.
+> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.
 > - **MAY** = optional; document enabling conditions.
+
+### 94.4.1 Architecture Overview
+
+- **Contract-first plugins.** Packages ship as deterministic ZIP archives containing the manifest, managed assemblies, and optional assets. Manifests declare capabilities, permission scopes, and dependency relationships enforced by the host before activation.【F:docs/Plugins/architecture.md†L15-L88】【F:docs/development/SRS/appendices/samples/plugins/autosteer/1.0.0.json†L1-L76】
+- **Capability leases.** Runtime access is governed by manifest-declared leases so exclusive surfaces (e.g., guidance control) cannot be pre-empted without arbitration, aligning with §95 security policies.【F:docs/development/SRS/appendices/samples/plugins/autosteer/1.0.0.json†L77-L140】【F:docs/development/SRS/sections/9X_Frontends_Ops/95_Security_Permissions.md†L47-L88】
+- **Deterministic execution.** Simulation and replay harnesses treat plugins as deterministic workloads via collectible `AssemblyLoadContext` boundaries, ensuring predictable teardown and hot-reload semantics across desktop and headless deployments.【F:docs/Plugins/performance.md†L34-L112】
+- **Resource management.** Hosts isolate plugins within bounded resource envelopes (memory, threads, IO) and surface telemetry so catalog governance can reject bundles that exceed stated budgets.【F:docs/Plugins/performance.md†L117-L188】【F:docs/development/SRS/sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md†L101-L156】
+
+#### Core Plugin Bands
+
+1. **Guidance & control** — AutoSteer, Section Control, Rate Control, and future guidance orchestrators feed arbitration pipelines and control loops.【F:docs/Plugins/Guidance.md†L10-L92】【F:docs/development/SRS/appendices/samples/plugins/sections/1.1.0.json†L1-L122】
+2. **Data & analytics** — Mapping, telemetry logging, crop/coverage analytics, and profit analysis expose dashboards and reports without modifying Core binaries.【F:docs/Plugins/Analytics.md†L9-L86】【F:docs/development/SRS/appendices/samples/plugins/telemetry-logging/1.0.0.json†L1-L88】
+3. **Hardware integration** — ISOBUS Bridge, Device Manager, and AgIO sidecars bridge physical transports into capability-aware services while maintaining watchdog compliance.【F:docs/Plugins/IsobusBridge.md†L1-L112】【F:docs/development/SRS/appendices/samples/plugins/device-manager/1.0.0.json†L1-L124】
+4. **Operational workflows** — Job Tasks, File IO, compatibility evaluators, and Sync Dashboard streamline setup, migration, and reporting for operators and support teams.【F:docs/Plugins/JobTasks.md†L9-L72】【F:docs/development/SRS/appendices/samples/plugins/file-io/1.0.0.json†L1-L110】
+
+#### Developer Quick Start
+
+1. [Provision the development environment](../../development/INDEX.md#initial-setup) with Nexus SDKs and manifest tooling.
+2. Scaffold a plugin via the tutorials, implement capability declarations, and bind to required services.【F:docs/Plugins/tutorials/first-plugin.md†L1-L128】
+3. Exercise integration tests and deterministic replay harnesses before packaging.【F:docs/development/testing.md†L42-L101】
+4. Package and publish via the manifest governance workflow described in §94.5, ensuring catalog metadata and optional signatures are attached.【F:docs/Plugins/plugin-lease-manifest-governance.md†L20-L112】
 
 ## 94.5 Requirements
 

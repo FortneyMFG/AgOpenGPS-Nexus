@@ -207,3 +207,35 @@ The scope covers legacy PGN flows, modular firmware capabilities, transport disc
 | C6 — Linux gateway bridge | 4 | 4 | 3 | 4 | 3 | 3.75 |
 
 > **Informative:** Weighted scores guide prioritization but final decisions require ADR sign-off.
+
+---
+
+## 51.13 Integration Patterns & Deployment Models
+
+### 51.13.1 Deployment Models
+
+- **CM5/Pi5 integrated controller.** Co-locates Core, Pumpkin Pi, and AgIO on a Compute Module 5 so steering, section control, and telemetry stay inside deterministic shared-memory loops with mirrored MQTT topics for observability.【F:docs/development/SRS/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L19-L78】【F:docs/development/SRS/sections/5X_Hardware_IO_Device_Layer/54-ADR-00XX - 00XX CM5 SHM Fastpath + HAL Plugin (Pumpkin Pi).md†L9-L22】
+- **Legacy AIO compatibility.** Maintains UDP and serial bridges plus PGN framing so existing AIO controllers and benches continue to function while migrations adopt capability-aware abstractions.【F:docs/development/SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L20-L78】【F:docs/development/SRS/references/AgIO_PGN_Baseline.md†L1-L120】
+- **Hybrid deployments.** Supports distributed sensor networks, remote section controllers, and MQTT/MQTT-SN bridges that tie axle-centric rigs to remote clients without sacrificing watchdog and authority guarantees.【F:docs/development/SRS/sections/2X_System_Architecture/22_Process_Model_Deployment.md†L19-L138】【F:docs/development/SRS/sections/5X_Hardware_IO_Device_Layer/52_AgIO_Service.md†L60-L112】
+
+These models inherit socket, GPIO, and CAN bindings from §52 while observing the capability registry and lease governance captured in §94/§95 so operators can select the appropriate topology for a rig without re-authoring hardware drivers.
+
+### 51.13.2 Protocol Support
+
+| Protocol | Transport | Primary Use Case | Canonical Reference |
+|----------|-----------|------------------|---------------------|
+| PGN v0 | UDP / Serial | Legacy AIO controllers and bench validation | [AgIO PGN baseline](../../references/AgIO_PGN_Baseline.md) |
+| AOG-Link v1 | Serial / CAN / Shared memory | Modern MCU integrations plus CM5 fast-path mirroring | [AOG-Link bridge architecture](../../../AgIO/aog-link-bridge-architecture-guide.md) |
+| MQTT / MQTT-SN | Network | Remote telemetry, distributed sensors, authority hand-offs | [AgIO bridging knowledge base](../../../AgIO/bridging-workflow-knowledge-base.md) |
+
+Protocol support remains schema-driven; new transports must document capability bindings, watchdog behaviour, and lease semantics before entering the catalog described in §53.
+
+### 51.13.3 Safety & Performance Guardrails
+
+Hardware integrations observe the safety posture and timing budgets defined across §§23 and 54:
+
+- Failsafe defaults, watchdog timers, and manual overrides are mandatory so disengagement occurs within configured TTLs even when transports degrade.【F:docs/development/SRS/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L63-L78】
+- Heartbeat and connection loss handling feed telemetry pipelines to expose authority state and latency for remote observers.【F:docs/development/SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L123-L169】
+- End-to-end latency targets (<100 ms for control loops, <2 ms p50 for CM5 steer targets) align with the scheduling guarantees in §23 Threading, Scheduling & Timing so planners and controllers can trust publish cadences.【F:docs/development/SRS/sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md†L137-L156】
+
+Configuration examples in Appendix samples (e.g., articulated tractor profiles) provide deterministic seeds, axle metadata, and mode policies that map directly onto these guardrails, ensuring simulation fixtures and field deployments behave consistently.

@@ -31,7 +31,7 @@ The shell includes a Device Manager compatibility card powered by
 `DeviceManagerCompatibilityViewModel`. The card evaluates plugin manifests via
 `PluginCompatibilityEvaluator`, surfaces summary health (`Healthy`, `Warnings`, `Blocked`), and lists
 per-plugin issues that map to ADR-031 governance signals. When running inside the repository, the
-view-model loads manifests from `docs/Plugins/manifests`; packaged builds fall back to a representative
+view-model loads manifests from `docs/development/SRS/appendices/samples/plugins`; packaged builds fall back to a representative
 sample. UI bindings render capability badges, dependency issues, and a data-source banner so operators
 understand what telemetry is driving the dashboard.
 

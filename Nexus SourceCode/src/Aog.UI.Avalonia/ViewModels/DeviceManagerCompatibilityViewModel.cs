@@ -75,7 +75,7 @@ public sealed class DeviceManagerCompatibilityViewModel
             if (manifests.Count > 0)
             {
                 var report = evaluator.Evaluate(manifests, environment);
-                var source = string.Format(CultureInfo.InvariantCulture, "Loaded {0} manifest(s) from docs/Plugins/manifests.", manifests.Count);
+                var source = string.Format(CultureInfo.InvariantCulture, "Loaded {0} manifest(s) from docs/development/SRS/appendices/samples/plugins.", manifests.Count);
                 return new DeviceManagerCompatibilityViewModel(report, source);
             }
         }
@@ -107,7 +107,7 @@ public sealed class DeviceManagerCompatibilityViewModel
             return manifests;
         }
 
-        var manifestRoot = Path.Combine(repoRoot, "docs", "plugins", "manifests");
+        var manifestRoot = Path.Combine(repoRoot, "docs", "development", "SRS", "appendices", "samples", "plugins");
         if (!Directory.Exists(manifestRoot))
         {
             return manifests;

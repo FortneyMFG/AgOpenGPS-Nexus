@@ -102,6 +102,12 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 - [96 — Quality Engineering & Release](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md)
 - [97 — Simulation & Replay](sections/9X_Frontends_Ops/97_Simulation_Replay.md)
 
+### Reference library
+- [Reference library overview](references/README.md)
+- [Core reference catalog](references/core/README.md)
+- [Guidance reference catalog](references/guidance/README.md)
+- [Mapping reference catalog](references/mapping/README.md)
+
 ### Option catalog
 #### 1X — Platform Foundations
 - [11-O1 – Unified .NET 8 + Avalonia](sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md)

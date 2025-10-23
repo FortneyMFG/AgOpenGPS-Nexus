@@ -23,10 +23,10 @@ flowchart TD
   multi-machine coordination workflows.
 
 ## Feature Highlights
-- **Data flow contracts:** The [Core data flow overview](data-flow.md)
+- **Data flow contracts:** The [Core data flow overview](../SRS/references/core/data-flow.md)
   summarizes how pose, control, and analytics streams move between
   services.
-- **Capability registry:** [Capability registry reference](capability-registry.md)
+- **Capability registry:** [Capability registry reference](../SRS/references/core/capability-registry.md)
   captures the identifiers shared across Core, AgIO, and plugins.
 - **Operations playbooks:** [Linux Core operations](linux-core-operations-playbook.md)
   and [performance budget dashboards](performance-budget-telemetry-dashboards.md)
@@ -46,8 +46,8 @@ flowchart TD
   telemetry feeds negotiated through Core.
 
 ## Additional References
-- [Core data flow](data-flow.md)
-- [Capability registry](capability-registry.md)
+- [Core data flow](../SRS/references/core/data-flow.md)
+- [Capability registry](../SRS/references/core/capability-registry.md)
 - [Linux operations playbook](linux-core-operations-playbook.md)
 - [Multi-machine synchronization](multi-machine-sync.md)
 - [Performance budget dashboards](performance-budget-telemetry-dashboards.md)

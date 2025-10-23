@@ -20,7 +20,7 @@
 - [01 — Live Field Builder](guidance/01_live-field-builder.md)
 - [02 — Fields2Cover Planner Integration](guidance/02_fields2cover-orchestrator.md)
 - [03 — Path Catalog & Sequencer](guidance/03_path-catalog-and-sequencer.md)
-- [04 — Execution & Autosteer Contracts](guidance/04_execution-and-autosteer-contracts.md)
+- [04 — Execution & Autosteer Contracts](SRS/references/guidance/execution-and-autosteer-contracts.md)
 - [05 — Refresh Policies & Hysteresis](guidance/05_refresh-policies-and-hysteresis.md)
 - [06 — Observability & Telemetry](guidance/06_observability-telemetry.md)
 

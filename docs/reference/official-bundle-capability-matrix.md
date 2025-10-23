@@ -7,7 +7,7 @@
 ADR-031 designates the official plugin bundle as the authoritative reference for Nexus
 capability governance. This matrix aggregates the capabilities declared in the bundled
 manifests, the lease posture Core expects at runtime, and links back to the source
-artifacts. Use it alongside the [capability registry](capability-registry.md) when
+artifacts. Use it alongside the [capability registry](../SRS/references/core/capability-registry.md) when
 reviewing manifest changes or diagnosing loader warnings so that required capabilities
 remain consistent across releases.【F:docs/SRS/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L12-L45】
 

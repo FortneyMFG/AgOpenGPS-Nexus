@@ -1,5 +1,7 @@
 # Nexus Glossary
 
+## Platform-wide Terms
+
 | Term | Definition |
 | --- | --- |
 | **Pose** | A timestamped position/orientation sample for a physical or virtual node (tractor, implement, toolbar, sensor) within the canonical coordinate reference system. |
@@ -20,3 +22,23 @@
 | **Fusion** | The process of combining multiple PoseStreams or layers (sessions, implements, seasons) into a unified dataset with provenance. |
 | **Provenance** | Recorded lineage describing how data was produced, transformed, and validated across plugins, sessions, and exports. |
 | **Registry Hash** | A stable hash computed over layer definitions and schemas to detect mismatches between plugins, firmware, and stored data. |
+
+## Guidance Orchestrator Terms
+
+| Term | Definition |
+| --- | --- |
+| **ENU** | East-North-Up local tangent plane coordinates anchored by `origin_llh` + `enu_epoch`. |
+| **`field.rev`** | Monotonic revision assigned to the accepted field boundary polygon. |
+| **`hole.rev`** | Monotonic revision for a keep-out polygon used in plan key hashing. |
+| **`W_eff`** | Effective implement width derived from active sections (vehicle frame). |
+| **`plan.key`** | SHA256 hash of `field.rev`, `holes.rev`, width bucket, settings hash, orientation metadata. |
+| **`plan_id`** | Stable identifier for committed catalog (hash of geometry + settings + source). |
+| **`epsilon_normalized`** | Pass-selection hysteresis threshold (0.05 normalized ≈ 0.10 m lateral delta). |
+| **`speed_cap_mps`** | Maximum allowed speed for current curvature; UI shows mph/kph equivalents. |
+| **`row_bias_m`** | Optional lateral offset applied when row/implement sensors are valid. |
+| **Quick Refresh** | Operator-triggered planner run using current boundary, keep-outs, and effective width. |
+| **AB fallback** | Deterministic AB-offset planner used when F2C errors or times out. |
+| **Catalog retention** | Policy of storing last three catalogs per `field.rev` under `~/.nexus/guidance/plans/`. |
+| **Golden scenarios** | Regression fixtures T01–T07 verifying latency, coverage, fallback, overrides. |
+
+> Have another term to add? Update this master glossary and cross-link any domain-specific guides back here.

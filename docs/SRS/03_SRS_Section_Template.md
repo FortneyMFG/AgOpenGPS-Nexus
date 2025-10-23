@@ -1,8 +1,8 @@
-# [Section Number] — [Section Title]  
+# [Section Number] — [Section Title]
 *(Status: [drafting/review/final])*
 
-**Section ID:** [X]  
-**Version:** 0.1.0  
+**Section ID:** [X]
+**Version:** 0.1.0
 **Editors:** @owner, @reviewer  
 **Last Updated:** 2025-10-20  
 **Related Sections:** [IDs or links]  
@@ -10,6 +10,10 @@
 **Downstream Impacts:** [IDs]
 
 ---
+
+> **Template Coverage:** This single template replaces the standalone section, option, and
+> decision-matrix stubs. Use §[X.5] for normative requirements, §[X.10]–§[X.12] for option and
+> comparison material, and link supporting ADRs from §[X.16].
 
 ## [X.1 Purpose & Scope]
 

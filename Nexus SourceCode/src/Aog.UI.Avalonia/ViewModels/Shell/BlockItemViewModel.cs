@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Layout;
@@ -10,7 +12,7 @@ namespace Aog.UI.Avalonia.ViewModels.Shell;
 /// <summary>
 /// View-model representing a rendered block instance within the shell.
 /// </summary>
-public sealed class BlockItemViewModel
+public sealed class BlockItemViewModel : INotifyPropertyChanged
 {
     private readonly BlockLayoutViewModel _owner;
     private readonly DelegateCommand _invokeCommand;
@@ -67,6 +69,9 @@ public sealed class BlockItemViewModel
     /// <summary>Gets the command that removes the block when permitted.</summary>
     public ICommand DeleteCommand => _deleteCommand;
 
+    /// <summary>Gets a value indicating whether layout modifications are currently locked.</summary>
+    public bool IsLayoutLocked => _owner.IsLocked;
+
     /// <summary>Gets the tile identifier associated with the block within the global grid.</summary>
     public string TileId => _tile.Id;
 
@@ -97,6 +102,8 @@ public sealed class BlockItemViewModel
     /// <summary>
     /// Re-evaluates command availability when layout state changes.
     /// </summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     internal void RefreshCommandStates()
     {
         _invokeCommand.RaiseCanExecuteChanged();
@@ -109,5 +116,13 @@ public sealed class BlockItemViewModel
         {
             option.Refresh();
         }
+
+        OnPropertyChanged(nameof(HasSettings));
+        OnPropertyChanged(nameof(IsLayoutLocked));
+    }
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

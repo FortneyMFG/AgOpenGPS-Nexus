@@ -1,235 +1,145 @@
-# 11-O1 — Unified .NET 8 + Avalonia Cross-Platform Stack
+# 11-O1 — Unified Runtime for Section 11 OS Coverage
 
-> **In plain terms:** We keep one C# codebase for everything—Windows cab PCs,
-> Linux headless boxes, and future tablets—so teams install the same features on
-> every machine without juggling separate projects.
+> **In plain terms:** Pick one managed runtime and toolkit so the Windows and
+> Linux desktop builds stay in lockstep, and the OS support matrix in Section 11
+> can be satisfied without parallel codebases.
 
 *(Status: Proposed)*
 
 **Option ID:** 11-O1  
-**Section ID:** 11 — OS Support  
-**Version:** 0.1.0  
-**Authors:** Codex  
-**Reviewers:** Platform Foundations Working Group  
-**Created:** 2025-10-20  
-**Last Updated:** 2025-10-20  
-**Related SRS:** `11_OS_Support.md`
+**Section ID:** 11 — Operating System Support  
+**Version:** 0.2.0  
+**Authors:** Platform Foundations Working Group  
+**Last Updated:** 2025-10-25  
+**Related SRS:** `11_OS_Support.md`  
 **Related ADRs:** `11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md`
 
 ---
 
 ## 1) Summary
 
-Adopt a unified C#/.NET 8 runtime with Avalonia UI so Nexus ships one stack across Windows 10/11 x64 and Linux (x86_64, ARM64).
-AgIO becomes the shared hardware abstraction host exposing gRPC contracts consumed by Core, plugins, and UI clients.
+Section 11 demands a Windows baseline with a Linux build that stays feature
+aligned. Option 11-O1 proposes standardising on .NET 8 with Avalonia UI and a
+single AgIO abstraction so every OS build comes from the same codebase, the same
+SDK, and the same packaging recipe. Success means operators download matching
+Windows and Linux artifacts, run the same smoke tests, and see identical device
+support tables.
 
 ---
 
-## 2) Problem, Goals, and Non-Goals
+## 2) Requirements Coverage
 
-**Problem:**
-Windows-only tooling locks modernization efforts and makes Linux headless deployments ad-hoc. A cohesive cross-platform plan is required.
+| Requirement | How 11-O1 satisfies it | Verification hook |
+|-------------|------------------------|-------------------|
+| **R-OS-000** — Windows build MUST ship | Build outputs a signed Windows installer from the unified solution. | Installer smoke + WinForms/Avalonia launch test |
+| **R-OS-001** — AgIO parity across OSes | AgIO backends expose identical gRPC contracts; OS-specific drivers stay behind adapters. | Cross-OS loopback tests for serial/UDP/CAN |
+| **R-OS-002** — Linux build SHOULD ship | Linux x64/ARM64 packages are compiled from the same solution with target-specific publish profiles. | Linux desktop parity checklist |
+| **R-OS-003** — Signed installers/packages | Shared build pipeline signs MSI/EXE and deb/rpm artifacts during publish. | Release pipeline signature verification |
+| **R-OS-004** — Performance guidance | Benchmarks run on each target OS using identical binaries and configuration presets. | Performance dashboard linked to release |
 
-**Goals:**
-
-- Satisfies **R-OS-000**, **R-OS-001**, **R-OS-004**, **R-OS-006**, **R-OS-007**.
-- Addresses **C1**, **C2**, **C3**, **C4**, **C5** from SRS §11.9.
-
-**Non-Goals:**
-
-- Does not redefine hardware-specific protocol behavior (handled by AgIO backends).
-- Does not select the mobile packaging story; focuses on enabling companion clients.
-- Does not replace specialized vendor SDK integrations where gRPC shims are impractical.
+> **Traceability:** The option is scoped only to Section 11 outcomes. UI/UX
+> policies, run modes, and build tooling details live in Sections 13 and 14.
 
 ---
 
-## 3) Architecture Overview
+## 3) Problem Statement & Goals
 
-- **Core concept:** Share one managed runtime and UI toolkit between Windows and Linux.
-- **Primary components:**
-  - `Aog.Core` guidance engine consuming AgIO gRPC services.
-  - `Aog.Agio` host process with Windows, Linux, and Simulation backends.
-  - `Aog.UI.Avalonia` shell reusing common view models and theming.
-  - Managed plugin catalog (`Aog.Plugins`) loaded via manifests and `AssemblyLoadContext`.
-- **Data flow:** Hardware inputs land in AgIO backend → published over gRPC/protobuf → consumed by Core/UI/plugins.
-- **Integration context:** Works with remote companions (Android/iOS) via gRPC-Web bridge or proxy.
+**Problem.** AgOpenGPS v6 proves we can ship Windows builds, but Linux parity is
+hand-crafted and inconsistent. Section 11 elevates Linux desktop support and I/O
+consistency to primary goals.
 
-**How the pieces connect (at a glance):**
+**Goals.**
 
-- **Devices** feed **AgIO** regardless of OS.
-- **AgIO** streams data to **Core** for guidance math and to the **Avalonia UI** for dashboards.
-- **Plugins** tap into the same streams, so adding features doesn’t depend on the OS you compiled for.
-- **Remote companions** subscribe to the Core/UI feeds over the network, using the same contracts.
+- Produce Windows and Linux installers from one solution so parity work scales.
+- Keep AgIO’s serial/UDP/CAN interfaces identical regardless of host OS.
+- Publish a single support matrix that covers Windows x64 and Linux x64/ARM64.
+- Document minimum hardware profiles using shared benchmark jobs.
 
-```mermaid
-graph TD
-  HW[Hardware Inputs] -->|Drivers/SDKs| AGIO[AgIO Backend]
-  AGIO -->|gRPC| CORE[Aog.Core]
-  AGIO -->|gRPC| UI[Aog.UI.Avalonia]
-  CORE -->|Events| PLUGINS[Managed Plugins]
-  UI -->|Telemetry| COMPANION[Remote Client]
-```
+**Non-goals.**
+
+- Selecting mobile packaging or companion UX (covered elsewhere in the SRS).
+- Redesigning AgIO transport semantics; focus stays on OS parity.
+- Dictating build pipeline topology beyond what Section 11 needs for parity.
 
 ---
 
-## 4) Interfaces & Contracts
+## 4) Approach Outline
 
-- gRPC/protobuf contracts packaged via `Aog.Abstractions` NuGet.
-- Plugin manifests declare capabilities and required streams; runtime enforces version compatibility.
-- AgIO backend contracts hide OS-specific APIs behind dependency-injected interfaces.
-- Requirement linkage: R-OS-001 (hardware abstraction), R-OS-004 (Linux packaging), R-OS-007 (mobile parity).
-
----
-
-## 5) Dependencies & Constraints
-
-- Requires .NET 8 SDK and runtime across Windows and Linux hosts.
-- Depends on Avalonia UI 11 LTS (or current stable) with GPU acceleration tuned for Pi/CM5.
-- Windows-specific drivers (e.g., PCAN, Kvaser) must ship alongside Linux SocketCAN equivalents.
-- Container base images maintained for CI and headless deployment parity.
-
----
-
-## 6) Security, Privacy, and Compliance
-
-- Code signing for Windows installers, NuGet packages, and plugin bundles.
-- TLS (mTLS optional) for AgIO gRPC endpoints when accessed remotely.
-- Secrets for device credentials or telemetry endpoints stored in OS vaults or secure files.
-- Aligns with Section 14 policies for build signing and credential hygiene.
-
----
-
-## 7) Performance & Sizing Targets
-
-- UI rendering ≥ 60 FPS on target hardware (Windows x64, Linux ARM64 Pi/CM5).
-- AgIO message latency ≤ 50 ms end-to-end for GNSS/CAN telemetry.
-- Plugin load overhead ≤ 500 ms per plugin during startup on reference hardware.
+1. **Runtime alignment.** Target .NET 8 LTS across all first-party executables
+   (Core, AgIO, UI shell, plugins) so supported OSes share binaries and tooling.
+2. **UI host reuse.** Use Avalonia as the desktop shell because it compiles for
+   both Windows and Linux without forking the view models or rendering
+   primitives. Section 13 details UX policy; this option simply records the
+   runtime dependency.
+3. **AgIO adapter strategy.** Keep hardware access behind AgIO interfaces that
+   swap Windows-specific SDK bindings for Linux equivalents such as SocketCAN.
+4. **Packaging templates.** Maintain publish profiles for Windows MSI/EXE and
+   Linux deb/rpm/AppImage targets sourced from the same project files.
+5. **Verification hooks.** Codify smoke scripts that exercise installation,
+   AgIO loopback, and UI startup for each OS before releases are tagged.
 
 ```mermaid
 flowchart LR
-  A[AgIO Event] --> B[gRPC Channel]
-  B --> C[Core/Plugin Processing]
-  C --> D[UI Rendering]
+  Solution[Unified .NET 8 Solution] -->|Publish| Win[Windows Installer]
+  Solution -->|Publish| Linux[Linux Packages]
+  Solution -->|Shared Contracts| AgIO[AgIO Interfaces]
+  AgIO --> Devices[Serial / UDP / CAN Devices]
 ```
 
 ---
 
-## 8) Operability
+## 5) OS Support Matrix
 
-- Structured logging via `Serilog` with OS-specific sinks (EventLog vs. journald).
-- Metrics endpoints per process (`/metrics` with Prometheus exporters where feasible).
-- Configuration stored in shared profile directories with environment overrides.
-- Crash dumps and trace logs captured uniformly across OSes for triage.
+| Platform Tier | Windows | Linux |
+|---------------|---------|-------|
+| **Primary** | Windows 10/11 x64 desktop builds produced from the unified solution. | Ubuntu LTS x64 packages; Debian-based ARM64 images for CM5/Pi. |
+| **Preview** | Windows NativeAOT investigations using the same projects. | Fedora/RHEL derivatives once tooling maturates. |
+| **Out of Scope** | Legacy .NET Framework builds. | Custom vendor-specific Linux distributions without glibc 2.31+. |
 
----
-
-## 9) Packaging & Distribution
-
-- Windows MSI/EXE installers with automatic driver detection and code signing.
-- Linux Debian packages + systemd unit files, plus optional container images/AppImage bundles.
-- Publish nightly artifacts for Windows and Linux to validate portability.
+> **Note:** Mobile companion builds are handled by Section 13. They are not
+> deliverables for Section 11 compliance but may benefit from the shared runtime.
 
 ---
 
-## 10) Migration, Rollout, and Backout
+## 6) Verification & Tooling
 
-- Stage migration: keep AgOpenGPS v6 WinForms builds available while introducing Avalonia UI in Nexus previews.
-- Roll out Linux Core as opt-in preview before default inclusion in release builds.
-- Backout: retain ability to ship Windows-only release if Linux parity blockers appear; revert via feature flags.
-
-**Rollout checkpoints:**
-
-1. **Stabilize Windows UI (Phase 1):** Ship Avalonia side-by-side with WinForms so operators can compare without risk.
-2. **Preview Linux Core (Phase 2):** Publish systemd packages and document the smoke checklist for Pi/CM5 rigs.
-3. **Expand to companions (Phase 3):** Exercise Android/iOS remote flows once Core/AgIO parity is proven.
-4. **Consolidate tooling (Phase 4):** Retire duplicate Windows-only build scripts after Linux packaging becomes default.
-
----
-
-## 11) Risks & Failure Modes
-
-| ID | Risk / Failure Mode | Likelihood | Impact | Mitigation / Trigger |
-| -- | ------------------- | ---------- | ------ | -------------------- |
-| R1 | Linux GPU drivers underperform on Pi/CM5. | Medium | High | Maintain benchmark lab, optimize rendering fallbacks. |
-| R2 | Vendor CAN/GNSS SDKs unavailable on Linux. | Medium | High | Develop gRPC shims; prioritize vendor outreach. |
-| R3 | Avalonia theming/performance gaps hinder operator adoption. | Medium | Medium | Run UX pilots, keep WinForms shell as safety net. |
+- **Installer smoke tests:** Scripted install/launch sequence per OS using the
+  shared publish output.
+- **AgIO loopback suite:** Serial, UDP, and CAN loopback tests executed on both
+  Windows and Linux to confirm adapters behave identically.
+- **Performance runs:** Benchmark workflow executed on reference hardware to
+  collect FPS and telemetry latency statistics for the Section 11 report.
+- **Support matrix publication:** Release notes include OS/architecture
+  coverage, required dependencies, and known caveats sourced from one markdown
+  template.
 
 ---
 
-## 12) Alternatives Considered
+## 7) Risk Register
 
-| Option | Summary | Reason Not Selected |
-|--------|---------|---------------------|
-| Windows-only baseline | Continue shipping WinForms only. | Blocks Linux/mobile roadmap; maintenance debt. |
-| Native Qt/C++ stack | Cross-platform UI without .NET. | Splits language/tooling; high rewrite cost. |
-| Electron/Web stack | Leverage web talent for UI. | Latency and hardware integration gaps for CAN/GNSS. |
-
----
-
-## 13) Validation Plan
-
-**Success criteria:** Demonstrate cross-platform builds, device parity, and UI performance targets.
-
-1. Build nightly Windows + Linux artifacts and execute smoke suite (`dotnet build`, `dotnet test`, `nexus sim smoke`).
-2. Benchmark GNSS/CAN latency across OS backends with hardware-in-loop rigs.
-3. Run UI rendering performance tests on Windows x64 and Linux ARM64 (Pi/CM5) hitting ≥ 60 FPS.
-4. Exercise remote client flows (Android/iOS) via gRPC/gRPC-Web proxy.
-
-```mermaid
-flowchart LR
-  A[Nightly Build] --> B[Cross-OS Smoke Tests]
-  B --> C{Pass?}
-  C -->|Yes| D[Publish Artifacts]
-  C -->|No| E[Block Release / File Issue]
-```
+| ID | Risk | Impact | Mitigation |
+|----|------|--------|------------|
+| O1-R1 | Linux GPU driver variance lowers FPS. | Operators perceive Avalonia as sluggish. | Maintain benchmark dashboards; fall back to software rendering profiles when hardware is limited. |
+| O1-R2 | Vendor CAN/GNSS SDKs lack Linux support. | Linux builds ship with reduced device coverage. | Prioritise SocketCAN shims and publish device support tiers in release notes. |
+| O1-R3 | Tooling drift splits Windows and Linux pipelines. | Parity work doubles. | Keep build scripts in repo with shared publish profiles; gate releases on dual-OS smoke runs. |
 
 ---
 
-## 14) Effort and Complexity
+## 8) Alternatives Considered
 
-| Area | Effort | Notes |
-|------|--------|-------|
-| Interfaces | Medium | Requires contract versioning and DI abstractions. |
-| Implementation | Medium | Shared runtime but multiple backend bindings. |
-| Testing | High | Dual-OS CI, hardware-in-loop coverage. |
-| Packaging | High | Parallel installer + Debian packaging + containers. |
-
----
-
-## 15) Community and Ecosystem Impact
-
-- Leverages existing C# contributor base, easing onboarding.
-- Opens Linux ARM64 participation, enabling lower-cost rigs.
-- Establishes consistent plugin/runtime story, benefiting third-party developers.
+| Option | Summary | Why it does not meet Section 11 |
+|--------|---------|---------------------------------|
+| Retain Windows-only WinForms baseline | Keep shipping .NET Framework/WinForms artifacts only. | Fails R-OS-001 and R-OS-002 by skipping Linux packaging and AgIO parity work. |
+| Forked Linux client | Maintain a Linux-specific UI/runtime while leaving Windows on .NET Framework. | Doubles maintenance cost and violates the single-matrix goal for Section 11. |
+| Native C++/Qt rewrite | Rebuild desktop apps in Qt per platform. | Replaces existing C# investments and delays Section 11 compliance for multiple releases. |
 
 ---
 
-## 16) References
+## 9) Decision Readiness
 
-- **SRS:** `11_OS_Support.md`
-- **ADRs:** `11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md`
-- **Prior work:** `docs/SRS/sections/1X_Platform_Foundations/11-ADR-001 - Adopt .NET 8 C stack for Nexus runtime.md`, `docs/SRS/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md`
+- Outstanding research: finalise Linux distribution list and reference hardware.
+- Dependencies: Section 12 runtime policy and Section 14 build tooling must
+  publish aligned templates.
+- Acceptance trigger: Section 11 decision matrix approves 11-O1 with evidence
+  from parity pilots and release pipeline demonstrations.
 
----
-
-## 17) Change Log
-
-| Date | Change | Author | PR / Issue |
-|------|--------|--------|------------|
-| 2025-10-20 | Initial draft aligned with standardized template. | Codex | #0000 |
-
----
-
-## 18) Review Checklist
-
-- [ ] Requirements traced and complete.
-- [ ] Interfaces and contracts defined.
-- [ ] Security and performance covered.
-- [ ] Validation plan with metrics.
-- [ ] Risks and mitigations documented.
-- [ ] References linked.
-
----
-
-> **Lifecycle:** Proposed → Favored → In Review → Approved → Deprecated  
-> **Cross-link:** Supports Decision Matrix §11.12 in the parent SRS.

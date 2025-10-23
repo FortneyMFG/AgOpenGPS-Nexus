@@ -1,3 +1,11 @@
+---
+owner: performance-working-group
+status: active
+last_reviewed: 2024-05-10
+related_tickets:
+  - NX-PP-017
+---
+
 # Performance Guidance
 
 Use this page to navigate the performance budgets, telemetry dashboards,

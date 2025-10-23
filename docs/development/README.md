@@ -21,5 +21,34 @@ Manifest authors should start with the
 [Plugin Manifest Workflow](howto/plugin-manifest-workflow.md) for governance
 roles, lint commands, capability exports, and escalation guidance.
 
+## Documentation front matter
+
+All new and updated development docs should begin with the following YAML front
+matter block. This metadata keeps ownership and review cadences visible across
+the tree.
+
+```
+---
+owner: <team-or-individual>
+status: <draft|in_review|active|deprecated>
+last_reviewed: <YYYY-MM-DD>
+related_tickets:
+  - <NX-### or NX-PP-###>
+---
+```
+
+Guidelines:
+
+- `owner` captures the accountable maintainer (team slug or individual).
+- `status` reflects the document's lifecycle. Use `active` for canonical
+  references and `in_review` when pending approval.
+- `last_reviewed` records the most recent verification date in ISO-8601
+  format.
+- `related_tickets` lists Nexus tasks that drove the latest update. Use an
+  empty list (`[]`) when there are no active tickets.
+
+Run `tools/scripts/lint-doc-front-matter.sh` before submitting a PR to ensure
+each touched Markdown file includes the required metadata.
+
 Link changes back to the appropriate SRS section and capture workflow
 impacts in `tasks.md` when updating these resources.

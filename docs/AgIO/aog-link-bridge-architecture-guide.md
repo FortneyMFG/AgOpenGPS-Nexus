@@ -4,8 +4,10 @@
 
 This guide walks through the practical view of the Bridge stack so engineers,
 integrators, and support teams can explain how gRPC services, AOG-Link v1, and
-the transport adapters cooperate. Pair it with Section 3A of the SRS for the
-full normative specification.
+the transport adapters cooperate. Pair it with the
+[SRS transport compatibility section](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md)
+and the [AgIO PGN reference](../SRS/references/AgIO_PGN_Baseline.md) for the
+normative protocol frames and ACK semantics.
 
 ## 1. Layered view at a glance
 
@@ -13,8 +15,9 @@ full normative specification.
    over the in-process gRPC bus. Everything north of the Bridge speaks this
    contract.
 2. **AOG-Link v1 layer.** The Bridge converts gRPC intents and telemetry into
-   protobuf payloads plus the 8-byte frame header defined in the SRS. Reliability
-   policies (ACKs, retries, segmentation) live here so transports stay thin.
+   protobuf payloads and applies the frame header defined in the SRS section
+   linked above. Reliability policies (ACKs, retries, segmentation) stay in this
+   layer so transports remain thin.
 3. **Adapters.** UDP, Serial, CAN, and MQTT adapters reuse the shared codec and
    only worry about sockets, ports, baud rates, and SocketCAN details.
 4. **Legacy bridge.** A dedicated adapter still emits/consumes AOG-Link v0 UDP
@@ -29,7 +32,8 @@ full normative specification.
 * **Discovery and authority.** Tracks `Hello`/`HelloAck`, role masks, authority
   tokens, and TTL windows so only the current controller drives actuators.
 * **Reliability guardrails.** Enforces retry policies, fragmentation, rate
-  shaping, and drop counters so every transport inherits the same behavior.
+  shaping, and drop counters so every transport inherits the same behavior per
+  the SRS contract.
 
 ```mermaid
 flowchart TD
@@ -114,11 +118,11 @@ flowchart TD
 
 | Path type         | Preferred transports                        | Notes                                                   |
 |-------------------|---------------------------------------------|---------------------------------------------------------|
-| Low-latency CTRL  | Shared memory (same host) → Serial/CAN → UDP | `ACK_REQUIRED` commands, steer and section loops.        |
+| Low-latency CTRL  | Shared memory (same host) → Serial/CAN → UDP | `ACK_REQUIRED` commands, steer and section loops (see SRS §53.4). |
 | Fan-out telemetry | MQTT QoS0 → UDP multicast (optional)         | GPS, IMU, status, health metrics.                       |
 | Legacy support    | v0 Bridge                                    | Emits AOG-Link v0 PGNs for classic controllers.         |
 
-The Mermaid flowchart above (mirrored in the SRS, Section 3A §6) marks
+The Mermaid flowchart above (mirrored in the SRS, Section 53 §6) marks
 control-focused adapters in red and telemetry-first adapters in blue. Use it as
 the visual aid when explaining the data paths to stakeholders.
 

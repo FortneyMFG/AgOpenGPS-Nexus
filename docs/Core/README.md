@@ -1,5 +1,11 @@
 # Core Runtime Overview
 
+This directory now houses Core runbooks and operational guides. The
+authoritative requirements, data contracts, and determinism budgets live
+in the SRS — start with the [Core data flow reference](../SRS/references/core/data-flow.md)
+and [Section 21 — System Decomposition & Boundaries](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md).
+Use these pages for procedures; consult the SRS for normative details.
+
 The Core runtime orchestrates deterministic scheduling, capability
 exchange, and orchestration services that connect plugins, UI shells, and
 AgIO transports. It enforces contracts, routes telemetry, and manages the

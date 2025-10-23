@@ -3,7 +3,12 @@
 ADR-034 shifts Nexus dashboards, inspectors, and legends to a metadata-driven
 model so the same widgets render consistently across desktop and companion
 clients. NX-326 codifies the styling guidance for those widgets so plugin teams
-can ship new layouts without breaking parity or accessibility guarantees.
+can ship new layouts without breaking parity or accessibility guarantees. The
+normative component requirements and token catalog now live in the SRS — review
+[ADR-034](../SRS/sections/9X_Frontends_Ops/91-ADR-034%20-%20Metadata-driven%20dashboards%20and%20inspector%20surfaces.md)
+and the companion samples under `docs/SRS/appendices/samples/plugins` before shipping
+changes. Treat this document as an operational checklist for applying those
+specs.
 
 ## Design principles
 
@@ -24,19 +29,15 @@ can ship new layouts without breaking parity or accessibility guarantees.
 
 ## Layout tokens
 
-| Token | Desktop | Companion | Notes |
-| --- | --- | --- | --- |
-| Card corner radius | 12 px | 16 px | Companions exaggerate the radius for touch ergonomics. |
-| Card padding | 16 px | 12 px | Mobile padding shrinks to preserve content density. |
-| Stack spacing | 12 px | 10 px | Maintain rhythm while saving vertical space on mobile. |
-| Header font size | 20 px (SemiBold) | 18 px (SemiBold) | Typography scales with the standard theme ramp. |
-| Body font size | 14 px | 14 px | Keep copy identical for readability. |
-| Sparkline height | 96 px | 72 px | Preserve relative proportions when screen real-estate is tight. |
-
-Use the shared `ThemeManager` tokens for colours and typography; do not
-instantiate raw `SolidColorBrush` values in views. Metadata that supplies
-colours (e.g., legend gradients) must provide `#AARRGGBB` values so the same
-appearance can be reproduced on the web or native shells.
+- Source all spacing, radius, and typography from
+  [`artifacts/ui-theme-tokens.json`](../../artifacts/ui-theme-tokens.json). Keep
+  PRs limited to that artifact (and the SRS appendices) when adjusting values so
+  consumers track diffs centrally.
+- Mirror companion overrides by importing the `Companion` token set documented
+  in the SRS appendix instead of hard-coding alternate values in views.
+- Metadata that supplies colours (e.g., legend gradients) must provide
+  `#AARRGGBB` values so the same appearance can be reproduced on the web or
+  native shells.
 
 ## Legend & inspector styling
 

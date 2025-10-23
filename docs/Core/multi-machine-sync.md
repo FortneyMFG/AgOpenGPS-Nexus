@@ -10,7 +10,10 @@ seat enforcement layer to worry about; the "fleet manifest" files described belo
 only to keep operator notes, machine IDs, and configuration metadata in sync across a
 fleet. Treat them like configuration rather than DRM. Pair this workflow with the
 [offline update channel guide](installer-update-channels.md) so staged media and nightly
-sync archives stay aligned with the channel assignments you deploy.
+sync archives stay aligned with the channel assignments you deploy. Normative policies
+for collaborative sessions and lifecycle events live in the
+[SRS UI layout section](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md) and
+[Job Sessions lifecycle ADR](../SRS/sections/6X_Core_Domain_Services/62-ADR-041%20-%20Job%20Sessions%20Lifecycle.md).
 
 ## Workflow roles and artifacts
 

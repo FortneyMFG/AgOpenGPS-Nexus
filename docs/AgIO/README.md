@@ -1,5 +1,12 @@
 # AgIO Subsystem Overview
 
+These pages act as AgIO runbooks and operational checklists. Formal
+requirements, protocol fields, and transport compatibility matrices now
+live in the [SRS AgIO references](../SRS/references/AgIO_PGN_Baseline.md)
+and [Section 53 — AOG-Link Compatibility](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md).
+Use this folder when you need deployment steps or troubleshooting flows;
+follow the linked SRS sections for normative specs.
+
 AgIO hosts Nexus hardware transports, bridge adapters, and compatibility
 services that keep legacy PGN devices and modern gRPC clients operating
 side-by-side. It arbitrates access to serial, UDP, CAN, MQTT-SN, and

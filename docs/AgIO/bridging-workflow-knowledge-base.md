@@ -2,7 +2,9 @@
 
 Bridging keeps legacy AgOpenGPS (V6/Teensy) installs productive while operators adopt Nexus. This
 knowledge base distils the scripts, checklists, and troubleshooting patterns that support teams use
-when coaching dealers and growers through mixed deployments.
+when coaching dealers and growers through mixed deployments. For protocol guarantees and legacy
+compatibility rules, defer to the
+[SRS bridge compatibility chapter](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md).
 
 ## Audience and prerequisites
 

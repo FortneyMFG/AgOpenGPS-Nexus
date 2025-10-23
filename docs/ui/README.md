@@ -1,5 +1,13 @@
 # UI Platform Overview
 
+These notes focus on UI operational guides, migration workbooks, and
+runbooks. The canonical UI requirements, metadata schemas, and layout
+contracts are captured in the SRS — see
+[Section 91 — UI Shell & Layout](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+and [ADR-034 Metadata Dashboards](../SRS/sections/9X_Frontends_Ops/91-ADR-034%20-%20Metadata-driven%20dashboards%20and%20inspector%20surfaces.md).
+Use this folder for implementation playbooks and reference the SRS for
+spec-grade directives.
+
 The Nexus UI platform modernises legacy WinForms experiences into shared
 Avalonia shells that can run on desktops, tablets, and companion devices.
 It consumes Core contracts, surfaces AgIO telemetry, and hosts plugin

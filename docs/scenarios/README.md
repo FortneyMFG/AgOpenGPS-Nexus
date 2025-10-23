@@ -9,7 +9,7 @@ seed fixtures, and topic coverage aligned with ADR-004.
 ## Files
 - `library.json` — full simulation configuration that declares the shared providers,
   default routes, and three scenario presets.
-- `legacy-auto-run/` — legacy UDP scenario pack with soak verification logs.
+- [`legacy-auto-run/`](../reference/agopengps-v6/scenarios/legacy-auto-run/README.md) — legacy UDP scenario pack with soak verification logs and soak reports.
 
 ## Scenario Presets
 ### `baseline-guidance`

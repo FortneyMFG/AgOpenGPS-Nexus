@@ -33,7 +33,7 @@ for translating legacy machine profiles before you drop them into the sync seed.
 ## Pre-flight checklist
 
 Complete these items before leaving the staging bench. Doing so keeps the
-[legacy migration guide](legacy-migration-guide.md) workflow aligned with the synced
+[legacy migration guide](../reference/agopengps-v6/legacy-migration-guide.md) workflow aligned with the synced
 machine identities when you upgrade existing fleets:
 
 1. Generate the machine manifest files from the toolkit helper (`dealer-toolkit fleet export`).

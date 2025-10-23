@@ -68,7 +68,7 @@ Example JSON representation:
 
 ## Legacy Implementation Notes
 ### AgOpenGPS v6
-- Field assets track boundaries and headlands through text exports (`Boundary.txt`, `Headland.txt`), and the WinForms runtime draws those polygons for lift cues, but there is no formal notion of keep-out or work-disabled zones beyond manual operator overrides.【F:docs/porting/V6-Functionality-Gap-Analysis.md†L16-L25】【F:docs/SRS/references/aog-v6-mapping-brief.md†L23-L34】
+- Field assets track boundaries and headlands through text exports (`Boundary.txt`, `Headland.txt`), and the WinForms runtime draws those polygons for lift cues, but there is no formal notion of keep-out or work-disabled zones beyond manual operator overrides.【F:docs/reference/agopengps-v6/porting/V6-Functionality-Gap-Analysis.md†L16-L25】【F:docs/SRS/references/aog-v6-mapping-brief.md†L23-L34】
 
 ### Legacy Dev Branch
 - The dev branch inherits the same boundary/headland-only model, leaving constraint gating requirements such as zone masks and automated keep-out enforcement unsatisfied, which is why new SRS items call for a ZoneService and arbiter gating around keep-out/work-disabled areas.【F:docs/SRS/sections/4X_Interprocess_Communications/42_Transports.md†L19-L24】【F:docs/SRS/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L23-L24】

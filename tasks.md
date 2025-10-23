@@ -307,7 +307,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-311 Radio provisioning UI flows _(Done)_ — ADR-048 provisioning UX
 - [x] NX-312 Companion metadata-driven parity pass _(Done)_ — ADR-034 remote parity
 - [x] NX-931 SimulationBar replay subscription cleanup _(Done)_ — Remove legacy EnsureReplayControllerSubscription helper
-- [x] NX-410 Legacy UI asset migration workbook _(Done)_ — See docs/ui/ui-shell-and-plugin-integration.md
+- [x] NX-410 Legacy UI asset migration workbook _(Done)_ — See docs/reference/agvalonia/ui-shell-and-plugin-integration.md
 - [x] NX-411 Shell & navigation port from V6/AgValonia _(Done)_ — Aligns with artifacts/ui-core-spec.md
 - [x] NX-412 Map canvas & field operations UI port _(Done)_ — Aligns with artifacts/ui-inventory.json
 - [x] NX-413 Job & field lifecycle dialogs port _(Done)_ — Aligns with artifacts/ui-backlog.json
@@ -696,7 +696,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-310 | Mesh share/subscribe UI | Done |  | — | [ADR-047](docs/SRS/sections/4X_Interprocess_Communications/42-ADR-047 - Live Telemetry Mesh.md) | ADR-047 live mesh UX |
 | NX-311 | Radio provisioning UI flows | Done |  | — | [ADR-048](docs/SRS/sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md) | ADR-048 provisioning UX |
 | NX-312 | Companion metadata-driven parity pass | Done |  | — | [ADR-034](docs/SRS/sections/9X_Frontends_Ops/91-ADR-034 - Metadata-driven dashboards and inspector surfaces.md) | Snapshot export keeps CompanionRemote dashboards, legends, and inspector metadata aligned. |
-| NX-410 | Legacy UI asset migration workbook | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Inventory V6/Dev/AgValonia components per docs/ui/ui-shell-and-plugin-integration.md |
+| NX-410 | Legacy UI asset migration workbook | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Inventory V6/Dev/AgValonia components per docs/reference/agvalonia/ui-shell-and-plugin-integration.md |
 | NX-411 | Shell & navigation port from V6/AgValonia | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Port menus/toolbars per artifacts/ui-core-spec.md |
 | NX-412 | Map canvas & field operations UI port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Integrate map canvas + boundary/flag dialogs per plan |
 | NX-413 | Job & field lifecycle dialogs port | Done |  | — | [SRS §3.4 UI Shell](docs/SRS/NOTES.md#srs-34-ui-shell) | Rebuild job/field dialogs aligned with artifacts/ui-backlog.json |
@@ -713,7 +713,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 
 | ID | Description | Status | Owner | Human QA | SRS Ref | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| NX-050 | V6 math inventory | Done |  | — | [SRS §5.1 V6 Porting Inventory](docs/SRS/NOTES.md#srs-51-v6-porting-inventory) | docs/porting/V6-Inventory.md |
+| NX-050 | V6 math inventory | Done |  | — | [SRS §5.1 V6 Porting Inventory](docs/SRS/NOTES.md#srs-51-v6-porting-inventory) | docs/reference/agopengps-v6/porting/V6-Inventory.md |
 | NX-051 | Coverage math port + tests | Done |  | — | [SRS §5.2 Coverage Math](docs/SRS/NOTES.md#srs-52-coverage-math) | Compare vs V6 CSVs |
 | NX-052 | AB/curve/headland generation port | Done |  | — | [SRS §5.3 Path Generation](docs/SRS/NOTES.md#srs-53-path-generation) | Tests green |
 | NX-053 | Controller gains/tuners | Done |  | — | [SRS §5.4 Controller Gains](docs/SRS/NOTES.md#srs-54-controller-gains) | Meets error targets |

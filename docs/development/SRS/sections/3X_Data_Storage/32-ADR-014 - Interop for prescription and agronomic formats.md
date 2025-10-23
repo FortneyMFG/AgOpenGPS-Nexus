@@ -1,7 +1,7 @@
 # ADR-014: Interop for prescription and agronomic formats
 
 ## Status
-Drafting (target review window: 2025-11-26 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** Variable Mapping, Rate Control, Mapping, Planter Monitor, File IO, Job Tasks
 

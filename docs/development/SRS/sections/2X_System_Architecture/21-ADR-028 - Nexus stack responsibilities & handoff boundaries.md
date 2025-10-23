@@ -4,8 +4,8 @@
 
 **Authors:** @architecture-wg
 **Reviewers:** @nexus-specs, @core-wg
-**Created:** 2024-09-30
-**Last Updated:** 2025-02-14
+**Created:** -
+**Last Updated:** -
 **Supersedes:** —
 **Superseded by:** —
 **Related SRS:** `21_System_Decomposition_Boundaries.md`
@@ -130,7 +130,7 @@ graph TD
 
 * **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.9, §21.12; `22_Process_Model_Deployment.md` — §22.5, §22.9; `24_Configuration_Environment.md` — §24.5, §24.9.
 * **Prior ADRs:** `21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md`
-* **External References:** Architecture WG minutes (2024-09-30), Plugin API governance doc (2024-Q4).
+* **External References:** Architecture WG minutes (-), Plugin API governance doc (2024-Q4).
 
 ---
 
@@ -138,8 +138,8 @@ graph TD
 
 | Date | Change | Author | PR / Issue |
 |------|--------|--------|------------|
-| 2024-09-30 | Initial decision drafted. | @architecture-wg | #0000 |
-| 2025-02-14 | Reformatted to ADR template; added governance guidance. | @architecture-wg | #0000 |
+| - | Initial decision drafted. | @architecture-wg | #0000 |
+| - | Reformatted to ADR template; added governance guidance. | @architecture-wg | #0000 |
 
 ---
 

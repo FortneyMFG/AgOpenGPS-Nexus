@@ -159,7 +159,7 @@ The community favors a hybrid approach: retain LocalInProc for quick-start rigs 
 
 | Date | Summary | PR / Issue |
 |------|---------|------------|
-| 2025-02-14 | Reformatted to SRS v2 template and added verification map. | #0000 |
+| - | Reformatted to SRS v2 template and added verification map. | #0000 |
 
 ---
 

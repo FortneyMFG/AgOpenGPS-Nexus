@@ -4,8 +4,8 @@
 
 **Authors:** @layer-wg
 **Reviewers:** @nexus-specs, @mapping-guild
-**Created:** 2025-05-17
-**Last Updated:** 2025-02-14
+**Created:** -
+**Last Updated:** -
 **Supersedes:** —
 **Superseded by:** —
 **Related SRS:** `21_System_Decomposition_Boundaries.md`
@@ -132,7 +132,7 @@ graph TD
 * **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.12; `23_Threading_Scheduling_Timing.md` — §23.5; `24_Configuration_Environment.md` — §24.5.
 * **SRS Sections:** `21_System_Decomposition_Boundaries.md` — §21.5, §21.9; `23_Threading_Scheduling_Timing.md` — §23.5, §23.9.
 * **Prior ADRs:** `21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md`
-* **External References:** Layer controller prototype replay reports (2025-05-10).
+* **External References:** Layer controller prototype replay reports (-).
 
 ---
 
@@ -140,8 +140,8 @@ graph TD
 
 | Date | Change | Author | PR / Issue |
 |------|--------|--------|------------|
-| 2025-05-17 | Decision accepted by Core & Mapping guild. | @layer-wg | #0000 |
-| 2025-02-14 | Reformatted to ADR template; added governance and risk tables. | @layer-wg | #0000 |
+| - | Decision accepted by Core & Mapping guild. | @layer-wg | #0000 |
+| - | Reformatted to ADR template; added governance and risk tables. | @layer-wg | #0000 |
 
 ---
 

@@ -1,7 +1,7 @@
 # ADR-026: Performance budgets and instrumentation
 
 ## Status
-Drafting (target review window: 2026-01-09 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** Full Stack
 

@@ -1,5 +1,5 @@
 {
-  "meeting_date": "2025-02-17",
+  "meeting_date": "-",
   "meeting_type": "Architecture Governance Review",
   "summary": "Monthly sync covering the ADR roadmap, plugin manifest dependencies, and telemetry publishing cadence.",
   "attendees": [
@@ -28,21 +28,21 @@
       "owner": "Plugins Owner",
       "description": "Backfill dependency digests for controller plugins into the governance artifact store.",
       "status": "open",
-      "due_date": "2025-03-03"
+      "due_date": "-"
     },
     {
       "id": "NX-610-2",
       "owner": "QA Steward",
       "description": "Attach governance telemetry JSON to the March review minutes for regression tracking.",
       "status": "in_progress",
-      "due_date": "2025-03-07"
+      "due_date": "-"
     },
     {
       "id": "NX-208-followup",
       "owner": "Core Owner",
       "description": "Confirm the UI compatibility dashboard ingests the manifest digest summaries without regression.",
       "status": "completed",
-      "completed_date": "2025-02-20"
+      "completed_date": "-"
     }
   ],
   "links": [

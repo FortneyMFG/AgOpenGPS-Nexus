@@ -1,7 +1,7 @@
 ---
 owner: performance-working-group
 status: active
-last_reviewed: 2024-05-10
+last_reviewed: -
 related_tickets:
   - NX-PP-017
 ---

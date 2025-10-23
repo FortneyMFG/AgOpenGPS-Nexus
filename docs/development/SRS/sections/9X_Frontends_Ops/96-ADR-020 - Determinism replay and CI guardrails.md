@@ -1,7 +1,7 @@
 # ADR-020: Determinism, replay, and CI guardrails
 
 ## Status
-Drafting (target review window: 2025-12-16 week)
+Drafting (target review window: - week)
 
 **Relevant Plugin(s):** Simulation & Replay providers, Mapping, Autosteer, Section Control, Rate Control, Telemetry Logging
 

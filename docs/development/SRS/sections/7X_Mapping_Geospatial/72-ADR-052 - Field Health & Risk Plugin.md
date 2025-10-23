@@ -1,7 +1,7 @@
 # ADR-052 — Field Health & Risk Plugin
 
 - **Status:** Drafting
-- **Date:** 2025-03-19
+- **Date:** -
 - **Author(s):** Nexus architecture guild
 - **NX Task:** NX-190 Comprehensive ADR portfolio review
 

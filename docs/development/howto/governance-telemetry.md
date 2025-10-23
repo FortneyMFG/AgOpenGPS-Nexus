@@ -61,8 +61,8 @@ Each JSON file inside `docs/development/SRS/sections/2X_System_Architecture/revi
       "owner": "Plugins Owner",
       "description": "Backfill dependency digests",
       "status": "open",
-      "due_date": "2025-03-03",
-      "completed_date": "2025-02-20"
+      "due_date": "-",
+      "completed_date": "-"
     }
   ],
   "links": [{"label": "Roadmap", "url": "docs/development/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md"}]

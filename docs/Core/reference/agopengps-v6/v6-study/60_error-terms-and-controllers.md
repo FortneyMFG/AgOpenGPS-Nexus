@@ -2,7 +2,7 @@
 intent: "AOG v6/Dev guidance extraction"
 status: "reference-notes"
 source_branch: "Legacy SourceCode -V6@cf5eafe25e7bc29b0023e81b14424a04645aca0e"
-last_audit: "2024-05-13"
+last_audit: "-"
 ---
 
 # Error Terms and Controllers

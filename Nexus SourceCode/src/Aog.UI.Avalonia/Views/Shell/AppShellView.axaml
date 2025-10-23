@@ -254,7 +254,8 @@
       <controls:PaneCanvas Layout="{Binding Layout.Grid}"
                            LayoutResult="{Binding Layout.PaneLayout}"
                            IsHitTestVisible="False" />
-      <ItemsControl ItemsSource="{Binding Layout.Blocks}"
+      <ItemsControl x:Name="BlockTiles"
+                    ItemsSource="{Binding Layout.Blocks}"
                     ItemTemplate="{StaticResource BlockTileTemplate}"
                     Background="Transparent"
                     SizeChanged="OnViewportSizeChanged">
@@ -263,14 +264,14 @@
             <controls:TiledPanel Layout="{Binding Layout.Grid}" />
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemContainerStyle>
-          <Style Selector="ContentPresenter">
+        <ItemsControl.Styles>
+          <Style Selector="#BlockTiles > ContentPresenter">
             <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
             <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
             <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />
             <Setter Property="controls:TiledPanel.ColumnSpan" Value="{Binding Tile.ColSpan}" />
           </Style>
-        </ItemsControl.ItemContainerStyle>
+        </ItemsControl.Styles>
       </ItemsControl>
     </Grid>
   </DockPanel>

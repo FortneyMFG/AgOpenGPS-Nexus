@@ -25,7 +25,7 @@ Two value converters translate the persisted layout settings into concrete measu
 
 ## Shell view integration
 
-`AppShellView.axaml` wraps every block region inside a `SidebarGridOverlay`. Left and right sidebars use vertical `WrapPanel` presenters, the top and bottom strips use horizontal wrapping, and the workspace border displays the same overlay over the main content with extra padding. When the layout is unlocked (`Layout.IsLocked == false`), the overlays become visible and drag/drop is enabled; locking hides them and returns the surfaces to a read-only state.【F:Nexus SourceCode/src/Aog.UI.Avalonia/Views/Shell/AppShellView.axaml†L394-L508】
+`AppShellView.axaml` arranges the shell chrome with a three-by-three grid: optional top and bottom strips span the full width, the left and right columns host vertical button stacks, and the center cell renders the workspace content, grid overlay, and tiled blocks. Each region is wrapped in a `SidebarGridOverlay` whose visibility is driven by the inverse of `Layout.IsLocked`, ensuring the grids only appear while editing. Vertical sidebars rely on `StackPanel` presenters, whereas the top and bottom strips use `WrapPanel` presenters sized by their `SidebarLayoutSettings`. The central `PaneCanvas` draws the snapping grid along with semi-transparent panel bounds and divider bars, hiding itself automatically whenever the layout is locked.【F:Nexus SourceCode/src/Aog.UI.Avalonia/Views/Shell/AppShellView.axaml†L214-L338】【F:Nexus SourceCode/src/Aog.UI.Avalonia/Controls/PaneCanvas.cs†L8-L92】【F:Nexus SourceCode/src/Aog.UI.Avalonia/Rendering/BooleanNegationConverter.cs†L1-L33】
 
 ## Interaction flow
 

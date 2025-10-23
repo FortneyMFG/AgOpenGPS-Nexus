@@ -12,8 +12,17 @@ public sealed class ShellLayoutPreferences
     /// <summary>Gets or sets whether the top toolbar is visible.</summary>
     public bool ShowTopToolbar { get; set; } = true;
 
+    /// <summary>Gets or sets whether the left sidebar is visible.</summary>
+    public bool ShowLeftSidebar { get; set; } = true;
+
     /// <summary>Gets or sets whether the right sidebar panels are visible.</summary>
     public bool ShowRightSidebar { get; set; } = true;
+
+    /// <summary>Gets or sets whether the top sidebar strip is visible.</summary>
+    public bool ShowTopSidebar { get; set; } = true;
+
+    /// <summary>Gets or sets whether the bottom sidebar strip is visible.</summary>
+    public bool ShowBottomSidebar { get; set; } = true;
 
     /// <summary>Gets or sets the last active workspace identifier.</summary>
     public string ActiveWorkspaceId { get; set; } = "workspace.main";
@@ -23,6 +32,21 @@ public sealed class ShellLayoutPreferences
 
     /// <summary>Gets or sets the global grid layout definition.</summary>
     public Layout.ShellGridLayout Grid { get; set; } = new();
+
+    /// <summary>Gets or sets the layout settings for the left sidebar.</summary>
+    public SidebarLayoutSettings LeftSidebar { get; set; } = SidebarLayoutSettings.CreateVerticalDefaults();
+
+    /// <summary>Gets or sets the layout settings for the right sidebar.</summary>
+    public SidebarLayoutSettings RightSidebar { get; set; } = SidebarLayoutSettings.CreateVerticalDefaults();
+
+    /// <summary>Gets or sets the layout settings for the top sidebar strip.</summary>
+    public SidebarLayoutSettings TopSidebar { get; set; } = SidebarLayoutSettings.CreateTopDefaults();
+
+    /// <summary>Gets or sets the layout settings for the bottom sidebar strip.</summary>
+    public SidebarLayoutSettings BottomSidebar { get; set; } = SidebarLayoutSettings.CreateBottomDefaults();
+
+    /// <summary>Gets or sets the layout settings for the central workspace.</summary>
+    public SidebarLayoutSettings Workspace { get; set; } = SidebarLayoutSettings.CreateWorkspaceDefaults();
 
     /// <summary>
     /// Legacy alias maintained for compatibility with existing bindings.
@@ -44,13 +68,46 @@ public sealed class ShellLayoutPreferences
         set => ShowRightSidebar = value;
     }
 
+    /// <summary>
+    /// Legacy alias maintained for compatibility with existing bindings.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsLeftSidebarVisible
+    {
+        get => ShowLeftSidebar;
+        set => ShowLeftSidebar = value;
+    }
+
+    /// <summary>
+    /// Legacy alias maintained for compatibility with existing bindings.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsTopSidebarVisible
+    {
+        get => ShowTopSidebar;
+        set => ShowTopSidebar = value;
+    }
+
+    /// <summary>
+    /// Legacy alias maintained for compatibility with existing bindings.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsBottomSidebarVisible
+    {
+        get => ShowBottomSidebar;
+        set => ShowBottomSidebar = value;
+    }
+
     /// <summary>Creates a deep copy of the layout preferences.</summary>
     public ShellLayoutPreferences Clone()
     {
         var clone = new ShellLayoutPreferences
         {
             ShowTopToolbar = ShowTopToolbar,
+            ShowLeftSidebar = ShowLeftSidebar,
             ShowRightSidebar = ShowRightSidebar,
+            ShowTopSidebar = ShowTopSidebar,
+            ShowBottomSidebar = ShowBottomSidebar,
             ActiveWorkspaceId = ActiveWorkspaceId,
             Grid = new Layout.ShellGridLayout
             {
@@ -61,6 +118,11 @@ public sealed class ShellLayoutPreferences
                 RootPane = ClonePane(Grid?.RootPane),
                 Tiles = Grid?.Tiles is { Count: > 0 } tiles ? CloneTiles(tiles) : new List<Layout.TileSpec>(),
             },
+            LeftSidebar = (LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
+            RightSidebar = (RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
+            TopSidebar = (TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone(),
+            BottomSidebar = (BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone(),
+            Workspace = (Workspace ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone(),
         };
 
         if (Instances.Count > 0)

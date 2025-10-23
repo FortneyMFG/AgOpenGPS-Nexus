@@ -37,6 +37,7 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
     {
         var preferences = _preferencesService.GetPreferences();
         var layout = preferences.ShellLayout;
+        EnsureSidebarSettings(layout);
         EnsureInstanceList(layout);
 
         var changed = RemoveMissingDefinitions(layout);
@@ -56,11 +57,21 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         ArgumentNullException.ThrowIfNull(instances);
 
         var layout = _preferencesService.GetPreferences().ShellLayout;
+        EnsureSidebarSettings(layout);
         EnsureInstanceList(layout);
 
         layout.Instances.Clear();
         layout.Instances.AddRange(instances.Select(instance => instance.Clone()));
         _preferencesService.UpdateShellLayout(layout);
+    }
+
+    private static void EnsureSidebarSettings(ShellLayoutPreferences layout)
+    {
+        layout.LeftSidebar ??= SidebarLayoutSettings.CreateVerticalDefaults();
+        layout.RightSidebar ??= SidebarLayoutSettings.CreateVerticalDefaults();
+        layout.TopSidebar ??= SidebarLayoutSettings.CreateTopDefaults();
+        layout.BottomSidebar ??= SidebarLayoutSettings.CreateBottomDefaults();
+        layout.Workspace ??= SidebarLayoutSettings.CreateWorkspaceDefaults();
     }
 
     private static void EnsureInstanceList(ShellLayoutPreferences layout)

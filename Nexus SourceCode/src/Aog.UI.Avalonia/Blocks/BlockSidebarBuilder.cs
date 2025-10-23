@@ -53,17 +53,15 @@ public sealed class BlockSidebarBuilder
                 continue;
             }
 
-            if (definition.Kind != BlockKind.CommandButton)
+            if (definition.Kind == BlockKind.Container || definition.Kind == BlockKind.Menu)
             {
                 continue;
             }
 
             var label = GetLabel(definition);
             var statusMessage = GetStatusMessage(definition);
-            buttons.Add(new SidebarButtonViewModel(
-                label,
-                new DelegateCommand(_ => _statusReporter(statusMessage)),
-                statusMessage));
+            var command = CreateCommand(definition, statusMessage);
+            buttons.Add(new SidebarButtonViewModel(label, command, statusMessage));
         }
 
         return buttons;
@@ -85,5 +83,15 @@ public sealed class BlockSidebarBuilder
         return string.IsNullOrWhiteSpace(definition.Label)
             ? "Command executed."
             : $"{definition.Label} activated.";
+    }
+
+    private DelegateCommand CreateCommand(BlockDefinition definition, string statusMessage)
+    {
+        if (!string.IsNullOrWhiteSpace(definition.CommandKey))
+        {
+            return new DelegateCommand(_ => _statusReporter(statusMessage));
+        }
+
+        return new DelegateCommand(_ => { });
     }
 }

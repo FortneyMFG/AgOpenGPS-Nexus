@@ -18,6 +18,9 @@
       <rendering:IconKeyToBitmapConverter x:Key="BlockIconConverter" />
       <rendering:LockStateToBitmapConverter x:Key="LockStateIconConverter" />
       <rendering:LockStateToTextConverter x:Key="LockTooltipConverter" />
+      <rendering:SidebarDimensionConverter x:Key="SidebarDimensionConverter" />
+      <rendering:SpacingToThicknessConverter x:Key="SpacingToThicknessConverter" />
+      <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
 
       <DataTemplate x:Key="ShellMenuItemTemplate"
                     x:DataType="workspace:ShellMenuItemViewModel">
@@ -59,6 +62,18 @@
                        TextWrapping="Wrap"
                        TextAlignment="Center" />
           </StackPanel>
+        </Button>
+      </DataTemplate>
+
+      <DataTemplate x:Key="SidebarButtonTemplate"
+                    x:DataType="workspace:SidebarButtonViewModel">
+        <Button Command="{Binding Command}"
+                ToolTip.Tip="{Binding Description}"
+                Classes.sidebar="True">
+          <TextBlock Text="{Binding Label}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     TextAlignment="Center" />
         </Button>
       </DataTemplate>
     </ResourceDictionary>
@@ -249,31 +264,133 @@
       </StackPanel>
     </Border>
 
-    <Grid>
-      <ContentControl Content="{Binding MainContent}" />
-      <controls:PaneCanvas Layout="{Binding Layout.Grid}"
-                           LayoutResult="{Binding Layout.PaneLayout}"
-                           IsHitTestVisible="False" />
-      <ItemsControl x:Name="BlockTiles"
-                    ItemsSource="{Binding Layout.Blocks}"
-                    ItemTemplate="{StaticResource BlockTileTemplate}"
-                    Background="Transparent"
-                    SizeChanged="OnViewportSizeChanged">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <controls:TiledPanel Layout="{Binding Layout.Grid}" />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.Styles>
-          <Style Selector="#BlockTiles ContentPresenter"
-                 x:DataType="vm:BlockItemViewModel">
-            <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
-            <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
-            <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />
-            <Setter Property="controls:TiledPanel.ColumnSpan" Value="{Binding Tile.ColSpan}" />
-          </Style>
-        </ItemsControl.Styles>
-      </ItemsControl>
+    <Grid RowDefinitions="Auto,*,Auto"
+          ColumnDefinitions="Auto,*,Auto"
+          RowSpacing="{DynamicResource ThemeSpacingSm}"
+          ColumnSpacing="{DynamicResource ThemeSpacingSm}">
+      <Grid Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Height="{Binding Layout.TopSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Height}"
+            IsVisible="{Binding Host.IsTopSidebarVisible}">
+        <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.TopSidebarLayout}"
+                                     Margin="{Binding Layout.TopSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                                     IsHitTestVisible="False"
+                                     IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+        <ItemsControl ItemsSource="{Binding Layout.TopSidebarButtons}"
+                      ItemTemplate="{StaticResource SidebarButtonTemplate}"
+                      Margin="{Binding Layout.TopSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal"
+                         Spacing="{Binding Layout.TopSidebarLayout.Spacing}"
+                         HorizontalAlignment="Center" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </Grid>
+
+      <Grid Grid.Row="1"
+            Grid.Column="0"
+            Width="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
+            IsVisible="{Binding Host.IsLeftSidebarVisible}">
+        <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.LeftSidebarLayout}"
+                                     Margin="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                                     IsHitTestVisible="False"
+                                     IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+        <ItemsControl ItemsSource="{Binding Layout.LeftSidebarButtons}"
+                      ItemTemplate="{StaticResource SidebarButtonTemplate}"
+                      Margin="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                      HorizontalAlignment="Stretch">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Vertical"
+                          Spacing="{Binding Layout.LeftSidebarLayout.Spacing}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </Grid>
+
+      <Grid Grid.Row="1"
+            Grid.Column="1">
+        <ContentControl Content="{Binding MainContent}"
+                        Panel.ZIndex="0" />
+        <controls:PaneCanvas Layout="{Binding Layout.Grid}"
+                             LayoutResult="{Binding Layout.PaneLayout}"
+                             Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                             IsHitTestVisible="False"
+                             IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
+                             Panel.ZIndex="1" />
+        <ItemsControl x:Name="BlockTiles"
+                      ItemsSource="{Binding Layout.Blocks}"
+                      ItemTemplate="{StaticResource BlockTileTemplate}"
+                      Background="Transparent"
+                      Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                      SizeChanged="OnViewportSizeChanged"
+                      Panel.ZIndex="2">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <controls:TiledPanel Layout="{Binding Layout.Grid}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.Styles>
+            <Style Selector="#BlockTiles ContentPresenter"
+                   x:DataType="vm:BlockItemViewModel">
+              <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
+              <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
+              <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />
+              <Setter Property="controls:TiledPanel.ColumnSpan" Value="{Binding Tile.ColSpan}" />
+            </Style>
+          </ItemsControl.Styles>
+        </ItemsControl>
+      </Grid>
+
+      <Grid Grid.Row="1"
+            Grid.Column="2"
+            Width="{Binding Layout.RightSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
+            IsVisible="{Binding Host.IsRightSidebarVisible}">
+        <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.RightSidebarLayout}"
+                                     Margin="{Binding Layout.RightSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                                     IsHitTestVisible="False"
+                                     IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+        <ItemsControl ItemsSource="{Binding Layout.RightSidebarButtons}"
+                      ItemTemplate="{StaticResource SidebarButtonTemplate}"
+                      Margin="{Binding Layout.RightSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                      HorizontalAlignment="Stretch">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Vertical"
+                          Spacing="{Binding Layout.RightSidebarLayout.Spacing}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </Grid>
+
+      <Grid Grid.Row="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Height="{Binding Layout.BottomSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Height}"
+            IsVisible="{Binding Host.IsBottomSidebarVisible}">
+        <controls:SidebarGridOverlay LayoutSettings="{Binding Layout.BottomSidebarLayout}"
+                                     Margin="{Binding Layout.BottomSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                                     IsHitTestVisible="False"
+                                     IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+        <ItemsControl ItemsSource="{Binding Layout.BottomSidebarButtons}"
+                      ItemTemplate="{StaticResource SidebarButtonTemplate}"
+                      Margin="{Binding Layout.BottomSidebarLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal"
+                         Spacing="{Binding Layout.BottomSidebarLayout.Spacing}"
+                         HorizontalAlignment="Center" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </Grid>
     </Grid>
   </DockPanel>
 </UserControl>

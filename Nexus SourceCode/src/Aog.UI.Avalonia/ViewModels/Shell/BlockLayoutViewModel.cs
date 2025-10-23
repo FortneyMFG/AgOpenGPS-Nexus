@@ -10,6 +10,7 @@ using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Layout;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.Hosting;
+using Aog.UI.Avalonia.ViewModels;
 using Avalonia;
 
 namespace Aog.UI.Avalonia.ViewModels.Shell;
@@ -65,10 +66,20 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
         var preferences = preferencesService.GetPreferences().ShellLayout ?? new ShellLayoutPreferences();
         Grid = preferences.Grid ?? new ShellGridLayout();
+        LeftSidebarLayout = (preferences.LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone();
+        RightSidebarLayout = (preferences.RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone();
+        TopSidebarLayout = (preferences.TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone();
+        BottomSidebarLayout = (preferences.BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone();
+        WorkspaceLayout = (preferences.Workspace ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone();
 
         Blocks = new ObservableCollection<BlockItemViewModel>();
+        LeftSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
+        RightSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
+        TopSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
+        BottomSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         BuildInitialCollections();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
+        RebuildSidebars();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -78,6 +89,33 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the global grid definition describing the tiled layout.</summary>
     public ShellGridLayout Grid { get; }
+
+    /// <summary>Gets the layout settings used to size the left sidebar.</summary>
+    public SidebarLayoutSettings LeftSidebarLayout { get; }
+
+    /// <summary>Gets the layout settings used to size the right sidebar.</summary>
+    public SidebarLayoutSettings RightSidebarLayout { get; }
+
+    /// <summary>Gets the layout settings used to size the top sidebar strip.</summary>
+    public SidebarLayoutSettings TopSidebarLayout { get; }
+
+    /// <summary>Gets the layout settings used to size the bottom sidebar strip.</summary>
+    public SidebarLayoutSettings BottomSidebarLayout { get; }
+
+    /// <summary>Gets the layout settings used to size the workspace surface.</summary>
+    public SidebarLayoutSettings WorkspaceLayout { get; }
+
+    /// <summary>Gets the collection of buttons rendered along the left sidebar.</summary>
+    public ObservableCollection<SidebarButtonViewModel> LeftSidebarButtons { get; }
+
+    /// <summary>Gets the collection of buttons rendered along the right sidebar.</summary>
+    public ObservableCollection<SidebarButtonViewModel> RightSidebarButtons { get; }
+
+    /// <summary>Gets the collection of controls rendered along the top strip.</summary>
+    public ObservableCollection<SidebarButtonViewModel> TopSidebarButtons { get; }
+
+    /// <summary>Gets the collection of controls rendered along the bottom strip.</summary>
+    public ObservableCollection<SidebarButtonViewModel> BottomSidebarButtons { get; }
 
     /// <summary>Gets or sets a value indicating whether layout modifications are locked.</summary>
     public bool IsLocked
@@ -129,6 +167,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     public void SetStatusReporter(Action<string> reporter)
     {
         _statusReporter = reporter ?? (_ => { });
+        RebuildSidebars();
     }
 
     public void SetCommandInterceptor(Func<BlockDefinition, bool>? interceptor)
@@ -201,6 +240,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Blocks.Remove(item);
         Grid.Tiles.RemoveAll(tile => string.Equals(tile.Id, item.TileId, StringComparison.OrdinalIgnoreCase));
         Save();
+        RebuildSidebars();
     }
 
     private void BuildInitialCollections()
@@ -210,6 +250,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             return;
         }
 
+        var workspaceIndex = 0;
         for (var i = 0; i < _instances.Count; i++)
         {
             var instance = _instances[i];
@@ -219,7 +260,12 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
                 continue;
             }
 
-            var tile = EnsureTile(instance, i);
+            if (!ShouldRenderInWorkspace(instance.Region))
+            {
+                continue;
+            }
+
+            var tile = EnsureTile(instance, workspaceIndex++);
             var item = new BlockItemViewModel(instance, definition, this, tile);
             Blocks.Add(item);
         }
@@ -260,6 +306,32 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         {
             item.RefreshCommandStates();
         }
+    }
+
+    private void RebuildSidebars()
+    {
+        var builder = new BlockSidebarBuilder(_catalog, _statusReporter);
+        RebuildSidebarCollection(builder, LeftSidebarButtons, BlockRegion.Left);
+        RebuildSidebarCollection(builder, RightSidebarButtons, BlockRegion.Right);
+        RebuildSidebarCollection(builder, TopSidebarButtons, BlockRegion.Top);
+        RebuildSidebarCollection(builder, BottomSidebarButtons, BlockRegion.Bottom);
+    }
+
+    private void RebuildSidebarCollection(
+        BlockSidebarBuilder builder,
+        ObservableCollection<SidebarButtonViewModel> target,
+        BlockRegion region)
+    {
+        target.Clear();
+        foreach (var button in builder.Build(region, _instances))
+        {
+            target.Add(button);
+        }
+    }
+
+    private static bool ShouldRenderInWorkspace(BlockRegion region)
+    {
+        return region == BlockRegion.Floating || region == BlockRegion.Overlay || region == BlockRegion.LeftSub;
     }
 
     private string GetStatusMessage(BlockDefinition definition)

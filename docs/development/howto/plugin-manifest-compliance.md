@@ -13,7 +13,7 @@ publish capability snapshots for dashboards or diagnostic tooling.
 
 The lint command performs the same checks enforced by CI:
 
-- Ensures every manifest under `docs/Plugins/manifests/` parses via the shared
+- Ensures every manifest under `docs/development/SRS/appendices/samples/plugins/` parses via the shared
   loader and matches its canonical baseline in
   `Nexus SourceCode/tests/Aog.Plugins.Tests/Compatibility/Baselines/`.
 - Verifies that each `supportedCapabilities` entry has a corresponding lease

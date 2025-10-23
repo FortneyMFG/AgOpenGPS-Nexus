@@ -34,7 +34,7 @@ python tools/scripts/generate-governance-telemetry.py \
    ADR governance backlog. The JSON output records counts by state along with
    the individual tickets used to populate dashboards.
 2. **Dependency digest** — The script loads manifest metadata from
-   `docs/Plugins/manifests/**`. Required APIs, transports, and declared
+   `docs/development/SRS/appendices/samples/plugins/**`. Required APIs, transports, and declared
    capabilities are summarised so governance checks can detect drift in the
    official bundle.
 3. **Review minutes** — Meeting notes stored as JSON files under

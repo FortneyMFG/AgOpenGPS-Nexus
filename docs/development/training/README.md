@@ -28,14 +28,15 @@ seed fixtures, and topic coverage aligned with ADR-004.
 
 ## Loading the Library
 1. Launch the UI and open **Simulation → Edit scenarios...**.
-2. Choose **Import**, select `docs/development/training/library.json`, and pick the desired scenario.
+2. Choose **Import**, select `docs/development/SRS/appendices/samples/scenarios/library.json`, and pick the desired scenario.
 3. Press **Apply scenario** to push the preset into the simulation bar.
 
 For headless runs, pass the file to the tooling scripts, e.g. `nexus sim --config
-./docs/development/training/library.json --scenario headland-training`.
+./docs/development/SRS/appendices/samples/scenarios/library.json --scenario headland-training`.
 
 ## Performance Budgets
-The `performance-matrix.json` catalog is exercised by the
+The `performance-matrix.json` catalog in
+`docs/development/SRS/appendices/samples/scenarios/` is exercised by the
 `SimulationPerformanceHarness` integration tests. Each run now wraps the
 simulation bus with the `InstrumentedSimBus` and aggregates publish timings via
 `SimulationPerformanceBudgetRecorder`. The resulting budget snapshot enforces

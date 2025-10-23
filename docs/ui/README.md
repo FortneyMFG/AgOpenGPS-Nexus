@@ -3,7 +3,10 @@
 The Nexus UI platform modernises legacy WinForms experiences into shared
 Avalonia shells that can run on desktops, tablets, and companion devices.
 It consumes Core contracts, surfaces AgIO telemetry, and hosts plugin
-workflows through metadata-driven layouts.
+workflows through metadata-driven layouts. This directory captures
+operational guides and modernization workbooks; UI requirements live in
+the [front-end & operations SRS chapters](../SRS/sections/9X_Frontends_Ops/)
+with design decisions anchored in [ADR-034](../SRS/sections/9X_Frontends_Ops/91-ADR-034%20-%20Metadata-driven%20dashboards%20and%20inspector%20surfaces.md).
 
 ```mermaid
 flowchart TD
@@ -21,6 +24,12 @@ flowchart TD
   and dashboards.
 - Enforce styling, accessibility, and metadata-driven layout guidance so
   plugin surfaces feel consistent across bundles.
+
+### SRS breadcrumbs
+- [Section 91 — UI shell layout](../SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
+- [ADR-034 — Metadata-driven dashboards & inspector surfaces](../SRS/sections/9X_Frontends_Ops/91-ADR-034%20-%20Metadata-driven%20dashboards%20and%20inspector%20surfaces.md)
+- [Section 92 — Gauges & machine panels](../SRS/sections/9X_Frontends_Ops/92_Gauges_Machine_Panels.md)
+- [Section 94 — Extensibility, packaging, & updates](../SRS/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 
 ## Feature Highlights
 - **Run modes:** [Avalonia run modes](avalonia-run-modes.md) explain

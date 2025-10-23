@@ -4,8 +4,10 @@
 
 This guide walks through the practical view of the Bridge stack so engineers,
 integrators, and support teams can explain how gRPC services, AOG-Link v1, and
-the transport adapters cooperate. Pair it with Section 3A of the SRS for the
-full normative specification.
+the transport adapters cooperate. Pair it with [Section 53 — AOG-Link
+Compatibility](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md)
+and [ADR-006 — MCU communications over AOG-Link](../SRS/sections/4X_Interprocess_Communications/42-ADR-006%20-%20MCU%20communications%20over%20AOG-Link%20(nanopb).md)
+for the full normative specification.
 
 ## 1. Layered view at a glance
 
@@ -13,7 +15,7 @@ full normative specification.
    over the in-process gRPC bus. Everything north of the Bridge speaks this
    contract.
 2. **AOG-Link v1 layer.** The Bridge converts gRPC intents and telemetry into
-   protobuf payloads plus the 8-byte frame header defined in the SRS. Reliability
+  protobuf payloads plus the 8-byte frame header defined in the SRS references above. Reliability
    policies (ACKs, retries, segmentation) live here so transports stay thin.
 3. **Adapters.** UDP, Serial, CAN, and MQTT adapters reuse the shared codec and
    only worry about sockets, ports, baud rates, and SocketCAN details.
@@ -118,7 +120,7 @@ flowchart TD
 | Fan-out telemetry | MQTT QoS0 → UDP multicast (optional)         | GPS, IMU, status, health metrics.                       |
 | Legacy support    | v0 Bridge                                    | Emits AOG-Link v0 PGNs for classic controllers.         |
 
-The Mermaid flowchart above (mirrored in the SRS, Section 3A §6) marks
+The Mermaid flowchart above (mirrored in the SRS, [Section 53.6.3](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md#5363-capability-negotiation--roles)) marks
 control-focused adapters in red and telemetry-first adapters in blue. Use it as
 the visual aid when explaining the data paths to stakeholders.
 

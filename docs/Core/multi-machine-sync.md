@@ -119,4 +119,5 @@ received updated guidance or coverage archives.
 | Anchor manifest lost after disk swap | `%PROGRAMDATA%` was wiped during OS reinstall. | Restore the latest `fleet/manifest.cache.json` and the most recent sync archive from the removable drive before restarting Nexus. |
 
 This workflow keeps machine identities tightly scoped per cab while preserving an offline,
-repeatable sync loop that satisfies the legacy compatibility goals in SRS §4.3.
+repeatable sync loop that satisfies the legacy compatibility goals in
+[SRS §4.3 Legacy Compatibility](../SRS/NOTES.md#srs-43-legacy-compatibility).

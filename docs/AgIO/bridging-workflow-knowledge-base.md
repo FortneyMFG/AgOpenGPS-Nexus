@@ -2,7 +2,9 @@
 
 Bridging keeps legacy AgOpenGPS (V6/Teensy) installs productive while operators adopt Nexus. This
 knowledge base distils the scripts, checklists, and troubleshooting patterns that support teams use
-when coaching dealers and growers through mixed deployments.
+when coaching dealers and growers through mixed deployments. Firmware and transport requirements
+remain governed by [SRS §53 AOG-Link Compatibility](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md)
+and the legacy PGN catalog in [the AgIO reference appendix](../SRS/references/AgIO_PGN_Baseline.md).
 
 ## Audience and prerequisites
 

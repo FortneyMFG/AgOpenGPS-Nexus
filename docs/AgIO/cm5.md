@@ -1,6 +1,7 @@
 # CM5 Integrated Controller Setup
 
-This guide prepares a CM5 that runs NAV, steer-ctrl, Pumpkin Pi, and the AgIO Bridge on the same device.
+This guide prepares a CM5 that runs NAV, steer-ctrl, Pumpkin Pi, and the AgIO Bridge on the same device. Hardware and authority
+requirements are formalised in [Section 54 — CM5 Integrated Controller](../SRS/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md).
 
 ## Prerequisites
 - Nexus runtime images for CM5 with NAV and steer-ctrl services installed.

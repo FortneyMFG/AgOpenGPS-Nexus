@@ -1,6 +1,6 @@
 # AOG-Link Transport Rollout Guide
 
-ADR-006 moves MCU communications to the AOG-Link protocol across Ethernet, RS-485, and CAN. This guide covers how to stage, validate, and support each transport as part of the rollout.
+ADR-006 moves MCU communications to the AOG-Link protocol across Ethernet, RS-485, and CAN. This guide covers how to stage, validate, and support each transport as part of the rollout. For the normative protocol requirements see [Section 53 — AOG-Link Compatibility](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md) and [ADR-006](../SRS/sections/4X_Interprocess_Communications/42-ADR-006%20-%20MCU%20communications%20over%20AOG-Link%20(nanopb).md).
 
 ## Transport Matrix
 

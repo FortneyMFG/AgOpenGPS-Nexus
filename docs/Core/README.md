@@ -3,7 +3,10 @@
 The Core runtime orchestrates deterministic scheduling, capability
 exchange, and orchestration services that connect plugins, UI shells, and
 AgIO transports. It enforces contracts, routes telemetry, and manages the
-lifecycle of simulation or hardware-backed workloads.
+lifecycle of simulation or hardware-backed workloads. The documents in
+this folder are operational runbooks; authoritative requirements are
+captured in the [Core domain services SRS chapters](../SRS/sections/6X_Core_Domain_Services/)
+and [section 21 system boundaries](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md).
 
 ```mermaid
 flowchart TD
@@ -21,6 +24,12 @@ flowchart TD
   ensure the correct leases and topics are active for each deployment.
 - Provide operational guardrails, including observability dashboards and
   multi-machine coordination workflows.
+
+### SRS breadcrumbs
+- [Section 21 — System decomposition & boundaries](../SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
+- [Section 62 — Job lifecycle services](../SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md)
+- [Section 63 — Layer registry & journal](../SRS/sections/6X_Core_Domain_Services/63_Layers_Registry_Journal.md)
+- [Section 64 — Telemetry health](../SRS/sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
 
 ## Feature Highlights
 - **Data flow contracts:** The [Core data flow overview](data-flow.md)

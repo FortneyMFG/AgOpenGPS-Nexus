@@ -4,7 +4,10 @@ AgIO hosts Nexus hardware transports, bridge adapters, and compatibility
 services that keep legacy PGN devices and modern gRPC clients operating
 side-by-side. It arbitrates access to serial, UDP, CAN, MQTT-SN, and
 AOG-Link channels while mirroring telemetry for the Core runtime and UI
-shells.
+shells. The runbooks in this folder document how operators deploy and
+support those transports; the normative protocol and safety requirements
+now live in the [SRS AOG-Link compatibility section](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md)
+and the [ADR-006 transport appendix](../SRS/sections/4X_Interprocess_Communications/42-ADR-006%20-%20MCU%20communications%20over%20AOG-Link%20(nanopb).md).
 
 ```mermaid
 flowchart TD
@@ -22,6 +25,11 @@ flowchart TD
   for Core and plugin orchestration.
 - Surface deployment runbooks for integrated controllers such as the CM5
   and guide staged rollouts of new transports.
+
+### SRS breadcrumbs
+- [Section 53 — AOG-Link Compatibility](../SRS/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md)
+- [ADR-006 — MCU communications over AOG-Link (nanopb)](../SRS/sections/4X_Interprocess_Communications/42-ADR-006%20-%20MCU%20communications%20over%20AOG-Link%20(nanopb).md)
+- [Section 54 — CM5 Integrated Controller](../SRS/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md)
 
 ## Feature Highlights
 - **Bridge topologies:** [Pumpkin Pi fastpath and bridge

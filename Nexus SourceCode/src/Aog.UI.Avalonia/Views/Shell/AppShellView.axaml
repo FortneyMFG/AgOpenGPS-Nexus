@@ -367,13 +367,13 @@
       <Canvas x:Name="LayoutCanvas"
               Width="{Binding #WorkspaceRoot.Bounds.Width}"
               Height="{Binding #WorkspaceRoot.Bounds.Height}"
-              Panel.ZIndex="1">
+              Canvas.ZIndex="1">
         <ContentControl Content="{Binding MainContent}"
                         Width="{Binding #WorkspaceRoot.Bounds.Width}"
                         Height="{Binding #WorkspaceRoot.Bounds.Height}"
                         Canvas.Left="0"
                         Canvas.Top="0"
-                        Panel.ZIndex="0" />
+                        Canvas.ZIndex="0" />
 
         <controls:PaneCanvas Layout="{Binding Layout.Grid}"
                              LayoutResult="{Binding Layout.PaneLayout}"
@@ -382,7 +382,7 @@
                              Height="{Binding #WorkspaceRoot.Bounds.Height}"
                              Canvas.Left="0"
                              Canvas.Top="0"
-                             Panel.ZIndex="0"
+                             Canvas.ZIndex="0"
                              IsHitTestVisible="False"
                              Opacity="0.82" />
 
@@ -392,7 +392,7 @@
                       Width="{Binding #WorkspaceRoot.Bounds.Width}"
                       Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       IsHitTestVisible="False"
-                      Panel.ZIndex="1">
+                      Canvas.ZIndex="1">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <Canvas />
@@ -419,7 +419,7 @@
                       SizeChanged="OnViewportSizeChanged"
                       Canvas.Left="0"
                       Canvas.Top="0"
-                      Panel.ZIndex="2">
+                      Canvas.ZIndex="2">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <controls:TiledPanel Layout="{Binding Layout.Grid}" />
@@ -443,7 +443,7 @@
                       Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       Canvas.Left="0"
                       Canvas.Top="0"
-                      Panel.ZIndex="5"
+                      Canvas.ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
                       IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
           <ItemsControl.ItemsPanel>
@@ -469,7 +469,7 @@
                       Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       Canvas.Left="0"
                       Canvas.Top="0"
-                      Panel.ZIndex="5"
+                      Canvas.ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
                       IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
           <ItemsControl.ItemsPanel>
@@ -490,7 +490,7 @@
       </Canvas>
 
       <field:FieldSettingsDock DataContext="{Binding Layout}"
-                               Panel.ZIndex="6" />
+                               Canvas.ZIndex="6" />
     </Grid>
 
     <Border Grid.Row="2"

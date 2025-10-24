@@ -24,6 +24,9 @@ public sealed class ShellLayoutPreferences
     /// <summary>Gets or sets whether the bottom sidebar strip is visible.</summary>
     public bool ShowBottomSidebar { get; set; } = true;
 
+    /// <summary>Gets or sets whether the shell layout is locked for modifications.</summary>
+    public bool IsLayoutLocked { get; set; } = true;
+
     /// <summary>Gets or sets the last active workspace identifier.</summary>
     public string ActiveWorkspaceId { get; set; } = "workspace.main";
 
@@ -108,6 +111,7 @@ public sealed class ShellLayoutPreferences
             ShowRightSidebar = ShowRightSidebar,
             ShowTopSidebar = ShowTopSidebar,
             ShowBottomSidebar = ShowBottomSidebar,
+            IsLayoutLocked = IsLayoutLocked,
             ActiveWorkspaceId = ActiveWorkspaceId,
             Grid = new Layout.ShellGridLayout
             {
@@ -118,6 +122,8 @@ public sealed class ShellLayoutPreferences
                 RootPane = ClonePane(Grid?.RootPane),
                 Tiles = Grid?.Tiles is { Count: > 0 } tiles ? CloneTiles(tiles) : new List<Layout.TileSpec>(),
                 Panels = Grid?.Panels is { Count: > 0 } panels ? ClonePanels(panels) : new List<Layout.PanelSpec>(),
+                FloatingPanels = Grid?.FloatingPanels is { Count: > 0 } floatingPanels ? CloneFloatingPanels(floatingPanels) : new List<Layout.FloatingPanelSpec>(),
+                FloatingBlocks = Grid?.FloatingBlocks is { Count: > 0 } floatingBlocks ? CloneFloatingBlocks(floatingBlocks) : new List<Layout.FloatingBlockSpec>(),
             },
             LeftSidebar = (LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
             RightSidebar = (RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone(),
@@ -203,6 +209,56 @@ public sealed class ShellLayoutPreferences
                 TopUsesGridSize = panel.TopUsesGridSize,
                 Anchor = panel.Anchor,
                 Offset = panel.Offset,
+            });
+        }
+
+        return clone;
+    }
+
+    private static List<Layout.FloatingPanelSpec> CloneFloatingPanels(IEnumerable<Layout.FloatingPanelSpec> panels)
+    {
+        var clone = new List<Layout.FloatingPanelSpec>();
+        foreach (var panel in panels)
+        {
+            if (panel is null)
+            {
+                continue;
+            }
+
+            clone.Add(new Layout.FloatingPanelSpec
+            {
+                Id = panel.Id,
+                Title = panel.Title,
+                ContentId = panel.ContentId,
+                X = panel.X,
+                Y = panel.Y,
+                Width = panel.Width,
+                Height = panel.Height,
+                IsLocked = panel.IsLocked,
+            });
+        }
+
+        return clone;
+    }
+
+    private static List<Layout.FloatingBlockSpec> CloneFloatingBlocks(IEnumerable<Layout.FloatingBlockSpec> blocks)
+    {
+        var clone = new List<Layout.FloatingBlockSpec>();
+        foreach (var block in blocks)
+        {
+            if (block is null)
+            {
+                continue;
+            }
+
+            clone.Add(new Layout.FloatingBlockSpec
+            {
+                Id = block.Id,
+                InstanceId = block.InstanceId,
+                X = block.X,
+                Y = block.Y,
+                Width = block.Width,
+                Height = block.Height,
             });
         }
 

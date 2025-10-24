@@ -19,35 +19,37 @@ It remains **decision neutral**: later Option subsections (§21.14) evaluate con
 
 ## 21.2 Legacy Baseline (Context Only)
 
-Historically, **AgOpenGPS (V6 / ROC)** operated as a **single-process monolith**:
+Historically, **AgOpenGPS (V6 / ROC)** centered the bulk of its logic inside the main WinForms host, yet it already relied on
+companion executables:
 
-- `ApplicationCore` managed guidance, steering, mapping, and PGN I/O within one thread space.
-- WinForms and AgIO shared direct references without API seams.
-- Simulation and telemetry replay relied on bespoke stubs.
-- Timing, UI rendering, and logic loops were tightly interleaved.
+- `ApplicationCore` (WinForms) coordinated guidance, steering, and mapping in the primary thread space.
+- **AgIO** shipped as a separate Windows process that bridged CAN/serial hardware via shared memory and PGNs.
+- **Rate & Section Control (ROC)** could be deployed as an additional process when operators enabled advanced rate logic.
+- Simulation and telemetry replay depended on bespoke stubs with minimal API seams between the processes.
+- Timing, UI rendering, and logic loops remained tightly interleaved, so crashes or stalls in one area frequently impacted the
+  rest of the stack despite the process split.
 
-This architecture is deterministic but resists cross-platform delivery, fault isolation, and community-driven extensions.
+This loose multi-process arrangement offered limited fault isolation while still resisting cross-platform delivery and
+community-driven extensions.
 
 ---
 
 ## 21.3 Feature Inventory & Task Alignment
 
-The table below inventories the major Nexus feature domains, notes representative backlog tickets, and highlights where those capabilities can live inside a decomposed stack. Use this as the quick “what runs where” reference when reasoning about plugins, SDKs, or process splits.
+The table below inventories the major Nexus feature domains and highlights where those capabilities can live inside a decomposed stack. Use this as the quick “what runs where” reference when reasoning about plugins, SDKs, or process splits.
 
-| Feature Domain | Representative Tickets (tasks.md) | Nexus Stack Default | Alternative Partition Options | Notes |
-|----------------|------------------------------------|---------------------|------------------------------|-------|
-| **Kinematics / Pose** | NX-215…NX-220 (layer controllers), NX-166 (Fusion plugin GA) | Core hard-real-time loop | Simulation plugin for replay-only contexts | Deterministic timebase; cannot tolerate IPC jitter for live control. |
-| **Autosteer Control** | NX-160 (AutoSteer plugin GA), NX-214 (Constraint gate) | Core loop + plugin arbitration | Externalized safety monitor, hardware assist MCU | Requires ≤20 ms loop. Plugin extension points govern strategies, not the actuator pump. |
-| **Guidance & Planning** | NX-161 (Mapping plugin GA), NX-170 (Job Tasks), NX-235 (Cross-track replay) | Plugin via Guidance SDK | Integrated module for single-process targets | Works well across gRPC; benefits from independent release cadence. |
-| **Mapping & Variable Layers** | NX-161…NX-165 (official plugins), NX-613 (layer registry) | Plugin hosted via Mapping SDK | UI-coupled module for kiosk builds | Heavy UI affinity but no hard timing; ideal plugin candidate. |
-| **Rate & Section Control** | NX-163 (Rate Control), NX-162 (Sections) | Plugin feeding Core contracts | Integrated when device count is tiny | Shares contracts with AgIO for deterministic command fan-out. |
-| **Monitoring & Telemetry** | NX-171 (Telemetry logging), NX-226…NX-229 (mesh services) | Plugin with telemetry service SDK | Bundled inside Core for embedded bundles | Primarily event driven; plugin keeps optional sensors out of Core. |
-| **AgIO Hardware Layer** | NX-020…NX-029 (host/backends), NX-462 (Linux packaging) | Dedicated AgIO process communicating via SDK | Embedded inside Core for constrained OSes | Sidecar isolates crashes and eases OS-specific builds. |
-| **Radiobridge / Communications** | NX-236…NX-245 (RadioBridge rollout) | Plugin running next to AgIO | Core-hosted radio for fixed rigs | Shares diagnostics with AgIO; optional for offline sims. |
-| **UI Shells** | NX-154 (Avalonia companion), NX-341 (packaging) | Avalonia/remote clients | Web/mobile thin clients via gRPC | UI consumes SDKs; no timing guarantees required. |
-| **Simulation & Replay** | NX-035 (Replay plugin), NX-155 (Sim fabric), NX-401 (Sim catalog) | Core SimClock + plugin providers | External orchestrator for cloud sims | Time authority stays in Core; providers plug in through contracts. |
-
-The presence of ticket identifiers reassures contributors that “building it modular” aligns with tracked work, not a speculative rewrite.
+| Feature Domain | Nexus Stack Default | Alternative Partition Options | Notes |
+|----------------|---------------------|------------------------------|-------|
+| **Kinematics / Pose** | Core-hosted plugin executing within the deterministic struct ABI container | Dedicated Core loop for minimal builds | Maintains deterministic timebase while allowing plugin-delivered fusion strategies. |
+| **Autosteer Control** | Core-hosted plugin with real-time arbitration hooks | Externalized safety monitor or assist MCU | Loop remains ≤20 ms; plugin governs strategies while Core enforces actuator safety. |
+| **Guidance & Planning** | Plugin via Guidance SDK | Integrated module for single-process targets | Works well across gRPC; benefits from independent release cadence. |
+| **Mapping & Variable Layers** | Plugin hosted via Mapping SDK | UI-coupled module for kiosk builds | Heavy UI affinity but no hard timing; ideal plugin candidate. |
+| **Rate & Section Control** | Plugin feeding Core contracts | Integrated when device count is tiny | Shares contracts with AgIO plugins for deterministic command fan-out. |
+| **Monitoring & Telemetry** | Plugin with telemetry service SDK | Bundled inside Core for embedded bundles | Primarily event driven; plugin keeps optional sensors out of Core. |
+| **AgIO Hardware Layer** | Core-hosted plugin(s) replacing the legacy sidecar process | Sidecar service for OS-constrained deployments | Plugin split allows multiple hardware stacks (“multins”) while keeping fault domains contained. |
+| **Radiobridge / Communications** | Plugin running alongside AgIO plugins | Core-hosted radio for fixed rigs | Shares diagnostics contracts with AgIO; optional for offline sims. |
+| **UI Shells** | Avalonia/remote clients | Web/mobile thin clients via gRPC | UI consumes SDKs; no timing guarantees required. |
+| **Simulation & Replay** | Core SimClock + plugin providers | External orchestrator for cloud sims | Time authority stays in Core; providers plug in through contracts. |
 
 ---
 

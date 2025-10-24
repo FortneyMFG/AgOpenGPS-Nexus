@@ -3,7 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
-            xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             xmlns:sty="clr-namespace:Avalonia.Styling;assembly=Avalonia.Styling"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Field.FieldSettingsDock"
              x:DataType="vm:BlockLayoutViewModel"
@@ -80,36 +81,36 @@
   </UserControl.Transitions>
 
   <UserControl.Styles>
-    <Style Selector="UserControl">
+    <sty:Style Selector="UserControl">
       <Setter Property="Margin" Value="-320,0,0,0" />
       <Setter Property="Opacity" Value="0" />
       <Setter Property="IsHitTestVisible" Value="False" />
       <Setter Property="Background" Value="#DD101010" />
       <Setter Property="Padding" Value="18" />
 
-      <Style.Triggers>
-        <DataTrigger Binding="{Binding IsLauncherDockVisible}" Value="True">
+      <sty:Style.Triggers>
+        <sty:DataTrigger Binding="{Binding IsLauncherDockVisible}" Value="True">
           <Setter Property="Margin" Value="0" />
           <Setter Property="Opacity" Value="1" />
           <Setter Property="IsHitTestVisible" Value="True" />
-        </DataTrigger>
-      </Style.Triggers>
-    </Style>
+        </sty:DataTrigger>
+      </sty:Style.Triggers>
+    </sty:Style>
 
-    <Style Selector="Border.menu-block">
+    <sty:Style Selector="Border.menu-block">
       <Setter Property="Background" Value="#1F1F1F" />
       <Setter Property="BorderBrush" Value="#3A3A3A" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="12" />
       <Setter Property="Padding" Value="14" />
       <Setter Property="Margin" Value="0,0,0,12" />
-    </Style>
+    </sty:Style>
 
-    <Style Selector="Border.menu-block:pointerover">
+    <sty:Style Selector="Border.menu-block:pointerover">
       <Setter Property="BorderBrush" Value="#4E8CDC" />
-    </Style>
+    </sty:Style>
 
-    <Style Selector="Button.launcher-action">
+    <sty:Style Selector="Button.launcher-action">
       <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeXs}" />
       <Setter Property="Padding" Value="8,4" />
       <Setter Property="CornerRadius" Value="6" />
@@ -117,15 +118,15 @@
       <Setter Property="Foreground" Value="#E6E6E6" />
       <Setter Property="BorderBrush" Value="#494949" />
       <Setter Property="BorderThickness" Value="1" />
-    </Style>
+    </sty:Style>
 
-    <Style Selector="Button.launcher-action:hover">
+    <sty:Style Selector="Button.launcher-action:hover">
       <Setter Property="Background" Value="#3C6DBB" />
       <Setter Property="BorderBrush" Value="#4F8CE0" />
       <Setter Property="Foreground" Value="#FFFFFF" />
-    </Style>
+    </sty:Style>
 
-    <Style Selector="Border.drop-placeholder">
+    <sty:Style Selector="Border.drop-placeholder">
       <Setter Property="Background" Value="#1B3A60" />
       <Setter Property="BorderBrush" Value="#2B72C3" />
       <Setter Property="BorderThickness" Value="1.5" />
@@ -133,7 +134,7 @@
       <Setter Property="Padding" Value="18" />
       <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="Margin" Value="0,16,0,0" />
-    </Style>
+    </sty:Style>
   </UserControl.Styles>
 
   <ScrollViewer VerticalScrollBarVisibility="Auto">

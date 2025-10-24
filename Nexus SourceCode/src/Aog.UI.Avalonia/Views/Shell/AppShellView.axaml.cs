@@ -109,13 +109,14 @@ public partial class AppShellView : UserControl
 
     private TiledPanel? GetTilePanel()
     {
-        if (_tilePanel is { IsAttachedToVisualTree: true })
+        if (_tilePanel is { } panel && panel.IsAttachedToVisualTree())
         {
-            return _tilePanel;
+            return panel;
         }
 
         var tiles = this.FindControl<ItemsControl>("BlockTiles");
-        _tilePanel = tiles?.GetVisualDescendants().OfType<TiledPanel>().FirstOrDefault();
-        return _tilePanel;
+        panel = tiles?.GetVisualDescendants().OfType<TiledPanel>().FirstOrDefault();
+        _tilePanel = panel;
+        return panel;
     }
 }

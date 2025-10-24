@@ -15,7 +15,7 @@
   - `sections/1X_Platform_Foundations/12_Development_Language_Runtime.md`
   - `sections/1X_Platform_Foundations/13_UI_Framework_UX.md`
 - **Related Options & ADRs:**
-  - `sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md`
+  - `11-O1` *(retired document)*
   - `sections/1X_Platform_Foundations/11-ADR-001 - Establish Windows and Linux Support Baseline.md`
   - `sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 8 LTS Runtime.md`
   - `sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md`

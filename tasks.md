@@ -557,8 +557,8 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-026 | TimingCaps probe (Linux PPS/PTP) | Done |  | — | [SRS §3.3 AGiO Services](docs/development/SRS/NOTES.md#srs-33-agio-services) | Report jitter |
 | NX-959 | Linux NMEA scan hot reload | In Progress |  | — | [SRS §3.3 AGiO Services](docs/development/SRS/NOTES.md#srs-33-agio-services) | Cancel and restart serial scan loop when configuration changes |
 | NX-027 | Legacy UDP gateway skeleton | Done |  | — | [SRS §4.3 Legacy Compatibility](docs/development/SRS/NOTES.md#srs-43-legacy-compatibility) | Loopback test |
-| NX-029 | Agio.Linux SocketCAN backend (CAN→gRPC) | Done |  | — | [SRS Option 11-O1](docs/development/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md) | Streams CAN frames + section relays |
-| NX-066 | GNSS source policy + TCP/UDP provider | Done |  | — | [SRS Option 11-O1](docs/development/SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md) | Aggregates `IPositionSource` feeds |
+| NX-029 | Agio.Linux SocketCAN backend (CAN→gRPC) | Done |  | — | SRS Option 11-O1 *(retired document)* | Streams CAN frames + section relays |
+| NX-066 | GNSS source policy + TCP/UDP provider | Done |  | — | SRS Option 11-O1 *(retired document)* | Aggregates `IPositionSource` feeds |
 | NX-117 | Bridge service host for gRPC ⇄ AOG-Link | Done |  | — | [ADR-002 gRPC Contracts](docs/development/SRS/sections/4X_Interprocess_Communications/41-ADR-002 - Expose Nexus services over gRPC protobuf contracts.md) | Standalone daemon mediating inter-process, AOG-Link, and PGN flows |
 | NX-118 | gRPC ⇄ AOG-Link translator layer | Done |  | — | [ADR-002 gRPC Contracts](docs/development/SRS/sections/4X_Interprocess_Communications/41-ADR-002 - Expose Nexus services over gRPC protobuf contracts.md) | Map service calls/streams onto nanopb datagrams with ack/retry semantics |
 | NX-119 | AOG-Link ⇄ PGN compatibility bridge | Done |  | — | [SRS Option O-COMM-6](docs/development/SRS/sections/4X_Interprocess_Communications/42-O6%20-%20PGN%20compatibility%20bridge%20layered%20over%20new%20APIs.md) | Maintain legacy devices during migration |

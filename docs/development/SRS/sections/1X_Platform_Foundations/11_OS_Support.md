@@ -153,7 +153,7 @@ Describe how compliance with the requirements is validated.
 
 | Option ID | Status | Type / Theme | Description | Reference Document |
 |-----------|--------|--------------|-------------|--------------------|
-| **11-O1** | Proposed | Unified runtime | Single .NET 8/Avalonia stack producing Windows and Linux builds from one solution. | 11-O1_Unified_DotNet8_Avalonia.md |
+| **11-O1** | Proposed | Unified runtime | Single .NET 8/Avalonia stack producing Windows and Linux builds from one solution. | *(Retired option document)* |
 
 > **Informative:** Options are explored alternatives, not binding requirements.
 

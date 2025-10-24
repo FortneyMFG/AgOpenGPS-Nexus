@@ -410,8 +410,11 @@
             ClipToBounds="True">
         <ContentControl Content="{Binding MainContent}"
                         HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        Panel.ZIndex="0" />
+                        VerticalAlignment="Stretch">
+          <Panel.ZIndex>
+            <x:Int32>0</x:Int32>
+          </Panel.ZIndex>
+        </ContentControl>
         <controls:PaneCanvas Layout="{Binding Layout.Grid}"
                              LayoutResult="{Binding Layout.PaneLayout}"
                              ShowMinorGrid="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
@@ -419,8 +422,11 @@
                              HorizontalAlignment="Stretch"
                              VerticalAlignment="Stretch"
                              IsHitTestVisible="False"
-                             Opacity="0.85"
-                             Panel.ZIndex="1" />
+                             Opacity="0.85">
+          <Panel.ZIndex>
+            <x:Int32>1</x:Int32>
+          </Panel.ZIndex>
+        </controls:PaneCanvas>
         <ItemsControl x:Name="BlockTiles"
                       ItemsSource="{Binding Layout.Blocks}"
                       ItemTemplate="{StaticResource BlockTileTemplate}"
@@ -428,8 +434,10 @@
                       Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
-                      SizeChanged="OnViewportSizeChanged"
-                      Panel.ZIndex="3">
+                      SizeChanged="OnViewportSizeChanged">
+          <Panel.ZIndex>
+            <x:Int32>3</x:Int32>
+          </Panel.ZIndex>
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <controls:TiledPanel Layout="{Binding Layout.Grid}" />
@@ -455,9 +463,12 @@
               CornerRadius="8"
               Padding="12,10"
               Margin="24,16,24,0"
-              Panel.ZIndex="1"
               IsHitTestVisible="False"
-              IsVisible="{Binding Host.IsTopSidebarVisible, FallbackValue=True}" />
+              IsVisible="{Binding Host.IsTopSidebarVisible, FallbackValue=True}">
+        <Panel.ZIndex>
+          <x:Int32>1</x:Int32>
+        </Panel.ZIndex>
+      </Border>
 
       <Border Grid.Row="1"
               Grid.Column="0"
@@ -467,10 +478,13 @@
               CornerRadius="8"
               Padding="12"
               Margin="24,16,16,24"
-              Panel.ZIndex="1"
               Width="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
               IsHitTestVisible="False"
-              IsVisible="{Binding Host.IsLeftSidebarVisible, FallbackValue=True}" />
+              IsVisible="{Binding Host.IsLeftSidebarVisible, FallbackValue=True}">
+        <Panel.ZIndex>
+          <x:Int32>1</x:Int32>
+        </Panel.ZIndex>
+      </Border>
 
       <Border Grid.Row="1"
               Grid.Column="2"
@@ -480,10 +494,13 @@
               CornerRadius="8"
               Padding="12"
               Margin="16,16,24,24"
-              Panel.ZIndex="1"
               Width="{Binding Layout.RightSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
               IsHitTestVisible="False"
-              IsVisible="{Binding Host.IsRightSidebarVisible, FallbackValue=True}" />
+              IsVisible="{Binding Host.IsRightSidebarVisible, FallbackValue=True}">
+        <Panel.ZIndex>
+          <x:Int32>1</x:Int32>
+        </Panel.ZIndex>
+      </Border>
 
       <Border Grid.Row="2"
               Grid.ColumnSpan="3"
@@ -493,9 +510,12 @@
               CornerRadius="8"
               Padding="12,10"
               Margin="24,0,24,24"
-              Panel.ZIndex="1"
               IsHitTestVisible="False"
-              IsVisible="{Binding Host.IsBottomSidebarVisible, FallbackValue=True}" />
+              IsVisible="{Binding Host.IsBottomSidebarVisible, FallbackValue=True}">
+        <Panel.ZIndex>
+          <x:Int32>1</x:Int32>
+        </Panel.ZIndex>
+      </Border>
     </Grid>
 
     <Border Grid.Row="2"

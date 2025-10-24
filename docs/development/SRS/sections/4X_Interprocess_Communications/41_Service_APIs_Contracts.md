@@ -10,22 +10,24 @@
 **Related Sections:** 21 — System Decomposition & Boundaries, 22 — Process Model & Deployment Topologies, 23 — Threading, Scheduling & Timing, 42 — Transports, 43 — Channel Security, 63 — Layers Registry & Journal Contracts
 **Upstream Dependencies:** 1X — Platform Foundations, 2X — System Architecture
 **Downstream Impacts:** 5X — Hardware IO Device Layer, 7X — Mapping & Geospatial, 9X — Frontends & Ops, 97 — Simulation & Replay
+**Related ADRs:** ADR-002, 41-ADR-062
 
 ---
 
 ## 41.1 Purpose & Scope
 
-Define the cross-process and cross-application APIs that connect Nexus Core, UI shells, automation tooling, and companion
-services. This section governs the contracts, versioning practices, and lifecycle expectations for gRPC, WebSocket, and
-registry surfaces so that headless Linux deployments and legacy Windows tooling can interoperate without bespoke bridges.
+Define the cross-process and in-process APIs that connect Nexus Core, UI shells, automation tooling, and companion
+services. This section governs the contracts, versioning practices, and lifecycle expectations for **gRPC/WebSocket bridges**
+and **struct/record ABIs** so that headless Linux deployments, Core-hosted plugins, and legacy Windows tooling can interoperate
+without bespoke one-off integrations.
 
 ---
 
 ## 41.2 Context
 
 - AgOpenGPS and AgIO historically exchange binary PGNs over UDP/serial for steering, section control, and telemetry.
-- Linux pilots require typed APIs that expose the same semantics to remote front-ends and automation services.
-- Plugins and third-party tools need predictable versioning, schema discovery, and capability negotiation mechanisms.
+- Linux pilots require typed APIs that expose the same semantics to remote front-ends (via gRPC/WebSocket) and Core-hosted plugins (via struct ABIs).
+- Plugins and third-party tools need predictable versioning, schema discovery, and capability negotiation mechanisms regardless of hosting mode.
 - Legacy PGN clients must remain functional throughout the migration to typed contracts.
 
 > **Related Guides:** [AgIO subsystem overview](../../../AgIO/README.md), deployment playbooks in `/docs/ops/`.
@@ -52,6 +54,8 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 | Capability Registry | Shared catalog enumerating services, layers, and plugins with semantic versions.
 | Compatibility Bridge | Service that translates between legacy PGNs and typed contracts without data loss.
 | Manifest | Declarative description of plugin capabilities, UI contributions, and feature flags.
+| Struct ABI | Versioned C# struct/record contracts for in-process plugin communication.
+| Bridge Plugin | Core-hosted adapter exposing gRPC/WebSocket endpoints when plugins exchange structs in-process.
 
 ---
 
@@ -80,11 +84,12 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|-----------|---------|----------------|-----------------------------|
 | R-CTRL-001 | SHOULD | Configuration | Continue surfacing GNSS correction settings until equivalent typed API lands. | C1 | Feature parity checklist between PGN and typed surfaces. |
-| R-CTRL-002 | MUST | Capabilities | Provide Capabilities gRPC service for plugin registration and leasing. | C3 | Integration tests validate lease renewal and rejection flows. |
-| R-CTRL-003 | MUST | Service Catalog | Publish typed gRPC contracts for Pose, Equipment, SectionControl, LayerRegistry, TileQuery, Config, EventBus, Guidance, and Health. | C3 | Contract proto repo with lint + backward compatibility checks. |
+| R-CTRL-002 | MUST | Capabilities | Expose capability discovery surfaces across the plugin transport options in scope (e.g., gRPC clients, struct ABIs) so leasing behavior remains consistent regardless of hosting mode. | C3 | Integration tests validate lease renewal and rejection flows for each enabled transport. |
+| R-CTRL-003 | MUST | Service Catalog | Publish typed contracts with code generation artifacts covering each selected transport option (protobuf for gRPC, struct/record definitions for in-process bindings) for Pose, Equipment, SectionControl, LayerRegistry, TileQuery, Config, EventBus, Guidance, and Health. | C3 | Contract repositories enforce backward compatibility per binding. |
 | R-CTRL-004 | SHOULD | Audit | Require audit metadata on control-affecting RPCs. | C4 | Audit log integration test ensures identity + timestamp captured. |
 | R-CTRL-005 | MUST | Geometry | Provide canonical equipment hierarchy with stable IDs and offsets. | C2 | Schema published with integration test verifying IDs. |
 | R-CTRL-006 | SHOULD | Control Semantics | Document SectionGroup semantics and overrides for deterministic gating. | C2 | Behavior verified in control simulator. |
+| R-CTRL-007 | MUST | Bridge Adapter | If option 21-O-STRUCT is adopted, provide a bridge plugin that projects the struct ABI over gRPC/WebSocket for remote clients. | C3 | Bridge conformance tests ensure parity between struct and gRPC calls. |
 
 ### 41.5.3 Plugin & Registry Surfaces
 
@@ -98,7 +103,15 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 | R-REG-006 | SHOULD | UI Contracts | Define declarative schema for plugin UI contributions consumed by frontend APIs. | C4 | UI schema contract tests ensure layout metadata loads. |
 | R-REG-007 | SHOULD | Manifest Flags | Include feature flags and semantic versions in plugin manifests. | C3 | Manifest schema validated against compatibility rules. |
 
-### 41.5.4 Requirement Sources & Rationale
+### 41.5.4 In-Process Struct ABI Contracts
+
+| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
+|----|-----------|-----------|---------|----------------|-----------------------------|
+| R-STRUCT-001 | MUST | ABI Stability | If option 21-O-STRUCT is adopted, version struct/record definitions with semantic version + compatibility markers. | C3 | ABI compatibility tests block breaking field changes. |
+| R-STRUCT-002 | MUST | Memory Safety | If option 21-O-STRUCT is adopted, provide read-only handles or copy-on-write semantics so plugins cannot mutate Core state. | C3 | Unit tests ensure struct accessors do not modify Core-owned buffers. |
+| R-STRUCT-003 | SHOULD | Code Generation | If option 21-O-HYBRID is adopted, generate converters between struct ABIs and protobuf payloads to keep bridge adapters trivial. | C3 | Codegen suite validates parity across transports. |
+
+### 41.5.5 Requirement Sources & Rationale
 
 | Req ID | Source (issue/discussion/standard) | Rationale (one line) |
 |--------|-------------------------------------|----------------------|
@@ -111,8 +124,9 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 ## 41.6 Acceptance Criteria & Verification
 
 - Regression replay suite MUST validate PGN ↔ typed API parity across at least three representative field logs (see §41.5.1 R-CORE-001–R-CORE-004).
-- Contract code generation pipelines MUST block incompatible protobuf/schema changes without explicit version increments (see §41.5.2 R-CTRL-003 and §41.5.3 R-REG-003).
+- Contract code generation pipelines MUST block incompatible protobuf/schema changes without explicit version increments and enforce struct ABI compatibility checks (see §41.5.2 R-CTRL-003, §41.5.4 R-STRUCT-001, and §41.5.3 R-REG-003).
 - Plugin onboarding checklist MUST verify capability registration, manifest validation, and audit logging before approval (see §41.5.2 R-CTRL-002 and R-CTRL-004, plus §41.5.3 R-REG-004–R-REG-007).
+- Bridge parity harness MUST confirm that struct-based calls and gRPC endpoints deliver identical payloads and audit metadata (see §41.5.2 R-CTRL-007 and §41.5.4 R-STRUCT-003).
 
 ### 41.6.1 Requirement-to-Verification Map
 
@@ -122,6 +136,9 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 | R-REG-001 | CI lint | `/tools/registry-lint/` | Schema hash drift detected within one CI cycle. |
 | R-CTRL-003 | Contract tests | `/tests/contracts/grpc/` | Backward compatibility gate passes on PR merges. |
 | R-CTRL-004 | Integration tests | `/tests/integration/audit_logging/` | All control RPCs emit audit trail entries. |
+| R-STRUCT-001 | ABI tests | `/tests/contracts/struct-abi/` | Additive-only changes permitted without version bump. |
+| R-STRUCT-002 | Unit tests | `/tests/contracts/struct-abi/` | Guard rails prevent Core state mutation via structs. |
+| R-CTRL-007 | Bridge parity tests | `/tests/integration/plugin_bridge/` | gRPC and struct calls return identical payloads. |
 
 ---
 
@@ -133,11 +150,11 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 
 ### 41.7.1 Non-Functional Requirement Classes
 
-- **Performance:** gRPC request p95 ≤ 150 ms intra-host; PGN bridge adds ≤ 10 ms overhead.
+- **Performance:** gRPC request p95 ≤ 150 ms intra-host; struct ABI invocations stay lock-free and allocation-free; PGN bridge adds ≤ 10 ms overhead.
 - **Reliability & Availability:** Bridge services restartable without dropping in-flight leases; manifests revalidated on reconnect.
 - **Security:** Mutual TLS for gRPC services; signed manifest bundles for plugins.
 - **Operability:** Structured logs with schema version and PGN identifiers; health endpoints advertise capability sets.
-- **Maintainability:** Proto definitions versioned with backward compatibility tests; registry updates documented.
+- **Maintainability:** Proto definitions and struct ABIs versioned with backward compatibility tests; registry updates documented.
 
 ---
 
@@ -147,6 +164,7 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 |----|-------------|--------|---------------------|-------|
 | RISK-41-1 | Schema drift between firmware and typed APIs. | High | Registry hash negotiation and CI lint. | @interop-wg |
 | RISK-41-2 | Bridge latency impacts real-time control. | Medium | Enforce ≤10 ms overhead; benchmark under load. | @interop-wg |
+| RISK-41-3 | Struct ABI drift breaks Core-hosted plugins at runtime. | Medium | Enforce ABI tests + semantic version gates (R-STRUCT-001). | @interop-wg |
 | ISSUE-41-1 | Define manifest schema for UI contributions. | Medium | Draft schema in plugin repo; coordinate with UI WG. | @interop-wg |
 
 ---
@@ -159,6 +177,7 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 | C2 | Versioned Layer Registries | Shared layer definitions, units, and quality rules require schema hashes and negotiated IDs. |
 | C3 | Typed API Bridge Strategy | Bridge services must translate PGNs ↔ typed gRPC without data loss or added coupling. |
 | C4 | Plugin UX & Audit Guarantees | UI contributions and control RPCs require declarative manifests plus audit hooks. |
+| C5 | Struct ABI Governance | In-process plugins rely on versioned structs with parity to gRPC contracts and bridge adapters. |
 
 ### 41.9.1 Assumptions & Preconditions
 
@@ -191,5 +210,11 @@ registry surfaces so that headless Linux deployments and legacy Windows tooling 
 - Plugin manifests declare UI panels, overlays, and configuration surfaces consumed by frontend APIs without embedding arbitrary UI code.
 - Feature flags and semantic version ranges gate plugin activation; mismatches trigger downgrade or rejection flows.
 - Control-affecting RPCs include operator/plugin identity and timestamps to satisfy audit requirements.
+
+#### C5 - Struct ABI Governance
+
+- Struct/record definitions mirror protobuf contracts field-for-field to minimize divergence and simplify bridge adapters.
+- ABI generation emits version annotations; breaking changes require new major version and migration notes.
+- Plugins receive read-only views; mutation requires explicit command services or copy-on-write buffers to maintain Core integrity.
 
 ---

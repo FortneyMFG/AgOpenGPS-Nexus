@@ -61,7 +61,25 @@ Nexus exposes **five primary SDK surfaces** for optional services:
 4. **Setpoint & Commands** — rate/section requests delivered to AgIO.
 5. **Health & Diagnostics** — heartbeats, watchdogs, and recoverability contracts.
 
-Each SDK is gRPC-first with generated client helpers. Plugins may also load in-process (shared memory) without changing the contract surface. This means developers start with gRPC-hosted samples and progressively optimize without rewriting business logic.
+### 21.4.1 Problem Statement
+
+Field operators, Core services, UI shells, and plugins need consistent access to guidance, mapping, telemetry, and command surfaces regardless of where a component executes. Any SDK strategy MUST satisfy the following constraints pulled from Section 21 design considerations (C1–C6) and related requirements across Sections 41, 42, and 52:
+
+| Requirement | Source | Verification Hook |
+|-------------|--------|-------------------|
+| Typed contracts MUST expose deterministic data models for pose, command, and telemetry domains. | §41.5 R-CTRL-003 | Contract compatibility tests |
+| SDK surfaces MUST remain discoverable and versioned so operators can swap hosting modes without breaking plugins. | §41.5 R-CTRL-002, §41.5 R-STRUCT-001 | Capability registry + ABI tests |
+| Bridge strategies MUST preserve parity with legacy PGN transports and satisfy latency budgets. | §42.5 R-COMM-004…R-COMM-052 | Transport replay + parity suites |
+
+### 21.4.2 Candidate Binding Options
+
+| Option ID | Binding Shape | Strengths | Risks / Mitigations | Notes |
+|-----------|---------------|-----------|---------------------|-------|
+| 21-O-STRUCT | In-process ABI using versioned C# structs/records. | Zero serialization cost; aligns with Core-hosted plugin proposals. | Requires strict read-only governance and ABI testing to avoid crashes. | Discussed further in §21.5.3 and ADR-061. |
+| 21-O-GRPC | Out-of-process gRPC/WebSocket clients generated from protobuf contracts. | Mature tooling, remote deployment friendly. | Serialization adds jitter; depends on bridge parity with PGNs. | Captured in §21.5.2 and ADR-002/ADR-062. |
+| 21-O-HYBRID | Dual binding where struct ABI and gRPC share schemas/codegen. | Enables seamless host switching. | Requires bridge plugin and shared codegen investment. | Evaluated in Sections 41 & 42 option matrices. |
+
+Architectural decisions recorded in ADRs select among these options; the SRS keeps both bindings visible so requirement coverage stays verifiable independent of the eventual choice.
 
 ---
 
@@ -93,7 +111,7 @@ flowchart LR
 - Any device driver crash can terminate Core.
 - UI and business logic are inseparable.
 
-### 21.5.2 Nexus Stack (Preferred Default for Options Analysis)
+### 21.5.2 Reference Partition — Out-of-Process Plugin Runtime
 
 ```mermaid
 flowchart TB
@@ -103,31 +121,59 @@ flowchart TB
     SIM[SimClock / SimBus]
   end
 
-  subgraph Services
-    GUID[Guidance SDK Host]
-    MAP[Mapping SDK Host]
-    RATE[Rate / Section SDK]
-    MON[Monitoring SDK]
+  subgraph Sidecars
+    PLUG[Plugin Hosts]
+    AGIO[AgIO Service]
   end
 
-  subgraph IO
-    AGIO[AgIO Drivers]
-    RADIO[Radiobridge]
+  subgraph Bridges
+    BRIDGE[gRPC Bridge Plugin]
   end
 
   subgraph Clients
     AV[UI Shells]
-    API[Automation / External APIs]
+    AUTO[Automation / External APIs]
   end
 
-  Core <-- gRPC / SimBus --> Services
-  Services --> Clients
-  AGIO --> Core
-  RADIO --> AGIO
-  SIM -. provides deterministic time .-> Services
+  Core <-- gRPC / SimBus --> PLUG
+  PLUG --> BRIDGE
+  BRIDGE --> Clients
+  Core <-- gRPC --> AGIO
+  SIM -. provides deterministic time .-> PLUG
+  AGIO -. telemetry mirroring .-> BRIDGE
 ```
 
-This layout mirrors the Nexus prototype deployments: Core owns hard-real-time workloads, AgIO isolates device drivers, and optional capabilities live as SDK-hosted services. Everything can still be co-hosted for small form factors because the contracts stay identical.
+This diagram captures the existing deployment bias: plugins execute in separate processes over gRPC, AgIO stays as a managed service, and a bridge plugin speaks gRPC/WebSocket to UI shells.
+
+### 21.5.3 Reference Partition — Core-Hosted Plugin Runtime (Struct ABI)
+
+```mermaid
+flowchart TB
+  subgraph Core (In-Proc)
+    KIN[Kinematics]
+    STEER[Steering Arbiter]
+    SIM[SimClock / SimBus]
+    AGIOP[AgIO Plugin]
+    PLUGS[Plugin Host Containers]
+  end
+
+  subgraph Bridge
+    BRIDGE[gRPC Bridge Plugin]
+  end
+
+  subgraph External Clients
+    AV[UI Shells]
+    AUTO[Automation / Remote APIs]
+  end
+
+  KIN -- struct ABI --> PLUGS
+  SIM -. struct feeds .-> PLUGS
+  AGIOP -- struct ABI --> PLUGS
+  PLUGS --> BRIDGE
+  BRIDGE --> External Clients
+```
+
+Here, plugins—including AgIO—load in-process through versioned C# structs/records. A dedicated bridge plugin projects gRPC/WebSocket endpoints for remote clients while preserving the same logical contracts.
 
 ---
 
@@ -168,7 +214,7 @@ This framing emphasises why the plugin-first approach is **feasible**: only the 
 - **AgIO Sidecar** — Running AgIO separately allows distinct packaging for Windows (`NX-022`, `NX-023`) and Linux (`NX-024`, `NX-029`, `NX-462`). The Core binary stays OS-neutral while drivers ship with their dependencies.
 - **Combined Core + AgIO** — Embedded deployments may still merge them to reduce service management overhead. Contracts remain consistent, so swapping between modes is operational, not architectural.
 - **UI Hosting** — Avalonia desktop, remote web views, or mobile shells all consume the same SDK endpoints. Keeping UI outside Core ensures kiosk builds and headless rigs share business logic.
-- **Deployment Complexity** — Supervisors (systemd, Windows Service Control Manager) handle restart semantics. The gRPC boundary adds <1 ms latency in practice and supports in-proc hosting for constrained environments.
+- **Deployment Complexity** — Supervisors (systemd, Windows Service Control Manager) handle restart semantics. When using gRPC, budget <1 ms p95 intra-host latency; when hosting plugins in-process, enforce ABI version guards and bridge gRPC/WebSocket traffic through a dedicated adapter plugin.
 
 ---
 
@@ -191,36 +237,37 @@ Because plugins and services speak the same contracts as production, developers 
 |--------|-------------|--------------------|--------------------|
 | **A — Monolithic Core** | All logic compiled into one executable. | None (single process) | Windows WinForms legacy |
 | **B — Modular Monolith** | Logical modules separated by clean interfaces but still in one process. | None (in-proc only) | Avalonia host with modular namespaces |
-| **C — Plugin Runtime** | Core, AgIO, and domain services separated into individual services or dynamically loaded modules. | Process or gRPC boundaries | Linux Core + detachable plugins |
+| **C — Out-of-Proc Plugin Runtime** | Core, AgIO, and domain services separated into individual services or dynamically loaded modules. | Process or gRPC boundaries | Linux Core + detachable plugins |
+| **D — Core Plugin Runtime** | Core hosts plugin containers via struct/record ABIs and exposes remotes through a bridge plugin. | No boundary between Core and plugins; bridge projects gRPC/WebSocket | Windows/Linux single-binary bundle |
 
 ### 21.10.1 Domain Placement by Model
 
-| Domain | In Model A | In Model B | In Model C | Timing Risk if Separated | Typical Interfaces |
-|---------|-------------|------------|-------------|---------------------------|--------------------|
-| Kinematics | Core | Core | Core | High | SimBus / gRPC |
-| Autosteer | Core | Core | Core (hard loop) | High | SimBus / gRPC |
-| Guidance | Core | Internal module | External plugin | Medium | gRPC / Contracts.Guidance |
-| Mapping | Core (tied to UI) | Module (MVVM) | Plugin | Low | Contracts.Mapping |
-| Variable Mapping | Core | Module | Plugin | Low | Contracts.Mapping |
-| Variable Rate | Core | Module | Plugin | Low | Contracts.Rate |
-| Monitoring | Core | Module | Plugin | Low | Contracts.Monitor |
-| AgIO | Core | Shared service | Sidecar | Medium | Contracts.PGN |
-| Radiobridge | Core | Module | Plugin | Low | Contracts.Radio |
-| Simulation | None / ad-hoc | Integrated | Shared service | Low | SimBus |
-| UI Shells | WinForms host | Avalonia host | Remote clients | Low | WebSocket / gRPC |
+| Domain | In Model A | In Model B | In Model C | In Model D | Timing Risk if Separated | Typical Interfaces |
+|---------|-------------|------------|-------------|-------------|---------------------------|--------------------|
+| Kinematics | Core | Core | Core | Core | High | SimBus / Struct ABI / gRPC |
+| Autosteer | Core | Core | Core (hard loop) | Core (hard loop) | High | SimBus / Struct ABI / gRPC |
+| Guidance | Core | Internal module | External plugin | In-proc plugin | Medium | Struct ABI + Bridge / gRPC |
+| Mapping | Core (tied to UI) | Module (MVVM) | Plugin | In-proc plugin | Low | Struct ABI + Bridge / gRPC |
+| Variable Mapping | Core | Module | Plugin | In-proc plugin | Low | Struct ABI + Bridge / gRPC |
+| Variable Rate | Core | Module | Plugin | In-proc plugin | Low | Struct ABI + Bridge / gRPC |
+| Monitoring | Core | Module | Plugin | In-proc plugin | Low | Struct ABI + Bridge / gRPC |
+| AgIO | Core | Shared service | Sidecar | In-proc privileged plugin | Medium | Struct ABI (primary) + Bridge |
+| Radiobridge | Core | Module | Plugin | In-proc plugin | Low | Struct ABI + Bridge / gRPC |
+| Simulation | None / ad-hoc | Integrated | Shared service | Shared in-proc providers | Low | SimBus / Struct ABI |
+| UI Shells | WinForms host | Avalonia host | Remote clients | Remote clients via bridge | Low | Bridge gRPC/WebSocket |
 
 ### 21.10.2 Evaluation Matrix
 
-| Criterion | Model A — Monolithic | Model B — Modular Monolith | Model C — Plugin Runtime |
-|------------|----------------------|-----------------------------|---------------------------|
-| **Performance** | No IPC overhead | Minor abstraction cost | ≤1 ms IPC overhead (target) |
-| **Determinism** | Simple timing | Deterministic if SimClock central | Deterministic with explicit SimBus |
-| **Reliability** | Shared fault domain | Partial isolation | Full fault isolation (process) |
-| **Maintainability** | Tight coupling | Moderate | High — clear contracts |
-| **Cross-OS Portability** | Low | Medium | High |
-| **Community Extensibility** | Low | Medium | High |
-| **Testing & Simulation** | Manual | Replay harnesses possible | Fully deterministic replay |
-| **Deployment Complexity** | Simple | Simple | Higher (service mgmt) |
+| Criterion | Model A — Monolithic | Model B — Modular Monolith | Model C — Out-of-Proc Plugin Runtime | Model D — Core Plugin Runtime |
+|------------|----------------------|-----------------------------|------------------------------------|-------------------------------|
+| **Performance** | No IPC overhead | Minor abstraction cost | ≤1 ms IPC overhead (target) | Struct ABI eliminates serialization; bridge adds ≤1 ms |
+| **Determinism** | Simple timing | Deterministic if SimClock central | Deterministic with explicit SimBus | Deterministic with shared SimClock/struct feeds |
+| **Reliability** | Shared fault domain | Partial isolation | Full fault isolation (process) | Shared fault domain for plugins; bridge isolated |
+| **Maintainability** | Tight coupling | Moderate | High — clear contracts | High — contracts shared; ABI versioning required |
+| **Cross-OS Portability** | Low | Medium | High | High (single binary + bridge) |
+| **Community Extensibility** | Low | Medium | High | High — plugins ship as assemblies |
+| **Testing & Simulation** | Manual | Replay harnesses possible | Fully deterministic replay | Deterministic replay with struct taps |
+| **Deployment Complexity** | Simple | Simple | Higher (service mgmt) | Simple binary; must manage ABI compatibility |
 
 These comparisons show why the plugin-first stack is attractive: most benefits accrue without sacrificing determinism or adding noticeable latency.
 
@@ -228,9 +275,9 @@ These comparisons show why the plugin-first stack is attractive: most benefits a
 
 ## 21.11 Latency & Complexity Considerations
 
-- **IPC Budget** — Intra-host gRPC calls with protobuf payloads stay under **1 ms p95**; bulk transfers (maps, tiles) rely on async streaming to avoid blocking loops.
-- **Developer Ergonomics** — SDK templates scaffold command-line hosts and test harnesses. Contributors can build plugins in isolation, backed by CI compatibility gates (`NX-039`).
-- **Operational Simplicity** — For compact installations, services may be co-hosted in one process. Contracts remain unchanged, so separation is a deployment decision, not a coding burden.
+- **IPC Budget** — Intra-host gRPC calls with protobuf payloads stay under **1 ms p95**; in-proc struct calls are effectively zero-copy but require ABI guards. Bulk transfers (maps, tiles) rely on async streaming regardless of hosting model.
+- **Developer Ergonomics** — SDK templates scaffold both gRPC clients and struct-based host adapters. Contributors can build plugins in isolation, then choose deployment mode with the same generated types and CI compatibility gates (`NX-039`).
+- **Operational Simplicity** — Compact installations may co-host services in one process with a bridge plugin projecting remote APIs. Because contracts are shared, switching between struct and gRPC transport remains a deployment decision, not a coding burden.
 
 ---
 
@@ -239,7 +286,7 @@ These comparisons show why the plugin-first stack is attractive: most benefits a
 - All timing originates from a single **SimClock** reference.
 - Data interchange between processes must include timestamps and sequence numbers.
 - Hard-real-time loops (Steering, Kinematics) **remain in-process** with Core.
-- gRPC/IPC targets: **p95 ≤ 1 ms**, **p99 ≤ 3 ms** for intra-host links.
+- IPC targets: **p95 ≤ 1 ms**, **p99 ≤ 3 ms** for intra-host gRPC links; struct-based calls must remain lock-free and avoid allocations in hot loops.
 
 ---
 
@@ -247,10 +294,11 @@ These comparisons show why the plugin-first stack is attractive: most benefits a
 
 | ID | Question | Current Thinking | Owner |
 |----|-----------|------------------|--------|
-| Q-21-1 | Should AgIO be part of Core or run as a sidecar? | Split for isolation, see ADR-028 | Core WG |
-| Q-21-2 | Can mapping remain cross-platform without Avalonia dependency? | Yes, via SDK contracts | UI WG |
-| Q-21-3 | What minimum SDK granularity keeps developer friction low? | 4–5 contracts (Pose, LayerSnapshot, Target, Setpoint, Health) | SDK WG |
-| Q-21-4 | How to guarantee deterministic replay when services are split? | Shared SimBus / sequence journal | Simulation WG |
+| Q-21-1 | Should AgIO be part of Core or run as a sidecar? | Evaluate 21.5 reference partitions + §52 options before locking ADR scope. | Core WG |
+| Q-21-2 | Can mapping remain cross-platform without Avalonia dependency? | Yes, via shared contracts (struct or gRPC) | UI WG |
+| Q-21-3 | What minimum SDK granularity keeps developer friction low? | 4–5 contracts (Pose, LayerSnapshot, Target, Setpoint, Health) regardless of transport | SDK WG |
+| Q-21-4 | How to guarantee deterministic replay when services are split or hosted in-proc? | Shared SimBus / struct journals + bridge verification | Simulation WG |
+| Q-21-5 | What ABI versioning policy keeps struct-based plugins safe to load? | Define in new ADR (see §41, §52 option analysis). | SDK WG |
 
 ---
 
@@ -260,7 +308,8 @@ Subsections (21-O1 … 21-O7) define concrete architecture proposals. Examples:
 
 - **21-O1:** Maintain Monolithic Core.
 - **21-O4:** Modular Monolith.
-- **21-O7:** Plugin Runtime (AgIO + Core + Plugins via SDK).
+- **21-O7:** Plugin Runtime (AgIO + Core + Plugins via SDK over gRPC).
+- **21-O8:** Core-Hosted Plugin Runtime (AgIO plugin + struct ABI + gRPC bridge).
 
 Each option includes quantitative scoring (determinism, maintainability, latency, complexity) and ADR linkages.
 

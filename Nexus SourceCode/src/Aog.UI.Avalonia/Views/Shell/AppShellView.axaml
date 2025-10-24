@@ -5,9 +5,10 @@
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
              xmlns:workspace="clr-namespace:Aog.UI.Avalonia.ViewModels"
              xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
+             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              xmlns:shell="clr-namespace:Aog.UI.Avalonia.Views.Shell"
              xmlns:mapping="clr-namespace:Aog.UI.Avalonia.Views.Mapping"
-             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             xmlns:layout="clr-namespace:Aog.UI.Avalonia.Layout"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
              x:DataType="vm:AppShellViewModel"
@@ -49,37 +50,47 @@
         </Button>
       </DataTemplate>
 
+      <DataTemplate x:Key="PanelVisualTemplate"
+                    x:DataType="layout:PanelVisual">
+        <Border Background="#2A2A2ACC"
+                BorderBrush="#565656"
+                BorderThickness="2"
+                CornerRadius="12"
+                Opacity="0.92">
+          <Border.Background>
+            <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+              <GradientStop Offset="0" Color="#1C1C1CEE" />
+              <GradientStop Offset="1" Color="#2E2E2EFF" />
+            </LinearGradientBrush>
+          </Border.Background>
+        </Border>
+      </DataTemplate>
+
       <DataTemplate x:Key="BlockTileTemplate"
                     x:DataType="vm:BlockItemViewModel">
         <controls:BlockTileButton Command="{Binding InvokeCommand}"
                                   ToolTip.Tip="{Binding Label}"
                                   Classes.block-tile="True">
           <Grid>
-            <Border CornerRadius="8"
-                    Background="{DynamicResource ThemeSurfaceBrush}"
-                    BorderBrush="#555555"
+            <Border CornerRadius="10"
+                    Background="#1F1F1FCC"
+                    BorderBrush="#525252"
                     BorderThickness="2"
-                    Opacity="0.92" />
-            <Grid Margin="6">
+                    Opacity="0.94">
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                  <GradientStop Offset="0" Color="#2F2F2FF0" />
+                  <GradientStop Offset="1" Color="#1E1E1EE6" />
+                </LinearGradientBrush>
+              </Border.Background>
+            </Border>
+
+            <Grid Margin="8">
               <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
               </Grid.RowDefinitions>
-              <StackPanel Grid.Row="1"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Spacing="4">
-                <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
-                       Width="32"
-                       Height="32"
-                       Stretch="Uniform"
-                       IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}" />
-                <TextBlock Text="{Binding Label}"
-                           FontWeight="SemiBold"
-                           TextAlignment="Center"
-                           TextWrapping="Wrap"
-                           Foreground="#DDDDDD" />
-              </StackPanel>
+
               <Menu Grid.Row="0"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
@@ -94,7 +105,7 @@
                 <MenuItem ItemsSource="{Binding SizeOptions}"
                           ToolTip.Tip="Adjust block size">
                   <MenuItem.Header>
-                    <Border Background="#646464"
+                    <Border Background="#626262"
                             BorderBrush="#777777"
                             BorderThickness="1"
                             CornerRadius="4"
@@ -115,6 +126,22 @@
                   </MenuItem.ItemTemplate>
                 </MenuItem>
               </Menu>
+
+              <StackPanel Grid.Row="1"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Spacing="6">
+                <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
+                       Width="36"
+                       Height="36"
+                       Stretch="Uniform"
+                       IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}" />
+                <TextBlock Text="{Binding Label}"
+                           FontWeight="SemiBold"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           Foreground="#E0E0E0" />
+              </StackPanel>
             </Grid>
           </Grid>
         </controls:BlockTileButton>
@@ -180,32 +207,32 @@
 
     <Style Selector="Menu.menu-bar > MenuItem">
       <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
-      <Setter Property="Margin" Value="0,0,24,0" />
+      <Setter Property="Margin" Value="0,0,28,0" />
       <Setter Property="Padding" Value="6,0" />
       <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style Selector="Menu.menu-bar > MenuItem:pointerover">
-      <Setter Property="Background" Value="#3a3a3a" />
+      <Setter Property="Background" Value="#393939" />
     </Style>
 
     <Style Selector="Button.toolbar">
       <Setter Property="Background" Value="#383838" />
       <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
-      <Setter Property="Padding" Value="8,4" />
-      <Setter Property="CornerRadius" Value="6" />
-      <Setter Property="BorderBrush" Value="#555555" />
+      <Setter Property="Padding" Value="10,4" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="BorderBrush" Value="#545454" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
     </Style>
 
     <Style Selector="Button.toolbar:hover">
-      <Setter Property="Background" Value="#4a4a4a" />
+      <Setter Property="Background" Value="#4A4A4A" />
     </Style>
 
     <Style Selector="Button.toolbar.active">
-      <Setter Property="Background" Value="#0066cc" />
+      <Setter Property="Background" Value="#0A6AD9" />
       <Setter Property="Foreground" Value="#FFFFFF" />
     </Style>
 
@@ -214,18 +241,11 @@
       <Setter Property="VerticalContentAlignment" Value="Stretch" />
       <Setter Property="Padding" Value="0" />
       <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="Background">
-        <Setter.Value>
-          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Offset="0" Color="#3a3a3a" />
-            <GradientStop Offset="1" Color="#2a2a2a" />
-          </LinearGradientBrush>
-        </Setter.Value>
-      </Setter>
+      <Setter Property="Background" Value="Transparent" />
     </Style>
 
     <Style Selector="Button.block-tile:hover">
-      <Setter Property="Opacity" Value="0.95" />
+      <Setter Property="Opacity" Value="0.96" />
     </Style>
 
     <Style Selector="Button.block-tile:pressed">
@@ -235,74 +255,76 @@
     <Style Selector="Button.sidebar-button">
       <Setter Property="Background">
         <Setter.Value>
-          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Offset="0" Color="#3a3a3a" />
-            <GradientStop Offset="1" Color="#2a2a2a" />
+          <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#313131" />
+            <GradientStop Offset="1" Color="#272727" />
           </LinearGradientBrush>
         </Setter.Value>
       </Setter>
       <Setter Property="BorderBrush" Value="#555555" />
       <Setter Property="BorderThickness" Value="1.5" />
-      <Setter Property="CornerRadius" Value="6" />
-      <Setter Property="Foreground" Value="#DDDDDD" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Foreground" Value="#E0E0E0" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="Padding" Value="12,8" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style Selector="Button.sidebar-button:hover">
-      <Setter Property="Background" Value="#4a4a4a" />
+      <Setter Property="Background" Value="#444444" />
       <Setter Property="BorderBrush" Value="#777777" />
     </Style>
 
     <Style Selector="Button.sidebar-button.top">
-      <Setter Property="Padding" Value="8,6" />
+      <Setter Property="Padding" Value="10,6" />
       <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
     </Style>
 
     <Style Selector="Button.sidebar-button.bottom">
-      <Setter Property="Padding" Value="12,10" />
+      <Setter Property="Padding" Value="14,10" />
       <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeMd}" />
     </Style>
 
     <Style Selector="ToggleButton.layout-lock">
-      <Setter Property="Background" Value="#4a4a4a" />
+      <Setter Property="Background" Value="#4A4A4A" />
       <Setter Property="BorderBrush" Value="#666666" />
       <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="6" />
-      <Setter Property="Padding" Value="6,4" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="10,4" />
       <Setter Property="Foreground" Value="#FFFFFF" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style Selector="ToggleButton.layout-lock:hover">
-      <Setter Property="Background" Value="#5a5a5a" />
+      <Setter Property="Background" Value="#595959" />
     </Style>
 
     <Style Selector="ToggleButton.layout-lock:checked">
-      <Setter Property="Background" Value="#0066cc" />
-      <Setter Property="BorderBrush" Value="#0066cc" />
+      <Setter Property="Background" Value="#0A6AD9" />
+      <Setter Property="BorderBrush" Value="#0A6AD9" />
     </Style>
   </UserControl.Styles>
 
   <Grid RowDefinitions="Auto,*,Auto"
-        Background="#1a1a1a">
+        Background="#111111">
     <Border Grid.Row="0"
-            Background="#2a2a2a"
-            BorderBrush="#444444"
-            BorderThickness="0,0,0,1"
-            Padding="16,8">
-      <Grid ColumnDefinitions="*,Auto"
-            RowDefinitions="Auto,Auto"
-            ColumnSpacing="16">
-        <Grid Grid.Column="0"
-              Grid.Row="0"
-              ColumnDefinitions="Auto,Auto"
-              ColumnSpacing="32"
-              VerticalAlignment="Center">
-          <Menu Grid.Column="0"
-                Background="Transparent"
+            Background="Transparent">
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+          <GradientStop Offset="0" Color="#222222" />
+          <GradientStop Offset="1" Color="#2E2E2E" />
+        </LinearGradientBrush>
+      </Border.Background>
+      <Border BorderBrush="#3E3E3E"
+              BorderThickness="0,0,0,1"
+              Padding="20,10">
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              RowDefinitions="Auto,Auto"
+              ColumnSpacing="24"
+              RowSpacing="8">
+          <Menu Grid.Row="0"
+                Grid.Column="0"
                 Classes="menu-bar">
             <Menu.ItemsPanel>
               <ItemsPanelTemplate>
@@ -347,15 +369,17 @@
             </MenuItem>
           </Menu>
 
-          <StackPanel Grid.Column="1"
+          <StackPanel Grid.Row="0"
+                      Grid.Column="1"
                       Orientation="Horizontal"
-                      Spacing="8"
-                      VerticalAlignment="Center">
-            <Border Background="#333333"
-                    BorderBrush="#555555"
+                      Spacing="12"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Center">
+            <Border Background="#353535"
+                    BorderBrush="#545454"
                     BorderThickness="1"
-                    CornerRadius="6"
-                    Padding="8,4">
+                    CornerRadius="8"
+                    Padding="10,5">
               <TextBlock Text="AgOpenGPS"
                          FontWeight="Bold"
                          Foreground="#FFFFFF"
@@ -365,71 +389,100 @@
                        FontSize="{DynamicResource ThemeFontSizeMd}"
                        FontWeight="SemiBold"
                        VerticalAlignment="Center"
-                       Foreground="#9ad0ff" />
+                       Foreground="#9AD0FF" />
           </StackPanel>
+
+          <StackPanel Grid.Row="0"
+                      Grid.Column="2"
+                      Orientation="Vertical"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      Spacing="6">
+            <ToggleButton Classes="layout-lock"
+                          IsChecked="{Binding Layout.IsLocked}"
+                          ToolTip.Tip="{Binding Layout.IsLocked, Converter={StaticResource LockTooltipConverter}}"
+                          Content="{Binding Layout.IsLocked, Converter={StaticResource LockActionTextConverter}}" />
+            <TextBlock Text="{Binding StatusText}"
+                       Foreground="#CCCCCC"
+                       FontSize="{DynamicResource ThemeFontSizeSm}"
+                       TextAlignment="Right" />
+          </StackPanel>
+
+          <ItemsControl Grid.Row="1"
+                        Grid.ColumnSpan="3"
+                        ItemsSource="{Binding Host.TopToolbar.Items}"
+                        ItemTemplate="{StaticResource ToolbarItemTemplate}"
+                        HorizontalAlignment="Left"
+                        IsVisible="{Binding Host.IsTopToolbarVisible, FallbackValue=False}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="10" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
         </Grid>
-
-        <ItemsControl Grid.Column="0"
-                      Grid.Row="1"
-                      ItemsSource="{Binding Host.TopToolbar.Items}"
-                      ItemTemplate="{StaticResource ToolbarItemTemplate}"
-                      Margin="0,8,0,0"
-                      HorizontalAlignment="Left"
-                      IsVisible="{Binding Host.IsTopToolbarVisible, FallbackValue=False}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <StackPanel Orientation="Horizontal" Spacing="8" />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
-
-        <StackPanel Grid.Column="1"
-                    Grid.RowSpan="2"
-                    Orientation="Vertical"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Spacing="6">
-          <ToggleButton Classes="layout-lock"
-                        IsChecked="{Binding Layout.IsLocked}"
-                        ToolTip.Tip="{Binding Layout.IsLocked, Converter={StaticResource LockTooltipConverter}}"
-                        Content="{Binding Layout.IsLocked, Converter={StaticResource LockActionTextConverter}}" />
-          <TextBlock Text="{Binding StatusText}"
-                     Foreground="#cccccc"
-                     FontSize="{DynamicResource ThemeFontSizeSm}"
-                     TextAlignment="Right" />
-        </StackPanel>
-      </Grid>
+      </Border>
     </Border>
 
     <Grid Grid.Row="1"
-          ColumnDefinitions="Auto,*,Auto"
-          RowDefinitions="Auto,*,Auto"
-          Background="#1a1a1a">
-      <Grid Grid.ColumnSpan="3"
-            Grid.RowSpan="3"
-            ClipToBounds="True">
+          x:Name="WorkspaceRoot"
+          Background="#101010">
+      <Canvas x:Name="LayoutCanvas"
+              Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
+              Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+              Panel.ZIndex="1">
         <ContentControl Content="{Binding MainContent}"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        Panel.ZIndex="0" />
+                        Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
+                        Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+                        Canvas.Left="0"
+                        Canvas.Top="0"
+                        Canvas.ZIndex="0" />
+
         <controls:PaneCanvas Layout="{Binding Layout.Grid}"
                              LayoutResult="{Binding Layout.PaneLayout}"
                              ShowMinorGrid="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
-                             Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
-                             HorizontalAlignment="Stretch"
-                             VerticalAlignment="Stretch"
+                             Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
+                             Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+                             Canvas.Left="0"
+                             Canvas.Top="0"
+                             Canvas.ZIndex="0"
                              IsHitTestVisible="False"
-                             Opacity="0.85"
-                             Panel.ZIndex="1" />
+                             Opacity="0.82" />
+
+        <ItemsControl x:Name="PanelVisuals"
+                      ItemsSource="{Binding Layout.PaneLayout.Panels}"
+                      ItemTemplate="{StaticResource PanelVisualTemplate}"
+                      Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
+                      Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+                      IsHitTestVisible="False"
+                      Canvas.ZIndex="1">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <Canvas />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.Styles>
+            <Style Selector="#PanelVisuals ContentPresenter"
+                   x:DataType="layout:PanelVisual">
+              <Setter Property="Canvas.Left" Value="{Binding Bounds.X}" />
+              <Setter Property="Canvas.Top" Value="{Binding Bounds.Y}" />
+              <Setter Property="Width" Value="{Binding Bounds.Width}" />
+              <Setter Property="Height" Value="{Binding Bounds.Height}" />
+            </Style>
+          </ItemsControl.Styles>
+        </ItemsControl>
+
         <ItemsControl x:Name="BlockTiles"
                       ItemsSource="{Binding Layout.Blocks}"
                       ItemTemplate="{StaticResource BlockTileTemplate}"
                       Background="Transparent"
                       Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
+                      Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
+                      Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
                       SizeChanged="OnViewportSizeChanged"
-                      Panel.ZIndex="3">
+                      Canvas.Left="0"
+                      Canvas.Top="0"
+                      Canvas.ZIndex="2">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <controls:TiledPanel Layout="{Binding Layout.Grid}" />
@@ -445,57 +498,75 @@
             </Style>
           </ItemsControl.Styles>
         </ItemsControl>
-      </Grid>
+      </Canvas>
 
-      <Border Grid.Row="0"
-              Grid.ColumnSpan="3"
-              Background="#252525"
-              BorderBrush="#333333"
-              BorderThickness="1"
-              CornerRadius="8"
-              Padding="12,10"
-              Margin="24,16,24,0"
-              IsHitTestVisible="False"
-              IsVisible="{Binding Host.IsTopSidebarVisible, FallbackValue=True}"
-              Panel.ZIndex="1" />
+      <ItemsControl x:Name="LeftSidebar"
+                    ItemsSource="{Binding Layout.LeftSidebarButtons}"
+                    ItemTemplate="{StaticResource VerticalSidebarButtonTemplate}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Stretch"
+                    Margin="24,32,0,32"
+                    Width="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
+                    IsVisible="{Binding Host.IsLeftSidebarVisible, FallbackValue=True}"
+                    Panel.ZIndex="4">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Vertical"
+                        VerticalAlignment="Center"
+                        Spacing="{Binding Layout.LeftSidebarLayout.Spacing, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+      </ItemsControl>
 
-      <Border Grid.Row="1"
-              Grid.Column="0"
-              Background="#252525"
-              BorderBrush="#333333"
-              BorderThickness="1"
-              CornerRadius="8"
-              Padding="12"
-              Margin="24,16,16,24"
-              Width="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
-              IsHitTestVisible="False"
-              IsVisible="{Binding Host.IsLeftSidebarVisible, FallbackValue=True}"
-              Panel.ZIndex="1" />
+      <ItemsControl x:Name="RightSidebar"
+                    ItemsSource="{Binding Layout.RightSidebarButtons}"
+                    ItemTemplate="{StaticResource VerticalSidebarButtonTemplate}"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    Margin="0,32,24,32"
+                    Width="{Binding Layout.RightSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
+                    IsVisible="{Binding Host.IsRightSidebarVisible, FallbackValue=True}"
+                    Panel.ZIndex="4">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Vertical"
+                        VerticalAlignment="Center"
+                        Spacing="{Binding Layout.RightSidebarLayout.Spacing, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+      </ItemsControl>
 
-      <Border Grid.Row="1"
-              Grid.Column="2"
-              Background="#252525"
-              BorderBrush="#333333"
-              BorderThickness="1"
-              CornerRadius="8"
-              Padding="12"
-              Margin="16,16,24,24"
-              Width="{Binding Layout.RightSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
-              IsHitTestVisible="False"
-              IsVisible="{Binding Host.IsRightSidebarVisible, FallbackValue=True}"
-              Panel.ZIndex="1" />
+      <ItemsControl x:Name="TopSidebar"
+                    ItemsSource="{Binding Layout.TopSidebarButtons}"
+                    ItemTemplate="{StaticResource TopSidebarButtonTemplate}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Margin="0,20,0,0"
+                    IsVisible="{Binding Host.IsTopSidebarVisible, FallbackValue=True}"
+                    Panel.ZIndex="4">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal"
+                        Spacing="{Binding Layout.TopSidebarLayout.Spacing, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+      </ItemsControl>
 
-      <Border Grid.Row="2"
-              Grid.ColumnSpan="3"
-              Background="#252525"
-              BorderBrush="#333333"
-              BorderThickness="1"
-              CornerRadius="8"
-              Padding="12,10"
-              Margin="24,0,24,24"
-              IsHitTestVisible="False"
-              IsVisible="{Binding Host.IsBottomSidebarVisible, FallbackValue=True}"
-              Panel.ZIndex="1" />
+      <ItemsControl x:Name="BottomSidebar"
+                    ItemsSource="{Binding Layout.BottomSidebarButtons}"
+                    ItemTemplate="{StaticResource BottomSidebarButtonTemplate}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,0,24"
+                    IsVisible="{Binding Host.IsBottomSidebarVisible, FallbackValue=True}"
+                    Panel.ZIndex="4">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal"
+                        Spacing="{Binding Layout.BottomSidebarLayout.Spacing, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+      </ItemsControl>
     </Grid>
 
     <Border Grid.Row="2"

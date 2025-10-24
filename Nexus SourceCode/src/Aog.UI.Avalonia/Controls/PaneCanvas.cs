@@ -17,6 +17,9 @@ public sealed class PaneCanvas : Control
     public static readonly StyledProperty<PaneLayoutResult?> LayoutResultProperty =
         AvaloniaProperty.Register<PaneCanvas, PaneLayoutResult?>(nameof(LayoutResult));
 
+    public static readonly StyledProperty<bool> ShowMinorGridProperty =
+        AvaloniaProperty.Register<PaneCanvas, bool>(nameof(ShowMinorGrid));
+
     private static readonly Pen MinorGridPen = new(new ImmutableSolidColorBrush(Color.FromArgb(32, 255, 255, 255)), 1);
     private static readonly Pen MajorGridPen = new(new ImmutableSolidColorBrush(Color.FromArgb(128, 255, 255, 255)), 2);
     private static readonly IBrush PaneFillBrush = new ImmutableSolidColorBrush(Color.FromArgb(26, 15, 23, 42));
@@ -35,6 +38,12 @@ public sealed class PaneCanvas : Control
         set => SetValue(LayoutResultProperty, value);
     }
 
+    public bool ShowMinorGrid
+    {
+        get => GetValue(ShowMinorGridProperty);
+        set => SetValue(ShowMinorGridProperty, value);
+    }
+
     public override void Render(DrawingContext context)
     {
         base.Render(context);
@@ -44,14 +53,14 @@ public sealed class PaneCanvas : Control
             return;
         }
 
-        DrawGrid(context, layout);
+        DrawGrid(context, layout, ShowMinorGrid);
         if (LayoutResult is { } paneLayout)
         {
             DrawPanels(context, paneLayout);
         }
     }
 
-    private static void DrawGrid(DrawingContext context, ShellGridLayout layout)
+    private static void DrawGrid(DrawingContext context, ShellGridLayout layout, bool showMinorGrid)
     {
         var cell = layout.CellPx;
         if (layout.Columns <= 0 || layout.Rows <= 0 || cell <= 0)
@@ -70,14 +79,26 @@ public sealed class PaneCanvas : Control
         for (var col = 0; col <= layout.Columns; col++)
         {
             var x = col * step;
-            var pen = col % majorStep == 0 ? MajorGridPen : MinorGridPen;
+            var isMajor = col % majorStep == 0;
+            if (!isMajor && !showMinorGrid)
+            {
+                continue;
+            }
+
+            var pen = isMajor ? MajorGridPen : MinorGridPen;
             context.DrawLine(pen, new Point(x, 0), new Point(x, height));
         }
 
         for (var row = 0; row <= layout.Rows; row++)
         {
             var y = row * step;
-            var pen = row % rowMajorStep == 0 ? MajorGridPen : MinorGridPen;
+            var isMajor = row % rowMajorStep == 0;
+            if (!isMajor && !showMinorGrid)
+            {
+                continue;
+            }
+
+            var pen = isMajor ? MajorGridPen : MinorGridPen;
             context.DrawLine(pen, new Point(0, y), new Point(width, y));
         }
     }

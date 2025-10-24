@@ -69,3 +69,21 @@ public sealed class LockStateToTextConverter : IValueConverter
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException();
 }
+
+/// <summary>
+/// Converts a boolean lock state into the action label rendered on the lock toggle button.
+/// </summary>
+public sealed class LockStateToActionTextConverter : IValueConverter
+{
+    public static LockStateToActionTextConverter Instance { get; } = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is bool locked && !locked
+            ? "🔓 Lock UI"
+            : "🔒 Unlock UI";
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}

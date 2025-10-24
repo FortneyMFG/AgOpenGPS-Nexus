@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
              xmlns:workspace="clr-namespace:Aog.UI.Avalonia.ViewModels"
              xmlns:controls="clr-namespace:Aog.UI.Avalonia.Controls"
-             xmlns:model="clr-namespace:Aog.UI.Avalonia.Models"
+             xmlns:shell="clr-namespace:Aog.UI.Avalonia.Views.Shell"
              xmlns:mapping="clr-namespace:Aog.UI.Avalonia.Views.Mapping"
              xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              mc:Ignorable="d"
@@ -18,9 +18,12 @@
       <rendering:IconKeyToBitmapConverter x:Key="BlockIconConverter" />
       <rendering:LockStateToBitmapConverter x:Key="LockStateIconConverter" />
       <rendering:LockStateToTextConverter x:Key="LockTooltipConverter" />
+      <rendering:LockStateToActionTextConverter x:Key="LockActionTextConverter" />
       <rendering:SpacingToThicknessConverter x:Key="SpacingToThicknessConverter" />
       <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
       <rendering:BlockSettingsVisibilityConverter x:Key="BlockSettingsVisibilityConverter" />
+      <rendering:SidebarDimensionConverter x:Key="SidebarDimensionConverter" />
+      <rendering:StringHasValueConverter x:Key="StringHasValueConverter" />
 
       <DataTemplate x:Key="ShellMenuItemTemplate"
                     x:DataType="workspace:ShellMenuItemViewModel">
@@ -52,56 +55,110 @@
                                   ToolTip.Tip="{Binding Label}"
                                   Classes.block-tile="True">
           <Grid>
-            <StackPanel HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Spacing="4">
-              <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
-                     Width="32"
-                     Height="32"
-                     Stretch="Uniform" />
-              <TextBlock Text="{Binding Label}"
-                         TextWrapping="Wrap"
-                         TextAlignment="Center" />
-            </StackPanel>
-
-            <Menu HorizontalAlignment="Right"
-                  VerticalAlignment="Top"
-                  Background="Transparent"
-                  BorderThickness="0">
+            <Border CornerRadius="8"
+                    Background="{DynamicResource ThemeSurfaceBrush}"
+                    BorderBrush="#555555"
+                    BorderThickness="2"
+                    Opacity="0.92" />
+            <Grid Margin="6">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+              </Grid.RowDefinitions>
+              <StackPanel Grid.Row="1"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Spacing="4">
+                <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
+                       Width="32"
+                       Height="32"
+                       Stretch="Uniform"
+                       IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}" />
+                <TextBlock Text="{Binding Label}"
+                           FontWeight="SemiBold"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           Foreground="#DDDDDD" />
+              </StackPanel>
+              <Menu Grid.Row="0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Background="Transparent"
+                    BorderThickness="0">
                 <Menu.IsVisible>
                   <MultiBinding Converter="{StaticResource BlockSettingsVisibilityConverter}">
                     <Binding Path="HasSettings" />
                     <Binding Path="IsLayoutLocked" />
                   </MultiBinding>
                 </Menu.IsVisible>
-              <MenuItem ItemsSource="{Binding SizeOptions}"
-                        ToolTip.Tip="Adjust block size">
-                <MenuItem.Header>
-                  <Border Background="{DynamicResource ShellChromeBorderBrush}"
-                          BorderBrush="{DynamicResource ShellChromeBorderBrush}"
-                          BorderThickness="1"
-                          CornerRadius="{DynamicResource ThemeRadiusSm}"
-                          Padding="4"
-                          Margin="0">
-                    <TextBlock Text="⚙"
-                               FontSize="14"
-                               FontWeight="Bold" />
-                  </Border>
-                </MenuItem.Header>
-                <MenuItem.ItemTemplate>
+                <MenuItem ItemsSource="{Binding SizeOptions}"
+                          ToolTip.Tip="Adjust block size">
+                  <MenuItem.Header>
+                    <Border Background="#646464"
+                            BorderBrush="#777777"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="2"
+                            Margin="2">
+                      <TextBlock Text="⚙"
+                                 FontSize="12"
+                                 FontWeight="Bold" />
+                    </Border>
+                  </MenuItem.Header>
+                  <MenuItem.ItemTemplate>
                     <DataTemplate x:DataType="vm:BlockSizeOptionViewModel">
                       <MenuItem Header="{Binding Label}"
                                 Command="{Binding ApplyCommand}"
                                 ToggleType="CheckBox"
                                 IsChecked="{Binding IsSelected}" />
-                  </DataTemplate>
-                </MenuItem.ItemTemplate>
-              </MenuItem>
-            </Menu>
+                    </DataTemplate>
+                  </MenuItem.ItemTemplate>
+                </MenuItem>
+              </Menu>
+            </Grid>
           </Grid>
         </controls:BlockTileButton>
       </DataTemplate>
 
+      <DataTemplate x:Key="VerticalSidebarButtonTemplate"
+                    x:DataType="workspace:SidebarButtonViewModel">
+        <Button Command="{Binding Command}"
+                ToolTip.Tip="{Binding Description}"
+                Classes="sidebar-button vertical"
+                Margin="{Binding Margin}">
+          <TextBlock Text="{Binding Label}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     TextAlignment="Center"
+                     TextWrapping="Wrap" />
+        </Button>
+      </DataTemplate>
+
+      <DataTemplate x:Key="TopSidebarButtonTemplate"
+                    x:DataType="workspace:SidebarButtonViewModel">
+        <Button Command="{Binding Command}"
+                ToolTip.Tip="{Binding Description}"
+                Classes="sidebar-button top"
+                Margin="{Binding Margin}">
+          <TextBlock Text="{Binding Label}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     TextAlignment="Center" />
+        </Button>
+      </DataTemplate>
+
+      <DataTemplate x:Key="BottomSidebarButtonTemplate"
+                    x:DataType="workspace:SidebarButtonViewModel">
+        <Button Command="{Binding Command}"
+                ToolTip.Tip="{Binding Description}"
+                Classes="sidebar-button bottom"
+                Margin="{Binding Margin}">
+          <TextBlock Text="{Binding Label}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     TextAlignment="Center" />
+        </Button>
+      </DataTemplate>
     </ResourceDictionary>
   </UserControl.Resources>
 
@@ -109,221 +166,344 @@
     <DataTemplate x:DataType="workspace:MappingWorkspaceViewModel">
       <mapping:MappingWorkspaceView />
     </DataTemplate>
-  </UserControl.DataTemplates>
-
-  <UserControl.Styles>
-    <Style Selector="Button.toolbar">
-      <Setter Property="Background" Value="{DynamicResource ShellChromeBorderBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
-      <Setter Property="Padding" Value="{DynamicResource ShellToolbarButtonPadding}" />
-      <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusSm}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
-    </Style>
-
-    <Style Selector="Button.toolbar:hover">
-      <Setter Property="Background" Value="{DynamicResource ThemeAccentMutedBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
-    </Style>
-
-    <Style Selector="Button.toolbar.active">
-      <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
-      <Setter Property="Foreground" Value="#FFFFFFFF" />
-    </Style>
-
-    <Style Selector="Button.block-tile">
-      <Setter Property="Background" Value="{DynamicResource ShellChromeBackgroundBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusSm}" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-      <Setter Property="VerticalContentAlignment" Value="Stretch" />
-      <Setter Property="Padding" Value="8" />
-    </Style>
-
-    <Style Selector="Button.block-tile:hover">
-      <Setter Property="Background" Value="{DynamicResource ThemeAccentMutedBrush}" />
-      <Setter Property="Foreground" Value="#FFFFFFFF" />
-    </Style>
-
-    <Style Selector="Button.block-tile:pressed">
-      <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
-      <Setter Property="Foreground" Value="#FFFFFFFF" />
-    </Style>
-
-    <Style Selector="ToggleButton.layout-lock">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="Padding" Value="4" />
-      <Setter Property="Focusable" Value="False" />
-    </Style>
-
-    <Style Selector="ToggleButton.layout-lock:hover">
-      <Setter Property="Background" Value="{DynamicResource ThemeAccentMutedBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentMutedBrush}" />
-    </Style>
-
-    <Style Selector="ToggleButton.layout-lock:checked">
-      <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}" />
-    </Style>
-
-    <Style Selector="ToggleButton.layout-lock Image">
-      <Setter Property="Width" Value="20" />
-      <Setter Property="Height" Value="20" />
-    </Style>
-
-    <Style Selector="ToggleButton.layout-lock:checked Image">
-      <Setter Property="Opacity" Value="0.9" />
-    </Style>
-  </UserControl.Styles>
-
-  <UserControl.DataTemplates>
     <DataTemplate x:DataType="workspace:BoundaryToolViewModel">
       <controls:BoundaryViewControl />
     </DataTemplate>
   </UserControl.DataTemplates>
 
-  <DockPanel LastChildFill="True">
-    <Border DockPanel.Dock="Top"
-            Background="{DynamicResource ShellChromeBackgroundBrush}"
-            BorderBrush="{DynamicResource ShellChromeBorderBrush}"
-            BorderThickness="0,0,0,1"
-            Padding="{DynamicResource ShellChromePadding}">
-      <StackPanel Spacing="{DynamicResource ThemeSpacingSm}">
-        <Menu Background="Transparent">
-          <MenuItem Header="{Binding Host.ShellMenuBar.FileMenu.Header}"
-                    ItemsSource="{Binding Host.ShellMenuBar.FileMenu.Items}">
-            <MenuItem.ItemTemplate>
-              <StaticResource ResourceKey="ShellMenuItemTemplate" />
-            </MenuItem.ItemTemplate>
-          </MenuItem>
-          <MenuItem Header="{Binding Host.ShellMenuBar.FieldMenu.Header}"
-                    ItemsSource="{Binding Host.ShellMenuBar.FieldMenu.Items}">
-            <MenuItem.ItemTemplate>
-              <StaticResource ResourceKey="ShellMenuItemTemplate" />
-            </MenuItem.ItemTemplate>
-          </MenuItem>
-          <MenuItem Header="{Binding Host.ShellMenuBar.ToolsMenu.Header}"
-                    ItemsSource="{Binding Host.ShellMenuBar.ToolsMenu.Items}">
-            <MenuItem.ItemTemplate>
-              <StaticResource ResourceKey="ShellMenuItemTemplate" />
-            </MenuItem.ItemTemplate>
-          </MenuItem>
-          <MenuItem Header="{Binding Host.ShellMenuBar.SettingsMenu.Header}"
-                    ItemsSource="{Binding Host.ShellMenuBar.SettingsMenu.Items}">
-            <MenuItem.ItemTemplate>
-              <StaticResource ResourceKey="ShellMenuItemTemplate" />
-            </MenuItem.ItemTemplate>
-          </MenuItem>
-          <MenuItem Header="{Binding Host.ShellMenuBar.ServicesMenu.Header}"
-                    ItemsSource="{Binding Host.ShellMenuBar.ServicesMenu.Items}">
-            <MenuItem.ItemTemplate>
-              <StaticResource ResourceKey="ShellMenuItemTemplate" />
-            </MenuItem.ItemTemplate>
-          </MenuItem>
-          <MenuItem Header="{Binding Host.ShellMenuBar.PluginsMenu.Header}"
-                    ItemsSource="{Binding Host.ShellMenuBar.PluginsMenu.Items}">
-            <MenuItem.ItemTemplate>
-              <StaticResource ResourceKey="ShellMenuItemTemplate" />
-            </MenuItem.ItemTemplate>
-          </MenuItem>
-        </Menu>
+  <UserControl.Styles>
+    <Style Selector="Menu.menu-bar">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
 
-        <Grid ColumnDefinitions="Auto,*,Auto"
-              ColumnSpacing="{DynamicResource ThemeSpacingLg}"
+    <Style Selector="Menu.menu-bar > MenuItem">
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+      <Setter Property="Margin" Value="0,0,24,0" />
+      <Setter Property="Padding" Value="6,0" />
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="Menu.menu-bar > MenuItem:pointerover">
+      <Setter Property="Background" Value="#3a3a3a" />
+    </Style>
+
+    <Style Selector="Button.toolbar">
+      <Setter Property="Background" Value="#383838" />
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+      <Setter Property="Padding" Value="8,4" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="BorderBrush" Value="#555555" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
+    </Style>
+
+    <Style Selector="Button.toolbar:hover">
+      <Setter Property="Background" Value="#4a4a4a" />
+    </Style>
+
+    <Style Selector="Button.toolbar.active">
+      <Setter Property="Background" Value="#0066cc" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+
+    <Style Selector="Button.block-tile">
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="#3a3a3a" />
+            <GradientStop Offset="1" Color="#2a2a2a" />
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style Selector="Button.block-tile:hover">
+      <Setter Property="Opacity" Value="0.95" />
+    </Style>
+
+    <Style Selector="Button.block-tile:pressed">
+      <Setter Property="Opacity" Value="0.85" />
+    </Style>
+
+    <Style Selector="Button.sidebar-button">
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="#3a3a3a" />
+            <GradientStop Offset="1" Color="#2a2a2a" />
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="BorderBrush" Value="#555555" />
+      <Setter Property="BorderThickness" Value="1.5" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Foreground" Value="#DDDDDD" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="Button.sidebar-button:hover">
+      <Setter Property="Background" Value="#4a4a4a" />
+      <Setter Property="BorderBrush" Value="#777777" />
+    </Style>
+
+    <Style Selector="Button.sidebar-button.top">
+      <Setter Property="Padding" Value="8,6" />
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
+    </Style>
+
+    <Style Selector="Button.sidebar-button.bottom">
+      <Setter Property="Padding" Value="12,10" />
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeMd}" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock">
+      <Setter Property="Background" Value="#4a4a4a" />
+      <Setter Property="BorderBrush" Value="#666666" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="6,4" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock:hover">
+      <Setter Property="Background" Value="#5a5a5a" />
+    </Style>
+
+    <Style Selector="ToggleButton.layout-lock:checked">
+      <Setter Property="Background" Value="#0066cc" />
+      <Setter Property="BorderBrush" Value="#0066cc" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*,Auto"
+        Background="#1a1a1a">
+    <Border Grid.Row="0"
+            Background="#2a2a2a"
+            BorderBrush="#444444"
+            BorderThickness="0,0,0,1"
+            Padding="16,8">
+      <Grid ColumnDefinitions="*,Auto"
+            RowDefinitions="Auto,Auto"
+            ColumnSpacing="16">
+        <Grid Grid.Column="0"
+              Grid.Row="0"
+              ColumnDefinitions="Auto,Auto"
+              ColumnSpacing="32"
               VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal"
-                      Spacing="{DynamicResource ThemeSpacingSm}"
+          <Menu Grid.Column="0"
+                Background="Transparent"
+                Classes="menu-bar">
+            <Menu.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
+            <MenuItem Header="{Binding Host.ShellMenuBar.FileMenu.Header}"
+                      ItemsSource="{Binding Host.ShellMenuBar.FileMenu.Items}">
+              <MenuItem.ItemTemplate>
+                <StaticResource ResourceKey="ShellMenuItemTemplate" />
+              </MenuItem.ItemTemplate>
+            </MenuItem>
+            <MenuItem Header="{Binding Host.ShellMenuBar.FieldMenu.Header}"
+                      ItemsSource="{Binding Host.ShellMenuBar.FieldMenu.Items}">
+              <MenuItem.ItemTemplate>
+                <StaticResource ResourceKey="ShellMenuItemTemplate" />
+              </MenuItem.ItemTemplate>
+            </MenuItem>
+            <MenuItem Header="{Binding Host.ShellMenuBar.ToolsMenu.Header}"
+                      ItemsSource="{Binding Host.ShellMenuBar.ToolsMenu.Items}">
+              <MenuItem.ItemTemplate>
+                <StaticResource ResourceKey="ShellMenuItemTemplate" />
+              </MenuItem.ItemTemplate>
+            </MenuItem>
+            <MenuItem Header="{Binding Host.ShellMenuBar.SettingsMenu.Header}"
+                      ItemsSource="{Binding Host.ShellMenuBar.SettingsMenu.Items}">
+              <MenuItem.ItemTemplate>
+                <StaticResource ResourceKey="ShellMenuItemTemplate" />
+              </MenuItem.ItemTemplate>
+            </MenuItem>
+            <MenuItem Header="{Binding Host.ShellMenuBar.ServicesMenu.Header}"
+                      ItemsSource="{Binding Host.ShellMenuBar.ServicesMenu.Items}">
+              <MenuItem.ItemTemplate>
+                <StaticResource ResourceKey="ShellMenuItemTemplate" />
+              </MenuItem.ItemTemplate>
+            </MenuItem>
+            <MenuItem Header="{Binding Host.ShellMenuBar.PluginsMenu.Header}"
+                      ItemsSource="{Binding Host.ShellMenuBar.PluginsMenu.Items}">
+              <MenuItem.ItemTemplate>
+                <StaticResource ResourceKey="ShellMenuItemTemplate" />
+              </MenuItem.ItemTemplate>
+            </MenuItem>
+          </Menu>
+
+          <StackPanel Grid.Column="1"
+                      Orientation="Horizontal"
+                      Spacing="8"
                       VerticalAlignment="Center">
-            <Border Background="{DynamicResource ThemeSurfaceBrush}"
-                    BorderBrush="{DynamicResource ShellChromeBorderBrush}"
+            <Border Background="#333333"
+                    BorderBrush="#555555"
                     BorderThickness="1"
-                    CornerRadius="{DynamicResource ThemeRadiusSm}"
+                    CornerRadius="6"
                     Padding="8,4">
               <TextBlock Text="AgOpenGPS"
                          FontWeight="Bold"
-                         Foreground="{DynamicResource ThemeForegroundBrush}"
-                         FontSize="{DynamicResource ThemeFontSizeLg}" />
+                         Foreground="#FFFFFF"
+                         FontSize="{DynamicResource ThemeFontSizeMd}" />
             </Border>
             <TextBlock Text="Nexus"
-                       FontSize="{DynamicResource ThemeFontSizeLg}"
+                       FontSize="{DynamicResource ThemeFontSizeMd}"
                        FontWeight="SemiBold"
                        VerticalAlignment="Center"
-                       Foreground="{DynamicResource ThemeAccentMutedBrush}" />
-          </StackPanel>
-
-          <ItemsControl Grid.Column="1"
-                        ItemsSource="{Binding Host.TopToolbar.Items}"
-                        ItemTemplate="{StaticResource ToolbarItemTemplate}">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            Spacing="{DynamicResource ThemeSpacingSm}" />
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-          </ItemsControl>
-
-          <StackPanel Grid.Column="2"
-                      Orientation="Horizontal"
-                      HorizontalAlignment="Right"
-                      VerticalAlignment="Center"
-                      Spacing="8">
-            <ToggleButton Classes="layout-lock"
-                          IsChecked="{Binding Layout.IsLocked}"
-                          ToolTip.Tip="{Binding Layout.IsLocked, Converter={StaticResource LockTooltipConverter}}">
-              <Image Source="{Binding Layout.IsLocked, Converter={StaticResource LockStateIconConverter}}"
-                     Width="20"
-                     Height="20"
-                     Stretch="Uniform" />
-            </ToggleButton>
-            <TextBlock Text="{Binding StatusText}"
-                       Foreground="{DynamicResource ThemeAccentMutedBrush}"
-                       VerticalAlignment="Center" />
+                       Foreground="#9ad0ff" />
           </StackPanel>
         </Grid>
-      </StackPanel>
+
+        <ItemsControl Grid.Column="0"
+                      Grid.Row="1"
+                      ItemsSource="{Binding Host.TopToolbar.Items}"
+                      ItemTemplate="{StaticResource ToolbarItemTemplate}"
+                      Margin="0,8,0,0"
+                      HorizontalAlignment="Left"
+                      IsVisible="{Binding Host.IsTopToolbarVisible, FallbackValue=False}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal" Spacing="8" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+
+        <StackPanel Grid.Column="1"
+                    Grid.RowSpan="2"
+                    Orientation="Vertical"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Spacing="6">
+          <ToggleButton Classes="layout-lock"
+                        IsChecked="{Binding Layout.IsLocked}"
+                        ToolTip.Tip="{Binding Layout.IsLocked, Converter={StaticResource LockTooltipConverter}}"
+                        Content="{Binding Layout.IsLocked, Converter={StaticResource LockActionTextConverter}}" />
+          <TextBlock Text="{Binding StatusText}"
+                     Foreground="#cccccc"
+                     FontSize="{DynamicResource ThemeFontSizeSm}"
+                     TextAlignment="Right" />
+        </StackPanel>
+      </Grid>
     </Border>
 
-    <Grid>
-      <ContentControl Content="{Binding MainContent}"
+    <Grid Grid.Row="1"
+          ColumnDefinitions="Auto,*,Auto"
+          RowDefinitions="Auto,*,Auto"
+          Background="#1a1a1a">
+      <Grid Grid.ColumnSpan="3"
+            Grid.RowSpan="3"
+            ClipToBounds="True">
+        <ContentControl Content="{Binding MainContent}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Panel.ZIndex="0" />
+        <controls:PaneCanvas Layout="{Binding Layout.Grid}"
+                             LayoutResult="{Binding Layout.PaneLayout}"
+                             ShowMinorGrid="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
+                             Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"
+                             IsHitTestVisible="False"
+                             Opacity="0.85"
+                             Panel.ZIndex="1" />
+        <ItemsControl x:Name="BlockTiles"
+                      ItemsSource="{Binding Layout.Blocks}"
+                      ItemTemplate="{StaticResource BlockTileTemplate}"
+                      Background="Transparent"
+                      Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
                       HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch" />
-      <controls:PaneCanvas Layout="{Binding Layout.Grid}"
-                           LayoutResult="{Binding Layout.PaneLayout}"
-                           Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
-                           HorizontalAlignment="Stretch"
-                           VerticalAlignment="Stretch"
-                           IsHitTestVisible="False"
-                           IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
-      <ItemsControl x:Name="BlockTiles"
-                    ItemsSource="{Binding Layout.Blocks}"
-                    ItemTemplate="{StaticResource BlockTileTemplate}"
-                    Background="Transparent"
-                    Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    SizeChanged="OnViewportSizeChanged">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <controls:TiledPanel Layout="{Binding Layout.Grid}" />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.Styles>
-          <Style Selector="#BlockTiles ContentPresenter"
-                 x:DataType="vm:BlockItemViewModel">
-            <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
-            <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
-            <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />
-            <Setter Property="controls:TiledPanel.ColumnSpan" Value="{Binding Tile.ColSpan}" />
-          </Style>
-        </ItemsControl.Styles>
-      </ItemsControl>
+                      VerticalAlignment="Stretch"
+                      SizeChanged="OnViewportSizeChanged"
+                      Panel.ZIndex="3">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <controls:TiledPanel Layout="{Binding Layout.Grid}" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.Styles>
+            <Style Selector="#BlockTiles ContentPresenter"
+                   x:DataType="vm:BlockItemViewModel">
+              <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
+              <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
+              <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />
+              <Setter Property="controls:TiledPanel.ColumnSpan" Value="{Binding Tile.ColSpan}" />
+            </Style>
+          </ItemsControl.Styles>
+        </ItemsControl>
+      </Grid>
+
+      <Border Grid.Row="0"
+              Grid.ColumnSpan="3"
+              Background="#252525"
+              BorderBrush="#333333"
+              BorderThickness="1"
+              CornerRadius="8"
+              Padding="12,10"
+              Margin="24,16,24,0"
+              Panel.ZIndex="1"
+              IsHitTestVisible="False"
+              IsVisible="{Binding Host.IsTopSidebarVisible, FallbackValue=True}" />
+
+      <Border Grid.Row="1"
+              Grid.Column="0"
+              Background="#252525"
+              BorderBrush="#333333"
+              BorderThickness="1"
+              CornerRadius="8"
+              Padding="12"
+              Margin="24,16,16,24"
+              Panel.ZIndex="1"
+              Width="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
+              IsHitTestVisible="False"
+              IsVisible="{Binding Host.IsLeftSidebarVisible, FallbackValue=True}" />
+
+      <Border Grid.Row="1"
+              Grid.Column="2"
+              Background="#252525"
+              BorderBrush="#333333"
+              BorderThickness="1"
+              CornerRadius="8"
+              Padding="12"
+              Margin="16,16,24,24"
+              Panel.ZIndex="1"
+              Width="{Binding Layout.RightSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
+              IsHitTestVisible="False"
+              IsVisible="{Binding Host.IsRightSidebarVisible, FallbackValue=True}" />
+
+      <Border Grid.Row="2"
+              Grid.ColumnSpan="3"
+              Background="#252525"
+              BorderBrush="#333333"
+              BorderThickness="1"
+              CornerRadius="8"
+              Padding="12,10"
+              Margin="24,0,24,24"
+              Panel.ZIndex="1"
+              IsHitTestVisible="False"
+              IsVisible="{Binding Host.IsBottomSidebarVisible, FallbackValue=True}" />
     </Grid>
-  </DockPanel>
+
+    <Border Grid.Row="2"
+            Background="#202020"
+            BorderBrush="#333333"
+            BorderThickness="1,1,1,0"
+            Padding="16,8">
+      <shell:StatusStripView DataContext="{Binding StatusStrip}" />
+    </Border>
+  </Grid>
 </UserControl>

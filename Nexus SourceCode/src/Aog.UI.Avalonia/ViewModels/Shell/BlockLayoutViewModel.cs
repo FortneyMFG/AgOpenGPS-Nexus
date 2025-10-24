@@ -21,7 +21,7 @@ namespace Aog.UI.Avalonia.ViewModels.Shell;
 public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 {
     private const int MajorGridColumns = 10;
-    private const int MinorDivisionsPerMajor = 1;
+    private const int MinorDivisionsPerMajor = 2;
     private const int MinorGridColumns = MajorGridColumns * MinorDivisionsPerMajor;
 
     private static readonly IReadOnlyDictionary<string, string> DefaultStatusMessages =
@@ -269,7 +269,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
                 continue;
             }
 
-            if (!ShouldRenderInWorkspace(instance.Region))
+            if (!ShouldRenderOnGrid(instance.Region))
             {
                 continue;
             }
@@ -344,14 +344,18 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
             if (!tile.PaneAttached)
             {
+                tile.Offset = GetDefaultOffset(block.Instance.Region, block.Instance.Order, desiredColSpan, desiredRowSpan);
                 var (anchorCol, anchorRow) = ResolveAnchorPosition(tile, columns, rows, desiredColSpan, desiredRowSpan);
                 tile.Col = anchorCol;
                 tile.Row = anchorRow;
             }
+            else
+            {
+                tile.Offset = (0, 0);
+            }
 
             tile.Col = Math.Clamp(tile.Col, 0, maxColumn);
             tile.Row = Math.Clamp(tile.Row, 0, maxRow);
-            tile.Offset = (0, 0);
         }
     }
 
@@ -402,9 +406,15 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         return new Thickness(normalized);
     }
 
-    private static bool ShouldRenderInWorkspace(BlockRegion region)
+    private static bool ShouldRenderOnGrid(BlockRegion region)
     {
-        return region == BlockRegion.Floating || region == BlockRegion.Overlay || region == BlockRegion.LeftSub;
+        return region is BlockRegion.Floating
+            or BlockRegion.Overlay
+            or BlockRegion.LeftSub
+            or BlockRegion.Left
+            or BlockRegion.Right
+            or BlockRegion.Top
+            or BlockRegion.Bottom;
     }
 
     private string GetStatusMessage(BlockDefinition definition)
@@ -520,9 +530,22 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         {
             BlockRegion.Left or BlockRegion.LeftSub => RelativeAnchor.BottomLeft,
             BlockRegion.Right => RelativeAnchor.BottomRight,
-            BlockRegion.Top => RelativeAnchor.TopCenter,
-            BlockRegion.Bottom => RelativeAnchor.BottomCenter,
+            BlockRegion.Top => RelativeAnchor.TopLeft,
+            BlockRegion.Bottom => RelativeAnchor.BottomLeft,
             _ => RelativeAnchor.Center,
+        };
+    }
+
+    private static (int dx, int dy) GetDefaultOffset(BlockRegion region, int order, int colSpan, int rowSpan)
+    {
+        var normalizedOrder = Math.Max(0, order);
+        return region switch
+        {
+            BlockRegion.Left or BlockRegion.LeftSub => (0, normalizedOrder * Math.Max(1, rowSpan)),
+            BlockRegion.Right => (0, normalizedOrder * Math.Max(1, rowSpan)),
+            BlockRegion.Top => (normalizedOrder * Math.Max(1, colSpan), 0),
+            BlockRegion.Bottom => (normalizedOrder * Math.Max(1, colSpan), 0),
+            _ => (0, 0),
         };
     }
 

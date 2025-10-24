@@ -55,7 +55,7 @@ public partial class FieldSettingsDock : UserControl
         _dragStart = e.GetPosition(control);
         _isPressArmed = true;
         _isDragActive = false;
-        control.CapturePointer(e.Pointer);
+        e.Pointer.Capture(control);
     }
 
     private async void OnLauncherPointerMoved(object? sender, PointerEventArgs e)
@@ -173,9 +173,9 @@ public partial class FieldSettingsDock : UserControl
 
     private void ResetLauncherDrag(Control? source, IPointer? pointer)
     {
-        if (source is not null && pointer is not null && source.PointerCaptures?.Contains(pointer) == true)
+        if (source is not null && pointer is not null && pointer.Captured == source)
         {
-            source.ReleasePointerCapture(pointer);
+            pointer.Capture(null);
         }
 
         _dragLauncher = null;

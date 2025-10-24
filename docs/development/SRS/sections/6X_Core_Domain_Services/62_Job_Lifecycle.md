@@ -103,6 +103,9 @@ UX flows preserve immutable IDs while automated checks audit emitted event paylo
 - Must maintain immutable IDs for farm, season, job, and session entities once issued.
 - Must respect privacy policies for notes and telemetry when syncing across devices.
 - Must operate offline-first, syncing when connectivity is restored without data loss.
+- Lifecycle APIs MUST publish versioned payloads with documented compatibility guarantees for clients.
+- Session persistence MUST remain atomic so crash recovery does not duplicate events.
+- Client shells MUST consume provided journaling hooks and honor immutable identifiers when integrating TaskService workflows.
 
 ---
 
@@ -174,9 +177,7 @@ and confirm provenance completeness.
 
 ## 62.14 Implementation Policy
 
-Core must expose lifecycle APIs with versioned payloads, persist session documents
-atomically, and document TaskService integration contracts. Client shells must respect
-immutable IDs and use provided journaling hooks.
+*(Reserved — implementation details are covered by Section 62 ADRs and runbooks.)*
 
 ---
 

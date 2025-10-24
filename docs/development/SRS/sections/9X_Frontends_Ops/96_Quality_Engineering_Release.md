@@ -102,9 +102,12 @@ Quality and release workflows succeed when deterministic replay suites pass, pac
 
 ## 96.7 Constraints
 
-- Legacy manual release workflows must remain available until automated pipelines earn operator trust.  
-- Replay datasets require storage, curation, and security practices to protect sensitive agronomic data.  
+- Legacy manual release workflows must remain available until automated pipelines earn operator trust.
+- Replay datasets require storage, curation, and security practices to protect sensitive agronomic data.
 - Hardware-in-loop tests depend on lab availability and cannot block emergency hotfixes.
+- Replay datasets and fixture manifests MUST be versioned and accessible for CI and audit trails.
+- Release notes MUST summarize feature flags, replay coverage, and provenance evidence for each shipment.
+- Release artifacts MUST ship with SBOM and checksum outputs consumable by UI/CLI tooling.
 
 ---
 
@@ -174,9 +177,7 @@ No competing release strategies are under review; modernization follows consider
 
 ## 96.14 Implementation Policy
 
-- Store replay datasets and fixture metadata in `artifacts/replay/` with versioned manifests.  
-- Publish release notes documenting feature flags, replay coverage, and provenance summary in `docs/releases/<version>.md`.  
-- Maintain SBOM and checksum outputs in `artifacts/releases/<version>/` consumed by UI/CLI surfaces.
+*(Reserved — artifact layouts and documentation templates are defined in release ADRs.)*
 
 ---
 

@@ -96,9 +96,12 @@ Gauge implementations undergo schema validation, transport compatibility testing
 
 ## 92.7 Constraints
 
-- Gauge metadata must remain immutable once published to avoid breaking manifest compatibility.  
-- Transport payloads must respect existing bandwidth allocations alongside rate-control and steering PGNs.  
+- Gauge metadata must remain immutable once published to avoid breaking manifest compatibility.
+- Transport payloads must respect existing bandwidth allocations alongside rate-control and steering PGNs.
 - Security policies in §95 enforce read-only scope for gauge subscribers; write access remains prohibited.【F:docs/sections/9X_Frontends_Ops/95_Security_Permissions.md†L31-L68】
+- Gauge definitions MUST ship as schema-validated, versioned artifacts consumable by UI and headless deployments.
+- Gauge transports MUST emit heartbeat or equivalent liveness signals at documented cadences to support stale detection.
+- UI shells MUST invalidate cached gauge metadata when manifest versions change to honor offline policies from §91.
 
 ---
 
@@ -168,9 +171,7 @@ No competing options are under review; gauge handling follows design considerati
 
 ## 92.14 Implementation Policy
 
-- Gauge definitions stored in `/configs/gauges/*.json` with schema enforcement during CI.  
-- Gauge Block transports publish heartbeat PGN `0xD8` at 2-second cadence with optional sequence trailer when `capabilities.seq = 1`.  
-- UI Shell caches gauge metadata locally and invalidates on manifest version bump, aligning with offline policies in §91.
+*(Reserved — storage layouts and transport encodings are captured in supporting ADRs.)*
 
 ---
 

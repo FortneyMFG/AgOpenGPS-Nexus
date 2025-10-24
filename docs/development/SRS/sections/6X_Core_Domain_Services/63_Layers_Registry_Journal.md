@@ -97,6 +97,9 @@ latency and backpressure effectiveness.
 - Must store journals in tamper-evident append-only media compliant with retention
   requirements.
 - Must provide offline snapshot export/import flows for air-gapped rigs.
+- Must publish registry metadata through governed migrations with versioned APIs.
+- Must document delta formats and enforce access control policies for all readers and writers.
+- Must pair journal operations with tamper-evident logging that surfaces provenance to auditors.
 
 ---
 
@@ -166,9 +169,7 @@ backward compatible and delta compaction retains determinism.
 
 ## 63.14 Implementation Policy
 
-Implementations must publish registry metadata through controlled migrations, expose
-versioned APIs, document delta formats, and enforce ACL policies alongside tamper-evident
-logging mechanisms.
+*(Reserved — operational specifics belong in registry ADRs and tooling guides.)*
 
 ---
 

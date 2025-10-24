@@ -97,9 +97,12 @@ The CLI must pass cross-platform smoke tests, structured output validation, and 
 
 ## 93.7 Constraints
 
-- CLI distribution must align with OS packaging policies defined in §11 and §94.  
-- Security-sensitive operations (token storage, plugin verb permissions) defer to §95 without embedding credentials in plain text.  
+- CLI distribution must align with OS packaging policies defined in §11 and §94.
+- Security-sensitive operations (token storage, plugin verb permissions) defer to §95 without embedding credentials in plain text.
 - CLI must operate in restricted environments (air-gapped, offline) without network dependencies beyond configured endpoints.
+- CLI configuration MUST support per-user profiles with environment overrides for CI and automation workflows.
+- Credential storage MUST leverage OS-secure providers or encrypted containers consistent with §95.
+- Release communications MUST surface CLI updates through the plugin catalog and official release notes so operators stay informed.
 
 ---
 
@@ -169,9 +172,7 @@ No alternative CLI proposals are under review; focus remains on maturing `nx` pe
 
 ## 93.14 Implementation Policy
 
-- Store CLI configuration in `~/.nexus/config.yml` with environment overrides for CI pipelines.  
-- Persist credentials in `~/.nexus/credentials` encrypted per OS recommendations (DPAPI, libsecret).  
-- Distribute CLI update notifications via plugin catalog UI (§91) and release notes in §96.
+*(Reserved — configuration file locations and distribution helpers are captured in supporting ADRs.)*
 
 ---
 

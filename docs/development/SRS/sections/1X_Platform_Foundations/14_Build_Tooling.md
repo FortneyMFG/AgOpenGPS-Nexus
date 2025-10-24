@@ -116,6 +116,8 @@ Document the build toolchains, automation, signing, and secrets policies that en
 - Signing certificates must be stored in hardware-backed vaults where possible.
 - Build pipelines must complete within agreed SLAs to avoid release delays.
 - Container base images require periodic CVE scans and patching.
+- Release documentation MUST summarize bootstrap script updates so contributors can reproduce environments.
+- Release artifacts MUST enumerate supported container image versions for operators and CI consumers.
 
 ### 14.7.1 Non-Functional Requirement Classes
 
@@ -191,9 +193,8 @@ Future alternatives (e.g., Bazel build system) would require dedicated option do
 
 ## 14.14 Implementation Policy
 
-- Version bootstrap scripts and document updates in release notes.
-- Enforce mandatory signing verification before publishing artifacts.
-- Publish container image version matrix alongside release binaries.
+*(Reserved — see `14-ADR-001` for implementation governance. This section remains
+focused on normative requirements.)*
 
 ---
 

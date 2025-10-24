@@ -162,9 +162,11 @@ Extensibility features must pass manifest schema validation, dependency solver t
 
 ## 94.7 Constraints
 
-- Plugin manifests must remain backward-compatible across patch releases or provide migration scripts documented in release notes.  
-- Packaging must adhere to OS security policies (code signing, notarization, repository trust).  
+- Plugin manifests must remain backward-compatible across patch releases or provide migration scripts documented in release notes.
+- Packaging must adhere to OS security policies (code signing, notarization, repository trust).
 - Update orchestrators must respect §95 security gates and staged rollout approvals.
+- Plugin manifests MUST be validated against the shared governance schema during build and release pipelines.
+- Plugin catalog metadata MUST be published in both machine-readable and operator-facing formats for UI/CLI consumption.
 
 ---
 
@@ -234,9 +236,7 @@ No alternative extensibility proposals are under evaluation; modernization focus
 
 ## 94.14 Implementation Policy
 
-- Store manifests in `plugins/<PluginName>/manifest.json` validated during build and release pipelines.  
-- Publish plugin catalog metadata to `docs/Plugins/catalog.json` consumed by UI and CLI surfaces.  
-- Require versioned migration scripts for breaking manifest changes, referenced in §96 release notes.
+*(Reserved — repository layouts and catalog distribution mechanics are detailed in plugin ADRs.)*
 
 ---
 

@@ -58,6 +58,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-205 Weather snapshot schema extensions _(Done)_ — ADR-053 weather & environment plugin
 - [x] NX-206 Report template schema + manifest handshake _(Done)_ — ADR-051 report builder & exports
 - [x] NX-207 SRS + ADR cross-reference sweep for new layers _(Done)_ — ADR-027…ADR-053 portfolio alignment
+- [x] NX-PP-137 SRS implementation policy cleanup _(Done)_ — Ensure sections state “what” requirements while ADRs capture “how” guidance
 - [x] NX-208 Official bundle capability matrix update _(Done)_ — ADR-031 manifest governance
 - [x] NX-209 CRS normalization matrix publication _(Done)_ — ADR-022 CRS policy
 - [x] NX-210 Contracts freeze automation for new capabilities _(Done)_ — ADR-031 governance rollout

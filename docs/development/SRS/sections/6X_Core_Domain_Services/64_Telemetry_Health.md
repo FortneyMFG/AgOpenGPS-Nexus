@@ -113,6 +113,9 @@ logging, privacy enforcement, and maintenance record generation.
 - Must support offline-first rigs with local log storage and deferred export.
 - Must guard personally identifiable information when streaming telemetry off-rig.
 - Must align with regulatory retention policies for agronomic and safety data.
+- Must expose health endpoints, watchdog hooks, and exporter instrumentation so operators can verify system state.
+- Must provide configurable telemetry retention policies with documented defaults per deployment tier.
+- Must integrate equipment health records and automation telemetry so TaskService workflows and alerts remain consistent.
 
 ---
 
@@ -191,9 +194,7 @@ radio diagnostics while privacy audits review retention and consent logs.
 
 ## 64.14 Implementation Policy
 
-Implementations must instrument telemetry exporters, document `/healthz` and watchdog
-contracts, provide configurable retention policies, and integrate equipment health
-records with TaskService and automation telemetry feeds.
+*(Reserved — instrumentation details are recorded in observability ADRs and playbooks.)*
 
 ---
 

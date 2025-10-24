@@ -671,6 +671,10 @@ public sealed class SocketCanBackendTests
             ReconnectDelay = template.ReconnectDelay,
         };
 
+        clone.SourcePrefix = sourcePrefix;
+        return clone;
+    }
+
     private static readonly Lazy<bool> s_hasSocketCanPrivileges = new(CheckSocketCanPrivileges);
 
     private static void SkipIfSocketCanPrivilegesMissing()
@@ -949,12 +953,14 @@ public sealed class SocketCanBackendTests
             return new ChangeHandle(this, listener);
         }
 
-        public void Update(SocketCanOptions options, string name = Options.DefaultName)
+        public void Update(SocketCanOptions options, string? name = null)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
+
+            var effectiveName = name ?? Options.DefaultName;
 
             List<Action<SocketCanOptions, string>> listeners;
             lock (_gate)
@@ -965,7 +971,7 @@ public sealed class SocketCanBackendTests
 
             foreach (var listener in listeners)
             {
-                listener(options, name);
+                listener(options, effectiveName);
             }
         }
 

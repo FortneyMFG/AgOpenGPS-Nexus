@@ -51,7 +51,7 @@ public sealed class LegacyMultiFieldEnvelopeTranslatorTests
         result.AreaHectares.Should().BeApproximately(2.0, 0.05);
 
         result.Members.Should().HaveCount(2);
-        result.Members.Should().OnlyContain(m => m.AreaHectares is > 0.9 and < 1.1);
+        result.Members.Should().OnlyContain(m => m.AreaHectares > 0.9 && m.AreaHectares < 1.1);
 
         var boundingBox = result.BoundingBox;
         boundingBox.MinLatitude.Should().BeApproximately(41.0, 1e-6);

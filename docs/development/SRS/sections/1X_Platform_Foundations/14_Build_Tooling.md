@@ -12,7 +12,8 @@
 **Section ID:** 14  
 **Editors:** Release & Tooling Working Group  
 **Last Updated:** 2025-10-20  
-**Related Sections:** 11 — OS Support, 12 — Development Language & Runtime, 96 — Quality Engineering & Release  
+**Related Sections:** 11 — OS Support, 12 — Development Language & Runtime, 96 — Quality Engineering & Release
+**Related Decisions:** `14-ADR-001 — Standardize Build Environment & Tooling`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
 **Upstream Dependencies:** 12 — Runtime Governance, 96 — QE Policies  
 **Downstream Impacts:** Release pipelines, developer onboarding
 
@@ -26,7 +27,7 @@ Document the build toolchains, automation, signing, and secrets policies that en
 
 ## 14.2 Context
 
-- Windows installers and Linux packages must be produced from consistent pipelines.
+- Windows installers and Linux packages must be produced from consistent pipelines (`11-ADR-001`).
 - Containerized builds support simulation, testing, and remote deployments.
 - Secrets (signing keys, credentials) must be centrally managed.
 - Developers need bootstrap tooling to align with CI environments.
@@ -69,7 +70,7 @@ Document the build toolchains, automation, signing, and secrets policies that en
 
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|-----------|----------|-----------------|-----------------------------|
-| R-BUILD-000 | MUST | Reproducibility | Pin .NET SDK versions, native dependencies, and publish repeatable restore manifest. | QE policy | Build hash comparison |
+| R-BUILD-000 | MUST | Reproducibility | Pin .NET SDK versions, native dependencies, and publish repeatable restore manifest (`14-ADR-001`). | QE policy | Build hash comparison |
 | R-BUILD-001 | MUST | Signing | Sign installers, NuGet packages, plugin bundles with project certificates; verify signatures in CI. | Release governance | Signing verification step |
 | R-BUILD-002 | SHOULD | Container Support | Provide Dockerfiles/base images for headless builds matching field deployments. | Linux Core roadmap | Container smoke build |
 | R-BUILD-003 | SHOULD | Developer Ergonomics | Automate environment bootstrap via scripts/CLI. | Developer onboarding | `nexus setup` success rate |

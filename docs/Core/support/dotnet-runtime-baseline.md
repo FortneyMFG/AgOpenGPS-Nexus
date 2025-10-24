@@ -1,6 +1,6 @@
 # .NET 8 Runtime Baseline Playbook
 
-Nexus standardises on .NET 8 across Core, AgIO, plugins, tooling, and the Avalonia UI per [ADR-001](../development/SRS/sections/1X_Platform_Foundations/11-ADR-001 - Adopt .NET 8 C stack for Nexus runtime.md). This playbook records the enforcement knobs that keep the baseline in place and how to validate them during reviews and CI.
+Nexus standardises on .NET 8 across Core, AgIO, plugins, tooling, and the Avalonia UI per [12-ADR-001](../development/SRS/sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 8 LTS Runtime.md). This playbook records the enforcement knobs that keep the baseline in place and how to validate them during reviews and CI.
 
 ## Repository Guardrails
 

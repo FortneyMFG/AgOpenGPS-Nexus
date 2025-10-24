@@ -12,7 +12,7 @@
 **Authors:** Platform Foundations Working Group  
 **Last Updated:** 2025-10-25  
 **Related SRS:** `11_OS_Support.md`  
-**Related ADRs:** `11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md`
+**Related ADRs:** `11-ADR-001 - Establish Windows and Linux Support Baseline.md`, `12-ADR-001 - Adopt .NET 8 LTS Runtime.md`, `13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md`
 
 ---
 
@@ -66,11 +66,12 @@ consistency to primary goals.
 ## 4) Approach Outline
 
 1. **Runtime alignment.** Target .NET 8 LTS across all first-party executables
-   (Core, AgIO, UI shell, plugins) so supported OSes share binaries and tooling.
+   (Core, AgIO, UI shell, plugins) so supported OSes share binaries and tooling
+   in line with `12-ADR-001`.
 2. **UI host reuse.** Use Avalonia as the desktop shell because it compiles for
-   both Windows and Linux without forking the view models or rendering
-   primitives. Section 13 details UX policy; this option simply records the
-   runtime dependency.
+   Windows, Linux, and future Android builds without forking the view models or
+   rendering primitives. Section 13 details UX policy; this option simply
+   records the runtime dependency and points to `13-ADR-001`.
 3. **AgIO adapter strategy.** Keep hardware access behind AgIO interfaces that
    swap Windows-specific SDK bindings for Linux equivalents such as SocketCAN.
 4. **Packaging templates.** Maintain publish profiles for Windows MSI/EXE and
@@ -93,7 +94,7 @@ flowchart LR
 | Platform Tier | Windows | Linux |
 |---------------|---------|-------|
 | **Primary** | Windows 10/11 x64 desktop builds produced from the unified solution. | Ubuntu LTS x64 packages; Debian-based ARM64 images for CM5/Pi. |
-| **Preview** | Windows NativeAOT investigations using the same projects. | Fedora/RHEL derivatives once tooling maturates. |
+| **Preview** | Windows NativeAOT investigations using the same projects. | Fedora/RHEL derivatives once tooling maturates; Android builds once Avalonia Android is production ready. |
 | **Out of Scope** | Legacy .NET Framework builds. | Custom vendor-specific Linux distributions without glibc 2.31+. |
 
 > **Note:** Mobile companion builds are handled by Section 13. They are not

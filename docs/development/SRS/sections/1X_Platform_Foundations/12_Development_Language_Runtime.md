@@ -5,7 +5,8 @@
 **Version:** 0.1.0  
 **Editors:** Platform Foundations WG  
 **Last Updated:** 2025-10-21  
-**Related Sections:** 11 — OS Support, 14 — Build Environment & Tooling  
+**Related Sections:** 11 — OS Support, 14 — Build Environment & Tooling
+**Related Decisions:** `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
 **Downstream Impacts:** 6X — Core Domain Services, 9X — Frontends & Ops  
 
@@ -24,7 +25,7 @@ It also defines boundaries for dependency management and contract versioning so 
 
 ## 12.2 Context  
 
-- All Nexus components share a managed runtime that supports both Windows and Linux as defined in §11.  
+- All Nexus components share a managed runtime that supports both Windows and Linux as defined in §11 (`11-ADR-001`).
 - Prior versions of AgOpenGPS mixed .NET Framework, WPF, and native utilities, leading to inconsistent build behavior.  
 - The modern Nexus stack aims to unify runtime, language, and dependency handling across Core, AgIO, UI, and CLI tools.  
 - Build environment and CI enforcement are covered in §14, while this section defines the policies that those builds must enforce.  
@@ -57,7 +58,7 @@ It also defines boundaries for dependency management and contract versioning so 
 
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|-----------|----------|----------------|-----------------------------|
-| **R-STACK-001** | **MUST** | Runtime | Use a single long-term-support managed runtime across all Nexus projects. | Architecture WG | CI confirms all projects target the same TFM. |
+| **R-STACK-001** | **MUST** | Runtime | Use a single long-term-support managed runtime across all Nexus projects (`12-ADR-001`). | Architecture WG | CI confirms all projects target the same TFM. |
 | **R-STACK-002** | **MUST** | Language | Use C# as the primary implementation language while keeping shared contracts language-agnostic. | Core WG | Contract build produces valid stubs for all languages. |
 | **R-STACK-003** | **MUST** | Build Integrity | Pin SDK and dependency versions to ensure deterministic builds. | Build WG | Hash comparison between builds is identical. |
 | **R-STACK-004** | **MUST** | Abstraction | Contain all OS-specific or hardware-specific logic behind dependency-injected interfaces. | AgIO WG | Swappable backend tests pass on both Windows and Linux. |

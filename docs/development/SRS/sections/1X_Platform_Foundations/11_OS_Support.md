@@ -5,7 +5,8 @@
 **Version:** 0.1.0  
 **Editors:** @owner, @reviewer  
 **Last Updated:** 2025-10-21  
-**Related Sections:** 12 — Development Language & Runtime, 14 — Build Environment & Tooling  
+**Related Sections:** 12 — Development Language & Runtime, 14 — Build Environment & Tooling
+**Related Decisions:** `11-ADR-001 — Establish Windows & Linux Support Baseline`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `13-ADR-001 — Use Avalonia for the Nexus Desktop UI Shell`
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
 **Downstream Impacts:** 5X — Hardware I/O Device Layer, 9X — Frontends & Ops
 
@@ -24,7 +25,7 @@ This section sets expectations for where the application must/should run at the 
 
 ## 11.2 Context
 
-- Depends on .NET 8 runtime and the selected cross-platform UI framework (see §12).  
+- Depends on .NET 8 runtime and the selected cross-platform UI framework (see §12, `12-ADR-001`, and `13-ADR-001`).
 - Interacts with AgIO for hardware interfaces (serial, UDP, CAN) (see §5X).  
 - Out of scope: service modes (e.g., headless), packaging specifics, mobile companions.
 

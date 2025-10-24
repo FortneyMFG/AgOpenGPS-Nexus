@@ -21,7 +21,7 @@ public class BlockLayoutStoreTests
         instances.Should().NotBeEmpty();
         instances.Should().Contain(i => i.DefinitionId.Value == "Menu.EquipmentControls" && i.Origin == BlockOrigin.Canonical);
         instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.AutoSteerToggle" && i.Origin == BlockOrigin.Canonical);
-        instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.AutoSteerToggle" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Right);
+        instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.AutoSteerToggle" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Overlay);
         preferences.ShellLayout.Instances.Should().NotBeEmpty();
     }
 

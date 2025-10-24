@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -9,6 +10,7 @@ namespace Aog.UI.Avalonia.Tests.Views;
 public sealed class AppShellLayoutTests
 {
     private static readonly XNamespace AvaloniaNs = "https://github.com/avaloniaui";
+    private static readonly string SrcDirectory = LocateSrcDirectory();
 
     [Fact]
     public void AppShellUsesSingleItemsPanel()
@@ -36,10 +38,26 @@ public sealed class AppShellLayoutTests
     private static XDocument LoadShellView() => XDocument.Load(ShellViewPath);
 
     private static string ShellViewPath => Path.Combine(
-        "Nexus SourceCode",
-        "src",
-        "Aog.UI.Avalonia",
+        SrcDirectory,
         "Views",
         "Shell",
         "AppShellView.axaml");
+
+    private static string LocateSrcDirectory()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && directory.Exists)
+        {
+            var candidate = Path.Combine(directory.FullName, "Nexus SourceCode", "src", "Aog.UI.Avalonia");
+            if (Directory.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            directory = directory.Parent;
+        }
+
+        throw new InvalidOperationException(
+            $"Unable to locate repository root containing 'Nexus SourceCode/src/Aog.UI.Avalonia' starting from '{AppContext.BaseDirectory}'.");
+    }
 }

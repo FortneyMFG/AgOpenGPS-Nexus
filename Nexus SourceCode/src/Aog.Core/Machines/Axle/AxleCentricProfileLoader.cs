@@ -222,6 +222,12 @@ public sealed class AxleCentricProfileLoader
             return Array.Empty<AxleJoint>();
         }
 
+        if (array.Count == 0)
+        {
+            messages.Add(new AxleIngestionMessage("KIN-030", AxleIngestionSeverity.Error, "Profile must include joint definitions."));
+            return Array.Empty<AxleJoint>();
+        }
+
         var knownAxles = new HashSet<string>(axles.Select(a => a.Id), StringComparer.OrdinalIgnoreCase);
         var results = new List<AxleJoint>();
         foreach (var entry in array)

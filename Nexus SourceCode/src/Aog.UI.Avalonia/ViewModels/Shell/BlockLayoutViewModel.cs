@@ -245,7 +245,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     public void UpdateViewport(Size viewport)
     {
         Viewport = viewport;
-        Grid.GutterPx = 0;
+        Grid.GutterPx = Math.Max(0, WorkspaceLayout.Spacing / 2d);
 
         if (viewport.Width <= 0 || viewport.Height <= 0)
         {
@@ -265,6 +265,33 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         SnapTilesToGrid();
         EnsureDefaultPanels();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
+    }
+
+    public void ApplyWorkspaceSettings(double spacing, double tileSize)
+    {
+        if (IsLocked)
+        {
+            return;
+        }
+
+        var normalizedSpacing = double.IsFinite(spacing) ? Math.Clamp(spacing, 0d, 400d) : WorkspaceLayout.Spacing;
+        var normalizedTileSize = double.IsFinite(tileSize) ? Math.Clamp(tileSize, 32d, 512d) : WorkspaceLayout.BlockSize;
+
+        if (Math.Abs(WorkspaceLayout.Spacing - normalizedSpacing) > double.Epsilon)
+        {
+            WorkspaceLayout.Spacing = normalizedSpacing;
+        }
+
+        if (Math.Abs(WorkspaceLayout.BlockSize - normalizedTileSize) > double.Epsilon)
+        {
+            WorkspaceLayout.BlockSize = normalizedTileSize;
+        }
+
+        OnPropertyChanged(nameof(WorkspaceLayout));
+
+        UpdateViewport(Viewport);
+        UpdateCollisionStates();
+        Save();
     }
 
     internal bool CanInteract(BlockItemViewModel item) => item is not null;
@@ -838,6 +865,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         layout.Grid = Grid;
         layout.Grid.FloatingBlocks ??= new List<FloatingBlockSpec>();
         layout.Grid.FloatingPanels ??= new List<FloatingPanelSpec>();
+        layout.Workspace = WorkspaceLayout.Clone();
         _preferencesService.UpdateShellLayout(layout);
     }
 
@@ -1091,7 +1119,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
     private (double width, double height) CalculateFloatingBlockSize(BlockDefinition definition)
     {
-        var cell = Grid.CellPx <= 0 ? 56d : Grid.CellPx;
+        var baseTile = WorkspaceLayout.BlockSize <= 0 ? 112d : WorkspaceLayout.BlockSize;
+        var cell = Grid.CellPx <= 0 ? baseTile : Grid.CellPx;
         var widthUnits = GetWidthUnits(definition.PreferredSize);
         var heightUnits = GetHeightUnits(definition.PreferredSize);
         var width = Math.Max(cell, widthUnits * cell);

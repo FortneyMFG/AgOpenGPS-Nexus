@@ -1,0 +1,57 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
+        mc:Ignorable="d"
+        x:Class="Aog.UI.Avalonia.Views.Shell.LayoutSettingsWindow"
+        x:DataType="vm:LayoutSettingsDialogViewModel"
+        Title="Layout settings"
+        Width="420"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Window.Styles>
+    <Style Selector="TextBlock.header">
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeMd}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto,Auto,Auto" Margin="20" RowSpacing="16">
+    <StackPanel Grid.Row="0" Spacing="4">
+      <TextBlock Classes="header" Text="Workspace" />
+      <TextBlock Text="Configure the spacing and tile sizing used when arranging shell content."
+                 TextWrapping="Wrap"
+                 Foreground="#A9BBD3"
+                 FontSize="{DynamicResource ThemeFontSizeXs}" />
+    </StackPanel>
+
+    <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="18">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Tile spacing (px)" FontWeight="SemiBold" />
+        <NumericUpDown Minimum="0"
+                       Maximum="200"
+                       Increment="2"
+                       Value="{Binding WorkspaceSpacing, Mode=TwoWay}"
+                       IsEnabled="{Binding CanEdit}" />
+      </StackPanel>
+      <StackPanel Spacing="4">
+        <TextBlock Text="Base tile size (px)" FontWeight="SemiBold" />
+        <NumericUpDown Minimum="48"
+                       Maximum="320"
+                       Increment="4"
+                       Value="{Binding WorkspaceTileSize, Mode=TwoWay}"
+                       IsEnabled="{Binding CanEdit}" />
+      </StackPanel>
+    </Grid>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="Cancel" Click="OnCancelClick" />
+      <Button Content="Save"
+              Click="OnSaveClick"
+              IsEnabled="{Binding CanEdit}" />
+    </StackPanel>
+  </Grid>
+</Window>

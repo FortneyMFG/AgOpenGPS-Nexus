@@ -151,6 +151,7 @@ namespace Aog.UI.Avalonia.Views.Main
         {
             ArgumentNullException.ThrowIfNull(shell);
             _shell = shell;
+            _shell.LayoutSettingsRequested += OnLayoutSettingsRequested;
             _shell.FloatingPanelSettingsRequested += OnFloatingPanelSettingsRequested;
             _shell.FloatingBlockSettingsRequested += OnFloatingBlockSettingsRequested;
         }
@@ -162,9 +163,31 @@ namespace Aog.UI.Avalonia.Views.Main
                 return;
             }
 
+            _shell.LayoutSettingsRequested -= OnLayoutSettingsRequested;
             _shell.FloatingPanelSettingsRequested -= OnFloatingPanelSettingsRequested;
             _shell.FloatingBlockSettingsRequested -= OnFloatingBlockSettingsRequested;
             _shell = null;
+        }
+
+        private async void OnLayoutSettingsRequested(object? sender, EventArgs e)
+        {
+            if (_shell is null)
+            {
+                return;
+            }
+
+            if (_shell.Layout.IsLocked)
+            {
+                return;
+            }
+
+            var dialog = new LayoutSettingsWindow
+            {
+                DataContext = new LayoutSettingsDialogViewModel(_shell.Layout),
+                Icon = Icon,
+            };
+
+            await dialog.ShowDialog<bool?>(this);
         }
 
         private async void OnFloatingPanelSettingsRequested(object? sender, FloatingPanelViewModel panel)

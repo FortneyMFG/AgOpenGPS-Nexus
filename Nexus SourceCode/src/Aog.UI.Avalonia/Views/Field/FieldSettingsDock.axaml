@@ -15,12 +15,19 @@
   <UserControl.Resources>
     <rendering:IconKeyToBitmapConverter x:Key="LauncherIconConverter" />
     <rendering:StringHasValueConverter x:Key="StringHasValueConverter" />
+    <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
     <rendering:BooleanToValueConverter x:Key="LauncherDockMarginConverter"
                                        TrueValue="0"
                                        FalseValue="-320,0,0,0" />
     <rendering:BooleanToValueConverter x:Key="LauncherDockOpacityConverter"
                                        TrueValue="1"
                                        FalseValue="0" />
+    <rendering:BooleanToValueConverter x:Key="LayoutLockStatusConverter"
+                                       TrueValue="Layout locked"
+                                       FalseValue="Layout unlocked" />
+    <rendering:BooleanToValueConverter x:Key="LayoutLockDescriptionConverter"
+                                       TrueValue="Unlock the layout to drag blocks onto the workspace."
+                                       FalseValue="Drag blocks into the workspace or use the shortcuts below." />
 
     <DataTemplate x:Key="MenuBlockTemplate"
                   x:DataType="vm:BlockLauncherItemViewModel">
@@ -119,6 +126,15 @@
       <Setter Property="Margin" Value="0,0,0,12" />
     </Style>
 
+    <Style Selector="Border.dock-header">
+      <Setter Property="Background" Value="#1E1E1E" />
+      <Setter Property="BorderBrush" Value="#333333" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="14" />
+      <Setter Property="Margin" Value="0,0,0,16" />
+    </Style>
+
     <Style Selector="Border.menu-block:pointerover">
       <Setter Property="BorderBrush" Value="#4E8CDC" />
     </Style>
@@ -131,6 +147,22 @@
       <Setter Property="Foreground" Value="#E6E6E6" />
       <Setter Property="BorderBrush" Value="#494949" />
       <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="ToggleButton.launcher-action">
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeXs}" />
+      <Setter Property="Padding" Value="8,4" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Background" Value="#2E2E2E" />
+      <Setter Property="Foreground" Value="#E6E6E6" />
+      <Setter Property="BorderBrush" Value="#494949" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="ToggleButton.launcher-action:checked">
+      <Setter Property="Background" Value="#3C6DBB" />
+      <Setter Property="BorderBrush" Value="#4F8CE0" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
     </Style>
 
     <Style Selector="Button.launcher-action:hover">
@@ -152,6 +184,40 @@
 
   <ScrollViewer VerticalScrollBarVisibility="Auto">
     <StackPanel Spacing="18">
+      <Border Classes="dock-header">
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="12">
+          <StackPanel Grid.Column="0" Grid.RowSpan="2" Spacing="2">
+            <TextBlock Text="Blocks &amp; layout"
+                       FontSize="{DynamicResource ThemeFontSizeSm}"
+                       FontWeight="SemiBold"
+                       Foreground="#E6F2FF" />
+            <TextBlock Text="{Binding IsLocked, Converter={StaticResource LayoutLockStatusConverter}}"
+                       FontSize="{DynamicResource ThemeFontSizeXs}"
+                       Foreground="#B7C8DD" />
+            <TextBlock Text="{Binding IsLocked, Converter={StaticResource LayoutLockDescriptionConverter}}"
+                       FontSize="{DynamicResource ThemeFontSizeXs}"
+                       Foreground="#6E8196"
+                       TextWrapping="Wrap"
+                       Margin="0,6,0,0" />
+          </StackPanel>
+
+          <ToggleButton Grid.Column="1"
+                        Grid.Row="0"
+                        Content="Pin panel"
+                        Classes="launcher-action"
+                        HorizontalAlignment="Right"
+                        IsChecked="{Binding IsFieldDockPinned}" />
+
+          <Button Grid.Column="1"
+                  Grid.Row="1"
+                  Content="Layout settings"
+                  Classes="launcher-action"
+                  HorizontalAlignment="Right"
+                  Command="{Binding ShowLayoutSettingsCommand}"
+                  IsEnabled="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+        </Grid>
+      </Border>
+
       <ItemsControl ItemsSource="{Binding LauncherCategories}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="vm:BlockLauncherCategoryViewModel">

@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
              xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
-             xmlns:sty="clr-namespace:Avalonia.Styling;assembly=Avalonia.Styling"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.FloatingBlockOverlay"
              x:DataType="vm:FloatingBlockViewModel"
@@ -15,31 +14,31 @@
   </UserControl.Resources>
 
   <UserControl.Styles>
-    <sty:Style Selector="Border#Outline">
+    <Style Selector="Border#Outline">
       <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="2" />
       <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusMd}" />
       <Setter Property="Background" Value="{DynamicResource FloatingBlockBackgroundBrush}" />
       <Setter Property="Opacity" Value="0.94" />
 
-      <sty:Style.Triggers>
-        <sty:DataTrigger Binding="{Binding IsColliding}" Value="True">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsColliding}" Value="True">
           <Setter Property="BorderBrush" Value="#FFDD5B5B" />
           <Setter Property="Background" Value="#40DD5B5B" />
-        </sty:DataTrigger>
+        </DataTrigger>
 
-        <sty:DataTrigger Binding="{Binding IsLocked}" Value="True">
+        <DataTrigger Binding="{Binding IsLocked}" Value="True">
           <Setter Property="Opacity" Value="0.75" />
-        </sty:DataTrigger>
-      </sty:Style.Triggers>
-    </sty:Style>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
 
-    <sty:Style Selector="Border.resize-handle">
+    <Style Selector="Border.resize-handle">
       <Setter Property="Background" Value="#4F8CE0" />
       <Setter Property="CornerRadius" Value="3" />
       <Setter Property="BorderBrush" Value="#255A92" />
       <Setter Property="BorderThickness" Value="1" />
-    </sty:Style>
+    </Style>
   </UserControl.Styles>
 
   <Grid>

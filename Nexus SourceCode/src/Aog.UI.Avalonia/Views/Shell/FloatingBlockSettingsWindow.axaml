@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
+        mc:Ignorable="d"
+        x:Class="Aog.UI.Avalonia.Views.Shell.FloatingBlockSettingsWindow"
+        x:DataType="vm:FloatingBlockSettingsDialogViewModel"
+        Title="Floating block settings"
+        Width="360"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Grid Margin="20" RowDefinitions="Auto,Auto,Auto">
+    <StackPanel Grid.Row="0" Spacing="6">
+      <TextBlock Text="Block"
+                 FontSize="{DynamicResource ThemeFontSizeMd}"
+                 FontWeight="SemiBold" />
+      <TextBlock Text="{Binding Label}" />
+      <TextBlock Text="{Binding DefinitionId}" FontSize="{DynamicResource ThemeFontSizeSm}" Foreground="#9C9C9C" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Margin="0,18,0,0" Spacing="12">
+      <TextBlock Text="Size" FontSize="{DynamicResource ThemeFontSizeMd}" FontWeight="SemiBold" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <StackPanel Width="140" Spacing="4">
+          <TextBlock Text="Width" FontWeight="SemiBold" />
+          <NumericUpDown Minimum="96"
+                         Maximum="1600"
+                         Increment="8"
+                         Value="{Binding Width, Mode=TwoWay}"
+                         IsEnabled="{Binding CanEdit}" />
+        </StackPanel>
+        <StackPanel Width="140" Spacing="4">
+          <TextBlock Text="Height" FontWeight="SemiBold" />
+          <NumericUpDown Minimum="96"
+                         Maximum="1600"
+                         Increment="8"
+                         Value="{Binding Height, Mode=TwoWay}"
+                         IsEnabled="{Binding CanEdit}" />
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,24,0,0">
+      <Button Content="Cancel" Click="OnCancelClick" />
+      <Button Content="Save" Click="OnSaveClick" IsEnabled="{Binding CanEdit}" />
+    </StackPanel>
+  </Grid>
+</Window>

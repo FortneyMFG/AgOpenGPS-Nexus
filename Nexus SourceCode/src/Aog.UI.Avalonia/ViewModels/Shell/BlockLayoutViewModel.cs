@@ -223,6 +223,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             _isLocked = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsLauncherDockVisible));
+            OnPropertyChanged(nameof(AreFloatingOverlaysVisible));
             ApplyLockStateToFloating();
             RefreshCommandStates();
             RefreshLauncherStates();
@@ -230,6 +231,9 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             Save();
         }
     }
+
+    /// <summary>Gets a value indicating whether floating overlays should be rendered.</summary>
+    public bool AreFloatingOverlaysVisible => !_isLocked;
 
     /// <summary>Gets the computed pane layout visual metadata.</summary>
     public PaneLayoutResult? PaneLayout
@@ -1055,7 +1059,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             return;
         }
 
-        block.UpdateBounds(bounds);
+        var normalized = ClampFloatingBounds(bounds, 96, 96);
+        block.UpdateBounds(normalized);
         UpdateCollisionStates();
         Save();
     }
@@ -1067,7 +1072,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             return;
         }
 
-        panel.UpdateBounds(bounds);
+        var normalized = ClampFloatingBounds(bounds, 160, 160);
+        panel.UpdateBounds(normalized);
         UpdateCollisionStates();
         Save();
     }
@@ -1158,6 +1164,70 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             BlockSize.TileHalfx2 => 2d,
             _ => 1d,
         };
+    }
+
+    public void ApplyFloatingPanelSettings(
+        FloatingPanelViewModel panel,
+        string? title,
+        string? contentId,
+        bool isPanelLocked,
+        double width,
+        double height)
+    {
+        if (panel is null)
+        {
+            return;
+        }
+
+        var sanitizedTitle = string.IsNullOrWhiteSpace(title) ? string.Empty : title.Trim();
+        var sanitizedContent = string.IsNullOrWhiteSpace(contentId) ? null : contentId.Trim();
+        panel.ApplySettings(sanitizedTitle, sanitizedContent);
+        panel.UpdatePanelLock(isPanelLocked);
+
+        var current = panel.Bounds;
+        var resized = new Rect(current.Position, new Size(Math.Max(0, width), Math.Max(0, height)));
+        var normalized = ClampFloatingBounds(resized, 160, 160);
+        panel.UpdateBounds(normalized);
+        UpdateCollisionStates();
+        Save();
+    }
+
+    public void ApplyFloatingBlockSettings(
+        FloatingBlockViewModel block,
+        double width,
+        double height)
+    {
+        if (block is null)
+        {
+            return;
+        }
+
+        var current = block.Bounds;
+        var resized = new Rect(current.Position, new Size(Math.Max(0, width), Math.Max(0, height)));
+        var normalized = ClampFloatingBounds(resized, 96, 96);
+        block.UpdateBounds(normalized);
+        UpdateCollisionStates();
+        Save();
+    }
+
+    internal Rect ClampFloatingBounds(Rect bounds, double minWidth, double minHeight)
+    {
+        var viewport = Viewport;
+        if (viewport.Width <= 0 || viewport.Height <= 0)
+        {
+            var widthFallback = Math.Max(minWidth, bounds.Width);
+            var heightFallback = Math.Max(minHeight, bounds.Height);
+            return new Rect(bounds.Position, new Size(widthFallback, heightFallback));
+        }
+
+        var width = Math.Max(minWidth, Math.Min(bounds.Width, viewport.Width));
+        var height = Math.Max(minHeight, Math.Min(bounds.Height, viewport.Height));
+
+        var maxX = Math.Max(0, viewport.Width - width);
+        var maxY = Math.Max(0, viewport.Height - height);
+        var x = Math.Clamp(bounds.X, 0, maxX);
+        var y = Math.Clamp(bounds.Y, 0, maxY);
+        return new Rect(x, y, width, height);
     }
 
     private void UpdateLauncherDropIndicator()

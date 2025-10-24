@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
+        mc:Ignorable="d"
+        x:Class="Aog.UI.Avalonia.Views.Shell.FloatingPanelSettingsWindow"
+        x:DataType="vm:FloatingPanelSettingsDialogViewModel"
+        Title="Floating panel settings"
+        Width="420"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Window.Styles>
+    <Style Selector="TextBlock.header">
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeMd}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto,* ,Auto" Margin="20">
+    <StackPanel Grid.Row="0" Spacing="6">
+      <TextBlock Classes="header" Text="Panel metadata" />
+      <StackPanel Orientation="Vertical" Spacing="4">
+        <TextBlock Text="Title" FontWeight="SemiBold" />
+        <TextBox Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}" />
+      </StackPanel>
+      <StackPanel Orientation="Vertical" Spacing="4">
+        <TextBlock Text="Content Id" FontWeight="SemiBold" />
+        <TextBox Text="{Binding ContentId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}" />
+      </StackPanel>
+      <CheckBox Content="Lock this panel"
+                IsChecked="{Binding IsPanelLocked, Mode=TwoWay}"
+                IsEnabled="{Binding CanEdit}" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Margin="0,16,0,0" Spacing="10">
+      <TextBlock Classes="header" Text="Size" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <StackPanel Width="160" Spacing="4">
+          <TextBlock Text="Width" FontWeight="SemiBold" />
+          <NumericUpDown Minimum="160"
+                         Maximum="2000"
+                         Increment="10"
+                         Value="{Binding Width, Mode=TwoWay}"
+                         IsEnabled="{Binding CanEdit}" />
+        </StackPanel>
+        <StackPanel Width="160" Spacing="4">
+          <TextBlock Text="Height" FontWeight="SemiBold" />
+          <NumericUpDown Minimum="160"
+                         Maximum="2000"
+                         Increment="10"
+                         Value="{Binding Height, Mode=TwoWay}"
+                         IsEnabled="{Binding CanEdit}" />
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,20,0,0">
+      <Button Content="Cancel" Click="OnCancelClick" />
+      <Button Content="Save" Click="OnSaveClick" IsEnabled="{Binding CanEdit}" />
+    </StackPanel>
+  </Grid>
+</Window>

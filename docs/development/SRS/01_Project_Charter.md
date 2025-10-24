@@ -3,7 +3,7 @@
 
 ## Document Control
 - **Version:** 0.4.0
-- **Authors:** Nexus Program Office (Codex)
+- **Authors:** Nexus Team
 - **License:** GPLv3
 - **Reviewers:** Platform Foundations Working Group, UI Working Group, Release Working Group
 - **Approval Authority:** Nexus Program Steering Committee

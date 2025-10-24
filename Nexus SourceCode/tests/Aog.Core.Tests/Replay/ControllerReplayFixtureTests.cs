@@ -13,16 +13,16 @@ public sealed class ControllerReplayFixtureTests
     {
         using var tempDirectory = ControllerReplayFixture.CreateTemporaryDirectory();
 
-        var scenario = await ControllerReplayFixture.CreateAsync(tempDirectory.Path);
+        var scenario = await ControllerReplayFixture.CreateAsync(tempDirectory.DirectoryPath);
 
-        scenario.ReplayOptions.InputDirectory.Should().Be(tempDirectory.Path);
+        scenario.ReplayOptions.InputDirectory.Should().Be(tempDirectory.DirectoryPath);
         scenario.StartTimestamp.Should().Be(new DateTime(2024, 2, 15, 14, 0, 0, DateTimeKind.Utc));
         scenario.Duration.Should().Be(TimeSpan.FromSeconds(5));
         scenario.ControllerCommands.Should().HaveCount(2);
         scenario.ControllerCommands[0].PluginId.Should().Be("controllers.guidance");
         scenario.ControllerCommands[1].PluginId.Should().Be("controllers.sections");
 
-        var parquetFiles = Directory.GetFiles(tempDirectory.Path, "*.parquet", SearchOption.AllDirectories);
+        var parquetFiles = Directory.GetFiles(tempDirectory.DirectoryPath, "*.parquet", SearchOption.AllDirectories);
         parquetFiles.Should().NotBeEmpty("fixture should emit parquet logs for replay");
     }
 }

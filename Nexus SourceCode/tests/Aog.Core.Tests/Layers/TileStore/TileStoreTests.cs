@@ -8,6 +8,7 @@ using Aog.Core.Tests.Replay;
 using FluentAssertions;
 using Microsoft.Extensions.Time.Testing;
 using Xunit;
+using TileStoreImplementation = Aog.Core.Layers.TileStore.TileStore;
 
 namespace Aog.Core.Tests.Layers.TileStore;
 
@@ -19,9 +20,9 @@ public sealed class TileStoreTests
         using var directory = new TemporaryDirectory("tilestore-tests");
         var time = new FakeTimeProvider(new DateTimeOffset(2025, 5, 5, 6, 30, 0, TimeSpan.Zero));
         var audit = new RecordingAuditSink();
-        using (var store = new TileStore(new TileStoreOptions
+        using (var store = new TileStoreImplementation(new TileStoreOptions
         {
-            Path = directory.Path,
+            Path = directory.DirectoryPath,
             TimeProvider = time,
             MaxSegmentSizeBytes = 2048,
             MaxRecordsPerSegment = 16,
@@ -32,7 +33,7 @@ public sealed class TileStoreTests
 
         audit.Entries.Should().Contain(e => e.EventType == "tile.append");
 
-        using var reloaded = new TileStore(new TileStoreOptions { Path = directory.Path, TimeProvider = time });
+        using var reloaded = new TileStoreImplementation(new TileStoreOptions { Path = directory.DirectoryPath, TimeProvider = time });
         var tiles = reloaded.GetLiveTiles();
         tiles.Should().ContainSingle(tile => tile.TileId == "tile:controller:alpha:0");
     }
@@ -42,9 +43,9 @@ public sealed class TileStoreTests
     {
         using var directory = new TemporaryDirectory("tilestore-tests");
         var time = new FakeTimeProvider(new DateTimeOffset(2025, 5, 6, 7, 0, 0, TimeSpan.Zero));
-        using var store = new TileStore(new TileStoreOptions
+        using var store = new TileStoreImplementation(new TileStoreOptions
         {
-            Path = directory.Path,
+            Path = directory.DirectoryPath,
             TimeProvider = time,
             MaxSegmentSizeBytes = 256,
             MaxRecordsPerSegment = 2,
@@ -80,9 +81,9 @@ public sealed class TileStoreTests
         using var directory = new TemporaryDirectory("tilestore-tests");
         var time = new FakeTimeProvider(new DateTimeOffset(2025, 5, 7, 8, 0, 0, TimeSpan.Zero));
         var audit = new RecordingAuditSink();
-        using var store = new TileStore(new TileStoreOptions
+        using var store = new TileStoreImplementation(new TileStoreOptions
         {
-            Path = directory.Path,
+            Path = directory.DirectoryPath,
             TimeProvider = time,
             MaxSegmentSizeBytes = 256,
             MaxRecordsPerSegment = 2,

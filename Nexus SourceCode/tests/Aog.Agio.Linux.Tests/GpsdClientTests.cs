@@ -1,5 +1,12 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Aog.Agio.Linux.Gpsd;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -15,11 +22,11 @@ public sealed class GpsdClientTests
     {
         var feed = new[]
         {
-            "{\"class\":\"VERSION\",\"release\":\"3.23\"}",
-            "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
-            "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1173,\"lon\":11.5167,\"alt\":545.4,\"speed\":0.514,\"track\":84.4,\"time\":\"2024-01-01T12:35:19.000Z\"}",
-            "{\"class\":\"TPV\",\"mode\":2,\"lat\":48.1174,\"lon\":11.5168,\"speed\":0.420,\"track\":83.0}",
-            "{\"class\":\"TPV\",\"mode\":99,\"lat\":48.1175,\"lon\":11.5169,\"speed\":0.400,\"track\":82.5}",
+            Json(new { @class = "VERSION", release = "3.23" }),
+            Json(new { @class = "WATCH", enable = true, json = true }),
+            Json(new { @class = "TPV", mode = 3, lat = 48.1173, lon = 11.5167, alt = 545.4, speed = 0.514, track = 84.4, time = "2024-01-01T12:35:19.000Z" }),
+            Json(new { @class = "TPV", mode = 2, lat = 48.1174, lon = 11.5168, speed = 0.420, track = 83.0 }),
+            Json(new { @class = "TPV", mode = 99, lat = 48.1175, lon = 11.5169, speed = 0.400, track = 82.5 }),
         };
 
         var factory = new FakeGpsdConnectionFactory(feed);
@@ -51,9 +58,9 @@ public sealed class GpsdClientTests
     {
         var feed = new[]
         {
-            "{\"class\":\"VERSION\",\"release\":\"3.23\"}",
-            "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
-            $"{{\\"class\\":\\"TPV\\",\\"mode\\":3,\\"lat\\":{latitude},\\"lon\\":{longitude},\\"alt\\":545.4,\\"speed\\":0.514,\\"track\\":84.4,\\"time\\":\\"2024-01-01T12:35:19.000Z\\"}}",
+            Json(new { @class = "VERSION", release = "3.23" }),
+            Json(new { @class = "WATCH", enable = true, json = true }),
+            Json(new { @class = "TPV", mode = 3, lat = latitude, lon = longitude, alt = 545.4, speed = 0.514, track = 84.4, time = "2024-01-01T12:35:19.000Z" }),
         };
 
         var factory = new FakeGpsdConnectionFactory(feed);
@@ -74,10 +81,10 @@ public sealed class GpsdClientTests
     {
         var feed = new[]
         {
-            "{\"class\":\"VERSION\",\"release\":\"3.23\"}",
-            "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
-            "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1173,\"lon\":11.5167,\"alt\":545.4}",
-            "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1174,\"lon\":11.5168,\"alt\":545.4,\"speed\":0.514,\"track\":84.4}",
+            Json(new { @class = "VERSION", release = "3.23" }),
+            Json(new { @class = "WATCH", enable = true, json = true }),
+            Json(new { @class = "TPV", mode = 3, lat = 48.1173, lon = 11.5167, alt = 545.4 }),
+            Json(new { @class = "TPV", mode = 3, lat = 48.1174, lon = 11.5168, alt = 545.4, speed = 0.514, track = 84.4 }),
         };
 
         var factory = new FakeGpsdConnectionFactory(feed);
@@ -108,10 +115,10 @@ public sealed class GpsdClientTests
     {
         var feed = new[]
         {
-            "{\"class\":\"VERSION\",\"release\":\"3.23\"}",
-            "{\"class\":\"WATCH\",\"enable\":true,\"json\":true}",
-            "{\"class\":\"TPV\",\"mode\":3}",
-            "{\"class\":\"TPV\",\"mode\":3,\"lat\":48.1174,\"lon\":11.5168,\"alt\":545.4,\"speed\":0.514,\"track\":84.4,\"time\":\"2024-01-01T12:35:19.000Z\"}",
+            Json(new { @class = "VERSION", release = "3.23" }),
+            Json(new { @class = "WATCH", enable = true, json = true }),
+            Json(new { @class = "TPV", mode = 3 }),
+            Json(new { @class = "TPV", mode = 3, lat = 48.1174, lon = 11.5168, alt = 545.4, speed = 0.514, track = 84.4, time = "2024-01-01T12:35:19.000Z" }),
         };
 
         var factory = new FakeGpsdConnectionFactory(feed);
@@ -233,6 +240,11 @@ public sealed class GpsdClientTests
         }
     }
 
+    private static string Json(object value)
+    {
+        return JsonSerializer.Serialize(value);
+    }
+
     private sealed class FakeGpsdConnectionFactory : IGpsdConnectionFactory
     {
         private readonly string _feed;
@@ -240,7 +252,7 @@ public sealed class GpsdClientTests
 
         public FakeGpsdConnectionFactory(IEnumerable<string> lines)
         {
-            _feed = string.Join("\n", lines) + "\n";
+            _feed = string.Join("\n", lines.Select(line => line.Trim())) + "\n";
         }
 
         public List<string> WrittenLines { get; } = new();
@@ -426,9 +438,6 @@ public sealed class GpsdClientTests
 
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
             => WaitForReleaseAsync(cancellationToken);
-
-        public override Task WriteAsync(byte[] buffer, int offset, int count)
-            => WaitForReleaseAsync(CancellationToken.None);
 
         public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
             => new(WaitForReleaseAsync(cancellationToken));

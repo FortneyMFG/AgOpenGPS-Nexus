@@ -56,7 +56,11 @@
                 BorderBrush="#565656"
                 BorderThickness="2"
                 CornerRadius="12"
-                Opacity="0.92">
+                Opacity="0.92"
+                Width="{Binding Bounds.Width}"
+                Height="{Binding Bounds.Height}"
+                Canvas.Left="{Binding Bounds.X}"
+                Canvas.Top="{Binding Bounds.Y}">
           <Border.Background>
             <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
               <GradientStop Offset="0" Color="#1C1C1CEE" />
@@ -70,7 +74,11 @@
                     x:DataType="vm:BlockItemViewModel">
         <controls:BlockTileButton Command="{Binding InvokeCommand}"
                                   ToolTip.Tip="{Binding Label}"
-                                  Classes.block-tile="True">
+                                  Classes.block-tile="True"
+                                  controls:TiledPanel.Row="{Binding Tile.Row}"
+                                  controls:TiledPanel.Column="{Binding Tile.Col}"
+                                  controls:TiledPanel.RowSpan="{Binding Tile.RowSpan}"
+                                  controls:TiledPanel.ColumnSpan="{Binding Tile.ColSpan}">
           <Grid>
             <Border CornerRadius="10"
                     Background="#1F1F1FCC"
@@ -149,12 +157,18 @@
 
       <DataTemplate x:Key="FloatingPanelOverlayTemplate"
                     x:DataType="vm:FloatingPanelViewModel">
-        <shell:FloatingPanelOverlay />
+        <shell:FloatingPanelOverlay Width="{Binding Bounds.Width}"
+                                    Height="{Binding Bounds.Height}"
+                                    Canvas.Left="{Binding Bounds.X}"
+                                    Canvas.Top="{Binding Bounds.Y}" />
       </DataTemplate>
 
       <DataTemplate x:Key="FloatingBlockOverlayTemplate"
                     x:DataType="vm:FloatingBlockViewModel">
-        <shell:FloatingBlockOverlay />
+        <shell:FloatingBlockOverlay Width="{Binding Bounds.Width}"
+                                    Height="{Binding Bounds.Height}"
+                                    Canvas.Left="{Binding Bounds.X}"
+                                    Canvas.Top="{Binding Bounds.Y}" />
       </DataTemplate>
 
     </ResourceDictionary>
@@ -392,22 +406,11 @@
                       Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       IsHitTestVisible="False"
                       ZIndex="1">
-          <ItemsControl.Styles>
-            <Style Selector="#PanelVisuals">
-              <Setter Property="ItemsPanel">
-                <ItemsPanelTemplate>
-                  <Canvas />
-                </ItemsPanelTemplate>
-              </Setter>
-            </Style>
-            <Style Selector="#PanelVisuals ContentPresenter"
-                   x:DataType="layout:PanelVisual">
-              <Setter Property="Canvas.Left" Value="{Binding Bounds.X}" />
-              <Setter Property="Canvas.Top" Value="{Binding Bounds.Y}" />
-              <Setter Property="Width" Value="{Binding Bounds.Width}" />
-              <Setter Property="Height" Value="{Binding Bounds.Height}" />
-            </Style>
-          </ItemsControl.Styles>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <Canvas />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
         </ItemsControl>
 
         <ItemsControl x:Name="BlockTiles"
@@ -426,15 +429,6 @@
               <controls:TiledPanel Layout="{Binding Layout.Grid}" />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
-          <ItemsControl.Styles>
-            <Style Selector="#BlockTiles ContentPresenter"
-                   x:DataType="vm:BlockItemViewModel">
-              <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
-              <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
-              <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />
-              <Setter Property="controls:TiledPanel.ColumnSpan" Value="{Binding Tile.ColSpan}" />
-            </Style>
-          </ItemsControl.Styles>
         </ItemsControl>
 
         <ItemsControl x:Name="FloatingPanelOverlays"
@@ -447,22 +441,11 @@
                       ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
                       IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
-          <ItemsControl.Styles>
-            <Style Selector="#FloatingPanelOverlays">
-              <Setter Property="ItemsPanel">
-                <ItemsPanelTemplate>
-                  <Canvas />
-                </ItemsPanelTemplate>
-              </Setter>
-            </Style>
-            <Style Selector="#FloatingPanelOverlays ContentPresenter"
-                   x:DataType="vm:FloatingPanelViewModel">
-              <Setter Property="Canvas.Left" Value="{Binding Bounds.X}" />
-              <Setter Property="Canvas.Top" Value="{Binding Bounds.Y}" />
-              <Setter Property="Width" Value="{Binding Bounds.Width}" />
-              <Setter Property="Height" Value="{Binding Bounds.Height}" />
-            </Style>
-          </ItemsControl.Styles>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <Canvas />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
         </ItemsControl>
 
         <ItemsControl x:Name="FloatingBlockOverlays"
@@ -475,22 +458,11 @@
                       ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
                       IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
-          <ItemsControl.Styles>
-            <Style Selector="#FloatingBlockOverlays">
-              <Setter Property="ItemsPanel">
-                <ItemsPanelTemplate>
-                  <Canvas />
-                </ItemsPanelTemplate>
-              </Setter>
-            </Style>
-            <Style Selector="#FloatingBlockOverlays ContentPresenter"
-                   x:DataType="vm:FloatingBlockViewModel">
-              <Setter Property="Canvas.Left" Value="{Binding Bounds.X}" />
-              <Setter Property="Canvas.Top" Value="{Binding Bounds.Y}" />
-              <Setter Property="Width" Value="{Binding Bounds.Width}" />
-              <Setter Property="Height" Value="{Binding Bounds.Height}" />
-            </Style>
-          </ItemsControl.Styles>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <Canvas />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
         </ItemsControl>
       </Canvas>
 

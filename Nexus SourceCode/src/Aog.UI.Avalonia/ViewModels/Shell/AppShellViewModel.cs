@@ -45,8 +45,14 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
             CenterViewCommand = ReactiveCommand.Create(() => { /* TODO: Implement center view */ });
             PanToolCommand = ReactiveCommand.Create(() => { /* TODO: Implement pan tool */ });
             MeasureToolCommand = ReactiveCommand.Create(() => { /* TODO: Implement measure tool */ });
-            ToggleLayoutLockCommand = ReactiveCommand.Create(() => Layout.IsLocked = !Layout.IsLocked);
-            OpenLayoutSettingsCommand = ReactiveCommand.Create(() => Layout.RequestLayoutSettings());
+            ToggleLayoutLockCommand = ReactiveCommand.Create(() =>
+            {
+                Layout.IsLocked = !Layout.IsLocked;
+            });
+            OpenLayoutSettingsCommand = ReactiveCommand.Create(() =>
+            {
+                Layout.RequestLayoutSettings();
+            });
             StatusStrip = new StatusStripViewModel(Array.Empty<ShellStatusIndicatorViewModel>());
             CurrentView = "Select a tool or open a field operation to begin.";
         }

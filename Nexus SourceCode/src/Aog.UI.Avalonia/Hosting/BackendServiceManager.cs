@@ -22,13 +22,13 @@ public sealed class BackendServiceManager
         {
             [BackendServiceKind.CoreHost] = new(
                 "Core Host",
-                Path.Combine(repoRoot, @"src\Aog.Core.Host\Aog.Core.Host.csproj")),
+                Path.Combine(repoRoot, "src", "Aog.Core.Host", "Aog.Core.Host.csproj")),
             [BackendServiceKind.AgioWindows] = new(
                 "AgIO (Windows)",
-                Path.Combine(repoRoot, @"src\Aog.Agio.Windows\Aog.Agio.Windows.csproj")),
+                Path.Combine(repoRoot, "src", "Aog.Agio.Windows", "Aog.Agio.Windows.csproj")),
             [BackendServiceKind.AgioSim] = new(
                 "AgIO Simulator",
-                Path.Combine(repoRoot, @"src\Aog.Agio.Sim\Aog.Agio.Sim.csproj")),
+                Path.Combine(repoRoot, "src", "Aog.Agio.Sim", "Aog.Agio.Sim.csproj")),
         };
     }
 

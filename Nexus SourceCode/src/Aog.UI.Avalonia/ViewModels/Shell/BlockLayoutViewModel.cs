@@ -80,10 +80,6 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Grid.FloatingPanels ??= new List<FloatingPanelSpec>();
         Grid.FloatingBlocks ??= new List<FloatingBlockSpec>();
         EnsureDefaultPanels();
-        LeftSidebarLayout = (preferences.LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone();
-        RightSidebarLayout = (preferences.RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone();
-        TopSidebarLayout = (preferences.TopSidebar ?? SidebarLayoutSettings.CreateTopDefaults()).Clone();
-        BottomSidebarLayout = (preferences.BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone();
         WorkspaceLayout = (preferences.Workspace ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone();
 
         _showLayoutSettingsCommand = new DelegateCommand(_ => RequestLayoutSettings());
@@ -91,16 +87,11 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Blocks = new ObservableCollection<BlockItemViewModel>();
         FloatingPanels = new ObservableCollection<FloatingPanelViewModel>();
         FloatingBlocks = new ObservableCollection<FloatingBlockViewModel>();
-        LeftSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
-        RightSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
-        TopSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
-        BottomSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         LauncherCategories = new ObservableCollection<BlockLauncherCategoryViewModel>();
         BuildInitialCollections();
         SnapTilesToGrid();
         BuildFloatingCollections();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
-        RebuildSidebars();
         RebuildLauncher();
         UpdateLauncherDropIndicator();
     }
@@ -125,18 +116,6 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     /// <summary>Gets the global grid definition describing the tiled layout.</summary>
     public ShellGridLayout Grid { get; }
 
-    /// <summary>Gets the layout settings used to size the left sidebar.</summary>
-    public SidebarLayoutSettings LeftSidebarLayout { get; }
-
-    /// <summary>Gets the layout settings used to size the right sidebar.</summary>
-    public SidebarLayoutSettings RightSidebarLayout { get; }
-
-    /// <summary>Gets the layout settings used to size the top sidebar strip.</summary>
-    public SidebarLayoutSettings TopSidebarLayout { get; }
-
-    /// <summary>Gets the layout settings used to size the bottom sidebar strip.</summary>
-    public SidebarLayoutSettings BottomSidebarLayout { get; }
-
     /// <summary>Gets the layout settings used to size the workspace surface.</summary>
     public SidebarLayoutSettings WorkspaceLayout { get; }
 
@@ -147,18 +126,6 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     {
         LayoutSettingsRequested?.Invoke(this, EventArgs.Empty);
     }
-
-    /// <summary>Gets the collection of buttons rendered along the left sidebar.</summary>
-    public ObservableCollection<SidebarButtonViewModel> LeftSidebarButtons { get; }
-
-    /// <summary>Gets the collection of buttons rendered along the right sidebar.</summary>
-    public ObservableCollection<SidebarButtonViewModel> RightSidebarButtons { get; }
-
-    /// <summary>Gets the collection of controls rendered along the top strip.</summary>
-    public ObservableCollection<SidebarButtonViewModel> TopSidebarButtons { get; }
-
-    /// <summary>Gets the collection of controls rendered along the bottom strip.</summary>
-    public ObservableCollection<SidebarButtonViewModel> BottomSidebarButtons { get; }
 
     /// <summary>Gets the launcher categories available within the field settings dock.</summary>
     public ObservableCollection<BlockLauncherCategoryViewModel> LauncherCategories { get; }
@@ -268,7 +235,6 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     public void SetStatusReporter(Action<string> reporter)
     {
         _statusReporter = reporter ?? (_ => { });
-        RebuildSidebars();
     }
 
     public void SetCommandInterceptor(Func<BlockDefinition, bool>? interceptor)
@@ -351,7 +317,6 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             Grid.FloatingBlocks.RemoveAll(spec => spec.InstanceId == floating.Instance.InstanceId.Value);
         }
         Save();
-        RebuildSidebars();
         UpdateCollisionStates();
         RefreshLauncherStates();
     }
@@ -387,7 +352,6 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         }
 
         SnapTilesToGrid();
-        RebuildSidebars();
         RefreshCommandStates();
         UpdateCollisionStates();
         Save();
@@ -547,11 +511,14 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         if (spec is null)
         {
             var (width, height) = CalculateFloatingBlockSize(definition);
+            var (x, y) = GetDefaultFloatingPosition(instance.Region, instance.Order, width, height);
             spec = new FloatingBlockSpec
             {
                 InstanceId = instance.InstanceId.Value,
                 Width = width,
                 Height = height,
+                X = x,
+                Y = y,
             };
             specs.Add(spec);
         }
@@ -562,6 +529,13 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
                 var (width, height) = CalculateFloatingBlockSize(definition);
                 spec.Width = width;
                 spec.Height = height;
+            }
+
+            if (Math.Abs(spec.X) <= double.Epsilon && Math.Abs(spec.Y) <= double.Epsilon)
+            {
+                var (x, y) = GetDefaultFloatingPosition(instance.Region, instance.Order, spec.Width, spec.Height);
+                spec.X = x;
+                spec.Y = y;
             }
         }
 
@@ -639,15 +613,6 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
         ApplyLockStateToFloating();
         RefreshLauncherStates();
-    }
-
-    private void RebuildSidebars()
-    {
-        var builder = new BlockSidebarBuilder(_catalog, _statusReporter);
-        RebuildSidebarCollection(builder, LeftSidebarButtons, BlockRegion.Left);
-        RebuildSidebarCollection(builder, RightSidebarButtons, BlockRegion.Right);
-        RebuildSidebarCollection(builder, TopSidebarButtons, BlockRegion.Top);
-        RebuildSidebarCollection(builder, BottomSidebarButtons, BlockRegion.Bottom);
     }
 
     private void RefreshLauncherStates()
@@ -729,35 +694,6 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             .OrderBy(pair => pair.instance.Order)
             .Select(pair => (pair.instance, pair.definition!))
             .ToList();
-    }
-
-    private void RebuildSidebarCollection(
-        BlockSidebarBuilder builder,
-        ObservableCollection<SidebarButtonViewModel> target,
-        BlockRegion region)
-    {
-        target.Clear();
-        var margin = GetSidebarButtonMargin(region);
-        foreach (var button in builder.Build(region, _instances))
-        {
-            button.Margin = margin;
-            target.Add(button);
-        }
-    }
-
-    private Thickness GetSidebarButtonMargin(BlockRegion region)
-    {
-        var spacing = region switch
-        {
-            BlockRegion.Left => LeftSidebarLayout.Spacing,
-            BlockRegion.Right => RightSidebarLayout.Spacing,
-            BlockRegion.Top => TopSidebarLayout.Spacing,
-            BlockRegion.Bottom => BottomSidebarLayout.Spacing,
-            _ => 0d,
-        };
-
-        var normalized = Math.Max(0d, spacing) / 2d;
-        return new Thickness(normalized);
     }
 
     private static string ResolveContainerKey(BlockInstance instance, BlockDefinition definition)
@@ -989,6 +925,24 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             BlockRegion.Top => (normalizedOrder * Math.Max(1, colSpan), 0),
             BlockRegion.Bottom => (normalizedOrder * Math.Max(1, colSpan), 0),
             _ => (0, 0),
+        };
+    }
+
+    private static (double x, double y) GetDefaultFloatingPosition(BlockRegion region, int order, double width, double height)
+    {
+        var index = Math.Max(0, order);
+        var column = index % 3;
+        var row = index / 3;
+        var spacing = 32d;
+        var tileWidth = Math.Max(width, 160d);
+        var tileHeight = Math.Max(height, 128d);
+        var baseX = 48d + column * (tileWidth + spacing);
+        var baseY = 48d + row * (tileHeight + spacing);
+
+        return region switch
+        {
+            BlockRegion.Overlay => (baseX, baseY),
+            _ => (baseX, baseY),
         };
     }
 

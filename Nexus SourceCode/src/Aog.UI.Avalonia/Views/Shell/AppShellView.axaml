@@ -24,7 +24,6 @@
       <rendering:SpacingToThicknessConverter x:Key="SpacingToThicknessConverter" />
       <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
       <rendering:BlockSettingsVisibilityConverter x:Key="BlockSettingsVisibilityConverter" />
-      <rendering:SidebarDimensionConverter x:Key="SidebarDimensionConverter" />
       <rendering:StringHasValueConverter x:Key="StringHasValueConverter" />
 
       <DataTemplate x:Key="ShellMenuItemTemplate"
@@ -158,45 +157,6 @@
         <shell:FloatingBlockOverlay />
       </DataTemplate>
 
-      <DataTemplate x:Key="VerticalSidebarButtonTemplate"
-                    x:DataType="workspace:SidebarButtonViewModel">
-        <Button Command="{Binding Command}"
-                ToolTip.Tip="{Binding Description}"
-                Classes="sidebar-button vertical"
-                Margin="{Binding Margin}">
-          <TextBlock Text="{Binding Label}"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     TextAlignment="Center"
-                     TextWrapping="Wrap" />
-        </Button>
-      </DataTemplate>
-
-      <DataTemplate x:Key="TopSidebarButtonTemplate"
-                    x:DataType="workspace:SidebarButtonViewModel">
-        <Button Command="{Binding Command}"
-                ToolTip.Tip="{Binding Description}"
-                Classes="sidebar-button top"
-                Margin="{Binding Margin}">
-          <TextBlock Text="{Binding Label}"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     TextAlignment="Center" />
-        </Button>
-      </DataTemplate>
-
-      <DataTemplate x:Key="BottomSidebarButtonTemplate"
-                    x:DataType="workspace:SidebarButtonViewModel">
-        <Button Command="{Binding Command}"
-                ToolTip.Tip="{Binding Description}"
-                Classes="sidebar-button bottom"
-                Margin="{Binding Margin}">
-          <TextBlock Text="{Binding Label}"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     TextAlignment="Center" />
-        </Button>
-      </DataTemplate>
     </ResourceDictionary>
   </UserControl.Resources>
 
@@ -261,40 +221,6 @@
 
     <Style Selector="Button.block-tile:pressed">
       <Setter Property="Opacity" Value="0.85" />
-    </Style>
-
-    <Style Selector="Button.sidebar-button">
-      <Setter Property="Background">
-        <Setter.Value>
-          <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-            <GradientStop Offset="0" Color="#313131" />
-            <GradientStop Offset="1" Color="#272727" />
-          </LinearGradientBrush>
-        </Setter.Value>
-      </Setter>
-      <Setter Property="BorderBrush" Value="#555555" />
-      <Setter Property="BorderThickness" Value="1.5" />
-      <Setter Property="CornerRadius" Value="8" />
-      <Setter Property="Foreground" Value="#E0E0E0" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="Padding" Value="12,8" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
-
-    <Style Selector="Button.sidebar-button:hover">
-      <Setter Property="Background" Value="#444444" />
-      <Setter Property="BorderBrush" Value="#777777" />
-    </Style>
-
-    <Style Selector="Button.sidebar-button.top">
-      <Setter Property="Padding" Value="10,6" />
-      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeSm}" />
-    </Style>
-
-    <Style Selector="Button.sidebar-button.bottom">
-      <Setter Property="Padding" Value="14,10" />
-      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeMd}" />
     </Style>
 
     <Style Selector="ToggleButton.layout-lock">
@@ -562,74 +488,6 @@
           </ItemsControl.Styles>
         </ItemsControl>
       </Canvas>
-
-      <ItemsControl x:Name="LeftSidebar"
-                    ItemsSource="{Binding Layout.LeftSidebarButtons}"
-                    ItemTemplate="{StaticResource VerticalSidebarButtonTemplate}"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Stretch"
-                    Margin="24,32,0,32"
-                    Width="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
-                    IsVisible="{Binding Host.IsLeftSidebarVisible, FallbackValue=True}"
-                    Panel.ZIndex="4">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <StackPanel Orientation="Vertical"
-                        VerticalAlignment="Center"
-                        Spacing="{Binding Layout.LeftSidebarLayout.Spacing, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-      </ItemsControl>
-
-      <ItemsControl x:Name="RightSidebar"
-                    ItemsSource="{Binding Layout.RightSidebarButtons}"
-                    ItemTemplate="{StaticResource VerticalSidebarButtonTemplate}"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Stretch"
-                    Margin="0,32,24,32"
-                    Width="{Binding Layout.RightSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
-                    IsVisible="{Binding Host.IsRightSidebarVisible, FallbackValue=True}"
-                    Panel.ZIndex="4">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <StackPanel Orientation="Vertical"
-                        VerticalAlignment="Center"
-                        Spacing="{Binding Layout.RightSidebarLayout.Spacing, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-      </ItemsControl>
-
-      <ItemsControl x:Name="TopSidebar"
-                    ItemsSource="{Binding Layout.TopSidebarButtons}"
-                    ItemTemplate="{StaticResource TopSidebarButtonTemplate}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Top"
-                    Margin="0,20,0,0"
-                    IsVisible="{Binding Host.IsTopSidebarVisible, FallbackValue=True}"
-                    Panel.ZIndex="4">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <StackPanel Orientation="Horizontal"
-                        Spacing="{Binding Layout.TopSidebarLayout.Spacing, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-      </ItemsControl>
-
-      <ItemsControl x:Name="BottomSidebar"
-                    ItemsSource="{Binding Layout.BottomSidebarButtons}"
-                    ItemTemplate="{StaticResource BottomSidebarButtonTemplate}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
-                    Margin="0,0,0,24"
-                    IsVisible="{Binding Host.IsBottomSidebarVisible, FallbackValue=True}"
-                    Panel.ZIndex="4">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <StackPanel Orientation="Horizontal"
-                        Spacing="{Binding Layout.BottomSidebarLayout.Spacing, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-      </ItemsControl>
 
       <field:FieldSettingsDock DataContext="{Binding Layout}"
                                Panel.ZIndex="6" />

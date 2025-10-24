@@ -92,19 +92,230 @@ public sealed class BlockLayoutViewModelTests
         telemetryBlock.Tile.Offset.Should().Be((0, 0));
     }
 
+    [Fact]
+    public void IsLocked_TogglesFloatingBlocksAndOverlayVisibility()
+    {
+        var instanceId = Guid.Parse("00000000-0000-0000-0000-000000000010");
+        var layoutStore = new FakeLayoutStore(new[]
+        {
+            new BlockInstance
+            {
+                InstanceId = new BlockInstanceId(instanceId),
+                DefinitionId = new BlockDefinitionId("Cmd.AutoSteerToggle"),
+                Region = BlockRegion.Overlay,
+                Origin = BlockOrigin.Clone,
+            },
+        });
+
+        var catalog = new FakeCatalog(new[]
+        {
+            new BlockDefinition
+            {
+                Id = new BlockDefinitionId("Cmd.AutoSteerToggle"),
+                PreferredDock = BlockRegion.Overlay,
+                Kind = BlockKind.CommandButton,
+                Placement = PlacementPolicy.MenuScoped,
+            },
+        });
+
+        var preferences = new UiPreferences
+        {
+            ShellLayout = new ShellLayoutPreferences
+            {
+                IsLayoutLocked = true,
+                Grid = new ShellGridLayout
+                {
+                    FloatingBlocks = new List<FloatingBlockSpec>
+                    {
+                        new()
+                        {
+                            InstanceId = instanceId,
+                            X = 48,
+                            Y = 48,
+                            Width = 180,
+                            Height = 160,
+                        },
+                    },
+                },
+            },
+        };
+
+        var preferencesService = new FakePreferencesService(preferences);
+        var dispatcher = new FakeCommandDispatcher();
+
+        var viewModel = new BlockLayoutViewModel(layoutStore, catalog, dispatcher, preferencesService);
+
+        viewModel.AreFloatingOverlaysVisible.Should().BeFalse();
+        viewModel.FloatingBlocks.Should().ContainSingle();
+        viewModel.FloatingBlocks[0].IsLocked.Should().BeTrue();
+
+        viewModel.IsLocked = false;
+
+        viewModel.AreFloatingOverlaysVisible.Should().BeTrue();
+        viewModel.FloatingBlocks[0].IsLocked.Should().BeFalse();
+    }
+
+    [Fact]
+    public void OpenSettingsCommand_RaisesFloatingBlockSettingsRequested()
+    {
+        var instanceId = Guid.Parse("00000000-0000-0000-0000-000000000020");
+        var layoutStore = new FakeLayoutStore(new[]
+        {
+            new BlockInstance
+            {
+                InstanceId = new BlockInstanceId(instanceId),
+                DefinitionId = new BlockDefinitionId("Cmd.SectionMaster"),
+                Region = BlockRegion.Overlay,
+                Origin = BlockOrigin.Clone,
+            },
+        });
+
+        var catalog = new FakeCatalog(new[]
+        {
+            new BlockDefinition
+            {
+                Id = new BlockDefinitionId("Cmd.SectionMaster"),
+                PreferredDock = BlockRegion.Overlay,
+                Kind = BlockKind.CommandButton,
+                Placement = PlacementPolicy.MenuScoped,
+            },
+        });
+
+        var preferences = new UiPreferences
+        {
+            ShellLayout = new ShellLayoutPreferences
+            {
+                IsLayoutLocked = false,
+                Grid = new ShellGridLayout
+                {
+                    FloatingBlocks = new List<FloatingBlockSpec>
+                    {
+                        new()
+                        {
+                            InstanceId = instanceId,
+                            X = 120,
+                            Y = 180,
+                            Width = 200,
+                            Height = 180,
+                        },
+                    },
+                },
+            },
+        };
+
+        var preferencesService = new FakePreferencesService(preferences);
+        var dispatcher = new FakeCommandDispatcher();
+
+        var viewModel = new BlockLayoutViewModel(layoutStore, catalog, dispatcher, preferencesService);
+        viewModel.UpdateViewport(new Size(800, 600));
+
+        var block = viewModel.FloatingBlocks.Should().ContainSingle().Subject;
+        var invoked = false;
+        FloatingBlockViewModel? observed = null;
+        viewModel.FloatingBlockSettingsRequested += (_, args) =>
+        {
+            invoked = true;
+            observed = args;
+        };
+
+        block.OpenSettingsCommand.CanExecute(null).Should().BeTrue();
+        block.OpenSettingsCommand.Execute(null);
+
+        invoked.Should().BeTrue();
+        observed.Should().BeSameAs(block);
+    }
+
+    [Fact]
+    public void UpdateFloatingBlock_PersistsBounds()
+    {
+        var instanceId = Guid.Parse("00000000-0000-0000-0000-000000000030");
+        var layoutStore = new FakeLayoutStore(new[]
+        {
+            new BlockInstance
+            {
+                InstanceId = new BlockInstanceId(instanceId),
+                DefinitionId = new BlockDefinitionId("Cmd.Start"),
+                Region = BlockRegion.Overlay,
+                Origin = BlockOrigin.Clone,
+            },
+        });
+
+        var catalog = new FakeCatalog(new[]
+        {
+            new BlockDefinition
+            {
+                Id = new BlockDefinitionId("Cmd.Start"),
+                PreferredDock = BlockRegion.Overlay,
+                Kind = BlockKind.CommandButton,
+                Placement = PlacementPolicy.Free,
+            },
+        });
+
+        var preferences = new UiPreferences
+        {
+            ShellLayout = new ShellLayoutPreferences
+            {
+                IsLayoutLocked = false,
+                Grid = new ShellGridLayout
+                {
+                    FloatingBlocks = new List<FloatingBlockSpec>
+                    {
+                        new()
+                        {
+                            InstanceId = instanceId,
+                            X = 40,
+                            Y = 40,
+                            Width = 180,
+                            Height = 160,
+                        },
+                    },
+                },
+            },
+        };
+
+        var preferencesService = new FakePreferencesService(preferences);
+        var dispatcher = new FakeCommandDispatcher();
+
+        var viewModel = new BlockLayoutViewModel(layoutStore, catalog, dispatcher, preferencesService);
+        viewModel.UpdateViewport(new Size(1024, 768));
+
+        var block = viewModel.FloatingBlocks.Should().ContainSingle().Subject;
+        var target = new Rect(320, 256, 240, 200);
+
+        viewModel.UpdateFloatingBlock(block, target);
+
+        layoutStore.SavedInstances.Should().ContainSingle(instance => instance.InstanceId.Value == instanceId);
+
+        var snapshot = preferencesService.GetPreferences();
+        snapshot.ShellLayout.Should().NotBeNull();
+        snapshot.ShellLayout!.Grid.Should().NotBeNull();
+        var spec = snapshot.ShellLayout!.Grid!.FloatingBlocks.Should().ContainSingle().Subject;
+        spec.X.Should().BeApproximately(block.Bounds.X, 0.1);
+        spec.Y.Should().BeApproximately(block.Bounds.Y, 0.1);
+        spec.Width.Should().BeApproximately(block.Bounds.Width, 0.1);
+        spec.Height.Should().BeApproximately(block.Bounds.Height, 0.1);
+    }
+
     private sealed class FakeLayoutStore : IBlockLayoutStore
     {
-        private readonly IReadOnlyList<BlockInstance> _instances;
+        private readonly List<BlockInstance> _instances;
+
+        public IReadOnlyList<BlockInstance> SavedInstances { get; private set; } = Array.Empty<BlockInstance>();
 
         public FakeLayoutStore(IEnumerable<BlockInstance> instances)
         {
-            _instances = instances.Select(instance => instance.Clone()).ToArray();
+            _instances = instances?.Select(instance => instance.Clone()).ToList() ?? new List<BlockInstance>();
         }
 
         public IReadOnlyList<BlockInstance> Load() => _instances.Select(instance => instance.Clone()).ToArray();
 
         public void Save(IEnumerable<BlockInstance> instances)
         {
+            ArgumentNullException.ThrowIfNull(instances);
+            var snapshot = instances.Select(instance => instance.Clone()).ToArray();
+            SavedInstances = snapshot;
+            _instances.Clear();
+            _instances.AddRange(snapshot.Select(instance => instance.Clone()));
         }
     }
 

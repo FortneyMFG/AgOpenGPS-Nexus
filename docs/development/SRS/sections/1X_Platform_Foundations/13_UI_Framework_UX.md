@@ -38,7 +38,7 @@ Balance legacy WinForms expectations with modernization via Avalonia and remote 
 - **QA verifying run modes:** Uses the Avalonia shell to swap between LocalInProc and CompanionRemote, ensuring the same dashboard cards appear without manual window reshuffling.
 - **Dealer supporting a headless rig:** Runs Avalonia on a Windows laptop while connected to a Linux Core over gRPC, confirming metadata-driven dashboards populate automatically.
 
-> **Visual reference:** The annotated layouts in `docs/UI/sidebar-layout-overview.md` and the run-mode walkthrough in `docs/UI/avalonia-run-modes.md` show how windows, panels, and dashboards change between WinForms and Avalonia.
+> **Visual reference:** The annotated layouts in `docs/UI/floating-block-overview.md` and the run-mode walkthrough in `docs/UI/avalonia-run-modes.md` show how windows, panels, and dashboards change between WinForms and Avalonia.
 
 ---
 

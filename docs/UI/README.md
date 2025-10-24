@@ -6,7 +6,7 @@ to find layout conventions, lifecycle notes, and modernization plans.
 ## Quick Links
 
 - [Avalonia run modes](avalonia-run-modes.md)
-- [Sidebar layout overview](sidebar-layout-overview.md)
+- [Floating block layout overview](floating-block-overview.md)
 - [UI session lifecycle](ui-session-lifecycle.md)
 - [Metadata-driven style guide](metadata-driven-ui-style-guide.md)
 - [Phase 5 plugin surfaces](ui-phase5-plugin-surfaces.md)

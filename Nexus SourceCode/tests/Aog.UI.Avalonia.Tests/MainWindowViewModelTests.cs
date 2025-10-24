@@ -276,7 +276,7 @@ public sealed class MainWindowViewModelTests
             tooltip.Should().Contain("Last invoked");
 
             var offset = TimeZoneInfo.Local.GetUtcOffset(DateTimeOffset.UtcNow);
-            var expectedOffset = string.Format(CultureInfo.InvariantCulture, "{0:+hh\\:mm;-hh\\:mm}", offset);
+            var expectedOffset = offset.ToString(@"\+hh\:mm;-hh\:mm", CultureInfo.InvariantCulture);
             tooltip.Should().Contain(expectedOffset);
         }
         finally

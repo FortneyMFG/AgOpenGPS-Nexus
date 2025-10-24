@@ -263,11 +263,6 @@
           <Menu Grid.Row="0"
                 Grid.Column="0"
                 Classes="menu-bar">
-            <Menu.ItemsPanel>
-              <ItemsPanelTemplate>
-                <StackPanel Orientation="Horizontal" />
-              </ItemsPanelTemplate>
-            </Menu.ItemsPanel>
             <MenuItem Header="{Binding Host.ShellMenuBar.FileMenu.Header}"
                       ItemsSource="{Binding Host.ShellMenuBar.FileMenu.Items}">
               <MenuItem.ItemTemplate>
@@ -351,11 +346,15 @@
                         ItemTemplate="{StaticResource ToolbarItemTemplate}"
                         HorizontalAlignment="Left"
                         IsVisible="{Binding Host.IsTopToolbarVisible, FallbackValue=False}">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <StackPanel Orientation="Horizontal" Spacing="10" />
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+            <ItemsControl.Styles>
+              <Style Selector="ItemsControl">
+                <Setter Property="ItemsPanel">
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="10" />
+                  </ItemsPanelTemplate>
+                </Setter>
+              </Style>
+            </ItemsControl.Styles>
           </ItemsControl>
         </Grid>
       </Border>
@@ -393,12 +392,14 @@
                       Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       IsHitTestVisible="False"
                       ZIndex="1">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <Canvas />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
           <ItemsControl.Styles>
+            <Style Selector="#PanelVisuals">
+              <Setter Property="ItemsPanel">
+                <ItemsPanelTemplate>
+                  <Canvas />
+                </ItemsPanelTemplate>
+              </Setter>
+            </Style>
             <Style Selector="#PanelVisuals ContentPresenter"
                    x:DataType="layout:PanelVisual">
               <Setter Property="Canvas.Left" Value="{Binding Bounds.X}" />
@@ -446,12 +447,14 @@
                       ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
                       IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <Canvas />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
           <ItemsControl.Styles>
+            <Style Selector="#FloatingPanelOverlays">
+              <Setter Property="ItemsPanel">
+                <ItemsPanelTemplate>
+                  <Canvas />
+                </ItemsPanelTemplate>
+              </Setter>
+            </Style>
             <Style Selector="#FloatingPanelOverlays ContentPresenter"
                    x:DataType="vm:FloatingPanelViewModel">
               <Setter Property="Canvas.Left" Value="{Binding Bounds.X}" />
@@ -472,12 +475,14 @@
                       ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
                       IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <Canvas />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
           <ItemsControl.Styles>
+            <Style Selector="#FloatingBlockOverlays">
+              <Setter Property="ItemsPanel">
+                <ItemsPanelTemplate>
+                  <Canvas />
+                </ItemsPanelTemplate>
+              </Setter>
+            </Style>
             <Style Selector="#FloatingBlockOverlays ContentPresenter"
                    x:DataType="vm:FloatingBlockViewModel">
               <Setter Property="Canvas.Left" Value="{Binding Bounds.X}" />

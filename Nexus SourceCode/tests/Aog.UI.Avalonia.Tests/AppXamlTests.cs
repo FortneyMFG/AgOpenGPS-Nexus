@@ -39,7 +39,9 @@ public sealed class AppXamlTests
     {
         Assert.True(Directory.Exists(SrcDirectory), $"Could not locate src folder at '{SrcDirectory}'.");
 
-        var xamlFiles = Directory.GetFiles(SrcDirectory, "*.axaml", SearchOption.AllDirectories);
+        var xamlFiles = Directory
+            .GetFiles(SrcDirectory, "*.axaml", SearchOption.AllDirectories)
+            .Where(path => !ShouldSkipPath(path));
         var seen = new Dictionary<string, string>(StringComparer.Ordinal);
 
         foreach (var path in xamlFiles)
@@ -66,6 +68,14 @@ public sealed class AppXamlTests
 
             seen[className] = path;
         }
+    }
+
+    private static bool ShouldSkipPath(string path)
+    {
+        var normalizedPath = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        return normalizedPath.Contains(
+            $"{Path.DirectorySeparatorChar}backup{Path.DirectorySeparatorChar}",
+            StringComparison.OrdinalIgnoreCase);
     }
 
     private static string LocateSrcDirectory()

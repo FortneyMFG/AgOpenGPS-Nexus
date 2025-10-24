@@ -188,7 +188,6 @@ This catalog groups every document under `docs/development/` by theme with a one
 | --- | --- | --- | --- |
 | [11 — Operating System Support](SRS/sections/1X_Platform_Foundations/11_OS_Support.md) | Details on 11 — Operating System Support. | System architects & domain leads | - |
 | [11-ADR-001 — Establish Windows & Linux Support Baseline](SRS/sections/1X_Platform_Foundations/11-ADR-001 - Establish Windows and Linux Support Baseline.md) | Decision record covering 11-ADR-001 — Establish Windows & Linux Support Baseline. | System architects & domain leads | - |
-| [11-O1 — Unified Runtime for Section 11 OS Coverage](SRS/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md) | Details on 11-O1 — Unified Runtime for Section 11 OS Coverage. | System architects & domain leads | - |
 | [12 — Development Language & Runtime](SRS/sections/1X_Platform_Foundations/12_Development_Language_Runtime.md) | Details on 12 — Development Language & Runtime. | System architects & domain leads | - |
 | [12-ADR-001 — Adopt .NET 8 LTS Runtime Across Nexus](SRS/sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 8 LTS Runtime.md) | Decision record covering 12-ADR-001 — Adopt .NET 8 LTS Runtime Across Nexus. | System architects & domain leads | - |
 | [13 — UI Framework & UX Language](SRS/sections/1X_Platform_Foundations/13_UI_Framework_UX.md) | Details on 13 — UI Framework & UX Language. | System architects & domain leads | - |

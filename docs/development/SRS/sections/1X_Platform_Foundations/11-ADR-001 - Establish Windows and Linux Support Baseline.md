@@ -7,7 +7,7 @@
 **Created:** 2025-10-20  
 **Last Updated:** 2025-10-25  
 **Related SRS:** `11_OS_Support.md`  
-**Related Options:** `11-O1_Unified_DotNet8_Avalonia.md`
+**Related Options:** `11-O1` *(retired document)*
 
 ---
 

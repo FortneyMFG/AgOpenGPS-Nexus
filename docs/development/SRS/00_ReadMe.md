@@ -110,7 +110,6 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 
 ### Option catalog
 #### 1X — Platform Foundations
-- [11-O1 – Unified .NET 8 + Avalonia](sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md)
 
 #### 2X — System Architecture
 - [O-BACKEND-6 – Linux Core Service](sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)

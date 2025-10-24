@@ -18,7 +18,7 @@
 Nexus modernization requires deterministic simulation for CI, operator training, and plugin validation.
 Legacy executables managed their own clocks and message pumps, leading to drift, replay inconsistency, and duplicated routing logic.
 SRS §21 identifies the need for a composite simulation fabric where Core owns the authoritative clock, plugins publish to a shared bus, and hardware inputs can pre-empt simulated data without breaking determinism.【F:docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L1-L120】【F:docs/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L17-L71】
-Option 11-O1 aligns by positioning AgIO’s simulation backend alongside Windows and Linux backends using common contracts.【F:docs/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L47】
+Option 11-O1 aligns by positioning AgIO’s simulation backend alongside Windows and Linux backends using common contracts. *(Retired option document)*
 
 ```mermaid
 flowchart LR

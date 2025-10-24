@@ -22,7 +22,7 @@ Define the Nexus UI shell, layout system, and companion experiences that operato
 ## 91.2 Context
 
 - Legacy AgOpenGPS and AgIO WinForms shells remain the primary operator experience.【F:SourceCode/GPS/AgOpenGPS.csproj†L1-L102】
-- Avalonia-based modernization must coexist with Windows installers while preparing Linux Core kiosks and remote displays.【F:docs/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L1-L47】
+- Avalonia-based modernization must coexist with Windows installers while preparing Linux Core kiosks and remote displays.
 - Metadata-driven layer dashboards, presets, and inspectors expand scope and require declarative tooling and governance.【F:docs/sections/9X_Frontends_Ops/91-ADR-034 - Metadata-driven dashboards and inspector surfaces.md†L7-L68】
 - Remote gRPC/WebSocket clients, simulation tooling, and plugin manifests introduce capability separation, security, and determinism considerations.【F:docs/sections/9X_Frontends_Ops/91-ADR-051 - Report Builder & Export System.md†L21-L52】【F:docs/sections/9X_Frontends_Ops/91-ADR-011 - Mapping and visualization imagery pipeline.md†L29-L78】
 
@@ -172,7 +172,7 @@ Modernization must retain legacy workflows while enabling declarative dashboards
 | ID | Consideration | Description |
 |----|----------------|-------------|
 | C1 | Windows baseline continuity | Preserve WinForms + AgIO launcher experience while introducing Avalonia shells for modernization. |
-| C2 | Shared Avalonia shell | Adopt shared .NET 8 + Avalonia runtime with optional Windows-native host shims to reduce code duplication.【F:docs/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L1-L79】 |
+| C2 | Shared Avalonia shell | Adopt shared .NET 8 + Avalonia runtime with optional Windows-native host shims to reduce code duplication. |
 | C3 | Metadata-driven dashboards | Favor declarative overlays, inspectors, and presets curated through Layer Definition Manager to accelerate new layer onboarding.【F:docs/sections/9X_Frontends_Ops/91-ADR-034 - Metadata-driven dashboards and inspector surfaces.md†L7-L68】 |
 | C4 | Remote & kiosk clients | Provide gRPC/WebSocket remote clients, kiosk launch scripts, and offline cache to support Linux Core deployments.【F:docs/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L6-L44】 |
 | C5 | Preset orchestration | Maintain preset linking, diffing, and orchestration status to keep multi-machine layouts aligned.【F:docs/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L7-L35】 |

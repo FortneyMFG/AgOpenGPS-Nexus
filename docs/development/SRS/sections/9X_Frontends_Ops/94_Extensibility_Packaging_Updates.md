@@ -180,7 +180,7 @@ Extensibility features must pass manifest schema validation, dependency solver t
 
 | ID | Consideration | Description |
 |----|----------------|-------------|
-| C1 | Managed plugin runtime | Favor .NET 8 `AssemblyLoadContext` loader with shared gRPC contracts for cross-platform parity.【F:docs/sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md†L9-L79】 |
+| C1 | Managed plugin runtime | Favor .NET 8 `AssemblyLoadContext` loader with shared gRPC contracts for cross-platform parity. |
 | C2 | Plugin catalog UX | Provide catalog UI + CLI surfaces for installing, updating, and auditing plugins with dependency visualization. |
 | C3 | Update Orchestration | Deliver safe update flows with staged rollouts, catalog gating, and rollback hooks. |
 | C4 | Community Onboarding | Offer templates, documentation, and review processes to encourage safe third-party contributions. |

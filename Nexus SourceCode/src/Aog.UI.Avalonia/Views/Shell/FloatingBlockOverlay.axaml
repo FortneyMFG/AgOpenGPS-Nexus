@@ -3,7 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
-            xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             xmlns:sty="clr-namespace:Avalonia.Styling;assembly=Avalonia.Styling"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.FloatingBlockOverlay"
              x:DataType="vm:FloatingBlockViewModel"
@@ -14,31 +15,31 @@
   </UserControl.Resources>
 
   <UserControl.Styles>
-    <Style Selector="Border#Outline">
+    <sty:Style Selector="Border#Outline">
       <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="2" />
       <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusMd}" />
       <Setter Property="Background" Value="{DynamicResource FloatingBlockBackgroundBrush}" />
       <Setter Property="Opacity" Value="0.94" />
 
-      <Style.Triggers>
-        <DataTrigger Binding="{Binding IsColliding}" Value="True">
+      <sty:Style.Triggers>
+        <sty:DataTrigger Binding="{Binding IsColliding}" Value="True">
           <Setter Property="BorderBrush" Value="#FFDD5B5B" />
           <Setter Property="Background" Value="#40DD5B5B" />
-        </DataTrigger>
+        </sty:DataTrigger>
 
-        <DataTrigger Binding="{Binding IsLocked}" Value="True">
+        <sty:DataTrigger Binding="{Binding IsLocked}" Value="True">
           <Setter Property="Opacity" Value="0.75" />
-        </DataTrigger>
-      </Style.Triggers>
-    </Style>
+        </sty:DataTrigger>
+      </sty:Style.Triggers>
+    </sty:Style>
 
-    <Style Selector="Border.resize-handle">
+    <sty:Style Selector="Border.resize-handle">
       <Setter Property="Background" Value="#4F8CE0" />
       <Setter Property="CornerRadius" Value="3" />
       <Setter Property="BorderBrush" Value="#255A92" />
       <Setter Property="BorderThickness" Value="1" />
-    </Style>
+    </sty:Style>
   </UserControl.Styles>
 
   <Grid>

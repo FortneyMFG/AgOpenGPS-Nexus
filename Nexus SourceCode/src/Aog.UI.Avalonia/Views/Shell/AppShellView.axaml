@@ -402,125 +402,100 @@
     </Border>
 
     <Grid Grid.Row="1"
+          ColumnDefinitions="Auto,*,Auto"
           RowDefinitions="Auto,*,Auto"
-          RowSpacing="12"
-          Margin="16,12">
-      <Border Grid.Row="0"
-              Background="#252525"
-              BorderBrush="#333333"
-              BorderThickness="1"
-              CornerRadius="8"
-              Padding="12,10"
-              IsVisible="{Binding Host.IsTopSidebarVisible, FallbackValue=True}">
-        <ItemsControl ItemsSource="{Binding Layout.TopSidebarButtons}"
-                      ItemTemplate="{StaticResource TopSidebarButtonTemplate}">
+          Background="#1a1a1a">
+      <Grid Grid.ColumnSpan="3"
+            Grid.RowSpan="3"
+            ClipToBounds="True">
+        <ContentControl Content="{Binding MainContent}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Panel.ZIndex="0" />
+        <controls:PaneCanvas Layout="{Binding Layout.Grid}"
+                             LayoutResult="{Binding Layout.PaneLayout}"
+                             ShowMinorGrid="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
+                             Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"
+                             IsHitTestVisible="False"
+                             Opacity="0.85"
+                             Panel.ZIndex="1" />
+        <ItemsControl x:Name="BlockTiles"
+                      ItemsSource="{Binding Layout.Blocks}"
+                      ItemTemplate="{StaticResource BlockTileTemplate}"
+                      Background="Transparent"
+                      Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      SizeChanged="OnViewportSizeChanged"
+                      Panel.ZIndex="3">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
-              <StackPanel Orientation="Horizontal" Spacing="12" />
+              <controls:TiledPanel Layout="{Binding Layout.Grid}" />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
+          <ItemsControl.Styles>
+            <Style Selector="#BlockTiles ContentPresenter"
+                   x:DataType="vm:BlockItemViewModel">
+              <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
+              <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
+              <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />
+              <Setter Property="controls:TiledPanel.ColumnSpan" Value="{Binding Tile.ColSpan}" />
+            </Style>
+          </ItemsControl.Styles>
         </ItemsControl>
-      </Border>
-
-      <Grid Grid.Row="1"
-            ColumnDefinitions="Auto,*,Auto"
-            ColumnSpacing="16">
-        <Border Grid.Column="0"
-                Background="#252525"
-                BorderBrush="#333333"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="12"
-                Width="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
-                IsVisible="{Binding Host.IsLeftSidebarVisible, FallbackValue=True}">
-          <ItemsControl ItemsSource="{Binding Layout.LeftSidebarButtons}"
-                        ItemTemplate="{StaticResource VerticalSidebarButtonTemplate}">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <StackPanel Orientation="Vertical" Spacing="8" />
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-          </ItemsControl>
-        </Border>
-
-        <Border Grid.Column="1"
-                Background="#202020"
-                BorderBrush="#333333"
-                BorderThickness="1.5"
-                CornerRadius="12"
-                Padding="12">
-          <Grid ClipToBounds="True">
-            <ContentControl Content="{Binding MainContent}"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch" />
-            <controls:PaneCanvas Layout="{Binding Layout.Grid}"
-                                 LayoutResult="{Binding Layout.PaneLayout}"
-                                 Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
-                                 HorizontalAlignment="Stretch"
-                                 VerticalAlignment="Stretch"
-                                 IsHitTestVisible="False"
-                                 IsVisible="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
-            <ItemsControl x:Name="BlockTiles"
-                          ItemsSource="{Binding Layout.Blocks}"
-                          ItemTemplate="{StaticResource BlockTileTemplate}"
-                          Background="Transparent"
-                          Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
-                          HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          SizeChanged="OnViewportSizeChanged">
-              <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                  <controls:TiledPanel Layout="{Binding Layout.Grid}" />
-                </ItemsPanelTemplate>
-              </ItemsControl.ItemsPanel>
-              <ItemsControl.Styles>
-                <Style Selector="#BlockTiles ContentPresenter"
-                       x:DataType="vm:BlockItemViewModel">
-                  <Setter Property="controls:TiledPanel.Row" Value="{Binding Tile.Row}" />
-                  <Setter Property="controls:TiledPanel.Column" Value="{Binding Tile.Col}" />
-                  <Setter Property="controls:TiledPanel.RowSpan" Value="{Binding Tile.RowSpan}" />
-                  <Setter Property="controls:TiledPanel.ColumnSpan" Value="{Binding Tile.ColSpan}" />
-                </Style>
-              </ItemsControl.Styles>
-            </ItemsControl>
-          </Grid>
-        </Border>
-
-        <Border Grid.Column="2"
-                Background="#252525"
-                BorderBrush="#333333"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="12"
-                Width="{Binding Layout.RightSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
-                IsVisible="{Binding Host.IsRightSidebarVisible, FallbackValue=True}">
-          <ItemsControl ItemsSource="{Binding Layout.RightSidebarButtons}"
-                        ItemTemplate="{StaticResource VerticalSidebarButtonTemplate}">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <StackPanel Orientation="Vertical" Spacing="8" />
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-          </ItemsControl>
-        </Border>
       </Grid>
 
-      <Border Grid.Row="2"
+      <Border Grid.Row="0"
+              Grid.ColumnSpan="3"
               Background="#252525"
               BorderBrush="#333333"
               BorderThickness="1"
               CornerRadius="8"
               Padding="12,10"
-              IsVisible="{Binding Host.IsBottomSidebarVisible, FallbackValue=True}">
-        <ItemsControl ItemsSource="{Binding Layout.BottomSidebarButtons}"
-                      ItemTemplate="{StaticResource BottomSidebarButtonTemplate}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <StackPanel Orientation="Horizontal" Spacing="12" />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
-      </Border>
+              Margin="24,16,24,0"
+              Panel.ZIndex="1"
+              IsHitTestVisible="False"
+              IsVisible="{Binding Host.IsTopSidebarVisible, FallbackValue=True}" />
+
+      <Border Grid.Row="1"
+              Grid.Column="0"
+              Background="#252525"
+              BorderBrush="#333333"
+              BorderThickness="1"
+              CornerRadius="8"
+              Padding="12"
+              Margin="24,16,16,24"
+              Panel.ZIndex="1"
+              Width="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
+              IsHitTestVisible="False"
+              IsVisible="{Binding Host.IsLeftSidebarVisible, FallbackValue=True}" />
+
+      <Border Grid.Row="1"
+              Grid.Column="2"
+              Background="#252525"
+              BorderBrush="#333333"
+              BorderThickness="1"
+              CornerRadius="8"
+              Padding="12"
+              Margin="16,16,24,24"
+              Panel.ZIndex="1"
+              Width="{Binding Layout.RightSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
+              IsHitTestVisible="False"
+              IsVisible="{Binding Host.IsRightSidebarVisible, FallbackValue=True}" />
+
+      <Border Grid.Row="2"
+              Grid.ColumnSpan="3"
+              Background="#252525"
+              BorderBrush="#333333"
+              BorderThickness="1"
+              CornerRadius="8"
+              Padding="12,10"
+              Margin="24,0,24,24"
+              Panel.ZIndex="1"
+              IsHitTestVisible="False"
+              IsVisible="{Binding Host.IsBottomSidebarVisible, FallbackValue=True}" />
     </Grid>
 
     <Border Grid.Row="2"

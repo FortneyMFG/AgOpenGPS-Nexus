@@ -1,0 +1,95 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
+             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             mc:Ignorable="d"
+             x:Class="Aog.UI.Avalonia.Views.Shell.FloatingPanelOverlay"
+             x:DataType="vm:FloatingPanelViewModel"
+             d:DesignWidth="320"
+             d:DesignHeight="240">
+  <UserControl.Resources>
+    <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="Border#Outline">
+      <Setter Property="BorderBrush" Value="#4F8CE0" />
+      <Setter Property="Background" Value="#401a2b3a" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Opacity" Value="0.9" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsColliding}" Value="True">
+          <Setter Property="BorderBrush" Value="#FFDD5B5B" />
+          <Setter Property="Background" Value="#40DD5B5B" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding IsLocked}" Value="True">
+          <Setter Property="Opacity" Value="0.72" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style Selector="Border.resize-handle">
+      <Setter Property="Background" Value="#4F8CE0" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="BorderBrush" Value="#255A92" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid>
+    <Border x:Name="Outline"
+            PointerPressed="OnDragPointerPressed"
+            PointerReleased="OnDragPointerReleased"
+            PointerMoved="OnDragPointerMoved"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Background="#1F101010"
+                Padding="10"
+                CornerRadius="8,8,0,0"
+                IsHitTestVisible="True">
+          <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Title}"
+                       FontWeight="SemiBold"
+                       Foreground="#F0F4F8"
+                       Margin="0,0,12,0" />
+            <Button Command="{Binding OpenSettingsCommand}"
+                    Width="28"
+                    Height="28"
+                    Padding="0"
+                    Content="⚙"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    ToolTip.Tip="Open panel settings"
+                    IsEnabled="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+          </Grid>
+        </Border>
+        <Grid Grid.Row="1" Margin="10">
+          <TextBlock Text="Drag to reposition"
+                     Foreground="#C0D6EB"
+                     FontSize="12"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Top" />
+        </Grid>
+      </Grid>
+    </Border>
+
+    <Border x:Name="ResizeHandle"
+            Classes="resize-handle"
+            Width="16"
+            Height="16"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Margin="4"
+            PointerPressed="OnResizePointerPressed"
+            PointerReleased="OnResizePointerReleased"
+            PointerMoved="OnResizePointerMoved"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+  </Grid>
+</UserControl>

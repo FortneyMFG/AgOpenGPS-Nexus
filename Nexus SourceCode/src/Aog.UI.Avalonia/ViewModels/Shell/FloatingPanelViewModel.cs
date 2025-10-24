@@ -95,6 +95,8 @@ public sealed class FloatingPanelViewModel : INotifyPropertyChanged
 
     internal FloatingPanelSpec Spec => _spec;
 
+    internal BlockLayoutViewModel Owner => _owner;
+
     internal void UpdateBounds(Rect bounds)
     {
         Bounds = bounds;
@@ -102,6 +104,23 @@ public sealed class FloatingPanelViewModel : INotifyPropertyChanged
         _spec.Y = bounds.Y;
         _spec.Width = bounds.Width;
         _spec.Height = bounds.Height;
+    }
+
+    internal void ApplySettings(string title, string? contentId)
+    {
+        var normalizedTitle = title ?? string.Empty;
+        if (!string.Equals(_spec.Title, normalizedTitle, StringComparison.Ordinal))
+        {
+            _spec.Title = normalizedTitle;
+            OnPropertyChanged(nameof(Title));
+        }
+
+        var normalizedContent = string.IsNullOrWhiteSpace(contentId) ? null : contentId.Trim();
+        if (!string.Equals(_spec.ContentId, normalizedContent, StringComparison.Ordinal))
+        {
+            _spec.ContentId = normalizedContent;
+            OnPropertyChanged(nameof(ContentId));
+        }
     }
 
     internal void SetCollision(bool isColliding)

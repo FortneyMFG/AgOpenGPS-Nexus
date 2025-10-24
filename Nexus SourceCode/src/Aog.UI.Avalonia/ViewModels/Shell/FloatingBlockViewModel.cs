@@ -106,6 +106,8 @@ public sealed class FloatingBlockViewModel : INotifyPropertyChanged
 
     internal FloatingBlockSpec Spec => _spec;
 
+    internal BlockLayoutViewModel Owner => _owner;
+
     internal void UpdateBounds(Rect bounds)
     {
         Bounds = bounds;

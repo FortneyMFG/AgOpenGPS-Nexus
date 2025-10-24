@@ -5,6 +5,8 @@ using Avalonia.Markup.Xaml;
 using Aog.UI.Avalonia.Hosting;
 using Aog.UI.Avalonia.Settings;
 using Aog.UI.Avalonia.ViewModels;
+using Aog.UI.Avalonia.ViewModels.Shell;
+using Aog.UI.Avalonia.Views.Shell;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -20,6 +22,7 @@ namespace Aog.UI.Avalonia.Views.Main
         private PixelPoint? _lastNormalPosition;
         private IDisposable? _clientSizeSubscription;
         private IDisposable? _windowStateSubscription;
+        private AppShellViewModel? _shell;
 
         // DI-friendly default ctor
         public MainWindow()
@@ -43,6 +46,7 @@ namespace Aog.UI.Avalonia.Views.Main
             ApplyPlacement(preferences.Window);
 
             DataContext = viewModel;
+            AttachShell(viewModel.Shell);
 
             _clientSizeSubscription = this.GetObservable(ClientSizeProperty).Subscribe(size =>
             {
@@ -125,6 +129,8 @@ namespace Aog.UI.Avalonia.Views.Main
             Closed -= OnClosed;
             PositionChanged -= OnPositionChanged;
 
+            DetachShell();
+
             if (DataContext is IDisposable disposable)
             {
                 disposable.Dispose();
@@ -139,6 +145,70 @@ namespace Aog.UI.Avalonia.Views.Main
             {
                 _lastNormalPosition = e.Point;
             }
+        }
+
+        private void AttachShell(AppShellViewModel shell)
+        {
+            ArgumentNullException.ThrowIfNull(shell);
+            _shell = shell;
+            _shell.FloatingPanelSettingsRequested += OnFloatingPanelSettingsRequested;
+            _shell.FloatingBlockSettingsRequested += OnFloatingBlockSettingsRequested;
+        }
+
+        private void DetachShell()
+        {
+            if (_shell is null)
+            {
+                return;
+            }
+
+            _shell.FloatingPanelSettingsRequested -= OnFloatingPanelSettingsRequested;
+            _shell.FloatingBlockSettingsRequested -= OnFloatingBlockSettingsRequested;
+            _shell = null;
+        }
+
+        private async void OnFloatingPanelSettingsRequested(object? sender, FloatingPanelViewModel panel)
+        {
+            if (_shell is null || panel is null)
+            {
+                return;
+            }
+
+            var layout = _shell.Layout;
+            if (layout.IsLocked || panel.IsLocked)
+            {
+                return;
+            }
+
+            var dialog = new FloatingPanelSettingsWindow
+            {
+                DataContext = new FloatingPanelSettingsDialogViewModel(layout, panel),
+                Icon = Icon,
+            };
+
+            await dialog.ShowDialog<bool?>(this);
+        }
+
+        private async void OnFloatingBlockSettingsRequested(object? sender, FloatingBlockViewModel block)
+        {
+            if (_shell is null || block is null)
+            {
+                return;
+            }
+
+            var layout = _shell.Layout;
+            if (layout.IsLocked || block.IsLocked)
+            {
+                return;
+            }
+
+            var dialog = new FloatingBlockSettingsWindow
+            {
+                DataContext = new FloatingBlockSettingsDialogViewModel(layout, block),
+                Icon = Icon,
+            };
+
+            await dialog.ShowDialog<bool?>(this);
         }
     }
 }

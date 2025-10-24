@@ -3,8 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
-             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
-             xmlns:styling="clr-namespace:Avalonia.Styling;assembly=Avalonia.Styling"
+            xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.FloatingPanelOverlay"
              x:DataType="vm:FloatingPanelViewModel"
@@ -22,13 +21,13 @@
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Opacity" Value="0.9" />
       <Style.Triggers>
-        <styling:DataTrigger Binding="{Binding IsColliding}" Value="True">
+        <DataTrigger Binding="{Binding IsColliding}" Value="True">
           <Setter Property="BorderBrush" Value="#FFDD5B5B" />
           <Setter Property="Background" Value="#40DD5B5B" />
-        </styling:DataTrigger>
-        <styling:DataTrigger Binding="{Binding IsLocked}" Value="True">
+        </DataTrigger>
+        <DataTrigger Binding="{Binding IsLocked}" Value="True">
           <Setter Property="Opacity" Value="0.72" />
-        </styling:DataTrigger>
+        </DataTrigger>
       </Style.Triggers>
     </Style>
 

@@ -3,8 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
-             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
-             xmlns:styling="clr-namespace:Avalonia.Styling;assembly=Avalonia.Styling"
+            xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Field.FieldSettingsDock"
              x:DataType="vm:BlockLayoutViewModel"
@@ -88,11 +87,11 @@
       <Setter Property="Background" Value="#DD101010" />
       <Setter Property="Padding" Value="18" />
       <Style.Triggers>
-        <styling:DataTrigger Binding="{Binding IsLauncherDockVisible}" Value="True">
+        <DataTrigger Binding="{Binding IsLauncherDockVisible}" Value="True">
           <Setter Property="Margin" Value="0" />
           <Setter Property="Opacity" Value="1" />
           <Setter Property="IsHitTestVisible" Value="True" />
-        </styling:DataTrigger>
+        </DataTrigger>
       </Style.Triggers>
     </Style>
 

@@ -411,7 +411,7 @@
         <ContentControl Content="{Binding MainContent}"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
-                        Panel.ZIndex="0" />
+                        Panel.ZIndex="{x:Int32 0}" />
         <controls:PaneCanvas Layout="{Binding Layout.Grid}"
                              LayoutResult="{Binding Layout.PaneLayout}"
                              ShowMinorGrid="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
@@ -420,7 +420,7 @@
                              VerticalAlignment="Stretch"
                              IsHitTestVisible="False"
                              Opacity="0.85"
-                             Panel.ZIndex="1" />
+                             Panel.ZIndex="{x:Int32 1}" />
         <ItemsControl x:Name="BlockTiles"
                       ItemsSource="{Binding Layout.Blocks}"
                       ItemTemplate="{StaticResource BlockTileTemplate}"
@@ -429,7 +429,7 @@
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       SizeChanged="OnViewportSizeChanged"
-                      Panel.ZIndex="3">
+                      Panel.ZIndex="{x:Int32 3}">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <controls:TiledPanel Layout="{Binding Layout.Grid}" />
@@ -455,7 +455,7 @@
               CornerRadius="8"
               Padding="12,10"
               Margin="24,16,24,0"
-              Panel.ZIndex="1"
+              Panel.ZIndex="{x:Int32 1}"
               IsHitTestVisible="False"
               IsVisible="{Binding Host.IsTopSidebarVisible, FallbackValue=True}" />
 
@@ -467,7 +467,7 @@
               CornerRadius="8"
               Padding="12"
               Margin="24,16,16,24"
-              Panel.ZIndex="1"
+              Panel.ZIndex="{x:Int32 1}"
               Width="{Binding Layout.LeftSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
               IsHitTestVisible="False"
               IsVisible="{Binding Host.IsLeftSidebarVisible, FallbackValue=True}" />
@@ -480,7 +480,7 @@
               CornerRadius="8"
               Padding="12"
               Margin="16,16,24,24"
-              Panel.ZIndex="1"
+              Panel.ZIndex="{x:Int32 1}"
               Width="{Binding Layout.RightSidebarLayout, Converter={StaticResource SidebarDimensionConverter}, ConverterParameter=Width}"
               IsHitTestVisible="False"
               IsVisible="{Binding Host.IsRightSidebarVisible, FallbackValue=True}" />
@@ -493,7 +493,7 @@
               CornerRadius="8"
               Padding="12,10"
               Margin="24,0,24,24"
-              Panel.ZIndex="1"
+              Panel.ZIndex="{x:Int32 1}"
               IsHitTestVisible="False"
               IsVisible="{Binding Host.IsBottomSidebarVisible, FallbackValue=True}" />
     </Grid>

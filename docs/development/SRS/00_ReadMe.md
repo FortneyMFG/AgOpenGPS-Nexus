@@ -169,9 +169,9 @@ Returning contributors can skip straight to sections flagged "Under review" or "
 - [ISOBUS section control](references/ISOBUS_Section_Control.md)
 
 ### ADR index
-- [ADR – 001 .NET 8 runtime](sections/1X_Platform_Foundations/11-ADR-001 - Adopt .NET 8 C stack for Nexus runtime.md)
+- [12-ADR-001 — .NET 8 runtime](sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 8 LTS Runtime.md)
 - [ADR – 002 gRPC contracts](sections/4X_Interprocess_Communications/41-ADR-002 - Expose Nexus services over gRPC protobuf contracts.md)
-- [ADR – 003 Avalonia UI](sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md)
+- [13-ADR-001 — Avalonia UI](sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md)
 - [ADR – 004 Composite simulation](sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md)
 - [ADR – 006 AOG Link MCU communications](sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md)
 - [ADR – 007 PoseStream section-state architecture](sections/6X_Core_Domain_Services/61-ADR-007 - PoseStream and SectionState architecture.md)

@@ -32,7 +32,7 @@ Define the Nexus UI shell, layout system, and companion experiences that operato
 
 | Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
 |---------------|-----------------|------------------------|---------------------------|--------------------|
-| UI Shell | WinForms desktop with discrete utilities (AgOpenGPS, AgIO, ModSim). | Windows-only workflows and fragmented utilities. | Unified Avalonia shell spanning Windows/Linux while preserving tooling launch points. | Legacy AgOpenGPS releases; ADR-003 shared runtime【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L24-L42】 |
+| UI Shell | WinForms desktop with discrete utilities (AgOpenGPS, AgIO, ModSim). | Windows-only workflows and fragmented utilities. | Unified Avalonia shell spanning Windows/Linux while preserving tooling launch points. | Legacy AgOpenGPS releases; 13-ADR-001 shared runtime【F:docs/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L24-L44】 |
 | Layout & Dashboards | Hard-coded overlays, limited inspector depth, manual presets. | Slow to onboard new layers; inconsistent diagnostics. | Metadata-driven dashboards, declarative inspectors, and preset orchestration. | ADR-032 presets & layout linking; ADR-034 metadata dashboards【F:docs/sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md†L7-L34】【F:docs/sections/9X_Frontends_Ops/91-ADR-034 - Metadata-driven dashboards and inspector surfaces.md†L7-L68】 |
 | Remote & Companion | Remote desktop mirrors and ad-hoc browser experiments. | Safety posture unclear; offline support brittle. | gRPC/WebSocket clients with explicit capability flags, offline cache, and kiosk launchers. | Remote client exploration notes; Linux Core pilots【F:docs/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L6-L44】 |
 
@@ -95,10 +95,10 @@ Define the Nexus UI shell, layout system, and companion experiences that operato
 | R-FE-014 | SHOULD | Operator Readiness | Capture training, preset migration, and configuration handoff requirements during rollout. | Deployment readiness plan | Field pilot checklist |
 | R-FE-020 | SHOULD | Simulation Control | Provide unified simulation bar controlling SimClock for replay and plugin simulators. | Simulation roadmap | Replay automation tests |
 | R-FE-021 | SHOULD | Accessibility | Deliver theming and localization hooks for plugin panels. | UI accessibility charter | Accessibility regression suite |
-| R-FE-060 | MUST | Companion Rollout | Ship connection center handling discovery, auth, reconnect, and health across gRPC / gRPC-Web. | ADR-003 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L24-L42】 | Companion connection acceptance tests |
-| R-FE-061 | SHOULD | Offline Resilience | Provide offline cache for boundaries, guidance, and coverage with resync. | ADR-003 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L24-L31】 | Offline cache soak tests |
-| R-FE-062 | MUST | Run Mode Switching | Expose `RunMode` toggles to swap `ICoreTransport` implementations without altering view models. | ADR-003 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L24-L42】 | Mode-switch integration tests |
-| R-FE-063 | SHOULD | Feature Gating | Introduce feature flags for mobile deployments while sharing project codebase. | ADR-003 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L33-L42】 | Feature flag configuration tests |
+| R-FE-060 | MUST | Companion Rollout | Ship connection center handling discovery, auth, reconnect, and health across gRPC / gRPC-Web. | 13-ADR-001 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L24-L44】 | Companion connection acceptance tests |
+| R-FE-061 | SHOULD | Offline Resilience | Provide offline cache for boundaries, guidance, and coverage with resync. | 13-ADR-001 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L24-L33】 | Offline cache soak tests |
+| R-FE-062 | MUST | Run Mode Switching | Expose `RunMode` toggles to swap `ICoreTransport` implementations without altering view models. | 13-ADR-001 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L24-L44】 | Mode-switch integration tests |
+| R-FE-063 | SHOULD | Feature Gating | Introduce feature flags for mobile deployments while sharing project codebase. | 13-ADR-001 cross-platform shell【F:docs/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L33-L44】 | Feature flag configuration tests |
 | R-FE-094 | SHOULD | Sync Dashboard | Provide read-only web dashboard using mirrored `/Seasons/` folders without control actions. | Sync dashboard concept【F:docs/Plugins/briefs/SyncDashboard.md†L1-L150】 | Sync dashboard smoke tests |
 | R-FE-095 | SHOULD | Plugin Marketplace | Add plugin catalog UI with manifest validation, compatibility badges, and install workflows. | Plugin catalog design notes【F:docs/Plugins/briefs/PluginCatalog.md†L1-L160】 | Marketplace integration tests |
 
@@ -131,7 +131,7 @@ Define the Nexus UI shell, layout system, and companion experiences that operato
 | R-FE-010 | ADR-034 metadata dashboards | Ensure new layers reach dashboards without bespoke code. |
 | R-FE-012 | Linux Core remote client pilots | Unlock headless rigs and remote tablets with safety posture. |
 | R-FE-040 | ADR-044 zone drawing framework | Provide consistent constraint visualization across plugins. |
-| R-FE-060 | ADR-003 cross-platform shell | Guarantee companion clients connect reliably across transports. |
+| R-FE-060 | 13-ADR-001 cross-platform shell | Guarantee companion clients connect reliably across transports. |
 
 ---
 
@@ -256,7 +256,7 @@ No active option proposals are under review; modernization guidance is documente
 | R-FE-010 | C3, C5 | 91-ADR-034 | `tes../UI/MetadataDashboardSuite` | Avalonia dashboard module |
 | R-FE-012 | C4 | — | `tests/remote/CompanionConnectivity.md` | CompanionRemote shell |
 | R-FE-040 | C6 | 72-ADR-044 | `tes../UI/ZoneVisualization.snap` | Shared zone tool package |
-| R-FE-060 | C2, C4 | 13-ADR-003 | `tests/companion/ConnectionCenter.feature` | Connection Center service |
+| R-FE-060 | C2, C4 | 13-ADR-001 | `tests/companion/ConnectionCenter.feature` | Connection Center service |
 
 ---
 
@@ -274,10 +274,10 @@ An implementation **conforms** to §91 when:
 This section aligns with ISO/IEC/IEEE 29148:2018 for requirements specification and IEEE 1016:2017 for design documentation. Normative content resides in §91.5 and §91.7; informative context appears elsewhere.
 
 ## Mobile companion and embedded roadmap
-- **CompanionRemote (today):** Android builds speak gRPC directly while iOS falls back to gRPC-Web through an Envoy/grpcwebproxy sidecar. The connection center covers discovery, TLS/auth, and reconnect states so the same UI ships as a remote monitor for Core + AgIO rigs.【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L24-L31】
-- **LocalInProc (next):** Package Core as a library referenced by the Avalonia app. DI swaps the transport to an in-process adapter, enabling “lite” offline workflows with feature gates and local telemetry persistence on mobile devices.【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L32-L36】
-- **LocalOutOfProc (later):** Embed Core as a self-contained binary launched via platform services (Android foreground service, Windows/Linux process). The UI continues using gRPC against `127.0.0.1`, preserving crash isolation, logging, and security patterns shared with desktop shells.【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L36-L42】
-- **AgIO convergence:** Android platforms extend the same transport abstraction to USB-OTG serial, Bluetooth SPP, and BLE so AgIO features can move in-process once the mobile host proves stable, while iOS companions remain remote-first and rely on BLE/Wi-Fi to reach bridge hardware.【F:docs/sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md†L43-L44】
+- **CompanionRemote (today):** Android builds speak gRPC directly while iOS falls back to gRPC-Web through an Envoy/grpcwebproxy sidecar. The connection center covers discovery, TLS/auth, and reconnect states so the same UI ships as a remote monitor for Core + AgIO rigs.【F:docs/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L24-L33】
+- **LocalInProc (next):** Package Core as a library referenced by the Avalonia app. DI swaps the transport to an in-process adapter, enabling “lite” offline workflows with feature gates and local telemetry persistence on mobile devices.【F:docs/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L33-L37】
+- **LocalOutOfProc (later):** Embed Core as a self-contained binary launched via platform services (Android foreground service, Windows/Linux process). The UI continues using gRPC against `127.0.0.1`, preserving crash isolation, logging, and security patterns shared with desktop shells.【F:docs/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L37-L44】
+- **AgIO convergence:** Android platforms extend the same transport abstraction to USB-OTG serial, Bluetooth SPP, and BLE so AgIO features can move in-process once the mobile host proves stable, while iOS companions remain remote-first and rely on BLE/Wi-Fi to reach bridge hardware.【F:docs/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L44-L45】
 
 ## Open questions
 - Which screens must be mirrored vs. reimagined for mobile?

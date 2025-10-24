@@ -1,6 +1,6 @@
 # Avalonia Run Modes (CompanionRemote, LocalInProc, LocalOutOfProc)
 
-[ADR-003](../development/SRS/sections/1X_Platform_Foundations/13-ADR-003%20-%20Use%20Avalonia%20for%20the%20cross-platform%20Nexus%20UI%20shell.md) requires the Avalonia shell to switch between three run modes so the same UI serves as a remote companion or a full desktop host. This guide explains the configuration surface, transport wiring, and smoke tests for each mode.
+[13-ADR-001](../development/SRS/sections/1X_Platform_Foundations/13-ADR-001%20-%20Use%20Avalonia%20for%20the%20Nexus%20Desktop%20UI%20Shell.md) requires the Avalonia shell to switch between three run modes so the same UI serves as a remote companion or a full desktop host. This guide explains the configuration surface, transport wiring, and smoke tests for each mode.
 
 ## Configuration Surface
 
@@ -35,4 +35,4 @@
 3. **In-proc hardware probe.** With simulated devices from the [Windows no-hardware quick start](windows-no-hw.md), ensure LocalInProc exposes GNSS/IMU feeds to the UI charts.
 4. **Out-of-proc restart.** Kill the spawned Core process and confirm the UI restarts it and resubscribes to telemetry feeds.
 
-Following this checklist keeps the Avalonia client aligned with ADR-003 expectations and provides clear validation steps for release sign-off.
+Following this checklist keeps the Avalonia client aligned with 13-ADR-001 expectations and provides clear validation steps for release sign-off.

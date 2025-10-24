@@ -16,8 +16,10 @@
   - `sections/1X_Platform_Foundations/13_UI_Framework_UX.md`
 - **Related Options & ADRs:**
   - `sections/1X_Platform_Foundations/11-O1_Unified_DotNet8_Avalonia.md`
-  - `sections/1X_Platform_Foundations/11-ADR-001 - Adopt Unified .NET 8 Runtime & Avalonia Stack.md`
-  - `sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md`
+  - `sections/1X_Platform_Foundations/11-ADR-001 - Establish Windows and Linux Support Baseline.md`
+  - `sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 8 LTS Runtime.md`
+  - `sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md`
+  - `sections/1X_Platform_Foundations/14-ADR-001 - Standardize Build Environment & Tooling.md`
   - `sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md`
   - `sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md`
   - `sections/9X_Frontends_Ops/91-ADR-032 - Presets and Layout Linking for Equipment Workflows.md`
@@ -114,7 +116,7 @@ Feature candidates deferred from this phase must be captured in the enhancement 
 
 ## 6. Scope Definition
 ### 6.1 In Scope
-- Unified .NET LTS runtime and Avalonia UI adoption per ADR-001 and ADR-003, with guardrails to revisit newer frameworks as they stabilise.
+- Unified .NET LTS runtime and Avalonia UI adoption per ADR-001 and 13-ADR-001, with guardrails to revisit newer frameworks as they stabilise.
 - Packaging pipelines for Windows installers, Linux packages, containers, and systemd service definitions supporting headless deployments.
 - AgIO abstraction updates covering serial, UDP, and CAN bus integrations, plus GNSS/IMU handling focused on data formats rather than vendor-specific implementations.
 - Core guidance logic refactoring to isolate business rules, simulation hooks, and deterministic behaviours.

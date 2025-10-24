@@ -1,4 +1,4 @@
-# 13-ADR-003 — Use Avalonia for the Nexus Desktop UI Shell
+# 13-ADR-001 — Use Avalonia for the Nexus Desktop UI Shell
 
 *(Status: Accepted — 2025-10-25)*
 
@@ -7,6 +7,7 @@
 **Created:** 2025-10-20  
 **Last Updated:** 2025-10-25  
 **Related SRS:** `13_UI_Framework_UX.md`
+**Related Decisions:** `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
 
 ---
 
@@ -15,11 +16,13 @@
 Section 13 documents how Nexus manages its presentation layer while modernising
 beyond the legacy WinForms UI. Operators still rely on WinForms today, but the
 SRS requires a cross-platform shell, metadata-driven widgets, and run modes that
-work on Windows and Linux desktops. Previous WPF experiments stalled, and
+work on Windows and Linux desktops with future expansion to Android (full-stack)
+and optional iOS/web companions. Previous WPF experiments stalled, and
 alternatives such as Qt/C++ or web shells would fragment engineering skill sets
 and slow the transition. Avalonia provides a .NET-friendly toolkit that runs on
-Windows and Linux, matching the runtime adopted in Section 11 without forcing a
-rewrite of view models or bindings.
+Windows, Linux, and the mobile platforms targeted for future expansion, matching
+the runtime adopted in `12-ADR-001` without forcing a rewrite of view models or
+bindings.
 
 ---
 
@@ -28,8 +31,8 @@ rewrite of view models or bindings.
 Use Avalonia as the primary desktop shell for Nexus while WinForms remains the
 fallback UI during the transition period. Avalonia projects host the shared view
 models, theming system, and metadata-driven dashboards described in Section 13.
-Any platform-specific polish must wrap the Avalonia shell rather than reanimate
-retired WPF panels.
+Mobile or web companions MAY share view models or services, but desktop polish
+must wrap the Avalonia shell rather than reanimate retired WPF panels.
 
 **Scope limitations.** This ADR governs desktop UI policy for Section 13 only.
 Mobile companions, build tooling, and OS support matrices are addressed in their
@@ -41,8 +44,8 @@ respective sections.
 
 **Positive impacts**
 
-- Enables a single UI codebase across Windows and Linux, aligning with Section
-  13 requirements for cross-platform UX.
+- Enables a single UI codebase across Windows and Linux today while supporting
+  future Android builds using the same XAML/view-model stack.
 - Supports metadata-driven dashboards and run-mode toggles without maintaining
   multiple UI frameworks.
 - Preserves C# and XAML expertise already present in the contributor base.
@@ -55,6 +58,7 @@ respective sections.
   latency, and render performance for the devices listed in Section 13.
 - WinForms must stay healthy until Avalonia reaches feature parity; mitigated by
   gating WinForms retirement on the acceptance criteria documented in Section 13.
+  Companion/mobile/web shells may lag desktop features and require bridging.
 
 **Follow-up actions**
 

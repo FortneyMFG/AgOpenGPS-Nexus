@@ -61,7 +61,7 @@ This reference captures representative hardware stacks that operators deploy tod
 
 ## Related ADRs
 
-- [ADR-001 — Adopt .NET 8 C# Stack](../sections/1X_Platform_Foundations/11-ADR-001 - Adopt .NET 8 C stack for Nexus runtime.md)
-- [ADR-003 — Avalonia UI](../sections/1X_Platform_Foundations/13-ADR-003 - Use Avalonia for the cross-platform Nexus UI shell.md)
+- [12-ADR-001 — Adopt .NET 8 LTS Runtime](../sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 8 LTS Runtime.md)
+- [13-ADR-001 — Avalonia UI](../sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md)
 - [ADR-006 — AgIO Link MCU Communications](../sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md)
 - [ADR-048 — RadioBridge](../sections/4X_Interprocess_Communications/42-ADR-048 - RadioBridge for ELRS LoRa Telemetry.md)

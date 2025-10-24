@@ -36,7 +36,10 @@ public partial class FloatingPanelOverlay : UserControl
         _isDragging = true;
         _dragStart = point;
         _initialBounds = panel.Bounds;
-        (sender as IInputElement)?.CapturePointer(e.Pointer);
+        if (sender is IInputElement inputElement)
+        {
+            e.Pointer.Capture(inputElement);
+        }
         e.Handled = true;
     }
 
@@ -89,7 +92,10 @@ public partial class FloatingPanelOverlay : UserControl
         _isResizing = true;
         _dragStart = e.GetPosition(this);
         _initialBounds = panel.Bounds;
-        (sender as IInputElement)?.CapturePointer(e.Pointer);
+        if (sender is IInputElement inputElement)
+        {
+            e.Pointer.Capture(inputElement);
+        }
         e.Handled = true;
     }
 
@@ -135,7 +141,7 @@ public partial class FloatingPanelOverlay : UserControl
         _isDragging = false;
         _dragStart = default;
         _initialBounds = default;
-        (sender as IInputElement)?.ReleasePointerCapture(pointer);
+        pointer.Capture(null);
     }
 
     private void ResetResize(object? sender, IPointer pointer)
@@ -143,6 +149,6 @@ public partial class FloatingPanelOverlay : UserControl
         _isResizing = false;
         _dragStart = default;
         _initialBounds = default;
-        (sender as IInputElement)?.ReleasePointerCapture(pointer);
+        pointer.Capture(null);
     }
 }

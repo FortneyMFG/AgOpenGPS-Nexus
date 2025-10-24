@@ -8,6 +8,7 @@ using Aog.Core.Eventing;
 using Aog.Core.Logging;
 using Aog.Core.Replay;
 using Aog.Core.V1;
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
 namespace Aog.Core.Tests.Replay;
@@ -68,7 +69,7 @@ internal static class ControllerReplayFixture
         {
             Header = CreateHeader(sequence++, "vehicle", "can", startTimestamp + TimeSpan.FromSeconds(2)),
             ArbitrationId = 0x18FF51,
-            Payload = new byte[] { 0x10, 0x20, 0x30, 0x40 },
+            Payload = ByteString.CopyFrom(0x10, 0x20, 0x30, 0x40),
             IsExtendedId = true,
             IsRemoteRequest = false
         };

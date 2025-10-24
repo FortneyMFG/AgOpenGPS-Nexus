@@ -38,7 +38,7 @@ public sealed class LiveTelemetryMeshServiceTests
         await service.UpdatePresenceAsync(new MeshPresenceUpdate(
             "device:alpha",
             new MeshSessionDescriptor(" season:2025 ", " job:123 ", " session:42 "),
-            new MeshPose(45.123, -96.321, headingDegrees: 87.5),
+            new MeshPose(45.123, -96.321, HeadingDegrees: 87.5),
             MeshPresenceState.Online,
             new Dictionary<string, string> { [" operator "] = "  Ada  " }),
             CancellationToken.None);

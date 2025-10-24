@@ -1,36 +1,35 @@
-using System.Linq;
-using System.Text.Json.Nodes;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using FluentAssertions;
-using Nexus.Plugin.Manifest;
+using Nexus.Plugin;
 using Xunit;
 
 namespace Nexus.Plugin.Manifest.Tests;
 
-public class PluginManifestTests
+public sealed class PluginManifestTests
 {
     [Fact]
-    public void FromJson_WhenManifestIsValid_ReturnsManifest()
+    public async Task LoadAsync_WhenManifestIsValid_ReturnsManifest()
     {
         const string json = """
         {
           "id": "fe.example",
           "name": "Example Plugin",
-          "version": "1.0.0",
-          "sdkVersion": ">=1.0.0 <2.0.0",
-          "requires": {
-            "fe.base": ">=1.0.0"
-          },
+          "version": "1.2.3",
+          "sdkVersion": "1.0.0",
+          "description": "Demo plugin",
           "entrypoints": {
-            "core": "Fe.Example.CoreEntrypoint",
-            "ui": "Fe.Example.UiEntrypoint",
+            "core": "Fe.Example.Core",
+            "ui": "Fe.Example.Ui",
             "agio": null
           },
           "capabilities": ["window", "blocks"],
+          "requires": [
+            { "id": "fe.base", "range": ">=1.0.0" }
+          ],
           "assets": {
             "icon": "assets/icon.png"
-          },
-          "update": {
-            "feed": null
           },
           "permissions": {
             "network": true,
@@ -39,30 +38,44 @@ public class PluginManifestTests
         }
         """;
 
-        var manifest = PluginManifest.FromJson(json);
+        await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        var manifest = await PluginManifest.LoadAsync(stream);
 
         manifest.Id.Should().Be("fe.example");
         manifest.Name.Should().Be("Example Plugin");
-        manifest.Version.Should().Be("1.0.0");
-        manifest.SdkVersion.Should().Be(">=1.0.0 <2.0.0");
+        manifest.Version.Should().Be("1.2.3");
+        manifest.SdkVersion.Should().Be("1.0.0");
         manifest.Capabilities.Should().Contain(new[] { "window", "blocks" });
+        manifest.Requires.Should().ContainSingle(r => r.Id == "fe.base" && r.Range == ">=1.0.0");
         manifest.Permissions.Network.Should().BeTrue();
         manifest.Permissions.Serial.Should().BeFalse();
     }
 
     [Fact]
-    public void GenerateJsonSchema_ContainsRequiredProperties()
+    public void Validate_WhenRequiredFieldsMissing_Throws()
     {
-        var schema = PluginManifest.GenerateJsonSchema();
-        schema.Should().NotBeNull();
+        var manifest = new PluginManifest();
 
-        var required = schema["required"]!.AsArray().Select(node => node!.GetValue<string>()).ToList();
-        required.Should().Contain(new[] { "id", "name", "version", "sdkVersion", "entrypoints", "capabilities" });
+        Action act = manifest.Validate;
 
-        var properties = schema["properties"]!.AsObject();
-        properties.Should().ContainKey("entrypoints");
-        properties["entrypoints"]!.AsObject()["required"]!.AsArray()
-            .Select(node => node!.GetValue<string>())
-            .Should().Contain(new[] { "core", "ui", "agio" });
+        act.Should().Throw<InvalidDataException>()
+            .WithMessage("*must be provided*");
+    }
+
+    [Fact]
+    public void Validate_WhenVersionNotSemVer_Throws()
+    {
+        var manifest = new PluginManifest
+        {
+            Id = "fe.invalid",
+            Name = "Invalid Plugin",
+            Version = "2024.01-beta",
+            SdkVersion = "invalid",
+        };
+
+        Action act = manifest.Validate;
+
+        act.Should().Throw<InvalidDataException>()
+            .WithMessage("*semantic version*");
     }
 }

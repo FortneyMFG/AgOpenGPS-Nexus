@@ -111,11 +111,11 @@ public sealed class LayerEditEventJournalServiceTests
         var operation = new LayerEditEventOperation("create", "feature:zone-1");
 
         var invalidLayerRequest = new LayerEditEventAppendRequest("layer?invalid", "job:ok", context, new[] { operation }, "actor", "polygon");
-        await Assert.ThrowsAsync<ArgumentException>(() => service.AppendAsync(invalidLayerRequest));
+        await Assert.ThrowsAsync<ArgumentException>(() => service.AppendAsync(invalidLayerRequest).AsTask());
 
         var invalidOperation = new LayerEditEventOperation("merge", "feature:zone-1");
         var request = new LayerEditEventAppendRequest("layer:alpha", "job:ok", context, new[] { invalidOperation }, "actor", "polygon");
-        await Assert.ThrowsAsync<ArgumentException>(() => service.AppendAsync(request));
+        await Assert.ThrowsAsync<ArgumentException>(() => service.AppendAsync(request).AsTask());
     }
 
     [Fact]
@@ -126,6 +126,6 @@ public sealed class LayerEditEventJournalServiceTests
         var operation = new LayerEditEventOperation("create", "feature:zone-1");
 
         var request = new LayerEditEventAppendRequest("layer:alpha", "job:ok", context, new[] { operation }, "actor", "unknown");
-        await Assert.ThrowsAsync<ArgumentException>(() => service.AppendAsync(request));
+        await Assert.ThrowsAsync<ArgumentException>(() => service.AppendAsync(request).AsTask());
     }
 }

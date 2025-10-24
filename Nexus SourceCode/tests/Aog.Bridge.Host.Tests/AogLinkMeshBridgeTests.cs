@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Bridge.Host.AogLink;
@@ -134,9 +135,7 @@ public sealed class AogLinkMeshBridgeTests
         }
 
         public IAsyncEnumerable<MeshPublication> SubscribeAsync(MeshSubscriptionRequest request, CancellationToken cancellationToken = default)
-        {
-            return System.Linq.AsyncEnumerable.Empty<MeshPublication>();
-        }
+            => EmptyAsync(cancellationToken);
 
         public ValueTask UpdatePresenceAsync(MeshPresenceUpdate update, CancellationToken cancellationToken = default)
         {
@@ -158,6 +157,11 @@ public sealed class AogLinkMeshBridgeTests
                 PresenceUpdates.Count,
                 new MeshDiagnosticsAclSnapshot(0, 0, 0, 0, 0, 0),
                 new MeshDiagnosticsTrafficSnapshot(0, 0, 0, 0, 0, 0));
+        }
+        private static async IAsyncEnumerable<MeshPublication> EmptyAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            await Task.CompletedTask.ConfigureAwait(false);
+            yield break;
         }
     }
 }

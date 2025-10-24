@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgOpenGPS Nexus UI</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow: hidden; background: #1a1a1a; color: #fff; }
+    .header { background: #2a2a2a; height: 40px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid #444; position: relative; z-index: 1000; }
+    .menu-bar { display: flex; gap: 30px; }
+    .menu-item { cursor: pointer; padding: 5px 10px; border-radius: 4px; transition: background .2s; }
+    .menu-item:hover { background: #3a3a3a; }
+    .unlock-btn { margin-left: auto; background: #4a4a4a; border: 1px solid #666; color: #fff; padding: 5px 15px; border-radius: 4px; cursor: pointer; transition: all .2s; }
+    .unlock-btn:hover { background: #5a5a5a; }
+    .unlock-btn.active { background: #06c; }
+
+    .container { position: relative; height: calc(100vh - 40px); overflow: hidden; }
+    .grid-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity .3s; }
+    .unlocked .grid-container { opacity: 1; }
+    .grid-svg { width: 100%; height: 100%; }
+    .grid-cell { fill: rgba(255,255,255,.035); }
+    .grid-dot { fill: rgba(255,255,255,.25); }
+    .grid-line { stroke: rgba(255,255,255,.1); stroke-width: 1; }
+    .grid-line.major { stroke: rgba(255,255,255,.3); stroke-width: 1.5; }
+    .grid-line.sub { stroke: rgba(255,255,255,.15); stroke-width: .5; }
+    .grid-label { fill: rgba(255,255,255,.5); font-size: 12px; font-family: monospace; }
+
+    .panel { position: absolute; background: rgba(40,40,40,.9); border: 2px solid #555; border-radius: 8px; padding: 10px; min-width: 100px; min-height: 100px; cursor: move; transition: border-color .2s; }
+    .panel:hover { border-color: #777; }
+    .panel.dragging { border-color: #06c; z-index: 100; }
+    .panel-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #ccc; }
+    .panel-content { color: #aaa; font-size: 12px; }
+
+    .resize-handle { position: absolute; background: #666; border: 1px solid #888; border-radius: 2px; opacity: 0; transition: opacity .2s; }
+    .unlocked .resize-handle { opacity: 1; }
+    .resize-handle.corner { width: 10px; height: 10px; }
+    .resize-handle.edge { background: transparent; border: none; }
+    .resize-handle.top { top: -5px; left: 50%; width: 20px; height: 10px; margin-left: -10px; cursor: n-resize; }
+    .resize-handle.bottom { bottom: -5px; left: 50%; width: 20px; height: 10px; margin-left: -10px; cursor: s-resize; }
+    .resize-handle.left { left: -5px; top: 50%; width: 10px; height: 20px; margin-top: -10px; cursor: w-resize; }
+    .resize-handle.right { right: -5px; top: 50%; width: 10px; height: 20px; margin-top: -10px; cursor: e-resize; }
+    .resize-handle.top-left { top: -5px; left: -5px; cursor: nw-resize; }
+    .resize-handle.top-right { top: -5px; right: -5px; cursor: ne-resize; }
+    .resize-handle.bottom-left { bottom: -5px; left: -5px; cursor: sw-resize; }
+    .resize-handle.bottom-right { bottom: -5px; right: -5px; cursor: se-resize; }
+
+    .block { position: absolute; background: linear-gradient(135deg,#3a3a3a 0%,#2a2a2a 100%); border: 2px solid #555; border-radius: 8px; padding: 10px; cursor: move; transition: all .2s; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #ccc; overflow: hidden; }
+    .block:hover { border-color: #777; transform: translateY(-1px); }
+    .block.dragging { opacity: .8; z-index: 1000; border-color: #06c; }
+    .block.over-panel { opacity: .5; }
+    .block-content { text-align: center; }
+    .block-title { font-weight: bold; margin-bottom: 5px; }
+    .block-value { font-size: 16px; color: #4caf50; }
+
+    .settings-btn-small { position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; background: rgba(100,100,100,.7); border: 1px solid #666; border-radius: 3px; color: #fff; font-size: 12px; cursor: pointer; opacity: 0; transition: all .2s; display: flex; align-items: center; justify-content: center; z-index: 10; }
+    .unlocked .settings-btn-small { opacity: 1; }
+    .settings-btn-small:hover { background: rgba(150,150,150,.9); }
+
+    .field-menu-block { background: linear-gradient(135deg,#2a2a2a 0%,#1a1a1a 100%); border-color: #666; }
+    .field-menu-block:hover { background: linear-gradient(135deg,#3a3a3a 0%,#2a2a2a 100%); }
+
+    .field-settings-menu { position: absolute; background: rgba(30,30,30,.95); border: 2px solid #555; border-radius: 8px; padding: 10px; display: none; z-index: 500; box-shadow: 0 4px 20px rgba(0,0,0,.5); max-height: calc(100% - 8px); overflow: auto; }
+    .field-settings-menu.active { display: block; }
+
+    .menu-block { background: rgba(40,40,40,.9); border: 1px solid #666; margin-bottom: 8px; padding: 8px; border-radius: 4px; cursor: move; display: flex; align-items: center; justify-content: center; }
+    .menu-block:hover { background: rgba(60,60,60,.9); border-color: #888; }
+    .menu-block:last-child { margin-bottom: 0; }
+
+    .block.in-menu { position: relative !important; width: 100% !important; height: auto !important; left: auto !important; right: auto !important; top: auto !important; bottom: auto !important; }
+
+    .settings-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2a2a2a; border: 2px solid #555; border-radius: 8px; padding: 20px; z-index: 2000; min-width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,.5); }
+    .settings-modal.active { display: block; }
+    .settings-header { font-size: 18px; margin-bottom: 15px; color: #ccc; }
+    .settings-row { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .settings-input { background: #1a1a1a; border: 1px solid #444; color: #fff; padding: 5px 10px; border-radius: 4px; width: 120px; }
+    .settings-select { background: #1a1a1a; border: 1px solid #444; color: #fff; padding: 5px 10px; border-radius: 4px; width: 120px; }
+    .settings-buttons { margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end; }
+    .settings-btn { background: #4a4a4a; border: 1px solid #666; color: #fff; padding: 5px 15px; border-radius: 4px; cursor: pointer; transition: all .2s; }
+    .settings-btn:hover { background: #5a5a5a; }
+    .settings-btn.primary { background: #06c; }
+    .settings-btn.primary:hover { background: #08f; }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); z-index: 1999; }
+    .modal-overlay.active { display: block; }
+
+    .collision-indicator { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,0,0,.2); border: 2px dashed #f00; border-radius: 6px; pointer-events: none; opacity: 0; transition: opacity .2s; }
+    .block.collision .collision-indicator { opacity: 1; }
+
+    /* Visual drop indicator for sorting inside the Field Settings menu */
+    .drop-indicator { height: 4px; background: #08f; border-radius: 2px; margin: 4px 2px; opacity: .9; box-shadow: 0 0 6px rgba(0,136,255,.7); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="menu-bar">
+      <div class="menu-item">File</div>
+      <div class="menu-item">Edit</div>
+      <div class="menu-item">View</div>
+      <div class="menu-item">Settings</div>
+      <div class="menu-item">Services</div>
+      <div class="menu-item">Help</div>
+    </div>
+    <button class="unlock-btn" id="unlockBtn">🔒 Unlock UI</button>
+  </div>
+
+  <div class="container" id="container">
+    <div class="grid-container"><svg class="grid-svg" id="gridSvg"></svg></div>
+
+    <!-- Main Panel -->
+    <div class="panel" id="mainPanel" style="left:10%;bottom:0;width:80%;height:60%;">
+      <button class="settings-btn-small" onclick="openPanelSettings('mainPanel')">⚙</button>
+      <div class="panel-title">Main Display Panel</div>
+      <div class="panel-content">GPS Coordinates, Field Map, Vehicle Status</div>
+      <div class="resize-handle top"></div><div class="resize-handle bottom"></div><div class="resize-handle left"></div><div class="resize-handle right"></div>
+      <div class="resize-handle top-left corner"></div><div class="resize-handle top-right corner"></div><div class="resize-handle bottom-left corner"></div><div class="resize-handle bottom-right corner"></div>
+    </div>
+
+    <!-- Field Settings Block (launcher) -->
+    <div class="block field-menu-block" id="fieldSettingsBlock" style="left:0;bottom:60%;width:10%;height:12%;">
+      <button class="settings-btn-small" onclick="openBlockSettings('fieldSettingsBlock')">⚙</button>
+      <div class="collision-indicator"></div>
+      <div class="block-content"><div class="block-title">Field Settings</div><div class="block-value">⚙</div></div>
+    </div>
+
+    <!-- Field Settings Menu (docking column) -->
+    <div class="field-settings-menu" id="fieldSettingsMenu">
+      <div class="menu-block">Field Boundaries</div>
+      <div class="menu-block">Headland Setup</div>
+      <div class="menu-block">AB Lines</div>
+      <div class="menu-block" style="margin-bottom:0;">Contour Mode</div>
+    </div>
+
+    <!-- Left Blocks -->
+    <div class="block" id="block1" style="left:0;bottom:0;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block1')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Speed</div><div class="block-value">12.5 km/h</div></div></div>
+    <div class="block" id="block2" style="left:0;bottom:12%;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block2')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Heading</div><div class="block-value">N 45°</div></div></div>
+    <div class="block" id="block3" style="left:0;bottom:24%;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block3')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Altitude</div><div class="block-value">342 m</div></div></div>
+    <div class="block" id="block4" style="left:0;bottom:36%;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block4')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Satellites</div><div class="block-value">12/16</div></div></div>
+    <div class="block" id="block5" style="left:0;bottom:48%;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block5')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Accuracy</div><div class="block-value">±2 cm</div></div></div>
+
+    <!-- Right Blocks -->
+    <div class="block" id="block6" style="right:0;bottom:0;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block6')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Steering</div><div class="block-value">Auto</div></div></div>
+    <div class="block" id="block7" style="right:0;bottom:12%;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block7')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Section 1</div><div class="block-value">ON</div></div></div>
+    <div class="block" id="block8" style="right:0;bottom:24%;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block8')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Section 2</div><div class="block-value">OFF</div></div></div>
+    <div class="block" id="block9" style="right:0;bottom:36%;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block9')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Boom</div><div class="block-value">Up</div></div></div>
+    <div class="block" id="block10" style="right:0;bottom:48%;width:10%;height:12%;"><button class="settings-btn-small" onclick="openBlockSettings('block10')">⚙</button><div class="collision-indicator"></div><div class="block-content"><div class="block-title">Rate</div><div class="block-value">150 L/Ha</div></div></div>
+  </div>
+
+  <!-- Settings Modals -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="settings-modal" id="blockSettingsModal">
+    <div class="settings-header">Block Settings</div>
+    <div class="settings-row"><label>Title:</label><input type="text" class="settings-input" id="blockTitle"></div>
+    <div class="settings-row"><label>Value:</label><input type="text" class="settings-input" id="blockValue"></div>
+    <div class="settings-row"><label>Width (grid units):</label><input type="number" class="settings-input" id="blockWidth" step="0.5" min="0.5" max="3"></div>
+    <div class="settings-row"><label>Height (grid units):</label><input type="number" class="settings-input" id="blockHeight" step="0.5" min="0.5" max="3"></div>
+    <div class="settings-row"><label>Background Opacity:</label><input type="range" class="settings-input" id="blockOpacity" min="0" max="100"></div>
+    <div class="settings-row"><label>Text Color:</label>
+      <select class="settings-select" id="blockTextColor">
+        <option value="#ccc">Light Gray</option>
+        <option value="#4CAF50">Green</option>
+        <option value="#2196F3">Blue</option>
+        <option value="#FF9800">Orange</option>
+        <option value="#F44336">Red</option>
+        <option value="#fff">White</option>
+      </select>
+    </div>
+    <div class="settings-buttons"><button class="settings-btn" onclick="closeSettings()">Cancel</button><button class="settings-btn primary" onclick="applyBlockSettings()">Apply</button></div>
+  </div>
+  <div class="settings-modal" id="panelSettingsModal">
+    <div class="settings-header">Panel Settings</div>
+    <div class="settings-row"><label>Title:</label><input type="text" class="settings-input" id="panelTitle"></div>
+    <div class="settings-row"><label>Content:</label><input type="text" class="settings-input" id="panelContent"></div>
+    <div class="settings-row"><label>Bottom-Left X:</label><input type="number" class="settings-input" id="panelStartX" step="0.5"></div>
+    <div class="settings-row"><label>Bottom-Left Y:</label><input type="number" class="settings-input" id="panelStartY" step="0.5"></div>
+    <div class="settings-row"><label>Top-Right X:</label><input type="number" class="settings-input" id="panelEndX" step="0.5"></div>
+    <div class="settings-row"><label>Top-Right Y:</label><input type="number" class="settings-input" id="panelEndY" step="0.5"></div>
+    <div class="settings-row"><label>Background Opacity:</label><input type="range" class="settings-input" id="panelOpacity" min="0" max="100"></div>
+    <div class="settings-buttons"><button class="settings-btn" onclick="closeSettings()">Cancel</button><button class="settings-btn primary" onclick="applyPanelSettings()">Apply</button></div>
+  </div>
+
+  <script>
+    // --- State ---
+    let isUnlocked = false;
+    let gridSize = 10;   // whole units across
+    let gridUnit = 0;    // px per whole unit
+
+    let draggedElement = null;
+    let dragOffset = { x: 0, y: 0 };
+    let currentPanel = null;
+    let currentBlock = null;
+    let resizeHandle = null;
+    let resizeStart = {};
+
+    let fieldMenuOpen = false;
+    let isMenuDrag = false; // when dragging inside the menu for reordering
+    let menuDropPlaceholder = null; // singleton drop indicator
+
+    // --- DOM ---
+    const container = document.getElementById('container');
+    const gridSvg = document.getElementById('gridSvg');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const fieldSettingsBlock = document.getElementById('fieldSettingsBlock');
+    const fieldSettingsMenu = document.getElementById('fieldSettingsMenu');
+
+    // --- Grid drawing ---
+    function updateGrid() {
+      const rect = container.getBoundingClientRect();
+      gridUnit = rect.width / gridSize; // 1.0 unit = gridUnit px; 0.5 unit = gridUnit/2
+      gridSvg.innerHTML = '';
+
+      // Half-grid checkerboard
+      const cols = Math.ceil(rect.width / (gridUnit / 2));
+      const rows = Math.ceil(rect.height / (gridUnit / 2));
+      for (let j = 0; j < rows; j++) {
+        for (let i = 0; i < cols; i++) {
+          if ((i + j) % 2 === 1) {
+            const cell = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            cell.setAttribute('x', i * (gridUnit / 2));
+            const yTop = rect.height - (j + 1) * (gridUnit / 2); // svg y=0 at top
+            cell.setAttribute('y', yTop);
+            cell.setAttribute('width', gridUnit / 2);
+            cell.setAttribute('height', gridUnit / 2);
+            cell.setAttribute('class', 'grid-cell');
+            gridSvg.appendChild(cell);
+          }
+        }
+      }
+
+      // Vertical lines + labels
+      for (let i = 0; i <= gridSize * 2; i++) {
+        const x = i * (gridUnit / 2);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x); line.setAttribute('y1', 0); line.setAttribute('x2', x); line.setAttribute('y2', rect.height);
+        line.classList.add('grid-line');
+        line.classList.add(i % 2 === 0 ? 'major' : 'sub');
+        gridSvg.appendChild(line);
+        if (i % 2 === 0 && i > 0) {
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', x - 10); text.setAttribute('y', rect.height - 5);
+          text.setAttribute('class', 'grid-label');
+          text.textContent = i / 2;
+          gridSvg.appendChild(text);
+        }
+      }
+
+      // Horizontal lines + labels
+      for (let i = 0; i <= rows; i++) {
+        const y = rect.height - (i * (gridUnit / 2));
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', 0); line.setAttribute('y1', y); line.setAttribute('x2', rect.width); line.setAttribute('y2', y);
+        line.classList.add('grid-line');
+        line.classList.add(i % 2 === 0 ? 'major' : 'sub');
+        gridSvg.appendChild(line);
+        if (i % 2 === 0 && i > 0) {
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', 5); text.setAttribute('y', y + 15);
+          text.setAttribute('class', 'grid-label');
+          text.textContent = i / 2;
+          gridSvg.appendChild(text);
+        }
+      }
+
+      // Sparse 0.5 intersection dots
+      for (let i = 0; i <= gridSize * 2; i++) {
+        if (i % 2 === 1) {
+          const x = i * (gridUnit / 2);
+          for (let j = 0; j <= rows; j++) {
+            if (j % 2 === 1) {
+              const y = rect.height - (j * (gridUnit / 2));
+              const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+              dot.setAttribute('cx', x); dot.setAttribute('cy', y); dot.setAttribute('r', 1.2);
+              dot.setAttribute('class', 'grid-dot');
+              gridSvg.appendChild(dot);
+            }
+          }
+        }
+      }
+    }
+
+    function snap(v) { return Math.round(v / (gridUnit / 2)) * (gridUnit / 2); }
+    function roundHalfUnits(u) { return Math.round(u * 2) / 2; }
+
+    function checkCollisions(moving) {
+      const blocks = document.querySelectorAll('.block');
+      const movingRect = moving.getBoundingClientRect();
+      for (let block of blocks) {
+        if (block === moving || block === fieldSettingsBlock || block.closest('.field-settings-menu')) continue;
+        const r = block.getBoundingClientRect();
+        if (!(movingRect.right <= r.left || movingRect.left >= r.right || movingRect.bottom <= r.top || movingRect.top >= r.bottom)) return true;
+      }
+      return false;
+    }
+
+    function overPanel(block) {
+      const panels = document.querySelectorAll('.panel');
+      const bRect = block.getBoundingClientRect();
+      for (let p of panels) {
+        const pRect = p.getBoundingClientRect();
+        if (!(bRect.right <= pRect.left || bRect.left >= pRect.right || bRect.bottom <= pRect.top || bRect.top >= pRect.bottom)) return true;
+      }
+      return false;
+    }
+
+    // ---- Field menu sizing and conversion ----
+    function sizeFieldMenuItems() {
+      fieldSettingsMenu.style.width = gridUnit + 'px';
+      const items = fieldSettingsMenu.querySelectorAll('.menu-block, .block.in-menu');
+      items.forEach(it => {
+        it.style.height = Math.round(gridUnit * 0.9) + 'px';
+        it.style.width = '100%';
+      });
+    }
+
+    let menuBlockCounter = 0;
+    function convertMenuItemsToBlocks() {
+      const items = Array.from(fieldSettingsMenu.querySelectorAll('.menu-block'));
+      items.forEach(it => {
+        if (it.classList.contains('block')) return; // already converted
+        const title = it.textContent.trim();
+        const id = 'menuBlock' + (++menuBlockCounter);
+        it.classList.add('block', 'in-menu');
+        it.id = id;
+        it.innerHTML = `<button class="settings-btn-small" onclick="openBlockSettings('${id}')">⚙</button>
+                        <div class="collision-indicator"></div>
+                        <div class="block-content"><div class="block-title">${title}</div><div class="block-value">—</div></div>`;
+        it.addEventListener('mousedown', startDrag);
+      });
+      sizeFieldMenuItems();
+    }
+
+    // ---- Menu drop placeholder (single instance) ----
+    function ensureMenuPlaceholder() {
+      if (!menuDropPlaceholder) {
+        menuDropPlaceholder = document.createElement('div');
+        menuDropPlaceholder.className = 'drop-indicator';
+      }
+      if (!menuDropPlaceholder.parentElement) {
+        fieldSettingsMenu.appendChild(menuDropPlaceholder);
+      }
+    }
+    function removeMenuPlaceholder() {
+      if (menuDropPlaceholder && menuDropPlaceholder.parentElement) {
+        menuDropPlaceholder.parentElement.removeChild(menuDropPlaceholder);
+      }
+    }
+    function positionPlaceholderAt(clientY) {
+      ensureMenuPlaceholder();
+      const items = Array.from(fieldSettingsMenu.querySelectorAll('.block.in-menu'))
+        .filter(n => n !== menuDropPlaceholder && n !== draggedElement);
+      let inserted = false;
+      for (const child of items) {
+        const r = child.getBoundingClientRect();
+        const mid = r.top + r.height / 2;
+        if (clientY < mid) {
+          fieldSettingsMenu.insertBefore(menuDropPlaceholder, child);
+          inserted = true;
+          break;
+        }
+      }
+      if (!inserted) fieldSettingsMenu.appendChild(menuDropPlaceholder);
+    }
+    function commitPlaceholderWith(el) {
+      if (menuDropPlaceholder && menuDropPlaceholder.parentElement) {
+        fieldSettingsMenu.insertBefore(el, menuDropPlaceholder);
+        removeMenuPlaceholder();
+      } else {
+        placeBlockInMenu(el);
+      }
+      sizeFieldMenuItems();
+    }
+
+    // ---- Persist block grid size across menu <-> grid ----
+    function saveGridSize(el) {
+      el.dataset.gridW = el.offsetWidth;
+      el.dataset.gridH = el.offsetHeight;
+    }
+    function restoreGridSize(el) {
+      if (el.dataset.gridW && el.dataset.gridH) {
+        el.style.width = el.dataset.gridW + 'px';
+        el.style.height = el.dataset.gridH + 'px';
+      }
+    }
+
+    function placeBlockInMenu(el) {
+      if (!el.classList.contains('in-menu')) saveGridSize(el);
+      el.classList.add('in-menu');
+      el.style.position = 'relative';
+      el.style.left = '';
+      el.style.bottom = '';
+      el.style.right = '';
+      el.style.top = '';
+      el.style.width = '100%';
+      el.style.height = Math.round(gridUnit * 0.9) + 'px';
+      fieldSettingsMenu.appendChild(el);
+    }
+    function placeBlockInGrid(el) {
+      el.classList.remove('in-menu');
+      container.appendChild(el);
+      restoreGridSize(el);
+    }
+
+    // ---- Menu positioning ----
+    function positionFieldMenu() {
+      sizeFieldMenuItems();
+      const b = fieldSettingsBlock.getBoundingClientRect();
+      const c = container.getBoundingClientRect();
+      const gap = Math.round(gridUnit * 0.1);
+      const menuWidth = gridUnit;
+
+      // Prefer right, otherwise left
+      let left = (b.right - c.left) + gap;
+      if (left + menuWidth > c.width) left = (b.left - c.left) - gap - menuWidth;
+      left = Math.max(0, Math.min(left, c.width - menuWidth));
+      fieldSettingsMenu.style.left = left + 'px';
+      fieldSettingsMenu.style.right = '';
+
+      // Align top with block top, clamp vertically
+      const mh = fieldSettingsMenu.getBoundingClientRect().height;
+      let bottom = c.height - (b.top - c.top) - mh;
+      bottom = Math.max(0, Math.min(bottom, c.height - mh));
+      fieldSettingsMenu.style.bottom = bottom + 'px';
+    }
+
+    function toggleFieldMenu() {
+      fieldMenuOpen = !fieldMenuOpen;
+      fieldSettingsMenu.classList.toggle('active', fieldMenuOpen);
+      if (fieldMenuOpen) {
+        convertMenuItemsToBlocks();
+        positionFieldMenu();
+      } else {
+        removeMenuPlaceholder();
+      }
+    }
+
+    // ---- Events ----
+    fieldSettingsBlock.addEventListener('click', (e) => { e.stopPropagation(); toggleFieldMenu(); });
+    document.addEventListener('click', (e) => {
+      if (fieldMenuOpen && !e.target.closest('.field-settings-menu') && !e.target.closest('.field-menu-block')) {
+        fieldMenuOpen = false; fieldSettingsMenu.classList.remove('active'); removeMenuPlaceholder();
+      }
+    });
+    unlockBtn.addEventListener('click', () => {
+      isUnlocked = !isUnlocked;
+      container.classList.toggle('unlocked', isUnlocked);
+      unlockBtn.textContent = isUnlocked ? '🔓 Lock UI' : '🔒 Unlock UI';
+      unlockBtn.classList.toggle('active', isUnlocked);
+      if (!isUnlocked && fieldMenuOpen) { fieldMenuOpen = false; fieldSettingsMenu.classList.remove('active'); removeMenuPlaceholder(); }
+    });
+
+    document.querySelectorAll('.block').forEach(b => b.addEventListener('mousedown', startDrag));
+    document.querySelectorAll('.panel').forEach(p => p.addEventListener('mousedown', startPanelDrag));
+    document.querySelectorAll('.resize-handle').forEach(h => h.addEventListener('mousedown', startResize));
+
+    function startDrag(e) {
+      if (!isUnlocked || e.target.classList.contains('settings-btn-small')) return;
+      const el = e.currentTarget;
+      if (el.classList.contains('in-menu')) {
+        // In-menu reorder mode
+        isMenuDrag = true;
+        ensureMenuPlaceholder();
+        positionPlaceholderAt(e.clientY);
+      }
+      draggedElement = el; draggedElement.classList.add('dragging');
+      const r = draggedElement.getBoundingClientRect();
+      const c = container.getBoundingClientRect();
+      dragOffset.x = e.clientX - r.left; dragOffset.y = e.clientY - r.top; e.preventDefault();
+    }
+
+    function startPanelDrag(e) {
+      if (!isUnlocked || e.target.classList.contains('resize-handle') || e.target.classList.contains('settings-btn-small')) return;
+      draggedElement = e.currentTarget; draggedElement.classList.add('dragging');
+      const r = draggedElement.getBoundingClientRect();
+      dragOffset.x = e.clientX - r.left; dragOffset.y = e.clientY - r.top; currentPanel = draggedElement; e.preventDefault();
+    }
+
+    function startResize(e) {
+      if (!isUnlocked) return;
+      resizeHandle = e.currentTarget; const p = resizeHandle.closest('.panel');
+      resizeStart = { width: p.offsetWidth, height: p.offsetHeight, left: p.offsetLeft, bottom: container.offsetHeight - p.offsetTop - p.offsetHeight, x: e.clientX, y: e.clientY };
+      e.preventDefault(); e.stopPropagation();
+    }
+
+    document.addEventListener('mousemove', e => {
+      if (draggedElement) {
+        if (isMenuDrag) {
+          positionPlaceholderAt(e.clientY);
+        } else {
+          const c = container.getBoundingClientRect();
+          const rawLeft = e.clientX - c.left - dragOffset.x;
+          const rawTop = e.clientY - c.top - dragOffset.y;
+          let left = Math.max(0, Math.min(rawLeft, c.width - draggedElement.offsetWidth));
+          let top = Math.max(0, Math.min(rawTop, c.height - draggedElement.offsetHeight));
+          left = snap(left); top = snap(top);
+          const offsetFromBottom = draggedElement.offsetHeight - dragOffset.y;
+          let rawBottom = (c.height - (e.clientY - c.top)) - offsetFromBottom;
+          let bottom = Math.max(0, Math.min(rawBottom, c.height - draggedElement.offsetHeight));
+          bottom = snap(bottom);
+          draggedElement.style.left = left + 'px';
+          draggedElement.style.bottom = bottom + 'px';
+          if (draggedElement.classList.contains('block')) {
+            checkCollisions(draggedElement) ? draggedElement.classList.add('collision') : draggedElement.classList.remove('collision');
+            overPanel(draggedElement) ? draggedElement.classList.add('over-panel') : draggedElement.classList.remove('over-panel');
+          }
+        }
+      }
+
+      if (resizeHandle) {
+        const p = resizeHandle.closest('.panel');
+        const c = container.getBoundingClientRect();
+        const dx = e.clientX - resizeStart.x;
+        const dy = e.clientY - resizeStart.y;
+        let w = resizeStart.width;
+        let h = resizeStart.height;
+        let l = resizeStart.left;
+        let b = resizeStart.bottom;
+        if (resizeHandle.classList.contains('right') || resizeHandle.classList.contains('top-right') || resizeHandle.classList.contains('bottom-right')) w = resizeStart.width + dx;
+        if (resizeHandle.classList.contains('left') || resizeHandle.classList.contains('top-left') || resizeHandle.classList.contains('bottom-left')) { l = resizeStart.left + dx; w = resizeStart.width - dx; }
+        if (resizeHandle.classList.contains('bottom') || resizeHandle.classList.contains('bottom-left') || resizeHandle.classList.contains('bottom-right')) { b = resizeStart.bottom - dy; h = resizeStart.height + dy; }
+        if (resizeHandle.classList.contains('top') || resizeHandle.classList.contains('top-left') || resizeHandle.classList.contains('top-right')) { h = resizeStart.height - dy; b = resizeStart.bottom; }
+        w = Math.max(100, w); h = Math.max(100, h);
+        w = snap(w); h = snap(h);
+        l = snap(Math.max(0, Math.min(l, c.width - w)));
+        b = snap(Math.max(0, Math.min(b, c.height - h)));
+        p.style.width = w + 'px'; p.style.height = h + 'px'; p.style.left = l + 'px'; p.style.bottom = b + 'px';
+      }
+    });
+
+    document.addEventListener('mouseup', (e) => {
+      if (draggedElement) {
+        const el = draggedElement;
+        const menuRect = fieldSettingsMenu.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const overlapsMenu = !(elRect.right <= menuRect.left || elRect.left >= menuRect.right || elRect.bottom <= menuRect.top || elRect.top >= menuRect.bottom);
+        if (isMenuDrag) {
+          if (!overlapsMenu) {
+            // Leave the menu -> grid drop, preserve size
+            const cRect = container.getBoundingClientRect();
+            const left = snap(Math.max(0, Math.min(e.clientX - cRect.left - dragOffset.x, cRect.width - el.offsetWidth)));
+            const top = Math.max(0, Math.min(e.clientY - cRect.top - dragOffset.y, cRect.height - el.offsetHeight));
+            const bottom = snap(Math.max(0, Math.min(cRect.height - top - el.offsetHeight, cRect.height - el.offsetHeight)));
+            placeBlockInGrid(el);
+            el.style.left = left + 'px';
+            el.style.bottom = bottom + 'px';
+            removeMenuPlaceholder();
+          } else {
+            // Commit position in menu
+            commitPlaceholderWith(el);
+          }
+        } else {
+          if (overlapsMenu) {
+            ensureMenuPlaceholder();
+            positionPlaceholderAt(e.clientY);
+            commitPlaceholderWith(el);
+          }
+        }
+        if (el.classList.contains('collision')) {
+          const ox = parseFloat(el.dataset.ox || 0), oy = parseFloat(el.dataset.oy || 0);
+          if (ox || oy) { el.style.left = ox + 'px'; el.style.bottom = oy + 'px'; }
+        }
+        el.classList.remove('dragging');
+        draggedElement = null;
+        isMenuDrag = false;
+      }
+      resizeHandle = null;
+    });
+
+    // ---- Settings modals ----
+    function openBlockSettings(id) {
+      currentBlock = document.getElementById(id);
+      document.getElementById('blockTitle').value = currentBlock.querySelector('.block-title').textContent;
+      document.getElementById('blockValue').value = currentBlock.querySelector('.block-value').textContent;
+      document.getElementById('blockWidth').value = roundHalfUnits(currentBlock.offsetWidth / gridUnit).toFixed(1);
+      document.getElementById('blockHeight').value = roundHalfUnits(currentBlock.offsetHeight / gridUnit).toFixed(1);
+      const bg = window.getComputedStyle(currentBlock).backgroundColor;
+      let alpha = 100;
+      if (bg.includes('rgba')) {
+        const parts = bg.split(',');
+        alpha = Math.round(parseFloat(parts[3] || parts[3].replace(')', '')) * 100);
+      }
+      document.getElementById('blockOpacity').value = alpha;
+      document.getElementById('blockTextColor').value = window.getComputedStyle(currentBlock.querySelector('.block-value')).color;
+      document.getElementById('blockSettingsModal').classList.add('active');
+      modalOverlay.classList.add('active');
+    }
+
+    function openPanelSettings(id) {
+      currentPanel = document.getElementById(id);
+      document.getElementById('panelTitle').value = currentPanel.querySelector('.panel-title').textContent;
+      document.getElementById('panelContent').value = currentPanel.querySelector('.panel-content').textContent;
+      const c = container.getBoundingClientRect();
+      const p = currentPanel.getBoundingClientRect();
+      document.getElementById('panelStartX').value = roundHalfUnits(p.left / gridUnit).toFixed(1);
+      document.getElementById('panelStartY').value = roundHalfUnits((c.height - p.bottom) / gridUnit).toFixed(1);
+      document.getElementById('panelEndX').value = roundHalfUnits(p.right / gridUnit).toFixed(1);
+      document.getElementById('panelEndY').value = roundHalfUnits((c.height - p.top) / gridUnit).toFixed(1);
+      const bg = window.getComputedStyle(currentPanel).backgroundColor;
+      let alpha = 90;
+      if (bg.includes('rgba')) {
+        const parts = bg.split(','); alpha = Math.round(parseFloat(parts[3] || parts[3].replace(')', '')) * 100);
+      }
+      document.getElementById('panelOpacity').value = alpha;
+      document.getElementById('panelSettingsModal').classList.add('active');
+      modalOverlay.classList.add('active');
+    }
+
+    function closeSettings() {
+      document.querySelectorAll('.settings-modal').forEach(m => m.classList.remove('active'));
+      modalOverlay.classList.remove('active'); currentBlock = null; currentPanel = null;
+    }
+
+    modalOverlay.addEventListener('click', closeSettings);
+
+    function applyBlockSettings() {
+      if (currentBlock) {
+        const t = document.getElementById('blockTitle').value;
+        const v = document.getElementById('blockValue').value;
+        const w = roundHalfUnits(parseFloat(document.getElementById('blockWidth').value)) * gridUnit;
+        const h = roundHalfUnits(parseFloat(document.getElementById('blockHeight').value)) * gridUnit;
+        const o = document.getElementById('blockOpacity').value / 100;
+        const c = document.getElementById('blockTextColor').value;
+        currentBlock.querySelector('.block-title').textContent = t;
+        currentBlock.querySelector('.block-value').textContent = v;
+        currentBlock.style.width = w + 'px'; currentBlock.style.height = h + 'px';
+        currentBlock.style.background = `linear-gradient(135deg, ${hexToRgba('#3a3a3a', o)} 0%, ${hexToRgba('#2a2a2a', o)} 100%)`;
+        currentBlock.querySelector('.block-value').style.color = c;
+        saveGridSize(currentBlock); // keep persisted size updated
+      }
+      closeSettings();
+    }
+
+    function applyPanelSettings() {
+      if (currentPanel) {
+        const t = document.getElementById('panelTitle').value;
+        const ct = document.getElementById('panelContent').value;
+        const sx = roundHalfUnits(parseFloat(document.getElementById('panelStartX').value)) * gridUnit;
+        const sy = roundHalfUnits(parseFloat(document.getElementById('panelStartY').value)) * gridUnit;
+        const ex = roundHalfUnits(parseFloat(document.getElementById('panelEndX').value)) * gridUnit;
+        const ey = roundHalfUnits(parseFloat(document.getElementById('panelEndY').value)) * gridUnit;
+        const o = document.getElementById('panelOpacity').value / 100;
+        currentPanel.querySelector('.panel-title').textContent = t;
+        currentPanel.querySelector('.panel-content').textContent = ct;
+        currentPanel.style.left = sx + 'px'; currentPanel.style.bottom = sy + 'px'; currentPanel.style.width = (ex - sx) + 'px'; currentPanel.style.height = (ey - sy) + 'px';
+        currentPanel.style.background = `rgba(40,40,40,${o})`;
+      }
+      closeSettings();
+    }
+
+    function hexToRgba(hex, a) {
+      const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r},${g},${b},${a})`;
+    }
+
+    // --- Init ---
+    document.querySelectorAll('.block').forEach(b => { b.dataset.ox = b.offsetLeft; b.dataset.oy = parseInt(b.style.bottom) || 0; });
+    window.addEventListener('resize', () => { updateGrid(); sizeFieldMenuItems(); if (fieldMenuOpen) positionFieldMenu(); });
+    updateGrid();
+    convertMenuItemsToBlocks();
+    sizeFieldMenuItems();
+
+    // --- Self-tests (console) ---
+    (function runTests(){
+      try {
+        console.assert(document.documentElement.tagName === 'HTML', 'Root element should be <html>');
+        console.assert(typeof roundHalfUnits(1.26) === 'number' && roundHalfUnits(1.26) === 1.5, 'roundHalfUnits should round to nearest 0.5');
+        // menu bounds test
+        toggleFieldMenu();
+        const c = container.getBoundingClientRect();
+        const m = fieldSettingsMenu.getBoundingClientRect();
+        console.assert(m.left >= c.left - 0.5 && m.right <= c.right + 0.5, 'Menu should be horizontally within container');
+        console.assert(m.top >= c.top - 0.5 && m.bottom <= c.bottom + 0.5, 'Menu should be vertically within container');
+        // singleton placeholder test
+        ensureMenuPlaceholder(); ensureMenuPlaceholder();
+        const placeholders = fieldSettingsMenu.querySelectorAll('.drop-indicator');
+        console.assert(placeholders.length === 1, 'There must be exactly one drop indicator element');
+        removeMenuPlaceholder();
+        // menu items converted to blocks
+        const converted = fieldSettingsMenu.querySelectorAll('.block.in-menu');
+        console.assert(converted.length >= 4, 'Menu items should be converted to .block.in-menu');
+        // keep UI state clean
+        toggleFieldMenu();
+        console.log('Self-tests passed');
+      } catch (e) { console.warn('Self-tests error:', e); }
+    })();
+  </script>
+</body>
+</html>

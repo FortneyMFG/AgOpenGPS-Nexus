@@ -1,12 +1,16 @@
 # Aog.UI.Avalonia
 
-## Legacy shell layout parity (NX-1116)
+## Floating block shell (NX-1212)
 
-The main window shell now mirrors the V6 WPF layout, including the chrome header, left/right
-button strips, and bottom quick actions. `AppShellView` integrates `SidebarButtonViewModel`
-collections exposed by `MainWindowViewModel` so Avalonia renders the same legacy-inspired
-menus and strip buttons while retaining Nexus theming. The central workspace continues to host
-the boundary tool sample while the right-hand column preserves the diagnostics/summary panel.
+The main window shell now mirrors the floating block model used by the layout persistence store.
+`AppShellView` renders grid tiles, pane chrome, and floating overlays together so quick actions
+no longer depend on sidebar button templates. `BlockLayoutViewModel` exposes
+`FloatingBlockViewModel` instances backed by persisted `FloatingBlockSpec` records; the shell binds
+those overlays through `FloatingBlockOverlay` and the launcher dock instead of
+`SidebarButtonViewModel` collections. Default shortcut blocks (autosteer, sections, nudge, start)
+seed as overlay clones with themed gradients and border treatments defined in
+`NexusLegacyShellTheme.axaml`, keeping the workspace clear for mapping panels while still
+supporting drag, resize, and settings workflows.
 
 ## Zone editor toolbar (NX-291)
 
@@ -92,8 +96,8 @@ exercise queue, diagnostics, and follow-up messaging without mesh hardware.
 
 ## Diagnostics workspace (NX-416)
 
-`DiagnosticsWorkspaceViewModel` aggregates GPS, loop, network, and serial telemetry so the sidebar can
-mirror AGiO health. The workspace feeds off `TelemetryPrivacyViewModel` and
+`DiagnosticsWorkspaceViewModel` aggregates GPS, loop, network, and serial telemetry so the floating
+workspace can mirror AGiO health. The workspace feeds off `TelemetryPrivacyViewModel` and
 `DeviceManagerCompatibilityViewModel` to summarise opt-in status, plugin health, UDP throughput, loop
 frequency, and recent diagnostics events. Sample data mirrors NX-309/NX-311 fixtures, providing realistic
 metadata for designers while keeping the panel free from code-behind glue.

@@ -15,11 +15,11 @@
 
   <UserControl.Styles>
     <Style Selector="Border#Outline">
-      <Setter Property="BorderBrush" Value="#4F8CE0" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ShellChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="2" />
-      <Setter Property="CornerRadius" Value="8" />
-      <Setter Property="Background" Value="#401a2b3a" />
-      <Setter Property="Opacity" Value="0.92" />
+      <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusMd}" />
+      <Setter Property="Background" Value="{DynamicResource FloatingBlockBackgroundBrush}" />
+      <Setter Property="Opacity" Value="0.94" />
       <Style.Triggers>
         <DataTrigger Binding="{Binding IsColliding}" Value="True">
           <Setter Property="BorderBrush" Value="#FFDD5B5B" />
@@ -50,9 +50,9 @@
           <RowDefinition Height="Auto" />
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Border Background="#27101010"
+        <Border Background="#1A0C1626"
                 Padding="8"
-                CornerRadius="6,6,0,0">
+                CornerRadius="{DynamicResource ThemeRadiusSm}">
           <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
             <TextBlock Text="{Binding Label}" FontWeight="SemiBold" Foreground="#F0F4F8" />
             <Button Command="{Binding OpenSettingsCommand}"

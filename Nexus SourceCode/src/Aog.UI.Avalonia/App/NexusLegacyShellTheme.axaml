@@ -2,72 +2,88 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <ResourceDictionary.ThemeDictionaries>
     <ResourceDictionary x:Key="Light">
-      <Color x:Key="ThemeColorSurface">#FFFFFFFF</Color>
-      <Color x:Key="ThemeColorSurfaceAlt">#FFF3F6FB</Color>
-      <Color x:Key="ThemeColorText">#FF1F2933</Color>
-      <Color x:Key="ThemeColorAccent">#FF1D9BF0</Color>
-      <Color x:Key="ThemeColorAccentMuted">#FF7CC4FF</Color>
-      <Color x:Key="ThemeColorSuccess">#FF2DCB74</Color>
-      <Color x:Key="ThemeColorWarning">#FFF7B529</Color>
-      <Color x:Key="ThemeColorDanger">#FFE5484D</Color>
-      <SolidColorBrush x:Key="ThemeSurfaceBrush" Color="#FFFFFFFF" />
-      <SolidColorBrush x:Key="ThemeSurfaceAltBrush" Color="#FFF3F6FB" />
-      <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FF1F2933" />
-      <SolidColorBrush x:Key="ThemeAccentBrush" Color="#FF1D9BF0" />
-      <SolidColorBrush x:Key="ThemeAccentMutedBrush" Color="#FF7CC4FF" />
-      <SolidColorBrush x:Key="ThemeSuccessBrush" Color="#FF2DCB74" />
-      <SolidColorBrush x:Key="ThemeWarningBrush" Color="#FFF7B529" />
-      <SolidColorBrush x:Key="ThemeDangerBrush" Color="#FFE5484D" />
-      <SolidColorBrush x:Key="ShellChromeBackgroundBrush" Color="#FF1F2D3D" />
-      <SolidColorBrush x:Key="ShellChromeBorderBrush" Color="#FF2D3E52" />
-      <SolidColorBrush x:Key="ShellPanelBackgroundBrush" Color="#FFFFFFFF" />
-      <SolidColorBrush x:Key="ShellPanelBorderBrush" Color="#FFD1D8E0" />
+      <Color x:Key="ThemeColorSurface">#FF111827</Color>
+      <Color x:Key="ThemeColorSurfaceAlt">#FF1F2937</Color>
+      <Color x:Key="ThemeColorText">#FFE2E8F0</Color>
+      <Color x:Key="ThemeColorAccent">#FF38BDF8</Color>
+      <Color x:Key="ThemeColorAccentMuted">#FFA5F3FC</Color>
+      <Color x:Key="ThemeColorSuccess">#FF22C55E</Color>
+      <Color x:Key="ThemeColorWarning">#FFF97316</Color>
+      <Color x:Key="ThemeColorDanger">#FFEF4444</Color>
+      <SolidColorBrush x:Key="ThemeSurfaceBrush" Color="#FF111827" />
+      <SolidColorBrush x:Key="ThemeSurfaceAltBrush" Color="#FF1F2937" />
+      <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FFE2E8F0" />
+      <SolidColorBrush x:Key="ThemeAccentBrush" Color="#FF38BDF8" />
+      <SolidColorBrush x:Key="ThemeAccentMutedBrush" Color="#FFA5F3FC" />
+      <SolidColorBrush x:Key="ThemeSuccessBrush" Color="#FF22C55E" />
+      <SolidColorBrush x:Key="ThemeWarningBrush" Color="#FFF97316" />
+      <SolidColorBrush x:Key="ThemeDangerBrush" Color="#FFEF4444" />
+      <SolidColorBrush x:Key="ShellChromeBackgroundBrush" Color="#FF0B1120" />
+      <LinearGradientBrush x:Key="ShellChromeGradientBrush" StartPoint="0,1" EndPoint="0,0">
+        <GradientStop Offset="0" Color="#FF0B1120" />
+        <GradientStop Offset="1" Color="#FF17233B" />
+      </LinearGradientBrush>
+      <SolidColorBrush x:Key="ShellChromeBorderBrush" Color="#FF1F2A40" />
+      <SolidColorBrush x:Key="ShellPanelBackgroundBrush" Color="#FF111827" />
+      <SolidColorBrush x:Key="ShellPanelBorderBrush" Color="#FF24324A" />
+      <LinearGradientBrush x:Key="FloatingBlockBackgroundBrush" StartPoint="0,1" EndPoint="1,0">
+        <GradientStop Offset="0" Color="#6620364F" />
+        <GradientStop Offset="1" Color="#661A2E4A" />
+      </LinearGradientBrush>
     </ResourceDictionary>
     <ResourceDictionary x:Key="Dark">
-      <Color x:Key="ThemeColorSurface">#FF131722</Color>
-      <Color x:Key="ThemeColorSurfaceAlt">#FF1F2534</Color>
-      <Color x:Key="ThemeColorText">#FFF8FAFC</Color>
-      <Color x:Key="ThemeColorAccent">#FF5AB9FF</Color>
-      <Color x:Key="ThemeColorAccentMuted">#FF94D2FF</Color>
-      <Color x:Key="ThemeColorSuccess">#FF4ADE80</Color>
-      <Color x:Key="ThemeColorWarning">#FFFACC15</Color>
-      <Color x:Key="ThemeColorDanger">#FFF87171</Color>
-      <SolidColorBrush x:Key="ThemeSurfaceBrush" Color="#FF131722" />
-      <SolidColorBrush x:Key="ThemeSurfaceAltBrush" Color="#FF1F2534" />
-      <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FFF8FAFC" />
-      <SolidColorBrush x:Key="ThemeAccentBrush" Color="#FF5AB9FF" />
-      <SolidColorBrush x:Key="ThemeAccentMutedBrush" Color="#FF94D2FF" />
-      <SolidColorBrush x:Key="ThemeSuccessBrush" Color="#FF4ADE80" />
-      <SolidColorBrush x:Key="ThemeWarningBrush" Color="#FFFACC15" />
-      <SolidColorBrush x:Key="ThemeDangerBrush" Color="#FFF87171" />
-      <SolidColorBrush x:Key="ShellChromeBackgroundBrush" Color="#FF0F1722" />
-      <SolidColorBrush x:Key="ShellChromeBorderBrush" Color="#FF243042" />
-      <SolidColorBrush x:Key="ShellPanelBackgroundBrush" Color="#FF101820" />
-      <SolidColorBrush x:Key="ShellPanelBorderBrush" Color="#FF1F2D3D" />
+      <Color x:Key="ThemeColorSurface">#FF070B16</Color>
+      <Color x:Key="ThemeColorSurfaceAlt">#FF101B2D</Color>
+      <Color x:Key="ThemeColorText">#FFCBD5F5</Color>
+      <Color x:Key="ThemeColorAccent">#FF0EA5E9</Color>
+      <Color x:Key="ThemeColorAccentMuted">#FF38BDF8</Color>
+      <Color x:Key="ThemeColorSuccess">#FF16A34A</Color>
+      <Color x:Key="ThemeColorWarning">#FFEAB308</Color>
+      <Color x:Key="ThemeColorDanger">#FFDC2626</Color>
+      <SolidColorBrush x:Key="ThemeSurfaceBrush" Color="#FF070B16" />
+      <SolidColorBrush x:Key="ThemeSurfaceAltBrush" Color="#FF101B2D" />
+      <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FFCBD5F5" />
+      <SolidColorBrush x:Key="ThemeAccentBrush" Color="#FF0EA5E9" />
+      <SolidColorBrush x:Key="ThemeAccentMutedBrush" Color="#FF38BDF8" />
+      <SolidColorBrush x:Key="ThemeSuccessBrush" Color="#FF16A34A" />
+      <SolidColorBrush x:Key="ThemeWarningBrush" Color="#FFEAB308" />
+      <SolidColorBrush x:Key="ThemeDangerBrush" Color="#FFDC2626" />
+      <SolidColorBrush x:Key="ShellChromeBackgroundBrush" Color="#FF040714" />
+      <LinearGradientBrush x:Key="ShellChromeGradientBrush" StartPoint="0,1" EndPoint="0,0">
+        <GradientStop Offset="0" Color="#FF040714" />
+        <GradientStop Offset="1" Color="#FF13203A" />
+      </LinearGradientBrush>
+      <SolidColorBrush x:Key="ShellChromeBorderBrush" Color="#FF1B2A45" />
+      <SolidColorBrush x:Key="ShellPanelBackgroundBrush" Color="#FF0B1120" />
+      <SolidColorBrush x:Key="ShellPanelBorderBrush" Color="#FF1F2A40" />
+      <LinearGradientBrush x:Key="FloatingBlockBackgroundBrush" StartPoint="0,1" EndPoint="1,0">
+        <GradientStop Offset="0" Color="#6622394F" />
+        <GradientStop Offset="1" Color="#66142B43" />
+      </LinearGradientBrush>
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
 
-  <x:Double x:Key="ThemeFontSizeXs">10</x:Double>
-  <x:Double x:Key="ThemeFontSizeSm">12</x:Double>
-  <x:Double x:Key="ThemeFontSizeMd">14</x:Double>
-  <x:Double x:Key="ThemeFontSizeLg">18</x:Double>
-  <x:Double x:Key="ThemeFontSizeXl">24</x:Double>
+  <x:Double x:Key="ThemeFontSizeXs">11</x:Double>
+  <x:Double x:Key="ThemeFontSizeSm">13</x:Double>
+  <x:Double x:Key="ThemeFontSizeMd">15</x:Double>
+  <x:Double x:Key="ThemeFontSizeLg">20</x:Double>
+  <x:Double x:Key="ThemeFontSizeXl">28</x:Double>
 
   <x:Double x:Key="ThemeSpacingXs">4</x:Double>
-  <x:Double x:Key="ThemeSpacingSm">8</x:Double>
-  <x:Double x:Key="ThemeSpacingMd">12</x:Double>
-  <x:Double x:Key="ThemeSpacingLg">16</x:Double>
-  <x:Double x:Key="ThemeSpacingXl">24</x:Double>
+  <x:Double x:Key="ThemeSpacingSm">10</x:Double>
+  <x:Double x:Key="ThemeSpacingMd">16</x:Double>
+  <x:Double x:Key="ThemeSpacingLg">20</x:Double>
+  <x:Double x:Key="ThemeSpacingXl">28</x:Double>
 
-  <Thickness x:Key="ThemeSpacingSmThickness">8</Thickness>
-  <Thickness x:Key="ThemeSpacingMdThickness">12</Thickness>
-  <Thickness x:Key="ThemeSpacingLgThickness">16</Thickness>
-  <Thickness x:Key="ThemeSpacingXlThickness">24</Thickness>
+  <Thickness x:Key="ThemeSpacingSmThickness">10</Thickness>
+  <Thickness x:Key="ThemeSpacingMdThickness">16</Thickness>
+  <Thickness x:Key="ThemeSpacingLgThickness">20</Thickness>
+  <Thickness x:Key="ThemeSpacingXlThickness">28</Thickness>
 
-  <CornerRadius x:Key="ThemeRadiusSm">4</CornerRadius>
-  <CornerRadius x:Key="ThemeRadiusMd">8</CornerRadius>
-  <CornerRadius x:Key="ThemeRadiusLg">12</CornerRadius>
+  <CornerRadius x:Key="ThemeRadiusSm">6</CornerRadius>
+  <CornerRadius x:Key="ThemeRadiusMd">12</CornerRadius>
+  <CornerRadius x:Key="ThemeRadiusLg">18</CornerRadius>
 
-  <Thickness x:Key="ShellChromePadding">8,10</Thickness>
-  <Thickness x:Key="ShellToolbarButtonPadding">12,6</Thickness>
+  <Thickness x:Key="ShellChromePadding">12,14</Thickness>
+  <Thickness x:Key="ShellToolbarButtonPadding">14,6</Thickness>
 </ResourceDictionary>

@@ -38,7 +38,7 @@ related_tickets: []
 ## UI
 
 - [UI overview](UI/README.md) — Avalonia run modes, metadata-driven layout patterns, and lifecycle guidance.
-- [Sidebar layout overview](UI/sidebar-layout-overview.md) — shell navigation conventions and workspace expectations.
+- [Floating block layout overview](UI/floating-block-overview.md) — shell overlays, launcher behaviours, and workspace expectations.
 - [Metadata-driven style guide](UI/metadata-driven-ui-style-guide.md) — theming, typography, and control inventories.
 - [UI session lifecycle](UI/ui-session-lifecycle.md) — orchestration between Core, UI hosts, and plugins.
 

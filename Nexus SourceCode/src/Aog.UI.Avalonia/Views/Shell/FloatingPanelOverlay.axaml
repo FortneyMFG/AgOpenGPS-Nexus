@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
              xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             xmlns:styling="clr-namespace:Avalonia.Styling;assembly=Avalonia.Styling"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.FloatingPanelOverlay"
              x:DataType="vm:FloatingPanelViewModel"
@@ -21,13 +22,13 @@
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Opacity" Value="0.9" />
       <Style.Triggers>
-        <DataTrigger Binding="{Binding IsColliding}" Value="True">
+        <styling:DataTrigger Binding="{Binding IsColliding}" Value="True">
           <Setter Property="BorderBrush" Value="#FFDD5B5B" />
           <Setter Property="Background" Value="#40DD5B5B" />
-        </DataTrigger>
-        <DataTrigger Binding="{Binding IsLocked}" Value="True">
+        </styling:DataTrigger>
+        <styling:DataTrigger Binding="{Binding IsLocked}" Value="True">
           <Setter Property="Opacity" Value="0.72" />
-        </DataTrigger>
+        </styling:DataTrigger>
       </Style.Triggers>
     </Style>
 

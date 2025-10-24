@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
              xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             xmlns:styling="clr-namespace:Avalonia.Styling;assembly=Avalonia.Styling"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Field.FieldSettingsDock"
              x:DataType="vm:BlockLayoutViewModel"
@@ -86,13 +87,13 @@
       <Setter Property="IsHitTestVisible" Value="False" />
       <Setter Property="Background" Value="#DD101010" />
       <Setter Property="Padding" Value="18" />
-      <Style.DataTriggers>
-        <DataTrigger Binding="{Binding IsLauncherDockVisible}" Value="True">
+      <Style.Triggers>
+        <styling:DataTrigger Binding="{Binding IsLauncherDockVisible}" Value="True">
           <Setter Property="Margin" Value="0" />
           <Setter Property="Opacity" Value="1" />
           <Setter Property="IsHitTestVisible" Value="True" />
-        </DataTrigger>
-      </Style.DataTriggers>
+        </styling:DataTrigger>
+      </Style.Triggers>
     </Style>
 
     <Style Selector="Border.menu-block">

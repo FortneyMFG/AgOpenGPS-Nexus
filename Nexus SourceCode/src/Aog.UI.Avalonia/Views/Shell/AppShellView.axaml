@@ -365,34 +365,34 @@
           x:Name="WorkspaceRoot"
           Background="#101010">
       <Canvas x:Name="LayoutCanvas"
-              Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
-              Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+              Width="{Binding #WorkspaceRoot.Bounds.Width}"
+              Height="{Binding #WorkspaceRoot.Bounds.Height}"
               Panel.ZIndex="1">
         <ContentControl Content="{Binding MainContent}"
-                        Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
-                        Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+                        Width="{Binding #WorkspaceRoot.Bounds.Width}"
+                        Height="{Binding #WorkspaceRoot.Bounds.Height}"
                         Canvas.Left="0"
                         Canvas.Top="0"
-                        Canvas.ZIndex="0" />
+                        Panel.ZIndex="0" />
 
         <controls:PaneCanvas Layout="{Binding Layout.Grid}"
                              LayoutResult="{Binding Layout.PaneLayout}"
                              ShowMinorGrid="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
-                             Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
-                             Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+                             Width="{Binding #WorkspaceRoot.Bounds.Width}"
+                             Height="{Binding #WorkspaceRoot.Bounds.Height}"
                              Canvas.Left="0"
                              Canvas.Top="0"
-                             Canvas.ZIndex="0"
+                             Panel.ZIndex="0"
                              IsHitTestVisible="False"
                              Opacity="0.82" />
 
         <ItemsControl x:Name="PanelVisuals"
                       ItemsSource="{Binding Layout.PaneLayout.Panels}"
                       ItemTemplate="{StaticResource PanelVisualTemplate}"
-                      Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
-                      Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+                      Width="{Binding #WorkspaceRoot.Bounds.Width}"
+                      Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       IsHitTestVisible="False"
-                      Canvas.ZIndex="1">
+                      Panel.ZIndex="1">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <Canvas />
@@ -414,12 +414,12 @@
                       ItemTemplate="{StaticResource BlockTileTemplate}"
                       Background="Transparent"
                       Margin="{Binding Layout.WorkspaceLayout, Converter={StaticResource SpacingToThicknessConverter}}"
-                      Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
-                      Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+                      Width="{Binding #WorkspaceRoot.Bounds.Width}"
+                      Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       SizeChanged="OnViewportSizeChanged"
                       Canvas.Left="0"
                       Canvas.Top="0"
-                      Canvas.ZIndex="2">
+                      Panel.ZIndex="2">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <controls:TiledPanel Layout="{Binding Layout.Grid}" />
@@ -439,11 +439,11 @@
         <ItemsControl x:Name="FloatingPanelOverlays"
                       ItemsSource="{Binding Layout.FloatingPanels}"
                       ItemTemplate="{StaticResource FloatingPanelOverlayTemplate}"
-                      Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
-                      Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+                      Width="{Binding #WorkspaceRoot.Bounds.Width}"
+                      Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       Canvas.Left="0"
                       Canvas.Top="0"
-                      Canvas.ZIndex="5"
+                      Panel.ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
                       IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
           <ItemsControl.ItemsPanel>
@@ -465,11 +465,11 @@
         <ItemsControl x:Name="FloatingBlockOverlays"
                       ItemsSource="{Binding Layout.FloatingBlocks}"
                       ItemTemplate="{StaticResource FloatingBlockOverlayTemplate}"
-                      Width="{Binding ActualWidth, ElementName=WorkspaceRoot}"
-                      Height="{Binding ActualHeight, ElementName=WorkspaceRoot}"
+                      Width="{Binding #WorkspaceRoot.Bounds.Width}"
+                      Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       Canvas.Left="0"
                       Canvas.Top="0"
-                      Canvas.ZIndex="5"
+                      Panel.ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
                       IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
           <ItemsControl.ItemsPanel>

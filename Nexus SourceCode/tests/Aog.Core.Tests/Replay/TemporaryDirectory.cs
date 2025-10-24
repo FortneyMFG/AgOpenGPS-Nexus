@@ -15,19 +15,19 @@ internal sealed class TemporaryDirectory : IDisposable
         var basePath = Path.Combine(Path.GetTempPath(), prefix);
         Directory.CreateDirectory(basePath);
 
-        Path = System.IO.Path.Combine(basePath, Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(Path);
+        DirectoryPath = System.IO.Path.Combine(basePath, Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(DirectoryPath);
     }
 
-    public string Path { get; }
+    public string DirectoryPath { get; }
 
     public void Dispose()
     {
         try
         {
-            if (Directory.Exists(Path))
+            if (Directory.Exists(DirectoryPath))
             {
-                Directory.Delete(Path, recursive: true);
+                Directory.Delete(DirectoryPath, recursive: true);
             }
         }
         catch

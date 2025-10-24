@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Avalonia;
+using Avalonia.Headless;
 using Aog.Abstractions.Runtime;
 using Aog.UI.Avalonia.App;
 using Aog.UI.Avalonia.Hosting;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
 namespace Aog.UI.Avalonia;
@@ -49,12 +51,14 @@ public static class Program
         AvaloniaServiceProviderAccessor.Initialize(host.Services);
         host.StartAsync(CancellationToken.None).GetAwaiter().GetResult();
         var pluginBootstrapper = host.Services.GetRequiredService<Aog.UI.Avalonia.Plugins.PluginBootstrapper>();
+        var shellOptions = host.Services.GetRequiredService<IOptions<AvaloniaShellOptions>>().Value;
+        var bootstrapLogger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Program");
 
         try
         {
-            EnsureGraphicalEnvironment();
+            var useHeadlessPlatform = EnsureGraphicalEnvironment(shellOptions, bootstrapLogger);
 
-            return BuildAvaloniaApp(host.Services)
+            return BuildAvaloniaApp(host.Services, useHeadlessPlatform)
                 .AfterSetup(_ =>
                 {
                     Console.WriteLine("Starting Avalonia UI shell...");
@@ -89,16 +93,28 @@ public static class Program
         }
     }
 
-    public static AppBuilder BuildAvaloniaApp(IServiceProvider services) =>
-        AppBuilder.Configure(() => services.GetRequiredService<NexusApp>())
-            .UsePlatformDetect()
+    public static AppBuilder BuildAvaloniaApp(IServiceProvider services, bool useHeadless)
+    {
+        var builder = AppBuilder.Configure(() => services.GetRequiredService<NexusApp>())
             .LogToTrace();
 
-    private static void EnsureGraphicalEnvironment()
+        if (useHeadless)
+        {
+            builder = builder.UseHeadless(new AvaloniaHeadlessPlatformOptions());
+        }
+        else
+        {
+            builder = builder.UsePlatformDetect();
+        }
+
+        return builder;
+    }
+
+    private static bool EnsureGraphicalEnvironment(AvaloniaShellOptions options, ILogger logger)
     {
         if (!OperatingSystem.IsLinux())
         {
-            return;
+            return false;
         }
 
         var hasDisplay = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DISPLAY"))
@@ -106,10 +122,16 @@ public static class Program
 
         if (hasDisplay)
         {
-            return;
+            return false;
         }
 
-        const string message = "No graphical display server was detected. Set the DISPLAY or WAYLAND_DISPLAY environment variable or run Nexus inside an X11/Wayland session.";
+        if (options.AllowHeadless)
+        {
+            logger.LogWarning("No graphical display server was detected. Falling back to Avalonia headless mode.");
+            return true;
+        }
+
+        const string message = "No graphical display server was detected. Set the DISPLAY or WAYLAND_DISPLAY environment variable or run Nexus inside an X11/Wayland session. To run without a display, set NEXUS_Avalonia__AllowHeadless=true.";
         throw new DisplayUnavailableException(message);
     }
 

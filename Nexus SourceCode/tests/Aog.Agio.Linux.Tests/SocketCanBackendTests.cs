@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.Agio.Linux.SocketCan;
@@ -15,9 +14,11 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using SocketCANSharp;
 using Xunit;
 using Xunit.Sdk;
+using System.Reflection;
+using SocketCanFrame = SocketCANSharp.CanFrame;
+using SocketCanUtils = SocketCANSharp.SocketCanUtils;
 
 namespace Aog.Agio.Linux.Tests;
 
@@ -43,8 +44,8 @@ public sealed class SocketCanBackendTests
         var extendedId = SocketCanUtils.CreateCanIdWithFlags(0x18FF50E5, isEff: true, isRtr: true, isErr: false);
         var frames = new[]
         {
-            new SocketCANSharp.CanFrame(SocketCanUtils.CreateCanIdWithFlags(0x123, isEff: false, isRtr: false, isErr: false), new byte[] { 0x01, 0x02, 0x03 }),
-            new SocketCANSharp.CanFrame(extendedId, Array.Empty<byte>()),
+            new SocketCanFrame(SocketCanUtils.CreateCanIdWithFlags(0x123, isEff: false, isRtr: false, isErr: false), new byte[] { 0x01, 0x02, 0x03 }),
+            new SocketCanFrame(extendedId, Array.Empty<byte>()),
         };
 
         var client = new FakeSocketCanClient("vcan0", frames);
@@ -170,7 +171,7 @@ public sealed class SocketCanBackendTests
     [Fact]
     public async Task BackgroundService_PublishesFrameImmediatelyAfterTimeout()
     {
-        var client = new FakeSocketCanClient("vcan0", Array.Empty<SocketCANSharp.CanFrame>());
+        var client = new FakeSocketCanClient("vcan0", Array.Empty<SocketCanFrame>());
         var factory = new FakeSocketCanClientFactory(client);
         var channel = new SocketCanFrameChannel();
 
@@ -199,7 +200,7 @@ public sealed class SocketCanBackendTests
         // Ensure at least one receive timeout has occurred so the pump is in "publish immediately" mode.
         await WaitForAsync(() => client.TimeoutCount > 0, TimeSpan.FromSeconds(1));
 
-        var frame = new SocketCANSharp.CanFrame(
+        var frame = new SocketCanFrame(
             SocketCanUtils.CreateCanIdWithFlags(0x456, isEff: false, isRtr: false, isErr: false),
             new byte[] { 0x0A, 0x0B });
 
@@ -671,18 +672,22 @@ public sealed class SocketCanBackendTests
             ReconnectDelay = template.ReconnectDelay,
         };
 
+        clone.SourcePrefix = sourcePrefix;
+        return clone;
+    }
+
     private static readonly Lazy<bool> s_hasSocketCanPrivileges = new(CheckSocketCanPrivileges);
 
     private static void SkipIfSocketCanPrivilegesMissing()
     {
         if (!OperatingSystem.IsLinux())
         {
-            throw new SkipException("SocketCAN backend tests require Linux.");
+            ThrowSkip("SocketCAN backend tests require Linux.");
         }
 
         if (!s_hasSocketCanPrivileges.Value)
         {
-            throw new SkipException(
+            ThrowSkip(
                 "SocketCAN backend tests require CAP_NET_ADMIN. Run `sudo setcap cap_net_admin+ep $(command -v dotnet)` " +
                 "or execute the suite in an environment started with --cap-add NET_ADMIN.");
         }
@@ -724,6 +729,22 @@ public sealed class SocketCanBackendTests
         }
 
         return false;
+    }
+
+    private static void ThrowSkip(string message)
+    {
+        var ctor = typeof(SkipException).GetConstructor(
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+            binder: null,
+            new[] { typeof(string) },
+            modifiers: null);
+
+        if (ctor is null)
+        {
+            throw new InvalidOperationException("Unable to locate SkipException constructor.");
+        }
+
+        throw (SkipException)ctor.Invoke(new object[] { message });
     }
 
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)
@@ -816,20 +837,20 @@ public sealed class SocketCanBackendTests
 
     private sealed class FakeSocketCanClient : ISocketCanClient
     {
-        private readonly ConcurrentQueue<SocketCANSharp.CanFrame> _frames;
+        private readonly ConcurrentQueue<SocketCanFrame> _frames;
         private int _timeoutCount;
 
-        public FakeSocketCanClient(string interfaceName, IEnumerable<SocketCANSharp.CanFrame> frames)
+        public FakeSocketCanClient(string interfaceName, IEnumerable<SocketCanFrame> frames)
         {
             InterfaceName = interfaceName;
-            _frames = new ConcurrentQueue<SocketCANSharp.CanFrame>(frames);
+            _frames = new ConcurrentQueue<SocketCanFrame>(frames);
         }
 
         public string InterfaceName { get; }
 
         public int TimeoutCount => Volatile.Read(ref _timeoutCount);
 
-        public void EnqueueFrame(SocketCANSharp.CanFrame frame) => _frames.Enqueue(frame);
+        public void EnqueueFrame(SocketCanFrame frame) => _frames.Enqueue(frame);
 
         public SocketCanFrameReadResult ReadFrame(CancellationToken cancellationToken)
         {
@@ -949,12 +970,14 @@ public sealed class SocketCanBackendTests
             return new ChangeHandle(this, listener);
         }
 
-        public void Update(SocketCanOptions options, string name = Options.DefaultName)
+        public void Update(SocketCanOptions options, string? name = null)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
+
+            var effectiveName = name ?? Options.DefaultName;
 
             List<Action<SocketCanOptions, string>> listeners;
             lock (_gate)
@@ -965,7 +988,7 @@ public sealed class SocketCanBackendTests
 
             foreach (var listener in listeners)
             {
-                listener(options, name);
+                listener(options, effectiveName);
             }
         }
 
@@ -1085,9 +1108,7 @@ public sealed class SocketCanBackendTests
         protected override AuthContext AuthContextCore { get; } = new(string.Empty, new Dictionary<string, List<AuthProperty>>());
 
         protected override ContextPropagationToken CreatePropagationTokenCore(ContextPropagationOptions options)
-        {
-            return new ContextPropagationToken(this, options);
-        }
+            => throw new NotSupportedException();
 
         protected override Task WriteResponseHeadersAsyncCore(Metadata responseHeaders) => Task.CompletedTask;
     }

@@ -12,4 +12,10 @@ public sealed class AvaloniaShellOptions
     /// </summary>
     [Required]
     public AvaloniaRunMode RunMode { get; set; } = AvaloniaRunMode.LocalInProc;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the shell may fall back to a
+    /// headless Avalonia platform when no display server is available.
+    /// </summary>
+    public bool AllowHeadless { get; set; }
 }

@@ -73,7 +73,7 @@ public class UnixDomainSocketGpsdConnectionFactoryTests
             listener.Bind(new UnixDomainSocketEndPoint(path));
             listener.Listen(backlog: 1);
 
-            return new UnixDomainSocketServer(path, listener, listener.AcceptAsync().AsTask());
+            return new UnixDomainSocketServer(path, listener, listener.AcceptAsync());
         }
 
         public async Task WaitForClientAsync(CancellationToken cancellationToken)

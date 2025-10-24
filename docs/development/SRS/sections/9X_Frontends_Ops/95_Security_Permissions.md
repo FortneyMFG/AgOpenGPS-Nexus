@@ -109,9 +109,12 @@ Security controls undergo automated tests, manual audits, and migration rehearsa
 
 ## 95.7 Constraints
 
-- Offline operation remains non-negotiable; authentication flows must support air-gapped rigs.  
-- Secrets storage must include recovery/backup guidance to avoid permanent lockouts.  
+- Offline operation remains non-negotiable; authentication flows must support air-gapped rigs.
+- Secrets storage must include recovery/backup guidance to avoid permanent lockouts.
 - Permission gates must integrate with plugin manifest schema defined in §94 without imposing breaking changes.
+- Secrets management MUST leverage OS-appropriate vault providers or encrypted storage with documented fallbacks.
+- Credential rotation procedures MUST be published so operators can refresh access without downtime.
+- Permission scope taxonomy MUST be documented and versioned alongside manifest metadata for governance.
 
 ---
 
@@ -181,9 +184,7 @@ No alternative security framework is under evaluation; modernization proceeds vi
 
 ## 95.14 Implementation Policy
 
-- Store secrets using OS-specific vault providers with fallback to encrypted files guarded by hardware-derived keys.  
-- Document credential rotation procedures in `docs/security/credential-rotation.md`.  
-- Publish permission scope taxonomy and mapping to manifest metadata in `docs/Plugins/permission-scopes.md`.
+*(Reserved — concrete storage providers and documentation live in security ADRs and guides.)*
 
 ---
 

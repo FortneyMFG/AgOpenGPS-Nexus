@@ -117,6 +117,8 @@ Balance legacy WinForms expectations with modernization via Avalonia and remote 
 - Maintain compatibility with existing WinForms OpenGL renderer until Avalonia reaches parity.
 - Ensure UI toolkits comply with cross-platform GPU requirements (OpenGL 3.3+).
 - Keep localization and accessibility requirements consistent across shells.
+- Publish theming and accessibility guidelines so every shell implements the same operator-facing standards.
+- Require metadata schema updates to include presentation hints that allow dashboards to render without custom code.
 
 ### 13.7.1 Non-Functional Requirement Classes
 
@@ -193,9 +195,7 @@ Any future toolkit alternatives will require standalone option documents under S
 
 ## 13.14 Implementation Policy
 
-- Keep AgOpenGPS v6 releases independent while Avalonia becomes the Nexus default; no WPF pipeline is maintained.
-- Publish UI theming guidelines and accessibility checklist for all shells.
-- Require metadata schema updates to include presentation hints for dashboards.
+*(Reserved — implementation decisions are captured in ADRs such as `13-ADR-001`.)*
 
 ---
 

@@ -67,6 +67,10 @@ This section defines controller requirements, evaluation metrics, and documentat
 | R-AUTO-005 | MUST | Verification | Validate controller performance in simulation + field regression; log cross-track, heading, and latency metrics. | QA evidence review. |
 | R-AUTO-006 | SHOULD | Implement Geometry | Support articulated and multi-implement rigs via configurable geometry parameters. | HIL geometry tests. |
 | R-AUTO-007 | COULD | Adaptive Bias | Accept optional `row_bias_m` decay parameters for sensor fusion experiments. | Experimental controller evaluation. |
+| R-AUTO-008 | MUST | Configuration | Allow operators to select compliant controllers via runtime configuration profiles. | Configuration profile integration tests. |
+| R-AUTO-009 | MUST | Default Behavior | Provide a default profile that selects a conformant controller with documented performance envelope. | Default profile validation checklist. |
+| R-AUTO-010 | SHOULD | Extensibility | Permit additional controllers delivered as plugins when they satisfy interface and performance requirements. | Plugin controller qualification tests. |
+| R-AUTO-011 | MUST | API Stability | Maintain backward-compatible autosteer target contracts across releases. | Contract diff analysis. |
 
 ---
 
@@ -135,10 +139,7 @@ This section defines controller requirements, evaluation metrics, and documentat
 
 ## 83.10 Implementation Policy
 
-- System SHALL allow runtime controller selection via configuration profiles.
-- A default profile SHALL select a conformant controller; algorithm specifics remain implementation-defined.
-- Additional controllers MAY ship as plugins if they meet interface and performance requirements.
-- Controller interfaces SHALL stay backward-compatible with existing `SteerTarget` contracts.
+*(Reserved — controller selection mechanics are detailed in guidance ADRs.)*
 
 ---
 

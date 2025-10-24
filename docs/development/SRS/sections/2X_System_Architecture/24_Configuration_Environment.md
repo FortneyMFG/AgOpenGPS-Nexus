@@ -92,8 +92,9 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 ## 24.7 Constraints
 
 - Configuration formats MUST remain backward compatible across minor releases and be versioned per profile.
-- Secrets integration MUST avoid storing raw credentials in source control or logs; logging only logical key names.
-- Feature flag registry MUST integrate with release dashboards and change management policy (§96).
+- Configuration governance MUST distinguish shared profiles from device-specific overrides using versioned identifiers.
+- Secrets integration MUST avoid storing raw credentials in source control or logs; providers resolve logical keys using OS-appropriate secure storage.
+- Feature flag registry MUST publish both human-readable and machine-readable artifacts while integrating with release dashboards and change management policy (§96).
 
 ---
 
@@ -146,9 +147,7 @@ Pilot deployments must exercise profile switching, secret rotation, and telemetr
 
 ## 24.14 Implementation Policy
 
-- Store base profiles in `config/profiles/` with semantic versioning; device overrides stored under `config/overrides/<device-id>/`.
-- Secrets references use logical keys resolved by platform-specific providers (DPAPI, libsecret, Vault). Values never committed to git.
-- Feature flag registry publishes Markdown + JSON artifacts for tooling and UI consumption.
+*(Reserved — concrete storage layouts are handled by configuration tooling ADRs.)*
 
 ---
 

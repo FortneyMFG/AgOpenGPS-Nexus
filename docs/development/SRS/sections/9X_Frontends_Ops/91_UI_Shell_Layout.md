@@ -156,6 +156,9 @@ Modernization must retain legacy workflows while enabling declarative dashboards
 - Maintain compatibility with Windows installers, shortcuts, and registry expectations while adding Avalonia shells.【F:SourceCode/AgOpenGPS.sln†L6-L35】
 - Remote clients must enforce safety gating and capability flags before exposing control actions.【F:docs/sections/2X_System_Architecture/21-O6 - Linux Core service with remote frontends.md†L21-L44】
 - Metadata definitions must be versioned and validated through plugin manifest governance to avoid runtime drift.【F:docs/sections/9X_Frontends_Ops/94-ADR-031 - Official Plugin Bundle Dependency Governance.md†L19-L68】
+- Layout presets and dashboard metadata MUST remain versioned alongside season/job configuration so operators can reproduce layouts.
+- Plugin manifests MUST declare UI contributions using the standardized governance schema from §94.
+- Remote clients MUST rely on capability-scoped credentials managed under §95 security policies.
 
 ---
 
@@ -228,9 +231,7 @@ No active option proposals are under review; modernization guidance is documente
 
 ## 91.14 Implementation Policy
 
-- Store layout presets and dashboard metadata alongside job configuration in `/Seasons/<Season>/Layouts/`.  
-- Plugin manifests declare UI contributions via `Nexus.Plugin.Manifest.ui` sections governed by ADR-031.  
-- Remote clients authenticate using capability-scoped tokens stored in `~/.nexus/credentials` with rotation guidance from §95 Security & Permissions.【F:docs/sections/9X_Frontends_Ops/95_Security_Permissions.md†L19-L64】
+*(Reserved — storage locations and credential helpers are defined in supporting ADRs and runbooks.)*
 
 ---
 

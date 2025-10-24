@@ -171,12 +171,10 @@ All MUST requirements pass their corresponding tests and audits with no waivers.
 
 ---
 
-## 12.14 Implementation Policy  
+## 12.14 Implementation Policy
 
-- Toolchain and SDK versions are pinned via repository manifest (`global.json` or equivalent).  
-- Dependency additions require a governance pull request referencing the allowlist.  
-- Contract package releases follow semantic versioning and publish changelogs.  
-- Every public API change must include version bump and test update.  
+*(Reserved — implementation specifics are governed by ADRs such as `12-ADR-001` and
+`14-ADR-001`. This SRS remains focused on normative “what” requirements.)*
 
 ---
 

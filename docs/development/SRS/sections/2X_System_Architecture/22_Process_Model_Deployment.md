@@ -92,6 +92,9 @@ Describe supported process layouts and deployment patterns for Nexus so critical
 - Packaging MUST support Windows installers and Debian packages using the same configuration schema (§24).【F:docs/sections/1X_Platform_Foundations/11_OS_Support.md†L14-L45】
 - Headless deployments MUST expose gRPC + WebSocket APIs consistent with §21 options.【F:docs/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L42-L128】
 - Remote clients MUST authenticate via shared configuration/secret policy from §24.
+- Deployment artifacts MUST include OS-appropriate service definitions and startup guidance for every supported topology.
+- Operational tooling MUST provide topology detection and health diagnostics for operators and CI.
+- Network interface and TLS requirements MUST be published so remote clients can interoperate safely.
 
 ---
 
@@ -145,9 +148,7 @@ Field pilots must validate reconnect flow, telemetry health, and container lifec
 
 ## 22.14 Implementation Policy
 
-- Ship reference systemd service files and Windows services templates aligned with packaging outputs.
-- Provide CLI tooling for topology detection and health diagnostics.
-- Document network port usage and TLS requirements for remote clients.
+*(Reserved — concrete service templates and tooling live in ADRs and deployment runbooks.)*
 
 ---
 

@@ -94,6 +94,9 @@ Telemetry dashboards expose live loop metrics and alert on threshold breaches.
 - Scheduling policies MUST be documented for every high-rate service and remain reproducible under simulation seeds.【F:docs/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L46】
 - Telemetry MUST surface latency metrics for operators and CI gating (§64).【F:docs/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L28-L126】
 - Clock synchronization MUST use secure protocols when spanning networks shared with remote clients.
+- Hosted services MUST declare priority classes and expose them through shared monitoring interfaces.
+- Deadline monitors MUST emit telemetry and CLI signals when loops approach timing budgets.
+- Deployment guidance MUST document recommended thread counts and CPU affinity expectations for reference hardware.
 
 ---
 
@@ -147,9 +150,7 @@ Field validation captures telemetry snapshots confirming latency budgets during 
 
 ## 23.14 Implementation Policy
 
-- All hosted services register explicit priority classes (safety, guidance, telemetry, UI) with shared monitoring hooks.
-- Introduce deadline monitors publishing to telemetry dashboards and CLI health checks.
-- Document recommended thread counts and CPU affinity guidelines for CM5 and desktop targets.
+*(Reserved — scheduling instrumentation and deployment guides are handled in related ADRs.)*
 
 ---
 

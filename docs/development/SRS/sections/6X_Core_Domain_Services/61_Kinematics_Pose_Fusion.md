@@ -115,6 +115,8 @@ exercise watchdog recovery scenarios.
 - Must interoperate with existing AgIO transports and plugin APIs without breaking
   backward compatibility during transition.
 - Must comply with automation safety policies and zone constraint governance.
+- Must publish PoseStream schema evolution rules and constraint gate contracts so clients remain interoperable.
+- Must ship kiosk launch guidance and watchdog integration for each supported platform to preserve recoverability.
 
 ---
 
@@ -210,9 +212,7 @@ performing kiosk boot simulations, and validating remote control leases.
 
 ## 61.14 Implementation Policy
 
-Implementations must expose PoseStream services with documented schema evolution
-rules, register SectionState diff handlers with constraint gates, and publish kiosk
-launcher scripts alongside watchdog configurations for supported platforms.
+*(Reserved — see related ADRs for detailed rollout plans.)*
 
 ---
 

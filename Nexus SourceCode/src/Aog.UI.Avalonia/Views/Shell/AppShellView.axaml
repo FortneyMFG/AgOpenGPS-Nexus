@@ -8,6 +8,7 @@
              xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              xmlns:shell="clr-namespace:Aog.UI.Avalonia.Views.Shell"
              xmlns:mapping="clr-namespace:Aog.UI.Avalonia.Views.Mapping"
+             xmlns:field="clr-namespace:Aog.UI.Avalonia.Views.Field"
              xmlns:layout="clr-namespace:Aog.UI.Avalonia.Layout"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
@@ -567,6 +568,9 @@
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
       </ItemsControl>
+
+      <field:FieldSettingsDock DataContext="{Binding Layout}"
+                               Panel.ZIndex="6" />
     </Grid>
 
     <Border Grid.Row="2"

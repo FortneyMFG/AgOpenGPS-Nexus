@@ -1,0 +1,165 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
+             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             mc:Ignorable="d"
+             x:Class="Aog.UI.Avalonia.Views.Field.FieldSettingsDock"
+             x:DataType="vm:BlockLayoutViewModel"
+             Width="320"
+             HorizontalAlignment="Left"
+             VerticalAlignment="Stretch"
+             d:DesignWidth="320"
+             d:DesignHeight="720">
+  <UserControl.Resources>
+    <rendering:IconKeyToBitmapConverter x:Key="LauncherIconConverter" />
+    <rendering:StringHasValueConverter x:Key="StringHasValueConverter" />
+
+    <DataTemplate x:Key="MenuBlockTemplate"
+                  x:DataType="vm:BlockLauncherItemViewModel">
+      <Border Classes="menu-block">
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="12"
+              RowDefinitions="Auto"
+              VerticalAlignment="Center">
+          <Border Width="40"
+                  Height="40"
+                  CornerRadius="10"
+                  Background="#2C2C2C"
+                  BorderBrush="#3F3F3F"
+                  BorderThickness="1"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+            <Image Source="{Binding IconKey, Converter={StaticResource LauncherIconConverter}}"
+                   Width="24"
+                   Height="24"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}" />
+          </Border>
+
+          <StackPanel Grid.Column="1"
+                      VerticalAlignment="Center"
+                      Spacing="4">
+            <TextBlock Text="{Binding Label}"
+                       FontWeight="SemiBold"
+                       Foreground="#F0F0F0"
+                       TextWrapping="Wrap" />
+            <TextBlock Text="Drag to workspace or use controls to add"
+                       FontSize="{DynamicResource ThemeFontSizeXs}"
+                       Foreground="#9C9C9C" />
+          </StackPanel>
+
+          <StackPanel Grid.Column="2"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      Spacing="6">
+            <Button Command="{Binding LaunchCommand}"
+                    Content="Add"
+                    Classes="launcher-action"
+                    MinWidth="52" />
+            <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+              <Button Command="{Binding MoveEarlierCommand}"
+                      Content="▲"
+                      Classes="launcher-action" />
+              <Button Command="{Binding MoveLaterCommand}"
+                      Content="▼"
+                      Classes="launcher-action" />
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <UserControl.Transitions>
+    <ThicknessTransition Property="Margin" Duration="0:0:0.18" />
+    <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+  </UserControl.Transitions>
+
+  <UserControl.Styles>
+    <Style Selector="UserControl">
+      <Setter Property="Margin" Value="-320,0,0,0" />
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+      <Setter Property="Background" Value="#DD101010" />
+      <Setter Property="Padding" Value="18" />
+      <Style.DataTriggers>
+        <DataTrigger Binding="{Binding IsLauncherDockVisible}" Value="True">
+          <Setter Property="Margin" Value="0" />
+          <Setter Property="Opacity" Value="1" />
+          <Setter Property="IsHitTestVisible" Value="True" />
+        </DataTrigger>
+      </Style.DataTriggers>
+    </Style>
+
+    <Style Selector="Border.menu-block">
+      <Setter Property="Background" Value="#1F1F1F" />
+      <Setter Property="BorderBrush" Value="#3A3A3A" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="14" />
+      <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+
+    <Style Selector="Border.menu-block:pointerover">
+      <Setter Property="BorderBrush" Value="#4E8CDC" />
+    </Style>
+
+    <Style Selector="Button.launcher-action">
+      <Setter Property="FontSize" Value="{DynamicResource ThemeFontSizeXs}" />
+      <Setter Property="Padding" Value="8,4" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Background" Value="#2E2E2E" />
+      <Setter Property="Foreground" Value="#E6E6E6" />
+      <Setter Property="BorderBrush" Value="#494949" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="Button.launcher-action:hover">
+      <Setter Property="Background" Value="#3C6DBB" />
+      <Setter Property="BorderBrush" Value="#4F8CE0" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+
+    <Style Selector="Border.drop-placeholder">
+      <Setter Property="Background" Value="#1B3A60" />
+      <Setter Property="BorderBrush" Value="#2B72C3" />
+      <Setter Property="BorderThickness" Value="1.5" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="18" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Margin" Value="0,16,0,0" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="18">
+      <ItemsControl ItemsSource="{Binding LauncherCategories}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:BlockLauncherCategoryViewModel">
+            <StackPanel>
+              <TextBlock Text="{Binding Title}"
+                         FontSize="{DynamicResource ThemeFontSizeSm}"
+                         FontWeight="SemiBold"
+                         Foreground="#9DD2FF"
+                         Margin="0,0,0,8" />
+              <ItemsControl ItemsSource="{Binding Blocks}"
+                            ItemTemplate="{StaticResource MenuBlockTemplate}" />
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <Border Classes="drop-placeholder"
+              IsVisible="{Binding IsLauncherDropIndicatorVisible}">
+        <TextBlock Text="Drop blocks here to create shortcuts"
+                   HorizontalAlignment="Center"
+                   Foreground="#D9E9FF" />
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
+

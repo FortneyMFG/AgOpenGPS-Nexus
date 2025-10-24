@@ -27,6 +27,9 @@ public sealed class ShellLayoutPreferences
     /// <summary>Gets or sets whether the shell layout is locked for modifications.</summary>
     public bool IsLayoutLocked { get; set; } = true;
 
+    /// <summary>Gets or sets whether the field settings dock remains pinned when the layout is locked.</summary>
+    public bool IsFieldDockPinned { get; set; } = false;
+
     /// <summary>Gets or sets the last active workspace identifier.</summary>
     public string ActiveWorkspaceId { get; set; } = "workspace.main";
 
@@ -111,6 +114,7 @@ public sealed class ShellLayoutPreferences
             ShowRightSidebar = ShowRightSidebar,
             ShowTopSidebar = ShowTopSidebar,
             ShowBottomSidebar = ShowBottomSidebar,
+            IsFieldDockPinned = IsFieldDockPinned,
             IsLayoutLocked = IsLayoutLocked,
             ActiveWorkspaceId = ActiveWorkspaceId,
             Grid = new Layout.ShellGridLayout

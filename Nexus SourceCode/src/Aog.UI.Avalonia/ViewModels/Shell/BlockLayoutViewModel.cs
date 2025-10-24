@@ -47,7 +47,10 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private Func<BlockDefinition, bool>? _commandInterceptor;
     private Action<string> _statusReporter;
     private readonly DelegateCommand _showLayoutSettingsCommand;
+    private readonly DelegateCommand _toggleFieldDockCommand;
     private bool _isLocked = true;
+    private bool _isFieldDockPinned;
+    private bool _isLauncherDropIndicatorVisible;
     private Size _viewport;
     private PaneLayoutResult? _paneLayout;
 
@@ -70,6 +73,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
         var preferences = preferencesService.GetPreferences().ShellLayout ?? new ShellLayoutPreferences();
         _isLocked = preferences.IsLayoutLocked;
+        _isFieldDockPinned = preferences.IsFieldDockPinned;
         Grid = preferences.Grid ?? new ShellGridLayout();
         Grid.Tiles ??= new List<TileSpec>();
         Grid.Panels ??= new List<PanelSpec>();
@@ -83,6 +87,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         WorkspaceLayout = (preferences.Workspace ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone();
 
         _showLayoutSettingsCommand = new DelegateCommand(_ => RequestLayoutSettings());
+        _toggleFieldDockCommand = new DelegateCommand(_ => ToggleFieldDockPinned());
         Blocks = new ObservableCollection<BlockItemViewModel>();
         FloatingPanels = new ObservableCollection<FloatingPanelViewModel>();
         FloatingBlocks = new ObservableCollection<FloatingBlockViewModel>();
@@ -90,11 +95,14 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         RightSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         TopSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         BottomSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
+        LauncherCategories = new ObservableCollection<BlockLauncherCategoryViewModel>();
         BuildInitialCollections();
         SnapTilesToGrid();
         BuildFloatingCollections();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
         RebuildSidebars();
+        RebuildLauncher();
+        UpdateLauncherDropIndicator();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -152,6 +160,55 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     /// <summary>Gets the collection of controls rendered along the bottom strip.</summary>
     public ObservableCollection<SidebarButtonViewModel> BottomSidebarButtons { get; }
 
+    /// <summary>Gets the launcher categories available within the field settings dock.</summary>
+    public ObservableCollection<BlockLauncherCategoryViewModel> LauncherCategories { get; }
+
+    /// <summary>Gets or sets a value indicating whether the field settings dock remains pinned.</summary>
+    public bool IsFieldDockPinned
+    {
+        get => _isFieldDockPinned;
+        set
+        {
+            if (_isFieldDockPinned == value)
+            {
+                return;
+            }
+
+            _isFieldDockPinned = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsLauncherDockVisible));
+            UpdateLauncherDropIndicator();
+            Save();
+        }
+    }
+
+    /// <summary>Gets a value indicating whether the field settings dock should be visible.</summary>
+    public bool IsLauncherDockVisible => !_isLocked || _isFieldDockPinned;
+
+    /// <summary>Gets a value indicating whether the drop indicator should be shown.</summary>
+    public bool IsLauncherDropIndicatorVisible
+    {
+        get => _isLauncherDropIndicatorVisible;
+        private set
+        {
+            if (_isLauncherDropIndicatorVisible == value)
+            {
+                return;
+            }
+
+            _isLauncherDropIndicatorVisible = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>Gets the command that toggles the dock pin state.</summary>
+    public ICommand ToggleFieldDockPinCommand => _toggleFieldDockCommand;
+
+    private void ToggleFieldDockPinned()
+    {
+        IsFieldDockPinned = !IsFieldDockPinned;
+    }
+
     /// <summary>Gets or sets a value indicating whether layout modifications are locked.</summary>
     public bool IsLocked
     {
@@ -165,8 +222,11 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
             _isLocked = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(IsLauncherDockVisible));
             ApplyLockStateToFloating();
             RefreshCommandStates();
+            RefreshLauncherStates();
+            UpdateLauncherDropIndicator();
             Save();
         }
     }
@@ -289,6 +349,88 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Save();
         RebuildSidebars();
         UpdateCollisionStates();
+        RefreshLauncherStates();
+    }
+
+    internal bool CanLaunch(BlockLauncherItemViewModel launcher)
+    {
+        return launcher is not null && !IsLocked;
+    }
+
+    internal void Launch(BlockLauncherItemViewModel launcher)
+    {
+        if (!CanLaunch(launcher))
+        {
+            return;
+        }
+
+        var definition = launcher.Definition;
+        var instance = new BlockInstance
+        {
+            DefinitionId = definition.Id,
+            Region = definition.PreferredDock,
+            Order = GetNextCloneOrder(definition.PreferredDock),
+            Origin = BlockOrigin.Clone,
+        };
+
+        _instances.Add(instance);
+
+        if (ShouldRenderOnGrid(instance.Region))
+        {
+            var tile = EnsureTile(instance);
+            var block = new BlockItemViewModel(instance, definition, this, tile);
+            Blocks.Add(block);
+        }
+
+        SnapTilesToGrid();
+        RebuildSidebars();
+        RefreshCommandStates();
+        UpdateCollisionStates();
+        Save();
+        _statusReporter(GetStatusMessage(definition));
+    }
+
+    internal bool CanMoveLauncherItem(BlockLauncherItemViewModel launcher, int offset)
+    {
+        if (launcher is null || offset == 0 || IsLocked)
+        {
+            return false;
+        }
+
+        var entries = GetLauncherEntries(launcher.ContainerId);
+        if (entries.Count <= 1)
+        {
+            return false;
+        }
+
+        var currentIndex = entries.FindIndex(entry => entry.instance.InstanceId.Value == launcher.Instance.InstanceId.Value);
+        if (currentIndex < 0)
+        {
+            return false;
+        }
+
+        var targetIndex = currentIndex + offset;
+        return targetIndex >= 0 && targetIndex < entries.Count;
+    }
+
+    internal void MoveLauncherItem(BlockLauncherItemViewModel launcher, int offset)
+    {
+        if (!CanMoveLauncherItem(launcher, offset))
+        {
+            return;
+        }
+
+        var entries = GetLauncherEntries(launcher.ContainerId);
+        var currentIndex = entries.FindIndex(entry => entry.instance.InstanceId.Value == launcher.Instance.InstanceId.Value);
+        var targetIndex = currentIndex + offset;
+
+        var current = entries[currentIndex].instance;
+        var target = entries[targetIndex].instance;
+        (current.Order, target.Order) = (target.Order, current.Order);
+
+        RebuildLauncher();
+        RefreshLauncherStates();
+        Save();
     }
 
     private void BuildInitialCollections()
@@ -492,6 +634,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         }
 
         ApplyLockStateToFloating();
+        RefreshLauncherStates();
     }
 
     private void RebuildSidebars()
@@ -501,6 +644,87 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         RebuildSidebarCollection(builder, RightSidebarButtons, BlockRegion.Right);
         RebuildSidebarCollection(builder, TopSidebarButtons, BlockRegion.Top);
         RebuildSidebarCollection(builder, BottomSidebarButtons, BlockRegion.Bottom);
+    }
+
+    private void RefreshLauncherStates()
+    {
+        foreach (var category in LauncherCategories)
+        {
+            category.RefreshStates();
+        }
+    }
+
+    private void RebuildLauncher()
+    {
+        LauncherCategories.Clear();
+
+        var canonical = _instances
+            .Select(instance => (instance, definition: _catalog.Get(instance.DefinitionId)))
+            .Where(pair => pair.definition is not null)
+            .Where(pair => pair.instance.Origin == BlockOrigin.Canonical)
+            .Where(pair => pair.definition!.Placement == PlacementPolicy.MenuScoped)
+            .ToList();
+
+        var categories = new Dictionary<string, BlockLauncherCategoryViewModel>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var container in canonical
+                     .Where(pair => pair.definition!.Kind is BlockKind.Container or BlockKind.Menu)
+                     .OrderBy(pair => pair.instance.Order))
+        {
+            var key = ResolveContainerKey(container.instance, container.definition!);
+            var title = string.IsNullOrWhiteSpace(container.definition!.Label)
+                ? key
+                : container.definition!.Label;
+            var category = new BlockLauncherCategoryViewModel(key, title, container.instance, this);
+            categories[key] = category;
+            LauncherCategories.Add(category);
+        }
+
+        foreach (var group in canonical
+                     .Where(pair => pair.definition!.Kind is not (BlockKind.Container or BlockKind.Menu))
+                     .GroupBy(pair => ResolveContainerKey(pair.instance, pair.definition!), StringComparer.OrdinalIgnoreCase))
+        {
+            if (!categories.TryGetValue(group.Key, out var category))
+            {
+                var first = group.First();
+                var title = string.IsNullOrWhiteSpace(first.definition!.Label)
+                    ? group.Key
+                    : first.definition!.Label;
+                category = new BlockLauncherCategoryViewModel(group.Key, title, first.instance, this);
+                categories[group.Key] = category;
+                LauncherCategories.Add(category);
+            }
+
+            foreach (var item in group.OrderBy(pair => pair.instance.Order))
+            {
+                category.Blocks.Add(new BlockLauncherItemViewModel(item.instance, item.definition!, group.Key, this));
+            }
+        }
+
+        RefreshLauncherStates();
+        UpdateLauncherDropIndicator();
+    }
+
+    private List<(BlockInstance instance, BlockDefinition definition)> GetLauncherEntries(string containerId)
+    {
+        if (string.IsNullOrWhiteSpace(containerId))
+        {
+            return new List<(BlockInstance, BlockDefinition)>();
+        }
+
+        return _instances
+            .Select(instance => (instance, definition: _catalog.Get(instance.DefinitionId)))
+            .Where(pair => pair.definition is not null)
+            .Where(pair => pair.instance.Origin == BlockOrigin.Canonical)
+            .Where(pair => pair.definition!.Placement == PlacementPolicy.MenuScoped)
+            .Where(pair => pair.definition!.Kind is not (BlockKind.Container or BlockKind.Menu))
+            .Where(pair => string.Equals(
+                ResolveContainerKey(pair.instance, pair.definition!),
+                containerId,
+                StringComparison.OrdinalIgnoreCase))
+            .OrderBy(pair => pair.instance.Order)
+            .Select(pair => (pair.instance, pair.definition!))
+            .ToList();
     }
 
     private void RebuildSidebarCollection(
@@ -530,6 +754,21 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
         var normalized = Math.Max(0d, spacing) / 2d;
         return new Thickness(normalized);
+    }
+
+    private static string ResolveContainerKey(BlockInstance instance, BlockDefinition definition)
+    {
+        if (!string.IsNullOrWhiteSpace(instance.ContainerId))
+        {
+            return instance.ContainerId!;
+        }
+
+        if (!string.IsNullOrWhiteSpace(definition.ContainerId))
+        {
+            return definition.ContainerId!;
+        }
+
+        return definition.Id.Value;
     }
 
     private static bool ShouldRenderOnGrid(BlockRegion region)
@@ -655,6 +894,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         var preferences = _preferencesService.GetPreferences();
         var layout = preferences.ShellLayout ?? new ShellLayoutPreferences();
         layout.IsLayoutLocked = _isLocked;
+        layout.IsFieldDockPinned = _isFieldDockPinned;
         layout.Grid = Grid;
         layout.Grid.FloatingBlocks ??= new List<FloatingBlockSpec>();
         layout.Grid.FloatingPanels ??= new List<FloatingPanelSpec>();
@@ -863,6 +1103,15 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         FloatingBlockSettingsRequested?.Invoke(this, block);
     }
 
+    private int GetNextCloneOrder(BlockRegion region)
+    {
+        return _instances
+            .Where(instance => instance is not null && instance.Region == region && instance.Origin == BlockOrigin.Clone)
+            .Select(instance => instance.Order)
+            .DefaultIfEmpty(-1)
+            .Max() + 1;
+    }
+
     private static IEnumerable<(BlockSize size, string label)> EnumerateCandidateSizes()
     {
         yield return (BlockSize.Tile1x1, "1 x 1");
@@ -909,6 +1158,11 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             BlockSize.TileHalfx2 => 2d,
             _ => 1d,
         };
+    }
+
+    private void UpdateLauncherDropIndicator()
+    {
+        IsLauncherDropIndicatorVisible = !_isLocked;
     }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null)

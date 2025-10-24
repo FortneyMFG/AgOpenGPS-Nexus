@@ -20,20 +20,18 @@
       <Setter Property="BorderThickness" Value="2" />
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Opacity" Value="0.9" />
+
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsColliding}" Value="True">
+          <Setter Property="BorderBrush" Value="#FFDD5B5B" />
+          <Setter Property="Background" Value="#40DD5B5B" />
+        </DataTrigger>
+
+        <DataTrigger Binding="{Binding IsLocked}" Value="True">
+          <Setter Property="Opacity" Value="0.72" />
+        </DataTrigger>
+      </Style.Triggers>
     </Style>
-
-    <DataTrigger Selector="Border#Outline"
-                 Binding="{Binding IsColliding}"
-                 Value="True">
-      <Setter Property="BorderBrush" Value="#FFDD5B5B" />
-      <Setter Property="Background" Value="#40DD5B5B" />
-    </DataTrigger>
-
-    <DataTrigger Selector="Border#Outline"
-                 Binding="{Binding IsLocked}"
-                 Value="True">
-      <Setter Property="Opacity" Value="0.72" />
-    </DataTrigger>
 
     <Style Selector="Border.resize-handle">
       <Setter Property="Background" Value="#4F8CE0" />

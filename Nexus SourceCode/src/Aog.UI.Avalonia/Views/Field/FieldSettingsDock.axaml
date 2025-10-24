@@ -86,15 +86,15 @@
       <Setter Property="IsHitTestVisible" Value="False" />
       <Setter Property="Background" Value="#DD101010" />
       <Setter Property="Padding" Value="18" />
-    </Style>
 
-    <DataTrigger Selector="UserControl"
-                 Binding="{Binding IsLauncherDockVisible}"
-                 Value="True">
-      <Setter Property="Margin" Value="0" />
-      <Setter Property="Opacity" Value="1" />
-      <Setter Property="IsHitTestVisible" Value="True" />
-    </DataTrigger>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsLauncherDockVisible}" Value="True">
+          <Setter Property="Margin" Value="0" />
+          <Setter Property="Opacity" Value="1" />
+          <Setter Property="IsHitTestVisible" Value="True" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
 
     <Style Selector="Border.menu-block">
       <Setter Property="Background" Value="#1F1F1F" />

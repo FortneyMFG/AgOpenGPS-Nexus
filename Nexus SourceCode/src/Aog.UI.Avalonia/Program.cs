@@ -52,6 +52,8 @@ public static class Program
 
         try
         {
+            EnsureGraphicalEnvironment();
+
             return BuildAvaloniaApp(host.Services)
                 .AfterSetup(_ =>
                 {
@@ -69,6 +71,12 @@ public static class Program
                 })
                 .StartWithClassicDesktopLifetime(args);
         }
+        catch (DisplayUnavailableException ex)
+        {
+            LogFatal("Avalonia UI cannot start because a graphical display server was not found.", ex);
+            Console.Error.WriteLine(ex.Message);
+            return -1;
+        }
         catch (Exception ex)
         {
             LogFatal("Avalonia host terminated unexpectedly.", ex);
@@ -85,6 +93,33 @@ public static class Program
         AppBuilder.Configure(() => services.GetRequiredService<NexusApp>())
             .UsePlatformDetect()
             .LogToTrace();
+
+    private static void EnsureGraphicalEnvironment()
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            return;
+        }
+
+        var hasDisplay = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DISPLAY"))
+            || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
+
+        if (hasDisplay)
+        {
+            return;
+        }
+
+        const string message = "No graphical display server was detected. Set the DISPLAY or WAYLAND_DISPLAY environment variable or run Nexus inside an X11/Wayland session.";
+        throw new DisplayUnavailableException(message);
+    }
+
+    private sealed class DisplayUnavailableException : InvalidOperationException
+    {
+        public DisplayUnavailableException(string message)
+            : base(message)
+        {
+        }
+    }
 
     private static void InstallGlobalExceptionHandlers()
     {

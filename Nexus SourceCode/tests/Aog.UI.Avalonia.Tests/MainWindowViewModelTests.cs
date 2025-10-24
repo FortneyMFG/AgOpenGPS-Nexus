@@ -56,7 +56,7 @@ public sealed class MainWindowViewModelTests
         viewModel.SteerPanel.IsEnabled.Should().BeTrue();
         viewModel.SteerPanel.TargetWheelAngleDegrees.Should().BeApproximately(2.5, 1e-3);
 
-        viewModel.SectionsPanel.Sections.Should().HaveCount(8);
+        viewModel.SectionsPanel.Sections.Count(section => section.IsVisible).Should().Be(8);
         viewModel.SectionsPanel.CurrentMask.Should().Be(0b0011_1100u);
 
         viewModel.PlanterPanel.Rows.Should().HaveCountGreaterThan(0);
@@ -276,7 +276,7 @@ public sealed class MainWindowViewModelTests
             tooltip.Should().Contain("Last invoked");
 
             var offset = TimeZoneInfo.Local.GetUtcOffset(DateTimeOffset.UtcNow);
-            var expectedOffset = string.Format(CultureInfo.InvariantCulture, "{0:+00\\:00;-00\\:00}", offset);
+            var expectedOffset = string.Format(CultureInfo.InvariantCulture, "{0:+hh\\:mm;-hh\\:mm}", offset);
             tooltip.Should().Contain(expectedOffset);
         }
         finally

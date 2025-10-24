@@ -411,7 +411,7 @@ public enum AxleIngestionSeverity
 /// </summary>
 public sealed class AxleIngestionOptions
 {
-    public static readonly AxleIngestionOptions Default = new(new Version(1, 0), null);
+    public static readonly AxleIngestionOptions Default = new(new Version(1, 2), null);
 
     public AxleIngestionOptions(Version? coreVersion, int? deterministicSeedOverride)
     {

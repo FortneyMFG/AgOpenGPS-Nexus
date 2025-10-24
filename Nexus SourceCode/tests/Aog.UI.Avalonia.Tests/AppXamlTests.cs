@@ -9,9 +9,7 @@ namespace Aog.UI.Avalonia.Tests;
 
 public sealed class AppXamlTests
 {
-    private static readonly string SrcDirectory = Path.GetFullPath(Path.Join(
-        Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(
-            AppContext.BaseDirectory!))!))!, "src", "Aog.UI.Avalonia"));
+    private static readonly string SrcDirectory = LocateSrcDirectory();
 
     [Fact]
     public void AppAxaml_ShouldContainSingleApplicationDefinition()
@@ -68,5 +66,23 @@ public sealed class AppXamlTests
 
             seen[className] = path;
         }
+    }
+
+    private static string LocateSrcDirectory()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && directory.Exists)
+        {
+            var candidate = Path.Combine(directory.FullName, "Nexus SourceCode", "src", "Aog.UI.Avalonia");
+            if (Directory.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            directory = directory.Parent;
+        }
+
+        throw new InvalidOperationException(
+            $"Unable to locate repository root containing 'Nexus SourceCode/src/Aog.UI.Avalonia' starting from '{AppContext.BaseDirectory}'.");
     }
 }

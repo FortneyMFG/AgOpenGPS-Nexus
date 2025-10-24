@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Aog.UI.Avalonia.Blocks;
 using Aog.UI.Avalonia.Layout;
 using Aog.UI.Avalonia.Settings;
@@ -45,6 +46,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private readonly List<BlockInstance> _instances;
     private Func<BlockDefinition, bool>? _commandInterceptor;
     private Action<string> _statusReporter;
+    private readonly DelegateCommand _showLayoutSettingsCommand;
     private bool _isLocked = true;
     private Size _viewport;
     private PaneLayoutResult? _paneLayout;
@@ -67,9 +69,12 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         _instances = storedInstances;
 
         var preferences = preferencesService.GetPreferences().ShellLayout ?? new ShellLayoutPreferences();
+        _isLocked = preferences.IsLayoutLocked;
         Grid = preferences.Grid ?? new ShellGridLayout();
         Grid.Tiles ??= new List<TileSpec>();
         Grid.Panels ??= new List<PanelSpec>();
+        Grid.FloatingPanels ??= new List<FloatingPanelSpec>();
+        Grid.FloatingBlocks ??= new List<FloatingBlockSpec>();
         EnsureDefaultPanels();
         LeftSidebarLayout = (preferences.LeftSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone();
         RightSidebarLayout = (preferences.RightSidebar ?? SidebarLayoutSettings.CreateVerticalDefaults()).Clone();
@@ -77,21 +82,37 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         BottomSidebarLayout = (preferences.BottomSidebar ?? SidebarLayoutSettings.CreateBottomDefaults()).Clone();
         WorkspaceLayout = (preferences.Workspace ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone();
 
+        _showLayoutSettingsCommand = new DelegateCommand(_ => RequestLayoutSettings());
         Blocks = new ObservableCollection<BlockItemViewModel>();
+        FloatingPanels = new ObservableCollection<FloatingPanelViewModel>();
+        FloatingBlocks = new ObservableCollection<FloatingBlockViewModel>();
         LeftSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         RightSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         TopSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         BottomSidebarButtons = new ObservableCollection<SidebarButtonViewModel>();
         BuildInitialCollections();
         SnapTilesToGrid();
+        BuildFloatingCollections();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
         RebuildSidebars();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public event EventHandler? LayoutSettingsRequested;
+
+    public event EventHandler<FloatingPanelViewModel>? FloatingPanelSettingsRequested;
+
+    public event EventHandler<FloatingBlockViewModel>? FloatingBlockSettingsRequested;
+
     /// <summary>Gets the observable block collection hosted on the global tiled panel.</summary>
     public ObservableCollection<BlockItemViewModel> Blocks { get; }
+
+    /// <summary>Gets the floating panel collection rendered above the tiled layout.</summary>
+    public ObservableCollection<FloatingPanelViewModel> FloatingPanels { get; }
+
+    /// <summary>Gets the floating block collection rendered independently of the grid.</summary>
+    public ObservableCollection<FloatingBlockViewModel> FloatingBlocks { get; }
 
     /// <summary>Gets the global grid definition describing the tiled layout.</summary>
     public ShellGridLayout Grid { get; }
@@ -110,6 +131,14 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the layout settings used to size the workspace surface.</summary>
     public SidebarLayoutSettings WorkspaceLayout { get; }
+
+    /// <summary>Gets the command that launches the layout settings dialog.</summary>
+    public ICommand ShowLayoutSettingsCommand => _showLayoutSettingsCommand;
+
+    public void RequestLayoutSettings()
+    {
+        LayoutSettingsRequested?.Invoke(this, EventArgs.Empty);
+    }
 
     /// <summary>Gets the collection of buttons rendered along the left sidebar.</summary>
     public ObservableCollection<SidebarButtonViewModel> LeftSidebarButtons { get; }
@@ -136,7 +165,9 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
             _isLocked = value;
             OnPropertyChanged();
+            ApplyLockStateToFloating();
             RefreshCommandStates();
+            Save();
         }
     }
 
@@ -249,8 +280,15 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         _instances.Remove(item.Instance);
         Blocks.Remove(item);
         Grid.Tiles.RemoveAll(tile => string.Equals(tile.Id, item.TileId, StringComparison.OrdinalIgnoreCase));
+        var floating = FloatingBlocks.FirstOrDefault(block => block.Instance.InstanceId.Value == item.Instance.InstanceId.Value);
+        if (floating is not null)
+        {
+            FloatingBlocks.Remove(floating);
+            Grid.FloatingBlocks.RemoveAll(spec => spec.InstanceId == floating.Instance.InstanceId.Value);
+        }
         Save();
         RebuildSidebars();
+        UpdateCollisionStates();
     }
 
     private void BuildInitialCollections()
@@ -282,6 +320,58 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         TrimOrphanedTiles();
     }
 
+    private void BuildFloatingCollections()
+    {
+        FloatingPanels.Clear();
+        FloatingBlocks.Clear();
+
+        if (Grid.FloatingPanels is { Count: > 0 })
+        {
+            foreach (var panel in Grid.FloatingPanels)
+            {
+                if (panel is null)
+                {
+                    continue;
+                }
+
+                var panelViewModel = new FloatingPanelViewModel(panel, this);
+                FloatingPanels.Add(panelViewModel);
+            }
+        }
+
+        if (_instances.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var instance in _instances)
+        {
+            if (instance is null)
+            {
+                continue;
+            }
+
+            if (instance.Region is not (BlockRegion.Floating or BlockRegion.Overlay))
+            {
+                continue;
+            }
+
+            var definition = _catalog.Get(instance.DefinitionId);
+            if (definition is null)
+            {
+                continue;
+            }
+
+            var spec = EnsureFloatingBlockSpec(instance, definition);
+            var blockViewModel = new FloatingBlockViewModel(instance, definition, spec, this);
+            FloatingBlocks.Add(blockViewModel);
+        }
+
+        TrimOrphanedFloatingSpecs();
+        ApplyLockStateToFloating();
+        UpdateCollisionStates();
+    }
+
     private TileSpec EnsureTile(BlockInstance instance)
     {
         var tileId = instance.InstanceId.Value.ToString();
@@ -304,10 +394,44 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         return tile;
     }
 
+    private FloatingBlockSpec EnsureFloatingBlockSpec(BlockInstance instance, BlockDefinition definition)
+    {
+        var specs = Grid.FloatingBlocks;
+        var spec = specs.FirstOrDefault(s => s.InstanceId == instance.InstanceId.Value);
+        if (spec is null)
+        {
+            var (width, height) = CalculateFloatingBlockSize(definition);
+            spec = new FloatingBlockSpec
+            {
+                InstanceId = instance.InstanceId.Value,
+                Width = width,
+                Height = height,
+            };
+            specs.Add(spec);
+        }
+        else
+        {
+            if (spec.Width <= 0 || spec.Height <= 0)
+            {
+                var (width, height) = CalculateFloatingBlockSize(definition);
+                spec.Width = width;
+                spec.Height = height;
+            }
+        }
+
+        return spec;
+    }
+
     private void TrimOrphanedTiles()
     {
         var validIds = new HashSet<string>(Blocks.Select(b => b.TileId), StringComparer.OrdinalIgnoreCase);
         Grid.Tiles.RemoveAll(tile => !validIds.Contains(tile.Id));
+    }
+
+    private void TrimOrphanedFloatingSpecs()
+    {
+        var validIds = new HashSet<Guid>(FloatingBlocks.Select(b => b.Instance.InstanceId.Value));
+        Grid.FloatingBlocks.RemoveAll(block => !validIds.Contains(block.InstanceId));
     }
 
     private void SnapTilesToGrid()
@@ -366,6 +490,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             item.RefreshCommandStates();
             item.RefreshSettingsState();
         }
+
+        ApplyLockStateToFloating();
     }
 
     private void RebuildSidebars()
@@ -435,6 +561,76 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             : $"{definition.Label} activated.";
     }
 
+    private void ApplyLockStateToFloating()
+    {
+        foreach (var panel in FloatingPanels)
+        {
+            panel.SetLockState(_isLocked);
+        }
+
+        foreach (var block in FloatingBlocks)
+        {
+            block.SetLockState(_isLocked);
+        }
+    }
+
+    private void UpdateCollisionStates()
+    {
+        for (var i = 0; i < FloatingPanels.Count; i++)
+        {
+            var panel = FloatingPanels[i];
+            var colliding = false;
+
+            for (var j = 0; j < FloatingPanels.Count; j++)
+            {
+                if (i == j)
+                {
+                    continue;
+                }
+
+                if (FloatingPanels[j].Bounds.Intersects(panel.Bounds))
+                {
+                    colliding = true;
+                    break;
+                }
+            }
+
+            if (!colliding)
+            {
+                colliding = FloatingBlocks.Any(block => block.Bounds.Intersects(panel.Bounds));
+            }
+
+            panel.SetCollision(colliding);
+        }
+
+        for (var i = 0; i < FloatingBlocks.Count; i++)
+        {
+            var block = FloatingBlocks[i];
+            var colliding = false;
+
+            for (var j = 0; j < FloatingBlocks.Count; j++)
+            {
+                if (i == j)
+                {
+                    continue;
+                }
+
+                if (FloatingBlocks[j].Bounds.Intersects(block.Bounds))
+                {
+                    colliding = true;
+                    break;
+                }
+            }
+
+            if (!colliding)
+            {
+                colliding = FloatingPanels.Any(panel => panel.Bounds.Intersects(block.Bounds));
+            }
+
+            block.SetCollision(colliding);
+        }
+    }
+
     private async Task DispatchCommandAsync(string commandKey)
     {
         if (string.IsNullOrWhiteSpace(commandKey))
@@ -458,7 +654,10 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         _layoutStore.Save(_instances);
         var preferences = _preferencesService.GetPreferences();
         var layout = preferences.ShellLayout ?? new ShellLayoutPreferences();
+        layout.IsLayoutLocked = _isLocked;
         layout.Grid = Grid;
+        layout.Grid.FloatingBlocks ??= new List<FloatingBlockSpec>();
+        layout.Grid.FloatingPanels ??= new List<FloatingPanelSpec>();
         _preferencesService.UpdateShellLayout(layout);
     }
 
@@ -609,6 +808,61 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Save();
     }
 
+    public void UpdateFloatingBlock(FloatingBlockViewModel block, Rect bounds)
+    {
+        if (block is null)
+        {
+            return;
+        }
+
+        block.UpdateBounds(bounds);
+        UpdateCollisionStates();
+        Save();
+    }
+
+    public void UpdateFloatingPanel(FloatingPanelViewModel panel, Rect bounds)
+    {
+        if (panel is null)
+        {
+            return;
+        }
+
+        panel.UpdateBounds(bounds);
+        UpdateCollisionStates();
+        Save();
+    }
+
+    public void SetFloatingPanelLock(FloatingPanelViewModel panel, bool isLocked)
+    {
+        if (panel is null)
+        {
+            return;
+        }
+
+        panel.UpdatePanelLock(isLocked);
+        Save();
+    }
+
+    internal void RequestFloatingPanelSettings(FloatingPanelViewModel panel)
+    {
+        if (panel is null)
+        {
+            return;
+        }
+
+        FloatingPanelSettingsRequested?.Invoke(this, panel);
+    }
+
+    internal void RequestFloatingBlockSettings(FloatingBlockViewModel block)
+    {
+        if (block is null)
+        {
+            return;
+        }
+
+        FloatingBlockSettingsRequested?.Invoke(this, block);
+    }
+
     private static IEnumerable<(BlockSize size, string label)> EnumerateCandidateSizes()
     {
         yield return (BlockSize.Tile1x1, "1 x 1");
@@ -623,6 +877,37 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         {
             BlockSize.Tile1x2 or BlockSize.Tile2x2 => definition.SupportsFullHeight,
             _ => true,
+        };
+    }
+
+    private (double width, double height) CalculateFloatingBlockSize(BlockDefinition definition)
+    {
+        var cell = Grid.CellPx <= 0 ? 56d : Grid.CellPx;
+        var widthUnits = GetWidthUnits(definition.PreferredSize);
+        var heightUnits = GetHeightUnits(definition.PreferredSize);
+        var width = Math.Max(cell, widthUnits * cell);
+        var height = Math.Max(cell, heightUnits * cell);
+        return (width, height);
+    }
+
+    private static double GetWidthUnits(BlockSize size)
+    {
+        return size switch
+        {
+            BlockSize.Tile2x1 or BlockSize.Tile2x2 or BlockSize.Tile2xHalf => 2d,
+            BlockSize.TileHalfx1 or BlockSize.TileHalfx2 => 0.5d,
+            _ => 1d,
+        };
+    }
+
+    private static double GetHeightUnits(BlockSize size)
+    {
+        return size switch
+        {
+            BlockSize.Tile1x2 or BlockSize.Tile2x2 => 2d,
+            BlockSize.Tile1xHalf or BlockSize.Tile2xHalf => 0.5d,
+            BlockSize.TileHalfx2 => 2d,
+            _ => 1d,
         };
     }
 

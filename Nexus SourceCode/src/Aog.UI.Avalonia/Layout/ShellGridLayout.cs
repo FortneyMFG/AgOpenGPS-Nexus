@@ -22,6 +22,10 @@ public sealed class ShellGridLayout
 
     public List<PanelSpec> Panels { get; set; } = new();
 
+    public List<FloatingPanelSpec> FloatingPanels { get; set; } = new();
+
+    public List<FloatingBlockSpec> FloatingBlocks { get; set; } = new();
+
     public Rect ToPixelRect(int column, int row, int columnSpan, int rowSpan)
     {
         if (column < 0)
@@ -237,4 +241,49 @@ public sealed class PanelSpec
 
         return Math.Clamp(rows + value, 0, rows);
     }
+}
+
+public sealed class FloatingPanelSpec
+{
+    public string Id { get; init; } = Guid.NewGuid().ToString();
+
+    public string Title { get; set; } = string.Empty;
+
+    public string? ContentId { get; set; }
+        = null;
+
+    public double X { get; set; }
+        = 0d;
+
+    public double Y { get; set; }
+        = 0d;
+
+    public double Width { get; set; }
+        = 200d;
+
+    public double Height { get; set; }
+        = 200d;
+
+    public bool IsLocked { get; set; }
+        = false;
+}
+
+public sealed class FloatingBlockSpec
+{
+    public string Id { get; init; } = Guid.NewGuid().ToString();
+
+    public Guid InstanceId { get; set; }
+        = Guid.Empty;
+
+    public double X { get; set; }
+        = 0d;
+
+    public double Y { get; set; }
+        = 0d;
+
+    public double Width { get; set; }
+        = 160d;
+
+    public double Height { get; set; }
+        = 160d;
 }

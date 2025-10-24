@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Aog.UI.Avalonia.Layout;
 using Aog.UI.Avalonia.Settings;
 
 namespace Aog.UI.Avalonia.Blocks;
@@ -39,6 +40,7 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         var layout = preferences.ShellLayout;
         EnsureSidebarSettings(layout);
         EnsureInstanceList(layout);
+        EnsureFloatingCollections(layout);
 
         var changed = RemoveMissingDefinitions(layout);
         changed |= EnsureMenuScopedCanonicals(layout);
@@ -59,6 +61,7 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         var layout = _preferencesService.GetPreferences().ShellLayout;
         EnsureSidebarSettings(layout);
         EnsureInstanceList(layout);
+        EnsureFloatingCollections(layout);
 
         layout.Instances.Clear();
         layout.Instances.AddRange(instances.Select(instance => instance.Clone()));
@@ -82,6 +85,13 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         }
     }
 
+    private static void EnsureFloatingCollections(ShellLayoutPreferences layout)
+    {
+        layout.Grid ??= new ShellGridLayout();
+        layout.Grid.FloatingBlocks ??= new List<FloatingBlockSpec>();
+        layout.Grid.FloatingPanels ??= new List<FloatingPanelSpec>();
+    }
+
     private bool RemoveMissingDefinitions(ShellLayoutPreferences layout)
     {
         var removed = layout.Instances.RemoveAll(instance =>
@@ -89,6 +99,12 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
             || instance.DefinitionId is null
             || string.IsNullOrWhiteSpace(instance.DefinitionId.Value)
             || _catalog.Get(instance.DefinitionId) is null);
+
+        if (removed > 0)
+        {
+            var existing = new HashSet<Guid>(layout.Instances.Select(i => i.InstanceId.Value));
+            layout.Grid?.FloatingBlocks?.RemoveAll(block => !existing.Contains(block.InstanceId));
+        }
 
         return removed > 0;
     }

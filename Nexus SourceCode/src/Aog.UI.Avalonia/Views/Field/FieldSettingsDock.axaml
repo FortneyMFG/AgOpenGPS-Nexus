@@ -31,7 +31,11 @@
 
     <DataTemplate x:Key="MenuBlockTemplate"
                   x:DataType="vm:BlockLauncherItemViewModel">
-      <Border Classes="menu-block">
+      <Border Classes="menu-block"
+              PointerPressed="OnLauncherPointerPressed"
+              PointerMoved="OnLauncherPointerMoved"
+              PointerReleased="OnLauncherPointerReleased"
+              PointerCaptureLost="OnLauncherPointerCaptureLost">
         <Grid ColumnDefinitions="Auto,*,Auto"
               ColumnSpacing="12"
               RowDefinitions="Auto"

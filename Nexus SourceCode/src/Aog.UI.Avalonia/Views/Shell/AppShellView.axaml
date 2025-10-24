@@ -380,7 +380,10 @@
       <Canvas x:Name="LayoutCanvas"
               Width="{Binding #WorkspaceRoot.Bounds.Width}"
               Height="{Binding #WorkspaceRoot.Bounds.Height}"
-              ZIndex="1">
+              ZIndex="1"
+              DragDrop.AllowDrop="True"
+              DragDrop.DragOver="OnWorkspaceDragOver"
+              DragDrop.Drop="OnWorkspaceDrop">
         <ContentControl Content="{Binding MainContent}"
                         Width="{Binding #WorkspaceRoot.Bounds.Width}"
                         Height="{Binding #WorkspaceRoot.Bounds.Height}"

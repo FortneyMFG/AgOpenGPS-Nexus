@@ -51,6 +51,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private bool _isLocked = true;
     private bool _isFieldDockPinned;
     private bool _isLauncherDropIndicatorVisible;
+    private int _activeLauncherDrags;
     private Size _viewport;
     private PaneLayoutResult? _paneLayout;
 
@@ -174,6 +175,26 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private void ToggleFieldDockPinned()
     {
         IsFieldDockPinned = !IsFieldDockPinned;
+    }
+
+    internal void BeginLauncherDrag()
+    {
+        if (_activeLauncherDrags < int.MaxValue)
+        {
+            _activeLauncherDrags++;
+        }
+
+        UpdateLauncherDropIndicator();
+    }
+
+    internal void EndLauncherDrag()
+    {
+        if (_activeLauncherDrags > 0)
+        {
+            _activeLauncherDrags--;
+        }
+
+        UpdateLauncherDropIndicator();
     }
 
     /// <summary>Gets or sets a value indicating whether layout modifications are locked.</summary>
@@ -353,11 +374,11 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         return launcher is not null && !IsLocked;
     }
 
-    internal void Launch(BlockLauncherItemViewModel launcher)
+    internal BlockItemViewModel? Launch(BlockLauncherItemViewModel launcher, int? column = null, int? row = null)
     {
         if (!CanLaunch(launcher))
         {
-            return;
+            return null;
         }
 
         var definition = launcher.Definition;
@@ -371,11 +392,19 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
         _instances.Add(instance);
 
+        BlockItemViewModel? created = null;
         if (ShouldRenderOnGrid(instance.Region))
         {
             var tile = EnsureTile(instance);
-            var block = new BlockItemViewModel(instance, definition, this, tile);
-            Blocks.Add(block);
+            if (column.HasValue && row.HasValue)
+            {
+                tile.Col = column.Value;
+                tile.Row = row.Value;
+                tile.PaneAttached = true;
+            }
+
+            created = new BlockItemViewModel(instance, definition, this, tile);
+            Blocks.Add(created);
         }
 
         SnapTilesToGrid();
@@ -383,6 +412,25 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         UpdateCollisionStates();
         Save();
         _statusReporter(GetStatusMessage(definition));
+        return created;
+    }
+
+    internal (int colSpan, int rowSpan) GetGridSpan(BlockLauncherItemViewModel launcher)
+    {
+        if (launcher is null)
+        {
+            return (1, 1);
+        }
+
+        var size = launcher.Instance.SizeOverride ?? launcher.Definition.PreferredSize;
+        return CalculateGridSpan(size);
+    }
+
+    private static (int colSpan, int rowSpan) CalculateGridSpan(BlockSize size)
+    {
+        var colSpan = Math.Max(1, (int)Math.Round(GetWidthUnits(size) * MinorDivisionsPerMajor));
+        var rowSpan = Math.Max(1, (int)Math.Round(GetHeightUnits(size) * MinorDivisionsPerMajor));
+        return (colSpan, rowSpan);
     }
 
     internal bool CanMoveLauncherItem(BlockLauncherItemViewModel launcher, int offset)
@@ -1215,7 +1263,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
     private void UpdateLauncherDropIndicator()
     {
-        IsLauncherDropIndicatorVisible = !_isLocked;
+        IsLauncherDropIndicatorVisible = !_isLocked && _activeLauncherDrags > 0;
     }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null)

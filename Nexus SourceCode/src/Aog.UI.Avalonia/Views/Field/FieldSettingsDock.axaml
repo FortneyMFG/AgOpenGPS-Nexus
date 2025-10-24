@@ -15,6 +15,12 @@
   <UserControl.Resources>
     <rendering:IconKeyToBitmapConverter x:Key="LauncherIconConverter" />
     <rendering:StringHasValueConverter x:Key="StringHasValueConverter" />
+    <rendering:BooleanToValueConverter x:Key="LauncherDockMarginConverter"
+                                       TrueValue="0"
+                                       FalseValue="-320,0,0,0" />
+    <rendering:BooleanToValueConverter x:Key="LauncherDockOpacityConverter"
+                                       TrueValue="1"
+                                       FalseValue="0" />
 
     <DataTemplate x:Key="MenuBlockTemplate"
                   x:DataType="vm:BlockLauncherItemViewModel">
@@ -81,19 +87,25 @@
 
   <UserControl.Styles>
     <Style Selector="UserControl">
-      <Setter Property="Margin" Value="-320,0,0,0" />
-      <Setter Property="Opacity" Value="0" />
-      <Setter Property="IsHitTestVisible" Value="False" />
       <Setter Property="Background" Value="#DD101010" />
       <Setter Property="Padding" Value="18" />
-
-      <Style.Triggers>
-        <DataTrigger Binding="{Binding IsLauncherDockVisible}" Value="True">
-          <Setter Property="Margin" Value="0" />
-          <Setter Property="Opacity" Value="1" />
-          <Setter Property="IsHitTestVisible" Value="True" />
-        </DataTrigger>
-      </Style.Triggers>
+      <Setter Property="Margin">
+        <Setter.Value>
+          <Binding Path="IsLauncherDockVisible"
+                   Converter="{StaticResource LauncherDockMarginConverter}" />
+        </Setter.Value>
+      </Setter>
+      <Setter Property="Opacity">
+        <Setter.Value>
+          <Binding Path="IsLauncherDockVisible"
+                   Converter="{StaticResource LauncherDockOpacityConverter}" />
+        </Setter.Value>
+      </Setter>
+      <Setter Property="IsHitTestVisible">
+        <Setter.Value>
+          <Binding Path="IsLauncherDockVisible" />
+        </Setter.Value>
+      </Setter>
     </Style>
 
     <Style Selector="Border.menu-block">

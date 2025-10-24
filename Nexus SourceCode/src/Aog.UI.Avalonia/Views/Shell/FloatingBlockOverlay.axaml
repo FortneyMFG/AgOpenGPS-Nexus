@@ -11,6 +11,12 @@
              d:DesignHeight="200">
   <UserControl.Resources>
     <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
+    <rendering:BooleanToValueConverter x:Key="CollisionBorderBrushConverter"
+                                       TrueValue="#FFDD5B5B" />
+    <rendering:BooleanToValueConverter x:Key="CollisionBackgroundConverter"
+                                       TrueValue="#40DD5B5B" />
+    <rendering:BooleanToValueConverter x:Key="LockedOpacityConverter"
+                                       TrueValue="0.75" />
   </UserControl.Resources>
 
   <UserControl.Styles>
@@ -20,17 +26,6 @@
       <Setter Property="CornerRadius" Value="{DynamicResource ThemeRadiusMd}" />
       <Setter Property="Background" Value="{DynamicResource FloatingBlockBackgroundBrush}" />
       <Setter Property="Opacity" Value="0.94" />
-
-      <Style.Triggers>
-        <DataTrigger Binding="{Binding IsColliding}" Value="True">
-          <Setter Property="BorderBrush" Value="#FFDD5B5B" />
-          <Setter Property="Background" Value="#40DD5B5B" />
-        </DataTrigger>
-
-        <DataTrigger Binding="{Binding IsLocked}" Value="True">
-          <Setter Property="Opacity" Value="0.75" />
-        </DataTrigger>
-      </Style.Triggers>
     </Style>
 
     <Style Selector="Border.resize-handle">
@@ -43,6 +38,9 @@
 
   <Grid>
     <Border x:Name="Outline"
+            BorderBrush="{Binding IsColliding, Converter={StaticResource CollisionBorderBrushConverter}}"
+            Background="{Binding IsColliding, Converter={StaticResource CollisionBackgroundConverter}}"
+            Opacity="{Binding IsLocked, Converter={StaticResource LockedOpacityConverter}}"
             PointerPressed="OnDragPointerPressed"
             PointerReleased="OnDragPointerReleased"
             PointerMoved="OnDragPointerMoved"

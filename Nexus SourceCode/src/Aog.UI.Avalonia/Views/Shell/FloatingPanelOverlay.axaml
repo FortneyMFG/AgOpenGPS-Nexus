@@ -11,6 +11,12 @@
              d:DesignHeight="240">
   <UserControl.Resources>
     <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
+    <rendering:BooleanToValueConverter x:Key="PanelCollisionBorderBrushConverter"
+                                       TrueValue="#FFDD5B5B" />
+    <rendering:BooleanToValueConverter x:Key="PanelCollisionBackgroundConverter"
+                                       TrueValue="#40DD5B5B" />
+    <rendering:BooleanToValueConverter x:Key="PanelLockedOpacityConverter"
+                                       TrueValue="0.72" />
   </UserControl.Resources>
 
   <UserControl.Styles>
@@ -20,17 +26,6 @@
       <Setter Property="BorderThickness" Value="2" />
       <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Opacity" Value="0.9" />
-
-      <Style.Triggers>
-        <DataTrigger Binding="{Binding IsColliding}" Value="True">
-          <Setter Property="BorderBrush" Value="#FFDD5B5B" />
-          <Setter Property="Background" Value="#40DD5B5B" />
-        </DataTrigger>
-
-        <DataTrigger Binding="{Binding IsLocked}" Value="True">
-          <Setter Property="Opacity" Value="0.72" />
-        </DataTrigger>
-      </Style.Triggers>
     </Style>
 
     <Style Selector="Border.resize-handle">
@@ -43,6 +38,9 @@
 
   <Grid>
     <Border x:Name="Outline"
+            BorderBrush="{Binding IsColliding, Converter={StaticResource PanelCollisionBorderBrushConverter}}"
+            Background="{Binding IsColliding, Converter={StaticResource PanelCollisionBackgroundConverter}}"
+            Opacity="{Binding IsLocked, Converter={StaticResource PanelLockedOpacityConverter}}"
             PointerPressed="OnDragPointerPressed"
             PointerReleased="OnDragPointerReleased"
             PointerMoved="OnDragPointerMoved"

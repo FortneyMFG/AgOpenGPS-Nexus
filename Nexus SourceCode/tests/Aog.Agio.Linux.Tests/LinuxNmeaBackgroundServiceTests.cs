@@ -169,7 +169,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
             new[] { activeStream, activeStream, activeStream },
             () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
 
-        var options = Options.Create(new NmeaSerialPortScanOptions
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
         {
             ProbeDuration = TimeSpan.FromSeconds(1),
             ReadTimeout = TimeSpan.FromMilliseconds(50),
@@ -186,7 +186,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
             options);
 
         var logger = new TestLogger<LinuxNmeaBackgroundService>();
-        var service = new LinuxNmeaBackgroundService(scanner, logger);
+        var service = new LinuxNmeaBackgroundService(scanner, logger, options);
 
         await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
 
@@ -367,7 +367,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
             new[] { streamWithMissingSpeed },
             () => timeProvider.Advance(TimeSpan.FromMilliseconds(200)));
 
-        var options = Options.Create(new NmeaSerialPortScanOptions
+        var options = new TestOptionsMonitor<NmeaSerialPortScanOptions>(new NmeaSerialPortScanOptions
         {
             ProbeDuration = TimeSpan.FromSeconds(1),
             ReadTimeout = TimeSpan.FromMilliseconds(50),
@@ -384,7 +384,7 @@ public sealed class LinuxNmeaBackgroundServiceTests
             options);
 
         var logger = new TestLogger<LinuxNmeaBackgroundService>();
-        var service = new LinuxNmeaBackgroundService(scanner, logger);
+        var service = new LinuxNmeaBackgroundService(scanner, logger, options);
 
         await service.StartAsync(CancellationToken.None).ConfigureAwait(false);
 

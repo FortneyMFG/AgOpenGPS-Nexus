@@ -18,7 +18,7 @@ public sealed class TelemetryReplayControllerTests
     public async Task PlayAsync_ReplaysTelemetryAndUpdatesState()
     {
         using var tempDirectory = ControllerReplayFixture.CreateTemporaryDirectory();
-        var scenario = await ControllerReplayFixture.CreateAsync(tempDirectory.Path);
+        var scenario = await ControllerReplayFixture.CreateAsync(tempDirectory.DirectoryPath);
 
         var playbackBus = new InMemoryEventBus();
         var poses = new List<Pose>();
@@ -127,7 +127,7 @@ public sealed class TelemetryReplayControllerTests
     public async Task SeekAsync_JumpsToRequestedPosition()
     {
         using var tempDirectory = ControllerReplayFixture.CreateTemporaryDirectory();
-        var scenario = await ControllerReplayFixture.CreateAsync(tempDirectory.Path);
+        var scenario = await ControllerReplayFixture.CreateAsync(tempDirectory.DirectoryPath);
 
         var playbackBus = new InMemoryEventBus();
         var poses = new List<Pose>();

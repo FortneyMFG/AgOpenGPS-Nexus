@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Linq;
 using Aog.Core.Coverage;
 using FluentAssertions;
+using NetTopologySuite;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
@@ -126,13 +127,11 @@ public sealed class CoverageExportVerifierTests
                 })
                 .ToList();
 
-            using (var writer = new ShapefileDataWriter(shapefilePath, GeometryFactory)
-            {
-                Header = ShapefileDataWriter.GetHeader(features[0], features.Count),
-            })
-            {
-                writer.Write(features);
-            }
+        var writer = new ShapefileDataWriter(shapefilePath, GeometryFactory)
+        {
+            Header = ShapefileDataWriter.GetHeader(features[0], features.Count),
+        };
+        writer.Write(features);
 
             var zipPath = Path.Combine(Path.GetTempPath(), "coverage-zip-" + Guid.NewGuid().ToString("N") + ".zip");
             if (File.Exists(zipPath))

@@ -44,6 +44,7 @@ public static class ServiceCollectionExtensions
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, LoggingShellCommandHandler>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, SystemSummaryDialogHandler>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, PluginManagerDialogHandler>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, LayoutShellCommandHandler>());
         services.TryAddSingleton<BackendServiceManager>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IShellCommandHandler, BackendServiceCommandHandler>());
         services.TryAddSingleton(TimeProvider.System);

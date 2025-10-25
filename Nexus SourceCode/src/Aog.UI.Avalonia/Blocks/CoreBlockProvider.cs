@@ -11,75 +11,52 @@ public sealed class CoreBlockProvider : IBlockProvider
     {
         yield return new BlockDefinition
         {
-            Id = new BlockDefinitionId("Menu.SystemSettings"),
+            Id = new BlockDefinitionId("Menu.FieldSettings"),
             Kind = BlockKind.Container,
-            Label = "System Settings",
+            Label = "Field Settings",
             PreferredDock = BlockRegion.Left,
             Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "SystemSettings",
+            ContainerId = "FieldSettings",
         };
 
         yield return new BlockDefinition
         {
-            Id = new BlockDefinitionId("Menu.FarmSettings"),
-            Kind = BlockKind.Container,
-            Label = "Farm Settings",
+            Id = new BlockDefinitionId("Cmd.FieldBoundaries"),
+            Kind = BlockKind.CommandButton,
+            Label = "Field Boundaries",
             PreferredDock = BlockRegion.Left,
             Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "FarmSettings",
+            ContainerId = "FieldSettings",
         };
 
         yield return new BlockDefinition
         {
-            Id = new BlockDefinitionId("Menu.EquipmentControls"),
-            Kind = BlockKind.Container,
-            Label = "Equipment Controls",
+            Id = new BlockDefinitionId("Cmd.HeadlandSetup"),
+            Kind = BlockKind.CommandButton,
+            Label = "Headland Setup",
             PreferredDock = BlockRegion.Left,
             Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "EquipmentControls",
-            Children = new[]
-            {
-                new BlockDefinitionId("Container.AutosteerControls"),
-                new BlockDefinitionId("Container.SectionControls"),
-                new BlockDefinitionId("Container.RateControls"),
-            },
+            ContainerId = "FieldSettings",
         };
 
         yield return new BlockDefinition
         {
-            Id = new BlockDefinitionId("Container.AutosteerControls"),
-            Kind = BlockKind.Container,
-            Label = "Autosteer Controls",
+            Id = new BlockDefinitionId("Cmd.ABLinesMenu"),
+            Kind = BlockKind.CommandButton,
+            Label = "AB Lines",
+            PreferredDock = BlockRegion.Left,
             Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "AutosteerControls",
-            Children = new[]
-            {
-                new BlockDefinitionId("Cmd.AutoSteerToggle"),
-                new BlockDefinitionId("Cmd.ABLineCycle"),
-                new BlockDefinitionId("Cmd.UTurnToggle"),
-            },
+            ContainerId = "FieldSettings",
         };
 
         yield return new BlockDefinition
         {
-            Id = new BlockDefinitionId("Container.SectionControls"),
-            Kind = BlockKind.Container,
-            Label = "Section Controls",
+            Id = new BlockDefinitionId("Cmd.ContourMode"),
+            Kind = BlockKind.CommandButton,
+            Label = "Contour Mode",
+            PreferredDock = BlockRegion.Left,
             Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "SectionControls",
-            Children = new[]
-            {
-                new BlockDefinitionId("Cmd.SectionMaster"),
-            },
-        };
-
-        yield return new BlockDefinition
-        {
-            Id = new BlockDefinitionId("Container.RateControls"),
-            Kind = BlockKind.Container,
-            Label = "Rate Controls",
-            Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "RateControls",
+            ContainerId = "FieldSettings",
         };
 
         yield return new BlockDefinition
@@ -89,8 +66,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Label = "Autosteer",
             IconKey = "autosteer",
             PreferredDock = BlockRegion.Overlay,
-            Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "AutosteerControls",
+            Placement = PlacementPolicy.Free,
             CommandKey = "Host.ToggleAutosteer",
         };
 
@@ -101,8 +77,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Label = "Cycle AB Line",
             IconKey = "ab-lines",
             PreferredDock = BlockRegion.Overlay,
-            Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "AutosteerControls",
+            Placement = PlacementPolicy.Free,
             CommandKey = "Host.CycleAbLine",
         };
 
@@ -113,8 +88,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Label = "U-Turn",
             IconKey = "uturn",
             PreferredDock = BlockRegion.Overlay,
-            Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "AutosteerControls",
+            Placement = PlacementPolicy.Free,
             CommandKey = "Host.ToggleUTurn",
         };
 
@@ -125,8 +99,7 @@ public sealed class CoreBlockProvider : IBlockProvider
             Label = "Sections",
             IconKey = "sections",
             PreferredDock = BlockRegion.Overlay,
-            Placement = PlacementPolicy.MenuScoped,
-            ContainerId = "SectionControls",
+            Placement = PlacementPolicy.Free,
             CommandKey = "Host.ToggleSections",
         };
 
@@ -187,25 +160,10 @@ public sealed class CoreBlockProvider : IBlockProvider
 
         yield return new BlockDefinition
         {
-            Id = new BlockDefinitionId("Tel.Speed"),
+            Id = new BlockDefinitionId("Info.Speed"),
             Kind = BlockKind.Telemetry,
             Label = "Speed",
-            IconKey = "speed",
-            PreferredDock = BlockRegion.Floating,
-            PreferredSize = BlockSize.Tile1xHalf,
-            Placement = PlacementPolicy.Free,
-            SupportsHalfHeight = true,
-            TelemetrySmallViewKey = "Telemetry/SpeedSmall",
-            TelemetryLargeViewKey = "Telemetry/SpeedLarge",
-        };
-
-        yield return new BlockDefinition
-        {
-            Id = new BlockDefinitionId("Tel.Gps"),
-            Kind = BlockKind.Telemetry,
-            Label = "GPS",
-            IconKey = "guidance",
-            PreferredDock = BlockRegion.Floating,
+            PreferredDock = BlockRegion.Left,
             PreferredSize = BlockSize.Tile1xHalf,
             Placement = PlacementPolicy.Free,
             SupportsHalfHeight = true,
@@ -213,11 +171,10 @@ public sealed class CoreBlockProvider : IBlockProvider
 
         yield return new BlockDefinition
         {
-            Id = new BlockDefinitionId("Tel.Sections"),
+            Id = new BlockDefinitionId("Info.Heading"),
             Kind = BlockKind.Telemetry,
-            Label = "Sections",
-            IconKey = "sections",
-            PreferredDock = BlockRegion.Floating,
+            Label = "Heading",
+            PreferredDock = BlockRegion.Left,
             PreferredSize = BlockSize.Tile1xHalf,
             Placement = PlacementPolicy.Free,
             SupportsHalfHeight = true,
@@ -225,11 +182,87 @@ public sealed class CoreBlockProvider : IBlockProvider
 
         yield return new BlockDefinition
         {
-            Id = new BlockDefinitionId("Tel.Radio"),
+            Id = new BlockDefinitionId("Info.Altitude"),
             Kind = BlockKind.Telemetry,
-            Label = "Radio",
-            IconKey = "coverage",
-            PreferredDock = BlockRegion.Floating,
+            Label = "Altitude",
+            PreferredDock = BlockRegion.Left,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Info.Satellites"),
+            Kind = BlockKind.Telemetry,
+            Label = "Satellites",
+            PreferredDock = BlockRegion.Left,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Info.Accuracy"),
+            Kind = BlockKind.Telemetry,
+            Label = "Accuracy",
+            PreferredDock = BlockRegion.Left,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Info.Steering"),
+            Kind = BlockKind.Telemetry,
+            Label = "Steering",
+            PreferredDock = BlockRegion.Right,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Info.Section1"),
+            Kind = BlockKind.Telemetry,
+            Label = "Section 1",
+            PreferredDock = BlockRegion.Right,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Info.Section2"),
+            Kind = BlockKind.Telemetry,
+            Label = "Section 2",
+            PreferredDock = BlockRegion.Right,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Info.Boom"),
+            Kind = BlockKind.Telemetry,
+            Label = "Boom",
+            PreferredDock = BlockRegion.Right,
+            PreferredSize = BlockSize.Tile1xHalf,
+            Placement = PlacementPolicy.Free,
+            SupportsHalfHeight = true,
+        };
+
+        yield return new BlockDefinition
+        {
+            Id = new BlockDefinitionId("Info.Rate"),
+            Kind = BlockKind.Telemetry,
+            Label = "Rate",
+            PreferredDock = BlockRegion.Right,
             PreferredSize = BlockSize.Tile1xHalf,
             Placement = PlacementPolicy.Free,
             SupportsHalfHeight = true,

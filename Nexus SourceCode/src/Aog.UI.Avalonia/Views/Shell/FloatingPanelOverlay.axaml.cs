@@ -10,9 +10,8 @@ namespace Aog.UI.Avalonia.Views.Shell;
 
 public partial class FloatingPanelOverlay : UserControl
 {
-    private bool _isDragging;
-    private bool _isResizing;
-    private Point _dragStart;
+    private ResizeHandle _activeHandle = ResizeHandle.None;
+    private Point _start;
     private Rect _initialBounds;
 
     public FloatingPanelOverlay()
@@ -27,128 +26,166 @@ public partial class FloatingPanelOverlay : UserControl
 
     private void OnDragPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (DataContext is not FloatingPanelViewModel panel || panel.IsLocked)
-        {
-            return;
-        }
-
-        var point = e.GetPosition(this);
-        _isDragging = true;
-        _dragStart = point;
-        _initialBounds = panel.Bounds;
-        if (sender is IInputElement inputElement)
-        {
-            e.Pointer.Capture(inputElement);
-        }
-        e.Handled = true;
+        BeginInteraction(ResizeHandle.Move, sender as IInputElement, e);
     }
 
-    private void OnDragPointerMoved(object? sender, PointerEventArgs e)
+    private void OnResizeHandlePressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!_isDragging || DataContext is not FloatingPanelViewModel panel)
+        if (sender is not Control control)
         {
             return;
         }
 
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-        {
-            ResetDrag(sender, e.Pointer);
-            return;
-        }
-
-        var current = e.GetPosition(this);
-        var delta = current - _dragStart;
-        if (Math.Abs(delta.X) < double.Epsilon && Math.Abs(delta.Y) < double.Epsilon)
+        if (!Enum.TryParse(control.Tag?.ToString(), ignoreCase: true, out ResizeHandle handle))
         {
             return;
         }
 
-        var updated = new Rect(
-            _initialBounds.X + delta.X,
-            _initialBounds.Y + delta.Y,
-            _initialBounds.Width,
-            _initialBounds.Height);
-        var normalized = panel.Owner.ClampFloatingBounds(updated, 160, 160);
-        panel.Owner.UpdateFloatingPanel(panel, normalized);
-        e.Handled = true;
+        BeginInteraction(handle, control, e);
     }
 
-    private void OnDragPointerReleased(object? sender, PointerReleasedEventArgs e)
-    {
-        if (_isDragging)
-        {
-            ResetDrag(sender, e.Pointer);
-            e.Handled = true;
-        }
-    }
-
-    private void OnResizePointerPressed(object? sender, PointerPressedEventArgs e)
+    private void BeginInteraction(ResizeHandle handle, IInputElement? captureTarget, PointerPressedEventArgs e)
     {
         if (DataContext is not FloatingPanelViewModel panel || panel.IsLocked)
         {
             return;
         }
 
-        _isResizing = true;
-        _dragStart = e.GetPosition(this);
-        _initialBounds = panel.Bounds;
-        if (sender is IInputElement inputElement)
+        if (e.GetCurrentPoint(this).Properties.PointerUpdateKind is not PointerUpdateKind.LeftButtonPressed)
         {
-            e.Pointer.Capture(inputElement);
+            return;
+        }
+
+        _activeHandle = handle;
+        _start = e.GetPosition(this);
+        _initialBounds = panel.Bounds;
+        if (captureTarget is not null)
+        {
+            e.Pointer.Capture(captureTarget);
         }
         e.Handled = true;
     }
 
-    private void OnResizePointerMoved(object? sender, PointerEventArgs e)
+    private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (!_isResizing || DataContext is not FloatingPanelViewModel panel)
+        if (_activeHandle == ResizeHandle.None || DataContext is not FloatingPanelViewModel panel)
         {
             return;
         }
 
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
-            ResetResize(sender, e.Pointer);
+            ResetInteraction(e.Pointer);
             return;
         }
 
         var current = e.GetPosition(this);
-        var delta = current - _dragStart;
+        var delta = current - _start;
         if (Math.Abs(delta.X) < double.Epsilon && Math.Abs(delta.Y) < double.Epsilon)
         {
             return;
         }
 
-        var width = _initialBounds.Width + delta.X;
-        var height = _initialBounds.Height + delta.Y;
-        var updated = new Rect(_initialBounds.Position, new Size(width, height));
+        var updated = CalculateBounds(delta);
         var normalized = panel.Owner.ClampFloatingBounds(updated, 160, 160);
         panel.Owner.UpdateFloatingPanel(panel, normalized);
         e.Handled = true;
     }
 
-    private void OnResizePointerReleased(object? sender, PointerReleasedEventArgs e)
+    private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (_isResizing)
+        if (_activeHandle != ResizeHandle.None)
         {
-            ResetResize(sender, e.Pointer);
+            ResetInteraction(e.Pointer);
             e.Handled = true;
         }
     }
 
-    private void ResetDrag(object? sender, IPointer pointer)
+    private void OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
     {
-        _isDragging = false;
-        _dragStart = default;
+        if (_activeHandle != ResizeHandle.None)
+        {
+            ResetInteraction(e.Pointer);
+        }
+    }
+
+    private void ResetInteraction(IPointer pointer)
+    {
+        _activeHandle = ResizeHandle.None;
+        _start = default;
         _initialBounds = default;
         pointer.Capture(null);
     }
 
-    private void ResetResize(object? sender, IPointer pointer)
+    private Rect CalculateBounds(Vector delta)
     {
-        _isResizing = false;
-        _dragStart = default;
-        _initialBounds = default;
-        pointer.Capture(null);
+        var bounds = _initialBounds;
+        const double minSize = 160d;
+
+        return _activeHandle switch
+        {
+            ResizeHandle.Move => new Rect(bounds.Position + delta, bounds.Size),
+            ResizeHandle.Left => ResizeFromLeft(bounds, delta.X, minSize),
+            ResizeHandle.Right => ResizeFromRight(bounds, delta.X, minSize),
+            ResizeHandle.Top => ResizeFromTop(bounds, delta.Y, minSize),
+            ResizeHandle.Bottom => ResizeFromBottom(bounds, delta.Y, minSize),
+            ResizeHandle.TopLeft => ResizeFromLeft(ResizeFromTop(bounds, delta.Y, minSize), delta.X, minSize),
+            ResizeHandle.TopRight => ResizeFromRight(ResizeFromTop(bounds, delta.Y, minSize), delta.X, minSize),
+            ResizeHandle.BottomLeft => ResizeFromLeft(ResizeFromBottom(bounds, delta.Y, minSize), delta.X, minSize),
+            ResizeHandle.BottomRight => ResizeFromRight(ResizeFromBottom(bounds, delta.Y, minSize), delta.X, minSize),
+            _ => bounds,
+        };
+    }
+
+    private static Rect ResizeFromLeft(Rect bounds, double deltaX, double minSize)
+    {
+        var newLeft = Math.Min(bounds.Right - minSize, bounds.X + deltaX);
+        var width = bounds.Right - newLeft;
+        if (width < minSize)
+        {
+            width = minSize;
+            newLeft = bounds.Right - width;
+        }
+
+        return new Rect(newLeft, bounds.Y, width, bounds.Height);
+    }
+
+    private static Rect ResizeFromRight(Rect bounds, double deltaX, double minSize)
+    {
+        var width = Math.Max(minSize, bounds.Width + deltaX);
+        return new Rect(bounds.X, bounds.Y, width, bounds.Height);
+    }
+
+    private static Rect ResizeFromTop(Rect bounds, double deltaY, double minSize)
+    {
+        var newTop = Math.Min(bounds.Bottom - minSize, bounds.Y + deltaY);
+        var height = bounds.Bottom - newTop;
+        if (height < minSize)
+        {
+            height = minSize;
+            newTop = bounds.Bottom - height;
+        }
+
+        return new Rect(bounds.X, newTop, bounds.Width, height);
+    }
+
+    private static Rect ResizeFromBottom(Rect bounds, double deltaY, double minSize)
+    {
+        var height = Math.Max(minSize, bounds.Height + deltaY);
+        return new Rect(bounds.X, bounds.Y, bounds.Width, height);
+    }
+
+    private enum ResizeHandle
+    {
+        None,
+        Move,
+        Left,
+        Right,
+        Top,
+        Bottom,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
     }
 }

@@ -24,6 +24,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private const int MajorGridColumns = 10;
     private const int MinorDivisionsPerMajor = 2;
     private const int MinorGridColumns = MajorGridColumns * MinorDivisionsPerMajor;
+    private const string PromptPanelId = "panel.prompt";
 
     private static readonly IReadOnlyDictionary<string, string> DefaultStatusMessages =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -82,6 +83,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Grid.FloatingBlocks ??= new List<FloatingBlockSpec>();
         EnsureDefaultPanels();
         WorkspaceLayout = (preferences.Workspace ?? SidebarLayoutSettings.CreateWorkspaceDefaults()).Clone();
+        EnsureDefaultFloatingPanels();
 
         _showLayoutSettingsCommand = new DelegateCommand(_ => RequestLayoutSettings());
         _toggleFieldDockCommand = new DelegateCommand(_ => ToggleFieldDockPinned());
@@ -282,6 +284,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             Grid.CellPx = 0;
             SnapTilesToGrid();
             EnsureDefaultPanels();
+            EnsureDefaultFloatingPanels();
             ClampPanelsToGrid();
             PaneLayout = PaneLayoutCompiler.Compile(Grid);
             RefreshPanelOverlays();
@@ -294,6 +297,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Grid.Rows = Math.Max(MinorDivisionsPerMajor, (int)Math.Floor(viewport.Height / minorCell));
         SnapTilesToGrid();
         EnsureDefaultPanels();
+        EnsureDefaultFloatingPanels();
+        ApplyFloatingPanelDefaults(viewport);
         ClampPanelsToGrid();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
         RefreshPanelOverlays();
@@ -566,6 +571,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         TrimOrphanedFloatingSpecs();
         ApplyLockStateToFloating();
         UpdateCollisionStates();
+        ApplyFloatingPanelDefaults(Viewport);
     }
 
     private TileSpec EnsureTile(BlockInstance instance)
@@ -1275,6 +1281,64 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             Top = top,
             Anchor = RelativeAnchor.BottomLeft,
         });
+    }
+
+    private void EnsureDefaultFloatingPanels()
+    {
+        Grid.FloatingPanels ??= new List<FloatingPanelSpec>();
+
+        if (Grid.FloatingPanels.Any(panel => panel is not null && string.Equals(panel.Id, PromptPanelId, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        Grid.FloatingPanels.Add(new FloatingPanelSpec
+        {
+            Id = PromptPanelId,
+            Title = "Edit Prompt",
+            ContentId = "prompt.edit",
+            Width = 360d,
+            Height = 280d,
+            X = Math.Max(0, WorkspaceLayout.Spacing),
+            Y = -1d,
+        });
+    }
+
+    private void ApplyFloatingPanelDefaults(Size viewport)
+    {
+        if (Grid.FloatingPanels is not { Count: > 0 })
+        {
+            return;
+        }
+
+        foreach (var panel in Grid.FloatingPanels)
+        {
+            if (panel is null || !string.Equals(panel.Id, PromptPanelId, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var width = panel.Width <= 0 ? 360d : panel.Width;
+            var height = panel.Height <= 0 ? 280d : panel.Height;
+
+            if (panel.Y < 0 || panel.Y + height > viewport.Height)
+            {
+                panel.Y = Math.Max(0, viewport.Height - height - WorkspaceLayout.Spacing);
+            }
+
+            if (panel.Width <= 0)
+            {
+                panel.Width = width;
+            }
+
+            if (panel.Height <= 0)
+            {
+                panel.Height = height;
+            }
+
+            var viewModel = FloatingPanels.FirstOrDefault(p => string.Equals(p.Id, PromptPanelId, StringComparison.OrdinalIgnoreCase));
+            viewModel?.UpdateBounds(new Rect(panel.X, panel.Y, panel.Width, panel.Height));
+        }
     }
 
     private static (int col, int row) ResolveAnchorPosition(

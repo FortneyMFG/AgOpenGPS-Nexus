@@ -147,13 +147,17 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
     private bool EnsureDefaultClones(ShellLayoutPreferences layout)
     {
         var changed = false;
-        changed |= EnsureClone(layout, "Cmd.FieldSettings", BlockRegion.Left, 0, BlockSize.Tile1x1);
-        changed |= EnsureClone(layout, "Cmd.MapTools", BlockRegion.Left, 1);
-        changed |= EnsureClone(layout, "Cmd.Guidance", BlockRegion.Left, 2);
-        changed |= EnsureClone(layout, "Cmd.Equipment", BlockRegion.Left, 3);
-        changed |= EnsureClone(layout, "Cmd.Coverage", BlockRegion.Left, 4);
-        changed |= EnsureClone(layout, "Cmd.Hydraulics", BlockRegion.Left, 5);
-        changed |= EnsureClone(layout, "Cmd.AbLines", BlockRegion.Left, 6);
+        changed |= EnsureClone(layout, "Cmd.FieldSettings", BlockRegion.Left, 5, BlockSize.Tile1x1);
+        changed |= EnsureClone(layout, "Info.Speed", BlockRegion.Left, 0, null, "12.5 km/h");
+        changed |= EnsureClone(layout, "Info.Heading", BlockRegion.Left, 1, null, "N 45°");
+        changed |= EnsureClone(layout, "Info.Altitude", BlockRegion.Left, 2, null, "342 m");
+        changed |= EnsureClone(layout, "Info.Satellites", BlockRegion.Left, 3, null, "12/16");
+        changed |= EnsureClone(layout, "Info.Accuracy", BlockRegion.Left, 4, null, "±2 cm");
+        changed |= EnsureClone(layout, "Info.Steering", BlockRegion.Right, 0, null, "Auto");
+        changed |= EnsureClone(layout, "Info.Section1", BlockRegion.Right, 1, null, "ON");
+        changed |= EnsureClone(layout, "Info.Section2", BlockRegion.Right, 2, null, "OFF");
+        changed |= EnsureClone(layout, "Info.Boom", BlockRegion.Right, 3, null, "Up");
+        changed |= EnsureClone(layout, "Info.Rate", BlockRegion.Right, 4, null, "150 L/Ha");
         changed |= EnsureClone(layout, "Cmd.AutoSteerToggle", BlockRegion.Bottom, 0);
         changed |= EnsureClone(layout, "Cmd.ABLineCycle", BlockRegion.Bottom, 1);
         changed |= EnsureClone(layout, "Cmd.UTurnToggle", BlockRegion.Bottom, 2);
@@ -172,10 +176,6 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         changed |= RemoveFloatingSpec(layout, "Cmd.Stop");
         changed |= RemoveFloatingSpec(layout, "Cmd.NudgeLeft");
         changed |= RemoveFloatingSpec(layout, "Cmd.NudgeRight");
-        changed |= EnsureClone(layout, "Tel.Speed", BlockRegion.Floating, 0, BlockSize.Tile1xHalf);
-        changed |= EnsureClone(layout, "Tel.Gps", BlockRegion.Floating, 1, BlockSize.Tile1xHalf);
-        changed |= EnsureClone(layout, "Tel.Sections", BlockRegion.Floating, 2, BlockSize.Tile1xHalf);
-        changed |= EnsureClone(layout, "Tel.Radio", BlockRegion.Floating, 3, BlockSize.Tile1xHalf);
         return changed;
     }
 
@@ -184,7 +184,8 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         string definitionId,
         BlockRegion region,
         int order,
-        BlockSize? sizeOverride = null)
+        BlockSize? sizeOverride = null,
+        string? groupKey = null)
     {
         var id = new BlockDefinitionId(definitionId);
         if (_catalog.Get(id) is null)
@@ -214,6 +215,12 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
                 updated = true;
             }
 
+            if (!string.Equals(existing.GroupKey, groupKey, StringComparison.Ordinal))
+            {
+                existing.GroupKey = groupKey;
+                updated = true;
+            }
+
             return updated;
         }
 
@@ -222,8 +229,9 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
             DefinitionId = id,
             Region = region,
             Order = order,
-            Origin = BlockOrigin.Clone,
             SizeOverride = sizeOverride,
+            Origin = BlockOrigin.Clone,
+            GroupKey = groupKey,
         });
         return true;
     }

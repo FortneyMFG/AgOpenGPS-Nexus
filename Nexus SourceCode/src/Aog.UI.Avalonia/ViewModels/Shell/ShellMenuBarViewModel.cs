@@ -43,60 +43,41 @@ public sealed class ShellMenuBarViewModel
                     "core.simulation.toggle",
                     dispatcher,
                     description: "Toggle the embedded simulator routes."),
-                ShellMenuItemViewModel.CreateCommand(
-                    "About",
-                    "menu.file",
-                    "core.shell.about",
-                    dispatcher,
-                    description: "Show build information, licensing, and release notes."),
             });
 
-        FieldMenu = new ShellMenuGroupViewModel(
-            ShellPluginSurfaces.FieldMenu,
-            "Field",
-            new[]
-            {
-                ShellMenuItemViewModel.CreateCommand(
-                    "Boundary tool…",
-                    "dialog.boundary",
-                    "core.boundary_tool_dialog.open",
-                    dispatcher,
-                    description: "Launch the boundary editor for the active field."),
-                ShellMenuItemViewModel.CreateCommand(
-                    "Headland",
-                    "menu.field",
-                    "core.field.headland",
-                    dispatcher,
-                    description: "Configure headland passes and tramlines."),
-                ShellMenuItemViewModel.CreateCommand(
-                    "Delete Applied",
-                    "menu.field",
-                    "core.field.clearApplied",
-                    dispatcher,
-                    description: "Clear recorded coverage for the current job."),
-            });
-
-        ToolsMenu = new ShellMenuGroupViewModel(
-            ShellPluginSurfaces.ToolsMenu,
-            "Tools",
+        EditMenu = new ShellMenuGroupViewModel(
+            ShellPluginSurfaces.EditMenu,
+            "Edit",
             new[]
             {
                 ShellMenuItemViewModel.CreateContainer(
-                    "Wizards",
+                    "Field Operations",
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Boundary tool…",
+                        "dialog.boundary",
+                        "core.boundary_tool_dialog.open",
+                        dispatcher,
+                        description: "Launch the boundary editor for the active field."),
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Headland",
+                        "menu.edit",
+                        "core.field.headland",
+                        dispatcher,
+                        description: "Configure headland passes and tramlines."),
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Delete Applied",
+                        "menu.edit",
+                        "core.field.clearApplied",
+                        dispatcher,
+                        description: "Clear recorded coverage for the current job.")),
+                ShellMenuItemViewModel.CreateContainer(
+                    "Calibration",
                     ShellMenuItemViewModel.CreateCommand(
                         "Steer Wizard",
-                        "menu.tools",
+                        "menu.edit",
                         "core.tools.steerWizard",
                         dispatcher,
                         description: "Launch the steering calibration wizard.")),
-                ShellMenuItemViewModel.CreateContainer(
-                    "Charts",
-                    ShellMenuItemViewModel.CreateCommand(
-                        "Steer Chart",
-                        "menu.tools",
-                        "core.tools.steerChart",
-                        dispatcher,
-                        description: "Open live steering telemetry charts.")),
                 ShellMenuItemViewModel.CreateContainer(
                     "Flags",
                     ShellMenuItemViewModel.CreateCommand(
@@ -105,26 +86,43 @@ public sealed class ShellMenuBarViewModel
                         "core.flag_manager_dialog.open",
                         dispatcher,
                         description: "Review and manage field flags.")),
-                ShellMenuItemViewModel.CreateCommand(
-                    "Log Viewer",
-                    "menu.tools",
-                    "core.tools.logViewer",
-                    dispatcher,
-                    description: "Review recent log entries and event history."),
-                ShellMenuItemViewModel.CreateCommand(
-                    "System Summary…",
-                    "menu.tools",
-                    "core.shell.systemSummary",
-                    dispatcher,
-                    description: "Show the current system summary, layers, and theme selections."),
                 ShellMenuItemViewModel.CreateContainer(
-                    "Offset",
+                    "Alignment",
                     ShellMenuItemViewModel.CreateCommand(
-                        "Shift Position",
+                        "Shift Position…",
                         "tools.offset",
                         "core.shift_position_dialog.open",
                         dispatcher,
-                    description: "Adjust the current vehicle position offsets.")),
+                        description: "Adjust the current vehicle position offsets.")),
+            });
+
+        ViewMenu = new ShellMenuGroupViewModel(
+            ShellPluginSurfaces.ViewMenu,
+            "View",
+            new[]
+            {
+                ShellMenuItemViewModel.CreateContainer(
+                    "Dashboards",
+                    ShellMenuItemViewModel.CreateCommand(
+                        "System Summary…",
+                        "menu.view",
+                        "core.shell.systemSummary",
+                        dispatcher,
+                        description: "Show the current system summary, layers, and theme selections."),
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Log Viewer",
+                        "menu.view",
+                        "core.tools.logViewer",
+                        dispatcher,
+                        description: "Review recent log entries and event history.")),
+                ShellMenuItemViewModel.CreateContainer(
+                    "Charts",
+                    ShellMenuItemViewModel.CreateCommand(
+                        "Steer Chart",
+                        "menu.view",
+                        "core.tools.steerChart",
+                        dispatcher,
+                        description: "Open live steering telemetry charts.")),
             });
 
         SettingsMenu = new ShellMenuGroupViewModel(
@@ -207,20 +205,20 @@ public sealed class ShellMenuBarViewModel
                     description: "Terminate the AgIO simulator backend."),
             });
 
-        PluginsMenu = new ShellMenuGroupViewModel(
-            ShellPluginSurfaces.PluginsMenu,
-            "Plugins",
-            BuildPluginMenuItems(dispatcher));
+        HelpMenu = new ShellMenuGroupViewModel(
+            ShellPluginSurfaces.HelpMenu,
+            "Help",
+            BuildHelpMenuItems(dispatcher));
     }
 
     /// <summary>Gets the File menu group.</summary>
     public ShellMenuGroupViewModel FileMenu { get; }
 
-    /// <summary>Gets the Field menu group.</summary>
-    public ShellMenuGroupViewModel FieldMenu { get; }
+    /// <summary>Gets the Edit menu group.</summary>
+    public ShellMenuGroupViewModel EditMenu { get; }
 
-    /// <summary>Gets the Tools menu group.</summary>
-    public ShellMenuGroupViewModel ToolsMenu { get; }
+    /// <summary>Gets the View menu group.</summary>
+    public ShellMenuGroupViewModel ViewMenu { get; }
 
     /// <summary>Gets the Settings menu group.</summary>
     public ShellMenuGroupViewModel SettingsMenu { get; }
@@ -228,8 +226,8 @@ public sealed class ShellMenuBarViewModel
     /// <summary>Gets the Services menu group.</summary>
     public ShellMenuGroupViewModel ServicesMenu { get; }
 
-    /// <summary>Gets the Plugins menu group.</summary>
-    public ShellMenuGroupViewModel PluginsMenu { get; }
+    /// <summary>Gets the Help menu group.</summary>
+    public ShellMenuGroupViewModel HelpMenu { get; }
 
     /// <summary>Enumerates all menu groups.</summary>
     public IEnumerable<ShellMenuGroupViewModel> AllMenus
@@ -237,15 +235,49 @@ public sealed class ShellMenuBarViewModel
         get
         {
             yield return FileMenu;
-            yield return FieldMenu;
-            yield return ToolsMenu;
+            yield return EditMenu;
+            yield return ViewMenu;
             yield return SettingsMenu;
             yield return ServicesMenu;
-            yield return PluginsMenu;
+            yield return HelpMenu;
         }
     }
+    
+    private IList<ShellMenuItemViewModel> BuildHelpMenuItems(IShellCommandDispatcher dispatcher)
+    {
+        var items = new List<ShellMenuItemViewModel>
+        {
+            ShellMenuItemViewModel.CreateCommand(
+                "About",
+                "menu.help",
+                "core.shell.about",
+                dispatcher,
+                description: "Show build information, licensing, and release notes."),
+            ShellMenuItemViewModel.CreateCommand(
+                "View documentation",
+                "menu.help",
+                "core.shell.docs",
+                dispatcher,
+                description: "Open the Nexus documentation portal."),
+        };
 
-    private IList<ShellMenuItemViewModel> BuildPluginMenuItems(IShellCommandDispatcher dispatcher)
+        var pluginItems = BuildPluginStatusItems();
+        if (pluginItems.Count > 0)
+        {
+            items.Add(ShellMenuItemViewModel.CreateContainer("Plugins", pluginItems.ToArray()));
+        }
+
+        items.Add(ShellMenuItemViewModel.CreateCommand(
+            "Plugin Manager…",
+            "menu.help",
+            "core.plugins.manager",
+            dispatcher,
+            description: "Open the plugin manager to view installed plugins, status, and updates."));
+
+        return items;
+    }
+
+    private IList<ShellMenuItemViewModel> BuildPluginStatusItems()
     {
         var items = new List<ShellMenuItemViewModel>();
         foreach (var descriptor in _registry.GetDescriptors()
@@ -260,18 +292,6 @@ public sealed class ShellMenuBarViewModel
             var header = FormattableString.Invariant($"{descriptor.Manifest.Name} ({status} - {source})");
             items.Add(ShellMenuItemViewModel.CreateContainer(header));
         }
-
-        if (items.Count > 0)
-        {
-            items.Add(ShellMenuItemViewModel.CreateContainer("-"));
-        }
-
-        items.Add(ShellMenuItemViewModel.CreateCommand(
-            "Plugin Manager...",
-            "menu.plugins",
-            "core.plugins.manager",
-            dispatcher,
-            description: "Open the plugin manager to view installed plugins, status, and updates."));
 
         return items;
     }

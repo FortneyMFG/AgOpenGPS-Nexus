@@ -40,6 +40,9 @@ public sealed class BlockItemViewModel : INotifyPropertyChanged
     /// <summary>Gets the user visible label for the block.</summary>
     public string Label => string.IsNullOrWhiteSpace(Definition.Label) ? Definition.Id.Value : Definition.Label;
 
+    /// <summary>Gets the optional value presented by the block instance.</summary>
+    public string? Value => Instance.GroupKey;
+
     /// <summary>Gets the optional icon asset key.</summary>
     public string? IconKey => Definition.IconKey;
 

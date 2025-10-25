@@ -53,6 +53,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private bool _isFieldDockPinned;
     private bool _isLauncherDropIndicatorVisible;
     private int _activeLauncherDrags;
+    private int _activeTileDrags;
     private Size _viewport;
     private PaneLayoutResult? _paneLayout;
 
@@ -199,6 +200,26 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         if (_activeLauncherDrags > 0)
         {
             _activeLauncherDrags--;
+        }
+
+        UpdateLauncherDropIndicator();
+    }
+
+    internal void BeginTileDrag()
+    {
+        if (_activeTileDrags < int.MaxValue)
+        {
+            _activeTileDrags++;
+        }
+
+        UpdateLauncherDropIndicator();
+    }
+
+    internal void EndTileDrag()
+    {
+        if (_activeTileDrags > 0)
+        {
+            _activeTileDrags--;
         }
 
         UpdateLauncherDropIndicator();
@@ -1668,7 +1689,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
     private void UpdateLauncherDropIndicator()
     {
-        IsLauncherDropIndicatorVisible = !_isLocked && _activeLauncherDrags > 0;
+        IsLauncherDropIndicatorVisible = !_isLocked && (_activeLauncherDrags > 0 || _activeTileDrags > 0);
     }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null)

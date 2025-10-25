@@ -147,6 +147,7 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
     private bool EnsureDefaultClones(ShellLayoutPreferences layout)
     {
         var changed = false;
+        changed |= EnsureClone(layout, "Cmd.FieldSettings", BlockRegion.Left, 0, BlockSize.Tile1x2);
         changed |= EnsureFloatingShortcut(layout, "Cmd.AutoSteerToggle", 0, 48, 48);
         changed |= EnsureFloatingShortcut(layout, "Cmd.ABLineCycle", 1, 232, 48);
         changed |= EnsureFloatingShortcut(layout, "Cmd.UTurnToggle", 2, 416, 48);

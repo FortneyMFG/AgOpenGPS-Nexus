@@ -15,6 +15,7 @@
   <UserControl.Resources>
     <rendering:IconKeyToBitmapConverter x:Key="LauncherIconConverter" />
     <rendering:StringHasValueConverter x:Key="StringHasValueConverter" />
+    <rendering:StringIsNullOrWhiteSpaceConverter x:Key="StringIsNullOrWhiteSpaceConverter" />
     <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
     <rendering:BooleanToValueConverter x:Key="LauncherDockMarginConverter"
                                        TrueValue="0"
@@ -48,13 +49,21 @@
                   BorderThickness="1"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center">
-            <Image Source="{Binding IconKey, Converter={StaticResource LauncherIconConverter}}"
-                   Width="24"
-                   Height="24"
-                   Stretch="Uniform"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}" />
+            <Grid HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+              <Image Source="{Binding IconKey, Converter={StaticResource LauncherIconConverter}}"
+                     Width="24"
+                     Height="24"
+                     Stretch="Uniform"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}" />
+              <TextBlock Text="⚙"
+                         FontSize="18"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         IsVisible="{Binding IconKey, Converter={StaticResource StringIsNullOrWhiteSpaceConverter}}" />
+            </Grid>
           </Border>
 
           <StackPanel Grid.Column="1"

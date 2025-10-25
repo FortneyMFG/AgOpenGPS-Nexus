@@ -25,6 +25,10 @@
       <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
       <rendering:BlockSettingsVisibilityConverter x:Key="BlockSettingsVisibilityConverter" />
       <rendering:StringHasValueConverter x:Key="StringHasValueConverter" />
+      <rendering:StringIsNullOrWhiteSpaceConverter x:Key="StringIsNullOrWhiteSpaceConverter" />
+      <rendering:BooleanToValueConverter x:Key="LockStateToGridOpacityConverter"
+                                         TrueValue="0"
+                                         FalseValue="0.82" />
 
       <DataTemplate x:Key="ShellMenuItemTemplate"
                     x:DataType="workspace:ShellMenuItemViewModel">
@@ -139,11 +143,19 @@
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
                           Spacing="6">
-                <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
-                       Width="36"
-                       Height="36"
-                       Stretch="Uniform"
-                       IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}" />
+                <Grid HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
+                  <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
+                         Width="36"
+                         Height="36"
+                         Stretch="Uniform"
+                         IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}" />
+                  <TextBlock Text="⚙"
+                             FontSize="28"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             IsVisible="{Binding IconKey, Converter={StaticResource StringIsNullOrWhiteSpaceConverter}}" />
+                </Grid>
                 <TextBlock Text="{Binding Label}"
                            FontWeight="SemiBold"
                            TextAlignment="Center"
@@ -394,13 +406,13 @@
         <controls:PaneCanvas Layout="{Binding Layout.Grid}"
                              LayoutResult="{Binding Layout.PaneLayout}"
                              ShowMinorGrid="{Binding Layout.IsLocked, Converter={StaticResource BooleanNegationConverter}}"
-                             Width="{Binding #WorkspaceRoot.Bounds.Width}"
-                             Height="{Binding #WorkspaceRoot.Bounds.Height}"
-                             Canvas.Left="0"
+                              Width="{Binding #WorkspaceRoot.Bounds.Width}"
+                              Height="{Binding #WorkspaceRoot.Bounds.Height}"
+                              Canvas.Left="0"
                              Canvas.Top="0"
                              ZIndex="0"
-                             IsHitTestVisible="False"
-                             Opacity="0.82" />
+                             Opacity="{Binding Layout.IsLocked, Converter={StaticResource LockStateToGridOpacityConverter}}"
+                             IsHitTestVisible="False" />
 
         <ItemsControl x:Name="PanelVisuals"
                       ItemsSource="{Binding Layout.PaneLayout.Panels}"

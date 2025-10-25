@@ -439,6 +439,14 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable, IFieldOp
             case "Cmd.AbLines":
                 Shell.StatusText = "AB line editor integration in progress.";
                 return true;
+            case "Cmd.FieldSettings":
+                var layout = Shell.Layout;
+                var shouldPinDock = !layout.IsFieldDockPinned;
+                layout.IsFieldDockPinned = shouldPinDock;
+                Shell.StatusText = shouldPinDock
+                    ? "Field settings dock pinned. Drag blocks onto the workspace."
+                    : "Field settings dock hidden.";
+                return true;
             default:
                 return false;
         }

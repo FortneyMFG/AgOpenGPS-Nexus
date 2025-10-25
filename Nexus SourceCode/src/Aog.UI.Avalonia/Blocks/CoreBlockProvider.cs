@@ -237,6 +237,16 @@ public sealed class CoreBlockProvider : IBlockProvider
 
         yield return new BlockDefinition
         {
+            Id = new BlockDefinitionId("Cmd.FieldSettings"),
+            Kind = BlockKind.CommandButton,
+            Label = "Field Settings",
+            PreferredDock = BlockRegion.Left,
+            Placement = PlacementPolicy.Free,
+            CommandKey = "Layout.ToggleFieldDock",
+        };
+
+        yield return new BlockDefinition
+        {
             Id = new BlockDefinitionId("Cmd.MapTools"),
             Kind = BlockKind.CommandButton,
             Label = "Map Tools",

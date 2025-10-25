@@ -167,6 +167,14 @@
                            TextAlignment="Center"
                            TextWrapping="Wrap"
                            Foreground="#E0E0E0" />
+                <TextBlock Text="{Binding Value}"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Margin="0,2,0,0"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           Foreground="#4CAF50"
+                           IsVisible="{Binding Value, Converter={StaticResource StringHasValueConverter}}" />
               </StackPanel>
             </Grid>
           </Grid>

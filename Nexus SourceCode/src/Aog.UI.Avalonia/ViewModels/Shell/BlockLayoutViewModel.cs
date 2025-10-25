@@ -88,6 +88,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Blocks = new ObservableCollection<BlockItemViewModel>();
         FloatingPanels = new ObservableCollection<FloatingPanelViewModel>();
         FloatingBlocks = new ObservableCollection<FloatingBlockViewModel>();
+        PanelOverlays = new ObservableCollection<PanelOverlayViewModel>();
         LauncherCategories = new ObservableCollection<BlockLauncherCategoryViewModel>();
         BuildInitialCollections();
         SnapTilesToGrid();
@@ -95,6 +96,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
         RebuildLauncher();
         UpdateLauncherDropIndicator();
+        RefreshPanelOverlays();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -113,6 +115,9 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
     /// <summary>Gets the floating block collection rendered independently of the grid.</summary>
     public ObservableCollection<FloatingBlockViewModel> FloatingBlocks { get; }
+
+    /// <summary>Gets the overlay descriptors for anchored panels rendered on the workspace.</summary>
+    public ObservableCollection<PanelOverlayViewModel> PanelOverlays { get; }
 
     /// <summary>Gets the global grid definition describing the tiled layout.</summary>
     public ShellGridLayout Grid { get; }
@@ -213,6 +218,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsLauncherDockVisible));
             OnPropertyChanged(nameof(AreFloatingOverlaysVisible));
             ApplyLockStateToFloating();
+            ApplyLockStateToPanels();
             RefreshCommandStates();
             RefreshLauncherStates();
             UpdateLauncherDropIndicator();
@@ -233,6 +239,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             {
                 _paneLayout = value;
                 OnPropertyChanged();
+                RefreshPanelOverlays();
             }
         }
     }
@@ -275,7 +282,9 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             Grid.CellPx = 0;
             SnapTilesToGrid();
             EnsureDefaultPanels();
+            ClampPanelsToGrid();
             PaneLayout = PaneLayoutCompiler.Compile(Grid);
+            RefreshPanelOverlays();
             return;
         }
 
@@ -285,7 +294,9 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Grid.Rows = Math.Max(MinorDivisionsPerMajor, (int)Math.Floor(viewport.Height / minorCell));
         SnapTilesToGrid();
         EnsureDefaultPanels();
+        ClampPanelsToGrid();
         PaneLayout = PaneLayoutCompiler.Compile(Grid);
+        RefreshPanelOverlays();
     }
 
     public void ApplyWorkspaceSettings(double spacing, double tileSize)
@@ -828,6 +839,331 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         }
     }
 
+    private void ApplyLockStateToPanels()
+    {
+        foreach (var overlay in PanelOverlays)
+        {
+            overlay.SetLockState(_isLocked);
+        }
+    }
+
+    private void RefreshPanelOverlays()
+    {
+        if (PanelOverlays is null)
+        {
+            return;
+        }
+
+        if (Grid?.Panels is not { Count: > 0 })
+        {
+            if (PanelOverlays.Count > 0)
+            {
+                PanelOverlays.Clear();
+            }
+
+            return;
+        }
+
+        var existing = PanelOverlays.ToDictionary(panel => panel.Id, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var panel in Grid.Panels)
+        {
+            if (panel is null)
+            {
+                continue;
+            }
+
+            if (existing.TryGetValue(panel.Id, out var overlay))
+            {
+                overlay.RefreshBounds();
+                overlay.SetLockState(_isLocked);
+                existing.Remove(panel.Id);
+            }
+            else
+            {
+                var created = new PanelOverlayViewModel(panel, this);
+                created.RefreshBounds();
+                created.SetLockState(_isLocked);
+                PanelOverlays.Add(created);
+            }
+        }
+
+        foreach (var obsolete in existing.Values)
+        {
+            PanelOverlays.Remove(obsolete);
+        }
+    }
+
+    internal void UpdatePanelBounds(PanelOverlayViewModel panel, Rect bounds)
+    {
+        if (panel is null)
+        {
+            return;
+        }
+
+        var normalized = ClampPanelBounds(bounds);
+        if (!UpdatePanelSpecFromRect(panel.Spec, normalized))
+        {
+            panel.RefreshBounds();
+            return;
+        }
+
+        PaneLayout = PaneLayoutCompiler.Compile(Grid);
+        Save();
+        panel.RefreshBounds();
+    }
+
+    internal Rect ClampPanelBounds(Rect bounds)
+    {
+        if (Grid is null)
+        {
+            return bounds;
+        }
+
+        var columns = Math.Max(1, Grid.Columns);
+        var rows = Math.Max(1, Grid.Rows);
+        var cell = Grid.CellPx > 0 ? Grid.CellPx : WorkspaceLayout.BlockSize;
+        var gutter = Grid.GutterPx;
+        var step = cell + gutter;
+        var minWidth = Math.Max(cell, step);
+        var minHeight = Math.Max(cell, step);
+        var totalRect = Grid.ToPixelRect(0, 0, columns, rows);
+        var width = Math.Clamp(bounds.Width, minWidth, totalRect.Width);
+        var height = Math.Clamp(bounds.Height, minHeight, totalRect.Height);
+        var maxX = Math.Max(0, totalRect.Width - width);
+        var maxY = Math.Max(0, totalRect.Height - height);
+        var x = Math.Clamp(bounds.X, 0, maxX);
+        var y = Math.Clamp(bounds.Y, 0, maxY);
+        return new Rect(x, y, width, height);
+    }
+
+    private bool UpdatePanelSpecFromRect(PanelSpec spec, Rect rect)
+    {
+        if (Grid is null)
+        {
+            return false;
+        }
+
+        var columns = Math.Max(1, Grid.Columns);
+        var rows = Math.Max(1, Grid.Rows);
+        var cell = Grid.CellPx > 0 ? Grid.CellPx : WorkspaceLayout.BlockSize;
+        if (cell <= 0)
+        {
+            return false;
+        }
+
+        var gutter = Grid.GutterPx;
+        var step = cell + gutter;
+        var colSpan = Math.Clamp((int)Math.Round((rect.Width + gutter) / step), 1, columns);
+        var rowSpan = Math.Clamp((int)Math.Round((rect.Height + gutter) / step), 1, rows);
+        var (col, row) = Grid.SnapToGrid(rect.Position, colSpan, rowSpan);
+        var maxCol = Math.Max(0, columns - colSpan);
+        var maxRow = Math.Max(0, rows - rowSpan);
+        var normalizedCol = Math.Clamp(col, 0, maxCol);
+        var normalizedRow = Math.Clamp(row, 0, maxRow);
+        var touchesLeft = normalizedCol == 0;
+        var touchesRight = normalizedCol + colSpan >= columns;
+        var touchesBottom = normalizedRow == 0;
+        var touchesTop = normalizedRow + rowSpan >= rows;
+
+        int newLeft;
+        bool leftUsesGrid;
+        int newRight;
+        bool rightUsesGrid;
+
+        if (touchesLeft && touchesRight)
+        {
+            newLeft = 0;
+            leftUsesGrid = false;
+            newRight = 0;
+            rightUsesGrid = true;
+        }
+        else if (touchesRight)
+        {
+            newLeft = -colSpan;
+            leftUsesGrid = true;
+            newRight = 0;
+            rightUsesGrid = true;
+        }
+        else
+        {
+            newLeft = normalizedCol;
+            leftUsesGrid = false;
+            newRight = Math.Min(columns, normalizedCol + colSpan);
+            rightUsesGrid = false;
+        }
+
+        int newBottom;
+        bool bottomUsesGrid;
+        int newTop;
+        bool topUsesGrid;
+
+        if (touchesBottom && touchesTop)
+        {
+            newBottom = 0;
+            bottomUsesGrid = false;
+            newTop = 0;
+            topUsesGrid = true;
+        }
+        else if (touchesTop)
+        {
+            newBottom = -rowSpan;
+            bottomUsesGrid = true;
+            newTop = 0;
+            topUsesGrid = true;
+        }
+        else
+        {
+            newBottom = normalizedRow;
+            bottomUsesGrid = false;
+            newTop = Math.Min(rows, normalizedRow + rowSpan);
+            topUsesGrid = false;
+        }
+
+        var anchor = DeterminePanelAnchor(touchesLeft, touchesRight, touchesBottom, touchesTop);
+
+        var changed = spec.Left != newLeft
+            || spec.Bottom != newBottom
+            || spec.Right != newRight
+            || spec.Top != newTop
+            || spec.LeftUsesGridSize != leftUsesGrid
+            || spec.RightUsesGridSize != rightUsesGrid
+            || spec.BottomUsesGridSize != bottomUsesGrid
+            || spec.TopUsesGridSize != topUsesGrid
+            || spec.Anchor != anchor;
+
+        spec.Left = newLeft;
+        spec.Bottom = newBottom;
+        spec.Right = newRight;
+        spec.Top = newTop;
+        spec.LeftUsesGridSize = leftUsesGrid;
+        spec.RightUsesGridSize = rightUsesGrid;
+        spec.BottomUsesGridSize = bottomUsesGrid;
+        spec.TopUsesGridSize = topUsesGrid;
+        spec.Anchor = anchor;
+        spec.Offset = (0, 0);
+
+        return changed;
+    }
+
+    private void ClampPanelsToGrid()
+    {
+        if (Grid?.Panels is not { Count: > 0 })
+        {
+            return;
+        }
+
+        var columns = Math.Max(1, Grid.Columns);
+        var rows = Math.Max(1, Grid.Rows);
+
+        foreach (var panel in Grid.Panels)
+        {
+            if (panel is null)
+            {
+                continue;
+            }
+
+            var resolvedLeft = panel.LeftUsesGridSize ? columns + panel.Left : panel.Left;
+            var resolvedRight = panel.RightUsesGridSize ? columns + panel.Right : panel.Right;
+            var resolvedBottom = panel.BottomUsesGridSize ? rows + panel.Bottom : panel.Bottom;
+            var resolvedTop = panel.TopUsesGridSize ? rows + panel.Top : panel.Top;
+
+            resolvedLeft = Math.Clamp(resolvedLeft, 0, Math.Max(0, columns - 1));
+            resolvedRight = Math.Clamp(resolvedRight, resolvedLeft + 1, columns);
+            resolvedBottom = Math.Clamp(resolvedBottom, 0, Math.Max(0, rows - 1));
+            resolvedTop = Math.Clamp(resolvedTop, resolvedBottom + 1, rows);
+
+            var colSpan = resolvedRight - resolvedLeft;
+            var rowSpan = resolvedTop - resolvedBottom;
+
+            var touchesLeft = resolvedLeft == 0;
+            var touchesRight = resolvedRight == columns;
+            var touchesBottom = resolvedBottom == 0;
+            var touchesTop = resolvedTop == rows;
+
+            panel.LeftUsesGridSize = touchesRight && !touchesLeft;
+            panel.RightUsesGridSize = touchesRight;
+            panel.BottomUsesGridSize = touchesTop && !touchesBottom;
+            panel.TopUsesGridSize = touchesTop;
+
+            panel.Left = panel.LeftUsesGridSize ? -colSpan : resolvedLeft;
+            panel.Right = panel.RightUsesGridSize ? 0 : resolvedRight;
+            panel.Bottom = panel.BottomUsesGridSize ? -rowSpan : resolvedBottom;
+            panel.Top = panel.TopUsesGridSize ? 0 : resolvedTop;
+            panel.Anchor = DeterminePanelAnchor(touchesLeft, touchesRight, touchesBottom, touchesTop);
+            panel.Offset = (0, 0);
+        }
+    }
+
+    private static RelativeAnchor DeterminePanelAnchor(
+        bool touchesLeft,
+        bool touchesRight,
+        bool touchesBottom,
+        bool touchesTop)
+    {
+        if (touchesLeft && touchesRight)
+        {
+            if (touchesTop && touchesBottom)
+            {
+                return RelativeAnchor.Center;
+            }
+
+            if (touchesTop)
+            {
+                return RelativeAnchor.TopCenter;
+            }
+
+            if (touchesBottom)
+            {
+                return RelativeAnchor.BottomCenter;
+            }
+
+            return RelativeAnchor.Center;
+        }
+
+        if (touchesLeft)
+        {
+            if (touchesTop)
+            {
+                return RelativeAnchor.TopLeft;
+            }
+
+            if (touchesBottom)
+            {
+                return RelativeAnchor.BottomLeft;
+            }
+
+            return RelativeAnchor.MiddleLeft;
+        }
+
+        if (touchesRight)
+        {
+            if (touchesTop)
+            {
+                return RelativeAnchor.TopRight;
+            }
+
+            if (touchesBottom)
+            {
+                return RelativeAnchor.BottomRight;
+            }
+
+            return RelativeAnchor.MiddleRight;
+        }
+
+        if (touchesTop)
+        {
+            return RelativeAnchor.TopCenter;
+        }
+
+        if (touchesBottom)
+        {
+            return RelativeAnchor.BottomCenter;
+        }
+
+        return RelativeAnchor.Center;
+    }
+
     private void UpdateCollisionStates()
     {
         for (var i = 0; i < FloatingPanels.Count; i++)
@@ -924,14 +1260,19 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             return;
         }
 
+        var columns = Math.Max(1, Grid.Columns);
+        var rows = Math.Max(1, Grid.Rows);
+        var left = Math.Clamp((int)Math.Round(columns * 0.1), 0, Math.Max(0, columns - 2));
+        var right = Math.Clamp((int)Math.Round(columns * 0.9), left + 1, columns);
+        var top = Math.Clamp((int)Math.Round(rows * 0.6), 1, rows);
+
         Grid.Panels.Add(new PanelSpec
         {
             Id = "panel.map",
-            Left = 1,
-            Bottom = 1,
-            Right = -1,
-            RightUsesGridSize = true,
-            TopUsesGridSize = true,
+            Left = left,
+            Bottom = 0,
+            Right = right,
+            Top = top,
             Anchor = RelativeAnchor.BottomLeft,
         });
     }

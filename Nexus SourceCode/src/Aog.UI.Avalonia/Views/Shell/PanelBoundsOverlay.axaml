@@ -1,0 +1,181 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
+             xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
+             mc:Ignorable="d"
+             x:Class="Aog.UI.Avalonia.Views.Shell.PanelBoundsOverlay"
+             x:DataType="vm:PanelOverlayViewModel"
+             d:DesignWidth="600"
+             d:DesignHeight="400">
+  <UserControl.Resources>
+    <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
+    <rendering:BooleanToValueConverter x:Key="LockedOpacityConverter"
+                                       TrueValue="0.72"
+                                       FalseValue="0.9" />
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="Border#Outline">
+      <Setter Property="BorderBrush" Value="#4F8CE0" />
+      <Setter Property="Background" Value="#401A2B3A" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Opacity">
+        <Setter.Value>
+          <Binding Path="IsLocked" Converter="{StaticResource LockedOpacityConverter}" />
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style Selector="Border.resize-handle">
+      <Setter Property="Background" Value="#4F8CE0" />
+      <Setter Property="BorderBrush" Value="#255A92" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Opacity" Value="0.85" />
+    </Style>
+
+    <Style Selector="Border.resize-handle.edge">
+      <Setter Property="Opacity" Value="0.65" />
+    </Style>
+
+    <Style Selector="Border.resize-handle.corner">
+      <Setter Property="Width" Value="14" />
+      <Setter Property="Height" Value="14" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid>
+    <Border x:Name="Outline"
+            PointerPressed="OnDragPointerPressed"
+            PointerMoved="OnPointerMoved"
+            PointerReleased="OnPointerReleased"
+            PointerCaptureLost="OnPointerCaptureLost"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0"
+                Background="#1F101010"
+                Padding="10"
+                CornerRadius="8,8,0,0">
+          <TextBlock Text="{Binding DisplayName}"
+                     FontWeight="SemiBold"
+                     Foreground="#F0F4F8" />
+        </Border>
+        <Grid Grid.Row="1" Margin="12">
+          <TextBlock Text="Drag to reposition or use the handles to resize."
+                     Foreground="#C0D6EB"
+                     FontSize="12"
+                     TextWrapping="Wrap" />
+        </Grid>
+      </Grid>
+    </Border>
+
+    <!-- Edge handles -->
+    <Border Classes="resize-handle edge"
+            Tag="Top"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top"
+            Height="8"
+            Margin="24,-4,24,0"
+            Cursor="TopSide"
+            PointerPressed="OnHandlePointerPressed"
+            PointerMoved="OnPointerMoved"
+            PointerReleased="OnPointerReleased"
+            PointerCaptureLost="OnPointerCaptureLost"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+
+    <Border Classes="resize-handle edge"
+            Tag="Bottom"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Bottom"
+            Height="8"
+            Margin="24,0,24,-4"
+            Cursor="BottomSide"
+            PointerPressed="OnHandlePointerPressed"
+            PointerMoved="OnPointerMoved"
+            PointerReleased="OnPointerReleased"
+            PointerCaptureLost="OnPointerCaptureLost"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+
+    <Border Classes="resize-handle edge"
+            Tag="Left"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Left"
+            Width="8"
+            Margin="-4,24,0,24"
+            Cursor="LeftSide"
+            PointerPressed="OnHandlePointerPressed"
+            PointerMoved="OnPointerMoved"
+            PointerReleased="OnPointerReleased"
+            PointerCaptureLost="OnPointerCaptureLost"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+
+    <Border Classes="resize-handle edge"
+            Tag="Right"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Right"
+            Width="8"
+            Margin="0,24,-4,24"
+            Cursor="RightSide"
+            PointerPressed="OnHandlePointerPressed"
+            PointerMoved="OnPointerMoved"
+            PointerReleased="OnPointerReleased"
+            PointerCaptureLost="OnPointerCaptureLost"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+
+    <!-- Corner handles -->
+    <Border Classes="resize-handle corner"
+            Tag="TopLeft"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Margin="-6,-6,0,0"
+            Cursor="TopLeftCorner"
+            PointerPressed="OnHandlePointerPressed"
+            PointerMoved="OnPointerMoved"
+            PointerReleased="OnPointerReleased"
+            PointerCaptureLost="OnPointerCaptureLost"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+
+    <Border Classes="resize-handle corner"
+            Tag="TopRight"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="0,-6,-6,0"
+            Cursor="TopRightCorner"
+            PointerPressed="OnHandlePointerPressed"
+            PointerMoved="OnPointerMoved"
+            PointerReleased="OnPointerReleased"
+            PointerCaptureLost="OnPointerCaptureLost"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+
+    <Border Classes="resize-handle corner"
+            Tag="BottomLeft"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Margin="-6,0,0,-6"
+            Cursor="BottomLeftCorner"
+            PointerPressed="OnHandlePointerPressed"
+            PointerMoved="OnPointerMoved"
+            PointerReleased="OnPointerReleased"
+            PointerCaptureLost="OnPointerCaptureLost"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+
+    <Border Classes="resize-handle corner"
+            Tag="BottomRight"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Margin="0,0,-6,-6"
+            Cursor="BottomRightCorner"
+            PointerPressed="OnHandlePointerPressed"
+            PointerMoved="OnPointerMoved"
+            PointerReleased="OnPointerReleased"
+            PointerCaptureLost="OnPointerCaptureLost"
+            IsHitTestVisible="{Binding IsLocked, Converter={StaticResource BooleanNegationConverter}}" />
+  </Grid>
+</UserControl>

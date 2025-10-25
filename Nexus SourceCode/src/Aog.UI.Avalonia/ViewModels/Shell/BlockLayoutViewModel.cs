@@ -51,6 +51,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private readonly DelegateCommand _toggleFieldDockCommand;
     private bool _isLocked = true;
     private bool _isFieldDockPinned;
+    private bool _isFieldDockTransientOpen;
     private bool _isLauncherDropIndicatorVisible;
     private int _activeLauncherDrags;
     private int _activeTileDrags;
@@ -77,6 +78,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         var preferences = preferencesService.GetPreferences().ShellLayout ?? new ShellLayoutPreferences();
         _isLocked = preferences.IsLayoutLocked;
         _isFieldDockPinned = preferences.IsFieldDockPinned;
+        _isFieldDockTransientOpen = !_isLocked || _isFieldDockPinned;
         Grid = preferences.Grid ?? new ShellGridLayout();
         Grid.Tiles ??= new List<TileSpec>();
         Grid.Panels ??= new List<PanelSpec>();
@@ -151,6 +153,15 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             }
 
             _isFieldDockPinned = value;
+            if (_isFieldDockPinned)
+            {
+                SetFieldDockTransientOpen(true);
+            }
+            else if (_isLocked)
+            {
+                SetFieldDockTransientOpen(false);
+            }
+
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsLauncherDockVisible));
             UpdateLauncherDropIndicator();
@@ -159,7 +170,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Gets a value indicating whether the field settings dock should be visible.</summary>
-    public bool IsLauncherDockVisible => !_isLocked || _isFieldDockPinned;
+    public bool IsLauncherDockVisible => !_isLocked || _isFieldDockPinned || _isFieldDockTransientOpen;
 
     /// <summary>Gets a value indicating whether the drop indicator should be shown.</summary>
     public bool IsLauncherDropIndicatorVisible
@@ -244,6 +255,10 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             ApplyLockStateToPanels();
             RefreshCommandStates();
             RefreshLauncherStates();
+            if (_isLocked && !_isFieldDockPinned)
+            {
+                SetFieldDockTransientOpen(false);
+            }
             UpdateLauncherDropIndicator();
             Save();
         }
@@ -291,6 +306,19 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     public void SetCommandInterceptor(Func<BlockDefinition, bool>? interceptor)
     {
         _commandInterceptor = interceptor;
+    }
+
+    internal bool IsFieldDockTransientOpen => _isFieldDockTransientOpen;
+
+    internal void SetFieldDockTransientOpen(bool isOpen)
+    {
+        if (_isFieldDockTransientOpen == isOpen)
+        {
+            return;
+        }
+
+        _isFieldDockTransientOpen = isOpen;
+        OnPropertyChanged(nameof(IsLauncherDockVisible));
     }
 
     public void UpdateViewport(Size viewport)

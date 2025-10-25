@@ -204,6 +204,11 @@
                                    Canvas.Left="{Binding Bounds.X}"
                                    Canvas.Top="{Binding Bounds.Y}" />
       </DataTemplate>
+
+      <ItemsPanelTemplate x:Key="CanvasItemsPanelTemplate">
+        <Canvas />
+      </ItemsPanelTemplate>
+
     </ResourceDictionary>
   </UserControl.Resources>
 
@@ -453,16 +458,11 @@
         <ItemsControl x:Name="PanelVisuals"
                       ItemsSource="{Binding Layout.PaneLayout.Panels}"
                       ItemTemplate="{StaticResource PanelVisualTemplate}"
+                      ItemsPanel="{StaticResource CanvasItemsPanelTemplate}"
                       Width="{Binding #WorkspaceRoot.Bounds.Width}"
                       Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       IsHitTestVisible="False"
-                      ZIndex="1">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <Canvas />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
+                      ZIndex="1" />
 
         <ItemsControl x:Name="BlockTiles"
                       ItemsSource="{Binding Layout.Blocks}"
@@ -485,53 +485,38 @@
         <ItemsControl x:Name="PanelOverlays"
                       ItemsSource="{Binding Layout.PanelOverlays}"
                       ItemTemplate="{StaticResource PanelOverlayTemplate}"
+                      ItemsPanel="{StaticResource CanvasItemsPanelTemplate}"
                       Width="{Binding #WorkspaceRoot.Bounds.Width}"
                       Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       Canvas.Left="0"
                       Canvas.Top="0"
                       ZIndex="3"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
-                      IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <Canvas />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
+                      IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}" />
 
         <ItemsControl x:Name="FloatingPanelOverlays"
                       ItemsSource="{Binding Layout.FloatingPanels}"
                       ItemTemplate="{StaticResource FloatingPanelOverlayTemplate}"
+                      ItemsPanel="{StaticResource CanvasItemsPanelTemplate}"
                       Width="{Binding #WorkspaceRoot.Bounds.Width}"
                       Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       Canvas.Left="0"
                       Canvas.Top="0"
                       ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
-                      IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <Canvas />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
+                      IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}" />
 
         <ItemsControl x:Name="FloatingBlockOverlays"
                       ItemsSource="{Binding Layout.FloatingBlocks}"
                       ItemTemplate="{StaticResource FloatingBlockOverlayTemplate}"
+                      ItemsPanel="{StaticResource CanvasItemsPanelTemplate}"
                       Width="{Binding #WorkspaceRoot.Bounds.Width}"
                       Height="{Binding #WorkspaceRoot.Bounds.Height}"
                       Canvas.Left="0"
                       Canvas.Top="0"
                       ZIndex="5"
                       IsVisible="{Binding Layout.AreFloatingOverlaysVisible}"
-                      IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <Canvas />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
+                      IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}" />
       </Canvas>
 
       <field:FieldSettingsDock DataContext="{Binding Layout}"

@@ -57,11 +57,31 @@ public sealed class LayoutShellCommandHandler : IShellCommandHandler
     private bool ToggleFieldDock()
     {
         var layout = GetLayout();
-        var shouldPin = !layout.IsFieldDockPinned;
-        layout.IsFieldDockPinned = shouldPin;
         var shell = GetShell();
-        shell.StatusText = shouldPin
-            ? "Field settings dock pinned. Drag blocks onto the workspace."
+
+        if (!layout.IsLocked)
+        {
+            var shouldPin = !layout.IsFieldDockPinned;
+            layout.IsFieldDockPinned = shouldPin;
+            shell.IsFieldMenuOpen = shouldPin;
+            shell.StatusText = shouldPin
+                ? "Field settings dock pinned. Drag blocks onto the workspace."
+                : "Field settings dock hidden.";
+            return true;
+        }
+
+        if (layout.IsFieldDockPinned)
+        {
+            layout.IsFieldDockPinned = false;
+            shell.IsFieldMenuOpen = false;
+            shell.StatusText = "Field settings dock hidden.";
+            return true;
+        }
+
+        var shouldOpen = !shell.IsFieldMenuOpen;
+        shell.IsFieldMenuOpen = shouldOpen;
+        shell.StatusText = shouldOpen
+            ? "Field settings dock open. Pin it to keep it visible."
             : "Field settings dock hidden.";
         return true;
     }

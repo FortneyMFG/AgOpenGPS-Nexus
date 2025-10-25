@@ -30,8 +30,22 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
         [Reactive]
         public object? MainContent { get; set; }
         public BlockLayoutViewModel Layout { get; }
-        [Reactive]
-        public bool IsFieldMenuOpen { get; set; }
+        private bool _isFieldMenuOpen;
+
+        public bool IsFieldMenuOpen
+        {
+            get => _isFieldMenuOpen;
+            set
+            {
+                if (_isFieldMenuOpen == value)
+                {
+                    return;
+                }
+
+                this.RaiseAndSetIfChanged(ref _isFieldMenuOpen, value);
+                Layout.SetFieldDockTransientOpen(value);
+            }
+        }
         [Reactive]
         public BlockLauncherCategoryViewModel? FieldSettingsCategory { get; private set; }
 
@@ -51,6 +65,7 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
             Layout.LauncherCategories.CollectionChanged += OnLauncherCategoriesChanged;
             Layout.PropertyChanged += OnLayoutPropertyChanged;
             UpdateFieldSettingsCategory();
+            IsFieldMenuOpen = Layout.IsFieldDockPinned || Layout.IsFieldDockTransientOpen;
 
             CenterViewCommand = ReactiveCommand.Create(() => { /* TODO: Implement center view */ });
             PanToolCommand = ReactiveCommand.Create(() => { /* TODO: Implement pan tool */ });
@@ -106,7 +121,20 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
         {
             if (string.Equals(e.PropertyName, nameof(BlockLayoutViewModel.IsLocked), StringComparison.Ordinal))
             {
-                if (Layout.IsLocked)
+                if (Layout.IsLocked && !Layout.IsFieldDockPinned)
+                {
+                    IsFieldMenuOpen = false;
+                }
+                return;
+            }
+
+            if (string.Equals(e.PropertyName, nameof(BlockLayoutViewModel.IsFieldDockPinned), StringComparison.Ordinal))
+            {
+                if (Layout.IsFieldDockPinned)
+                {
+                    IsFieldMenuOpen = true;
+                }
+                else if (Layout.IsLocked)
                 {
                     IsFieldMenuOpen = false;
                 }

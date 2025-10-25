@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
 using System.Reactive;
 using Aog.UI.Avalonia.ViewModels;
 using ReactiveUI;
@@ -27,6 +30,10 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
         [Reactive]
         public object? MainContent { get; set; }
         public BlockLayoutViewModel Layout { get; }
+        [Reactive]
+        public bool IsFieldMenuOpen { get; set; }
+        [Reactive]
+        public BlockLauncherCategoryViewModel? FieldSettingsCategory { get; private set; }
 
         public event EventHandler? LayoutSettingsRequested;
 
@@ -41,6 +48,9 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
             Layout.LayoutSettingsRequested += OnLayoutSettingsRequested;
             Layout.FloatingPanelSettingsRequested += OnFloatingPanelSettingsRequested;
             Layout.FloatingBlockSettingsRequested += OnFloatingBlockSettingsRequested;
+            Layout.LauncherCategories.CollectionChanged += OnLauncherCategoriesChanged;
+            Layout.PropertyChanged += OnLayoutPropertyChanged;
+            UpdateFieldSettingsCategory();
 
             CenterViewCommand = ReactiveCommand.Create(() => { /* TODO: Implement center view */ });
             PanToolCommand = ReactiveCommand.Create(() => { /* TODO: Implement pan tool */ });
@@ -87,11 +97,40 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
             FloatingBlockSettingsRequested?.Invoke(this, block);
         }
 
+        private void OnLauncherCategoriesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            UpdateFieldSettingsCategory();
+        }
+
+        private void OnLayoutPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (string.Equals(e.PropertyName, nameof(BlockLayoutViewModel.IsLocked), StringComparison.Ordinal))
+            {
+                if (Layout.IsLocked)
+                {
+                    IsFieldMenuOpen = false;
+                }
+            }
+        }
+
+        private void UpdateFieldSettingsCategory()
+        {
+            FieldSettingsCategory = Layout.LauncherCategories
+                .FirstOrDefault(category => string.Equals(category.Id, "FieldSettings", StringComparison.OrdinalIgnoreCase));
+
+            if (FieldSettingsCategory is null)
+            {
+                IsFieldMenuOpen = false;
+            }
+        }
+
         public void Dispose()
         {
             Layout.LayoutSettingsRequested -= OnLayoutSettingsRequested;
             Layout.FloatingPanelSettingsRequested -= OnFloatingPanelSettingsRequested;
             Layout.FloatingBlockSettingsRequested -= OnFloatingBlockSettingsRequested;
+            Layout.LauncherCategories.CollectionChanged -= OnLauncherCategoriesChanged;
+            Layout.PropertyChanged -= OnLayoutPropertyChanged;
         }
     }
 }

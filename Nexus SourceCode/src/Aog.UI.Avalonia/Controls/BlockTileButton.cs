@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Aog.UI.Avalonia.Layout;
 using Aog.UI.Avalonia.ViewModels.Shell;
+using Aog.UI.Avalonia.Views.Field;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -17,6 +18,8 @@ public sealed class BlockTileButton : Button
     private bool _suppressClick;
     private Point _start;
     private TiledPanel? _panel;
+    private bool _tileDragActive;
+    private BlockItemViewModel? _dragBlock;
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
@@ -44,6 +47,8 @@ public sealed class BlockTileButton : Button
             return;
         }
 
+        _dragBlock = block;
+        _tileDragActive = false;
         _isDragging = true;
         _suppressClick = false;
         _start = e.GetPosition(_panel);
@@ -65,6 +70,7 @@ public sealed class BlockTileButton : Button
             var delta = current - _start;
             if (Math.Abs(delta.X) > DragThreshold || Math.Abs(delta.Y) > DragThreshold)
             {
+                EnsureTileDragStarted();
                 _suppressClick = true;
                 PseudoClasses.Set(":pressed", false);
             }
@@ -73,8 +79,22 @@ public sealed class BlockTileButton : Button
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        if (_isDragging && _panel is not null && DataContext is BlockItemViewModel block)
+        if (_isDragging && _panel is not null && _dragBlock is { } block)
         {
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (_tileDragActive && topLevel is not null)
+            {
+                var pointerPosition = e.GetPosition(topLevel);
+                if (TryDropIntoFieldDock(topLevel, pointerPosition, block))
+                {
+                    e.Pointer.Capture(null);
+                    e.Handled = true;
+                    base.OnPointerReleased(e);
+                    ResetDragState();
+                    return;
+                }
+            }
+
             var position = e.GetPosition(_panel);
             if (_panel.Layout is { } layout)
             {
@@ -96,10 +116,57 @@ public sealed class BlockTileButton : Button
         ResetDragState();
     }
 
+    private void EnsureTileDragStarted()
+    {
+        if (_tileDragActive)
+        {
+            return;
+        }
+
+        if (_dragBlock is { } block)
+        {
+            block.Owner.BeginTileDrag();
+            _tileDragActive = true;
+        }
+    }
+
+    private bool TryDropIntoFieldDock(TopLevel topLevel, Point pointerPosition, BlockItemViewModel block)
+    {
+        foreach (var dock in topLevel.GetVisualDescendants().OfType<FieldSettingsDock>())
+        {
+            if (!dock.IsEffectivelyVisible || !dock.IsHitTestVisible)
+            {
+                continue;
+            }
+
+            var origin = dock.TranslatePoint(default, topLevel);
+            if (origin is null)
+            {
+                continue;
+            }
+
+            var bounds = new Rect(origin.Value, dock.Bounds.Size);
+            if (bounds.Contains(pointerPosition) && block.Owner.CanDelete(block))
+            {
+                block.Owner.Delete(block);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void ResetDragState()
     {
+        if (_tileDragActive && _dragBlock is { } block)
+        {
+            block.Owner.EndTileDrag();
+        }
+
         _isDragging = false;
         _suppressClick = false;
+        _tileDragActive = false;
+        _dragBlock = null;
         _panel = null;
     }
 }

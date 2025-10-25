@@ -1,12 +1,12 @@
-# 12 — Development Language & Runtime
+# 12 — Development Language & Runtime  
 *(Status: Drafting — Decision Agnostic)*
 
 **Section ID:** 12  
 **Version:** 0.1.0  
-**Editors:** Platform Foundations WG  
-**Last Updated:** 2025-10-21  
-**Related Sections:** 11 — OS Support, 14 — Build Environment & Tooling
-**Related Decisions:** `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
+**Editors:** Nexus Team (Fortney)  
+**Last Updated:** 2025-10-24
+**Related Sections:** 11 — OS Support, 14 — Build Environment & Tooling  
+**Related Decisions:** `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`  
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
 **Downstream Impacts:** 6X — Core Domain Services, 9X — Frontends & Ops  
 
@@ -56,10 +56,17 @@ It also defines boundaries for dependency management and contract versioning so 
 
 ## 12.5 Requirements  
 
+> **Requirement Grammar (per RFC 2119)** —  
+> **MUST / MUST NOT** = mandatory · **SHOULD / SHOULD NOT** = strong recommendation · **MAY** = optional.  
+> Each requirement must be testable and traceable.
+
+> See 12-ADR-001 (Runtime Selection) and 12-ADR-002 (Contract Governance) for specific implementation choices.
+
+
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|-----------|----------|----------------|-----------------------------|
 | **R-STACK-001** | **MUST** | Runtime | Use a single long-term-support managed runtime across all Nexus projects (`12-ADR-001`). | Architecture WG | CI confirms all projects target the same TFM. |
-| **R-STACK-002** | **MUST** | Language | Use C# as the primary implementation language while keeping shared contracts language-agnostic. | Core WG | Contract build produces valid stubs for all languages. |
+| **R-STACK-002** | **MUST** | Language | Use C# as the implementation language for Core, UI, and AgIO. Shared contract packages MUST be consumable by other languages without modification. | Core WG | Contract build produces valid stubs for all languages. |
 | **R-STACK-003** | **MUST** | Build Integrity | Pin SDK and dependency versions to ensure deterministic builds. | Build WG | Hash comparison between builds is identical. |
 | **R-STACK-004** | **MUST** | Abstraction | Contain all OS-specific or hardware-specific logic behind dependency-injected interfaces. | AgIO WG | Swappable backend tests pass on both Windows and Linux. |
 | **R-STACK-005** | **SHOULD** | Dependency Governance | Maintain a curated dependency allowlist verified across Windows and Linux CI lanes. | Release WG | CI pipeline rejects unapproved package additions. |
@@ -83,6 +90,7 @@ It also defines boundaries for dependency management and contract versioning so 
 |--------|-------------------|---------------------|---------------------|
 | R-STACK-001 | CI Integration | `/pipelines/dotnet.yml` | All projects compile under unified TFM. |
 | R-STACK-003 | Build Audit | `/qa/build_repeatability.md` | Hash and signature match baseline. |
+| R-STACK-004 | Cross-Platform Backend Swap Test | `/tests/agio/driver_matrix/` | All hardware-facing interfaces pass the same behavioral tests on Windows and Linux. |
 | R-STACK-005 | Policy Check | `/tools/dependency-allowlist.json` | No unapproved dependencies detected. |
 | R-STACK-006 | Contract Test | `/tests/contracts/` | All API compatibility tests succeed. |
 
@@ -101,7 +109,7 @@ It also defines boundaries for dependency management and contract versioning so 
 - **Reliability:** CI must validate runtime behavior across at least two OS architectures.  
 - **Security:** All builds must produce signed binaries and published SBOMs.  
 - **Maintainability:** Shared code analyzers and style rules are mandatory for all repos.  
-- **Portability:** Must compile and run on both Windows x64 and Linux (x86-64, ARM64).  
+- **Portability:** All managed components MUST compile and run on all Primary OS targets defined in §11 / ADR 11-001.
 
 ---
 
@@ -139,6 +147,10 @@ It also defines boundaries for dependency management and contract versioning so 
 |------------|--------|--------------|-------------|--------------------|
 | **12-O1** | Proposed | Runtime Policy | Use a single LTS managed runtime and unified toolchain. | 12-O1_Runtime_Policy.md |
 | **12-O2** | Proposed | Contract Governance | Define semantic versioning and compatibility tests for shared packages. | 12-O2_Contract_Governance.md |
+
+> **Informative:**  
+> Options describe possible implementation policies. They are not normative until accepted via ADR.
+
 
 ---
 
@@ -184,19 +196,20 @@ Contributors broadly support a unified managed runtime and stricter dependency c
 Plugin authors have requested clear documentation for contract versioning and migration guidance.  
 Build maintainers emphasize reproducibility and security of the release pipeline.  
 
-| Date | Summary | PR / Issue |
-|------|----------|------------|
-| 2025-10-21 | Initial draft of runtime and dependency governance | #0000 |
+
 
 ---
+
 
 ## 12.16 Traceability  
 
 | Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
 |----------------|-------------------|--------|-----------------------|--------------------------|
-| R-STACK-001 | 12-O1 | — | `/pipelines/dotnet.yml` | `/global.json` |
-| R-STACK-003 | 12-O1 | — | `/qa/build_repeatability.md` | `/src/Build/` |
-| R-STACK-006 | 12-O2 | — | `/tests/contracts/` | `/src/Aog.Abstractions/` |
+| R-STACK-001 | 12-O1 | 12-ADR-001 (Runtime Selection) | `/pipelines/dotnet.yml` | `/global.json` |
+| R-STACK-003 | 12-O1 | 14-ADR-001 (Build & Signing Policy) | `/qa/build_repeatability.md` | `/src/Build/` |
+| R-STACK-004 | 12-O1 | 11-ADR-001 (Windows/Linux Baseline) | `/tests/agio/driver_matrix/` | `/src/AgIO/` |
+| R-STACK-006 | 12-O2 | 12-ADR-002 (Contract Governance) | `/tests/contracts/` | `/src/Aog.Abstractions/` |
+
 
 ---
 
@@ -211,6 +224,14 @@ An implementation conforms to §12 when:
 
 ## Standards Context  
 
-Aligns with **ISO/IEC/IEEE 29148:2018** (*Systems and Software Requirements Specification*) and  
-**IEEE 1016:2017** (*Software Design Description*).  
-Also consistent with **CNCF Secure Supply Chain** principles for deterministic builds and dependency transparency.  
+Aligns with **ISO/IEC/IEEE 29148:2018** (Systems and Software Requirements Specification) and  
+**IEEE 1016:2017** (Software Design Description).  
+Also consistent with CNCF secure supply chain guidance (reproducible builds, dependency transparency, SBOM publishing).  
+These references exist to ensure §12 can be used for audit, onboarding, and future certification without rewriting the requirements model.
+
+
+| Date | Summary | PR / Issue |
+|------|----------|------------|
+| 2025-10-21 | Initial draft of runtime and dependency governance | #0000 |
+| 2025-10-24 | Major structural review — added requirement grammar preamble, verification for R-STACK-004, traceability links to ADR 11-001/14-ADR-001, and minor consistency fixes. | #0001 |
+

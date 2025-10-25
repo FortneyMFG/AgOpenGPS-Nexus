@@ -1,21 +1,15 @@
-# 13 — UI Framework & UX Language
+# 13 — UI Framework & UX Language  
+*(Status: Drafting — Decision Agnostic)*  
 
-> **In plain terms:** We keep the familiar WinForms screens stable while teaching
-> everyone how the newer Avalonia shell, dashboards, and remote modes will feel,
-> so operators are never surprised when the UI evolves.
-
-*(Status: Proposed)*
-
-**Author:** Codex  
-**Created:** 2025-10-20  
-**Version:** 0.1.0  
 **Section ID:** 13  
-**Editors:** UI Working Group  
-**Last Updated:** 2025-10-20  
-**Related Sections:** 11 — OS Support, 9X — Frontends & Ops
-**Related Decisions:** `13-ADR-001 — Use Avalonia for the Nexus Desktop UI Shell`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
+**Version:** 0.1.0  
+**Editors:** UI Working Group (Fortney + Codex)  
+**Last Updated:** 2025-10-25  
+**Related Sections:** 11 — OS Support, 12 — Development Language & Runtime, 9X — Frontends & Ops  
+**Related Decisions:** `13-ADR-001 — Adopt Avalonia as Nexus UI Shell`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`  
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
-**Downstream Impacts:** 9X — Frontends & Ops, Training materials
+**Downstream Impacts:** 9X — Frontends & Ops, Operator Training  
+
 
 ---
 
@@ -72,7 +66,7 @@ Balance legacy WinForms expectations with modernization via Avalonia and remote 
 
 | ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
 |----|-----------|-----------|----------|-----------------|-----------------------------|
-| R-UI-000 | MUST | Legacy Support | Keep WinForms desktop UI shipping with mapping, PGN tools, OpenGL panels. | Legacy operators | Windows regression suite |
+| R-UI-001 | MUST | Legacy Support | Keep WinForms desktop UI shipping with mapping, PGN tools, OpenGL panels. | Legacy operators | Windows regression suite |
 | R-UI-002 | SHOULD | AgIO Config | Maintain AgIO Windows Forms dialogs for device setup. | AgIO maintainers | UI automation on dialogs |
 | R-UI-003 | SHOULD | Multi-monitor | Preserve window placement helpers for multi-monitor cabs. | Operator feedback | UI layout tests |
 | R-UI-004 | SHOULD | Metadata Widgets | Provide metadata-driven widgets to surface new layers without code rewrites. | Metadata dashboards backlog | Prototype dashboards hitting feature checklist |
@@ -105,9 +99,9 @@ Balance legacy WinForms expectations with modernization via Avalonia and remote 
 
 | Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
 |--------|--------------------|---------------------|---------------------|
-| R-UI-000 | Regression suite | `tes../UI/winforms-smoke/` | All scenarios pass |
-| R-UI-004 | Prototype demo | `dem../UI/metadata-dashboard/` | Checklist complete |
-| R-UI-005 | Integration test | `tes../UI/remote-client/` | Connects to headless Core without errors |
+| R-UI-000 | Regression suite | `tests/UI/winforms-smoke/` | All scenarios pass |
+| R-UI-004 | Prototype demo | `demos/UI/metadata-dashboard/` | Checklist complete |
+| R-UI-005 | Integration test | `tests/UI/remote-client/` | Connects to headless Core without errors |
 | R-UI-008 | CI build | `pipelines/ui-avalonia.yml` | Android/iOS builds succeed |
 
 ---
@@ -160,9 +154,18 @@ Balance legacy WinForms expectations with modernization via Avalonia and remote 
 
 ## 13.10 Option Overview
 
+Define viable UI framework and UX strategy options for Nexus, balancing modernization with operator familiarity.
+
 | Option ID | Status | Type / Theme | Description | Reference Document |
 |-----------|--------|--------------|-------------|--------------------|
-| — | — | — | No dedicated Section 13 option documents; modernization leverages Option 11-O1 for runtime stack and 9X options for dashboard/remote UX. | — |
+| **13-O1** | Proposed | Cross-Platform Desktop | Use **Avalonia UI** as the modern desktop shell for Windows and Linux, sharing view models, layouts, and theming across platforms. | `13-ADR-001_Avalonia_UI_Shell.md` |
+| **13-O2** | Retained | Legacy Compatibility | Maintain **WinForms (v6)** as the stable, production-proven UI during the transition to Avalonia. | `Legacy SourceCode/V6/` |
+| **13-O3** | Exploratory | Web / Companion UX | Evaluate **web-based dashboards** (e.g., Blazor Hybrid or WebAssembly) to connect to headless Core instances via gRPC/WebSocket. | `docs/UI/web-ui-concepts.md` *(placeholder)* |
+
+> **Informative:**  
+> These options capture the present and near-term UI stack choices.  
+> Only Option 13-O1 (Avalonia) is expected to become normative through ADR 13-001;  
+> WinForms remains supported for legacy continuity, and Web UX exploration is future scope.
 
 ---
 
@@ -180,8 +183,23 @@ Balance legacy WinForms expectations with modernization via Avalonia and remote 
 
 ## 13.12 Decision Matrix
 
-UI framework selection follows the runtime decision (11-O1). Section 13 focuses on UX policies, metadata-driven dashboards, and remote client support.
-Any future toolkit alternatives will require standalone option documents under Section 13.
+*(Reserved — will be completed upon adoption of `13-ADR-001`.)*
+
+### 13.12.1 Evaluation Criteria
+
+| Criterion | Rationale for Inclusion | Weight |
+|-----------|-------------------------|--------|
+| **Cross-Platform Reach** | Must support Windows + Linux per §11 baseline. | 0.25 |
+| **Maintainability** | Unified code and theming reduce divergence. | 0.20 |
+| **Operator Familiarity** | Smooth transition from existing WinForms UI. | 0.15 |
+| **Performance / Responsiveness** | Meet target FPS and latency benchmarks (§11). | 0.15 |
+| **Extensibility / Web Readiness** | Foundation for future web or hybrid companion UIs. | 0.15 |
+| **Accessibility / Localization** | Compliance with WCAG 2.1 and translation hooks. | 0.10 |
+| **Total** |  | **1.00** |
+
+> **Note:**  
+> Current pilots favor **13-O1 (Avalonia)** for maintainability and roadmap alignment,  
+> but §13 remains decision-agnostic until ADR 13-001 is formally approved.
 
 ---
 
@@ -208,8 +226,10 @@ Any future toolkit alternatives will require standalone option documents under S
 ### 13.15.1 Section Change Log
 
 | Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Converted UI framework section to standardized template with updated considerations. | #0000 |
+|------|----------|------------|
+| 2025-10-20 | Converted UI framework section to standardized template. | #0000 |
+| 2025-10-25 | Added Avalonia transition path, run-mode verification, and accessibility baseline. | #0001 |
+
 
 ---
 

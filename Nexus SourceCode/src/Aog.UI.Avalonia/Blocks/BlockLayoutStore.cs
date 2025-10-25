@@ -147,22 +147,31 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
     private bool EnsureDefaultClones(ShellLayoutPreferences layout)
     {
         var changed = false;
-        changed |= EnsureClone(layout, "Cmd.FieldSettings", BlockRegion.Left, 0, BlockSize.Tile1x2);
+        changed |= EnsureClone(layout, "Cmd.FieldSettings", BlockRegion.Left, 0, BlockSize.Tile1x1);
         changed |= EnsureClone(layout, "Cmd.MapTools", BlockRegion.Left, 1);
         changed |= EnsureClone(layout, "Cmd.Guidance", BlockRegion.Left, 2);
         changed |= EnsureClone(layout, "Cmd.Equipment", BlockRegion.Left, 3);
         changed |= EnsureClone(layout, "Cmd.Coverage", BlockRegion.Left, 4);
         changed |= EnsureClone(layout, "Cmd.Hydraulics", BlockRegion.Left, 5);
         changed |= EnsureClone(layout, "Cmd.AbLines", BlockRegion.Left, 6);
-        changed |= EnsureFloatingShortcut(layout, "Cmd.AutoSteerToggle", 0, 48, 48);
-        changed |= EnsureFloatingShortcut(layout, "Cmd.ABLineCycle", 1, 232, 48);
-        changed |= EnsureFloatingShortcut(layout, "Cmd.UTurnToggle", 2, 416, 48);
-        changed |= EnsureFloatingShortcut(layout, "Cmd.SectionMaster", 3, 600, 48);
-        changed |= EnsureFloatingShortcut(layout, "Cmd.Start", 4, 48, 216);
-        changed |= EnsureFloatingShortcut(layout, "Cmd.Pause", 5, 232, 216);
-        changed |= EnsureFloatingShortcut(layout, "Cmd.Stop", 6, 416, 216);
-        changed |= EnsureFloatingShortcut(layout, "Cmd.NudgeLeft", 7, 232, 384);
-        changed |= EnsureFloatingShortcut(layout, "Cmd.NudgeRight", 8, 416, 384);
+        changed |= EnsureClone(layout, "Cmd.AutoSteerToggle", BlockRegion.Bottom, 0);
+        changed |= EnsureClone(layout, "Cmd.ABLineCycle", BlockRegion.Bottom, 1);
+        changed |= EnsureClone(layout, "Cmd.UTurnToggle", BlockRegion.Bottom, 2);
+        changed |= EnsureClone(layout, "Cmd.SectionMaster", BlockRegion.Bottom, 3);
+        changed |= EnsureClone(layout, "Cmd.Start", BlockRegion.Bottom, 4);
+        changed |= EnsureClone(layout, "Cmd.Pause", BlockRegion.Bottom, 5);
+        changed |= EnsureClone(layout, "Cmd.Stop", BlockRegion.Bottom, 6);
+        changed |= EnsureClone(layout, "Cmd.NudgeLeft", BlockRegion.Bottom, 7);
+        changed |= EnsureClone(layout, "Cmd.NudgeRight", BlockRegion.Bottom, 8);
+        changed |= RemoveFloatingSpec(layout, "Cmd.AutoSteerToggle");
+        changed |= RemoveFloatingSpec(layout, "Cmd.ABLineCycle");
+        changed |= RemoveFloatingSpec(layout, "Cmd.UTurnToggle");
+        changed |= RemoveFloatingSpec(layout, "Cmd.SectionMaster");
+        changed |= RemoveFloatingSpec(layout, "Cmd.Start");
+        changed |= RemoveFloatingSpec(layout, "Cmd.Pause");
+        changed |= RemoveFloatingSpec(layout, "Cmd.Stop");
+        changed |= RemoveFloatingSpec(layout, "Cmd.NudgeLeft");
+        changed |= RemoveFloatingSpec(layout, "Cmd.NudgeRight");
         changed |= EnsureClone(layout, "Tel.Speed", BlockRegion.Floating, 0, BlockSize.Tile1xHalf);
         changed |= EnsureClone(layout, "Tel.Gps", BlockRegion.Floating, 1, BlockSize.Tile1xHalf);
         changed |= EnsureClone(layout, "Tel.Sections", BlockRegion.Floating, 2, BlockSize.Tile1xHalf);
@@ -219,79 +228,23 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
         return true;
     }
 
-    private bool EnsureFloatingShortcut(
-        ShellLayoutPreferences layout,
-        string definitionId,
-        int order,
-        double x,
-        double y)
+    private bool RemoveFloatingSpec(ShellLayoutPreferences layout, string definitionId)
     {
         var id = new BlockDefinitionId(definitionId);
-        if (_catalog.Get(id) is null)
+        var instance = layout.Instances.FirstOrDefault(i => i.DefinitionId == id && i.Origin == BlockOrigin.Clone);
+        if (instance is null)
         {
             return false;
         }
 
-        var changed = false;
-        var instance = layout.Instances.FirstOrDefault(i =>
-            i.DefinitionId == id && i.Origin == BlockOrigin.Clone);
-        if (instance is null)
+        if (layout.Grid?.FloatingBlocks is not { Count: > 0 } specs)
         {
-            instance = new BlockInstance
-            {
-                DefinitionId = id,
-                Region = BlockRegion.Overlay,
-                Order = order,
-                Origin = BlockOrigin.Clone,
-            };
-            layout.Instances.Add(instance);
-            changed = true;
-        }
-        else
-        {
-            if (instance.Region != BlockRegion.Overlay)
-            {
-                instance.Region = BlockRegion.Overlay;
-                changed = true;
-            }
-
-            if (instance.Order != order)
-            {
-                instance.Order = order;
-                changed = true;
-            }
+            return false;
         }
 
-        var specs = layout.Grid?.FloatingBlocks;
-        if (specs is null)
-        {
-            layout.Grid ??= new ShellGridLayout();
-            specs = layout.Grid.FloatingBlocks ??= new List<FloatingBlockSpec>();
-        }
-
-        var spec = specs.FirstOrDefault(s => s.InstanceId == instance.InstanceId.Value);
-        if (spec is null)
-        {
-            specs.Add(new FloatingBlockSpec
-            {
-                InstanceId = instance.InstanceId.Value,
-                X = x,
-                Y = y,
-            });
-            changed = true;
-        }
-        else
-        {
-            const double epsilon = 0.5d;
-            if (Math.Abs(spec.X - x) > epsilon || Math.Abs(spec.Y - y) > epsilon)
-            {
-                spec.X = x;
-                spec.Y = y;
-                changed = true;
-            }
-        }
-
-        return changed;
+        var removed = specs.RemoveAll(spec => spec.InstanceId == instance.InstanceId.Value);
+        return removed > 0;
     }
+
 }
 

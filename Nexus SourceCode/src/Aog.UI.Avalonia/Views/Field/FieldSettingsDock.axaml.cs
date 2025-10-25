@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Aog.UI.Avalonia.ViewModels.Shell;
@@ -155,17 +156,17 @@ public partial class FieldSettingsDock : UserControl
             return;
         }
 
-        var data = new DataObject();
-        data.Set(LauncherDragDataFormat, _dragLauncher);
+        var data = LauncherDragData.CreatePayload(_dragLauncher, out var token);
 
         layout.BeginLauncherDrag();
 
         try
         {
-            await DragDrop.DoDragDrop(e, data, DragDropEffects.Copy);
+            await DragDrop.DoDragDropAsync(e, data, DragDropEffects.Copy);
         }
         finally
         {
+            LauncherDragData.ReleasePayload(token);
             layout.EndLauncherDrag();
             ResetLauncherDrag(source, e.Pointer);
         }
@@ -181,5 +182,47 @@ public partial class FieldSettingsDock : UserControl
         _dragLauncher = null;
         _isPressArmed = false;
         _isDragActive = false;
+    }
+}
+
+internal static class LauncherDragData
+{
+    private static readonly ConcurrentDictionary<string, BlockLauncherItemViewModel> ActiveLaunchers = new();
+    private static readonly DataFormat<string> LauncherFormat = DataFormat.CreateStringApplicationFormat(FieldSettingsDock.LauncherDragDataFormat);
+
+    public static DataTransfer CreatePayload(BlockLauncherItemViewModel launcher, out string token)
+    {
+        token = Guid.NewGuid().ToString("N");
+        ActiveLaunchers[token] = launcher;
+
+        var transfer = new DataTransfer();
+        transfer.Add(DataTransferItem.Create(LauncherFormat, token));
+        return transfer;
+    }
+
+    public static bool TryGetLauncher(IDataTransfer data, out BlockLauncherItemViewModel? launcher)
+    {
+        launcher = null;
+
+        if (data is null)
+        {
+            return false;
+        }
+
+        foreach (var item in data.Items)
+        {
+            if (item.TryGetRaw(LauncherFormat) is string token && ActiveLaunchers.TryGetValue(token, out var candidate))
+            {
+                launcher = candidate;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static void ReleasePayload(string token)
+    {
+        ActiveLaunchers.TryRemove(token, out _);
     }
 }

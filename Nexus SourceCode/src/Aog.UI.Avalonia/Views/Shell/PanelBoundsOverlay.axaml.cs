@@ -31,7 +31,7 @@ public partial class PanelBoundsOverlay : UserControl
 
     private void OnHandlePointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (sender is not IControl control)
+        if (sender is not Control control)
         {
             return;
         }

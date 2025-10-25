@@ -65,25 +65,36 @@ public sealed class PluginSurfaceDescriptorTests
     }
 
     [Fact]
-    public void FieldMenuDescriptorMatchesManifest()
+    public void EditMenuDescriptorMatchesManifest()
     {
-        AssertSurfaceMatches(ShellPluginSurfaces.FieldMenu);
+        AssertSurfaceMatches(ShellPluginSurfaces.EditMenu);
         using var dispatcher = new NoOpShellCommandDispatcher();
         var registry = new PluginRegistry();
         var host = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
         var menuBar = new ShellMenuBarViewModel(dispatcher, registry, host);
-        Assert.Equal(ShellPluginSurfaces.FieldMenu, menuBar.FieldMenu.Descriptor);
+        Assert.Equal(ShellPluginSurfaces.EditMenu, menuBar.EditMenu.Descriptor);
     }
 
     [Fact]
-    public void ToolsMenuDescriptorMatchesManifest()
+    public void ViewMenuDescriptorMatchesManifest()
     {
-        AssertSurfaceMatches(ShellPluginSurfaces.ToolsMenu);
+        AssertSurfaceMatches(ShellPluginSurfaces.ViewMenu);
         using var dispatcher = new NoOpShellCommandDispatcher();
         var registry = new PluginRegistry();
         var host = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
         var menuBar = new ShellMenuBarViewModel(dispatcher, registry, host);
-        Assert.Equal(ShellPluginSurfaces.ToolsMenu, menuBar.ToolsMenu.Descriptor);
+        Assert.Equal(ShellPluginSurfaces.ViewMenu, menuBar.ViewMenu.Descriptor);
+    }
+
+    [Fact]
+    public void HelpMenuDescriptorMatchesManifest()
+    {
+        AssertSurfaceMatches(ShellPluginSurfaces.HelpMenu);
+        using var dispatcher = new NoOpShellCommandDispatcher();
+        var registry = new PluginRegistry();
+        var host = new PluginHost(new NullServiceProvider(), NullLogger<PluginHost>.Instance);
+        var menuBar = new ShellMenuBarViewModel(dispatcher, registry, host);
+        Assert.Equal(ShellPluginSurfaces.HelpMenu, menuBar.HelpMenu.Descriptor);
     }
 
     [Fact]

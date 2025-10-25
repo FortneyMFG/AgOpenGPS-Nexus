@@ -30,7 +30,7 @@ public sealed class BlockLayoutViewModelTests
             new BlockInstance
             {
                 InstanceId = new BlockInstanceId(Guid.Parse("00000000-0000-0000-0000-000000000002")),
-                DefinitionId = new BlockDefinitionId("Tel.Speed"),
+                DefinitionId = new BlockDefinitionId("Info.Speed"),
                 Region = BlockRegion.Floating,
                 SizeOverride = BlockSize.Tile1xHalf,
             },
@@ -47,7 +47,7 @@ public sealed class BlockLayoutViewModelTests
             },
             new BlockDefinition
             {
-                Id = new BlockDefinitionId("Tel.Speed"),
+                Id = new BlockDefinitionId("Info.Speed"),
                 PreferredSize = BlockSize.Tile1xHalf,
                 Kind = BlockKind.Telemetry,
                 Placement = PlacementPolicy.Free,
@@ -85,7 +85,7 @@ public sealed class BlockLayoutViewModelTests
         standardBlock.Tile.Col.Should().BeLessOrEqualTo(viewModel.Grid.Columns - standardBlock.Tile.ColSpan);
         standardBlock.Tile.Row.Should().BeLessOrEqualTo(viewModel.Grid.Rows - standardBlock.Tile.RowSpan);
 
-        var telemetryBlock = viewModel.Blocks.Single(block => block.Definition.Id.Value == "Tel.Speed");
+        var telemetryBlock = viewModel.Blocks.Single(block => block.Definition.Id.Value == "Info.Speed");
         telemetryBlock.Tile.ColSpan.Should().Be(2);
         telemetryBlock.Tile.RowSpan.Should().Be(1);
         telemetryBlock.Tile.Row.Should().BeGreaterOrEqualTo(0);

@@ -14,9 +14,10 @@ public sealed class LoggingShellCommandHandler : IShellCommandHandler
     private static readonly HashSet<string> KnownInjectionPoints = new(StringComparer.OrdinalIgnoreCase)
     {
         "menu.file",
-        "menu.tools",
+        "menu.edit",
+        "menu.view",
         "menu.settings",
-        "menu.field",
+        "menu.help",
         "toolbar.top",
         "shell.main",
         "shell.map",

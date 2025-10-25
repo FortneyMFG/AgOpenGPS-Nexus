@@ -15,14 +15,14 @@ screens:
     host: core
     inject_point: menu.file
     contract: core.file_menu.v1
-  - id: tools_menu
+  - id: edit_menu
     host: core
-    inject_point: menu.tools
-    contract: core.tools_menu.v1
-  - id: field_menu
+    inject_point: menu.edit
+    contract: core.edit_menu.v1
+  - id: view_menu
     host: core
-    inject_point: menu.field
-    contract: core.field_menu.v1
+    inject_point: menu.view
+    contract: core.view_menu.v1
   - id: settings_menu
     host: core
     inject_point: menu.settings
@@ -31,10 +31,10 @@ screens:
     host: core
     inject_point: services.backend
     contract: core.services_menu.v1
-  - id: plugins_menu
+  - id: help_menu
     host: core
-    inject_point: menu.plugins
-    contract: core.plugins_menu.v1
+    inject_point: menu.help
+    contract: core.help_menu.v1
   - id: job_manager_dialog
     host: core
     inject_point: dialog.jobs

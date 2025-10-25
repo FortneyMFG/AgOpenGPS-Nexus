@@ -142,25 +142,26 @@
               <StackPanel Grid.Row="1"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
-                          Spacing="6">
+                          Spacing="8">
                 <Grid HorizontalAlignment="Center"
-                      VerticalAlignment="Center">
+                      VerticalAlignment="Center"
+                      IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}">
                   <Image Source="{Binding IconKey, Converter={StaticResource BlockIconConverter}}"
-                         Width="36"
-                         Height="36"
-                         Stretch="Uniform"
-                         IsVisible="{Binding IconKey, Converter={StaticResource StringHasValueConverter}}" />
-                  <TextBlock Text="⚙"
-                             FontSize="28"
-                             HorizontalAlignment="Center"
-                             VerticalAlignment="Center"
-                             IsVisible="{Binding IconKey, Converter={StaticResource StringIsNullOrWhiteSpaceConverter}}" />
+                         Width="32"
+                         Height="32"
+                         Stretch="Uniform" />
                 </Grid>
                 <TextBlock Text="{Binding Label}"
                            FontWeight="SemiBold"
                            TextAlignment="Center"
                            TextWrapping="Wrap"
                            Foreground="#E0E0E0" />
+                <TextBlock Text="{Binding Value}"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="#4CAF50"
+                           TextAlignment="Center"
+                           IsVisible="{Binding Value, Converter={StaticResource StringHasValueConverter}}" />
               </StackPanel>
             </Grid>
           </Grid>
@@ -303,14 +304,14 @@
                 <StaticResource ResourceKey="ShellMenuItemTemplate" />
               </MenuItem.ItemTemplate>
             </MenuItem>
-            <MenuItem Header="{Binding Host.ShellMenuBar.FieldMenu.Header}"
-                      ItemsSource="{Binding Host.ShellMenuBar.FieldMenu.Items}">
+            <MenuItem Header="{Binding Host.ShellMenuBar.EditMenu.Header}"
+                      ItemsSource="{Binding Host.ShellMenuBar.EditMenu.Items}">
               <MenuItem.ItemTemplate>
                 <StaticResource ResourceKey="ShellMenuItemTemplate" />
               </MenuItem.ItemTemplate>
             </MenuItem>
-            <MenuItem Header="{Binding Host.ShellMenuBar.ToolsMenu.Header}"
-                      ItemsSource="{Binding Host.ShellMenuBar.ToolsMenu.Items}">
+            <MenuItem Header="{Binding Host.ShellMenuBar.ViewMenu.Header}"
+                      ItemsSource="{Binding Host.ShellMenuBar.ViewMenu.Items}">
               <MenuItem.ItemTemplate>
                 <StaticResource ResourceKey="ShellMenuItemTemplate" />
               </MenuItem.ItemTemplate>
@@ -327,8 +328,8 @@
                 <StaticResource ResourceKey="ShellMenuItemTemplate" />
               </MenuItem.ItemTemplate>
             </MenuItem>
-            <MenuItem Header="{Binding Host.ShellMenuBar.PluginsMenu.Header}"
-                      ItemsSource="{Binding Host.ShellMenuBar.PluginsMenu.Items}">
+            <MenuItem Header="{Binding Host.ShellMenuBar.HelpMenu.Header}"
+                      ItemsSource="{Binding Host.ShellMenuBar.HelpMenu.Items}">
               <MenuItem.ItemTemplate>
                 <StaticResource ResourceKey="ShellMenuItemTemplate" />
               </MenuItem.ItemTemplate>

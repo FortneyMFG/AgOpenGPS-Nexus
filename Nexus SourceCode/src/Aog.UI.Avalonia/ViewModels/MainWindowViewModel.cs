@@ -440,16 +440,46 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable, IFieldOp
                 Shell.StatusText = "AB line editor integration in progress.";
                 return true;
             case "Cmd.FieldSettings":
-                var layout = Shell.Layout;
-                var shouldPinDock = !layout.IsFieldDockPinned;
-                layout.IsFieldDockPinned = shouldPinDock;
-                Shell.StatusText = shouldPinDock
-                    ? "Field settings dock pinned. Drag blocks onto the workspace."
-                    : "Field settings dock hidden.";
+                ToggleFieldDock();
                 return true;
             default:
                 return false;
         }
+    }
+
+    private void ToggleFieldDock()
+    {
+        var layout = Shell.Layout;
+        if (layout is null)
+        {
+            Shell.StatusText = "Layout unavailable.";
+            return;
+        }
+
+        if (!layout.IsLocked)
+        {
+            var shouldPin = !layout.IsFieldDockPinned;
+            layout.IsFieldDockPinned = shouldPin;
+            Shell.IsFieldMenuOpen = shouldPin;
+            Shell.StatusText = shouldPin
+                ? "Field settings dock pinned. Drag blocks onto the workspace."
+                : "Field settings dock hidden.";
+            return;
+        }
+
+        if (layout.IsFieldDockPinned)
+        {
+            layout.IsFieldDockPinned = false;
+            Shell.IsFieldMenuOpen = false;
+            Shell.StatusText = "Field settings dock hidden.";
+            return;
+        }
+
+        var shouldOpen = !Shell.IsFieldMenuOpen;
+        Shell.IsFieldMenuOpen = shouldOpen;
+        Shell.StatusText = shouldOpen
+            ? "Field settings dock open. Pin it to keep it visible."
+            : "Field settings dock hidden.";
     }
 
     private void ShowMapToolsMenu()

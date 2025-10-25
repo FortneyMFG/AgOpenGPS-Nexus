@@ -1,7 +1,7 @@
 # 42-ADR-021 — Timebase and clock synchronization
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Interprocess Communications Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -78,4 +78,12 @@ fallback, transports can reconcile sample capture times, align mesh topics, and 
 | Per-device clocks | Allow each device to free-run. | Leads to drift and non-deterministic control behavior. |
 | NTP-only sync | Use commodity NTP. | Insufficient precision for sub-10 ms control loops. |
 | Application-level reconciliation | Let each service handle drift manually. | Duplicated logic and inconsistent mitigation. |
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
 

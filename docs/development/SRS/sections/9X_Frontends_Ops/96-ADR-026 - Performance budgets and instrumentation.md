@@ -1,9 +1,13 @@
 # ADR-026: Performance budgets and instrumentation
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** Full Stack
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
 
 
 ## Context
@@ -38,3 +42,12 @@ As Nexus integrates PoseStream, controllers, and visualization pipelines, perfor
 - [ADR-020: Determinism, replay, and CI guardrails](ADR-020-determinism-replay-ci.md)
 - [ADR-021: Timebase and clock synchronization](ADR-021-timebase-clock-sync.md)
 - [ADR-025: Data lifecycle and retention policy](ADR-025-data-lifecycle-retention.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

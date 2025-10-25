@@ -1,9 +1,13 @@
 # ADR-020: Determinism, replay, and CI guardrails
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** Simulation & Replay providers, Mapping, Autosteer, Section Control, Rate Control, Telemetry Logging
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
 
 
 ## Context
@@ -36,3 +40,12 @@ Nexus relies on deterministic replays to validate PoseStream, TileStore, and con
 - [ADR-007: PoseStream and SectionState architecture](ADR-007-posestream-sectionstate-architecture.md)
 - [ADR-009: PoseStream vector logs and layer TileStore persistence](ADR-009-posestream-vector-tilestore-persistence.md)
 - [ADR-026: Performance budgets](ADR-026-performance-budgets.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

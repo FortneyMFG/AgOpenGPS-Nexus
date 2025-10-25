@@ -1,13 +1,12 @@
 # ADR-032: Presets and Layout Linking for Equipment Workflows
 
-## Status
-Accepted
+*(Status: Accepted)*
 
-NX-130 advanced this ADR through review, locking the preset/layout model as the
-authoritative workflow for equipment orchestration across desktop and companion
-clients.
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
 
-**Relevant Plugin(s):** UI Shell (Presets), Device Manager, Mapping, Autosteer, Section Control, Rate Control, Job Tasks, Variable Mapping
+---
 
 
 
@@ -77,3 +76,12 @@ Adopt a Preset model that binds Equipment, Implement, and Layout selections into
 - [SRS §4.2 Safety & QA](../NOTES.md#srs-42-safety--qa)
 - [SRS §12 Extensibility & Plugins](../sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 - Tasks spec excerpt provided by product stakeholders (internal notes)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

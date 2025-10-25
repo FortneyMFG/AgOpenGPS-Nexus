@@ -1,9 +1,12 @@
 # ADR-011: Mapping and visualization imagery pipeline
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** Mapping, UI Shell (Avalonia/Web), Telemetry Logging
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
 
 
 
@@ -36,3 +39,12 @@ Nexus must render PoseStream-derived ribbons, heatmaps, and telemetry overlays w
 - [Frontend requirements](../sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
 - [ADR-029: Mapping plugin architecture](ADR-029-mapping-plugin-architecture.md)
 - [ADR-034: Metadata-driven dashboards and inspector surfaces](ADR-034-metadata-driven-dashboards.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

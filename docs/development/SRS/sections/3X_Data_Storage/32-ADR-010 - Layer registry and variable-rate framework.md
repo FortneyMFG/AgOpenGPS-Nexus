@@ -1,9 +1,12 @@
 # ADR-010: Layer registry and variable-rate framework
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** Mapping, Variable Mapping, Rate Control, Section Control, Planter Monitor, Telemetry Logging
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
 
 
 
@@ -43,3 +46,12 @@ Variable-rate workflows, analytics, and dashboards require a canonical catalog o
 - [Extensibility & plugin requirements](../sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 - [ADR-009: PoseStream vector logs and layer TileStore persistence](ADR-009-posestream-vector-tilestore-persistence.md)
 - [ADR-031: Official plugin bundle governance](ADR-031-official-plugin-bundle.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

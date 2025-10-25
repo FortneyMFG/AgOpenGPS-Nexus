@@ -1,7 +1,7 @@
 # 14-ADR-001 — Standardize Build Environment & Tooling  
 *(Status: Draft — Pending Review)*  
 
-**Authors:** Release & Tooling Working Group  
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Platform Foundations Working Group  
 **Created:** 2025-10-25  
 **Last Updated:** 2025-10-25  
@@ -87,6 +87,6 @@ Unified scripts, container bases, and vault integration ensure that every contri
 
 ## 8) Change Log  
 
-| Date | Change | Author |
-|------|---------|--------|
-| 2025-10-25 | Initial draft defining standardized VS Code + GitHub Actions + Vault build environment. | Release & Tooling WG |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-25 | Initial draft defining standardized VS Code + GitHub Actions + Vault build environment. | Nexus Team (Codex) |  |

@@ -1,7 +1,7 @@
 # 97 — Simulation & Replay
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-24
 **Version:** 0.1.0
 **Section ID:** 97
@@ -100,4 +100,12 @@ Define deterministic simulation and replay services that allow Nexus to capture,
 ## 97.8 Decision History
 
 - Simulation content moved from §94 to dedicated section to clarify responsibilities (2025-10-24).
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
 

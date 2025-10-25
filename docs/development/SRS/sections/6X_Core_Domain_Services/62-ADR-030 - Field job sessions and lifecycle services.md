@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Job Lifecycle Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -125,3 +125,12 @@ structured imports, or extensible automation hooks.
 * [Persistence formats](../3X_Data_Storage/32_Persistence_Formats.md)
 * [Plugin lifecycle](../9X_Frontends_Ops/94-ADR-018%20-%20Plugin%20API%20and%20capability%20discovery.md)
 * [Mapping & coverage responsibilities](../9X_Frontends_Ops/94-ADR-029%20-%20Mapping%20plugin%20architecture.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

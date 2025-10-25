@@ -1,5 +1,13 @@
 # AgOpenGPS Next SRS
 
+*(Status: Drafting)*
+
+**Authors:** Nexus Team (Fortney)
+**Last Updated:** 2025-10-24
+
+---
+
+
 Welcome to the Software Requirements Specification (SRS) workspace for the next generation of AgOpenGPS.
 
 ## What lives here
@@ -479,3 +487,11 @@ _This matrix links every requirement (R-) to the options, references, and eventu
 - **Kiosk mode**: Locked-down runtime experience intended for field operators with minimal UI.
 - **Multi-monitor**: Use of two or more displays to show different dashboards or controls simultaneously.
 - **Remote UI**: User interface accessed via another device (tablet, browser, thin client).
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial SRS overview seeded | Nexus Team (Fortney) |  |

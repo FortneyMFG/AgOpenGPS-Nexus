@@ -1,9 +1,12 @@
 # ADR-012: Multi-session and multi-PoseStream fusion
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** Mapping, Variable Mapping, Telemetry Logging, Job Tasks
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
 
 
 
@@ -37,3 +40,12 @@ Operations often blend PoseStreams from multiple machines and seasons (e.g., pla
 - [ADR-009: PoseStream vector logs and layer TileStore persistence](ADR-009-posestream-vector-tilestore-persistence.md)
 - [ADR-022: CRS, units, and precision policy](ADR-022-crs-units-precision-policy.md)
 - [ADR-019: Provenance, audit, and QA](ADR-019-provenance-audit-qa.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

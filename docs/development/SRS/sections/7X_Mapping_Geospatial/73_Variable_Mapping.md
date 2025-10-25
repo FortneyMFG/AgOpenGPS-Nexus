@@ -1,7 +1,7 @@
 # 73 — Variable Mapping
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Version:** 0.1.0
 **Section ID:** 73
@@ -149,3 +149,12 @@ Define how Nexus represents agronomic intent as variable mapping layers, transfo
 | Preview Confidence | Multi-layer previews with statistics | Static shapefile overlays |
 | Import/Export | ISOXML/GeoJSON/Shapefile with provenance | Vendor-specific shapefile variants |
 | Controller Alignment | Embedded hints + bounds for §77 | Manual retuning per implement |
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

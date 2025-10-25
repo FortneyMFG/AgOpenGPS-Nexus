@@ -69,3 +69,12 @@ with the context bus for analytics.
 
 - Implements risk overlay storage requirement R-DATA-047 in §08 Data Model & Storage and catalog coverage in §04 Mapping Layers.【F:docs/sections/3X_Data_Storage/32_Persistence_Formats.md†L35-L36】【F:docs/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L62-L67】
 - Powers severity toggles and overlay legends required by R-FE-074 in §05 Frontends.【F:docs/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L29-L30】
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

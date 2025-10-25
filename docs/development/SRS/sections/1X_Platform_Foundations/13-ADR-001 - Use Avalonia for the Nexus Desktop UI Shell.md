@@ -1,7 +1,7 @@
 # 13-ADR-001 — Adopt Avalonia for the Nexus Desktop UI Shell  
 *(Status: Accepted — 2025-10-25)*  
 
-**Authors:** UI Working Group  
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Platform Foundations Working Group  
 **Created:** 2025-10-20  
 **Last Updated:** 2025-10-25  
@@ -109,7 +109,7 @@ language, runtime, and CI infrastructure already adopted for Core and AgIO.
 
 ## 7) Change Log
 
-| Date | Change | Author |
-|------|---------|--------|
-| 2025-10-20 | Initial draft adopting Avalonia as desktop shell. | Codex |
-| 2025-10-25 | Replaced WPF references with Qt lineage, aligned context and governance. | UI Working Group |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft adopting Avalonia as desktop shell. | Nexus Team (Codex) |  |
+| 2025-10-25 | Replaced WPF references with Qt lineage, aligned context and governance. | Nexus Team (Codex) |  |

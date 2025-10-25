@@ -1,9 +1,14 @@
 # ADR-00XX: CM5 SHM Fastpath + HAL Plugin (“Pumpkin Pi”)
 
-## Status
-Accepted (target release: AOG-Link v1.0)
+*(Status: Accepted (target release: AOG-Link v1.0))*
 
-**Relevant Plugin(s):** Pumpkin Pi (HAL, Autosteer Integration)
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
+
 
 ## Context
 Running navigation and steer control on the same Compute Module 5 (CM5) introduces avoidable jitter when setpoints traverse the broker or AgIO sockets. The CM5 integrated-controller requirements demand a deterministic shared-memory fast path that keeps <2 ms p50 latency while still mirroring telemetry for external hardware and UI observers.【F:docs/sections/5X_Hardware_IO_Device_Layer/54_CM5_Integrated_Controller.md†L3-L78】【F:docs/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L287-L339】 At the same time, the hardware I/O plan preserves AgIO as a privileged plugin so UDP, serial, CAN-FD, and MQTT-SN adapters remain online for legacy modules and future HAL backends.【F:docs/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L6-L27】 Pumpkin Pi formalizes this integrated path by owning a CM5-local hardware abstraction layer (HAL) and mediating authority so external controllers can still participate without bespoke firmware.【F:docs/Plugins/briefs/pumpkin-pi.md†L1-L30】【F:docs/AgIO/cm5.md†L1-L38】
@@ -41,3 +46,12 @@ The legacy dev branch prototypes Linux bridges and PGN compatibility but still r
 - [CM5 Integrated Controller Setup](../AgIO/cm5.md)
 - [AgIO subsystem overview](../AgIO/README.md)
 - [NX Task Tracker — Section E](../../tasks.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

@@ -103,7 +103,7 @@ would violate §11 and §12 requirements for OS parity, determinism, and maintai
 
 ## 8) Change Log
 
-| Date | Change | Author |
-|------|---------|--------|
-| 2025-10-20 | Initial adoption of .NET 8 LTS runtime. | Nexus Team (Codex) |
-| 2025-10-25 | Clarified NativeAOT scope and dependency governance linkage. |  Nexus Team (Fortney) |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial adoption of .NET 8 LTS runtime. | Nexus Team (Fortney) |  |
+| 2025-10-25 | Clarified NativeAOT scope and dependency governance linkage. | Nexus Team (Fortney) |  |

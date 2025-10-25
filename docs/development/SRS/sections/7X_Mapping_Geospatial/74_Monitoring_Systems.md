@@ -1,7 +1,7 @@
 # 74 — Monitoring Systems
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Version:** 0.1.0
 **Section ID:** 74
@@ -206,3 +206,12 @@ Define how Nexus captures, normalizes, and visualizes machine monitoring telemet
 | Harvest Integration | Yield telemetry normalized with calibration + lag | Vendor-specific scripts |
 | Telemetry Reliability | Heartbeats, stale detection, smoothing controls | Ad-hoc polling, no stale handling |
 | Export Support | CSV/GeoJSON swath summaries | Manual CSV exports without metadata |
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

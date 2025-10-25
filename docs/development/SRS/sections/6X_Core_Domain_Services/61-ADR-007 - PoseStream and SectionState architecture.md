@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Core Domain Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -119,3 +119,12 @@ without excessive synchronization overhead.【F:docs/sections/6X_Core_Domain_Ser
 
 * [Communications & transports requirements](../4X_Interprocess_Communications/42_Transports.md)
 * [Data model & storage requirements](../3X_Data_Storage/32_Persistence_Formats.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

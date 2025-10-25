@@ -1,9 +1,9 @@
 # 12 — Development Language & Runtime  
 *(Status: Drafting — Decision Agnostic)*
 
-**Section ID:** 12  
-**Version:** 0.1.0  
-**Editors:** Nexus Team (Fortney)  
+**Section ID:** 12
+**Version:** 0.1.0
+**Authors:** Nexus Team (Fortney)
 **Last Updated:** 2025-10-24
 **Related Sections:** 11 — OS Support, 14 — Build Environment & Tooling  
 **Related Decisions:** `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`  
@@ -222,16 +222,20 @@ An implementation conforms to §12 when:
 
 ---
 
-## Standards Context  
+## 12.18 Standards Context
 
-Aligns with **ISO/IEC/IEEE 29148:2018** (Systems and Software Requirements Specification) and  
-**IEEE 1016:2017** (Software Design Description).  
-Also consistent with CNCF secure supply chain guidance (reproducible builds, dependency transparency, SBOM publishing).  
+Aligns with **ISO/IEC/IEEE 29148:2018** (Systems and Software Requirements Specification) and
+**IEEE 1016:2017** (Software Design Description).
+Also consistent with CNCF secure supply chain guidance (reproducible builds, dependency transparency, SBOM publishing).
 These references exist to ensure §12 can be used for audit, onboarding, and future certification without rewriting the requirements model.
 
 
-| Date | Summary | PR / Issue |
-|------|----------|------------|
-| 2025-10-21 | Initial draft of runtime and dependency governance | #0000 |
-| 2025-10-24 | Major structural review — added requirement grammar preamble, verification for R-STACK-004, traceability links to ADR 11-001/14-ADR-001, and minor consistency fixes. | #0001 |
+---
+
+## 12.19 Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-21 | Initial draft of runtime and dependency governance | Nexus Team (Fortney) |  |
+| 2025-10-24 | Major structural review — added requirement grammar preamble, verification for R-STACK-004, traceability links to ADR 11-001/14-ADR-001, and minor consistency fixes. | Nexus Team (Fortney) |  |
 

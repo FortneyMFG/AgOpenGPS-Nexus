@@ -2,7 +2,7 @@
 
 *(Status: Accepted)*
 
-**Authors:** @simulation-wg
+**Authors:** Nexus Team (Codex)
 **Reviewers:** @nexus-specs, @core-architects
 **Created:** -
 **Last Updated:** -
@@ -138,10 +138,10 @@ graph TD
 
 ## 11) Change Log
 
-| Date | Change | Author | PR / Issue |
-|------|--------|--------|------------|
-| - | Initial decision drafted. | @simulation-wg | #0000 |
-| - | Reformatted to ADR template; added governance details. | @simulation-wg | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| - | Initial decision drafted. | Nexus Team (Codex) |  |
+| - | Reformatted to ADR template; added governance details. | Nexus Team (Codex) |  |
 
 ---
 

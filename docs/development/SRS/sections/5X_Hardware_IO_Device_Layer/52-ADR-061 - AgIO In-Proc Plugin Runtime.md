@@ -1,5 +1,14 @@
 # 52-ADR-061 — AgIO In-Process Plugin Runtime
 
+*(Status: Drafting)*
+
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
+
 - **Status:** Draft
 - **Deciders:** Hardware & IO WG, Core WG
 - **Date:** 2025-10-24
@@ -73,4 +82,12 @@ Offer **AgIO as a Core-hosted plugin** in addition to the existing sidecar. The 
 - Update CI pipelines to run ABI compatibility tests and bridge parity harnesses (ties to R-AGIO-008).
 - Coordinate with Security WG on revised threat modeling for shared-process deployments.
 - Document operator guidance covering when to choose each option and how to migrate between them.
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
 

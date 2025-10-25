@@ -1,7 +1,7 @@
 # 55 — Firmware Interfaces & Updates
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Status:** Proposed
 **Version:** 0.1.0
@@ -181,3 +181,12 @@ Scope includes device identity broadcasts, catalog governance, orchestrator beha
 | C5 — Safety automation | 3 | 5 | 4 | 3 | 3.95 |
 
 > **Informative:** Weighted scores assume compatibility 0.25, safety 0.30, maintainability 0.20, extensibility 0.15, operator experience 0.10.
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

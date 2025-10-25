@@ -1,7 +1,7 @@
 # 41 — Service APIs & Contracts
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Version:** 0.1.0
 **Section ID:** 41
@@ -218,3 +218,12 @@ without bespoke one-off integrations.
 - Plugins receive read-only views; mutation requires explicit command services or copy-on-write buffers to maintain Core integrity.
 
 ---
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

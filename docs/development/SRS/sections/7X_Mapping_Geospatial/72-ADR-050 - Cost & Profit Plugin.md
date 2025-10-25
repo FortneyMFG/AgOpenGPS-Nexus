@@ -79,3 +79,12 @@ deducts quantities, updates weighted cost bases, and feeds replenishment forecas
 - Covers ledger, cost, and provenance requirements R-DATA-046, R-DATA-050, and R-DATA-051 in §08 Data Model & Storage.【F:docs/sections/3X_Data_Storage/32_Persistence_Formats.md†L34-L39】
 - Supports profit overlays and work order reconciliation described in §05 Frontends (R-FE-074) and §03 Job Lifecycle (R-JOB-042…R-JOB-043).【F:docs/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L29-L30】【F:docs/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L73-L76】
 - Establishes plugin responsibilities for economic analytics within §12 Extensibility policies.【F:docs/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L18-L36】
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

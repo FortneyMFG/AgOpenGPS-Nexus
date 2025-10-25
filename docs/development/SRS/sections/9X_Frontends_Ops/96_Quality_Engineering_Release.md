@@ -1,7 +1,7 @@
 # 96 — Quality Engineering & Release
 *(Status: Proposed)*
 
-**Author:** Codex  
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20  
 **Version:** 0.1.0  
 **Section ID:** 96  
@@ -189,9 +189,9 @@ No competing release strategies are under review; modernization follows consider
 
 ### 96.15.1 Section Change Log
 
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Converted to new SRS template; integrated replay-driven considerations into design table. | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Converted to new SRS template; integrated replay-driven considerations into design table. | Nexus Team (Codex) |  |
 
 ---
 

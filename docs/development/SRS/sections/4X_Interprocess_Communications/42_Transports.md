@@ -1,7 +1,7 @@
 # 42 — Transports
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Status:** Proposed
 **Version:** 0.1.0
@@ -220,3 +220,12 @@ typed APIs delivered via gRPC or struct ABIs.
 - Bridge plugin converts struct payloads to gRPC/WebSocket frames, preserving timestamps and audit metadata.
 
 ---
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

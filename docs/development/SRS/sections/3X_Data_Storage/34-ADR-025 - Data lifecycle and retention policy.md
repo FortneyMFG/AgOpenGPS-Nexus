@@ -1,9 +1,12 @@
 # ADR-025: Data lifecycle and retention policy
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** Mapping, Variable Mapping, Telemetry Logging, Job Tasks, UI Shell
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
 
 
 
@@ -38,3 +41,12 @@ Field deployments accumulate large PoseStream, tile, and derived datasets that m
 - [ADR-009: PoseStream vector logs and layer TileStore persistence](ADR-009-posestream-vector-tilestore-persistence.md)
 - [ADR-019: Provenance, audit, and QA governance](ADR-019-provenance-audit-qa.md)
 - [ADR-020: Determinism, replay, and CI guardrails](ADR-020-determinism-replay-ci.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

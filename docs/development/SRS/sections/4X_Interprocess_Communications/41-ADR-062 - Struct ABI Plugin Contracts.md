@@ -1,5 +1,14 @@
 # 41-ADR-062 — Struct ABI Plugin Contracts with Bridge Adapter
 
+*(Status: Drafting)*
+
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
+
 - **Status:** Draft
 - **Deciders:** Interprocess Communications WG, SDK WG
 - **Date:** 2025-10-24
@@ -67,4 +76,12 @@ Define a **dual-surface contract strategy**:
 - Update plugin SDK documentation to describe struct ABI usage, version negotiation, and bridge packaging.
 - Define manifest fields for struct ABI versions and enforce them at load time.
 - Coordinate with Security WG to review memory-safety implications of exposing struct pointers to plugins.
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
 

@@ -1,7 +1,7 @@
 # 92 — Gauges & Machine Panels
 *(Status: Proposed)*
 
-**Author:** Codex  
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20  
 **Version:** 0.1.0  
 **Section ID:** 92  
@@ -183,9 +183,9 @@ No competing options are under review; gauge handling follows design considerati
 
 ### 92.15.1 Section Change Log
 
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Converted to SRS template; codified gauge metadata requirements. | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Converted to SRS template; codified gauge metadata requirements. | Nexus Team (Codex) |  |
 
 ---
 

@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Authors:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Plugins WG, Autonomy WG, UI WG
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -93,3 +93,12 @@ It reduces manual boundary management, enforces keep-outs as first-class inputs,
 - [ADR-027 — Spatial Constraints & Zone Policies](../ADR/ADR-027-spatial-constraints.md)
 - [ADR-018 — Capability Discovery](../ADR/ADR-018-capability-discovery.md)
 - [Fields2Cover documentation](https://fields2cover.github.io/)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

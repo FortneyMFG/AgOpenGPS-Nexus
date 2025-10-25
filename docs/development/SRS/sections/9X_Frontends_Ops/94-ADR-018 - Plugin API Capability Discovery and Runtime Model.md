@@ -1,9 +1,13 @@
 # ADR-018: Plugin API, Capability Discovery, and Runtime Model
 
-## Status
-Proposed
+*(Status: Proposed)*
 
-**Relevant Plugin(s):** Full Stack
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
 
 
 ## Context
@@ -56,3 +60,12 @@ Establish a gRPC-first plugin architecture composed of:
 - [Section 94 — Extensibility, Packaging & Updates](../sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 - [ADR-002 — Expose Nexus services over gRPC/protobuf contracts](ADR-002-grpc-contracts.md)
 - [ADR-004 — Composite simulation fabric](ADR-004-composite-simulation.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

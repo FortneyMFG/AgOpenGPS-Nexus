@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Automation & Safety Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -114,3 +114,12 @@ graph could not guarantee predictable priority handling or auditability across p
 * [ADR-008 — Equipment hierarchy](61-ADR-008%20-%20Equipment%20Implement%20Toolbar%20Section%20hierarchy.md)
 * [ADR-007 — PoseStream and SectionState architecture](61-ADR-007%20-%20PoseStream%20and%20SectionState%20architecture.md)
 * [ADR-018 — Plugin API and capability discovery](../9X_Frontends_Ops/94-ADR-018%20-%20Plugin%20API%20and%20capability%20discovery.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

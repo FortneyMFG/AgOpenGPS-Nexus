@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Provenance & QA Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -109,3 +109,12 @@ security requirements.
 * [Persistence formats](../3X_Data_Storage/32_Persistence_Formats.md)
 * [ADR-009 — PoseStream vector logs and TileStore persistence](../6X_Core_Domain_Services/61-ADR-009%20-%20PoseStream%20vector%20logs%20and%20layer%20TileStore%20persistence.md)
 * [ADR-023 — Session and job model](62-ADR-023%20-%20Session%20and%20job%20model%20with%20provenance%20graph.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

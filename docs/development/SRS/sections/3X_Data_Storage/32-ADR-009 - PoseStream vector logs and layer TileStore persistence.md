@@ -1,9 +1,12 @@
 # ADR-009: PoseStream vector logs and layer TileStore persistence
 
-## Status
-In Review (target sign-off window: 2025-10-28 week)
+*(Status: In Review (target sign-off window: 2025-10-28 week))*
 
-**Relevant Plugin(s):** Mapping, Variable Mapping, Telemetry Logging, Replay
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
 
 
 
@@ -36,3 +39,12 @@ To support deterministic replay, analytics, and long-term storage, Nexus needs a
 - [ADR-007: PoseStream and SectionState architecture](ADR-007-posestream-sectionstate-architecture.md)
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
 - [ADR-020: Determinism, replay, and CI](ADR-020-determinism-replay-ci.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

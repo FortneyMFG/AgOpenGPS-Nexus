@@ -1,9 +1,13 @@
 # ADR-014: Interop for prescription and agronomic formats
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** Variable Mapping, Rate Control, Mapping, Planter Monitor, File IO, Job Tasks
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
 
 
 ## Context
@@ -43,3 +47,12 @@ Nexus must import and export industry-standard agronomic formats—ISOXML TaskDa
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
 - [ADR-013: Derived products and prescription analytics](ADR-013-derived-products-analytics-prescriptions.md)
 - [ADR-022: CRS, units, and precision policy](ADR-022-crs-units-precision-policy.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

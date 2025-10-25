@@ -1,7 +1,7 @@
 # 77 — Variable Rate Control
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-24
 **Version:** 0.1.0
 **Section ID:** 77
@@ -135,4 +135,12 @@ Define the closed-loop control architecture that transforms mapped agronomic int
 | Option ID | Status | Type / Theme | Description | Reference Document |
 |-----------|--------|--------------|-------------|--------------------|
 | — | — | — | All trade-offs incorporated as design considerations in §77.8. | — |
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
 

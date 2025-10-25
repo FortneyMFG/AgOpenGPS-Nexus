@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Session Lifecycle Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -143,3 +143,12 @@ crash recovery.
 * [Job Lifecycle SRS section](62_Job_Lifecycle.md)
 * [TaskService work order integration](62_Job_Lifecycle.md#work-orders-task-orchestration)
 * [Provenance governance](64-ADR-019%20-%20Provenance%20audit%20and%20QA%20governance.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

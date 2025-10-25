@@ -1,7 +1,7 @@
 # 72 — Mapping Layers Plugin
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Version:** 0.1.0
 **Section ID:** 72
@@ -162,3 +162,12 @@ Specify expectations for Nexus mapping plugins that render coverage, agronomic o
 | Editing | Shared LayerEditService with journaling | Plugin-specific tools, no shared undo |
 | Telemetry | Commanded vs. actual metrics exported | Limited or no telemetry hooks |
 | Import/Export | Normalized ingest with provenance capture | Manual GIS conversions |
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

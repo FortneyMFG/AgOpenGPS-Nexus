@@ -1,7 +1,7 @@
 # 41-ADR-002 — Expose Nexus services over gRPC/protobuf contracts
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Interprocess Communications Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -111,4 +111,12 @@ ensure legacy PGNs remain usable, and the shared proto repository simplifies gov
 | Status quo PGNs | Continue exposing only UDP/serial PGNs. | Lacks typed contracts, version negotiation, and Linux-friendly APIs. |
 | REST/JSON facade | Wrap PGNs in REST/JSON endpoints. | Adds latency and lacks streaming semantics required by guidance. |
 | MQTT/AMQP | Adopt brokered pub/sub for all transports. | Introduces new infrastructure while duplicating bridge responsibilities. |
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
 

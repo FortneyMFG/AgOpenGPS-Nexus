@@ -1,7 +1,7 @@
 # 43 — Channel Security
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Status:** Proposed
 **Version:** 0.1.0
@@ -175,3 +175,12 @@ legacy PGN bridges.
 - Recovery procedures document how to revoke compromised tokens and reprovision devices without reinstalling transports.
 
 ---
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

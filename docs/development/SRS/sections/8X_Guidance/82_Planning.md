@@ -1,7 +1,7 @@
 # 82 — Planning
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Version:** 0.1.0
 **Section ID:** 82
@@ -148,3 +148,12 @@ This section captures planner responsibilities, caching strategies, fallback beh
 - [ADR-033 — Guidance planner and autosteer orchestration](81-ADR-033%20-%20Guidance%20planner%20and%20autosteer%20orchestration.md)
 - [ADR-069 — Guidance Orchestrator plugin](81-ADR-069%20-%20Guidance%20Orchestrator%20plugin.md)
 - [Fields2Cover documentation](https://fields2cover.github.io/)
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Kinematics Runtime Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -178,3 +178,12 @@ These snippets align with the articulated tractor example in Appendix samples an
 * [ADR-017 — Equipment profiles and kinematics](61-ADR-017%20-%20Equipment%20profiles%20and%20kinematics.md)
 * [ADR-033 — Guidance planner and autosteer orchestration](../6X_Core_Domain_Services/61-ADR-033%20-%20Guidance%20planner%20and%20autosteer%20orchestration.md)
 * [ADR-028 — Stack boundaries](../6X_Core_Domain_Services/61-ADR-028%20-%20Stack%20boundaries.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

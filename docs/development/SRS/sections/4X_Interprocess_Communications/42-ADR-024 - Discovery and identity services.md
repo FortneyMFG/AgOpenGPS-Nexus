@@ -1,7 +1,7 @@
 # 42-ADR-024 — Discovery and identity services
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Interprocess Communications Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -78,4 +78,12 @@ compliance and diagnostics.
 | Status quo discovery | Continue ad-hoc UDP announcements. | Inconsistent naming, no leases, weak security. |
 | Manual registry management | Rely on operators editing config files. | Error-prone, lacks telemetry, unsuitable for multi-node rigs. |
 | External identity provider | Outsource discovery to third-party IAM. | Adds dependencies and complexity unsuited for offline rigs. |
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
 

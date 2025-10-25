@@ -71,3 +71,12 @@ builder and analytics.
 - Fulfills session snapshot and overlay requirements R-DATA-042 and R-DATA-048 in §08 Data Model & Storage.【F:docs/sections/3X_Data_Storage/32_Persistence_Formats.md†L30-L36】
 - Wires weather logging hooks into §03 Job Lifecycle events (`onSessionWeatherUpdate`).【F:docs/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L31-L35】
 - Powers weather overlays and timelines required by R-FE-074 and R-FE-075 in §05 Frontends.【F:docs/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L29-L31】
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

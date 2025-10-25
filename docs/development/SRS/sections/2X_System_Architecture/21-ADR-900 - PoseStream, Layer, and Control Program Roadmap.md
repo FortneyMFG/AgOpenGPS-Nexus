@@ -2,7 +2,7 @@
 
 *(Status: Accepted)*
 
-**Authors:** @architecture-wg
+**Authors:** Nexus Team (Codex)
 **Reviewers:** @nexus-specs, @program-management
 **Created:** -
 **Last Updated:** -
@@ -138,10 +138,10 @@ graph TD
 
 ## 11) Change Log
 
-| Date | Change | Author | PR / Issue |
-|------|--------|--------|------------|
-| - | Initial roadmap ADR created. | @architecture-wg | #0000 |
-| - | Reformatted to ADR template; added risk/governance details. | @architecture-wg | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| - | Initial roadmap ADR created. | Nexus Team (Codex) |  |
+| - | Reformatted to ADR template; added risk/governance details. | Nexus Team (Codex) |  |
 
 ---
 

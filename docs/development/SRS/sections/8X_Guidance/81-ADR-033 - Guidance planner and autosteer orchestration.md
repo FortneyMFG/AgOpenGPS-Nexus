@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Authors:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Guidance WG, Autonomy WG, UI WG
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -92,3 +92,12 @@ Alternatives relying on legacy ad-hoc planners fail to satisfy zone policies, te
 - [ADR-027 — Spatial constraints and zone policies](../ADR/ADR-027-spatial-constraints.md)
 - [ADR-068 — Layer controllers and aggregation runtime](../ADR/ADR-068-layer-controllers-runtime.md)
 - [ADR-017 — Equipment profiles and kinematics](../ADR/ADR-017-profiles-kinematics.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

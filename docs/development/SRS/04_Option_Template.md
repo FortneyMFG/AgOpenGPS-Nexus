@@ -5,7 +5,7 @@
 **Option ID:** [Section]-O#
 **Section ID:** [Section] — [Section Title]
 **Version:** 0.1.0
-**Authors:** [Names]
+**Authors:** Nexus Team (Codex)
 **Reviewers:** [Working Group or Reviewers]
 **Created:** YYYY-MM-DD
 **Last Updated:** YYYY-MM-DD
@@ -187,11 +187,11 @@ flowchart LR
 
 ## 17) Change Log
 
-| Date       | Change         | Author | PR / Issue |
-| ---------- | -------------- | ------ | ---------- |
-| YYYY-MM-DD | Initial draft  | [Name] | [#]        |
-| YYYY-MM-DD | Review updates | [Name] | [#]        |
-| YYYY-MM-DD | Approved       | [Name] | [#]        |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| YYYY-MM-DD | Initial draft | Nexus Team (Codex) |  |
+| YYYY-MM-DD | Review updates | Nexus Team (Codex) |  |
+| YYYY-MM-DD | Approved | Nexus Team (Codex) |  |
 
 ---
 

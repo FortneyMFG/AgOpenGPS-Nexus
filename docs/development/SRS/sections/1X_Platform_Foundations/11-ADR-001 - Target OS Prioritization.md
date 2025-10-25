@@ -137,7 +137,7 @@ tiers keeps expansion visible without diluting the mandatory desktop experience.
 
 ## 8) Change Log
 
-| Date | Change | Author |
-|------|--------|--------|
-| 2025-10-20 | Initial acceptance of Windows/Linux support policy. | Nexus Team (Fortney) |
-| 2025-10-24 | Expanded preview/companion notes; aligned with Section 11 parity checklist. | Nexus Team (Fortney) |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial acceptance of Windows/Linux support policy. | Nexus Team (Fortney) |  |
+| 2025-10-24 | Expanded preview/companion notes; aligned with Section 11 parity checklist. | Nexus Team (Fortney) |  |

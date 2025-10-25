@@ -1,21 +1,21 @@
 # 14 — Build Environment & Tooling
 
+*(Status: Proposed)*
+
+**Section ID:** 14
+**Version:** 0.1.0
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-20
+**Last Updated:** 2025-10-25
+**Related Sections:** 11 — OS Support, 12 — Development Language & Runtime, 96 — Quality Engineering & Release
+**Related Decisions:** `14-ADR-001 — Standardize Build Environment & Tooling`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
+**Upstream Dependencies:** §12 — Runtime Governance, §96 — QE Policies
+**Downstream Impacts:** Release pipelines and developer onboarding
+**Reviewers:** Release & Tooling Working Group
+
 > **In plain terms:** Anyone can spin up the Nexus build in minutes, the CI
 > machines use the exact same scripts, and secrets stay locked away so signed
 > installers and packages are always trustworthy.
-
-*(Status: Proposed)*  
-
-**Author:** Codex  
-**Created:** 2025-10-20  
-**Version:** 0.1.0  
-**Section ID:** 14  
-**Editors:** Release & Tooling Working Group  
-**Last Updated:** 2025-10-25  
-**Related Sections:** 11 — OS Support, 12 — Development Language & Runtime, 96 — Quality Engineering & Release  
-**Related Decisions:** `14-ADR-001 — Standardize Build Environment & Tooling`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`  
-**Upstream Dependencies:** §12 — Runtime Governance, §96 — QE Policies  
-**Downstream Impacts:** Release pipelines and developer onboarding  
 
 ---
 
@@ -186,20 +186,15 @@ Future alternatives (e.g., Bazel or Nix build systems) require separate option d
 
 ---
 
-## 14.15 Community Sentiment  
+## 14.15 Community Sentiment
 
-- Developers prefer VS Code + scripts over manual IDE setup.  
-- Release team prioritizes signed, reproducible artifacts before public betas.  
-- Security group supports GitHub Actions with vault integration and SBOM output.  
-
-| Date | Summary | PR / Issue |
-|------|----------|------------|
-| 2025-10-20 | Standardized build tooling section drafted. | #0000 |
-| 2025-10-25 | Updated to reflect VS Code + GitHub Actions workflow. | #0001 |
+- Developers prefer VS Code + scripts over manual IDE setup.
+- Release team prioritizes signed, reproducible artifacts before public betas.
+- Security group supports GitHub Actions with vault integration and SBOM output.
 
 ---
 
-## 14.16 Traceability  
+## 14.16 Traceability
 
 | Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
 |----------------|-------------------|--------|-----------------------|--------------------------|
@@ -218,7 +213,17 @@ Implementation conforms when:
 
 ---
 
-## Standards Context  
+## 14.18 Standards Context
 
-Aligned with **SLSA Level 2** (Supply-chain Levels for Software Artifacts),  
-**NIST SSDF** secure build guidelines, and **ISO/IEC/IEEE 29148:2018** for requirement traceability.  
+Aligned with **SLSA Level 2** (Supply-chain Levels for Software Artifacts),
+**NIST SSDF** secure build guidelines, and **ISO/IEC/IEEE 29148:2018** for requirement traceability.
+
+
+---
+
+## 14.19 Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Standardized build tooling section drafted. | Nexus Team (Codex) |  |
+| 2025-10-25 | Updated to reflect VS Code + GitHub Actions workflow. | Nexus Team (Codex) |  |

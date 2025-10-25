@@ -121,14 +121,14 @@
 
   <Grid RowDefinitions="Auto,*"
         Background="#111111">
-    <Border Grid.Row="0"
-            Background="#2A2A2A"
-            BorderBrush="#444444"
-            BorderThickness="0,0,0,1">
-      <Grid ColumnDefinitions="Auto,*,Auto"
-            Height="40"
-            VerticalAlignment="Center"
-            Padding="20,0">
+      <Border Grid.Row="0"
+              Background="#2A2A2A"
+              BorderBrush="#444444"
+              BorderThickness="0,0,0,1"
+              Padding="20,0">
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              Height="40"
+              VerticalAlignment="Center">
         <Menu Grid.Column="0"
               Classes="menu-bar">
           <MenuItem Header="{Binding Host.ShellMenuBar.FileMenu.Header}"
@@ -199,32 +199,33 @@
       <Border HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
               Opacity="{Binding Layout.IsLocked, Converter={StaticResource LockStateToGridOpacityConverter}}">
-        <Border.Background>
-          <DrawingBrush TileMode="Tile"
-                        Stretch="None"
-                        AlignmentX="Left"
-                        AlignmentY="Top"
-                        Viewport="0,0,40,40"
-                        ViewportUnits="Absolute">
-            <DrawingBrush.Drawing>
-              <DrawingGroup>
-                <GeometryDrawing Brush="#1FFFFFFF">
-                  <GeometryDrawing.Geometry>
-                    <RectangleGeometry Rect="0,0,40,40" />
-                  </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{Pen Brush=#33FFFFFF Thickness=1}">
-                  <GeometryDrawing.Geometry>
-                    <GeometryGroup>
-                      <LineGeometry StartPoint="0,0" EndPoint="40,0" />
-                      <LineGeometry StartPoint="0,0" EndPoint="0,40" />
-                    </GeometryGroup>
-                  </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-              </DrawingGroup>
-            </DrawingBrush.Drawing>
-          </DrawingBrush>
-        </Border.Background>
+          <Border.Background>
+            <DrawingBrush TileMode="Tile"
+                          Stretch="None"
+                          AlignmentX="Left"
+                          AlignmentY="Top">
+              <DrawingBrush.Drawing>
+                <DrawingGroup>
+                  <GeometryDrawing Brush="#1FFFFFFF">
+                    <GeometryDrawing.Geometry>
+                      <RectangleGeometry Rect="0,0,40,40" />
+                    </GeometryDrawing.Geometry>
+                  </GeometryDrawing>
+                  <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                      <Pen Brush="#33FFFFFF" Thickness="1" />
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                      <GeometryGroup>
+                        <LineGeometry StartPoint="0,0" EndPoint="40,0" />
+                        <LineGeometry StartPoint="0,0" EndPoint="0,40" />
+                      </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                  </GeometryDrawing>
+                </DrawingGroup>
+              </DrawingBrush.Drawing>
+            </DrawingBrush>
+          </Border.Background>
       </Border>
 
       <Border Margin="80,40,40,40"
@@ -281,13 +282,13 @@
         </StackPanel>
       </ToggleButton>
 
-      <Popup x:Name="FieldSettingsMenu"
-             PlacementTarget="{Binding #FieldSettingsToggle}"
-             Placement="Right"
-             VerticalOffset="-20"
-             IsOpen="{Binding IsFieldMenuOpen, Mode=TwoWay}"
-             StaysOpen="False"
-             Closed="OnFieldSettingsMenuClosed">
+        <Popup x:Name="FieldSettingsMenu"
+               PlacementTarget="{Binding #FieldSettingsToggle}"
+               Placement="Right"
+               VerticalOffset="-20"
+               IsOpen="{Binding IsFieldMenuOpen, Mode=TwoWay}"
+               IsLightDismissEnabled="True"
+               Closed="OnFieldSettingsMenuClosed">
         <Border Background="#1E1E1E"
                 BorderBrush="#555555"
                 BorderThickness="2"

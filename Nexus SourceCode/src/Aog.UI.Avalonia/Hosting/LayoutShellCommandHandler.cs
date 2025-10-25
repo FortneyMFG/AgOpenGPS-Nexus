@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Aog.UI.Avalonia.ViewModels.Shell;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Aog.UI.Avalonia.Hosting;
@@ -11,17 +12,16 @@ namespace Aog.UI.Avalonia.Hosting;
 /// </summary>
 public sealed class LayoutShellCommandHandler : IShellCommandHandler
 {
-    private readonly BlockLayoutViewModel _layout;
-    private readonly AppShellViewModel _shell;
+    private readonly IServiceProvider _services;
+    private BlockLayoutViewModel? _layout;
+    private AppShellViewModel? _shell;
     private readonly ILogger<LayoutShellCommandHandler> _logger;
 
     public LayoutShellCommandHandler(
-        BlockLayoutViewModel layout,
-        AppShellViewModel shell,
+        IServiceProvider services,
         ILogger<LayoutShellCommandHandler> logger)
     {
-        _layout = layout ?? throw new ArgumentNullException(nameof(layout));
-        _shell = shell ?? throw new ArgumentNullException(nameof(shell));
+        _services = services ?? throw new ArgumentNullException(nameof(services));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -56,13 +56,21 @@ public sealed class LayoutShellCommandHandler : IShellCommandHandler
 
     private bool ToggleFieldDock()
     {
-        var shouldPin = !_layout.IsFieldDockPinned;
-        _layout.IsFieldDockPinned = shouldPin;
-        _shell.StatusText = shouldPin
+        var layout = GetLayout();
+        var shouldPin = !layout.IsFieldDockPinned;
+        layout.IsFieldDockPinned = shouldPin;
+        var shell = GetShell();
+        shell.StatusText = shouldPin
             ? "Field settings dock pinned. Drag blocks onto the workspace."
             : "Field settings dock hidden.";
         return true;
     }
+
+    private BlockLayoutViewModel GetLayout() =>
+        _layout ??= _services.GetRequiredService<BlockLayoutViewModel>();
+
+    private AppShellViewModel GetShell() =>
+        _shell ??= _services.GetRequiredService<AppShellViewModel>();
 
     private bool LogUnknown(string commandId)
     {

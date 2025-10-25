@@ -22,6 +22,13 @@ public class BlockLayoutStoreTests
         instances.Should().Contain(i => i.DefinitionId.Value == "Menu.EquipmentControls" && i.Origin == BlockOrigin.Canonical);
         instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.AutoSteerToggle" && i.Origin == BlockOrigin.Canonical);
         instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.AutoSteerToggle" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Overlay);
+        instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.FieldSettings" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Left);
+        instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.MapTools" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Left);
+        instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.Guidance" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Left);
+        instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.Equipment" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Left);
+        instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.Coverage" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Left);
+        instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.Hydraulics" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Left);
+        instances.Should().Contain(i => i.DefinitionId.Value == "Cmd.AbLines" && i.Origin == BlockOrigin.Clone && i.Region == BlockRegion.Left);
         preferences.ShellLayout.Instances.Should().NotBeEmpty();
     }
 

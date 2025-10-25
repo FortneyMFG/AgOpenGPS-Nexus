@@ -148,6 +148,12 @@ public sealed class BlockLayoutStore : IBlockLayoutStore
     {
         var changed = false;
         changed |= EnsureClone(layout, "Cmd.FieldSettings", BlockRegion.Left, 0, BlockSize.Tile1x2);
+        changed |= EnsureClone(layout, "Cmd.MapTools", BlockRegion.Left, 1);
+        changed |= EnsureClone(layout, "Cmd.Guidance", BlockRegion.Left, 2);
+        changed |= EnsureClone(layout, "Cmd.Equipment", BlockRegion.Left, 3);
+        changed |= EnsureClone(layout, "Cmd.Coverage", BlockRegion.Left, 4);
+        changed |= EnsureClone(layout, "Cmd.Hydraulics", BlockRegion.Left, 5);
+        changed |= EnsureClone(layout, "Cmd.AbLines", BlockRegion.Left, 6);
         changed |= EnsureFloatingShortcut(layout, "Cmd.AutoSteerToggle", 0, 48, 48);
         changed |= EnsureFloatingShortcut(layout, "Cmd.ABLineCycle", 1, 232, 48);
         changed |= EnsureFloatingShortcut(layout, "Cmd.UTurnToggle", 2, 416, 48);

@@ -1,7 +1,7 @@
 # 94 — Extensibility, Packaging & Updates
 *(Status: Proposed)*
 
-**Author:** Codex  
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20  
 **Version:** 0.1.0  
 **Section ID:** 94  
@@ -248,9 +248,9 @@ No alternative extensibility proposals are under evaluation; modernization focus
 
 ### 94.15.1 Section Change Log
 
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Converted to new SRS template; organized requirements into governance, simulation, and lifecycle groups. | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Converted to new SRS template; organized requirements into governance, simulation, and lifecycle groups. | Nexus Team (Codex) |  |
 
 ---
 

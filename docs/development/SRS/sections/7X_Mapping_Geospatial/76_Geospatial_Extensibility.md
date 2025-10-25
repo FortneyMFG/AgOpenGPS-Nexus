@@ -1,7 +1,7 @@
 # 76 — Geospatial Extensibility
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Version:** 0.1.0
 **Section ID:** 76
@@ -158,3 +158,12 @@ Establish policies and tooling that let third parties introduce new geospatial l
 | Editing Experience | Shared LayerEditService extensions | Custom, inconsistent tooling |
 | Import/Export | Adapters with provenance preservation | Manual scripts with limited metadata |
 | Capability Discovery | Manifest-driven compatibility metadata | Implicit, error-prone assumptions |
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

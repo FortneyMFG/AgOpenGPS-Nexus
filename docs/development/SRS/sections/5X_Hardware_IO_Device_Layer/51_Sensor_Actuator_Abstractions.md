@@ -1,7 +1,7 @@
 # 51 — Sensor & Actuator Abstractions
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Status:** Proposed
 **Version:** 0.1.0
@@ -239,3 +239,12 @@ Hardware integrations observe the safety posture and timing budgets defined acro
 - End-to-end latency targets (<100 ms for control loops, <2 ms p50 for CM5 steer targets) align with the scheduling guarantees in §23 Threading, Scheduling & Timing so planners and controllers can trust publish cadences.【F:docs/development/SRS/sections/2X_System_Architecture/23_Threading_Scheduling_Timing.md†L137-L156】
 
 Configuration examples in Appendix samples (e.g., articulated tractor profiles) provide deterministic seeds, axle metadata, and mode policies that map directly onto these guardrails, ensuring simulation fixtures and field deployments behave consistently.
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

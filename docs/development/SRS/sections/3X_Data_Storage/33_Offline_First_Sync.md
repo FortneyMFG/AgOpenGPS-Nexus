@@ -1,7 +1,7 @@
 # 33 — Offline-first & Sync
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Section ID:** 33
 **Version:** 0.1.0
@@ -169,3 +169,12 @@ Constraints:
 - [ADR-028 — Stack Boundaries](../../ADR/ADR-028-stack-boundaries.md)
 
 ---
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

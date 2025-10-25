@@ -1,9 +1,13 @@
 # ADR-031: Official Plugin Bundle Dependency Governance
 
-## Status
-Proposed
+*(Status: Proposed)*
 
-**Relevant Plugin(s):** Mapping, Autosteer, Section Control, Rate Control, Variable Mapping, Device Manager, Telemetry Logging, UI Shell, Job Tasks
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
 
 
 ## Context
@@ -55,3 +59,12 @@ Adopt the plugin dependency map as the authoritative specification for the first
 - [SRS §05 — Frontends](../sections/9X_Frontends_Ops/91_UI_Shell_Layout.md)
 - [SRS §06 — Hardware I/O](../sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md)
 - [ADR Roadmap](ADR-roadmap.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

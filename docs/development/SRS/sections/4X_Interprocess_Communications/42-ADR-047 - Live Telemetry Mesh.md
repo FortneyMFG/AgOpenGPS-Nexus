@@ -1,7 +1,7 @@
 # 42-ADR-047 — Live Telemetry Mesh
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Nexus Architecture Guild
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -80,4 +80,12 @@ provide resilience on constrained links. Storing deltas as `LayerEditEvent` jour
 | Manual file sync | Copy coverage/layer files between machines. | High latency, prone to conflicts, no real-time collaboration. |
 | Central cloud broker | Route all telemetry through an external service. | Dependent on connectivity; unacceptable for offline fields. |
 | Peer-to-peer TCP mesh | Build custom TCP overlay per device. | Poor performance on lossy links; lacks QoS governance. |
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
 

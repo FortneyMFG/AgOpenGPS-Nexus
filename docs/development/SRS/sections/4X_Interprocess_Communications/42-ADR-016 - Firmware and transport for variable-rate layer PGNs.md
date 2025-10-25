@@ -1,7 +1,7 @@
 # 42-ADR-016 — Firmware and transport for variable-rate layer PGNs
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Interprocess Communications Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -79,4 +79,12 @@ sections fail closed within 300 ms if communication is lost.
 | Maintain legacy PGNs | Keep existing layer PGNs without registry hashes. | No drift detection; unsafe failure modes. |
 | Push all telemetry via gRPC | Skip PGNs and rely on typed APIs only. | Firmware lacks capacity; PGN clients would break. |
 | Custom vendor-specific frames | Allow OEM-specific payloads per implement. | Fragmented ecosystem and higher maintenance cost. |
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
 

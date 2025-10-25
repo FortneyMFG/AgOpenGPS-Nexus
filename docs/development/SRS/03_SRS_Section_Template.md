@@ -307,10 +307,10 @@ Capture relevant contributor discussions and alignment of community feedback.
 
 ### [X.15.1] Section Change Log
 
-| Date       | Summary                                | PR / Issue |
-|------------|----------------------------------------|------------|
-| 2025-10-20 | Initial draft of requirements & options | #0000      |
-| - | Approve [X]-O2; add verification plan   | #0000      |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft of requirements & options | Nexus Team (Codex) |  |
+| - | Approve [X]-O2; add verification plan | Nexus Team (Codex) |  |
 
 ---
 

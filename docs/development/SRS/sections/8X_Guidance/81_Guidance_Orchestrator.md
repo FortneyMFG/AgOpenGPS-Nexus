@@ -1,7 +1,7 @@
 # 81 — Guidance Orchestrator
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Version:** 0.1.0
 **Section ID:** 81
@@ -188,3 +188,12 @@ This section defines the orchestration behaviors, UX responsibilities, and contr
 - [ADR-027 — Spatial constraints and zone policies](../ADR/ADR-027-spatial-constraints.md)
 - [ADR-044 — Zone & layer drawing framework](../ADR/ADR-044_ZoneDrawingFramework.md)
 - [How-to: guidance lane contracts](../howto/guidance-lane-contracts.md)
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

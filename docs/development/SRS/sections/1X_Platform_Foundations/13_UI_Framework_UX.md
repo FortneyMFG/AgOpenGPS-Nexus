@@ -1,9 +1,9 @@
 # 13 — UI Framework & UX Language  
 *(Status: Drafting — Decision Agnostic)*  
 
-**Section ID:** 13  
-**Version:** 0.1.0  
-**Editors:** UI Working Group (Fortney + Codex)  
+**Section ID:** 13
+**Version:** 0.1.0
+**Authors:** Nexus Team (Codex)
 **Last Updated:** 2025-10-25  
 **Related Sections:** 11 — OS Support, 12 — Development Language & Runtime, 9X — Frontends & Ops  
 **Related Decisions:** `13-ADR-001 — Adopt Avalonia as Nexus UI Shell`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`  
@@ -223,16 +223,6 @@ Define viable UI framework and UX strategy options for Nexus, balancing moderniz
 - Contributors endorse Avalonia due to shared C# skill set and mobile ambitions.
 - UX working group emphasizes metadata-driven approach to reduce manual dashboard wiring.
 
-### 13.15.1 Section Change Log
-
-| Date | Summary | PR / Issue |
-|------|----------|------------|
-| 2025-10-20 | Converted UI framework section to standardized template. | #0000 |
-| 2025-10-25 | Added Avalonia transition path, run-mode verification, and accessibility baseline. | #0001 |
-
-
----
-
 ## 13.16 Traceability
 
 | Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
@@ -250,6 +240,16 @@ An implementation conforms when legacy UI obligations are met, modernization req
 
 ---
 
-## Standards Context
+## 13.18 Standards Context
 
 Aligns with **ISO/IEC/IEEE 29148:2018** for UI requirement traceability and W3C accessibility guidelines (WCAG 2.1 AA) for operator-facing interfaces.
+
+
+---
+
+## 13.19 Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Converted UI framework section to standardized template. | Nexus Team (Codex) |  |
+| 2025-10-25 | Added Avalonia transition path, run-mode verification, and accessibility baseline. | Nexus Team (Codex) |  |

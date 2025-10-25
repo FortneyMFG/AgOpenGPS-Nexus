@@ -1,7 +1,7 @@
 # 32 — Persistence & Formats
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Section ID:** 32
 **Version:** 0.1.0
@@ -229,3 +229,12 @@ Assumptions:
 - Hash schema-critical fields and package layer assets with configuration bundles so offline rigs detect drift, manage memory, and gate migrations behind explicit version upgrades.
 
 ---
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

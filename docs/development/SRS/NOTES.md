@@ -1,5 +1,13 @@
 # SRS Notes Redirect
 
+*(Status: Drafting)*
+
+**Authors:** Nexus Team (Codex)
+**Last Updated:** 2025-10-24
+
+---
+
+
 The historical `docs/SRS/NOTES.md` overview has moved. Use the section
 shortcuts below to jump into the current SRS files.
 
@@ -78,3 +86,11 @@ shortcuts below to jump into the current SRS files.
 
 ## SRS §5.8 Verification
 - [Verification](sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Notes scaffold captured | Nexus Team (Codex) |  |

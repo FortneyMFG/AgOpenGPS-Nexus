@@ -1,7 +1,7 @@
 # 42-ADR-048 — RadioBridge for ELRS/LoRa Telemetry
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Nexus Architecture Guild
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -79,4 +79,12 @@ AES-CCM encryption and ACLs protect sensitive data.
 | TCP over cellular modems | Use cellular networks for inter-machine telemetry. | Unreliable coverage, higher operating cost. |
 | UDP broadcast without bridge | Broadcast mesh topics raw over radios. | Lacks retransmission, encryption, and bandwidth governance. |
 | Third-party industrial radio stack | Adopt proprietary telemetry platforms. | Locks Nexus into vendor ecosystems and limits extensibility. |
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
 

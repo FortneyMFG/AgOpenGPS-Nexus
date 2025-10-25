@@ -72,3 +72,12 @@ Templates define header metadata, required data sources, and widget layout. Plug
 - Addresses report template governance R-DATA-049 in §08 Data Model & Storage and related packaging guidance.【F:docs/sections/3X_Data_Storage/32_Persistence_Formats.md†L37-L38】
 - Supplies generate/preview flows defined by R-FE-076 in §05 Frontends.【F:docs/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L31】
 - Requires plugin registration and export packaging policies covered in §12 Extensibility.【F:docs/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L18-L36】
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

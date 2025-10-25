@@ -2,7 +2,7 @@
 
 *(Status: Accepted)*
 
-**Authors:** @layer-wg
+**Authors:** Nexus Team (Codex)
 **Reviewers:** @nexus-specs, @mapping-guild
 **Created:** -
 **Last Updated:** -
@@ -138,10 +138,10 @@ graph TD
 
 ## 11) Change Log
 
-| Date | Change | Author | PR / Issue |
-|------|--------|--------|------------|
-| - | Decision accepted by Core & Mapping guild. | @layer-wg | #0000 |
-| - | Reformatted to ADR template; added governance and risk tables. | @layer-wg | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| - | Decision accepted by Core & Mapping guild. | Nexus Team (Codex) |  |
+| - | Reformatted to ADR template; added governance and risk tables. | Nexus Team (Codex) |  |
 
 ---
 

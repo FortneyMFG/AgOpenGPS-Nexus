@@ -1,9 +1,13 @@
 # ADR-027: Spatial Constraints & Zone Policies
 
-## Status
-Accepted — - architecture guild review
+*(Status: Accepted — - architecture guild review)*
 
-**Relevant Plugin(s):** Mapping, Autosteer, Section Control, Rate Control, Variable Mapping, UI Shell
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
 
 
 ## Context
@@ -79,3 +83,12 @@ Example JSON representation:
 - [Section 32 — Persistence & Formats](../sections/3X_Data_Storage/32_Persistence_Formats.md)
 - [Section 61 — Kinematics & Pose Fusion](../sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
 - [Section 64 — Telemetry & Health](../sections/6X_Core_Domain_Services/64_Telemetry_Health.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

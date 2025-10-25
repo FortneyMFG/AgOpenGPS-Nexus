@@ -1,9 +1,12 @@
 # ADR-013: Derived products and prescription analytics
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** Variable Mapping, Mapping, Rate Control, Telemetry Logging, Job Tasks
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
 
 
 
@@ -44,3 +47,12 @@ Turning PoseStream-derived datasets (yield, soil, NDVI) into actionable prescrip
 - [ADR-012: Multi-session and multi-PoseStream fusion](ADR-012-multi-session-posestream-fusion.md)
 - [ADR-014: Interop for prescriptions and agronomic formats](ADR-014-interop-prescription-formats.md)
 - [ADR-019: Provenance, audit, and QA](ADR-019-provenance-audit-qa.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

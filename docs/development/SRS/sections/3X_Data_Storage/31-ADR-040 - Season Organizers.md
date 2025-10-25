@@ -95,3 +95,12 @@ cached analytics and register interest in seasonal overlays before sessions begi
 - [Section 62 — Job Lifecycle](../sections/6X_Core_Domain_Services/62_Job_Lifecycle.md)
 - [Section 21 — System Decomposition & Boundaries](../sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md)
 - [ADR-023 — Session & Job Model](ADR-023-session-job-model.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

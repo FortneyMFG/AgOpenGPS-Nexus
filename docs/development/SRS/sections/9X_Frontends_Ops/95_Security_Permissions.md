@@ -1,7 +1,7 @@
 # 95 — Security & Permissions
 *(Status: Proposed)*
 
-**Author:** Codex  
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20  
 **Version:** 0.1.0  
 **Section ID:** 95  
@@ -196,9 +196,9 @@ No alternative security framework is under evaluation; modernization proceeds vi
 
 ### 95.15.1 Section Change Log
 
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Converted to new SRS template; formalized security requirements and considerations. | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Converted to new SRS template; formalized security requirements and considerations. | Nexus Team (Codex) |  |
 
 ---
 

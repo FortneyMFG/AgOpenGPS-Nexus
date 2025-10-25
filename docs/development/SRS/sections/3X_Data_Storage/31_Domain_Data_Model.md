@@ -1,7 +1,7 @@
 # 31 — Domain Data Model
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Section ID:** 31
 **Version:** 0.1.0
@@ -212,3 +212,12 @@ The following summaries capture Core vs. plugin responsibilities per entity. Det
 - **WeatherOverlay.v1:** Raster overlays referencing weather sources with plugin-owned value arrays.【F:docs/sections/7X_Mapping_Geospatial/72-ADR-053 - Weather & Environment Plugin.md†L21-L49】
 
 ---
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

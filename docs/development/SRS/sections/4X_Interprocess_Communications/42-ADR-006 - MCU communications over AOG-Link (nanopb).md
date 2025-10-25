@@ -1,7 +1,7 @@
 # 42-ADR-006 — MCU communications over AOG-Link (nanopb)
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Interprocess Communications Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -78,4 +78,12 @@ to translate between nanopb datagrams, typed gRPC APIs, and legacy PGNs without 
 | Status quo PGNs | Continue using PGNs for MCU ↔ host messaging. | Lacked schema evolution, sequencing, and lightweight acks. |
 | JSON/REST MCU API | Wrap MCU messages in JSON over HTTP. | Payload overhead too large; unsuitable for low-bandwidth links. |
 | Vendor-specific CAN stacks | Adopt proprietary CAN SDKs per controller. | Fragments firmware support and sacrifices portability. |
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
 

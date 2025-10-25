@@ -1,7 +1,7 @@
 # 63 — Layer Registry & Journal Contracts
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Status:** Proposed
 **Version:** 0.1.0
@@ -180,9 +180,9 @@ access and for pairing delta journals with replay-driven CI.
 
 ### 63.15.1 Section Change Log
 
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Initial rewrite using v0.1 template. | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial rewrite using v0.1 template. | Nexus Team (Codex) |  |
 
 ---
 

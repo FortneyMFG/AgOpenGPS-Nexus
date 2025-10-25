@@ -1,13 +1,12 @@
 # ADR-029: Mapping as a plugin with a minimal geospatial kernel in Core
 
-## Status
-Accepted
+*(Status: Accepted)*
 
-The architecture review board signed off during NX-126, promoting this split as the
-authoritative baseline for Core and plugin pods. Future mapping work must uphold the
-capability and determinism guarantees codified below.
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
 
-**Relevant Plugin(s):** Mapping, Variable Mapping, Rate Control, Section Control, Telemetry Logging
+---
 
 
 
@@ -107,3 +106,12 @@ Services:
 - **NullMapping readiness:** NullMapping provider start-up on reference hardware must complete in under 350 ms at the 95th percentile and publish a healthy capability state before sections/plugins request pose transforms.
 - **Capability enforcement:** Integration tests must fail within 2 seconds when a plugin advertises incompatible `mapping:*` capabilities, with actionable diagnostics surfaced through the Device Manager contract.
 - **Deterministic taps:** A 60-minute PoseStream replay must generate identical raster tile checksums when executed with and without mapping plugins loaded, demonstrating deterministic tap semantics for regression harnesses.
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

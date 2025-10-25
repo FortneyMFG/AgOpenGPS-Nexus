@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Lifecycle & Provenance Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -110,3 +110,12 @@ behavior.
 * [Control & automation requirements](../6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md)
 * [ADR-019 — Provenance, audit, and QA governance](64-ADR-019%20-%20Provenance%20audit%20and%20QA%20governance.md)
 * [ADR-030 — Field job sessions and lifecycle services](62-ADR-030%20-%20Field%20job%20sessions%20and%20lifecycle%20services.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

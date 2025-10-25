@@ -1,9 +1,12 @@
 # ADR-022: CRS, units, and precision policy
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** Mapping, Variable Mapping, Rate Control, Telemetry Logging, File IO
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
 
 
 
@@ -40,3 +43,12 @@ Consistent coordinate reference systems (CRS), units, and numeric precision are 
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
 - [ADR-014: Interop for prescription and agronomic formats](ADR-014-interop-prescription-formats.md)
 - [ADR-029: Mapping plugin architecture](ADR-029-mapping-plugin-architecture.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

@@ -1,7 +1,7 @@
 # 34 — Backup, Retention & Archival
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Section ID:** 34
 **Version:** 0.1.0
@@ -164,3 +164,12 @@ Assumptions:
 - [A3] Schema registry and layer catalogue remain accessible for validating backup contents.【F:docs/sections/3X_Data_Storage/32_Persistence_Formats.md†L21-L156】
 
 ---
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

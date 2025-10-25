@@ -1,7 +1,7 @@
 # 53 — AOG-Link Compatibility
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Status:** Proposed
 **Version:** 0.1.0
@@ -207,3 +207,12 @@ Serial and CAN(FD) bindings append CRC-16-CCITT; UDP MAY omit CRC when underlyin
 | C5 — Firmware tooling | 4 | 4 | 5 | 4 | 4.25 |
 
 > **Informative:** Weighted scores assume compatibility 0.25, safety 0.25, maintainability 0.20, extensibility 0.20, operator experience 0.10.
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

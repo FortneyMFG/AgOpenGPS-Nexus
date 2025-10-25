@@ -83,3 +83,12 @@ coverage events to auto-write variety polygons during planting.
 - Delivers genetics record schemas required by R-DATA-044 and catalog coverage in §04 Mapping Layers.【F:docs/sections/3X_Data_Storage/32_Persistence_Formats.md†L32-L34】【F:docs/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L62-L67】
 - Threads barcode and variety change events through job lifecycle workflows (R-JOB-040…R-JOB-042).【F:docs/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L27-L75】
 - Documents plugin registration and governance obligations for genetics extensions in §12 Extensibility.【F:docs/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md†L18-L36】
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

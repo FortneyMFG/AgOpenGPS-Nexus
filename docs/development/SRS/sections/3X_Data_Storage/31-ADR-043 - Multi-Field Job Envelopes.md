@@ -104,3 +104,12 @@ metadata, bounding box/centroid hints, and the CRS used for the envelope. Plugin
 - [Section 62 — Job Lifecycle](../sections/6X_Core_Domain_Services/62_Job_Lifecycle.md)
 - [Section 72 — Mapping Layers Plugin](../sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md)
 - [ADR-040 — Season Organizers](ADR-040_SeasonOrganizers.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

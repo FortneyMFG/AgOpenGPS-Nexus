@@ -105,3 +105,12 @@ validation and provenance entries.
 - Delivers shared toolbar and attribute panel experiences required by R-FE-070, R-FE-071, and R-FE-093 in §05 Frontends.【F:docs/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L22-L36】
 - Binds editing lifecycle hooks referenced by R-FE-033 and related job lifecycle events in §03 Job Lifecycle.【F:docs/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L48】【F:docs/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L21-L35】
 - Adds `LayerEditEvent.v1` schema under `/schemas` with examples for regression testing.
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

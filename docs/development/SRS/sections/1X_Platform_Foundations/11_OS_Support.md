@@ -1,9 +1,9 @@
 # 11 — Operating System Support
 *(Status: drafting)*
 
-**Section ID:** 11  
-**Version:** 0.1.0  
-**Editors:** @owner, @reviewer  
+**Section ID:** 11
+**Version:** 0.1.0
+**Authors:** Nexus Team (Fortney)
 **Last Updated:** 2025-10-24
 **Related Sections:** 12 — Development Language & Runtime, 14 — Build Environment & Tooling
 **Related Decisions:** `11-ADR-001 — Establish Windows & Linux Support Baseline`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `13-ADR-001 — Use Avalonia for the Nexus Desktop UI Shell`
@@ -255,14 +255,6 @@ Defines how compliance with § 11.5 requirements will be validated and documente
 
 *(Reserved — optional; may remain blank until there is feedback.)*
 
-### 11.15.1 Section Change Log
-
-| Date       | Summary                     | PR / Issue |
-|------------|-----------------------------|------------|
-| 2025-10-24 | Initial draft (OS-only)     | #0000      |
-
----
-
 ## 11.16 Traceability
 
 | Requirement ID | Related Option(s) | ADR(s) | Verification Artifact | Implementation Reference |
@@ -292,9 +284,18 @@ An implementation **conforms** to §11 when:
 
 This section aligns with the following standards for software requirements and architecture documentation:
 
-- **ISO/IEC/IEEE 29148:2018** — *Systems and Software Engineering — Life Cycle Processes — Requirements Engineering.*  
+- **ISO/IEC/IEEE 29148:2018** — *Systems and Software Engineering — Life Cycle Processes — Requirements Engineering.*
 - **IEEE 1016:2017** — *Standard for Information Technology — System Design Descriptions (SDD).*
 
 > **Informative:** Inclusion ensures §11 remains compatible with recognized industry frameworks for requirements traceability and architectural decisions.
+
+
+---
+
+## 11.19 Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft (OS-only) | Nexus Team (Fortney) |  |
 
 

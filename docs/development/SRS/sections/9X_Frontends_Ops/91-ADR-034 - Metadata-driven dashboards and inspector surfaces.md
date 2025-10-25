@@ -1,9 +1,12 @@
 # ADR-034: Metadata-driven dashboards and inspector surfaces
 
-## Status
-Drafting (target review window: - week)
+*(Status: Drafting (target review window: - week))*
 
-**Relevant Plugin(s):** UI Shell (Dashboards), Mapping, Variable Mapping, Telemetry Logging, Device Manager
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
 
 
 
@@ -37,3 +40,12 @@ UI overlays, dashboards, and inspectors need to consume layer metadata without h
 - [Extensibility & plugin requirements](../sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md)
 - [ADR-010: Layer registry and variable-rate framework](ADR-010-layer-registry-variable-rate.md)
 - [ADR-068: Layer controllers and aggregation runtime](ADR-068-layer-controllers-runtime.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

@@ -1,7 +1,7 @@
 # 26 — Units, Conventions & Coordinate Systems
 *(Status: Draft)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-24
 **Version:** 0.1.0
 **Section ID:** 26
@@ -88,4 +88,12 @@ Establish global policies for units, coordinate reference systems (CRS), timesta
 ## 26.8 Decision History
 
 - CRS normalization policy moved from §76 to this section to centralize global conventions (2025-10-24).
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
 

@@ -1,7 +1,7 @@
 # 21 — System Decomposition & Boundaries
 *(Status: Drafting — Decision-Agnostic Overview)*
 
-**Author:** Codex  
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20  
 **Version:** 0.3.0  
 **Editors:** @nexus-specs, @layer-wg  
@@ -324,4 +324,12 @@ Verification ensures architectural integrity regardless of model selection:
 - Cross-OS contract parity (Core/AgIO/SDK).
 
 ---
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-21 | Initial draft | Nexus Team (Codex) |  |
 

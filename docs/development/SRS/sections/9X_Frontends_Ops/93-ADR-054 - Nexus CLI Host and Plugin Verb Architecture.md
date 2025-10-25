@@ -1,9 +1,14 @@
 # ADR-054: Nexus CLI Host and Plugin Verb Architecture
 
-## Status
-Proposed
+*(Status: Proposed)*
 
-**Relevant Plugin(s):** Full Stack
+**Authors:** Nexus Team (Codex)
+**Created:** 2025-10-24
+**Last Updated:** 2025-10-24
+
+---
+
+
 
 ## Context
 Plugin authors and operators rely on automation to install packages, inspect
@@ -82,3 +87,12 @@ shared transport logic or version negotiation.
 - [SRS Section 16 – Plugin Packaging, Updates, and Catalog](../sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md#packaging-updates--catalog)
 - [ADR-031 – Official plugin bundle](ADR-031-official-plugin-bundle.md)
 - [ADR-028 – Stack boundaries](ADR-028-stack-boundaries.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

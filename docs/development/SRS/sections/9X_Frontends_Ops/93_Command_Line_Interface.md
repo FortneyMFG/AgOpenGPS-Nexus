@@ -1,7 +1,7 @@
 # 93 — Command Line Interface
 *(Status: Proposed)*
 
-**Author:** Codex  
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20  
 **Version:** 0.1.0  
 **Section ID:** 93  
@@ -184,9 +184,9 @@ No alternative CLI proposals are under review; focus remains on maturing `nx` pe
 
 ### 93.15.1 Section Change Log
 
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Converted to new SRS template; formalized CLI requirements and considerations. | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Converted to new SRS template; formalized CLI requirements and considerations. | Nexus Team (Codex) |  |
 
 ---
 

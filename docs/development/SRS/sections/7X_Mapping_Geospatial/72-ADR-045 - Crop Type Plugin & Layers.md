@@ -87,3 +87,12 @@ integrity, context publication, and storage; the plugin focuses on attribute sem
 - Satisfies crop history requirement R-DATA-041 and associated catalog expectations in §04 Mapping Layers and §08 Data Model & Storage.【F:docs/sections/3X_Data_Storage/32_Persistence_Formats.md†L28-L31】【F:docs/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L62-L67】
 - Hooks crop context auto-fill into job lifecycle and work order flows described in §03 Job Lifecycle (R-JOB-040…R-JOB-042).【F:docs/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L27-L75】
 - Powers crop overlay toggles and analytics in §05 Frontends (R-FE-074).【F:docs/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L29-L30】
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

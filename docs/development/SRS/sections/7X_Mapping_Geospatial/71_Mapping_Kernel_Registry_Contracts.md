@@ -1,7 +1,7 @@
 # 71 — Mapping Kernel & Registry Contracts
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Version:** 0.1.0
 **Section ID:** 71
@@ -180,3 +180,12 @@ Farm → Field → Season → Job → Session contexts MUST be emitted over the 
 | Persistence Safety | High — TileStore journaling and autosave. | Medium — ad-hoc copies prone to corruption. |
 | Scalability | High — multi-field envelopes and analytics services. | Low — single-field assumption. |
 | Operational Overhead | Medium — registry maintenance required. | Medium — manual coordination required. |
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
+

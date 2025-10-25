@@ -1,7 +1,7 @@
 # 91 — UI Shell & Layout
 *(Status: Proposed)*
 
-**Author:** Codex  
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20  
 **Version:** 0.1.0  
 **Section ID:** 91  
@@ -243,9 +243,9 @@ No active option proposals are under review; modernization guidance is documente
 
 ### 91.15.1 Section Change Log
 
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| 2025-10-20 | Initial conversion to new SRS template; migrated option notes into design considerations. | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial conversion to new SRS template; migrated option notes into design considerations. | Nexus Team (Codex) |  |
 
 ---
 

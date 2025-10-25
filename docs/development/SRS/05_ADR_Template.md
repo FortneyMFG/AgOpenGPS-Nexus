@@ -2,7 +2,7 @@
 
 *(Status: Proposed | Accepted | Superseded | Deprecated | Rejected)*
 
-**Authors:** [Name(s)]
+**Authors:** Nexus Team (Codex)
 **Reviewers:** [Working Group or Circle]
 **Created:** YYYY-MM-DD
 **Last Updated:** YYYY-MM-DD
@@ -139,11 +139,11 @@ Define any maintenance or policy frameworks resulting from this decision.
 
 ## 11) Change Log
 
-| Date       | Change        | Author | PR / Issue |
-| ---------- | ------------- | ------ | ---------- |
-| YYYY-MM-DD | Initial draft | [Name] | [#]        |
-| YYYY-MM-DD | Accepted      | [Name] | [#]        |
-| YYYY-MM-DD | Superseded    | [Name] | [#]        |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| YYYY-MM-DD | Initial draft | Nexus Team (Codex) |  |
+| YYYY-MM-DD | Accepted | Nexus Team (Codex) |  |
+| YYYY-MM-DD | Superseded | Nexus Team (Codex) |  |
 
 ---
 

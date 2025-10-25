@@ -1,7 +1,7 @@
 # 23 — Threading, Scheduling & Timing
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Status:** Proposed
 **Version:** 0.1.0
@@ -160,9 +160,9 @@ Contributors view deterministic scheduling as prerequisite for Linux deployments
 
 ### 23.15.1 Section Change Log
 
-| Date | Summary | PR / Issue |
-|------|---------|------------|
-| - | Reformatted to SRS v2 template with verification table. | #0000 |
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| - | Reformatted to SRS v2 template with verification table. | Nexus Team (Codex) |  |
 
 ---
 

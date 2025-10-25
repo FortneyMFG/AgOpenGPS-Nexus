@@ -1,7 +1,7 @@
 # 75 — Tiling & Rendering Services
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Created:** 2025-10-20
 **Version:** 0.1.0
 **Section ID:** 75
@@ -164,3 +164,12 @@ Define the tiling, caching, and rendering services responsible for presenting ma
 | Platform Coverage | Windows/Linux/ARM ES3 path validated | Desktop-centric, limited embedded support |
 | Export Capability | Headless PNG/GeoTIFF parity with UI | Manual screenshot exports |
 | Cache Management | Provenance-aware TileStore with eviction | Loose files with manual cleanup |
+
+---
+
+## Section Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

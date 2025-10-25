@@ -3,7 +3,7 @@
 
 ## Document Control
 - **Version:** 0.4.0
-- **Authors:** Nexus Team
+- **Authors:** Nexus Team (Fortney)
 - **License:** GPLv3
 - **Reviewers:** Platform Foundations Working Group, UI Working Group, Release Working Group
 - **Approval Authority:** Nexus Program Steering Committee
@@ -121,14 +121,14 @@ Regular syncs are informal and community-led—typically via GitHub issues, Tele
 
 ---
 
-## Appendix A — Revision History
-| Version | Date | Changes | Author |
-|---------|------|----------|--------|
-| 0.4.0 | 2025-10-24 | Major rewrite for clarity and realism: simplified governance, reframed risks, modernized mission and vision to reflect community-led development. | Nexus Team (Jon Fortney) |
-| 0.3.2 | 2025-10-23 | Streamlined charter to emphasize mission, guardrails, goals, and scope; removed process-specific execution details. | Nexus Team (Codex) |
-| 0.3.1 | 2025-10-22 | Consolidated charter with vision guardrails and baseline assumptions. | Nexus Team (Codex) |
-| 0.3.0 | 2025-10-22 | Expanded goals, scope, and governance based on Next charter lessons learned. | Nexus & Next Teams (Codex + Jon Fortney) |
-| 0.2.0 | 2025-10-21 | Community review update incorporating steering feedback. | Next Team (Markus Nuuja) |
-| 0.1.0 | 2025-10-20 | Initial draft aligning with SRS foundations. | Nexus Team (Codex) |
+## Appendix A — Change Log
+| Version | Date | Changes | Author | PR / Issue |
+|---------|------|----------|--------|------------|
+| 0.4.0 | 2025-10-24 | Major rewrite for clarity and realism: simplified governance, reframed risks, modernized mission and vision to reflect community-led development. | Nexus Team (Fortney) |  |
+| 0.3.2 | 2025-10-23 | Streamlined charter to emphasize mission, guardrails, goals, and scope; removed process-specific execution details. | Nexus Team (Codex) |  |
+| 0.3.1 | 2025-10-22 | Consolidated charter with vision guardrails and baseline assumptions. | Nexus Team (Codex) |  |
+| 0.3.0 | 2025-10-22 | Expanded goals, scope, and governance based on Next charter lessons learned. | Nexus Team (Fortney) |  |
+| 0.2.0 | 2025-10-21 | Community review update incorporating steering feedback. | Next Team (Markus) |  |
+| 0.1.0 | 2025-10-20 | Initial draft aligning with SRS foundations. | Nexus Team (Codex) |  |
 
 *End of document.*

@@ -2,7 +2,7 @@
 
 *(Status: Proposed)*
 
-**Author:** Codex
+**Authors:** Nexus Team (Codex)
 **Reviewers:** Equipment & Automation Working Group
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-20
@@ -117,3 +117,12 @@ complex toolbar relationships or provide stable IDs for telemetry and replay con
 * [Control & automation requirements](61_Kinematics_Pose_Fusion.md)
 * [ADR-007 — PoseStream and SectionState Architecture](61-ADR-007%20-%20PoseStream%20and%20SectionState%20architecture.md)
 * [ADR-015 — Section Control & Grouping Semantics](61-ADR-015%20-%20Section%20control%20and%20grouping%20semantics.md)
+
+---
+
+## Change Log
+
+| Date | Summary | Author | PR / Issue |
+|------|---------|--------|------------|
+| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+

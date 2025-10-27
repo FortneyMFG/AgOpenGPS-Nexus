@@ -7,20 +7,33 @@
 
 ## Context
 
-Current jobs are scoped to a single field boundary, forcing operators to end a job when crossing a lane or driveway that splits
-contiguous fields. Mapping, coverage, and analytics plugins treat each field separately, complicating operations where equipment
-works multiple fields in one outing without unloading inputs. A union envelope is needed so the job can mount several fields and
-plugins can publish aggregated and per-field outputs.
+[SRS §31 Domain Data Model](31_Domain_Data_Model.md) defines a farm-first organizer: farms contain seasons, seasons contain
+jobs, and jobs contain the sessions that persist spatial layers for coverage, guidance, and analytics. Fields remain important
+partitions for agronomic statistics and operator guidance, but the storage hierarchy is anchored on farms and seasons rather
+than individual field folders. The existing single-field restriction breaks that model. Operators must stop or duplicate jobs
+whenever equipment crosses interior driveways or parcels even though the spatial data continues to journal into the same farm,
+season, job, and session layer stacks. Mapping, coverage, and analytics plugins therefore cannot emit consistent multi-field
+layers without bespoke stitching.
+
+We need an envelope contract that lets a job mount several fields simultaneously, preserves per-field statistics, and still
+aligns with the farm/season/session storage hierarchy described in SRS §31. Plugins should read and write spatial layers that
+roll up by session, job, season, and farm, while treating fields as a deterministic split within those layers for analytics,
+guidance, and regulatory reporting.
 
 ## Decision
 
-Allow jobs to mount multiple fields simultaneously. The mapping plugin (and other spatial consumers) treat the union of the
-fields as the active working envelope while still tracking per-field statistics. Core records the mounted `fieldIds`, immutable
-authoring metadata, and derived stats on the job and requires plugins to respect multi-field contexts when emitting coverage,
-guidance, or rate outputs. Plugin extensions may annotate per-field envelopes (e.g., crop type or profitability overlays)
-without mutating core geometry. Core publishes the resolved union envelope via `onJobLoaded(jobContext)` and surfaces
-`activeEnvelopeChanged` notifications whenever the mounted field set is updated so plugins can rebuild spatial indices and UI
-overlays deterministically.
+Jobs MAY mount multiple fields drawn from the same farm organizer. Core persists the mounted `fieldIds`, immutable authoring
+metadata, and derived statistics on the job record. When a job mounts fields, Core resolves a union envelope spanning all
+members and journals it to the layer hierarchy alongside per-field splits. The mapping plugin (and any spatial consumer)
+treats the union envelope as the active working geometry for coverage and guidance layers while still exposing deterministic
+per-field indices for analytics. Plugins emit coverage, rate, and telemetry layers into the session/job/season/farm journals
+as usual, but must tag per-field contributions inside those layers for rollups.
+
+Plugin extensions may annotate per-field envelopes (e.g., crop type or profitability overlays) without mutating the stored
+geometry. Core publishes the resolved union envelope via `onFarmLoaded(farmContext)` and `onJobLoaded(jobContext)` callbacks
+that include session and layer provenance. Whenever the mounted field set changes, Core emits `activeEnvelopeChanged`
+notifications so plugins can rebuild spatial indices, refresh UI overlays, and append a new layer segment without replaying
+historical data.
 
 ### Job payload fragment
 
@@ -64,26 +77,32 @@ overlays deterministically.
 
 ## SRS Impact
 
-- Fulfils the multi-field hierarchy and envelope schema expectations in §02 Data Model, which document Season → Job → Session relationships and field membership constraints.【F:docs/sections/3X_Data_Storage/31_Domain_Data_Model.md†L22-L140】
-- Extends the mount/unmount lifecycle defined in §03 Job Lifecycle with deterministic `mountFields` events and per-field stat rollups.【F:docs/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L59-L112】
-- Aligns with §04 Mapping, Layer Governance & Multi-Field Envelopes by enforcing union envelope generation, R-tree maintenance, and per-field analytics exports for mounted fields.【F:docs/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L1-L44】
+- Reinforces §31 Domain Data Model expectations for farm → season → job → session organizers while allowing fields to remain the
+  unit of analytics and guidance splits within those layers.【F:docs/development/SRS/sections/3X_Data_Storage/31_Domain_Data_Model.md†L12-L140】
+- Extends the mount/unmount lifecycle in §62 Job Lifecycle so `mountFields` events capture multi-field context and layer
+  provenance, keeping session journals deterministic when the envelope changes.【F:docs/development/SRS/sections/6X_Core_Domain_Services/62_Job_Lifecycle.md†L59-L112】
+- Aligns with §72 Mapping Layers Plugin by enforcing union envelope construction, per-field R-tree maintenance, and layer
+  tagging so spatial outputs can be replayed and aggregated by session, job, season, and farm without bespoke stitching.【F:docs/development/SRS/sections/7X_Mapping_Geospatial/72_Mapping_Layers_Plugin.md†L1-L74】
 
 ## Consequences
 
-- The mapping plugin must merge polygons from all mounted fields, compute a union envelope, and render coverage without
-  requiring the operator to reopen jobs when crossing internal breaks.
-- Coverage, rate, and analytics plugins aggregate across the job while preserving per-field rollups in `job.stats.fields` and in
-  exported reports.
-- Spatial indexing (R-tree) must include all mounted fields so guidance and constraint lookups remain within latency budgets.
-- UI workflows need multi-field selection controls and a live indicator of the combined envelope.
-- Core publishes `onFarmLoaded` and `onJobLoaded` events with `fieldIds[]`, per-field acreage, immutable IDs, and job metadata;
-  plugins listen for the subsequent `mountFields(fieldIds[])` call (Core-provided helper that resolves geometry) and may read
-  job `extensions` to drive crop/genetics or profitability overlays. Core also emits `onJobContextChanged` when the active
-  envelope changes so spatial caches and analytics recompute safely.
+- The mapping plugin merges polygons from all mounted fields, computes a union envelope, and journals coverage/guidance layers
+  against the active session without forcing operators to reopen jobs when crossing internal breaks.
+- Coverage, rate, telemetry, and analytics plugins aggregate across the job while tagging per-field contributions in
+  `job.stats.fields` and layer metadata so exports remain compliant with regulatory splits.
+- Spatial indexing (R-tree) includes all mounted fields so guidance and constraint lookups remain within latency budgets even as
+  envelopes change. Plugins append a new layer segment on each `activeEnvelopeChanged` notification to preserve replay parity.
+- UI workflows provide multi-field selection controls, display the combined envelope, and surface which sessions contribute to
+  the active layer stack.
+- Core publishes `onFarmLoaded`/`onJobLoaded` events with `fieldIds[]`, per-field acreage, immutable IDs, session references,
+  and job metadata; plugins listen for `mountFields(fieldIds[])` and may read job `extensions` to drive crop/genetics or
+  profitability overlays. Core emits `onJobContextChanged` when the active envelope changes so spatial caches and analytics
+  recompute safely without rewriting history.
 
 `job.envelope` captures the deterministic geometry Core publishes: union polygons, optional per-field members with analytics
 metadata, bounding box/centroid hints, and the CRS used for the envelope. Plugins rely on the shared structure defined in
-`Job.v1` to avoid bespoke geometry parsing when replaying sessions or rendering overlays.
+`Job.v1` to avoid bespoke geometry parsing when replaying sessions or rendering overlays, and they associate emitted layers with
+the same session/job identifiers recorded in the envelope.
 
 ## Alternatives considered
 

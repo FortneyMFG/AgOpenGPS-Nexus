@@ -23,6 +23,7 @@ Capture timing budgets, threading models, and scheduling primitives required to 
 ## 23.2 Context
 
 - SimClock/SimBus from §21 govern deterministic loops for simulation, replay, and hardware ingestion.【F:docs/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L46】
+- Model D treats every Core domain as a plugin scheduled by the module host, so timing policies must assume plugin lifecycles and deterministic struct-based interactions.【F:docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L399-L433】
 - Headless batching (CLI jobs, automation) must not starve real-time threads while honoring CLI SLA targets.【F:docs/sections/9X_Frontends_Ops/93_Command_Line_Interface.md†L15-L66】
 - Remote frontends rely on clock synchronization (PTP/NTP) to keep telemetry overlays aligned with Core state.【F:docs/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】
 
@@ -46,6 +47,7 @@ Capture timing budgets, threading models, and scheduling primitives required to 
 | SimBus | Publish/subscribe fabric carrying deterministic topics (pose, telemetry, sections). |
 | Deadline Monitor | Telemetry component logging latency and jitter metrics per loop. |
 | Headless Batch | CLI-triggered workload processed without UI interaction. |
+| Module Host | Core runtime that schedules plugin workloads and enforces struct-based contracts per loop. |
 
 ---
 
@@ -59,6 +61,7 @@ Capture timing budgets, threading models, and scheduling primitives required to 
 | R-TIME-003 | MUST | Preemption & Priority | Prioritize safety-critical loops above telemetry batching and UI; enforce back-pressure when deadlines slip. | Safety review | Stress test verifies high-priority loops meet deadlines under overload.【F:docs/sections/6X_Core_Domain_Services/61_Kinematics_Pose_Fusion.md†L52-L156】 |
 | R-TIME-004 | SHOULD | Multi-process Sync | Provide cross-process clock sync (PTP/NTP, shared memory fences) keeping remote clients within ±5 ms of Core timeline. | Remote ops WG | Sync benchmark demonstrates ≤5 ms skew.【F:docs/sections/5X_Hardware_IO_Device_Layer/53_AOG_Link_Compatibility.md†L340-L368】【F:docs/sections/8X_Guidance/81_Guidance_Orchestrator.md†L102-L166】 |
 | R-TIME-005 | MUST | Headless Batching | Guarantee headless batches honor CLI SLA without starving control threads. | Ops CLI | CLI benchmark ensures batch completes while control loops stay within budgets.【F:docs/sections/9X_Frontends_Ops/93_Command_Line_Interface.md†L15-L66】 |
+| R-TIME-006 | MUST | Module Host Contracts | Ensure module host schedules plugin workloads with declared budgets, lifecycle hooks, and struct-based exchanges. | Model D baseline | Module host timing tests verify registration <100 ms and enforce per-loop budgets.【F:docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L399-L433】 |
 
 ### 23.5.1 Requirement Sources & Rationale
 
@@ -68,6 +71,7 @@ Capture timing budgets, threading models, and scheduling primitives required to 
 | R-TIME-001 | Timing review (2025-01) | Protects operator experience and control stability. |
 | R-TIME-003 | Safety audit | Avoids automation regressions under load. |
 | R-TIME-005 | CLI roadmap | Supports remote management and scripted workflows. |
+| R-TIME-006 | Model D decision (2025-10) | Aligns plugin scheduling with Core determinism. |
 
 ---
 
@@ -86,6 +90,7 @@ Telemetry dashboards expose live loop metrics and alert on threshold breaches.
 | R-TIME-003 | Stress test | `tests/load/high_priority_preemption.md` | Safety loops meet deadlines |
 | R-TIME-004 | Sync benchmark | `bench/clock_sync.md` | Skew ≤5 ms |
 | R-TIME-005 | CLI benchmark | `tests/cli/headless_batch.md` | Control loops within budgets |
+| R-TIME-006 | Integration test | `tests/integration/module_host_timing.md` | Plugin registration <100 ms; budgets enforced |
 
 ---
 
@@ -116,6 +121,7 @@ Telemetry dashboards expose live loop metrics and alert on threshold breaches.
 | C1 | Deterministic SimClock governance | SimClock/SimBus orchestrates loop cadence and replay determinism across services.【F:docs/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L14-L86】 |
 | C2 | Layer-aware scheduling | Layer controllers emit immutable snapshots that decouple ingestion from rendering/UI threads.【F:docs/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md†L36-L124】 |
 | C3 | Remote synchronization | Multi-process deployments rely on shared clock sync and telemetry alerts to protect remote overlays.【F:docs/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】 |
+| C4 | Module host lifecycle | Plugin workloads enter/exit schedules via module host contracts that enforce deterministic ordering and telemetry budgeting.【F:docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L399-L433】 |
 
 ### 23.9.1 Assumptions & Preconditions
 
@@ -171,9 +177,12 @@ Contributors view deterministic scheduling as prerequisite for Linux deployments
 | Requirement ID | Related Strategy / Consideration | ADR(s) | Verification Artifact | Implementation Reference |
 |----------------|----------------------------------|--------|-----------------------|--------------------------|
 | R-TIME-000 | Hosted services + channels, C1 | 21-ADR-004 | `bench/simbus_timing.md` | `docs/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md` |
-| R-TIME-001 | Hosted services + channels, C2 | 21-ADR-068 | `tests/replay/loop_latency.md` | `docs/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md` |
-| R-TIME-003 | Hosted services + channels, C3 | 21-ADR-028 | `tests/load/high_priority_preemption.md` | `docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md` |
-| R-TIME-005 | Hosted services + channels | 21-ADR-900 | `tests/cli/headless_batch.md` | `docs/sections/9X_Frontends_Ops/93_Command_Line_Interface.md` |
+| R-TIME-001 | Layer controllers, C2 | 21-ADR-068 | `tests/replay/loop_latency.md` | `docs/sections/2X_System_Architecture/21-ADR-068 - Layer Controllers & Aggregation Runtime.md` |
+| R-TIME-002 | Hosted services + channels, C2 | 21_System_Decomposition_Boundaries | `tests/integration/hosted_services.md` | `docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md` |
+| R-TIME-003 | Priority governance, C3 | 21-ADR-028 | `tests/load/high_priority_preemption.md` | `docs/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md` |
+| R-TIME-004 | Remote synchronization, C3 | 21-ADR-028 | `bench/clock_sync.md` | `docs/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md` |
+| R-TIME-005 | Hosted services + channels, C1 | 21-ADR-900 | `tests/cli/headless_batch.md` | `docs/sections/9X_Frontends_Ops/93_Command_Line_Interface.md` |
+| R-TIME-006 | Module host lifecycle, C4 | 21_System_Decomposition_Boundaries | `tests/integration/module_host_timing.md` | `docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md` |
 
 ---
 

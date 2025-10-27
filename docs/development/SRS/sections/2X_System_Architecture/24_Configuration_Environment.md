@@ -23,6 +23,7 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 ## 24.2 Context
 
 - Telemetry and replay pipelines rely on consistent configuration metadata for traceability and health reporting.【F:docs/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L28-L146】
+- Model D plugin hosting requires configuration to declare which domain plugins load, their struct contract versions, and any UI Bridge bindings that expose them remotely.【F:docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L399-L433】
 - Feature flag governance must align with release engineering workflows to coordinate staged rollouts.【F:docs/sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md†L149-L211】
 - Linux Core packaging introduces secrets management requirements that differ from Windows DPAPI assumptions.【F:docs/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】
 
@@ -46,6 +47,7 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 | Secret Lease | Time-bound access to encrypted credential managed by platform key store. |
 | Feature Flag Registry | Authoritative list of toggles with rollout metadata and telemetry hooks. |
 | Configuration Drift | Divergence between expected profile and live values detected via telemetry. |
+| Module Manifest | Configuration binding that selects plugin assemblies, struct contract versions, and safety policies for the Core module host. |
 
 ---
 
@@ -59,6 +61,7 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 | R-CONF-003 | MUST | Feature Flags | Provide centralized definitions with rollout notes, defaults, telemetry adoption metrics. | Release engineering | Feature flag registry automation publishes docs + dashboards. 【F:docs/sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md†L149-L211】 |
 | R-CONF-004 | SHOULD | Environment Detection | Detect hardware capabilities and apply safe defaults while allowing overrides. | Hardware WG | Detection harness covers CM5, desktop GPU, GNSS combos. 【F:docs/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md†L12-L116】 |
 | R-CONF-005 | MUST | Health Integration | Surface configuration drift and missing secrets via telemetry dashboards and CLI health checks. | Telemetry WG | Health alerts triggered within 60 s of drift. 【F:docs/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L96-L146】【F:docs/sections/6X_Core_Domain_Services/64-O5 - Layer diagnostics and health monitoring.md†L1-L38】 |
+| R-CONF-006 | MUST | Module Manifests | Configuration MUST declare plugin manifests, struct contract versions, and UI Bridge exposure flags for every Core module. | Model D baseline | Module manifest validation ensures declared contracts match runtime registry before load. 【F:docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L399-L433】 |
 
 ### 24.5.1 Requirement Sources & Rationale
 
@@ -68,6 +71,7 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 | R-CONF-001 | Security review | Protects RTK credentials and OTA signing keys. |
 | R-CONF-003 | Release engineering sync | Aligns rollout with telemetry-driven quality gates. |
 | R-CONF-005 | Telemetry roadmap | Enables fast diagnosis of misconfiguration. |
+| R-CONF-006 | Model D decision (2025-10) | Ensures plugin governance remains deterministic. |
 
 ---
 
@@ -86,6 +90,7 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 | R-CONF-002 | UI automation | `tes../UI/profile_switch.robot` | Profile swap <5 s |
 | R-CONF-003 | Automation | `tools/flags/generate_registry.md` | Docs + telemetry updated |
 | R-CONF-005 | Telemetry check | `tests/health/config_drift.md` | Alert <60 s |
+| R-CONF-006 | CI validation | `pipelines/module_manifest_check.yml` | Reject mismatched struct contracts |
 
 ---
 
@@ -95,6 +100,7 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 - Configuration governance MUST distinguish shared profiles from device-specific overrides using versioned identifiers.
 - Secrets integration MUST avoid storing raw credentials in source control or logs; providers resolve logical keys using OS-appropriate secure storage.
 - Feature flag registry MUST publish both human-readable and machine-readable artifacts while integrating with release dashboards and change management policy (§96).
+- Module manifests MUST enforce in-process struct contract boundaries; plugins MAY NOT declare gRPC endpoints inside Core and must rely on the UI Bridge for remote exposure.【F:docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L399-L433】
 
 ---
 
@@ -114,6 +120,7 @@ Specify how Nexus captures environment configuration—profiles, secrets, featur
 | C1 | Profile versioning & provenance | Profiles and overrides require schema validation with audit trails for fleet reproducibility.【F:docs/sections/6X_Core_Domain_Services/64_Telemetry_Health.md†L28-L96】 |
 | C2 | Secrets abstraction across platforms | Configuration must reference logical keys so Windows DPAPI, Linux keyrings, and vault providers remain interchangeable.【F:docs/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md†L78-L128】 |
 | C3 | Remote deployment readiness | Configuration artifacts support headless Core packaging and remote clients defined in §22 while surfacing drift telemetry.【F:docs/sections/2X_System_Architecture/22_Process_Model_Deployment.md†L1-L160】 |
+| C4 | Module manifest governance | Plugin manifests capture struct contracts, dependencies, and UI Bridge visibility to align with Model D hosting.【F:docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L399-L433】 |
 
 ### 24.9.1 Assumptions & Preconditions
 
@@ -169,8 +176,11 @@ Reliable configuration management is viewed as prerequisite for remote deploymen
 |----------------|-------------------------------|--------|-----------------------|--------------------------|
 | R-CONF-000 | Profile registry + overrides, C1 | 21-ADR-028 | `pipelines/config_schema_check.yml` | `docs/sections/9X_Frontends_Ops/94_Extensibility_Packaging_Updates.md` |
 | R-CONF-001 | Secrets providers, C2 | 21-ADR-028 | `tests/security/secret_rotation.md` | `docs/sections/2X_System_Architecture/21-ADR-028 - Nexus stack responsibilities & handoff boundaries.md` |
+| R-CONF-002 | Profile switching, C3 | 21-ADR-028 | `tes../UI/profile_switch.robot` | `docs/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md` |
 | R-CONF-003 | Feature flag registry, C3 | 21-ADR-900 | `tools/flags/generate_registry.md` | `docs/sections/9X_Frontends_Ops/96_Quality_Engineering_Release.md` |
+| R-CONF-004 | Environment detection, C3 | 21-ADR-028 | `tests/hardware/detection_matrix.md` | `docs/sections/5X_Hardware_IO_Device_Layer/51_Sensor_Actuator_Abstractions.md` |
 | R-CONF-005 | Telemetry integration, C3 | 21-ADR-004 | `tests/health/config_drift.md` | `docs/sections/6X_Core_Domain_Services/64_Telemetry_Health.md` |
+| R-CONF-006 | Module manifest governance, C4 | 21_System_Decomposition_Boundaries | `pipelines/module_manifest_check.yml` | `docs/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md` |
 
 ---
 

@@ -24,6 +24,7 @@ Establish global policies for units, coordinate reference systems (CRS), timesta
 - Legacy AgOpenGPS mixed imperial/metric unit defaults per screen, causing export mismatches and calibration drift.
 - Pose fusion, mapping, and telemetry components consume shared timestamps and orientation standards; drifting conventions introduce replay and analysis errors.
 - CRS selection previously lived in §76; formalizing it here simplifies mapping extensibility and downstream registry governance.
+- Model D plugin hosting means every Core module must honor the same unit and CRS policies to keep struct-based contracts stable across in-process boundaries.【F:docs/development/SRS/sections/2X_System_Architecture/21_System_Decomposition_Boundaries.md†L399-L433】
 
 ---
 

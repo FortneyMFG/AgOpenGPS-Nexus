@@ -31,6 +31,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-1319 Section 21 decomposition narrative refresh _(Done)_ — Clarify plugin-vs-core trade-offs, task alignment, and SDK topology in SRS §21
 - [x] NX-1321 SRS slices restructure _(Done)_ — Refresh system slices map, rename §41, split §73/§77, add units & simulation sections
 - [x] NX-1322 Platform foundations ADR split _(Done)_ — Break Section 1X decisions into dedicated ADRs for OS support, .NET 8 runtime, Avalonia UI, and build tooling
+- [ ] NX-1330 Section 2X Model D alignment — Refresh process, timing, and configuration SRS sections to reflect plugin-hosted Core and revised UI Bridge scope
 - [ ] NX-1014 Contract baseline generator tooling resilience — Ensure baseline generator works without direct project references
 
 - [x] NX-610 Governance telemetry automation _(Done)_ — ADR roadmap program board, dependency digests, and review minutes publishing

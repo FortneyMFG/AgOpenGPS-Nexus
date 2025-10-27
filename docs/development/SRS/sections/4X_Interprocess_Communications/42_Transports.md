@@ -1,148 +1,135 @@
 # 42 — Transports
-*(Status: Proposed)*
+*(Status: Revised)*
 
 **Authors:** Nexus Team (Codex)
-**Created:** 2025-10-20
-**Status:** Proposed
-**Version:** 0.1.0
-**Section ID:** 42
-**Editors:** Interprocess Communications Working Group
-**Last Updated:** 2025-10-20
-**Related Sections:** 21 — System Decomposition & Boundaries, 53 — AOG-Link Compatibility, 61 — Kinematics & Pose Fusion
-**Upstream Dependencies:** 1X — Platform Foundations, 2X — System Architecture
-**Downstream Impacts:** 5X — Hardware IO Device Layer, 6X — Core Domain Services, 7X — Mapping & Geospatial
-**Related ADRs:** ADR-006, 41-ADR-062
+**Created:** 2025-10-20  
+**Version:** 0.2.0  
+**Section ID:** 42  
+**Editors:** Interprocess Communications Working Group  
+**Last Updated:** 2025-10-26  
+**Related Sections:** 21 — System Decomposition & Boundaries, 41 — Service APIs & Contracts, 53 — AOG-Link Compatibility, 61 — Kinematics & Pose Fusion  
+**Upstream Dependencies:** 1X — Platform Foundations, 2X — System Architecture  
+**Downstream Impacts:** 5X — Hardware IO Device Layer, 6X — Core Domain Services, 7X — Mapping & Geospatial  
+**Related ADRs:** 41-ADR-062, 42-ADR-006, 42-ADR-047
 
 ---
 
 ## 42.1 Purpose & Scope
 
-Define how field devices, guidance engines, and remote clients exchange data across serial, UDP, CAN, radio, struct-based
-in-process calls, and higher-level transports with resiliency, deterministic timing, and observability. This section governs
-transport selection, bridging strategies, sequencing requirements, and telemetry mesh expectations for both legacy PGN flows and
-typed APIs delivered via gRPC or struct ABIs.
+Describe the transport stack that moves telemetry, control commands, and registry metadata between Nexus Core, in-process plugins, bridge services, and external devices. This revision aligns transports with the struct-first plugin strategy: **struct exchanges power in-process plugins**, **gRPC/WebSocket bridges serve remote UI and automation clients**, and **legacy PGN flows remain authoritative for hardware**. The section focuses on timing, reliability, and lifecycle expectations rather than enumerating separate ADRs per transport.
 
 ---
 
-## 42.2 Context
+## 42.2 Transport Topology Overview
 
-- AgIO manages serial and UDP PGNs that power steer, section, and telemetry flows today.
-- Linux pilots require gRPC/WebSocket facades while Core-hosted plugins depend on struct ABIs; both must maintain byte-level parity with legacy transports.
-- Variable-rate controllers and analytics expect schema negotiation, sequencing, and integrity checks on layer data.
-- Remote operations demand secure channels, mesh sharing, and bandwidth-aware throttling across heterogeneous links.
+```
++-----------------+      Struct ABI      +-----------------+
+|  Core Services  |<-------------------->| In-Process Plug. |
++-----------------+                      +-----------------+
+        |                                          |
+        |  PGN / nanopb                           |
+        v                                          v
++-----------------+      Bridge (gRPC/WebSocket)  +-----------------+
+| Legacy Devices  |<----------------------------->| UI / Automation |
++-----------------+                               +-----------------+
+```
+
+- Struct ABIs provide zero-copy access inside the Core host.
+- The bridge plugin projects struct payloads over authenticated gRPC/WebSocket channels.
+- Legacy transports (serial, UDP, CAN, nanopb) connect hardware and remain the source of truth for PGNs; converters translate into structs.
 
 ---
 
-## 42.3 Legacy Comparison
+## 42.3 Context & Drivers
 
-| Area / Theme | Legacy Behavior | Identified Limitation | Modernization Opportunity | Reference / Source |
-|---------------|-----------------|------------------------|---------------------------|--------------------|
-| Serial/UDP PGNs | Fixed PGN framing via AgIO utilities. | No sequencing beyond ad-hoc counters; limited schema awareness. | Introduce versioned PGNs with registry handshakes and retries. | AgIO toolchain |
-| Transport Facades | Windows-first UDP/serial bridging. | Lacks typed APIs for Linux/headless deployments. | Layer gRPC/WebSocket facade with deterministic PGN bridge. | Linux pilot reports |
-| Telemetry Sharing | Ad-hoc UDP multicast and file export. | No authenticated mesh or throttled radio support. | Build share profiles, mesh QoS, and RadioBridge abstraction. | Community telemetry backlog |
-
-> **Informative:** Captures historical context and modernization drivers.
+- Field deployments rely on AgIO-managed PGNs and nanopb messages; these MUST remain intact while new contracts mature.
+- Hosting plugins in-process removes gRPC hosting overhead and simplifies packaging for Linux targets.
+- UI shells and automation tooling still require language-neutral, authenticated endpoints.
+- Previous drafts scattered requirements across ADR-002, ADR-047, and struct option analyses; this revision consolidates expectations into a single transport charter tied to the struct-first decision.
 
 ---
 
 ## 42.4 Definitions
 
 | Term | Definition |
-|------|-------------|
-| AOG-Link | Nanopb-based datagram protocol for MCU ↔ host communications defined in Section 53.
-| PoseStream | Authoritative stream of pose, velocity, and zone mask samples consumed across services.
-| Share Profile | Operator policy describing which telemetry topics exit a cab and what external data is ingested.
-| RadioBridge | Abstraction over ELRS, LoRa, XBee, or similar radios with acknowledgement and replay semantics.
-| Struct Transport | In-process data exchange based on versioned C# struct/record ABIs rather than serialized frames.
-| Bridge Plugin | Adapter projecting struct transports onto gRPC/WebSocket channels for remote clients.
+|------|------------|
+| Struct Transport | In-process exchange of generated struct contracts with immutable views and ABI governance. |
+| Bridge Transport | gRPC/WebSocket projection of struct payloads implemented by the bridge plugin. |
+| Legacy PGN Transport | UDP/serial/CAN exchanges defined by AgIO and AOG-Link (nanopb) for MCU integration. |
+| Share Profile | Operator-defined policy describing telemetry topics permitted to exit the cab and external feeds admitted. |
+| PoseStream | Canonical stream of pose/velocity/zone data consumed across services. |
 
 ---
 
-> **Requirement Grammar (RFC-2119):**
-> - **MUST / MUST NOT** = mandatory; test must exist.
-> - **SHOULD / SHOULD NOT** = strong recommendation; justify exceptions.
-> - **MAY** = optional; document enabling conditions.
->
-> **Clarity Checklist:** Avoid weak words: *fast, robust, user-friendly, handle, support, adequate,* etc.
-> Prefer measurable forms: *“≤ 250 ms p95,” “error rate < 0.1%,” “99.5% success over 10k trials.”*
-> Each requirement: single behavior, single actor, single condition, single metric.
-
 ## 42.5 Requirements
 
-| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
-|----|-----------|-----------|---------|----------------|-----------------------------|
-| R-COMM-000 | MUST | Compatibility | Preserve serial port configuration pipeline for GPS, IMU, steer, and machine modules. | C1 | Serial integration tests cover default baud/port combos. |
-| R-COMM-001 | MUST | Discovery | Maintain UDP discovery, scanning, and monitoring workflows. | C1 | UDP monitor decodes ≥ 30 PGNs/s with checksum validation. |
-| R-COMM-002 | MUST | PGN Transport | Continue emitting and receiving CAN/UDP PGNs for control flows. | C1 | Replay harness validates PGN parity vs legacy logs. |
-| R-COMM-003 | SHOULD | Corrections | Support NTRIP over TCP alongside UDP/serial routing. | C1 | GNSS correction test verifies failover and reconnect. |
-| R-COMM-004 | SHOULD | Facade | If option 21-O-GRPC is adopted, provide a gRPC/WebSocket facade that coexists with PGNs and mirrors whichever in-process binding is selected. | C3 | Bridge integration tests validate typed facade parity. |
-| R-COMM-005 | MUST | Bridge Integrity | Preserve byte-for-byte PGN framing or provide deterministic bridge. | C3 | Round-trip diff < 1 byte difference on regression logs. |
-| R-COMM-010 | MUST | Layer Streams | Deliver versioned PGNs with sequencing and schema negotiation. | C2 | CI ensures schema hash negotiation and sequence checks. |
-| R-COMM-011 | SHOULD | Diagnostics | Enforce monotonic timestamps, bounds checks, and bad-sample counters. | C2 | Transport tests inject faults and verify rejection. |
-| R-COMM-012 | SHOULD | Latency Budgets | Document and enforce latency/error budgets for new channels. | C3 | Benchmarks confirm ≤100 ms control RTT, ≤0.1% loss. |
-| R-COMM-020 | MUST | Pose Cadence | Publish canonical PoseStream cadence and sequencing policy. | C3 | Replay diff ensures deterministic ordering across clients. |
-| R-COMM-021 | SHOULD | Layer Handshake | Extend registry handshake with chunking, retry, and back-pressure semantics. | C2 | Integration test verifies handshake negotiation. |
-| R-COMM-022 | MUST | Zone Service | Expose ZoneService contracts through the transport options in scope (e.g., gRPC clients, struct ABIs) so boundary/headland data remains accessible regardless of hosting mode. | C3 | Contract tests stream ≥ 10 zones with provenance metadata per binding. |
-| R-COMM-023 | MUST | Pose Zone Mask | Embed PoseZoneMask with zone identifiers and registry hash. | C3 | Replay verifies deterministic gating decisions. |
-| R-COMM-030 | MUST | Plugin Transport | Define plugin registration, leases, and heartbeats for each transport option in scope (gRPC clients, struct ABIs, or both) so lifecycle semantics stay consistent. | C3 | Plugin integration suite validates lease renewals for each enabled transport. |
-| R-COMM-031 | MUST | Permissions | Enforce authenticated sessions and capability permissions per connection. | C4 | Security tests confirm unauthorized access is rejected. |
-| R-COMM-032 | SHOULD | Health Reporting | Publish health/metrics expectations for gRPC and struct transports plus degraded-state signaling. | C4 | Health endpoint returns status within 200 ms under load. |
-| R-COMM-040 | MUST | Time Authority | Establish canonical timebase with documented tolerances. | C5 | Clock drift tests confirm ≤5 ms drift across nodes. |
-| R-COMM-041 | SHOULD | Timestamp Reconcile | Require capture timestamps/sequence numbers for reconciliation. | C5 | Integration tests realign device clocks within tolerance. |
-| R-COMM-042 | SHOULD | End-to-End Latency | Document latency budgets per topic. | C5 | Monitoring dashboards alert when thresholds exceeded. |
-| R-COMM-050 | MUST | Struct ABI Versioning | If option 21-O-STRUCT is adopted, version struct transport definitions alongside protobuf schemas. | C3 | ABI compatibility tests block breaking changes. |
-| R-COMM-051 | MUST | Memory Safety | If option 21-O-STRUCT is adopted, provide read-only or copy-on-write struct views for plugin consumption. | C3 | Unit tests confirm struct consumers cannot mutate Core buffers. |
-| R-COMM-052 | SHOULD | Bridge Adapter | If options 21-O-STRUCT or 21-O-HYBRID are adopted, supply a bridge plugin/service to translate struct transports to gRPC/WebSocket for remote clients. | C3 | Bridge conformance suite validates parity. |
+### 42.5.1 Legacy & Hardware Transports
 
-### 42.5.1 Requirement Sources & Rationale
+| ID | Priority | Summary | Verification |
+|----|----------|---------|--------------|
+| R-LEG-000 | MUST | Preserve serial/UDP configuration tooling for GPS, IMU, steer, and machine modules. | Serial integration tests cover default baud/port combinations. |
+| R-LEG-001 | MUST | Maintain PGN emission/ingestion with deterministic framing and checksum validation. | Replay harness validates byte-for-byte parity vs legacy logs. |
+| R-LEG-002 | SHOULD | Extend variable-rate layer PGNs with sequencing and schema negotiation hooks tied to registry hashes. | CI lint checks schema hashes; replay verifies sequence handling. |
+| R-LEG-003 | SHOULD | Provide converter helpers that translate PGNs/nanopb payloads into struct contracts for Core consumption. | `/tests/replay/pgn_bridge/` ensures deterministic conversions. |
 
-| Req ID | Source (issue/discussion/standard) | Rationale (one line) |
-|--------|-------------------------------------|----------------------|
-| R-COMM-000 | AgIO serial configuration backlog | Ensure continuity for deployed rigs. |
-| R-COMM-004 | Linux remote-core pilots | Typed facade enables headless deployments. |
-| R-COMM-010 | Layer registry proposals | Sequencing prevents telemetry drift. |
-| R-COMM-030 | Plugin lifecycle reviews | Plugins require deterministic leasing. |
-| R-COMM-040 | Timebase working sessions | Shared clock anchors determinism. |
-| R-COMM-050 | Plugin runtime option analysis | Struct ABI must remain aligned with protobuf contracts. |
-| R-COMM-051 | Plugin runtime option analysis | Prevent in-proc plugins from mutating Core buffers. |
-| R-COMM-052 | Plugin runtime option analysis | Bridge plugin keeps remote clients supported when Core hosts plugins in-proc. |
+### 42.5.2 Struct Transport Expectations
+
+| ID | Priority | Summary | Verification |
+|----|----------|---------|--------------|
+| R-STRUCT-010 | MUST | Expose struct transports for telemetry, command, registry, and event streams with lease semantics shared across plugins. | `/tests/integration/plugin_transport/` validates lease renewal and heartbeats. |
+| R-STRUCT-011 | MUST | Guarantee lock-free, allocation-free reads for steady-state telemetry access with ≤50 µs p95 latency. | Microbench suite in `/tests/perf/struct_transport/` enforces latency budget. |
+| R-STRUCT-012 | SHOULD | Support deterministic batching for bursty topics (e.g., guidance waypoints) while preserving ordering metadata. | Benchmarks verify ordering and latency bounds. |
+| R-STRUCT-013 | MUST | Publish transport health, back-pressure, and ABI fingerprints to the capability registry. | Registry lint confirms metadata presence. |
+
+### 42.5.3 Bridge Transport Expectations
+
+| ID | Priority | Summary | Verification |
+|----|----------|---------|--------------|
+| R-BRIDGE-010 | MUST | Mirror struct transport semantics over gRPC/WebSocket, including leasing, errors, and audit metadata. | `/tests/integration/plugin_bridge/` compares struct vs bridge flows. |
+| R-BRIDGE-011 | MUST | Enforce security controls from Section 43 (mutual TLS or signed tokens) and expose health endpoints. | Security regression tests validate rejection of unauthenticated sessions. |
+| R-BRIDGE-012 | SHOULD | Offer bandwidth-aware subscription policies (e.g., PoseStream down-sampling) configurable per share profile. | Mesh tests in `/tests/simulation/telemetry_mesh/` validate throttling. |
+| R-BRIDGE-013 | MAY | Provide UI-optimized aggregations (batched equipment snapshots, fused health summaries) so long as raw struct parity remains testable. | UI smoke tests confirm aggregation correctness. |
+
+### 42.5.4 Mesh & Timebase Coordination
+
+| ID | Priority | Summary | Verification |
+|----|----------|---------|--------------|
+| R-MESH-020 | MUST | Maintain canonical timebase with ≤5 ms drift across bridge participants. | Clock sync tests in `/tests/simulation/timebase/`. |
+| R-MESH-021 | MUST | Support share profiles that govern outbound/inbound telemetry topics across radio or IP links. | `/tests/integration/share_profiles/` enforces policy adherence. |
+| R-MESH-022 | SHOULD | Provide degraded-state signaling when bandwidth drops below configured thresholds. | Mesh simulations inject loss and verify health reports. |
 
 ---
 
 ## 42.6 Acceptance Criteria & Verification
 
-- Transport regression suite MUST replay historical PGN logs against bridge outputs with byte-for-byte parity.
-- Performance benchmarks MUST confirm transport latency budgets before enabling remote pilots.
-- Mesh simulations MUST validate share profile enforcement, store-and-forward windows, and RadioBridge throttling under loss.
-- Struct vs. gRPC parity suite MUST confirm identical payloads, timestamps, and error handling for shared contracts (see §42.5 R-COMM-004, R-COMM-022, and R-COMM-050…052).
+1. **Legacy Continuity:** Serial/UDP regression suites MUST pass without PGN diffs when struct converters are introduced (R-LEG-000/001/003).
+2. **Struct Performance:** Perf benchmarks MUST confirm struct telemetry access meets the ≤50 µs p95 latency goal before plugins may ship on a release train (R-STRUCT-010/011).
+3. **Bridge Parity & Security:** Bridge conformance suites MUST validate parity with struct transports and enforce Section 43 controls (R-BRIDGE-010/011).
+4. **Mesh Governance:** Share profile tests MUST prevent disallowed telemetry topics from leaving the cab and trigger alerts on sustained bandwidth drops (R-MESH-021/022).
 
-### 42.6.1 Requirement-to-Verification Map
-
-| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
-|--------|--------------------|---------------------|---------------------|
-| R-COMM-002 | Replay harness | `/tests/replay/pgn_transport/` | Zero mismatched PGN frames over baseline logs. |
-| R-COMM-010 | CI lint | `/tools/layer-registry-lint/` | Schema hash drift detected within one CI cycle. |
-| R-COMM-030 | Integration tests | `/tests/integration/plugin_transport/` | Lease renewals succeed across gRPC + struct; unauthorized clients rejected. |
-| R-COMM-040 | Clock sync tests | `/tests/simulation/timebase/` | Drift ≤5 ms after 30-minute run. |
-| R-COMM-050 | ABI tests | `/tests/contracts/struct-abi/` | Additive-only struct changes permitted without version bump. |
-| R-COMM-051 | Unit tests | `/tests/contracts/struct-abi/` | Struct consumers cannot mutate Core buffers. |
-| R-COMM-052 | Bridge parity tests | `/tests/integration/plugin_bridge/` | Struct and gRPC transports return identical payloads. |
+| Requirement Group | Verification Artifact | Pass Threshold |
+|-------------------|-----------------------|----------------|
+| Legacy (R-LEG-000…003) | `/tests/replay/pgn_transport/`, `/tests/replay/pgn_bridge/` | Zero checksum or payload diffs. |
+| Struct (R-STRUCT-010…013) | `/tests/integration/plugin_transport/`, `/tests/perf/struct_transport/` | Lease renewals succeed; latency budget met. |
+| Bridge (R-BRIDGE-010…013) | `/tests/integration/plugin_bridge/`, `/tests/security/bridge_auth/` | Auth required; parity coverage ≥95% of contract surface. |
+| Mesh (R-MESH-020…022) | `/tests/simulation/timebase/`, `/tests/simulation/telemetry_mesh/` | Drift ≤5 ms; share profile policy violations blocked. |
 
 ---
 
-## 42.7 Constraints
+## 42.7 Constraints & Non-Functional Targets
 
-- Transports MUST operate across Windows and Linux hosts without conditional compilation forks.
-- Offline scenarios MUST degrade gracefully, buffering telemetry for at least 30 minutes before discard.
-- Security controls MUST align with Section 43 channel policies, including mutual TLS or token negotiation where applicable.
+- Struct transports MUST be confined to the Core process; remote access occurs solely through the bridge.
+- Bridge services MUST reconnect without losing lease state and resume streaming within 5 s of recovery.
+- Radio bridges MUST respect configured bitrate ceilings and queue telemetry for ≥30 minutes before discard.
+- Logging MUST include transport ID, ABI version, and share profile identifier for traceability.
 
-### 42.7.1 Non-Functional Requirement Classes
+### Non-Functional Classes
 
-- **Performance:** Control loop RTT ≤ 100 ms; monitoring channels ≤ 500 ms; radio links respect configured bitrate ceilings; struct ABI calls remain lock-free/allocation-free.
-- **Reliability & Availability:** Bridge and mesh services restart without data loss, leveraging replay windows and acknowledgements.
-- **Security:** Mutual authentication on typed transports; encrypted radio links where hardware permits; share profiles enforce ACLs.
-- **Operability:** Structured logs include transport IDs, schema hashes, and sequence counters; health endpoints expose back-pressure state.
-- **Maintainability:** Transport bindings share codecs, struct ABIs, and configuration schema; registry updates documented with automated linting and ABI version notes.
+- **Performance:** Control loops ≤100 ms RTT; monitoring channels ≤500 ms; struct telemetry ≤50 µs p95.  
+- **Reliability:** Replayable queues ensure deterministic restart; share profiles survive reconnect.  
+- **Security:** Mutual authentication and encrypted channels per Section 43; signed manifest bundles for struct transports.  
+- **Operability:** Health endpoints expose back-pressure, lease counts, and active share profiles.  
+- **Maintainability:** Transport guidance lives in this section plus three ADRs (Struct ABI, AOG-Link, Telemetry Mesh) to avoid ADR sprawl.
 
 ---
 
@@ -150,82 +137,17 @@ typed APIs delivered via gRPC or struct ABIs.
 
 | ID | Description | Impact | Mitigation / Status | Owner |
 |----|-------------|--------|---------------------|-------|
-| RISK-42-1 | Bridge latency exceeds control budgets under load. | High | Benchmark with replay suite and optimize batching. | @interop-wg |
-| RISK-42-2 | Mesh share profiles misconfigured, leaking sensitive data. | Medium | Provide templates and CI validation for profiles. | @interop-wg |
-| RISK-42-3 | Struct ABI drift causes in-proc plugin crashes. | Medium | Enforce ABI tests and semantic version gating (R-COMM-050/051). | @interop-wg |
-| ISSUE-42-1 | Define telemetry topic prioritization for RadioBridge throttling. | Medium | Draft prioritization table with Ops WG. | @interop-wg |
+| RISK-42-1 | Struct transport latency regressions from plugin misuse. | High | Provide diagnostics counters and perf tests; escalate via SDK WG. | @interop-wg |
+| RISK-42-2 | Bridge bandwidth exhaustion for remote UI sessions. | Medium | Enforce share profiles and adaptive down-sampling. | @interop-wg |
+| RISK-42-3 | ABI drift between struct generators and legacy PGN converters. | Medium | Tie converter builds to schema repo CI. | @interop-wg |
+| ISSUE-42-1 | Need prioritization matrix for radio telemetry topics. | Medium | Coordinate with Ops WG; tracked in telemetry mesh ADR follow-up. | @interop-wg |
 
 ---
 
-## 42.9 Design Considerations
+## 42.9 Change Log
 
-| ID | Consideration | Description |
-|----|----------------|-------------|
-| C1 | Legacy PGN Transport Stewardship | Serial and UDP PGNs remain authoritative; configuration tooling must persist across OS targets. |
-| C2 | Versioned Variable-Rate Layer Streams | Layer PGNs require schema hashes, sequencing, and registry negotiation to prevent drift. |
-| C3 | Typed Facade & Compatibility Bridge | gRPC/WebSocket APIs must coexist with PGNs via deterministic translation. |
-| C4 | Plugin Leases & Security Enforcement | Transport-level leasing, permissions, and health semantics govern plugin behavior. |
-| C5 | Timebase & Telemetry Mesh Governance | Canonical timebase, mesh share profiles, and RadioBridge policies ensure deterministic multi-device coordination. |
-| C6 | Gauge Telemetry Channels | Dedicated gauge PGNs deliver engine and machine data with backwards compatibility and diagnostics. |
-| C7 | Struct ABI Transport | In-process struct exchanges mirror protobuf/gRPC contracts and feed the bridge plugin. |
-
-### 42.9.1 Assumptions & Preconditions
-
-- [A1] Field hardware continues emitting legacy PGNs during typed transport rollout.
-- [A2] Mesh participants maintain connectivity sufficient for heartbeat exchange (≥1 per 5 s) or trigger failover.
-- [A3] RadioBridge deployments negotiate bitrate limits prior to enabling higher-rate telemetry topics.
-
-#### C1 - Legacy PGN Transport Stewardship
-
-- Preserve serial port management for GPS, IMU, steer, and machine modules with configurable baud/port settings.
-- Maintain UDP discovery, scanning, and monitoring workflows used for field module supervision.
-- Continue publishing canonical PGN references and regression logs to validate compatibility during upgrades.
-
-#### C2 - Versioned Variable-Rate Layer Streams
-
-- PGNs `0xE1`, `0xE0`, and `0xDE` carry analog and binary layer samples with sequence counters to detect loss.
-- `0xE4`/`0xE3` commands, definition handshake `0xE2`, and aggregated summaries `0xDF` coordinate retries and acknowledgements.
-- Layer IDs reserve ranges (1=Working, 2=Flow State, 10=Actual/Commanded, 20=Downforce, 30=Yield, 40=Moisture, 240–255 third-party).
-- Samples outside expected bounds trigger `badSample` counters; monotonic timestamps accompany payloads for reconciliation.
-
-#### C3 - Typed Facade & Compatibility Bridge
-
-- Bridge services translate PGNs to typed gRPC/WebSocket events without altering payload semantics.
-- Sequencing and schema hashes ensure typed clients detect drift and request resynchronization.
-- Byte-for-byte validation across replay logs confirms deterministic translation and acceptable latency overhead.
-
-#### C4 - Plugin Leases & Security Enforcement
-
-- Core exposes capability directories, lease heartbeats, and permissions gating (pose.read, section.command, storage.write).
-- Health RPCs (Ping, GetStatus, GetMetrics) report degraded states, enabling operators to diagnose lagging transports.
-- All plugin connections authenticate (local policy or certificates) and emit structured audit logs for control actions.
-
-#### C5 - Timebase & Telemetry Mesh Governance
-
-- Canonical time authority derived from GPS or PTP with system clock fallback; drift tolerance ≤5 ms across nodes.
-- Mesh topics include `presence`, `poseTrail`, `coverage`, `layerEdit`, and `sessionState` with QoS budgets (presence 1 Hz, trails ≤2 Hz, coverage ≤1 Hz aggregated).
-- Share profiles define export/import policies, allow/deny lists, and privacy defaults (sensitive feeds opt-in).
-- Store-and-forward queues retain up to 20 MB/device, replaying payloads with hash validation; stale payloads drop after 30 minutes unless marked archival.
-
-#### C6 - Gauge Telemetry Channels
-
-- Gauge telemetry PGNs (0xDA, 0xD9, 0xD8) reuse existing AgOpenGPS framing to deliver engine and machine metrics.
-- Capability discovery advertises supported gauges and validity heartbeats for dashboards to pre-provision tiles.
-- Diagnostics tooling decodes raw payload bytes, engineering values, and source metadata to support troubleshooting.
-
-#### C7 - Struct ABI Transport
-
-- Struct transport definitions mirror protobuf field order and types to simplify conversion and keep latency predictable.
-- ABI releases publish semantic versions and migration notes; Core rejects plugins targeting incompatible versions.
-- Bridge plugin converts struct payloads to gRPC/WebSocket frames, preserving timestamps and audit metadata.
-
----
-
----
-
-## Section Change Log
-
-| Date | Summary | Author | PR / Issue |
-|------|---------|--------|------------|
-| 2025-10-20 | Initial draft | Nexus Team (Codex) |  |
+| Date | Summary | Author |
+|------|---------|--------|
+| 2025-10-26 | Align transports with struct-first plugin strategy and consolidate requirements. | Nexus Team (Codex) |
+| 2025-10-20 | Initial draft emphasizing gRPC-first facades. | Nexus Team (Codex) |
 

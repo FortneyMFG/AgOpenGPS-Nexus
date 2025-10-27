@@ -19,12 +19,18 @@ public sealed class FloatingPanelViewModel : INotifyPropertyChanged
     private Rect _bounds;
     private bool _isColliding;
     private bool _isLayoutLocked;
+    private bool _isVisible;
+    private bool _isVisibleWhenLocked;
+    private bool _requestedVisibility;
 
     public FloatingPanelViewModel(FloatingPanelSpec spec, BlockLayoutViewModel owner)
     {
         _spec = spec ?? throw new ArgumentNullException(nameof(spec));
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         _bounds = CreateBounds(spec);
+        _requestedVisibility = spec.IsVisible;
+        _isVisibleWhenLocked = spec.IsVisibleWhenLocked;
+        _isVisible = spec.IsVisible;
         _openSettingsCommand = new DelegateCommand(
             _ => _owner.RequestFloatingPanelSettings(this),
             _ => !IsLocked);
@@ -93,6 +99,26 @@ public sealed class FloatingPanelViewModel : INotifyPropertyChanged
     /// <summary>Gets the command that launches the panel settings UI.</summary>
     public ICommand OpenSettingsCommand => _openSettingsCommand;
 
+    /// <summary>Gets a value indicating whether the panel should be rendered.</summary>
+    public bool IsVisible => _isVisible;
+
+    /// <summary>Gets a value indicating whether the panel remains visible when the layout is locked.</summary>
+    public bool IsVisibleWhenLocked
+    {
+        get => _isVisibleWhenLocked;
+        private set
+        {
+            if (_isVisibleWhenLocked == value)
+            {
+                return;
+            }
+
+            _isVisibleWhenLocked = value;
+            OnPropertyChanged();
+            UpdateEffectiveVisibility();
+        }
+    }
+
     internal FloatingPanelSpec Spec => _spec;
 
     internal BlockLayoutViewModel Owner => _owner;
@@ -131,6 +157,7 @@ public sealed class FloatingPanelViewModel : INotifyPropertyChanged
     internal void SetLockState(bool isLocked)
     {
         IsLocked = isLocked;
+        UpdateEffectiveVisibility();
     }
 
     internal void UpdatePanelLock(bool isLocked)
@@ -143,6 +170,31 @@ public sealed class FloatingPanelViewModel : INotifyPropertyChanged
         _spec.IsLocked = isLocked;
         OnPropertyChanged(nameof(IsLocked));
         _openSettingsCommand.RaiseCanExecuteChanged();
+    }
+
+    internal void SetVisibility(bool isVisible)
+    {
+        _requestedVisibility = isVisible;
+        _spec.IsVisible = isVisible;
+        UpdateEffectiveVisibility();
+    }
+
+    internal void UpdateVisibilityPolicy(bool isVisibleWhenLocked)
+    {
+        IsVisibleWhenLocked = isVisibleWhenLocked;
+        _spec.IsVisibleWhenLocked = isVisibleWhenLocked;
+    }
+
+    private void UpdateEffectiveVisibility()
+    {
+        var effective = (!_isLayoutLocked || _isVisibleWhenLocked) && _requestedVisibility;
+        if (_isVisible == effective)
+        {
+            return;
+        }
+
+        _isVisible = effective;
+        OnPropertyChanged(nameof(IsVisible));
     }
 
     private static Rect CreateBounds(FloatingPanelSpec spec)

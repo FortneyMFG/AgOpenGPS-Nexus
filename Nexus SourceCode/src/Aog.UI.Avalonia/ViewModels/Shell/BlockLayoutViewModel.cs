@@ -25,6 +25,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     private const int MinorDivisionsPerMajor = 2;
     private const int MinorGridColumns = MajorGridColumns * MinorDivisionsPerMajor;
     private const string PromptPanelId = "panel.prompt";
+    private const string FieldMenuPanelId = "panel.fieldMenu";
+    private const string FieldMenuContentId = "field.menu";
 
     private static readonly IReadOnlyDictionary<string, string> DefaultStatusMessages =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -39,6 +41,19 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             ["Host.NudgeLeft"] = "Guidance nudged left.",
             ["Host.NudgeRight"] = "Guidance nudged right.",
         };
+
+    internal const double DefaultBlockOpacity = 0.94d;
+    internal const string DefaultBlockValueColor = "#4CAF50";
+
+    internal static readonly (string Name, string Color)[] ValueColorPalette =
+    {
+        ("Light Gray", "#CCCCCC"),
+        ("Green", "#4CAF50"),
+        ("Blue", "#2196F3"),
+        ("Orange", "#FF9800"),
+        ("Red", "#F44336"),
+        ("White", "#FFFFFF"),
+    };
 
     private readonly IBlockLayoutStore _layoutStore;
     private readonly IBlockCatalog _catalog;
@@ -112,6 +127,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
     public event EventHandler<FloatingBlockViewModel>? FloatingBlockSettingsRequested;
 
+    public event EventHandler<BlockItemViewModel>? BlockSettingsRequested;
+
     /// <summary>Gets the observable block collection hosted on the global tiled panel.</summary>
     public ObservableCollection<BlockItemViewModel> Blocks { get; }
 
@@ -164,6 +181,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsLauncherDockVisible));
+            UpdateFieldMenuVisibility();
             UpdateLauncherDropIndicator();
             Save();
         }
@@ -250,7 +268,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             _isLocked = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsLauncherDockVisible));
-            OnPropertyChanged(nameof(AreFloatingOverlaysVisible));
+            UpdateFieldMenuVisibility();
             ApplyLockStateToFloating();
             ApplyLockStateToPanels();
             RefreshCommandStates();
@@ -265,7 +283,18 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Gets a value indicating whether floating overlays should be rendered.</summary>
-    public bool AreFloatingOverlaysVisible => !_isLocked;
+    public bool AreFloatingOverlaysVisible
+    {
+        get
+        {
+            if (!_isLocked)
+            {
+                return true;
+            }
+
+            return FloatingPanels.Any(panel => panel.IsVisible && panel.IsVisibleWhenLocked);
+        }
+    }
 
     /// <summary>Gets the computed pane layout visual metadata.</summary>
     public PaneLayoutResult? PaneLayout
@@ -319,6 +348,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
 
         _isFieldDockTransientOpen = isOpen;
         OnPropertyChanged(nameof(IsLauncherDockVisible));
+        UpdateFieldMenuVisibility();
     }
 
     public void UpdateViewport(Size viewport)
@@ -413,6 +443,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         return item is not null && !IsLocked;
     }
 
+    internal bool CanEditBlock(BlockItemViewModel block) => block is not null && !IsLocked;
+
     internal void Delete(BlockItemViewModel item)
     {
         if (!CanDelete(item))
@@ -478,6 +510,16 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         Save();
         _statusReporter(GetStatusMessage(definition));
         return created;
+    }
+
+    internal void RequestBlockSettings(BlockItemViewModel block)
+    {
+        if (!CanEditBlock(block))
+        {
+            return;
+        }
+
+        BlockSettingsRequested?.Invoke(this, block);
     }
 
     internal (int colSpan, int rowSpan) GetGridSpan(BlockLauncherItemViewModel launcher)
@@ -585,6 +627,8 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
                 }
 
                 var panelViewModel = new FloatingPanelViewModel(panel, this);
+                panelViewModel.UpdateVisibilityPolicy(panel.IsVisibleWhenLocked);
+                panelViewModel.SetVisibility(panel.IsVisible);
                 FloatingPanels.Add(panelViewModel);
             }
         }
@@ -621,6 +665,7 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         ApplyLockStateToFloating();
         UpdateCollisionStates();
         ApplyFloatingPanelDefaults(Viewport);
+        UpdateFieldMenuVisibility();
     }
 
     private TileSpec EnsureTile(BlockInstance instance)
@@ -1336,21 +1381,61 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
     {
         Grid.FloatingPanels ??= new List<FloatingPanelSpec>();
 
-        if (Grid.FloatingPanels.Any(panel => panel is not null && string.Equals(panel.Id, PromptPanelId, StringComparison.OrdinalIgnoreCase)))
+        var panels = Grid.FloatingPanels;
+
+        var fieldMenu = panels.FirstOrDefault(panel =>
+            panel is not null && string.Equals(panel.Id, FieldMenuPanelId, StringComparison.OrdinalIgnoreCase));
+
+        if (fieldMenu is null)
         {
-            return;
+            fieldMenu = new FloatingPanelSpec
+            {
+                Id = FieldMenuPanelId,
+                Title = "Field Settings",
+                ContentId = FieldMenuContentId,
+                Width = 320d,
+                Height = 520d,
+                X = Math.Max(0, WorkspaceLayout.Spacing),
+                Y = Math.Max(0, WorkspaceLayout.Spacing),
+                IsVisible = IsLauncherDockVisible,
+                IsVisibleWhenLocked = true,
+            };
+            panels.Add(fieldMenu);
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(fieldMenu.ContentId))
+            {
+                fieldMenu.ContentId = FieldMenuContentId;
+            }
+
+            fieldMenu.IsVisibleWhenLocked = true;
+            fieldMenu.IsVisible = IsLauncherDockVisible;
         }
 
-        Grid.FloatingPanels.Add(new FloatingPanelSpec
+        var promptPanel = panels.FirstOrDefault(panel =>
+            panel is not null && string.Equals(panel.Id, PromptPanelId, StringComparison.OrdinalIgnoreCase));
+
+        if (promptPanel is null)
         {
-            Id = PromptPanelId,
-            Title = "Edit Prompt",
-            ContentId = "prompt.edit",
-            Width = 360d,
-            Height = 280d,
-            X = Math.Max(0, WorkspaceLayout.Spacing),
-            Y = -1d,
-        });
+            promptPanel = new FloatingPanelSpec
+            {
+                Id = PromptPanelId,
+                Title = "Edit Prompt",
+                ContentId = "prompt.edit",
+                Width = 360d,
+                Height = 280d,
+                X = Math.Max(0, WorkspaceLayout.Spacing),
+                Y = -1d,
+                IsVisible = !_isLocked,
+                IsVisibleWhenLocked = false,
+            };
+            panels.Add(promptPanel);
+        }
+        else if (string.IsNullOrWhiteSpace(promptPanel.ContentId))
+        {
+            promptPanel.ContentId = "prompt.edit";
+        }
     }
 
     private void ApplyFloatingPanelDefaults(Size viewport)
@@ -1360,34 +1445,105 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             return;
         }
 
+        var hasViewport = viewport.Width > 0 && viewport.Height > 0;
+        var spacing = Math.Max(0, WorkspaceLayout.Spacing);
+
         foreach (var panel in Grid.FloatingPanels)
         {
-            if (panel is null || !string.Equals(panel.Id, PromptPanelId, StringComparison.OrdinalIgnoreCase))
+            if (panel is null)
             {
                 continue;
             }
 
-            var width = panel.Width <= 0 ? 360d : panel.Width;
-            var height = panel.Height <= 0 ? 280d : panel.Height;
-
-            if (panel.Y < 0 || panel.Y + height > viewport.Height)
+            if (string.Equals(panel.Id, PromptPanelId, StringComparison.OrdinalIgnoreCase))
             {
-                panel.Y = Math.Max(0, viewport.Height - height - WorkspaceLayout.Spacing);
+                var width = panel.Width <= 0 ? 360d : panel.Width;
+                var height = panel.Height <= 0 ? 280d : panel.Height;
+
+                if (panel.Width <= 0)
+                {
+                    panel.Width = width;
+                }
+
+                if (panel.Height <= 0)
+                {
+                    panel.Height = height;
+                }
+
+                if (hasViewport && (panel.Y < 0 || panel.Y + height > viewport.Height))
+                {
+                    panel.Y = Math.Max(0, viewport.Height - height - spacing);
+                }
+
+                var viewModel = FloatingPanels.FirstOrDefault(p =>
+                    string.Equals(p.Id, PromptPanelId, StringComparison.OrdinalIgnoreCase));
+                viewModel?.UpdateBounds(new Rect(panel.X, panel.Y, panel.Width, panel.Height));
+                continue;
             }
 
-            if (panel.Width <= 0)
+            if (string.Equals(panel.Id, FieldMenuPanelId, StringComparison.OrdinalIgnoreCase))
             {
-                panel.Width = width;
-            }
+                var width = panel.Width <= 0 ? 320d : panel.Width;
+                var height = panel.Height <= 0
+                    ? Math.Max(360d, hasViewport ? viewport.Height * 0.45d : 520d)
+                    : panel.Height;
 
-            if (panel.Height <= 0)
-            {
-                panel.Height = height;
-            }
+                if (panel.Width <= 0)
+                {
+                    panel.Width = width;
+                }
 
-            var viewModel = FloatingPanels.FirstOrDefault(p => string.Equals(p.Id, PromptPanelId, StringComparison.OrdinalIgnoreCase));
-            viewModel?.UpdateBounds(new Rect(panel.X, panel.Y, panel.Width, panel.Height));
+                if (panel.Height <= 0)
+                {
+                    panel.Height = height;
+                }
+
+                if (hasViewport)
+                {
+                    panel.X = Math.Clamp(panel.X, spacing, Math.Max(spacing, viewport.Width - panel.Width - spacing));
+                    panel.Y = Math.Clamp(panel.Y, spacing, Math.Max(spacing, viewport.Height - panel.Height - spacing));
+                }
+
+                var viewModel = FloatingPanels.FirstOrDefault(p =>
+                    string.Equals(p.Id, FieldMenuPanelId, StringComparison.OrdinalIgnoreCase));
+                viewModel?.UpdateBounds(new Rect(panel.X, panel.Y, panel.Width, panel.Height));
+            }
         }
+    }
+
+    private void UpdateFieldMenuVisibility()
+    {
+        var shouldShow = IsLauncherDockVisible;
+
+        if (Grid.FloatingPanels is { Count: > 0 })
+        {
+            var spec = Grid.FloatingPanels.FirstOrDefault(panel =>
+                panel is not null && string.Equals(panel.Id, FieldMenuPanelId, StringComparison.OrdinalIgnoreCase));
+            if (spec is not null)
+            {
+                if (string.IsNullOrWhiteSpace(spec.ContentId))
+                {
+                    spec.ContentId = FieldMenuContentId;
+                }
+
+                if (!spec.IsVisibleWhenLocked)
+                {
+                    spec.IsVisibleWhenLocked = true;
+                }
+
+                spec.IsVisible = shouldShow;
+            }
+        }
+
+        var viewModel = FloatingPanels.FirstOrDefault(panel =>
+            string.Equals(panel.Id, FieldMenuPanelId, StringComparison.OrdinalIgnoreCase));
+        if (viewModel is not null)
+        {
+            viewModel.UpdateVisibilityPolicy(true);
+            viewModel.SetVisibility(shouldShow);
+        }
+
+        OnPropertyChanged(nameof(AreFloatingOverlaysVisible));
     }
 
     private static (int col, int row) ResolveAnchorPosition(
@@ -1515,7 +1671,54 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         block.Instance.SizeOverride = size == preferred ? null : size;
         SnapTilesToGrid();
         block.RefreshSettingsState();
+        block.RefreshPresentation();
         Save();
+    }
+
+    internal void ApplyBlockSettings(
+        BlockItemViewModel block,
+        string? title,
+        string? value,
+        double widthUnits,
+        double heightUnits,
+        double opacityPercent,
+        string? valueColor)
+    {
+        if (!CanEditBlock(block))
+        {
+            return;
+        }
+
+        var instance = block.Instance;
+        instance.TitleOverride = string.IsNullOrWhiteSpace(title) ? null : title.Trim();
+        var sanitizedValue = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+        instance.GroupKey = sanitizedValue;
+
+        var normalizedOpacity = NormalizeOpacity(opacityPercent);
+        instance.OpacityOverride = Math.Abs(normalizedOpacity - DefaultBlockOpacity) < 0.0001
+            ? null
+            : normalizedOpacity;
+
+        var normalizedColor = ValidateValueColor(valueColor);
+        instance.ValueColorOverride = string.Equals(normalizedColor, DefaultBlockValueColor, StringComparison.OrdinalIgnoreCase)
+            ? null
+            : normalizedColor;
+
+        var normalizedWidth = NormalizeUnits(widthUnits);
+        var normalizedHeight = NormalizeUnits(heightUnits);
+        if (TryResolveBlockSize(normalizedWidth, normalizedHeight, out var size))
+        {
+            var preferred = block.Definition.PreferredSize;
+            instance.SizeOverride = size == preferred ? null : size;
+        }
+
+        SnapTilesToGrid();
+        block.RefreshSettingsState();
+        block.RefreshPresentation();
+        Save();
+
+        var statusLabel = string.IsNullOrWhiteSpace(block.Label) ? "Block" : block.Label;
+        _statusReporter($"{statusLabel} updated.");
     }
 
     internal void MoveBlock(BlockItemViewModel block, int column, int row)
@@ -1608,13 +1811,18 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
         yield return (BlockSize.Tile2x1, "2 x 1");
         yield return (BlockSize.Tile1x2, "1 x 2");
         yield return (BlockSize.Tile2x2, "2 x 2");
+        yield return (BlockSize.Tile1xHalf, "1 x 0.5");
+        yield return (BlockSize.Tile2xHalf, "2 x 0.5");
+        yield return (BlockSize.TileHalfx1, "0.5 x 1");
+        yield return (BlockSize.TileHalfx2, "0.5 x 2");
     }
 
     private static bool SupportsSize(BlockDefinition definition, BlockSize size)
     {
         return size switch
         {
-            BlockSize.Tile1x2 or BlockSize.Tile2x2 => definition.SupportsFullHeight,
+            BlockSize.Tile1x2 or BlockSize.Tile2x2 or BlockSize.TileHalfx2 => definition.SupportsFullHeight,
+            BlockSize.Tile1xHalf or BlockSize.Tile2xHalf => definition.SupportsHalfHeight,
             _ => true,
         };
     }
@@ -1649,6 +1857,67 @@ public sealed class BlockLayoutViewModel : INotifyPropertyChanged
             BlockSize.TileHalfx2 => 2d,
             _ => 1d,
         };
+    }
+
+    private static double NormalizeUnits(double units)
+    {
+        if (!double.IsFinite(units))
+        {
+            return 1d;
+        }
+
+        var clamped = Math.Clamp(units, 0.5d, 2d);
+        return Math.Round(clamped * 2d, MidpointRounding.AwayFromZero) / 2d;
+    }
+
+    private static bool TryResolveBlockSize(double widthUnits, double heightUnits, out BlockSize size)
+    {
+        var best = BlockSize.Tile1x1;
+        var bestScore = double.MaxValue;
+
+        foreach (var (candidate, _) in EnumerateCandidateSizes())
+        {
+            var widthDelta = Math.Abs(GetWidthUnits(candidate) - widthUnits);
+            var heightDelta = Math.Abs(GetHeightUnits(candidate) - heightUnits);
+            var score = widthDelta + heightDelta;
+            if (score < bestScore)
+            {
+                bestScore = score;
+                best = candidate;
+            }
+        }
+
+        size = best;
+        return true;
+    }
+
+    private static double NormalizeOpacity(double opacityPercent)
+    {
+        if (!double.IsFinite(opacityPercent))
+        {
+            return DefaultBlockOpacity;
+        }
+
+        var clamped = Math.Clamp(opacityPercent, 0d, 100d);
+        return Math.Round(clamped / 100d, 3);
+    }
+
+    private static string ValidateValueColor(string? valueColor)
+    {
+        if (string.IsNullOrWhiteSpace(valueColor))
+        {
+            return DefaultBlockValueColor;
+        }
+
+        foreach (var (_, color) in ValueColorPalette)
+        {
+            if (string.Equals(color, valueColor, StringComparison.OrdinalIgnoreCase))
+            {
+                return color;
+            }
+        }
+
+        return DefaultBlockValueColor;
     }
 
     public void ApplyFloatingPanelSettings(

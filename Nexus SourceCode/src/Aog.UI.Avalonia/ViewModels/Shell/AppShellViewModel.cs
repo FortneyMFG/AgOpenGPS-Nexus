@@ -55,6 +55,8 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
 
         public event EventHandler<FloatingBlockViewModel>? FloatingBlockSettingsRequested;
 
+        public event EventHandler<BlockItemViewModel>? BlockSettingsRequested;
+
         public AppShellViewModel(BlockLayoutViewModel layout)
         {
             Layout = layout ?? throw new ArgumentNullException(nameof(layout));
@@ -62,6 +64,7 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
             Layout.LayoutSettingsRequested += OnLayoutSettingsRequested;
             Layout.FloatingPanelSettingsRequested += OnFloatingPanelSettingsRequested;
             Layout.FloatingBlockSettingsRequested += OnFloatingBlockSettingsRequested;
+            Layout.BlockSettingsRequested += OnBlockSettingsRequested;
             Layout.LauncherCategories.CollectionChanged += OnLauncherCategoriesChanged;
             Layout.PropertyChanged += OnLayoutPropertyChanged;
             UpdateFieldSettingsCategory();
@@ -112,6 +115,16 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
             FloatingBlockSettingsRequested?.Invoke(this, block);
         }
 
+        private void OnBlockSettingsRequested(object? sender, BlockItemViewModel block)
+        {
+            if (block is null)
+            {
+                return;
+            }
+
+            BlockSettingsRequested?.Invoke(this, block);
+        }
+
         private void OnLauncherCategoriesChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             UpdateFieldSettingsCategory();
@@ -157,6 +170,7 @@ namespace Aog.UI.Avalonia.ViewModels.Shell
             Layout.LayoutSettingsRequested -= OnLayoutSettingsRequested;
             Layout.FloatingPanelSettingsRequested -= OnFloatingPanelSettingsRequested;
             Layout.FloatingBlockSettingsRequested -= OnFloatingBlockSettingsRequested;
+            Layout.BlockSettingsRequested -= OnBlockSettingsRequested;
             Layout.LauncherCategories.CollectionChanged -= OnLauncherCategoriesChanged;
             Layout.PropertyChanged -= OnLayoutPropertyChanged;
         }

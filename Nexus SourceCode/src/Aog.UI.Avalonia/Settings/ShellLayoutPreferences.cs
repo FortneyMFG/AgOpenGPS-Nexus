@@ -239,6 +239,8 @@ public sealed class ShellLayoutPreferences
                 Width = panel.Width,
                 Height = panel.Height,
                 IsLocked = panel.IsLocked,
+                IsVisible = panel.IsVisible,
+                IsVisibleWhenLocked = panel.IsVisibleWhenLocked,
             });
         }
 

@@ -169,6 +169,12 @@ public sealed class BlockInstance
     public string? GroupKey { get; set; }
         = null;
 
+    public string? TitleOverride { get; set; }
+        = null;
+
+    public string? ValueColorOverride { get; set; }
+        = null;
+
     /// <summary>
     /// Creates a deep copy of the instance preserving the identifier.
     /// </summary>
@@ -185,6 +191,8 @@ public sealed class BlockInstance
             Origin = Origin,
             ContainerId = ContainerId,
             GroupKey = GroupKey,
+            TitleOverride = TitleOverride,
+            ValueColorOverride = ValueColorOverride,
         };
     }
 }

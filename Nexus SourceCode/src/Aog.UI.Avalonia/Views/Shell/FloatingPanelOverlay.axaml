@@ -5,11 +5,14 @@
              xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
              xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              xmlns:shell="clr-namespace:Aog.UI.Avalonia.Views.Shell"
+             xmlns:field="clr-namespace:Aog.UI.Avalonia.Views.Field"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.FloatingPanelOverlay"
+             x:Name="OverlayRoot"
              x:DataType="vm:FloatingPanelViewModel"
              d:DesignWidth="320"
-             d:DesignHeight="240">
+             d:DesignHeight="240"
+             IsVisible="{Binding IsVisible}">
   <UserControl.Resources>
     <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
     <rendering:BooleanToValueConverter x:Key="PanelCollisionBorderBrushConverter"
@@ -20,9 +23,9 @@
                                        TrueValue="0.72" />
     <rendering:StringEqualsConverter x:Key="PromptContentSelector"
                                      Match="prompt.edit" />
-    <rendering:StringEqualsConverter x:Key="PromptFallbackSelector"
-                                     Match="prompt.edit"
-                                     Negate="True" />
+    <rendering:StringEqualsConverter x:Key="FieldMenuContentSelector"
+                                     Match="field.menu" />
+    <rendering:StringIsNullOrWhiteSpaceConverter x:Key="StringIsNullOrWhiteSpaceConverter" />
   </UserControl.Resources>
 
   <UserControl.Styles>
@@ -90,13 +93,17 @@
           </Grid>
         </Border>
         <Grid Grid.Row="1" Margin="10">
+          <field:FieldSettingsDock DataContext="{Binding Owner}"
+                                   IsVisible="{Binding DataContext.ContentId, ElementName=OverlayRoot, Converter={StaticResource FieldMenuContentSelector}}"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch" />
           <shell:EditPromptPanel IsVisible="{Binding ContentId, Converter={StaticResource PromptContentSelector}}" />
           <TextBlock Text="Drag to reposition"
                      Foreground="#C0D6EB"
                      FontSize="12"
                      HorizontalAlignment="Left"
                      VerticalAlignment="Top"
-                     IsVisible="{Binding ContentId, Converter={StaticResource PromptFallbackSelector}}" />
+                     IsVisible="{Binding ContentId, Converter={StaticResource StringIsNullOrWhiteSpaceConverter}}" />
         </Grid>
       </Grid>
     </Border>

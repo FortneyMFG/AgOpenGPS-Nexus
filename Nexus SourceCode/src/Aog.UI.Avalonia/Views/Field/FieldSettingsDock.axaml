@@ -7,8 +7,6 @@
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Field.FieldSettingsDock"
              x:DataType="vm:BlockLayoutViewModel"
-             Width="320"
-             HorizontalAlignment="Left"
              VerticalAlignment="Stretch"
              d:DesignWidth="320"
              d:DesignHeight="720">
@@ -17,12 +15,6 @@
     <rendering:StringHasValueConverter x:Key="StringHasValueConverter" />
     <rendering:StringIsNullOrWhiteSpaceConverter x:Key="StringIsNullOrWhiteSpaceConverter" />
     <rendering:BooleanNegationConverter x:Key="BooleanNegationConverter" />
-    <rendering:BooleanToValueConverter x:Key="LauncherDockMarginConverter"
-                                       TrueValue="0"
-                                       FalseValue="-320,0,0,0" />
-    <rendering:BooleanToValueConverter x:Key="LauncherDockOpacityConverter"
-                                       TrueValue="1"
-                                       FalseValue="0" />
     <rendering:BooleanToValueConverter x:Key="LayoutLockStatusConverter"
                                        TrueValue="Layout locked"
                                        FalseValue="Layout unlocked" />
@@ -100,34 +92,11 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <UserControl.Transitions>
-    <Transitions>
-      <ThicknessTransition Property="Margin" Duration="0:0:0.18" />
-      <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
-    </Transitions>
-  </UserControl.Transitions>
-
   <UserControl.Styles>
     <Style Selector="UserControl">
       <Setter Property="Background" Value="#DD101010" />
       <Setter Property="Padding" Value="18" />
-      <Setter Property="Margin">
-        <Setter.Value>
-          <Binding Path="IsLauncherDockVisible"
-                   Converter="{StaticResource LauncherDockMarginConverter}" />
-        </Setter.Value>
-      </Setter>
-      <Setter Property="Opacity">
-        <Setter.Value>
-          <Binding Path="IsLauncherDockVisible"
-                   Converter="{StaticResource LauncherDockOpacityConverter}" />
-        </Setter.Value>
-      </Setter>
-      <Setter Property="IsHitTestVisible">
-        <Setter.Value>
-          <Binding Path="IsLauncherDockVisible" />
-        </Setter.Value>
-      </Setter>
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
 
     <Style Selector="Border.menu-block">

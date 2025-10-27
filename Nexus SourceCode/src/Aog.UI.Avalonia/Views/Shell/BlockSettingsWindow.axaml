@@ -1,0 +1,89 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aog.UI.Avalonia.ViewModels.Shell"
+        mc:Ignorable="d"
+        x:Class="Aog.UI.Avalonia.Views.Shell.BlockSettingsWindow"
+        x:DataType="vm:BlockSettingsDialogViewModel"
+        Title="Block settings"
+        Width="420"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Grid Margin="20"
+        RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+        RowSpacing="20">
+    <StackPanel Grid.Row="0" Spacing="4">
+      <TextBlock Text="Block"
+                 FontSize="{DynamicResource ThemeFontSizeMd}"
+                 FontWeight="SemiBold" />
+      <TextBlock Text="{Binding BlockLabel}" />
+      <TextBlock Text="{Binding DefinitionId}"
+                 FontSize="{DynamicResource ThemeFontSizeSm}"
+                 Foreground="#9C9C9C" />
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Spacing="8">
+      <TextBlock Text="Title" FontWeight="SemiBold" />
+      <TextBox Text="{Binding Title, Mode=TwoWay}" />
+      <TextBlock Text="Value" FontWeight="SemiBold" />
+      <TextBox Text="{Binding Value, Mode=TwoWay}" />
+    </StackPanel>
+
+    <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="16">
+      <StackPanel Spacing="6">
+        <TextBlock Text="Width (grid units)" FontWeight="SemiBold" />
+        <NumericUpDown Minimum="{Binding MinUnits}"
+                       Maximum="{Binding MaxUnits}"
+                       Increment="{Binding UnitStep}"
+                       Value="{Binding WidthUnits, Mode=TwoWay}" />
+      </StackPanel>
+      <StackPanel Grid.Column="1" Spacing="6">
+        <TextBlock Text="Height (grid units)" FontWeight="SemiBold" />
+        <NumericUpDown Minimum="{Binding MinUnits}"
+                       Maximum="{Binding MaxUnits}"
+                       Increment="{Binding UnitStep}"
+                       Value="{Binding HeightUnits, Mode=TwoWay}" />
+      </StackPanel>
+    </Grid>
+
+    <StackPanel Grid.Row="3" Spacing="10">
+      <TextBlock Text="Background opacity" FontWeight="SemiBold" />
+      <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+        <Slider Minimum="{Binding MinOpacity}"
+                Maximum="{Binding MaxOpacity}"
+                Value="{Binding BackgroundOpacity, Mode=TwoWay}"
+                Width="220" />
+        <TextBlock Text="{Binding BackgroundOpacity, StringFormat={}{0:F0}%}"
+                   Width="60"
+                   HorizontalAlignment="Right" />
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <StackPanel Spacing="6">
+        <TextBlock Text="Value text color" FontWeight="SemiBold" />
+        <ComboBox ItemsSource="{Binding ColorOptions}"
+                  SelectedItem="{Binding SelectedColor, Mode=TwoWay}"
+                  Width="180">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Border Width="18"
+                        Height="18"
+                        CornerRadius="4"
+                        Background="{Binding Color}" />
+                <TextBlock Text="{Binding Name}" />
+              </StackPanel>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
+        <Button Content="Cancel" Click="OnCancelClick" />
+        <Button Content="Apply" Click="OnApplyClick" IsEnabled="{Binding CanEdit}" />
+      </StackPanel>
+    </StackPanel>
+  </Grid>
+</Window>

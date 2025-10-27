@@ -266,6 +266,12 @@ public sealed class FloatingPanelSpec
 
     public bool IsLocked { get; set; }
         = false;
+
+    public bool IsVisible { get; set; }
+        = true;
+
+    public bool IsVisibleWhenLocked { get; set; }
+        = false;
 }
 
 public sealed class FloatingBlockSpec

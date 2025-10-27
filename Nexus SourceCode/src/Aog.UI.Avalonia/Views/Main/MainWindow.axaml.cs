@@ -154,6 +154,7 @@ namespace Aog.UI.Avalonia.Views.Main
             _shell.LayoutSettingsRequested += OnLayoutSettingsRequested;
             _shell.FloatingPanelSettingsRequested += OnFloatingPanelSettingsRequested;
             _shell.FloatingBlockSettingsRequested += OnFloatingBlockSettingsRequested;
+            _shell.BlockSettingsRequested += OnBlockSettingsRequested;
         }
 
         private void DetachShell()
@@ -166,6 +167,7 @@ namespace Aog.UI.Avalonia.Views.Main
             _shell.LayoutSettingsRequested -= OnLayoutSettingsRequested;
             _shell.FloatingPanelSettingsRequested -= OnFloatingPanelSettingsRequested;
             _shell.FloatingBlockSettingsRequested -= OnFloatingBlockSettingsRequested;
+            _shell.BlockSettingsRequested -= OnBlockSettingsRequested;
             _shell = null;
         }
 
@@ -228,6 +230,28 @@ namespace Aog.UI.Avalonia.Views.Main
             var dialog = new FloatingBlockSettingsWindow
             {
                 DataContext = new FloatingBlockSettingsDialogViewModel(layout, block),
+                Icon = Icon,
+            };
+
+            await dialog.ShowDialog<bool?>(this);
+        }
+
+        private async void OnBlockSettingsRequested(object? sender, BlockItemViewModel block)
+        {
+            if (_shell is null || block is null)
+            {
+                return;
+            }
+
+            var layout = _shell.Layout;
+            if (layout.IsLocked)
+            {
+                return;
+            }
+
+            var dialog = new BlockSettingsWindow
+            {
+                DataContext = new BlockSettingsDialogViewModel(layout, block),
                 Icon = Icon,
             };
 

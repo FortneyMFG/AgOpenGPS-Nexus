@@ -8,7 +8,6 @@
              xmlns:rendering="clr-namespace:Aog.UI.Avalonia.Rendering"
              xmlns:shell="clr-namespace:Aog.UI.Avalonia.Views.Shell"
              xmlns:mapping="clr-namespace:Aog.UI.Avalonia.Views.Mapping"
-             xmlns:field="clr-namespace:Aog.UI.Avalonia.Views.Field"
              xmlns:layout="clr-namespace:Aog.UI.Avalonia.Layout"
              mc:Ignorable="d"
              x:Class="Aog.UI.Avalonia.Views.Shell.AppShellView"
@@ -94,7 +93,7 @@
                     Background="#1F1F1FCC"
                     BorderBrush="#525252"
                     BorderThickness="2"
-                    Opacity="0.94">
+                    Opacity="{Binding BackgroundOpacity}">
               <Border.Background>
                 <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
                   <GradientStop Offset="0" Color="#2F2F2FF0" />
@@ -120,8 +119,7 @@
                     <Binding Path="IsLayoutLocked" />
                   </MultiBinding>
                 </Menu.IsVisible>
-                <MenuItem ItemsSource="{Binding SizeOptions}"
-                          ToolTip.Tip="Adjust block size">
+                <MenuItem>
                   <MenuItem.Header>
                     <Border Background="#626262"
                             BorderBrush="#777777"
@@ -134,14 +132,23 @@
                                  FontWeight="Bold" />
                     </Border>
                   </MenuItem.Header>
-                  <MenuItem.ItemTemplate>
-                    <DataTemplate x:DataType="vm:BlockSizeOptionViewModel">
-                      <MenuItem Header="{Binding Label}"
-                                Command="{Binding ApplyCommand}"
-                                ToggleType="CheckBox"
-                                IsChecked="{Binding IsSelected}" />
-                    </DataTemplate>
-                  </MenuItem.ItemTemplate>
+                  <MenuItem Header="Configure block..."
+                            Command="{Binding OpenSettingsCommand}" />
+                  <Separator IsVisible="{Binding HasSizeOptions}" />
+                  <MenuItem Header="Resize"
+                            IsVisible="{Binding HasSizeOptions}">
+                    <MenuItem.ItemsSource>
+                      <Binding Path="SizeOptions" />
+                    </MenuItem.ItemsSource>
+                    <MenuItem.ItemTemplate>
+                      <DataTemplate x:DataType="vm:BlockSizeOptionViewModel">
+                        <MenuItem Header="{Binding Label}"
+                                  Command="{Binding ApplyCommand}"
+                                  ToggleType="CheckBox"
+                                  IsChecked="{Binding IsSelected}" />
+                      </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                  </MenuItem>
                 </MenuItem>
               </Menu>
 
@@ -173,7 +180,7 @@
                            Margin="0,2,0,0"
                            TextAlignment="Center"
                            TextWrapping="Wrap"
-                           Foreground="#4CAF50"
+                           Foreground="{Binding ValueColor}"
                            IsVisible="{Binding Value, Converter={StaticResource StringHasValueConverter}}" />
               </StackPanel>
             </Grid>
@@ -519,8 +526,6 @@
                       IsHitTestVisible="{Binding Layout.AreFloatingOverlaysVisible}" />
       </Canvas>
 
-      <field:FieldSettingsDock DataContext="{Binding Layout}"
-                               ZIndex="6" />
     </Grid>
 
     <Border Grid.Row="2"

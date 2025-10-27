@@ -1,111 +1,62 @@
-# 97 — Simulation & Replay
-*(Status: Proposed)*
+# 97 — Simulation, Replay & Workspace Stress Testing
+*(Status: Draft — grid-aware rewrite)*
 
-**Authors:** Nexus Team (Codex)
-**Created:** 2025-10-24
-**Version:** 0.1.0
-**Section ID:** 97
-**Editors:** Simulation & Quality Working Group
-**Last Updated:** 2025-10-24
-**Related Sections:** 23 — Threading, Scheduling & Timing, 41 — Service APIs & Contracts, 63 — Layers Registry & Journal Contracts, 77 — Variable Rate Control, 96 — Quality Engineering & Release
-**Upstream Dependencies:** ADR-004, ADR-021, ADR-068, Layer Registry metadata, Job lifecycle services
-**Downstream Impacts:** CI replay gates, plugin certification, telemetry analytics, hardware-in-loop workflows
+**Authors:** Simulation Engineering Guild  
+**Version:** 1.0.0  
+**Section ID:** 97  
+**Related Sections:** 91 — UI Shell, 92 — Blocks, 96 — Quality Engineering  
+**Upstream Dependencies:** 4X — Interprocess Communications, 6X — Core Simulation Services  
+**Downstream Impacts:** Operator Training, Release Engineering
 
 ---
 
-## 97.1 Purpose & Scope
+## 97.1 Purpose
 
-Define deterministic simulation and replay services that allow Nexus to capture, timewarp, and re-run agronomic sessions for QA, development, and operator training. The section governs SimClock/SimBus expectations, record/replay fidelity, synthetic sensor providers, and golden run management used by §96 release gates.【F:docs/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md†L1-L68】
-
----
-
-## 97.2 Context
-
-- Composite simulation fabric (ADR-004) unifies SimClock and SimBus to orchestrate deterministic event delivery across plugins and services.
-- Journals (§63) and contracts (§41) capture telemetry, commands, and layer updates required for faithful replay.
-- Guidance and control loops (§77, §81) rely on simulation fixtures to validate safety interlocks before field deployment.
-- Packaging workflows (§94) must bundle simulation providers and golden datasets for offline QA and training.
+Provide deterministic simulation and replay capabilities that validate grid layouts, block behavior, and plugin interactions. Simulation ensures operators and QA can exercise drag/drop, resizing, and prompt workflows without hardware in the loop.
 
 ---
 
-## 97.3 Definitions
+## 97.2 Capabilities
 
-| Term | Definition |
-|------|------------|
-| SimClock | Deterministic clock controlling simulation time progression and time dilation. |
-| SimBus | Publish/subscribe fabric that delivers simulation topics with ordering guarantees tied to SimClock. |
-| Golden Run | Canonical recording used to verify regression behavior across releases. |
-| Synthetic Sensor | Provider that emits simulated hardware signals (GPS, flow, IMU) for closed-loop testing. |
-| Timewarp | Capability to accelerate, pause, or rewind simulation timelines while maintaining determinism. |
+- **Deterministic Replay:** Load recorded sessions that include layout states, block placements, and telemetry streams, ensuring layout diffs reproduce exactly.  
+- **Scenario Builder:** Compose synthetic scenarios (e.g., variable rate changes, section faults) to stress test blocks and panels.  
+- **Latency Injection:** Emulate slow telemetry or remote network jitter to verify layout sync resilience.  
+- **Automation Hooks:** Allow CLI (§93) and UI to trigger simulations via shared APIs for CI pipelines.
 
 ---
 
-> **Requirement Grammar (RFC-2119):**
-> - **MUST / MUST NOT** = mandatory, testable requirement.
-> - **SHOULD / SHOULD NOT** = strong recommendation; document deviations.
-> - **MAY** = optional extension gated by telemetry + ADR sign-off.
+## 97.3 Requirements
 
-## 97.4 Requirements
-
-| ID | Priority | Category | Summary | Source / C-IDs | Key Metrics / Verification |
-|----|-----------|----------|---------|-----------------|-----------------------------|
-| R-SIM-9700 | MUST | Determinism | SimClock and SimBus MUST deliver events deterministically given identical inputs and seeds. | ADR-004 | Replay harness compares event ordering hashes. |
-| R-SIM-9701 | MUST | Record/Replay | Simulation stack MUST capture telemetry, commands, and layer updates via §63 journals and expose replay APIs for §96 gates. | Journal charter | Golden run suite diff checks outputs. |
-| R-SIM-9702 | SHOULD | Synthetic Sensors | Provide pluggable synthetic sensors (GPS, IMU, flow, sections) with parameterizable noise models. | Simulation blueprint | Sensor provider tests validate parameter bounds. |
-| R-SIM-9703 | MUST | Timewarp | Simulation MUST support pause/resume and variable playback rates without breaking determinism. | ADR-004 | Timewarp regression harness validates consistent outputs. |
-| R-SIM-9704 | SHOULD | Hardware Shadowing | Enable hardware shadow mode where live hardware runs alongside simulation for A/B validation. | Automation WG notes | Shadow tests compare live vs. simulated telemetry. |
-| R-SIM-9705 | MUST | Golden Run Governance | Golden datasets MUST include provenance metadata, seed values, and acceptance thresholds versioned with §96 release criteria. | QA governance | Release checklist verifies golden package contents. |
+| ID | Priority | Requirement | Notes |
+|----|----------|-------------|-------|
+| R-SIM-01 | MUST | Layout Snapshotting | Capture workspace layout before and after each simulation run for diffing. |
+| R-SIM-02 | MUST | Telemetry Fidelity | Replay honors original timestamps and ordering to stress UI smoothing logic. |
+| R-SIM-03 | SHOULD | Multi-Client Sync | Support concurrent desktop and remote clients sharing the same simulation timeline. |
+| R-SIM-04 | SHOULD | Grid Stress Profiles | Provide scenarios that rapidly reconfigure blocks (drag storms) to test collision handling. |
+| R-SIM-05 | MUST | Prompt Automation | Simulations trigger configuration prompts (e.g., Edit Prompt) to ensure schema validation under load.【F:docs/UI/UI_Demo.html†L181-L221】 |
+| R-SIM-06 | SHOULD | Export Reports | Generate summaries (pass/fail, timing, screenshots) for release readiness. |
 
 ---
 
-## 97.5 Acceptance Criteria & Verification
+## 97.4 Tooling
 
-- Replay harness re-runs golden datasets and asserts telemetry, command, and layer hashes match baselines.
-- Synthetic sensor provider tests validate noise models and parameter ranges.
-- Timewarp scenarios exercise pause/resume and accelerated playback while verifying determinism.
-- Release pipeline checks confirm golden datasets are versioned, signed, and distributed with packaging outputs.
-
-### 97.5.1 Requirement-to-Verification Map
-
-| Req ID | Verification Type | Artifact / Location | Pass/Fail Threshold |
-|--------|--------------------|---------------------|---------------------|
-| R-SIM-9700 | Replay harness | `tests/sim/replay_determinism.cs` | Event ordering hash matches baseline. |
-| R-SIM-9701 | Golden run diff | `tests/sim/golden_suite.yaml` | Telemetry/layer hashes within tolerance. |
-| R-SIM-9702 | Provider tests | `tests/sim/synthetic_sensor_specs.cs` | Noise parameters stay in configured bounds. |
-| R-SIM-9703 | Timewarp regression | `tests/sim/timewarp_regression.md` | Replay output identical across playback rates. |
-| R-SIM-9704 | Shadow bench | `tests/hil/shadow_mode.md` | Simulated vs. live telemetry delta ≤ defined threshold. |
-| R-SIM-9705 | Release checklist | `qa/playbooks/golden_dataset.md` | Package includes provenance + acceptance thresholds. |
+- **SimClock Integration:** Aligns with existing simulation clock to maintain determinism across Core and UI.  
+- **Replay Service:** Streams recorded data to multiple clients, handling back-pressure and reconnection.  
+- **Scenario DSL:** Declarative DSL to describe block movements, prompts triggered, and telemetry events.  
+- **Visualization:** Provide overlays showing simulated drag paths and collision warnings for debugging.
 
 ---
 
-## 97.6 Interfaces & Dependencies
+## 97.5 Training & Operator Use
 
-- §41 defines service contracts used to stream simulation topics; §52 uses the same contracts for hardware mirroring.
-- §63 journals provide the authoritative event store for record/replay; §32 persistence ensures datasets remain durable.
-- §96 quality gates invoke simulation suites to decide release readiness; results feed telemetry dashboards in §64.
-- §94 packaging must distribute simulation providers and golden datasets with manifests referencing this section.
-
----
-
-## 97.7 Risks & Open Issues
-
-| ID | Description | Impact | Mitigation / Status | Owner |
-|----|-------------|--------|---------------------|-------|
-| RISK-97-1 | Golden run datasets grow large, impacting CI runtimes. | Medium | Provide tiered dataset sizes (smoke, regression, soak) and incremental diffs. | @qa |
-| RISK-97-2 | Synthetic sensor models diverge from hardware characteristics. | High | Continuously compare with bench captures; adjust noise parameters via ADR updates. | @simulation |
-| ISSUE-97-1 | Need deterministic GPU path for rendering-centric simulations. | Medium | Track under mapping WG; evaluate headless renderer instrumentation. | @mapping |
+- Supply training presets that walk operators through layout customization without affecting production data.  
+- Allow instructors to trigger sub-sidebars or prompts remotely, guiding trainees through complex workflows.  
+- Capture practice sessions for review and iterative improvements.
 
 ---
 
-## 97.8 Decision History
+## 97.6 Open Questions
 
-- Simulation content moved from §94 to dedicated section to clarify responsibilities (2025-10-24).
-
----
-
-## Section Change Log
-
-| Date | Summary | Author | PR / Issue |
-|------|---------|--------|------------|
-| 2025-10-24 | Initial draft | Nexus Team (Codex) |  |
-
+1. How granular should scenario scripting be (per-block vs. per-grid)?  
+2. What minimum hardware profile is required to run high-fidelity simulations locally?  
+3. Can we merge simulation artifacts with release telemetry for unified regression tracking?

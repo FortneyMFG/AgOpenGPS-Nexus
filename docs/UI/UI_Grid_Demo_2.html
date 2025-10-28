@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Nexus Unified Grid + Docks v2</title>
+<style>
+  body {
+    background: #1a1a1a;
+    color: #ddd;
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 1rem;
+    box-sizing: border-box;
+    height: 100vh;
+  }
+
+  .controls {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    overflow-y: auto;
+  }
+
+  .controls h1 {
+    font-size: 16px;
+    margin: 0 0 .5rem 0;
+    color: #fff;
+  }
+
+  .row {
+    margin-bottom: 0.75rem;
+  }
+
+  .row label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 0.25rem;
+  }
+
+  .row input[type="number"],
+  .row input[type="range"] {
+    width: 100%;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.4;
+  }
+
+  .metrics {
+    background: #1e1e1e;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: .5rem .75rem;
+    font-family: ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    color: #cfcfcf;
+  }
+
+  .preview-wrapper {
+    background: #000;
+    border: 1px solid #444;
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .surface {
+    position: relative;
+    background: #0b0b0b;
+    border: 2px solid #777;
+    box-shadow: 0 0 20px rgba(0,0,0,.8);
+    overflow: hidden;
+    image-rendering: pixelated;
+    font-size: 0;
+  }
+
+  /* Full-surface grid lines */
+  .grid-line-vert {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: rgba(0,255,255,0.4);
+    pointer-events: none;
+  }
+
+  .grid-line-horiz {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,0,0.5);
+    pointer-events: none;
+  }
+
+  .grid-line-horiz-half {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,0,0.2);
+    pointer-events: none;
+  }
+
+  .col-label,
+  .row-label {
+    position: absolute;
+    font-family: ui-monospace, monospace;
+    font-size: 10px;
+    line-height: 1;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 2px 4px;
+    border-radius: 3px;
+    pointer-events: none;
+    user-select: none;
+  }
+  .col-label {
+    top: 2px;
+    transform: translateX(-50%);
+  }
+  .row-label {
+    left: 2px;
+    transform: translateY(-50%);
+  }
+
+  /* Dock panels drawn as solid anchored frames (no inset) */
+  .dockCard {
+    position: absolute;
+    box-sizing: border-box;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: #fff;
+    text-shadow: 0 0 3px #000;
+    padding: 6px 8px;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.28);
+    background-clip: padding-box;
+  }
+
+  .headerDockCard {
+    background: rgba(255,0,0,0.22);
+    border-color: rgba(255,0,0,0.4);
+  }
+  .bottomDockCard {
+    background: rgba(255,255,0,0.22);
+    border-color: rgba(255,255,0,0.4);
+  }
+  .leftDockCard {
+    background: rgba(0,128,255,0.22);
+    border-color: rgba(0,128,255,0.4);
+  }
+  .rightDockCard {
+    background: rgba(255,0,255,0.22);
+    border-color: rgba(255,0,255,0.4);
+  }
+
+  /* "Working area" leftover hole for visualization only */
+  .workAreaOverlay {
+    position: absolute;
+    border: 1px dashed rgba(0,255,0,0.6);
+    color: #0f0;
+    font-family: ui-monospace, monospace;
+    font-size: 10px;
+    padding: 2px 4px;
+    pointer-events: none;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <h1>Nexus Grid + Docks (No Overlap)</h1>
+
+  <!-- GLOBAL VIEWPORT -->
+  <div class="row">
+    <label>
+      Usable Width (px)
+      <span id="valW"></span>
+    </label>
+    <input id="inputW" type="number" min="200" max="4000" step="10" value="1800">
+  </div>
+
+  <div class="row">
+    <label>
+      Usable Height (px)
+      <span id="valH"></span>
+    </label>
+    <input id="inputH" type="number" min="200" max="2500" step="10" value="1070">
+  </div>
+
+  <!-- GRID DENSITY -->
+  <div class="row">
+    <label>
+      Density Factor
+      <span id="valDensity"></span>
+    </label>
+    <input id="inputDensity" type="range" min="0.5" max="1.5" step="0.05" value="1.0">
+    <div class="hint">
+      &lt;1.0 = more cols (denser)<br/>
+      &gt;1.0 = fewer cols (bigger)
+    </div>
+  </div>
+
+  <div class="row">
+    <label>
+      Min Tap Width (px)
+      <span id="valTap"></span>
+    </label>
+    <input id="inputTap" type="number" min="60" max="300" step="5" value="120">
+    <div class="hint">Smallest allowed column width for touch/gloves.</div>
+  </div>
+
+  <!-- DOCK SIZES IN GRID UNITS -->
+  <div class="row">
+    <label>
+      Header Dock Height (rows)
+      <span id="valHeaderRows"></span>
+    </label>
+    <input id="inputHeaderRows" type="range" min="0.5" max="6" step="0.5" value="1.0">
+    <div class="hint">Top dock thickness in grid row units (min 0.5).</div>
+  </div>
+
+  <div class="row">
+    <label>
+      Bottom Dock Height (rows)
+      <span id="valBottomRows"></span>
+    </label>
+    <input id="inputBottomRows" type="range" min="0" max="6" step="0.5" value="1.0">
+    <div class="hint">Bottom dock thickness in grid row units. 0 = hidden.</div>
+  </div>
+
+  <div class="row">
+    <label>
+      Left Dock Width (cols)
+      <span id="valLeftCols"></span>
+    </label>
+    <input id="inputLeftCols" type="range" min="0" max="6" step="0.5" value="1.0">
+    <div class="hint">Left dock thickness in grid column units. 0 = hidden.</div>
+  </div>
+
+  <div class="row">
+    <label>
+      Right Dock Width (cols)
+      <span id="valRightCols"></span>
+    </label>
+    <input id="inputRightCols" type="range" min="0" max="6" step="0.5" value="1.0">
+    <div class="hint">Right dock thickness in grid column units. 0 = hidden.</div>
+  </div>
+
+  <div class="metrics" id="metricsBox"></div>
+
+  <div style="font-size:11px;color:#666;margin-top:.5rem;">
+    Cyan = global column lines<br/>
+    Yellow solid = 1.0h rows<br/>
+    Yellow faint = 0.5h half-rows<br/>
+    Colored strips = docks sized in grid units<br/>
+    Green dashed box = remaining working area (just for reference)
+  </div>
+</div>
+
+<div class="preview-wrapper">
+  <div id="surface" class="surface"></div>
+</div>
+
+<script>
+function clamp(v, lo, hi) {
+  return Math.max(lo, Math.min(hi, v));
+}
+
+function recompute() {
+  // Read inputs
+  const W             = parseFloat(document.getElementById('inputW').value);
+  const H             = parseFloat(document.getElementById('inputH').value);
+  const densityFactor = parseFloat(document.getElementById('inputDensity').value);
+  const minTapPx      = parseFloat(document.getElementById('inputTap').value);
+
+  let headerRows      = parseFloat(document.getElementById('inputHeaderRows').value);
+  let bottomRows      = parseFloat(document.getElementById('inputBottomRows').value);
+  let leftCols        = parseFloat(document.getElementById('inputLeftCols').value);
+  let rightCols       = parseFloat(document.getElementById('inputRightCols').value);
+
+  // Update labels
+  document.getElementById('valW').textContent           = W.toFixed(0);
+  document.getElementById('valH').textContent           = H.toFixed(0);
+  document.getElementById('valDensity').textContent     = densityFactor.toFixed(2);
+  document.getElementById('valTap').textContent         = minTapPx.toFixed(0);
+  document.getElementById('valHeaderRows').textContent  = headerRows.toFixed(1);
+  document.getElementById('valBottomRows').textContent  = bottomRows.toFixed(1);
+  document.getElementById('valLeftCols').textContent    = leftCols.toFixed(1);
+  document.getElementById('valRightCols').textContent   = rightCols.toFixed(1);
+
+  // --- Compute global grid from whole viewport ---
+  const AR = W / H;
+
+  let aspectCols = 6.6667 * AR + 0.6667;         // ~4 cols @AR=0.5, ~12 cols @1.7, etc
+  let scaledCols = aspectCols / densityFactor;   // densityFactor <1 => more cols, >1 => fewer
+
+  let physicalMaxCols = Math.floor(W / minTapPx);
+  if (physicalMaxCols < 1) physicalMaxCols = 1;
+
+  let columns = Math.round(scaledCols);
+  columns = clamp(columns, 3, 16);
+  columns = Math.min(columns, physicalMaxCols);
+  columns = Math.max(columns, 3);
+
+  const gridSizeX = W / columns;
+
+  let halfStepsY = Math.round((2.0 * H) / gridSizeX);
+  if (halfStepsY < 1) halfStepsY = 1;
+
+  const gridSizeY = (2.0 * H) / halfStepsY;
+  const approxFullRows = halfStepsY / 2.0;
+
+  // We now know: 1 column = gridSizeX px, 1 row = gridSizeY px
+
+  // Clamp docks so they don't collapse the middle to negative size
+  // Vertical: headerRows + bottomRows can't exceed total rows
+  const totalRowsAvailable = approxFullRows; // how many ~1.0h rows fit vertically
+  if (headerRows + bottomRows > totalRowsAvailable) {
+    const scale = totalRowsAvailable / (headerRows + bottomRows);
+    // honor header's min 0.5 first
+    // if scaling would push header below 0.5, clamp header and re-fit bottom
+    let hCandidate = headerRows * scale;
+    let bCandidate = bottomRows * scale;
+    if (hCandidate < 0.5) {
+      hCandidate = 0.5;
+      const leftover = totalRowsAvailable - hCandidate;
+      bCandidate = Math.max(0, Math.min(bottomRows, leftover));
+    }
+    headerRows = hCandidate;
+    bottomRows = bCandidate;
+  }
+
+  // Horizontal: leftCols + rightCols can't exceed columns
+  if (leftCols + rightCols > columns) {
+    const scale = columns / (leftCols + rightCols);
+    leftCols  *= scale;
+    rightCols *= scale;
+  }
+
+  // Convert dock sizes (grid units) -> px
+  const headerPxH = headerRows * gridSizeY;
+  const bottomPxH = bottomRows * gridSizeY;
+  const leftPxW   = leftCols   * gridSizeX;
+  const rightPxW  = rightCols  * gridSizeX;
+
+  // Build dock rects in px, origin bottom-left (our logical space)
+  const headerDock = {
+    x0: 0,
+    x1: W,
+    y0: H - headerPxH,
+    y1: H
+  };
+
+  const bottomDock = {
+    x0: 0,
+    x1: W,
+    y0: 0,
+    y1: bottomPxH
+  };
+
+  const leftDock = {
+    x0: 0,
+    x1: leftPxW,
+    y0: bottomPxH,
+    y1: H - headerPxH
+  };
+
+  const rightDock = {
+    x0: W - rightPxW,
+    x1: W,
+    y0: bottomPxH,
+    y1: H - headerPxH
+  };
+
+  // Working "hole" just for visualization (not canonical main surface, just leftover middle)
+  const workArea = {
+    x0: leftPxW,
+    x1: W - rightPxW,
+    y0: bottomPxH,
+    y1: H - headerPxH
+  };
+
+  // If docks eat everything, clamp so we don't get inverted rect
+  if (workArea.x1 < workArea.x0) workArea.x1 = workArea.x0;
+  if (workArea.y1 < workArea.y0) workArea.y1 = workArea.y0;
+
+  // ---- RENDER PHASE ----
+
+  const surfaceEl = document.getElementById('surface');
+  const wrapperEl = surfaceEl.parentElement;
+
+  // fit preview into right pane keeping aspect
+  const wrapW = wrapperEl.clientWidth - 40;
+  const wrapH = wrapperEl.clientHeight - 40;
+  const scale = Math.min(wrapW / W, wrapH / H);
+
+  const drawW = W * scale;
+  const drawH = H * scale;
+
+  surfaceEl.style.width = drawW + "px";
+  surfaceEl.style.height = drawH + "px";
+
+  // helper to convert px rect (bottom-left origin) -> CSS box in preview (top-left origin)
+  function pxRectToCss(rectPx) {
+    const x0s = rectPx.x0 * scale;
+    const x1s = rectPx.x1 * scale;
+    const y0s = rectPx.y0 * scale;
+    const y1s = rectPx.y1 * scale;
+
+    const cssLeft = x0s;
+    const cssTop  = drawH - y1s;
+    const cssW    = x1s - x0s;
+    const cssH    = y1s - y0s;
+
+    return {left: cssLeft, top: cssTop, width: cssW, height: cssH};
+  }
+
+  // wipe previous frame
+  surfaceEl.innerHTML = "";
+
+  // Draw grid (full surface)
+  const colWidthPreview = gridSizeX * scale;
+  const totalColsPreview = Math.floor(drawW / colWidthPreview);
+
+  for (let c = 0; c <= totalColsPreview; c++) {
+    const x = c * colWidthPreview;
+
+    const vline = document.createElement('div');
+    vline.className = 'grid-line-vert';
+    vline.style.left = x + "px";
+    vline.style.width = "1px";
+    vline.style.top = "0px";
+    vline.style.bottom = "0px";
+    surfaceEl.appendChild(vline);
+
+    if (c < totalColsPreview) {
+      const clabel = document.createElement('div');
+      clabel.className = 'col-label';
+      clabel.style.left = x + "px";
+      clabel.style.top = "2px";
+      clabel.textContent = c.toString();
+      surfaceEl.appendChild(clabel);
+    }
+  }
+
+  const fullRowHeightPreview  = gridSizeY * scale;
+  const halfRowHeightPreview  = 0.5 * fullRowHeightPreview;
+  const totalHalfStepsPreview = Math.floor(drawH / halfRowHeightPreview);
+
+  for (let hs = 0; hs <= totalHalfStepsPreview; hs++) {
+    const yFromBottom = hs * halfRowHeightPreview;
+    const cssY = drawH - yFromBottom;
+
+    const isFullRow = (hs % 2 === 0);
+
+    const hline = document.createElement('div');
+    hline.style.left = "0px";
+    hline.style.right = "0px";
+    hline.style.height = "1px";
+    hline.style.top = cssY + "px";
+    hline.className = isFullRow ? 'grid-line-horiz' : 'grid-line-horiz-half';
+    surfaceEl.appendChild(hline);
+
+    if (isFullRow && hs < totalHalfStepsPreview) {
+      const fullRowIndex = hs / 2;
+      const rlabel = document.createElement('div');
+      rlabel.className = 'row-label';
+      rlabel.style.left = "2px";
+      rlabel.style.top = cssY + "px";
+      rlabel.textContent = fullRowIndex.toString();
+      surfaceEl.appendChild(rlabel);
+    }
+  }
+
+  // Draw docks as solid strips (no overlap)
+  function drawDockCard(rectPx, className, text) {
+    const css = pxRectToCss(rectPx);
+    if (css.width <= 1 || css.height <= 1) return;
+    const card = document.createElement('div');
+    card.className = "dockCard " + className;
+    card.style.left   = css.left + "px";
+    card.style.top    = css.top + "px";
+    card.style.width  = css.width + "px";
+    card.style.height = css.height + "px";
+    card.textContent = text;
+    surfaceEl.appendChild(card);
+  }
+
+  drawDockCard(headerDock, "headerDockCard", "HeaderDock");
+  drawDockCard(bottomDock, "bottomDockCard", "BottomDock");
+  drawDockCard(leftDock,   "leftDockCard",   "LeftDock");
+  drawDockCard(rightDock,  "rightDockCard",  "RightDock");
+
+  // Draw leftover work area just for visualization
+  const workCss = pxRectToCss(workArea);
+  if (workCss.width > 1 && workCss.height > 1) {
+    const wa = document.createElement('div');
+    wa.className = "workAreaOverlay";
+    wa.style.left   = workCss.left + "px";
+    wa.style.top    = workCss.top + "px";
+    wa.style.width  = workCss.width + "px";
+    wa.style.height = workCss.height + "px";
+    wa.textContent = "workspace area (not special, just leftover)";
+    surfaceEl.appendChild(wa);
+  }
+
+  // Metrics
+  const metricsEl = document.getElementById('metricsBox');
+  metricsEl.textContent =
+`Viewport px        : ${W.toFixed(0)} x ${H.toFixed(0)}
+Aspect Ratio       : ${AR.toFixed(3)}
+
+Columns            : ${columns}
+gridSizeX (1 col)  : ${gridSizeX.toFixed(2)} px
+gridSizeY (1 row)  : ${gridSizeY.toFixed(2)} px
+halfStepsY (0.5h)  : ${halfStepsY} (~${approxFullRows.toFixed(2)} rows)
+
+DensityFactor      : ${densityFactor.toFixed(2)}
+MinTapPx           : ${minTapPx.toFixed(0)}
+physicalMaxCols    : ${physicalMaxCols}
+aspectCols raw     : ${aspectCols.toFixed(2)}
+scaledCols         : ${scaledCols.toFixed(2)}
+
+HeaderRows         : ${headerRows.toFixed(1)}
+BottomRows         : ${bottomRows.toFixed(1)}
+LeftCols           : ${leftCols.toFixed(1)}
+RightCols          : ${rightCols.toFixed(1)}
+
+HeaderDock px rect :
+  x0=${headerDock.x0.toFixed(1)} y0=${headerDock.y0.toFixed(1)}
+  x1=${headerDock.x1.toFixed(1)} y1=${headerDock.y1.toFixed(1)}
+
+BottomDock px rect :
+  x0=${bottomDock.x0.toFixed(1)} y0=${bottomDock.y0.toFixed(1)}
+  x1=${bottomDock.x1.toFixed(1)} y1=${bottomDock.y1.toFixed(1)}
+
+LeftDock px rect   :
+  x0=${leftDock.x0.toFixed(1)} y0=${leftDock.y0.toFixed(1)}
+  x1=${leftDock.x1.toFixed(1)} y1=${leftDock.y1.toFixed(1)}
+
+RightDock px rect  :
+  x0=${rightDock.x0.toFixed(1)} y0=${rightDock.y0.toFixed(1)}
+  x1=${rightDock.x1.toFixed(1)} y1=${rightDock.y1.toFixed(1)}
+
+Work area px rect  :
+  x0=${workArea.x0.toFixed(1)} y0=${workArea.y0.toFixed(1)}
+  x1=${workArea.x1.toFixed(1)} y1=${workArea.y1.toFixed(1)}
+`;
+}
+
+// hook up inputs
+document.getElementById('inputW').addEventListener('input', recompute);
+document.getElementById('inputH').addEventListener('input', recompute);
+document.getElementById('inputDensity').addEventListener('input', recompute);
+document.getElementById('inputTap').addEventListener('input', recompute);
+document.getElementById('inputHeaderRows').addEventListener('input', recompute);
+document.getElementById('inputBottomRows').addEventListener('input', recompute);
+document.getElementById('inputLeftCols').addEventListener('input', recompute);
+document.getElementById('inputRightCols').addEventListener('input', recompute);
+
+// redraw on window resize
+window.addEventListener('resize', recompute);
+
+// initial draw
+recompute();
+</script>
+
+</body>
+</html>

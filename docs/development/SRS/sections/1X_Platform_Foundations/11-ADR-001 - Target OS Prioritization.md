@@ -17,7 +17,7 @@ with functional parity across supported operating systems.
 
 Historically, AgOpenGPS releases shipped only **Windows** desktop installers, while
 community forks and experiments provided limited or manual **Linux** builds. Pilot
-work for §11 confirmed that a unified **.NET 8 + Avalonia** stack can generate signed
+work for §11 confirmed that a unified **.NET 10 + Avalonia 12 LTS** stack can generate signed
 **Windows** installers and **Linux** packages from a single solution.
 
 To align platform teams, this ADR codifies the officially supported OS scope,

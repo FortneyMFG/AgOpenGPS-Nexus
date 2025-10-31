@@ -23,7 +23,7 @@ The Weather plugin surfaces environmental context alongside the job timeline and
 ## Accessibility & Responsiveness
 
 - Charts and map legends must honor theme contrast requirements and support keyboard navigation for toggling series, switching overlay variables, and annotating snapshots. Focus indicators follow the shared Avalonia theming guidelines used by other analytics panels.【F:docs/development/SRS/sections/9X_Frontends_Ops/91_UI_Shell_Layout.md†L14-L33】
-- Companion clients reuse the same data model but collapse the timeline into summarized cards (current, 15 min, 1 hr trends) with a “View Chart” modal to avoid overwhelming smaller screens.【F:docs/development/SRS/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md†L24-L44】
+- Companion clients reuse the same data model but collapse the timeline into summarized cards (current, 15 min, 1 hr trends) with a “View Chart” modal to avoid overwhelming smaller screens.【F:docs/development/SRS/sections/1X_Platform_Foundations/13-ADR-001 - Adopt Avalonia 12 LTS for the Nexus Desktop UI Shell.md†L36-L44】
 - Offline workflows cache the last 24 hours of snapshots and overlays locally. When reconciling after reconnect, the UI surfaces a “Replayed data” banner and merges missing intervals while preserving manual entries with conflict resolution prompts.【F:docs/development/SRS/sections/6X_Core_Domain_Services/62-ADR-030 - Field job sessions and lifecycle services.md†L33-L86】
 
 ## Telemetry & Reporting Hooks

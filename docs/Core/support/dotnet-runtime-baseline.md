@@ -1,11 +1,11 @@
-# .NET 8 Runtime Baseline Playbook
+# .NET 10 Runtime Baseline Playbook
 
-Nexus standardises on .NET 8 across Core, AgIO, plugins, tooling, and the Avalonia UI per [12-ADR-001](../development/SRS/sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 8 LTS Runtime.md). This playbook records the enforcement knobs that keep the baseline in place and how to validate them during reviews and CI.
+Nexus standardises on .NET 10 across Core, AgIO, plugins, tooling, and the Avalonia UI per [12-ADR-001](../development/SRS/sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 10 LTS Runtime.md). This playbook records the enforcement knobs that keep the baseline in place and how to validate them during reviews and CI.
 
 ## Repository Guardrails
 
-1. **SDK pinning.** `global.json` locks contributors to the .NET 8 SDK family and rolls forward only within that feature band so we can coordinate upgrades. A blocked restore is an actionable signal that the local SDK needs to match the published baseline.
-2. **Shared build props.** `Nexus SourceCode/Directory.Build.props` sets `TargetFramework` to `net8.0` for every project and enables deterministic builds. Individual projects may multi-target (for example, Windows-specific assets) but cannot drop the .NET 8 target.
+1. **SDK pinning.** `global.json` locks contributors to the .NET 10 SDK family and rolls forward only within that feature band so we can coordinate upgrades. A blocked restore is an actionable signal that the local SDK needs to match the published baseline.
+2. **Shared build props.** `Nexus SourceCode/Directory.Build.props` sets `TargetFramework` to `net10.0` for every project and enables deterministic builds. Individual projects may multi-target (for example, Windows-specific assets) but cannot drop the .NET 10 target.
 3. **Solution auditing.** Both `AgOpenGPS.Nexus.sln` and `Nexus.sln` load only projects that inherit the shared props. Adding a project that bypasses the props file is treated as a policy violation.
 
 ## CI Verification
@@ -16,8 +16,8 @@ Nexus standardises on .NET 8 across Core, AgIO, plugins, tooling, and the Avalon
 
 ## Review Checklist
 
-- [ ] New projects or templates import `Directory.Build.props` or explicitly set `TargetFramework` to `net8.0`.
-- [ ] Dependencies resolve against packages compiled for .NET 8 (or multi-target packages that include `net8.0`).
+- [ ] New projects or templates import `Directory.Build.props` or explicitly set `TargetFramework` to `net10.0`.
+- [ ] Dependencies resolve against packages compiled for .NET 10 (or multi-target packages that include `net10.0`).
 - [ ] CI logs confirm the SDK version pinned in `global.json`.
 - [ ] Release notes mention any planned SDK roll-forward with impact analysis and a mitigation plan.
 

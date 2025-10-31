@@ -22,7 +22,7 @@ negotiation, plugin-supplied verbs, structured output, and multi-RID
 distribution.
 
 ## Decision
-Ship a single `.NET 8` CLI host named `nx` that boots plugin verbs dynamically
+Ship a single `.NET 10` CLI host named `nx` that boots plugin verbs dynamically
 and operates in offline or live modes:
 
 - Discover installed plugins via the manifest registry and load optional

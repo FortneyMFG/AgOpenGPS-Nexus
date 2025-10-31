@@ -17,7 +17,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-116 Shared aog-link.proto schemas _(Done)_
 - [x] NX-126 Mapping plugin architecture ADR _(Done)_
 - [x] NX-131 Field job session lifecycle ADR _(Done)_
-- [x] NX-152 .NET 8 runtime enforcement per ADR-001 _(Done)_
+- [x] NX-152 .NET 10 runtime enforcement per ADR-001 _(Done)_
 - [x] NX-190 Comprehensive ADR portfolio review _(Done)_ — Backlog gaps captured in NX-610…NX-616
 - [ ] NX-1314 Zip plugin architecture foundations — Introduce SDK surface + manifest tooling for plugin packaging
 - [x] NX-1405 Mapping core/plugin boundary contracts & doc _(Done)_
@@ -30,7 +30,7 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 - [x] NX-1318 Nexus project charter baseline _(Done)_ — Author charter aligning 1X platform foundations with modernization goals (version 0.3.0 refresh)
 - [x] NX-1319 Section 21 decomposition narrative refresh _(Done)_ — Clarify plugin-vs-core trade-offs, task alignment, and SDK topology in SRS §21
 - [x] NX-1321 SRS slices restructure _(Done)_ — Refresh system slices map, rename §41, split §73/§77, add units & simulation sections
-- [x] NX-1322 Platform foundations ADR split _(Done)_ — Break Section 1X decisions into dedicated ADRs for OS support, .NET 8 runtime, Avalonia UI, and build tooling
+- [x] NX-1322 Platform foundations ADR split _(Done)_ — Break Section 1X decisions into dedicated ADRs for OS support, .NET 10 runtime, Avalonia UI, and build tooling
 - [ ] NX-1330 Section 2X Model D alignment — Refresh process, timing, and configuration SRS sections to reflect plugin-hosted Core and revised UI Bridge scope
 - [ ] NX-1014 Contract baseline generator tooling resilience — Ensure baseline generator works without direct project references
 
@@ -468,10 +468,10 @@ single NX ticket (≈20 minutes of focused work) unless an ADR states otherwise.
 | NX-150 | ADR roadmap: PoseStream, layers, and control revamp | Done |  | — | [ADR roadmap](docs/development/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md) | Track upcoming ADR-007…ADR-020 deliverables and linked SRS requirements |
 | NX-115 | AOG-Link protocol specification and reference flows | Done |  | — | [SRS §3 Communications & Transports](docs/development/SRS/sections/03_Comm_Transports.md) | ADR-006 + SRS updates complete |
 | NX-116 | Shared `aog-link.proto` schemas with nanopb options | Done |  | — | [ADR-006 AOG-Link](docs/development/SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md) | Publish contracts aligned with `Aog.Abstractions` |
-| NX-152 | Enforce 12-ADR-001 .NET 8 runtime baselines across solutions and CI | Done | AI | — | [12-ADR-001 .NET 8 runtime](docs/development/SRS/sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 8 LTS Runtime.md) | Runtime baseline playbook + SDK pinning in `global.json` |
+| NX-152 | Enforce 12-ADR-001 .NET 10 runtime baselines across solutions and CI | Done | AI | — | [12-ADR-001 .NET 10 runtime](docs/development/SRS/sections/1X_Platform_Foundations/12-ADR-001 - Adopt .NET 10 LTS Runtime.md) | Runtime baseline playbook + SDK pinning in `global.json` |
 | NX-190 | Comprehensive ADR portfolio review | Done |  | — | [ADR roadmap](docs/development/SRS/sections/2X_System_Architecture/21-ADR-900 - PoseStream, Layer, and Control Program Roadmap.md) | Apply 2025 governance updates across accepted and draft ADRs |
 | NX-153 | Operationalize ADR-002 gRPC contract governance and compatibility gates | Done | AI | — | [ADR-002 gRPC contracts](docs/development/SRS/sections/4X_Interprocess_Communications/41-ADR-002 - Expose Nexus services over gRPC protobuf contracts.md) | Checklist for clinics, golden fixtures, and release gating |
-| NX-154 | Deliver 13-ADR-001 Avalonia shell run modes (CompanionRemote/Local) | Done | AI | — | [13-ADR-001 Avalonia UI](docs/development/SRS/sections/1X_Platform_Foundations/13-ADR-001 - Use Avalonia for the Nexus Desktop UI Shell.md) | Run-mode configuration + smoke test guide published |
+| NX-154 | Deliver 13-ADR-001 Avalonia 12 LTS shell run modes (CompanionRemote/Local) | Done | AI | — | [13-ADR-001 Avalonia 12 LTS UI](docs/development/SRS/sections/1X_Platform_Foundations/13-ADR-001 - Adopt Avalonia 12 LTS for the Nexus Desktop UI Shell.md) | Run-mode configuration + smoke test guide published |
 | NX-155 | Complete ADR-004 composite simulation fabric with regression packs | Done | AI | — | [ADR-004 Composite simulation](docs/development/SRS/sections/2X_System_Architecture/21-ADR-004 - Establish the composite simulation fabric (SimClock + SimBus).md) | GA validation checklist covering topics, seeds, replay |
 | NX-156 | Roll out ADR-006 AOG-Link transports and bridge translation layers | Done | AI | — | [ADR-006 AOG-Link](docs/development/SRS/sections/4X_Interprocess_Communications/42-ADR-006 - MCU communications over AOG-Link (nanopb).md) | Transport rollout guide + validation/support checklist |
 | NX-157 | Implement ADR-018 plugin API leases, manifests, and AgIO migration | Done | AI | — | [ADR-018 Plugin API](docs/development/SRS/sections/9X_Frontends_Ops/94-ADR-018 - Plugin API Capability Discovery and Runtime Model.md) | Lease + manifest governance guide for plugin authors |

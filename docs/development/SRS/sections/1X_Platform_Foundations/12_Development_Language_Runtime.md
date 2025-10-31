@@ -6,7 +6,7 @@
 **Authors:** Nexus Team (Fortney)
 **Last Updated:** 2025-10-24
 **Related Sections:** 11 — OS Support, 14 — Build Environment & Tooling  
-**Related Decisions:** `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`  
+**Related Decisions:** `12-ADR-001 — Adopt .NET 10 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
 **Downstream Impacts:** 6X — Core Domain Services, 9X — Frontends & Ops  
 

@@ -6,7 +6,7 @@
 **Authors:** Nexus Team (Fortney)
 **Last Updated:** 2025-10-24
 **Related Sections:** 12 — Development Language & Runtime, 14 — Build Environment & Tooling
-**Related Decisions:** `11-ADR-001 — Establish Windows & Linux Support Baseline`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `13-ADR-001 — Use Avalonia for the Nexus Desktop UI Shell`
+**Related Decisions:** `11-ADR-001 — Establish Windows & Linux Support Baseline`, `12-ADR-001 — Adopt .NET 10 LTS Runtime`, `13-ADR-001 — Adopt Avalonia 12 LTS for the Nexus Desktop UI Shell`
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
 **Downstream Impacts:** 5X — Hardware I/O Device Layer, 9X — Frontends & Ops
 
@@ -177,7 +177,7 @@ Defines how compliance with § 11.5 requirements will be validated and documente
 
 | Option ID | Status | Type / Theme | Description | Reference Document |
 |------------|--------|---------------|-------------|--------------------|
-| **11-O1** | Accepted | Unified runtime | Single **.NET 8 + Avalonia** stack producing both Windows and Linux builds from one solution. Establishes the baseline “full stack” target set. | ADR 11-001 — Target OS Prioritization |
+| **11-O1** | Accepted | Unified runtime | Single **.NET 10 + Avalonia 12 LTS** stack producing both Windows and Linux builds from one solution. Establishes the baseline “full stack” target set. | ADR 11-001 — Target OS Prioritization |
 | **11-O2** | Proposed | Mobile / Embedded Expansion | Extend full-stack capability to **Android** devices with sufficient hardware (e.g., rugged tablets) using the same codebase and minimal runtime differences. | *Future ADR* |
 | **11-O3** | Proposed | Companion Extension | Provide a **companion-only iOS build** capable of remote UI connection to Core over local network. | *Future ADR* |
 | **11-O4** | Proposed | macOS support | Add **macOS** as an optional desktop environment for analysis, playback, or bench testing; not required for field use. | *Future ADR* |
@@ -193,7 +193,7 @@ Defines how compliance with § 11.5 requirements will be validated and documente
 
 | Attribute / Criteria | 11-O1 | 11-O2 | 11-O3 | 11-O4 | 11-O5 |
 |----------------------|-------|-------|-------|-------|-------|
-| Core Approach | Shared .NET 8 / Avalonia runtime for Windows + Linux | Extend full-stack to Android | Add iOS companion app | Add macOS desktop parity build | Define Raspberry Pi OS under Linux tier |
+| Core Approach | Shared .NET 10 / Avalonia 12 LTS runtime for Windows + Linux | Extend full-stack to Android | Add iOS companion app | Add macOS desktop parity build | Define Raspberry Pi OS under Linux tier |
 | Implementation Effort | Medium | High | Medium | Medium | Low |
 | Maintainability | High | Medium | High | Medium | High |
 | Performance Potential | High | Medium | Medium | High | Medium |

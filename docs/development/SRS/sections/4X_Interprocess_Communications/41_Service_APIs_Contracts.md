@@ -25,7 +25,7 @@ Document the service contracts Nexus Core presents to in-process plugins, the UI
 | Surface | Audience | Contract Form | Ownership Notes |
 |---------|----------|---------------|-----------------|
 | Struct ABI (`Aog.Contracts.Struct`) | In-process plugins hosted by Core | Versioned `record struct` and immutable views generated from shared schemas. | Canonical source for telemetry, command, and registry data. Governed with ABI diff tests and semantic versioning. |
-| UI Bridge (`Aog.Contracts.Bridge`) | Avalonia UI, legacy desktop shells, automation scripts | gRPC and WebSocket endpoints that mirror struct payloads. | Implemented by a bridge plugin that binds Core struct contracts to remote clients. |
+| UI Bridge (`Aog.Contracts.Bridge`) | Avalonia 12 LTS UI, legacy desktop shells, automation scripts | gRPC and WebSocket endpoints that mirror struct payloads. | Implemented by a bridge plugin that binds Core struct contracts to remote clients. |
 | Legacy Compatibility | AgIO PGN/UDP consumers and MCU devices | Binary PGNs, nanopb messages, serial transports. | Remains authoritative for hardware integration; bridged into struct contracts. |
 
 > **Design intent:** One schema drives struct ABIs and bridge payloads. Plugins never consume gRPC directly; remote clients never receive raw structs.

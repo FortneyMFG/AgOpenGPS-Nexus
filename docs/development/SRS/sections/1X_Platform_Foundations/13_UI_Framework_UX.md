@@ -6,7 +6,7 @@
 **Authors:** Nexus Team (Codex)
 **Last Updated:** 2025-10-25  
 **Related Sections:** 11 — OS Support, 12 — Development Language & Runtime, 9X — Frontends & Ops  
-**Related Decisions:** `13-ADR-001 — Adopt Avalonia as Nexus UI Shell`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`  
+**Related Decisions:** `13-ADR-001 — Adopt Avalonia 12 LTS for the Nexus Desktop UI Shell`, `12-ADR-001 — Adopt .NET 10 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
 **Downstream Impacts:** 9X — Frontends & Ops, Operator Training  
 
@@ -24,7 +24,7 @@ Balance legacy WinForms expectations with modernization via Avalonia and remote 
 
 - WinForms remains the production UI for operators via AgOpenGPS v6; WPF experiments are retired.
 - Remote clients and metadata-driven dashboards require cross-platform components.
-- Avalonia pilots aim to share view models across Windows/Linux and mobile shells.
+- Avalonia 12 pilots aim to share view models across Windows/Linux and mobile shells.
 - UI stack must coexist with headless Core deployments connected through gRPC or WebSockets.
 
 ### Journeys to keep in mind
@@ -73,8 +73,8 @@ Balance legacy WinForms expectations with modernization via Avalonia and remote 
 | R-UI-005 | SHOULD | Remote Clients | Enable frontends that attach to headless Core via gRPC/Web transport. | Remote client plan | End-to-end remote client demo |
 | R-UI-006 | COULD | Cross-platform Stacks | Evaluate kiosk-friendly cross-platform stacks (Qt, Avalonia, Web). | Linux Core roadmap | Comparative spike reports |
 | R-UI-007 | SHOULD | Accessibility | Support high-DPI scaling, contrast presets, localization hooks. | Accessibility WG | Accessibility test matrix |
-| R-UI-008 | MUST | Shared Mobile Shell | Keep Avalonia project free of platform-specific forks for mobile builds. | 13-ADR-001 Avalonia UI | Mobile CI builds |
-| R-UI-009 | SHOULD | Run-mode Toggles | Provide configuration surface for run-mode switching. | 13-ADR-001 Avalonia UI | QA scenarios covering run modes |
+| R-UI-008 | MUST | Shared Mobile Shell | Keep Avalonia project free of platform-specific forks for mobile builds. | 13-ADR-001 Avalonia 12 LTS UI | Mobile CI builds |
+| R-UI-009 | SHOULD | Run-mode Toggles | Provide configuration surface for run-mode switching. | 13-ADR-001 Avalonia 12 LTS UI | QA scenarios covering run modes |
 
 > **Why it matters:** These requirements let today’s operators trust the WinForms UI, show what Avalonia adds (touch layouts, metadata dashboards), and guarantee remote clients see the same widgets without custom coding.
 
@@ -85,7 +85,7 @@ Balance legacy WinForms expectations with modernization via Avalonia and remote 
 | R-UI-000 | Production deployments | Preserve current operator workflows during transition. |
 | R-UI-004 | Metadata-driven dashboards option (9X) | Accelerate UI iteration without code changes. |
 | R-UI-005 | Linux Core roadmap | Ensure headless deployments still deliver UX. |
-| R-UI-008 | 13-ADR-001 Avalonia UI | Keep shared codebase across desktop/mobile. |
+| R-UI-008 | 13-ADR-001 Avalonia 12 LTS UI | Keep shared codebase across desktop/mobile. |
 
 ---
 
@@ -158,7 +158,7 @@ Define viable UI framework and UX strategy options for Nexus, balancing moderniz
 
 | Option ID | Status | Type / Theme | Description | Reference Document |
 |-----------|--------|--------------|-------------|--------------------|
-| **13-O1** | Proposed | Cross-Platform Desktop | Use **Avalonia UI** as the modern desktop shell for Windows and Linux, sharing view models, layouts, and theming across platforms. | `13-ADR-001_Avalonia_UI_Shell.md` |
+| **13-O1** | Proposed | Cross-Platform Desktop | Use **Avalonia 12 LTS** as the modern desktop shell for Windows and Linux, sharing view models, layouts, and theming across platforms. | `13-ADR-001 - Adopt Avalonia 12 LTS for the Nexus Desktop UI Shell.md` |
 | **13-O2** | Retained | Legacy Compatibility | Maintain **WinForms (v6)** as the stable, production-proven UI during the transition to Avalonia. | `Legacy SourceCode/V6/` |
 | **13-O3** | Exploratory | Web / Companion UX | Evaluate **web-based dashboards** (e.g., Blazor Hybrid or WebAssembly) to connect to headless Core instances via gRPC/WebSocket. | `docs/UI/web-ui-concepts.md` *(placeholder)* |
 

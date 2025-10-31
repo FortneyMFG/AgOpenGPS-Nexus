@@ -19,7 +19,7 @@ AgOpenGPS Nexus rebuilds the guidance platform on a maintainable, cross-platform
 
 Key outcomes this charter commits to delivering:
 - Unified runtimes, packaging, and UI shells for Windows and Linux environments aligned with SRS §11 and §13.
-- Clear architectural seams between Core logic, AgIO hardware services, and Avalonia presentation layers.
+- Clear architectural seams between Core logic, AgIO hardware services, and Avalonia 12 LTS presentation layers.
 - Tooling and documentation that shorten onboarding for new contributors while preserving operator confidence earned through v6 deployments.
 
 ---
@@ -52,7 +52,7 @@ Nexus becomes the canonical, community-driven guidance platform that:
   Priority field scenarios (guidance, GNSS processing, autosteer, implement control) must pass automated regression suites and targeted field validations. Any intentional retirements are documented in ADRs with operator approval.
 - **G2 — Achieve cross-platform deployment.**  
   Builds for Windows x64, Linux x64, and Linux ARM64 share a unified codebase with only packaging differences. Installers and packages must smoke-test cleanly on fresh system images.
-- **G3 — Deliver a responsive, accessible Avalonia UI shell.**  
+- **G3 — Deliver a responsive, accessible Avalonia 12 LTS UI shell.**
   v6 workflows are retained with UX refinements, maintain 30 FPS rendering on reference hardware, and pass accessibility review sign-off.
 - **G4 — Establish comprehensive automated testing.**  
   Unit and integration suites enforce coverage thresholds, and simulated field operations run pre-merge to preserve determinism and latency budgets.
@@ -77,7 +77,7 @@ Nexus is a ground-up rewrite focused on modernization, modularity, and maintaina
 
 ## 6. Scope
 ### 6.1 In Scope
-- Unified .NET LTS runtime and Avalonia UI adoption per ADR-001, with review checkpoints as new frameworks mature.
+- Unified .NET 10 LTS runtime and Avalonia 12 LTS UI adoption per ADR-001, with review checkpoints as new frameworks mature.
 - Packaging pipelines for Windows installers, Linux packages, containers, and systemd units supporting headless deployments.
 - AgIO service updates covering serial, UDP, and CAN integrations, plus GNSS/IMU data handling focused on open formats rather than vendor specifics.
 - Core guidance refactoring that isolates business rules, simulation hooks, and deterministic behaviors.

@@ -24,7 +24,7 @@ The plugin ecosystem rests on three pillars:
    lightweight and versionable.
 2. **Manifest & Packaging Tooling** — A JSON manifest describes entrypoints, capabilities, assets, and dependency constraints.
    An MSBuild target produces a deterministic `plugin.zip` artifact with schema validation and signing hooks.
-3. **Runtime Hosts** — The Avalonia UI shell and Aog.Core service layer load, activate, monitor, and unload plugins while
+3. **Runtime Hosts** — The Avalonia 12 LTS UI shell and Aog.Core service layer load, activate, monitor, and unload plugins while
    keeping layout state, telemetry, and resource usage bounded.
 
 ## SDK Composition
@@ -118,7 +118,7 @@ Packaging requirements:
 
 | Area | Responsibilities |
 | --- | --- |
-| UI Host (`Aog.UI.Avalonia`) | Plugin discovery, management panel UI, registry exposure for windows/blocks/tools/layers, drag-and-drop installation, enable/disable toggles, asset resolution, layout persistence. |
+| UI Host (`Aog.UI.Avalonia`) | Plugin discovery, management panel UI, registry exposure for windows/blocks/tools/layers, drag-and-drop installation, enable/disable toggles, asset resolution, layout persistence within the Avalonia 12 LTS shell. |
 | Core Host (`Aog.Core`) | Central plugin inventory, shared enable/disable state, install/uninstall orchestration, IPC bridges to UI, telemetry logging, dependency graph evaluation. |
 | AgIO Supervisor | Reserved for future IO sidecars; allocates transport endpoints and supervises external processes per plugin. |
 

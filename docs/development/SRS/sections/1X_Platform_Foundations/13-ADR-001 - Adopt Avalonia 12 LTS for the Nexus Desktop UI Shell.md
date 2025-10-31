@@ -1,12 +1,12 @@
-# 13-ADR-001 — Adopt Avalonia for the Nexus Desktop UI Shell  
-*(Status: Accepted — 2025-10-25)*  
+# 13-ADR-001 — Adopt Avalonia 12 LTS for the Nexus Desktop UI Shell
+*(Status: Accepted — 2027-03-14)*
 
 **Authors:** Nexus Team (Codex)
 **Reviewers:** Platform Foundations Working Group  
-**Created:** 2025-10-20  
-**Last Updated:** 2025-10-25  
+**Created:** 2025-10-20
+**Last Updated:** 2027-03-14
 **Related SRS:** `13_UI_Framework_UX.md`  
-**Related Decisions:** `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`  
+**Related Decisions:** `12-ADR-001 — Adopt .NET 10 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
 **Upstream Sections:** §11 — OS Support, §12 — Development Language & Runtime  
 **Downstream Impacts:** §9X — Frontends & Ops, Training & UX Guidelines  
 
@@ -24,7 +24,7 @@ but maintaining those toolchains separately from Core added complexity and fract
 the contributor base. A shared, managed UI framework is required to unify the visual
 and runtime layers under a single toolchain.
 
-**Avalonia UI** provides a modern, .NET-native, cross-platform framework that runs on
+**Avalonia 12 LTS** provides a modern, .NET-native, cross-platform framework that runs on
 Windows and Linux, aligning directly with the runtime chosen in `12-ADR-001` and
 supporting future mobile and companion use cases without a full rewrite of existing
 view models.
@@ -33,11 +33,11 @@ view models.
 
 ## 2) Decision
 
-Adopt **Avalonia UI** as the **primary desktop shell** for Nexus.  
+Adopt **Avalonia 12 LTS** as the **primary desktop shell** for Nexus.
 Legacy **WinForms** remains the fallback interface during the transition.
 
 - Avalonia projects will host shared **view models**, **theming system**, and
-  **metadata-driven dashboards** defined in §13.  
+  **metadata-driven dashboards** defined in §13.
 - Mobile or web companions **may** reuse shared view models and services, but all
   desktop work must target the Avalonia shell.  
 - WinForms will continue receiving maintenance updates until Avalonia reaches feature
@@ -56,7 +56,7 @@ Legacy **WinForms** remains the fallback interface during the transition.
   view-models.  
 - Enables **metadata-driven dashboards** and run-mode toggles without duplicating
   logic across frameworks.  
-- Keeps Nexus development within the **.NET 8 LTS** ecosystem, maximizing reuse of
+- Keeps Nexus development within the **.NET 10 LTS** ecosystem, maximizing reuse of
   existing tools and contributor expertise.
 
 ### Negative / Mitigated Impacts
@@ -68,7 +68,7 @@ Legacy **WinForms** remains the fallback interface during the transition.
   *Mitigation:* Gate retirement on the §13 acceptance criteria.
 
 ### Follow-Up Actions
-- Publish Avalonia scaffolds and example metadata widgets in `/docs/UI/`.  
+- Publish Avalonia scaffolds and example metadata widgets in `/docs/UI/`.
 - Document theming, accessibility, and layout policies alongside §13 reference
   material.  
 - Schedule quarterly UX smoke tests on Windows + Linux covering multi-monitor layouts
@@ -78,8 +78,8 @@ Legacy **WinForms** remains the fallback interface during the transition.
 
 ## 4) Rationale
 
-Avalonia satisfies the modernization goals of §13 — portability, accessibility, and
-metadata-driven expansion — without leaving the .NET ecosystem.  
+Avalonia 12 LTS satisfies the modernization goals of §13 — portability, accessibility, and
+metadata-driven expansion — without leaving the .NET ecosystem.
 Qt/C++ and hybrid web dashboards introduce additional toolchains and dependency
 management overhead, while Avalonia delivers cross-platform parity within the same
 language, runtime, and CI infrastructure already adopted for Core and AgIO.
@@ -113,3 +113,4 @@ language, runtime, and CI infrastructure already adopted for Core and AgIO.
 |------|---------|--------|------------|
 | 2025-10-20 | Initial draft adopting Avalonia as desktop shell. | Nexus Team (Codex) |  |
 | 2025-10-25 | Replaced WPF references with Qt lineage, aligned context and governance. | Nexus Team (Codex) |  |
+| 2027-03-14 | Updated scope for Avalonia 12 LTS alignment with .NET 10 migration. | Nexus Team (Codex) |  |

@@ -8,7 +8,7 @@
 **Created:** 2025-10-20
 **Last Updated:** 2025-10-25
 **Related Sections:** 11 — OS Support, 12 — Development Language & Runtime, 96 — Quality Engineering & Release
-**Related Decisions:** `14-ADR-001 — Standardize Build Environment & Tooling`, `12-ADR-001 — Adopt .NET 8 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
+**Related Decisions:** `14-ADR-001 — Standardize Build Environment & Tooling`, `12-ADR-001 — Adopt .NET 10 LTS Runtime`, `11-ADR-001 — Establish Windows & Linux Support Baseline`
 **Upstream Dependencies:** §12 — Runtime Governance, §96 — QE Policies
 **Downstream Impacts:** Release pipelines and developer onboarding
 **Reviewers:** Release & Tooling Working Group
@@ -22,7 +22,7 @@
 ## 14.1 Purpose & Scope  
 
 Define the **toolchains, automation, signing, and secrets policies** that keep all Nexus builds reproducible, portable, and secure across Windows and Linux.  
-All development currently uses **Visual Studio Code** with the **.NET 8 SDK**, and **GitHub Actions** handles the Windows + Linux continuous-integration lanes.  
+All development currently uses **Visual Studio Code** with the **.NET 10 SDK**, and **GitHub Actions** handles the Windows + Linux continuous-integration lanes.
 Local builds, containerized tests, and CI runs use identical scripts to guarantee environment parity.  
 
 ---

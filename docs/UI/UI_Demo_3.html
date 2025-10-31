@@ -115,6 +115,20 @@
     pointer-events: auto;
   }
 
+  .snap-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 18;
+  }
+
+  .snap-indicator {
+    position: absolute;
+    border: 2px dashed rgba(0, 200, 255, 0.8);
+    background: rgba(0, 200, 255, 0.12);
+    border-radius: 6px;
+  }
+
   .header-container {
     position: absolute;
     pointer-events: none;
@@ -285,6 +299,86 @@
     color: #4caf50;
   }
 
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    font-size: 14px;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-card {
+    background: #1f1f1f;
+    border: 1px solid #555;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    padding: 18px 20px 16px 20px;
+    color: #ddd;
+  }
+
+  .modal-card h2 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .modal-card .modal-field {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .modal-card label {
+    font-size: 12px;
+    color: #aaa;
+  }
+
+  .modal-card select,
+  .modal-card input[type="number"] {
+    background: #2c2c2c;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: #eee;
+    font-size: 13px;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .modal-actions button {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid #666;
+    background: #333;
+    color: #eee;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .modal-actions button.primary {
+    background: #0b6dff;
+    border-color: #0b6dff;
+  }
+
 </style>
 </head>
 <body>
@@ -384,8 +478,31 @@
     <div id="gridLayer" class="grid-layer"></div>
     <div id="dockLayer" class="dock-layer"></div>
     <div id="workLayer" class="work-layer"></div>
-    <div id="blockLayer" class="block-layer">
+  <div id="blockLayer" class="block-layer">
       <div id="headerContainer" class="header-container"></div>
+    </div>
+  </div>
+</div>
+
+<div id="panelSettingsModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="panelSettingsTitle">
+    <h2 id="panelSettingsTitle">Panel Settings</h2>
+    <div class="modal-field">
+      <label for="panelAnchorTarget">Anchor Target</label>
+      <select id="panelAnchorTarget"></select>
+    </div>
+    <div class="modal-field">
+      <label for="panelAnchorX">Horizontal Offset (%)</label>
+      <input id="panelAnchorX" type="number" min="0" max="100" step="1" value="0">
+    </div>
+    <div class="modal-field">
+      <label for="panelAnchorY">Vertical Offset (%)</label>
+      <input id="panelAnchorY" type="number" min="0" max="100" step="1" value="0">
+      <div class="hint">Measured from the bottom edge of the anchor target.</div>
+    </div>
+    <div class="modal-actions">
+      <button id="panelSettingsCancel" type="button">Cancel</button>
+      <button id="panelSettingsSave" type="button" class="primary">Save</button>
     </div>
   </div>
 </div>
@@ -395,16 +512,37 @@ function clamp(v, lo, hi) {
   return Math.max(lo, Math.min(hi, v));
 }
 
-function snapHalfUnits(value) {
-  return Math.round(value * 2) / 2;
-}
-
 const surfaceEl = document.getElementById('surface');
 const gridLayer = document.getElementById('gridLayer');
 const dockLayer = document.getElementById('dockLayer');
 const workLayer = document.getElementById('workLayer');
 const blockLayer = document.getElementById('blockLayer');
 const headerContainer = document.getElementById('headerContainer');
+const snapLayer = document.createElement('div');
+snapLayer.className = 'snap-layer';
+surfaceEl.appendChild(snapLayer);
+
+const modalEl = document.getElementById('panelSettingsModal');
+const modalTargetSelect = document.getElementById('panelAnchorTarget');
+const modalAnchorXInput = document.getElementById('panelAnchorX');
+const modalAnchorYInput = document.getElementById('panelAnchorY');
+const modalSaveBtn = document.getElementById('panelSettingsSave');
+const modalCancelBtn = document.getElementById('panelSettingsCancel');
+
+const DOCK_ANCHOR_TARGETS = [
+  { id: 'header', label: 'Header Dock' },
+  { id: 'bottom', label: 'Bottom Dock' },
+  { id: 'left', label: 'Left Dock' },
+  { id: 'right', label: 'Right Dock' },
+  { id: 'work', label: 'Work Area' }
+];
+
+const SNAP_THRESHOLD_PX = 160;
+
+let currentModalBlock = null;
+let dragAnchorCandidate = null;
+let currentSnapTarget = null;
+let snapIndicatorEl = null;
 
 let layoutState = null;
 let blocksInitialised = false;
@@ -457,6 +595,241 @@ function initializeDockModels() {
 
 initializeDockModels();
 
+function getDockRectById(id, layout) {
+  if (!layout) return null;
+  switch (id) {
+    case 'header':
+      return layout.headerDock;
+    case 'bottom':
+      return layout.bottomDock;
+    case 'left':
+      return layout.leftDock;
+    case 'right':
+      return layout.rightDock;
+    case 'work':
+      return layout.workArea;
+    default:
+      return null;
+  }
+}
+
+function anchorsEqual(a, b) {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  return (
+    a.targetType === b.targetType &&
+    a.targetId === b.targetId &&
+    Math.abs((a.offsetX || 0) - (b.offsetX || 0)) < 1e-4 &&
+    Math.abs((a.offsetY || 0) - (b.offsetY || 0)) < 1e-4
+  );
+}
+
+function getAnchorTargetRect(block, layout, anchor) {
+  if (!layout) return null;
+  if (anchor && anchor.targetType === 'dock') {
+    const rect = getDockRectById(anchor.targetId, layout);
+    if (rect) return rect;
+  }
+  if (anchor && anchor.targetType === 'block') {
+    const target = blocks.find(b => b.id === anchor.targetId);
+    if (target && target !== block && target.currentRectPx) {
+      return target.currentRectPx;
+    }
+  }
+  if (block.area === 'header') return layout.headerDock;
+  if (block.area === 'bottom') return layout.bottomDock;
+  if (block.area === 'left') return layout.leftDock;
+  if (block.area === 'right') return layout.rightDock;
+  return layout.workArea;
+}
+
+function computeAnchorFromBlockPosition(block, layout) {
+  if (block.anchor && block.anchor.targetType === 'block') {
+    return { ...block.anchor };
+  }
+  const targetId = block.area === 'header' ? 'header' : 'work';
+  const anchorRect = getDockRectById(targetId, layout) || layout.workArea;
+  const widthPx = block.cols * layout.gridSizeX;
+  const heightPx = block.rows * layout.gridSizeY;
+  const availableWidth = Math.max(anchorRect.x1 - anchorRect.x0 - widthPx, 0);
+  const availableHeight = Math.max(anchorRect.y1 - anchorRect.y0 - heightPx, 0);
+  const leftPx = anchorRect.x0 + block.col * layout.gridSizeX;
+  const bottomPx = anchorRect.y0 + block.row * layout.gridSizeY;
+  const offsetX = availableWidth === 0 ? 0 : (leftPx - anchorRect.x0) / availableWidth;
+  const offsetY = availableHeight === 0 ? 0 : (bottomPx - anchorRect.y0) / availableHeight;
+  return {
+    targetType: 'dock',
+    targetId,
+    offsetX: clamp(offsetX, 0, 1),
+    offsetY: clamp(offsetY, 0, 1)
+  };
+}
+
+function ensureBlockAnchor(block, layout) {
+  if (!block.anchor) {
+    block.anchor = computeAnchorFromBlockPosition(block, layout);
+  } else {
+    block.anchor.offsetX = clamp(block.anchor.offsetX ?? 0, 0, 1);
+    block.anchor.offsetY = clamp(block.anchor.offsetY ?? 0, 0, 1);
+  }
+}
+
+function computeBlockRectForAnchor(block, layout, anchorOverride) {
+  const anchor = anchorOverride || block.anchor;
+  const anchorRect = getAnchorTargetRect(block, layout, anchor);
+  if (!anchorRect) return null;
+  const widthPx = block.cols * layout.gridSizeX;
+  const heightPx = block.rows * layout.gridSizeY;
+  const availableWidth = Math.max(anchorRect.x1 - anchorRect.x0 - widthPx, 0);
+  const availableHeight = Math.max(anchorRect.y1 - anchorRect.y0 - heightPx, 0);
+  const offsetX = anchor ? clamp(anchor.offsetX ?? 0, 0, 1) : 0;
+  const offsetY = anchor ? clamp(anchor.offsetY ?? 0, 0, 1) : 0;
+  const leftPx = anchorRect.x0 + offsetX * availableWidth;
+  const bottomPx = anchorRect.y0 + offsetY * availableHeight;
+  return {
+    x0: leftPx,
+    y0: bottomPx,
+    x1: leftPx + widthPx,
+    y1: bottomPx + heightPx
+  };
+}
+
+function updateBlockParent(block, anchorOverride = null) {
+  if (!block.el) return;
+  const anchor = anchorOverride || block.anchor;
+  const targetId = anchor && anchor.targetType === 'dock' ? anchor.targetId : null;
+  const desiredParent = targetId === 'header' ? headerContainer : blockLayer;
+  if (block.el.parentElement !== desiredParent) {
+    desiredParent.appendChild(block.el);
+  }
+  block.area = targetId === 'header' ? 'header' : 'work';
+}
+
+function ensureSnapIndicator() {
+  if (!snapIndicatorEl) {
+    snapIndicatorEl = document.createElement('div');
+    snapIndicatorEl.className = 'snap-indicator';
+    snapLayer.appendChild(snapIndicatorEl);
+  }
+  return snapIndicatorEl;
+}
+
+function renderSnapIndicator(target, layout) {
+  if (!layout) return;
+  if (!target || !target.rect) {
+    clearSnapIndicator();
+    return;
+  }
+  const indicator = ensureSnapIndicator();
+  const rect = target.rect;
+  indicator.style.display = 'block';
+  indicator.style.left = `${rect.x0 * layout.scale}px`;
+  indicator.style.top = `${(layout.drawH - rect.y1 * layout.scale)}px`;
+  indicator.style.width = `${(rect.x1 - rect.x0) * layout.scale}px`;
+  indicator.style.height = `${(rect.y1 - rect.y0) * layout.scale}px`;
+}
+
+function clearSnapIndicator() {
+  if (snapIndicatorEl) {
+    snapIndicatorEl.style.display = 'none';
+  }
+}
+
+function collectSnapTargets(block, layout) {
+  const targets = [];
+  DOCK_ANCHOR_TARGETS.forEach(entry => {
+    const rect = getDockRectById(entry.id, layout);
+    if (!rect) return;
+    const width = rect.x1 - rect.x0;
+    const height = rect.y1 - rect.y0;
+    if (width <= 1 || height <= 1) return;
+    targets.push({ type: 'dock', id: entry.id, rect, label: entry.label });
+  });
+  blocks.forEach(other => {
+    if (other === block) return;
+    if (!other.currentRectPx) return;
+    const rect = other.currentRectPx;
+    const width = rect.x1 - rect.x0;
+    const height = rect.y1 - rect.y0;
+    if (width <= 1 || height <= 1) return;
+    targets.push({ type: 'block', id: other.id, rect, label: other.title || other.label || other.id });
+  });
+  return targets;
+}
+
+function distanceToRect(x, y, rect) {
+  const dx = x < rect.x0 ? rect.x0 - x : x > rect.x1 ? x - rect.x1 : 0;
+  const dy = y < rect.y0 ? rect.y0 - y : y > rect.y1 ? y - rect.y1 : 0;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function findBestSnapTarget(block, layout, pointerX, pointerY) {
+  const targets = collectSnapTargets(block, layout);
+  let best = null;
+  let bestDistance = Infinity;
+  targets.forEach(target => {
+    const distance = distanceToRect(pointerX, pointerY, target.rect);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = target;
+    }
+  });
+  if (best && bestDistance <= SNAP_THRESHOLD_PX) {
+    return best;
+  }
+  return null;
+}
+
+function buildModalTargetOptions(block) {
+  if (!modalTargetSelect) return;
+  modalTargetSelect.innerHTML = '';
+  const dockGroup = document.createElement('optgroup');
+  dockGroup.label = 'Docks';
+  DOCK_ANCHOR_TARGETS.forEach(entry => {
+    const option = document.createElement('option');
+    option.value = `dock:${entry.id}`;
+    option.textContent = entry.label;
+    dockGroup.appendChild(option);
+  });
+  modalTargetSelect.appendChild(dockGroup);
+
+  const blockGroup = document.createElement('optgroup');
+  blockGroup.label = 'Panels';
+  blocks.forEach(other => {
+    if (!other.el) return;
+    if (other === block) return;
+    const option = document.createElement('option');
+    option.value = `block:${other.id}`;
+    option.textContent = other.title || other.label || other.id;
+    blockGroup.appendChild(option);
+  });
+  if (blockGroup.children.length > 0) {
+    modalTargetSelect.appendChild(blockGroup);
+  }
+}
+
+function openPanelSettings(block) {
+  if (!modalEl || !block) return;
+  currentModalBlock = block;
+  buildModalTargetOptions(block);
+  ensureBlockAnchor(block, layoutState || computeLayout(readInputs()));
+  const anchor = block.anchor || { targetType: 'dock', targetId: block.area === 'header' ? 'header' : 'work', offsetX: 0, offsetY: 0 };
+  const value = `${anchor.targetType}:${anchor.targetId}`;
+  const optionMatch = Array.from(modalTargetSelect.options).some(opt => opt.value === value);
+  modalTargetSelect.value = optionMatch ? value : `dock:${anchor.targetType === 'dock' ? anchor.targetId : 'work'}`;
+  modalAnchorXInput.value = Math.round((anchor.offsetX ?? 0) * 100);
+  modalAnchorYInput.value = Math.round((anchor.offsetY ?? 0) * 100);
+  modalEl.classList.add('open');
+  modalEl.setAttribute('aria-hidden', 'false');
+}
+
+function closePanelSettings() {
+  if (!modalEl) return;
+  modalEl.classList.remove('open');
+  modalEl.setAttribute('aria-hidden', 'true');
+  currentModalBlock = null;
+}
+
 function initBlocks() {
   if (blocksInitialised) return;
   blocks.forEach(block => {
@@ -498,6 +871,10 @@ function initBlocks() {
     parent.appendChild(el);
     block.el = el;
     el.addEventListener('mousedown', startDrag);
+    el.addEventListener('dblclick', (event) => {
+      event.stopPropagation();
+      openPanelSettings(block);
+    });
   });
   blocksInitialised = true;
   updateLockButton();
@@ -800,11 +1177,6 @@ function positionHeaderContainer(layout) {
   headerContainer.style.height = `${css.height}px`;
 }
 
-function getBlockAreaRect(block, layout) {
-  if (block.area === 'header') return layout.headerDock;
-  return layout.workArea;
-}
-
 function drawGrid(layout) {
   gridLayer.innerHTML = '';
   const colWidthPreview = layout.gridSizeX * layout.scale;
@@ -904,44 +1276,46 @@ function applyStaticLayers(layout) {
   drawWorkArea(layout);
 }
 
-function clampBlockToArea(block, layout) {
-  const area = getBlockAreaRect(block, layout);
-  if (!area) return;
-  const areaCols = (area.x1 - area.x0) / layout.gridSizeX;
-  const areaRows = (area.y1 - area.y0) / layout.gridSizeY;
-  const maxCols = Math.max(0, areaCols - block.cols);
-  const maxRows = Math.max(0, areaRows - block.rows);
-  block.col = clamp(block.col, 0, maxCols);
-  block.row = clamp(block.row, 0, maxRows);
-}
-
-function applyBlockPosition(block, layout) {
+function applyBlockPosition(block, layout, anchorOverride = null) {
   if (!block.el) return;
-  const area = getBlockAreaRect(block, layout);
-  if (!area) return;
-  const widthPx = block.cols * layout.gridSizeX;
-  const heightPx = block.rows * layout.gridSizeY;
-  if (block.area === 'header') {
-    const containerHeight = (area.y1 - area.y0) * layout.scale;
-    const cssLeft = block.col * layout.gridSizeX * layout.scale;
-    const cssTop = containerHeight - (block.row + block.rows) * layout.gridSizeY * layout.scale;
+  ensureBlockAnchor(block, layout);
+  updateBlockParent(block, anchorOverride || block.anchor);
+  const rect = computeBlockRectForAnchor(block, layout, anchorOverride || block.anchor);
+  if (!rect) return;
+  block.currentRectPx = rect;
+  const widthPx = rect.x1 - rect.x0;
+  const heightPx = rect.y1 - rect.y0;
+  const anchor = anchorOverride || block.anchor;
+  const isHeader = anchor && anchor.targetType === 'dock' && anchor.targetId === 'header';
+  if (isHeader) {
+    const headerRect = layout.headerDock;
+    const cssLeft = (rect.x0 - headerRect.x0) * layout.scale;
+    const offsetFromBottom = rect.y0 - headerRect.y0;
+    const topFromTopPx = (headerRect.y1 - headerRect.y0) - (offsetFromBottom + heightPx);
+    const cssTop = topFromTopPx * layout.scale;
     block.el.style.left = `${cssLeft}px`;
     block.el.style.top = `${cssTop}px`;
   } else {
-    const leftPx = area.x0 + block.col * layout.gridSizeX;
-    const bottomPx = area.y0 + block.row * layout.gridSizeY;
-    const cssLeft = leftPx * layout.scale;
-    const cssTop = layout.drawH - (bottomPx + heightPx) * layout.scale;
+    const cssLeft = rect.x0 * layout.scale;
+    const cssTop = layout.drawH - rect.y1 * layout.scale;
     block.el.style.left = `${cssLeft}px`;
     block.el.style.top = `${cssTop}px`;
   }
   block.el.style.width = `${widthPx * layout.scale}px`;
   block.el.style.height = `${heightPx * layout.scale}px`;
+  if (!anchorOverride) {
+    const referenceRect = anchor && anchor.targetType === 'dock'
+      ? getDockRectById(anchor.targetId, layout)
+      : layout.workArea;
+    if (referenceRect) {
+      block.col = (rect.x0 - referenceRect.x0) / layout.gridSizeX;
+      block.row = (rect.y0 - referenceRect.y0) / layout.gridSizeY;
+    }
+  }
 }
 
 function updateBlocks(layout) {
   blocks.forEach(block => {
-    clampBlockToArea(block, layout);
     applyBlockPosition(block, layout);
   });
 }
@@ -1040,57 +1414,81 @@ function startDrag(e) {
   const block = findBlockForElement(e.currentTarget);
   if (!block) return;
   if (!isUnlocked) return;
-  const area = getBlockAreaRect(block, layoutState);
-  if (!area) return;
+  ensureBlockAnchor(block, layoutState);
+  const blockRect = computeBlockRectForAnchor(block, layoutState, block.anchor) || block.currentRectPx;
+  if (!blockRect) return;
   draggedBlock = block;
   block.el.classList.add('dragging');
-  const rect = surfaceEl.getBoundingClientRect();
-  const pointerX = (e.clientX - rect.left) / layoutState.scale;
-  const pointerY = (rect.bottom - e.clientY) / layoutState.scale;
-  const blockLeft = area.x0 + block.col * layoutState.gridSizeX;
-  const blockBottom = area.y0 + block.row * layoutState.gridSizeY;
-  dragOffset.x = pointerX - blockLeft;
-  dragOffset.y = pointerY - blockBottom;
+  const surfaceRect = surfaceEl.getBoundingClientRect();
+  const pointerX = (e.clientX - surfaceRect.left) / layoutState.scale;
+  const pointerY = (surfaceRect.bottom - e.clientY) / layoutState.scale;
+  dragAnchorCandidate = { ...block.anchor };
+  dragOffset.x = pointerX - blockRect.x0;
+  dragOffset.y = pointerY - blockRect.y0;
+  currentSnapTarget = dragAnchorCandidate ? {
+    type: dragAnchorCandidate.targetType,
+    id: dragAnchorCandidate.targetId,
+    rect: getAnchorTargetRect(block, layoutState, dragAnchorCandidate)
+  } : null;
+  renderSnapIndicator(currentSnapTarget, layoutState);
   e.preventDefault();
 }
 
 function handleDragMove(e) {
   if (!draggedBlock || !layoutState) return;
-  const rect = surfaceEl.getBoundingClientRect();
-  const pointerX = (e.clientX - rect.left) / layoutState.scale;
-  const pointerY = (rect.bottom - e.clientY) / layoutState.scale;
+  const surfaceRect = surfaceEl.getBoundingClientRect();
+  const pointerX = (e.clientX - surfaceRect.left) / layoutState.scale;
+  const pointerY = (surfaceRect.bottom - e.clientY) / layoutState.scale;
 
-  const area = getBlockAreaRect(draggedBlock, layoutState);
-  if (!area) return;
+  const blockWidth = draggedBlock.cols * layoutState.gridSizeX;
+  const blockHeight = draggedBlock.rows * layoutState.gridSizeY;
+
+  let snapTarget = findBestSnapTarget(draggedBlock, layoutState, pointerX, pointerY);
+  if (!snapTarget) {
+    const fallback = dragAnchorCandidate || draggedBlock.anchor || {
+      targetType: 'dock',
+      targetId: draggedBlock.area === 'header' ? 'header' : 'work',
+      offsetX: 0,
+      offsetY: 0
+    };
+    snapTarget = {
+      type: fallback.targetType,
+      id: fallback.targetId,
+      rect: getAnchorTargetRect(draggedBlock, layoutState, fallback)
+    };
+  }
+  currentSnapTarget = snapTarget;
+  renderSnapIndicator(currentSnapTarget, layoutState);
+
+  const anchorRect = snapTarget && snapTarget.rect ? snapTarget.rect : getAnchorTargetRect(draggedBlock, layoutState, draggedBlock.anchor);
+  if (!anchorRect) return;
 
   const rawLeft = pointerX - dragOffset.x;
   const rawBottom = pointerY - dragOffset.y;
 
-  const minLeft = area.x0;
-  const maxLeft = area.x1 - draggedBlock.cols * layoutState.gridSizeX;
-  const minBottom = area.y0;
-  const maxBottom = area.y1 - draggedBlock.rows * layoutState.gridSizeY;
+  const maxLeft = anchorRect.x1 - blockWidth;
+  const maxBottom = anchorRect.y1 - blockHeight;
+  const clampedLeft = clamp(rawLeft, anchorRect.x0, Math.max(anchorRect.x0, maxLeft));
+  const clampedBottom = clamp(rawBottom, anchorRect.y0, Math.max(anchorRect.y0, maxBottom));
 
-  const clampedLeft = clamp(rawLeft, minLeft, maxLeft);
-  const clampedBottom = clamp(rawBottom, minBottom, maxBottom);
+  const availableWidth = Math.max(anchorRect.x1 - anchorRect.x0 - blockWidth, 0);
+  const availableHeight = Math.max(anchorRect.y1 - anchorRect.y0 - blockHeight, 0);
+  const offsetX = availableWidth === 0 ? 0 : (clampedLeft - anchorRect.x0) / availableWidth;
+  const offsetY = availableHeight === 0 ? 0 : (clampedBottom - anchorRect.y0) / availableHeight;
 
-  const relativeCols = (clampedLeft - area.x0) / layoutState.gridSizeX;
-  const relativeRows = (clampedBottom - area.y0) / layoutState.gridSizeY;
+  const candidateAnchor = {
+    targetType: snapTarget.type,
+    targetId: snapTarget.id,
+    offsetX: clamp(offsetX, 0, 1),
+    offsetY: clamp(offsetY, 0, 1)
+  };
 
-  const areaCols = (area.x1 - area.x0) / layoutState.gridSizeX;
-  const areaRows = (area.y1 - area.y0) / layoutState.gridSizeY;
-
-  const snappedCols = clamp(snapHalfUnits(relativeCols), 0, Math.max(0, areaCols - draggedBlock.cols));
-  const snappedRows = clamp(snapHalfUnits(relativeRows), 0, Math.max(0, areaRows - draggedBlock.rows));
-
-  if (snappedCols !== draggedBlock.col || snappedRows !== draggedBlock.row) {
+  if (!anchorsEqual(candidateAnchor, draggedBlock.anchor)) {
     lastInteractionWasDrag = true;
   }
 
-  draggedBlock.col = snappedCols;
-  draggedBlock.row = snappedRows;
-
-  applyBlockPosition(draggedBlock, layoutState);
+  dragAnchorCandidate = candidateAnchor;
+  applyBlockPosition(draggedBlock, layoutState, dragAnchorCandidate);
 }
 
 function handleDragEnd() {
@@ -1098,6 +1496,14 @@ function handleDragEnd() {
   const block = draggedBlock;
   block.el.classList.remove('dragging');
   draggedBlock = null;
+  clearSnapIndicator();
+  const hasCandidate = !!dragAnchorCandidate;
+  if (hasCandidate && !anchorsEqual(block.anchor, dragAnchorCandidate)) {
+    block.anchor = { ...dragAnchorCandidate };
+    updateBlockParent(block);
+  }
+  dragAnchorCandidate = null;
+  currentSnapTarget = null;
   if (lastInteractionWasDrag) {
     reorderDockModelAfterDrag(block);
     recompute();
@@ -1109,6 +1515,48 @@ function handleDragEnd() {
 
 document.addEventListener('mousemove', handleDragMove);
 document.addEventListener('mouseup', handleDragEnd);
+
+if (modalSaveBtn) {
+  modalSaveBtn.addEventListener('click', () => {
+    if (!currentModalBlock) {
+      closePanelSettings();
+      return;
+    }
+    const rawValue = modalTargetSelect.value || 'dock:work';
+    const [targetType, targetId] = rawValue.split(':');
+    const offsetX = clamp(parseFloat(modalAnchorXInput.value) / 100 || 0, 0, 1);
+    const offsetY = clamp(parseFloat(modalAnchorYInput.value) / 100 || 0, 0, 1);
+    currentModalBlock.anchor = {
+      targetType,
+      targetId,
+      offsetX,
+      offsetY
+    };
+    updateBlockParent(currentModalBlock);
+    closePanelSettings();
+    recompute();
+  });
+}
+
+if (modalCancelBtn) {
+  modalCancelBtn.addEventListener('click', () => {
+    closePanelSettings();
+  });
+}
+
+if (modalEl) {
+  modalEl.addEventListener('click', (event) => {
+    if (event.target === modalEl) {
+      closePanelSettings();
+    }
+  });
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && modalEl && modalEl.classList.contains('open')) {
+    closePanelSettings();
+  }
+});
 
 document.getElementById('inputW').addEventListener('input', recompute);
 document.getElementById('inputH').addEventListener('input', recompute);

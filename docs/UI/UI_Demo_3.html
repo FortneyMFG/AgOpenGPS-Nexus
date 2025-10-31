@@ -90,13 +90,37 @@
     font-size: 0;
   }
 
+  .grid-layer,
+  .dock-layer,
+  .work-layer,
+  .block-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .grid-layer {
+    z-index: 5;
+  }
+
+  .dock-layer {
+    z-index: 8;
+  }
+
+  .work-layer {
+    z-index: 10;
+  }
+
+  .block-layer {
+    z-index: 20;
+    pointer-events: auto;
+  }
+
   /* Full-surface grid lines */
   .grid-line-vert {
     position: absolute;
     top: 0;
     bottom: 0;
     background: rgba(0,255,255,0.4);
-    pointer-events: none;
   }
 
   .grid-line-horiz {
@@ -104,7 +128,6 @@
     left: 0;
     right: 0;
     background: rgba(255,255,0,0.5);
-    pointer-events: none;
   }
 
   .grid-line-horiz-half {
@@ -112,7 +135,6 @@
     left: 0;
     right: 0;
     background: rgba(255,255,0,0.2);
-    pointer-events: none;
   }
 
   .col-label,
@@ -125,7 +147,6 @@
     color: #fff;
     padding: 2px 4px;
     border-radius: 3px;
-    pointer-events: none;
     user-select: none;
   }
   .col-label {
@@ -146,7 +167,6 @@
     color: #fff;
     text-shadow: 0 0 3px #000;
     padding: 6px 8px;
-    pointer-events: none;
     border: 1px solid rgba(255,255,255,0.28);
     background-clip: padding-box;
   }
@@ -176,7 +196,51 @@
     font-family: ui-monospace, monospace;
     font-size: 10px;
     padding: 2px 4px;
-    pointer-events: none;
+  }
+
+  .block {
+    position: absolute;
+    box-sizing: border-box;
+    background: linear-gradient(135deg,#3a3a3a 0%,#2a2a2a 100%);
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: grab;
+    transition: box-shadow .2s, transform .2s;
+    color: #ccc;
+    font-size: 12px;
+    min-width: 40px;
+    min-height: 40px;
+    z-index: 1;
+  }
+
+  .block:active {
+    cursor: grabbing;
+  }
+
+  .block.dragging {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.55);
+    transform: translateY(-1px);
+    border-color: #06c;
+  }
+
+  .block-title {
+    font-weight: 600;
+    color: #f5f5f5;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+  }
+
+  .block-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4caf50;
   }
 
 </style>
@@ -274,7 +338,12 @@
 </div>
 
 <div class="preview-wrapper">
-  <div id="surface" class="surface"></div>
+  <div id="surface" class="surface">
+    <div id="gridLayer" class="grid-layer"></div>
+    <div id="dockLayer" class="dock-layer"></div>
+    <div id="workLayer" class="work-layer"></div>
+    <div id="blockLayer" class="block-layer"></div>
+  </div>
 </div>
 
 <script>
@@ -282,59 +351,79 @@ function clamp(v, lo, hi) {
   return Math.max(lo, Math.min(hi, v));
 }
 
-function recompute() {
-  // Read inputs
-  const W             = parseFloat(document.getElementById('inputW').value);
-  const H             = parseFloat(document.getElementById('inputH').value);
-  const densityFactor = parseFloat(document.getElementById('inputDensity').value);
-  const minTapPx      = parseFloat(document.getElementById('inputTap').value);
+function snapHalfUnits(value) {
+  return Math.round(value * 2) / 2;
+}
 
-  let headerRows      = parseFloat(document.getElementById('inputHeaderRows').value);
-  let bottomRows      = parseFloat(document.getElementById('inputBottomRows').value);
-  let leftCols        = parseFloat(document.getElementById('inputLeftCols').value);
-  let rightCols       = parseFloat(document.getElementById('inputRightCols').value);
+const surfaceEl = document.getElementById('surface');
+const gridLayer = document.getElementById('gridLayer');
+const dockLayer = document.getElementById('dockLayer');
+const workLayer = document.getElementById('workLayer');
+const blockLayer = document.getElementById('blockLayer');
 
-  // Update labels
-  document.getElementById('valW').textContent           = W.toFixed(0);
-  document.getElementById('valH').textContent           = H.toFixed(0);
-  document.getElementById('valDensity').textContent     = densityFactor.toFixed(2);
-  document.getElementById('valTap').textContent         = minTapPx.toFixed(0);
-  document.getElementById('valHeaderRows').textContent  = headerRows.toFixed(1);
-  document.getElementById('valBottomRows').textContent  = bottomRows.toFixed(1);
-  document.getElementById('valLeftCols').textContent    = leftCols.toFixed(1);
-  document.getElementById('valRightCols').textContent   = rightCols.toFixed(1);
+let layoutState = null;
+let blocksInitialised = false;
+const blocks = [
+  { id: 'block-speed', title: 'Speed', value: '12.4 km/h', col: 0.5, row: 0.5, cols: 1.5, rows: 1.0 },
+  { id: 'block-heading', title: 'Heading', value: 'N 45°', col: 2.5, row: 0.5, cols: 1.5, rows: 1.0 },
+  { id: 'block-altitude', title: 'Altitude', value: '342 m', col: 0.5, row: 2.0, cols: 1.5, rows: 1.0 },
+  { id: 'block-sections', title: 'Sections', value: '12 / 16', col: 2.5, row: 2.0, cols: 1.5, rows: 1.0 }
+];
 
-  // --- Compute global grid from whole viewport ---
-  const AR = W / H;
+function initBlocks() {
+  if (blocksInitialised) return;
+  blocks.forEach(block => {
+    const el = document.createElement('div');
+    el.className = 'block';
+    el.dataset.blockId = block.id;
+    el.innerHTML = `
+      <div class="block-title">${block.title}</div>
+      <div class="block-value">${block.value}</div>
+    `;
+    blockLayer.appendChild(el);
+    block.el = el;
+    el.addEventListener('mousedown', startDrag);
+  });
+  blocksInitialised = true;
+}
 
-  let aspectCols = 6.6667 * AR + 0.6667;         // ~4 cols @AR=0.5, ~12 cols @1.7, etc
-  let scaledCols = aspectCols / densityFactor;   // densityFactor <1 => more cols, >1 => fewer
+function readInputs() {
+  return {
+    W: parseFloat(document.getElementById('inputW').value),
+    H: parseFloat(document.getElementById('inputH').value),
+    densityFactor: parseFloat(document.getElementById('inputDensity').value),
+    minTapPx: parseFloat(document.getElementById('inputTap').value),
+    headerRows: parseFloat(document.getElementById('inputHeaderRows').value),
+    bottomRows: parseFloat(document.getElementById('inputBottomRows').value),
+    leftCols: parseFloat(document.getElementById('inputLeftCols').value),
+    rightCols: parseFloat(document.getElementById('inputRightCols').value)
+  };
+}
 
-  let physicalMaxCols = Math.floor(W / minTapPx);
-  if (physicalMaxCols < 1) physicalMaxCols = 1;
+function computeLayout(config) {
+  const result = { ...config };
+  result.AR = result.W / result.H;
 
-  let columns = Math.round(scaledCols);
-  columns = clamp(columns, 3, 16);
-  columns = Math.min(columns, physicalMaxCols);
-  columns = Math.max(columns, 3);
+  result.aspectCols = 6.6667 * result.AR + 0.6667;
+  result.scaledCols = result.aspectCols / result.densityFactor;
 
-  const gridSizeX = W / columns;
+  result.physicalMaxCols = Math.max(1, Math.floor(result.W / result.minTapPx));
 
-  let halfStepsY = Math.round((2.0 * H) / gridSizeX);
-  if (halfStepsY < 1) halfStepsY = 1;
+  result.columns = clamp(Math.round(result.scaledCols), 3, 16);
+  result.columns = Math.min(result.columns, result.physicalMaxCols);
+  result.columns = Math.max(result.columns, 3);
 
-  const gridSizeY = (2.0 * H) / halfStepsY;
-  const approxFullRows = halfStepsY / 2.0;
+  result.gridSizeX = result.W / result.columns;
 
-  // We now know: 1 column = gridSizeX px, 1 row = gridSizeY px
+  result.halfStepsY = Math.max(1, Math.round((2.0 * result.H) / result.gridSizeX));
+  result.gridSizeY = (2.0 * result.H) / result.halfStepsY;
+  result.approxFullRows = result.halfStepsY / 2.0;
 
-  // Clamp docks so they don't collapse the middle to negative size
-  // Vertical: headerRows + bottomRows can't exceed total rows
-  const totalRowsAvailable = approxFullRows; // how many ~1.0h rows fit vertically
+  const totalRowsAvailable = result.approxFullRows;
+  let headerRows = result.headerRows;
+  let bottomRows = result.bottomRows;
   if (headerRows + bottomRows > totalRowsAvailable) {
     const scale = totalRowsAvailable / (headerRows + bottomRows);
-    // honor header's min 0.5 first
-    // if scaling would push header below 0.5, clamp header and re-fit bottom
     let hCandidate = headerRows * scale;
     let bCandidate = bottomRows * scale;
     if (hCandidate < 0.5) {
@@ -346,225 +435,310 @@ function recompute() {
     bottomRows = bCandidate;
   }
 
-  // Horizontal: leftCols + rightCols can't exceed columns
-  if (leftCols + rightCols > columns) {
-    const scale = columns / (leftCols + rightCols);
-    leftCols  *= scale;
+  let leftCols = result.leftCols;
+  let rightCols = result.rightCols;
+  if (leftCols + rightCols > result.columns) {
+    const scale = result.columns / (leftCols + rightCols);
+    leftCols *= scale;
     rightCols *= scale;
   }
 
-  // Convert dock sizes (grid units) -> px
-  const headerPxH = headerRows * gridSizeY;
-  const bottomPxH = bottomRows * gridSizeY;
-  const leftPxW   = leftCols   * gridSizeX;
-  const rightPxW  = rightCols  * gridSizeX;
+  result.headerRows = headerRows;
+  result.bottomRows = bottomRows;
+  result.leftCols = leftCols;
+  result.rightCols = rightCols;
 
-  // Build dock rects in px, origin bottom-left (our logical space)
-  const headerDock = {
-    x0: 0,
-    x1: W,
-    y0: H - headerPxH,
-    y1: H
-  };
+  const headerPxH = headerRows * result.gridSizeY;
+  const bottomPxH = bottomRows * result.gridSizeY;
+  const leftPxW = leftCols * result.gridSizeX;
+  const rightPxW = rightCols * result.gridSizeX;
 
-  const bottomDock = {
-    x0: 0,
-    x1: W,
-    y0: 0,
-    y1: bottomPxH
-  };
+  result.headerDock = { x0: 0, x1: result.W, y0: result.H - headerPxH, y1: result.H };
+  result.bottomDock = { x0: 0, x1: result.W, y0: 0, y1: bottomPxH };
+  result.leftDock = { x0: 0, x1: leftPxW, y0: bottomPxH, y1: result.H - headerPxH };
+  result.rightDock = { x0: result.W - rightPxW, x1: result.W, y0: bottomPxH, y1: result.H - headerPxH };
+  result.workArea = { x0: leftPxW, x1: result.W - rightPxW, y0: bottomPxH, y1: result.H - headerPxH };
 
-  const leftDock = {
-    x0: 0,
-    x1: leftPxW,
-    y0: bottomPxH,
-    y1: H - headerPxH
-  };
+  if (result.workArea.x1 < result.workArea.x0) result.workArea.x1 = result.workArea.x0;
+  if (result.workArea.y1 < result.workArea.y0) result.workArea.y1 = result.workArea.y0;
 
-  const rightDock = {
-    x0: W - rightPxW,
-    x1: W,
-    y0: bottomPxH,
-    y1: H - headerPxH
-  };
-
-  // Working "hole" just for visualization (not canonical main surface, just leftover middle)
-  const workArea = {
-    x0: leftPxW,
-    x1: W - rightPxW,
-    y0: bottomPxH,
-    y1: H - headerPxH
-  };
-
-  // If docks eat everything, clamp so we don't get inverted rect
-  if (workArea.x1 < workArea.x0) workArea.x1 = workArea.x0;
-  if (workArea.y1 < workArea.y0) workArea.y1 = workArea.y0;
-
-  // ---- RENDER PHASE ----
-
-  const surfaceEl = document.getElementById('surface');
   const wrapperEl = surfaceEl.parentElement;
-
-  // fit preview into right pane keeping aspect
   const wrapW = wrapperEl.clientWidth - 40;
   const wrapH = wrapperEl.clientHeight - 40;
-  const scale = Math.min(wrapW / W, wrapH / H);
+  result.scale = Math.min(wrapW / result.W, wrapH / result.H) || 1;
+  result.drawW = result.W * result.scale;
+  result.drawH = result.H * result.scale;
 
-  const drawW = W * scale;
-  const drawH = H * scale;
+  result.workCols = (result.workArea.x1 - result.workArea.x0) / result.gridSizeX;
+  result.workRows = (result.workArea.y1 - result.workArea.y0) / result.gridSizeY;
 
-  surfaceEl.style.width = drawW + "px";
-  surfaceEl.style.height = drawH + "px";
+  return result;
+}
 
-  // helper to convert px rect (bottom-left origin) -> CSS box in preview (top-left origin)
-  function pxRectToCss(rectPx) {
-    const x0s = rectPx.x0 * scale;
-    const x1s = rectPx.x1 * scale;
-    const y0s = rectPx.y0 * scale;
-    const y1s = rectPx.y1 * scale;
+function updateLabels(layout) {
+  document.getElementById('valW').textContent = layout.W.toFixed(0);
+  document.getElementById('valH').textContent = layout.H.toFixed(0);
+  document.getElementById('valDensity').textContent = layout.densityFactor.toFixed(2);
+  document.getElementById('valTap').textContent = layout.minTapPx.toFixed(0);
+  document.getElementById('valHeaderRows').textContent = layout.headerRows.toFixed(1);
+  document.getElementById('valBottomRows').textContent = layout.bottomRows.toFixed(1);
+  document.getElementById('valLeftCols').textContent = layout.leftCols.toFixed(1);
+  document.getElementById('valRightCols').textContent = layout.rightCols.toFixed(1);
+}
 
-    const cssLeft = x0s;
-    const cssTop  = drawH - y1s;
-    const cssW    = x1s - x0s;
-    const cssH    = y1s - y0s;
+function pxRectToCss(rectPx, layout) {
+  const x0s = rectPx.x0 * layout.scale;
+  const x1s = rectPx.x1 * layout.scale;
+  const y0s = rectPx.y0 * layout.scale;
+  const y1s = rectPx.y1 * layout.scale;
+  const cssLeft = x0s;
+  const cssTop = layout.drawH - y1s;
+  return {
+    left: cssLeft,
+    top: cssTop,
+    width: x1s - x0s,
+    height: y1s - y0s
+  };
+}
 
-    return {left: cssLeft, top: cssTop, width: cssW, height: cssH};
-  }
-
-  // wipe previous frame
-  surfaceEl.innerHTML = "";
-
-  // Draw grid (full surface)
-  const colWidthPreview = gridSizeX * scale;
-  const totalColsPreview = Math.floor(drawW / colWidthPreview);
+function drawGrid(layout) {
+  gridLayer.innerHTML = '';
+  const colWidthPreview = layout.gridSizeX * layout.scale;
+  const totalColsPreview = Math.floor(layout.drawW / colWidthPreview);
 
   for (let c = 0; c <= totalColsPreview; c++) {
     const x = c * colWidthPreview;
-
     const vline = document.createElement('div');
     vline.className = 'grid-line-vert';
-    vline.style.left = x + "px";
-    vline.style.width = "1px";
-    vline.style.top = "0px";
-    vline.style.bottom = "0px";
-    surfaceEl.appendChild(vline);
+    vline.style.left = `${x}px`;
+    vline.style.width = '1px';
+    vline.style.top = '0px';
+    vline.style.bottom = '0px';
+    gridLayer.appendChild(vline);
 
     if (c < totalColsPreview) {
       const clabel = document.createElement('div');
       clabel.className = 'col-label';
-      clabel.style.left = x + "px";
-      clabel.style.top = "2px";
+      clabel.style.left = `${x}px`;
+      clabel.style.top = '2px';
       clabel.textContent = c.toString();
-      surfaceEl.appendChild(clabel);
+      gridLayer.appendChild(clabel);
     }
   }
 
-  const fullRowHeightPreview  = gridSizeY * scale;
-  const halfRowHeightPreview  = 0.5 * fullRowHeightPreview;
-  const totalHalfStepsPreview = Math.floor(drawH / halfRowHeightPreview);
+  const fullRowHeightPreview = layout.gridSizeY * layout.scale;
+  const halfRowHeightPreview = 0.5 * fullRowHeightPreview;
+  const totalHalfStepsPreview = Math.floor(layout.drawH / halfRowHeightPreview);
 
   for (let hs = 0; hs <= totalHalfStepsPreview; hs++) {
     const yFromBottom = hs * halfRowHeightPreview;
-    const cssY = drawH - yFromBottom;
-
-    const isFullRow = (hs % 2 === 0);
+    const cssY = layout.drawH - yFromBottom;
+    const isFullRow = hs % 2 === 0;
 
     const hline = document.createElement('div');
-    hline.style.left = "0px";
-    hline.style.right = "0px";
-    hline.style.height = "1px";
-    hline.style.top = cssY + "px";
+    hline.style.left = '0px';
+    hline.style.right = '0px';
+    hline.style.height = '1px';
+    hline.style.top = `${cssY}px`;
     hline.className = isFullRow ? 'grid-line-horiz' : 'grid-line-horiz-half';
-    surfaceEl.appendChild(hline);
+    gridLayer.appendChild(hline);
 
     if (isFullRow && hs < totalHalfStepsPreview) {
-      const fullRowIndex = hs / 2;
       const rlabel = document.createElement('div');
       rlabel.className = 'row-label';
-      rlabel.style.left = "2px";
-      rlabel.style.top = cssY + "px";
-      rlabel.textContent = fullRowIndex.toString();
-      surfaceEl.appendChild(rlabel);
+      rlabel.style.left = '2px';
+      rlabel.style.top = `${cssY}px`;
+      rlabel.textContent = (hs / 2).toString();
+      gridLayer.appendChild(rlabel);
     }
   }
+}
 
-  // Draw docks as solid strips (no overlap)
-  function drawDockCard(rectPx, className, text) {
-    const css = pxRectToCss(rectPx);
+function drawDocks(layout) {
+  dockLayer.innerHTML = '';
+  const entries = [
+    { rect: layout.headerDock, className: 'dockCard headerDockCard', label: 'HeaderDock' },
+    { rect: layout.bottomDock, className: 'dockCard bottomDockCard', label: 'BottomDock' },
+    { rect: layout.leftDock, className: 'dockCard leftDockCard', label: 'LeftDock' },
+    { rect: layout.rightDock, className: 'dockCard rightDockCard', label: 'RightDock' }
+  ];
+
+  entries.forEach(entry => {
+    const css = pxRectToCss(entry.rect, layout);
     if (css.width <= 1 || css.height <= 1) return;
-    const card = document.createElement('div');
-    card.className = "dockCard " + className;
-    card.style.left   = css.left + "px";
-    card.style.top    = css.top + "px";
-    card.style.width  = css.width + "px";
-    card.style.height = css.height + "px";
-    card.textContent = text;
-    surfaceEl.appendChild(card);
-  }
+    const node = document.createElement('div');
+    node.className = entry.className;
+    node.style.left = `${css.left}px`;
+    node.style.top = `${css.top}px`;
+    node.style.width = `${css.width}px`;
+    node.style.height = `${css.height}px`;
+    node.textContent = entry.label;
+    dockLayer.appendChild(node);
+  });
+}
 
-  drawDockCard(headerDock, "headerDockCard", "HeaderDock");
-  drawDockCard(bottomDock, "bottomDockCard", "BottomDock");
-  drawDockCard(leftDock,   "leftDockCard",   "LeftDock");
-  drawDockCard(rightDock,  "rightDockCard",  "RightDock");
+function drawWorkArea(layout) {
+  workLayer.innerHTML = '';
+  const css = pxRectToCss(layout.workArea, layout);
+  if (css.width <= 1 || css.height <= 1) return;
+  const node = document.createElement('div');
+  node.className = 'workAreaOverlay';
+  node.style.left = `${css.left}px`;
+  node.style.top = `${css.top}px`;
+  node.style.width = `${css.width}px`;
+  node.style.height = `${css.height}px`;
+  node.textContent = 'workspace area (not special, just leftover)';
+  workLayer.appendChild(node);
+}
 
-  // Draw leftover work area just for visualization
-  const workCss = pxRectToCss(workArea);
-  if (workCss.width > 1 && workCss.height > 1) {
-    const wa = document.createElement('div');
-    wa.className = "workAreaOverlay";
-    wa.style.left   = workCss.left + "px";
-    wa.style.top    = workCss.top + "px";
-    wa.style.width  = workCss.width + "px";
-    wa.style.height = workCss.height + "px";
-    wa.textContent = "workspace area (not special, just leftover)";
-    surfaceEl.appendChild(wa);
-  }
+function applyStaticLayers(layout) {
+  surfaceEl.style.width = `${layout.drawW}px`;
+  surfaceEl.style.height = `${layout.drawH}px`;
+  drawGrid(layout);
+  drawDocks(layout);
+  drawWorkArea(layout);
+}
 
-  // Metrics
+function clampBlockToWorkArea(block, layout) {
+  const maxCols = Math.max(0, layout.workCols - block.cols);
+  const maxRows = Math.max(0, layout.workRows - block.rows);
+  block.col = clamp(block.col, 0, maxCols);
+  block.row = clamp(block.row, 0, maxRows);
+}
+
+function applyBlockPosition(block, layout) {
+  if (!block.el) return;
+  const leftPx = layout.workArea.x0 + block.col * layout.gridSizeX;
+  const bottomPx = layout.workArea.y0 + block.row * layout.gridSizeY;
+  const widthPx = block.cols * layout.gridSizeX;
+  const heightPx = block.rows * layout.gridSizeY;
+  const cssLeft = leftPx * layout.scale;
+  const cssTop = layout.drawH - (bottomPx + heightPx) * layout.scale;
+  block.el.style.left = `${cssLeft}px`;
+  block.el.style.top = `${cssTop}px`;
+  block.el.style.width = `${widthPx * layout.scale}px`;
+  block.el.style.height = `${heightPx * layout.scale}px`;
+}
+
+function updateBlocks(layout) {
+  blocks.forEach(block => {
+    clampBlockToWorkArea(block, layout);
+    applyBlockPosition(block, layout);
+  });
+}
+
+function updateMetrics(layout) {
   const metricsEl = document.getElementById('metricsBox');
   metricsEl.textContent =
-`Viewport px        : ${W.toFixed(0)} x ${H.toFixed(0)}
-Aspect Ratio       : ${AR.toFixed(3)}
+`Viewport px        : ${layout.W.toFixed(0)} x ${layout.H.toFixed(0)}
+Aspect Ratio       : ${layout.AR.toFixed(3)}
 
-Columns            : ${columns}
-gridSizeX (1 col)  : ${gridSizeX.toFixed(2)} px
-gridSizeY (1 row)  : ${gridSizeY.toFixed(2)} px
-halfStepsY (0.5h)  : ${halfStepsY} (~${approxFullRows.toFixed(2)} rows)
+Columns            : ${layout.columns}
+gridSizeX (1 col)  : ${layout.gridSizeX.toFixed(2)} px
+gridSizeY (1 row)  : ${layout.gridSizeY.toFixed(2)} px
+halfStepsY (0.5h)  : ${layout.halfStepsY} (~${layout.approxFullRows.toFixed(2)} rows)
 
-DensityFactor      : ${densityFactor.toFixed(2)}
-MinTapPx           : ${minTapPx.toFixed(0)}
-physicalMaxCols    : ${physicalMaxCols}
-aspectCols raw     : ${aspectCols.toFixed(2)}
-scaledCols         : ${scaledCols.toFixed(2)}
+DensityFactor      : ${layout.densityFactor.toFixed(2)}
+MinTapPx           : ${layout.minTapPx.toFixed(0)}
+physicalMaxCols    : ${layout.physicalMaxCols}
+aspectCols raw     : ${layout.aspectCols.toFixed(2)}
+scaledCols         : ${layout.scaledCols.toFixed(2)}
 
-HeaderRows         : ${headerRows.toFixed(1)}
-BottomRows         : ${bottomRows.toFixed(1)}
-LeftCols           : ${leftCols.toFixed(1)}
-RightCols          : ${rightCols.toFixed(1)}
+HeaderRows         : ${layout.headerRows.toFixed(1)}
+BottomRows         : ${layout.bottomRows.toFixed(1)}
+LeftCols           : ${layout.leftCols.toFixed(1)}
+RightCols          : ${layout.rightCols.toFixed(1)}
 
 HeaderDock px rect :
-  x0=${headerDock.x0.toFixed(1)} y0=${headerDock.y0.toFixed(1)}
-  x1=${headerDock.x1.toFixed(1)} y1=${headerDock.y1.toFixed(1)}
+  x0=${layout.headerDock.x0.toFixed(1)} y0=${layout.headerDock.y0.toFixed(1)}
+  x1=${layout.headerDock.x1.toFixed(1)} y1=${layout.headerDock.y1.toFixed(1)}
 
 BottomDock px rect :
-  x0=${bottomDock.x0.toFixed(1)} y0=${bottomDock.y0.toFixed(1)}
-  x1=${bottomDock.x1.toFixed(1)} y1=${bottomDock.y1.toFixed(1)}
+  x0=${layout.bottomDock.x0.toFixed(1)} y0=${layout.bottomDock.y0.toFixed(1)}
+  x1=${layout.bottomDock.x1.toFixed(1)} y1=${layout.bottomDock.y1.toFixed(1)}
 
 LeftDock px rect   :
-  x0=${leftDock.x0.toFixed(1)} y0=${leftDock.y0.toFixed(1)}
-  x1=${leftDock.x1.toFixed(1)} y1=${leftDock.y1.toFixed(1)}
+  x0=${layout.leftDock.x0.toFixed(1)} y0=${layout.leftDock.y0.toFixed(1)}
+  x1=${layout.leftDock.x1.toFixed(1)} y1=${layout.leftDock.y1.toFixed(1)}
 
 RightDock px rect  :
-  x0=${rightDock.x0.toFixed(1)} y0=${rightDock.y0.toFixed(1)}
-  x1=${rightDock.x1.toFixed(1)} y1=${rightDock.y1.toFixed(1)}
+  x0=${layout.rightDock.x0.toFixed(1)} y0=${layout.rightDock.y0.toFixed(1)}
+  x1=${layout.rightDock.x1.toFixed(1)} y1=${layout.rightDock.y1.toFixed(1)}
 
 Work area px rect  :
-  x0=${workArea.x0.toFixed(1)} y0=${workArea.y0.toFixed(1)}
-  x1=${workArea.x1.toFixed(1)} y1=${workArea.y1.toFixed(1)}
+  x0=${layout.workArea.x0.toFixed(1)} y0=${layout.workArea.y0.toFixed(1)}
+  x1=${layout.workArea.x1.toFixed(1)} y1=${layout.workArea.y1.toFixed(1)}
 `;
 }
 
-// hook up inputs
+function recompute() {
+  const inputs = readInputs();
+  layoutState = computeLayout(inputs);
+  updateLabels(layoutState);
+  applyStaticLayers(layoutState);
+  updateBlocks(layoutState);
+  updateMetrics(layoutState);
+}
+
+let draggedBlock = null;
+const dragOffset = { x: 0, y: 0 };
+
+function findBlockForElement(el) {
+  return blocks.find(b => b.el === el);
+}
+
+function startDrag(e) {
+  if (e.button !== 0) return;
+  if (!layoutState) return;
+  const block = findBlockForElement(e.currentTarget);
+  if (!block) return;
+  draggedBlock = block;
+  block.el.classList.add('dragging');
+  const rect = surfaceEl.getBoundingClientRect();
+  const pointerX = (e.clientX - rect.left) / layoutState.scale;
+  const pointerY = (rect.bottom - e.clientY) / layoutState.scale;
+  const blockLeft = layoutState.workArea.x0 + block.col * layoutState.gridSizeX;
+  const blockBottom = layoutState.workArea.y0 + block.row * layoutState.gridSizeY;
+  dragOffset.x = pointerX - blockLeft;
+  dragOffset.y = pointerY - blockBottom;
+  e.preventDefault();
+}
+
+function handleDragMove(e) {
+  if (!draggedBlock || !layoutState) return;
+  const rect = surfaceEl.getBoundingClientRect();
+  const pointerX = (e.clientX - rect.left) / layoutState.scale;
+  const pointerY = (rect.bottom - e.clientY) / layoutState.scale;
+
+  const rawLeft = pointerX - dragOffset.x;
+  const rawBottom = pointerY - dragOffset.y;
+
+  const minLeft = layoutState.workArea.x0;
+  const maxLeft = layoutState.workArea.x1 - draggedBlock.cols * layoutState.gridSizeX;
+  const minBottom = layoutState.workArea.y0;
+  const maxBottom = layoutState.workArea.y1 - draggedBlock.rows * layoutState.gridSizeY;
+
+  const clampedLeft = clamp(rawLeft, minLeft, maxLeft);
+  const clampedBottom = clamp(rawBottom, minBottom, maxBottom);
+
+  const relativeCols = (clampedLeft - layoutState.workArea.x0) / layoutState.gridSizeX;
+  const relativeRows = (clampedBottom - layoutState.workArea.y0) / layoutState.gridSizeY;
+
+  draggedBlock.col = clamp(snapHalfUnits(relativeCols), 0, Math.max(0, layoutState.workCols - draggedBlock.cols));
+  draggedBlock.row = clamp(snapHalfUnits(relativeRows), 0, Math.max(0, layoutState.workRows - draggedBlock.rows));
+
+  applyBlockPosition(draggedBlock, layoutState);
+}
+
+function handleDragEnd() {
+  if (!draggedBlock) return;
+  draggedBlock.el.classList.remove('dragging');
+  draggedBlock = null;
+}
+
+document.addEventListener('mousemove', handleDragMove);
+document.addEventListener('mouseup', handleDragEnd);
+
 document.getElementById('inputW').addEventListener('input', recompute);
 document.getElementById('inputH').addEventListener('input', recompute);
 document.getElementById('inputDensity').addEventListener('input', recompute);
@@ -574,10 +748,9 @@ document.getElementById('inputBottomRows').addEventListener('input', recompute);
 document.getElementById('inputLeftCols').addEventListener('input', recompute);
 document.getElementById('inputRightCols').addEventListener('input', recompute);
 
-// redraw on window resize
 window.addEventListener('resize', recompute);
 
-// initial draw
+initBlocks();
 recompute();
 </script>
 

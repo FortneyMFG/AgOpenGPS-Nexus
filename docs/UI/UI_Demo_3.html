@@ -115,6 +115,16 @@
     pointer-events: auto;
   }
 
+  .header-container {
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .header-container .block {
+    pointer-events: auto;
+  }
+
   /* Full-surface grid lines */
   .grid-line-vert {
     position: absolute;
@@ -217,6 +227,38 @@
     min-width: 40px;
     min-height: 40px;
     z-index: 1;
+  }
+
+  .header-block {
+    min-width: 0;
+    min-height: 0;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: linear-gradient(135deg, rgba(70,70,70,0.95) 0%, rgba(40,40,40,0.95) 100%);
+    border-color: rgba(200,200,200,0.35);
+  }
+
+  .header-block .header-block-label {
+    display: block;
+    text-align: center;
+    color: #f5f5f5;
+  }
+
+  .header-lock-block {
+    background: linear-gradient(135deg, rgba(80,80,80,0.95) 0%, rgba(50,50,50,0.95) 100%);
+    border-color: rgba(160,160,160,0.6);
+  }
+
+  .header-lock-block .header-block-label {
+    letter-spacing: 0.04em;
+  }
+
+  .header-lock-block.active {
+    background: linear-gradient(135deg, rgba(0,118,255,0.92) 0%, rgba(0,82,204,0.92) 100%);
+    border-color: rgba(0,150,255,0.9);
   }
 
   .block:active {
@@ -342,7 +384,9 @@
     <div id="gridLayer" class="grid-layer"></div>
     <div id="dockLayer" class="dock-layer"></div>
     <div id="workLayer" class="work-layer"></div>
-    <div id="blockLayer" class="block-layer"></div>
+    <div id="blockLayer" class="block-layer">
+      <div id="headerContainer" class="header-container"></div>
+    </div>
   </div>
 </div>
 
@@ -360,14 +404,25 @@ const gridLayer = document.getElementById('gridLayer');
 const dockLayer = document.getElementById('dockLayer');
 const workLayer = document.getElementById('workLayer');
 const blockLayer = document.getElementById('blockLayer');
+const headerContainer = document.getElementById('headerContainer');
 
 let layoutState = null;
 let blocksInitialised = false;
+let isUnlocked = false;
+let lockToggleBlock = null;
+let lastInteractionWasDrag = false;
 const blocks = [
-  { id: 'block-speed', title: 'Speed', value: '12.4 km/h', col: 0.5, row: 0.5, cols: 1.5, rows: 1.0 },
-  { id: 'block-heading', title: 'Heading', value: 'N 45°', col: 2.5, row: 0.5, cols: 1.5, rows: 1.0 },
-  { id: 'block-altitude', title: 'Altitude', value: '342 m', col: 0.5, row: 2.0, cols: 1.5, rows: 1.0 },
-  { id: 'block-sections', title: 'Sections', value: '12 / 16', col: 2.5, row: 2.0, cols: 1.5, rows: 1.0 }
+  { id: 'block-speed', area: 'work', title: 'Speed', value: '12.4 km/h', col: 0.5, row: 0.5, cols: 1.5, rows: 1.0 },
+  { id: 'block-heading', area: 'work', title: 'Heading', value: 'N 45°', col: 2.5, row: 0.5, cols: 1.5, rows: 1.0 },
+  { id: 'block-altitude', area: 'work', title: 'Altitude', value: '342 m', col: 0.5, row: 2.0, cols: 1.5, rows: 1.0 },
+  { id: 'block-sections', area: 'work', title: 'Sections', value: '12 / 16', col: 2.5, row: 2.0, cols: 1.5, rows: 1.0 },
+  { id: 'header-file', area: 'header', label: 'File', col: 0.0, row: 0.0, cols: 1.5, rows: 0.5 },
+  { id: 'header-edit', area: 'header', label: 'Edit', col: 1.5, row: 0.0, cols: 1.5, rows: 0.5 },
+  { id: 'header-view', area: 'header', label: 'View', col: 3.0, row: 0.0, cols: 1.5, rows: 0.5 },
+  { id: 'header-settings', area: 'header', label: 'Settings', col: 4.5, row: 0.0, cols: 1.5, rows: 0.5 },
+  { id: 'header-services', area: 'header', label: 'Services', col: 6.0, row: 0.0, cols: 1.5, rows: 0.5 },
+  { id: 'header-help', area: 'header', label: 'Help', col: 7.5, row: 0.0, cols: 1.0, rows: 0.5 },
+  { id: 'header-lock', area: 'header', label: 'Unlock UI', col: 8.5, row: 0.0, cols: 1.5, rows: 0.5, isLockToggle: true }
 ];
 
 function initBlocks() {
@@ -375,16 +430,46 @@ function initBlocks() {
   blocks.forEach(block => {
     const el = document.createElement('div');
     el.className = 'block';
+    if (block.area === 'header') {
+      el.classList.add('header-block');
+    }
     el.dataset.blockId = block.id;
-    el.innerHTML = `
-      <div class="block-title">${block.title}</div>
-      <div class="block-value">${block.value}</div>
-    `;
-    blockLayer.appendChild(el);
+    if (block.area === 'header') {
+      if (block.isLockToggle) {
+        el.classList.add('header-lock-block');
+        const label = document.createElement('span');
+        label.className = 'header-block-label';
+        el.appendChild(label);
+        el.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (lastInteractionWasDrag) {
+            lastInteractionWasDrag = false;
+            return;
+          }
+          toggleUnlockState();
+        });
+        block.lockLabel = label;
+        lockToggleBlock = block;
+      } else {
+        const label = document.createElement('span');
+        label.className = 'header-block-label';
+        label.textContent = block.label;
+        el.appendChild(label);
+      }
+    } else {
+      el.innerHTML = `
+        <div class="block-title">${block.title}</div>
+        <div class="block-value">${block.value}</div>
+      `;
+    }
+    const parent = block.area === 'header' ? headerContainer : blockLayer;
+    parent.appendChild(el);
     block.el = el;
     el.addEventListener('mousedown', startDrag);
   });
   blocksInitialised = true;
+  updateLockButton();
+  surfaceEl.classList.toggle('unlocked', isUnlocked);
 }
 
 function readInputs() {
@@ -501,6 +586,25 @@ function pxRectToCss(rectPx, layout) {
   };
 }
 
+function positionHeaderContainer(layout) {
+  if (!headerContainer) return;
+  const css = pxRectToCss(layout.headerDock, layout);
+  if (css.width <= 1 || css.height <= 1) {
+    headerContainer.style.display = 'none';
+    return;
+  }
+  headerContainer.style.display = 'block';
+  headerContainer.style.left = `${css.left}px`;
+  headerContainer.style.top = `${css.top}px`;
+  headerContainer.style.width = `${css.width}px`;
+  headerContainer.style.height = `${css.height}px`;
+}
+
+function getBlockAreaRect(block, layout) {
+  if (block.area === 'header') return layout.headerDock;
+  return layout.workArea;
+}
+
 function drawGrid(layout) {
   gridLayer.innerHTML = '';
   const colWidthPreview = layout.gridSizeX * layout.scale;
@@ -594,37 +698,66 @@ function drawWorkArea(layout) {
 function applyStaticLayers(layout) {
   surfaceEl.style.width = `${layout.drawW}px`;
   surfaceEl.style.height = `${layout.drawH}px`;
+  positionHeaderContainer(layout);
   drawGrid(layout);
   drawDocks(layout);
   drawWorkArea(layout);
 }
 
-function clampBlockToWorkArea(block, layout) {
-  const maxCols = Math.max(0, layout.workCols - block.cols);
-  const maxRows = Math.max(0, layout.workRows - block.rows);
+function clampBlockToArea(block, layout) {
+  const area = getBlockAreaRect(block, layout);
+  if (!area) return;
+  const areaCols = (area.x1 - area.x0) / layout.gridSizeX;
+  const areaRows = (area.y1 - area.y0) / layout.gridSizeY;
+  const maxCols = Math.max(0, areaCols - block.cols);
+  const maxRows = Math.max(0, areaRows - block.rows);
   block.col = clamp(block.col, 0, maxCols);
   block.row = clamp(block.row, 0, maxRows);
 }
 
 function applyBlockPosition(block, layout) {
   if (!block.el) return;
-  const leftPx = layout.workArea.x0 + block.col * layout.gridSizeX;
-  const bottomPx = layout.workArea.y0 + block.row * layout.gridSizeY;
+  const area = getBlockAreaRect(block, layout);
+  if (!area) return;
   const widthPx = block.cols * layout.gridSizeX;
   const heightPx = block.rows * layout.gridSizeY;
-  const cssLeft = leftPx * layout.scale;
-  const cssTop = layout.drawH - (bottomPx + heightPx) * layout.scale;
-  block.el.style.left = `${cssLeft}px`;
-  block.el.style.top = `${cssTop}px`;
+  if (block.area === 'header') {
+    const containerHeight = (area.y1 - area.y0) * layout.scale;
+    const cssLeft = block.col * layout.gridSizeX * layout.scale;
+    const cssTop = containerHeight - (block.row + block.rows) * layout.gridSizeY * layout.scale;
+    block.el.style.left = `${cssLeft}px`;
+    block.el.style.top = `${cssTop}px`;
+  } else {
+    const leftPx = area.x0 + block.col * layout.gridSizeX;
+    const bottomPx = area.y0 + block.row * layout.gridSizeY;
+    const cssLeft = leftPx * layout.scale;
+    const cssTop = layout.drawH - (bottomPx + heightPx) * layout.scale;
+    block.el.style.left = `${cssLeft}px`;
+    block.el.style.top = `${cssTop}px`;
+  }
   block.el.style.width = `${widthPx * layout.scale}px`;
   block.el.style.height = `${heightPx * layout.scale}px`;
 }
 
 function updateBlocks(layout) {
   blocks.forEach(block => {
-    clampBlockToWorkArea(block, layout);
+    clampBlockToArea(block, layout);
     applyBlockPosition(block, layout);
   });
+}
+
+function updateLockButton() {
+  if (!lockToggleBlock || !lockToggleBlock.lockLabel) return;
+  lockToggleBlock.lockLabel.textContent = isUnlocked ? '🔓 Lock UI' : '🔒 Unlock UI';
+  if (lockToggleBlock.el) {
+    lockToggleBlock.el.classList.toggle('active', isUnlocked);
+  }
+}
+
+function toggleUnlockState() {
+  isUnlocked = !isUnlocked;
+  surfaceEl.classList.toggle('unlocked', isUnlocked);
+  updateLockButton();
 }
 
 function updateMetrics(layout) {
@@ -688,17 +821,21 @@ function findBlockForElement(el) {
 }
 
 function startDrag(e) {
+  lastInteractionWasDrag = false;
   if (e.button !== 0) return;
   if (!layoutState) return;
   const block = findBlockForElement(e.currentTarget);
   if (!block) return;
+  if (!isUnlocked) return;
+  const area = getBlockAreaRect(block, layoutState);
+  if (!area) return;
   draggedBlock = block;
   block.el.classList.add('dragging');
   const rect = surfaceEl.getBoundingClientRect();
   const pointerX = (e.clientX - rect.left) / layoutState.scale;
   const pointerY = (rect.bottom - e.clientY) / layoutState.scale;
-  const blockLeft = layoutState.workArea.x0 + block.col * layoutState.gridSizeX;
-  const blockBottom = layoutState.workArea.y0 + block.row * layoutState.gridSizeY;
+  const blockLeft = area.x0 + block.col * layoutState.gridSizeX;
+  const blockBottom = area.y0 + block.row * layoutState.gridSizeY;
   dragOffset.x = pointerX - blockLeft;
   dragOffset.y = pointerY - blockBottom;
   e.preventDefault();
@@ -710,22 +847,35 @@ function handleDragMove(e) {
   const pointerX = (e.clientX - rect.left) / layoutState.scale;
   const pointerY = (rect.bottom - e.clientY) / layoutState.scale;
 
+  const area = getBlockAreaRect(draggedBlock, layoutState);
+  if (!area) return;
+
   const rawLeft = pointerX - dragOffset.x;
   const rawBottom = pointerY - dragOffset.y;
 
-  const minLeft = layoutState.workArea.x0;
-  const maxLeft = layoutState.workArea.x1 - draggedBlock.cols * layoutState.gridSizeX;
-  const minBottom = layoutState.workArea.y0;
-  const maxBottom = layoutState.workArea.y1 - draggedBlock.rows * layoutState.gridSizeY;
+  const minLeft = area.x0;
+  const maxLeft = area.x1 - draggedBlock.cols * layoutState.gridSizeX;
+  const minBottom = area.y0;
+  const maxBottom = area.y1 - draggedBlock.rows * layoutState.gridSizeY;
 
   const clampedLeft = clamp(rawLeft, minLeft, maxLeft);
   const clampedBottom = clamp(rawBottom, minBottom, maxBottom);
 
-  const relativeCols = (clampedLeft - layoutState.workArea.x0) / layoutState.gridSizeX;
-  const relativeRows = (clampedBottom - layoutState.workArea.y0) / layoutState.gridSizeY;
+  const relativeCols = (clampedLeft - area.x0) / layoutState.gridSizeX;
+  const relativeRows = (clampedBottom - area.y0) / layoutState.gridSizeY;
 
-  draggedBlock.col = clamp(snapHalfUnits(relativeCols), 0, Math.max(0, layoutState.workCols - draggedBlock.cols));
-  draggedBlock.row = clamp(snapHalfUnits(relativeRows), 0, Math.max(0, layoutState.workRows - draggedBlock.rows));
+  const areaCols = (area.x1 - area.x0) / layoutState.gridSizeX;
+  const areaRows = (area.y1 - area.y0) / layoutState.gridSizeY;
+
+  const snappedCols = clamp(snapHalfUnits(relativeCols), 0, Math.max(0, areaCols - draggedBlock.cols));
+  const snappedRows = clamp(snapHalfUnits(relativeRows), 0, Math.max(0, areaRows - draggedBlock.rows));
+
+  if (snappedCols !== draggedBlock.col || snappedRows !== draggedBlock.row) {
+    lastInteractionWasDrag = true;
+  }
+
+  draggedBlock.col = snappedCols;
+  draggedBlock.row = snappedRows;
 
   applyBlockPosition(draggedBlock, layoutState);
 }

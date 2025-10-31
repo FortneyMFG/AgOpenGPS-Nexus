@@ -425,6 +425,38 @@ const blocks = [
   { id: 'header-lock', area: 'header', label: 'Unlock UI', col: 8.5, row: 0.0, cols: 1.5, rows: 0.5, isLockToggle: true }
 ];
 
+const DOCK_METADATA = {
+  header: { orientation: 'horizontal', sizeProp: 'headerRows' },
+  bottom: { orientation: 'horizontal', sizeProp: 'bottomRows' },
+  left: { orientation: 'vertical', sizeProp: 'leftCols' },
+  right: { orientation: 'vertical', sizeProp: 'rightCols' },
+  work: { orientation: 'free' }
+};
+
+const dockModels = {};
+
+function initializeDockModels() {
+  Object.keys(DOCK_METADATA).forEach(area => {
+    dockModels[area] = [];
+  });
+  blocks.forEach(block => {
+    const area = block.area || 'work';
+    if (!dockModels[area]) {
+      dockModels[area] = [];
+    }
+    const entry = {
+      block,
+      footprint: { cols: block.cols, rows: block.rows },
+      dockIndex: dockModels[area].length,
+      position: { col: block.col, row: block.row }
+    };
+    block.dockIndex = entry.dockIndex;
+    dockModels[area].push(entry);
+  });
+}
+
+initializeDockModels();
+
 function initBlocks() {
   if (blocksInitialised) return;
   blocks.forEach(block => {
@@ -483,6 +515,174 @@ function readInputs() {
     leftCols: parseFloat(document.getElementById('inputLeftCols').value),
     rightCols: parseFloat(document.getElementById('inputRightCols').value)
   };
+}
+
+function calculateHorizontalLayout(model, availableCols) {
+  const placements = [];
+  const colLimit = Math.max(availableCols, 0.0001);
+  let cursorCol = 0;
+  let cursorRow = 0;
+  let lineHeight = 0;
+  let requiredRows = 0;
+  model.forEach(entry => {
+    const block = entry.block;
+    const spanCols = block.cols;
+    const spanRows = block.rows;
+    if (cursorCol > 0 && cursorCol + spanCols > colLimit + 1e-6) {
+      cursorRow += lineHeight;
+      cursorCol = 0;
+      lineHeight = 0;
+    }
+    placements.push({ entry, col: cursorCol, row: cursorRow });
+    cursorCol += spanCols;
+    lineHeight = Math.max(lineHeight, spanRows);
+    requiredRows = Math.max(requiredRows, cursorRow + spanRows);
+  });
+  if (lineHeight > 0) {
+    requiredRows = Math.max(requiredRows, cursorRow + lineHeight);
+  }
+  return { requiredRows, placements };
+}
+
+function calculateVerticalLayout(model, availableRows) {
+  const placements = [];
+  const rowLimit = Math.max(availableRows, 0.0001);
+  let cursorRow = 0;
+  let cursorCol = 0;
+  let lineWidth = 0;
+  let requiredCols = 0;
+  model.forEach(entry => {
+    const block = entry.block;
+    const spanRows = block.rows;
+    const spanCols = block.cols;
+    if (cursorRow > 0 && cursorRow + spanRows > rowLimit + 1e-6) {
+      cursorCol += lineWidth;
+      cursorRow = 0;
+      lineWidth = 0;
+    }
+    placements.push({ entry, col: cursorCol, row: cursorRow });
+    cursorRow += spanRows;
+    lineWidth = Math.max(lineWidth, spanCols);
+    requiredCols = Math.max(requiredCols, cursorCol + spanCols);
+  });
+  if (lineWidth > 0) {
+    requiredCols = Math.max(requiredCols, cursorCol + lineWidth);
+  }
+  return { requiredCols, placements };
+}
+
+function computeDockSizeAdjustments(layout) {
+  const overrides = {};
+  let changed = false;
+  Object.entries(DOCK_METADATA).forEach(([area, meta]) => {
+    const model = dockModels[area];
+    if (!model || model.length === 0) return;
+    if (meta.orientation === 'horizontal') {
+      const sizeProp = meta.sizeProp;
+      const availableRows = layout[sizeProp];
+      const measurement = calculateHorizontalLayout(model, layout.columns);
+      if (measurement.requiredRows > availableRows + 1e-6) {
+        const grown = Math.max(Math.ceil(measurement.requiredRows), availableRows);
+        overrides[sizeProp] = grown;
+        changed = true;
+      }
+    } else if (meta.orientation === 'vertical') {
+      const sizeProp = meta.sizeProp;
+      const availableCols = layout[sizeProp];
+      const measurement = calculateVerticalLayout(model, layout.workRows);
+      if (measurement.requiredCols > availableCols + 1e-6) {
+        const grown = Math.max(Math.ceil(measurement.requiredCols), availableCols);
+        overrides[sizeProp] = grown;
+        changed = true;
+      }
+    }
+  });
+  return { overrides, changed };
+}
+
+function applyDockBookOrder(layout) {
+  Object.entries(DOCK_METADATA).forEach(([area, meta]) => {
+    const model = dockModels[area];
+    if (!model || model.length === 0) return;
+    let placements = [];
+    if (meta.orientation === 'horizontal') {
+      placements = calculateHorizontalLayout(model, layout.columns).placements;
+    } else if (meta.orientation === 'vertical') {
+      placements = calculateVerticalLayout(model, layout.workRows).placements;
+    } else {
+      placements = model.map(entry => ({ entry, col: entry.block.col, row: entry.block.row }));
+    }
+    placements.forEach((placement, index) => {
+      const { entry, col, row } = placement;
+      entry.dockIndex = index;
+      entry.block.dockIndex = index;
+      entry.block.col = col;
+      entry.block.row = row;
+      entry.footprint.cols = entry.block.cols;
+      entry.footprint.rows = entry.block.rows;
+      entry.position = { col, row };
+    });
+  });
+}
+
+function syncDockModelPositionsFromBlocks() {
+  Object.values(dockModels).forEach(model => {
+    model.forEach(entry => {
+      entry.footprint.cols = entry.block.cols;
+      entry.footprint.rows = entry.block.rows;
+      entry.position = { col: entry.block.col, row: entry.block.row };
+      if (typeof entry.dockIndex === 'number') {
+        entry.block.dockIndex = entry.dockIndex;
+      }
+    });
+  });
+}
+
+function syncInputsToLayout(layout) {
+  const headerInput = document.getElementById('inputHeaderRows');
+  const bottomInput = document.getElementById('inputBottomRows');
+  const leftInput = document.getElementById('inputLeftCols');
+  const rightInput = document.getElementById('inputRightCols');
+  if (headerInput) headerInput.value = layout.headerRows;
+  if (bottomInput) bottomInput.value = layout.bottomRows;
+  if (leftInput) leftInput.value = layout.leftCols;
+  if (rightInput) rightInput.value = layout.rightCols;
+}
+
+function computeBookOrderKey(area, block) {
+  const meta = DOCK_METADATA[area];
+  if (!meta || meta.orientation === 'horizontal') {
+    return block.row * 1000 + block.col;
+  }
+  if (meta.orientation === 'vertical') {
+    return block.col * 1000 + block.row;
+  }
+  return block.row * 1000 + block.col;
+}
+
+function reorderDockModelAfterDrag(block) {
+  const area = block.area || 'work';
+  const model = dockModels[area];
+  if (!model) return;
+  const currentIndex = model.findIndex(entry => entry.block === block);
+  if (currentIndex === -1) return;
+  const [entry] = model.splice(currentIndex, 1);
+  entry.footprint.cols = block.cols;
+  entry.footprint.rows = block.rows;
+  const targetKey = computeBookOrderKey(area, block);
+  let insertIndex = model.length;
+  for (let i = 0; i < model.length; i++) {
+    const otherKey = computeBookOrderKey(area, model[i].block);
+    if (targetKey < otherKey) {
+      insertIndex = i;
+      break;
+    }
+  }
+  model.splice(insertIndex, 0, entry);
+  model.forEach((entry, idx) => {
+    entry.dockIndex = idx;
+    entry.block.dockIndex = idx;
+  });
 }
 
 function computeLayout(config) {
@@ -806,10 +1006,23 @@ Work area px rect  :
 
 function recompute() {
   const inputs = readInputs();
-  layoutState = computeLayout(inputs);
+  let adjustedInputs = { ...inputs };
+  let layout = computeLayout(adjustedInputs);
+  let iterations = 0;
+  while (iterations < 3) {
+    const { overrides, changed } = computeDockSizeAdjustments(layout);
+    if (!changed) break;
+    adjustedInputs = { ...adjustedInputs, ...overrides };
+    layout = computeLayout(adjustedInputs);
+    iterations += 1;
+  }
+  layoutState = layout;
+  applyDockBookOrder(layoutState);
+  syncInputsToLayout(layoutState);
   updateLabels(layoutState);
   applyStaticLayers(layoutState);
   updateBlocks(layoutState);
+  syncDockModelPositionsFromBlocks();
   updateMetrics(layoutState);
 }
 
@@ -882,8 +1095,16 @@ function handleDragMove(e) {
 
 function handleDragEnd() {
   if (!draggedBlock) return;
-  draggedBlock.el.classList.remove('dragging');
+  const block = draggedBlock;
+  block.el.classList.remove('dragging');
   draggedBlock = null;
+  if (lastInteractionWasDrag) {
+    reorderDockModelAfterDrag(block);
+    recompute();
+  } else if (layoutState) {
+    applyBlockPosition(block, layoutState);
+  }
+  lastInteractionWasDrag = false;
 }
 
 document.addEventListener('mousemove', handleDragMove);

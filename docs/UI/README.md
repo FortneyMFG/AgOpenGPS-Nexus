@@ -10,6 +10,7 @@ to find layout conventions, lifecycle notes, and modernization plans.
 - [UI session lifecycle](ui-session-lifecycle.md)
 - [Metadata-driven style guide](metadata-driven-ui-style-guide.md)
 - [Phase 5 plugin surfaces](ui-phase5-plugin-surfaces.md)
+- [Layout grid and dock system](layout-grid-system.md)
 
 Pair these notes with the [SRS UI slice](../development/SRS/sections/9X_Frontends_Ops/)
 and the [core reference dashboards](../Core/performance-budget-telemetry-dashboards.md)

@@ -432,7 +432,7 @@
       <span id="valHeaderRows"></span>
     </label>
     <input id="inputHeaderRows" type="range" min="0.5" max="6" step="0.5" value="1.0">
-    <div class="hint">Top dock thickness in grid row units (min 0.5).</div>
+    <div class="hint">Top dock thickness in grid row units (auto clamps to ≥0.5 so it stays interactive).</div>
   </div>
 
   <div class="row">
@@ -440,8 +440,8 @@
       Bottom Dock Height (rows)
       <span id="valBottomRows"></span>
     </label>
-    <input id="inputBottomRows" type="range" min="0" max="6" step="0.5" value="1.0">
-    <div class="hint">Bottom dock thickness in grid row units. 0 = hidden.</div>
+    <input id="inputBottomRows" type="range" min="0.5" max="6" step="0.5" value="1.0">
+    <div class="hint">Bottom dock thickness in grid row units (auto clamps to ≥0.5 for usability).</div>
   </div>
 
   <div class="row">
@@ -449,8 +449,8 @@
       Left Dock Width (cols)
       <span id="valLeftCols"></span>
     </label>
-    <input id="inputLeftCols" type="range" min="0" max="6" step="0.5" value="1.0">
-    <div class="hint">Left dock thickness in grid column units. 0 = hidden.</div>
+    <input id="inputLeftCols" type="range" min="0.5" max="6" step="0.5" value="1.0">
+    <div class="hint">Left dock thickness in grid column units (auto clamps to ≥0.5 for usability).</div>
   </div>
 
   <div class="row">
@@ -458,8 +458,8 @@
       Right Dock Width (cols)
       <span id="valRightCols"></span>
     </label>
-    <input id="inputRightCols" type="range" min="0" max="6" step="0.5" value="1.0">
-    <div class="hint">Right dock thickness in grid column units. 0 = hidden.</div>
+    <input id="inputRightCols" type="range" min="0.5" max="6" step="0.5" value="1.0">
+    <div class="hint">Right dock thickness in grid column units (auto clamps to ≥0.5 for usability).</div>
   </div>
 
   <div class="metrics" id="metricsBox"></div>
@@ -565,14 +565,27 @@ const blocks = [
 ];
 
 const DOCK_METADATA = {
-  header: { orientation: 'horizontal', sizeProp: 'headerRows' },
-  bottom: { orientation: 'horizontal', sizeProp: 'bottomRows' },
-  left: { orientation: 'vertical', sizeProp: 'leftCols' },
-  right: { orientation: 'vertical', sizeProp: 'rightCols' },
+  header: { orientation: 'horizontal', sizeProp: 'headerRows', minSize: 0, occupiedMinSize: 0.5 },
+  bottom: { orientation: 'horizontal', sizeProp: 'bottomRows', minSize: 0 },
+  left: { orientation: 'vertical', sizeProp: 'leftCols', minSize: 0 },
+  right: { orientation: 'vertical', sizeProp: 'rightCols', minSize: 0 },
   work: { orientation: 'free' }
 };
 
+const AUTO_DOCK_MIN_SIZE = 0.5;
+
 const dockModels = {};
+
+function getDockMinimumSize(area) {
+  const meta = DOCK_METADATA[area];
+  if (!meta) return 0;
+  const baseMin = typeof meta.minSize === 'number' ? meta.minSize : 0;
+  const model = dockModels[area] || [];
+  if (model.length > 0 && typeof meta.occupiedMinSize === 'number') {
+    return Math.max(baseMin, meta.occupiedMinSize);
+  }
+  return baseMin;
+}
 
 function initializeDockModels() {
   Object.keys(DOCK_METADATA).forEach(area => {
@@ -587,14 +600,63 @@ function initializeDockModels() {
       block,
       footprint: { cols: block.cols, rows: block.rows },
       dockIndex: dockModels[area].length,
-      position: { col: block.col, row: block.row }
+      position: { col: block.col, row: block.row },
+      area
     };
     block.dockIndex = entry.dockIndex;
+    block.dockEntry = entry;
     dockModels[area].push(entry);
   });
 }
 
 initializeDockModels();
+
+function ensureDockModel(area) {
+  if (!dockModels[area]) {
+    dockModels[area] = [];
+  }
+  return dockModels[area];
+}
+
+function reindexDockModel(area) {
+  const model = dockModels[area];
+  if (!model) return;
+  model.forEach((entry, idx) => {
+    entry.dockIndex = idx;
+    entry.block.dockIndex = idx;
+  });
+}
+
+function moveBlockDockEntry(block, nextArea) {
+  if (!block) return;
+  const entry = block.dockEntry;
+  if (!entry) return;
+  const previousArea = entry.area || block.area || 'work';
+  if (previousArea === nextArea) {
+    return;
+  }
+  const previousModel = dockModels[previousArea];
+  if (previousModel) {
+    const index = previousModel.indexOf(entry);
+    if (index !== -1) {
+      previousModel.splice(index, 1);
+    }
+    reindexDockModel(previousArea);
+  }
+  const nextModel = ensureDockModel(nextArea);
+  entry.area = nextArea;
+  nextModel.push(entry);
+  reindexDockModel(nextArea);
+}
+
+function getDockTargetIdForBlock(block) {
+  if (!block) return 'work';
+  const area = block.area;
+  if (area && DOCK_METADATA[area]) {
+    return area;
+  }
+  return 'work';
+}
 
 function getDockRectById(id, layout) {
   if (!layout) return null;
@@ -648,7 +710,7 @@ function computeAnchorFromBlockPosition(block, layout) {
   if (block.anchor && block.anchor.targetType === 'block') {
     return { ...block.anchor };
   }
-  const targetId = block.area === 'header' ? 'header' : 'work';
+  const targetId = getDockTargetIdForBlock(block);
   const anchorRect = getDockRectById(targetId, layout) || layout.workArea;
   const widthPx = block.cols * layout.gridSizeX;
   const heightPx = block.rows * layout.gridSizeY;
@@ -733,12 +795,29 @@ function computeBlockRectForAnchor(block, layout, anchorOverride) {
 function updateBlockParent(block, anchorOverride = null) {
   if (!block.el) return;
   const anchor = anchorOverride || block.anchor;
-  const targetId = anchor && anchor.targetType === 'dock' ? anchor.targetId : null;
-  const desiredParent = targetId === 'header' ? headerContainer : blockLayer;
+  let targetArea = block.area || 'work';
+  if (anchor && anchor.targetType === 'dock') {
+    targetArea = DOCK_METADATA[anchor.targetId] ? anchor.targetId : 'work';
+  } else if (anchor && anchor.targetType === 'block') {
+    const targetBlock = blocks.find(b => b.id === anchor.targetId);
+    if (targetBlock && targetBlock !== block) {
+      targetArea = targetBlock.area || targetArea;
+    }
+  }
+  if (!DOCK_METADATA[targetArea]) {
+    targetArea = 'work';
+  }
+  const desiredParent = targetArea === 'header' ? headerContainer : blockLayer;
   if (block.el.parentElement !== desiredParent) {
     desiredParent.appendChild(block.el);
   }
-  block.area = targetId === 'header' ? 'header' : 'work';
+  if (block.el) {
+    block.el.classList.toggle('header-block', targetArea === 'header');
+  }
+  if (block.area !== targetArea) {
+    moveBlockDockEntry(block, targetArea);
+  }
+  block.area = targetArea;
 }
 
 function ensureSnapIndicator() {
@@ -1038,10 +1117,12 @@ function openPanelSettings(block) {
   currentModalBlock = block;
   buildModalTargetOptions(block);
   ensureBlockAnchor(block, layoutState || computeLayout(readInputs()));
-  const anchor = block.anchor || { targetType: 'dock', targetId: block.area === 'header' ? 'header' : 'work', offsetX: 0, offsetY: 0 };
+  const fallbackTargetId = getDockTargetIdForBlock(block);
+  const anchor = block.anchor || { targetType: 'dock', targetId: fallbackTargetId, offsetX: 0, offsetY: 0 };
   const value = `${anchor.targetType}:${anchor.targetId}`;
   const optionMatch = Array.from(modalTargetSelect.options).some(opt => opt.value === value);
-  modalTargetSelect.value = optionMatch ? value : `dock:${anchor.targetType === 'dock' ? anchor.targetId : 'work'}`;
+  const defaultDock = anchor.targetType === 'dock' ? anchor.targetId : fallbackTargetId;
+  modalTargetSelect.value = optionMatch ? value : `dock:${defaultDock}`;
   modalAnchorXInput.value = Math.round((anchor.offsetX ?? 0) * 100);
   modalAnchorYInput.value = Math.round((anchor.offsetY ?? 0) * 100);
   modalEl.classList.add('open');
@@ -1119,6 +1200,14 @@ function readInputs() {
   };
 }
 
+function roundToHalfStep(value) {
+  if (!isFinite(value) || value <= 0) {
+    return 0;
+  }
+  const adjusted = Math.ceil((value - 1e-6) * 2);
+  return Math.max(0, adjusted / 2);
+}
+
 function calculateHorizontalLayout(model, availableCols) {
   const placements = [];
   const colLimit = Math.max(availableCols, 0.0001);
@@ -1173,28 +1262,33 @@ function calculateVerticalLayout(model, availableRows) {
   return { requiredCols, placements };
 }
 
-function computeDockSizeAdjustments(layout) {
+function computeDockSizeAdjustments(layout, manualInputs = {}) {
   const overrides = {};
   let changed = false;
   Object.entries(DOCK_METADATA).forEach(([area, meta]) => {
-    const model = dockModels[area];
-    if (!model || model.length === 0) return;
+    const model = dockModels[area] || [];
     if (meta.orientation === 'horizontal') {
       const sizeProp = meta.sizeProp;
       const availableRows = layout[sizeProp];
       const measurement = calculateHorizontalLayout(model, layout.columns);
-      if (measurement.requiredRows > availableRows + 1e-6) {
-        const grown = Math.max(Math.ceil(measurement.requiredRows), availableRows);
-        overrides[sizeProp] = grown;
+      const manualTarget = typeof manualInputs[sizeProp] === 'number' ? manualInputs[sizeProp] : 0;
+      const manualMin = Math.max(manualTarget, AUTO_DOCK_MIN_SIZE);
+      const minSize = Math.max(getDockMinimumSize(area), manualMin);
+      const neededRows = Math.max(roundToHalfStep(measurement.requiredRows), minSize);
+      if (Math.abs(neededRows - availableRows) > 1e-6) {
+        overrides[sizeProp] = neededRows;
         changed = true;
       }
     } else if (meta.orientation === 'vertical') {
       const sizeProp = meta.sizeProp;
       const availableCols = layout[sizeProp];
       const measurement = calculateVerticalLayout(model, layout.workRows);
-      if (measurement.requiredCols > availableCols + 1e-6) {
-        const grown = Math.max(Math.ceil(measurement.requiredCols), availableCols);
-        overrides[sizeProp] = grown;
+      const manualTarget = typeof manualInputs[sizeProp] === 'number' ? manualInputs[sizeProp] : 0;
+      const manualMin = Math.max(manualTarget, AUTO_DOCK_MIN_SIZE);
+      const minSize = Math.max(getDockMinimumSize(area), manualMin);
+      const neededCols = Math.max(roundToHalfStep(measurement.requiredCols), minSize);
+      if (Math.abs(neededCols - availableCols) > 1e-6) {
+        overrides[sizeProp] = neededCols;
         changed = true;
       }
     }
@@ -1245,10 +1339,23 @@ function syncInputsToLayout(layout) {
   const bottomInput = document.getElementById('inputBottomRows');
   const leftInput = document.getElementById('inputLeftCols');
   const rightInput = document.getElementById('inputRightCols');
-  if (headerInput) headerInput.value = layout.headerRows;
-  if (bottomInput) bottomInput.value = layout.bottomRows;
-  if (leftInput) leftInput.value = layout.leftCols;
-  if (rightInput) rightInput.value = layout.rightCols;
+  if (headerInput) {
+    const headerMin = Math.max(getDockMinimumSize('header'), AUTO_DOCK_MIN_SIZE);
+    headerInput.min = headerMin.toString();
+    headerInput.value = layout.headerRows;
+  }
+  if (bottomInput) {
+    bottomInput.min = Math.max(getDockMinimumSize('bottom'), AUTO_DOCK_MIN_SIZE);
+    bottomInput.value = layout.bottomRows;
+  }
+  if (leftInput) {
+    leftInput.min = Math.max(getDockMinimumSize('left'), AUTO_DOCK_MIN_SIZE);
+    leftInput.value = layout.leftCols;
+  }
+  if (rightInput) {
+    rightInput.min = Math.max(getDockMinimumSize('right'), AUTO_DOCK_MIN_SIZE);
+    rightInput.value = layout.rightCols;
+  }
 }
 
 function computeBookOrderKey(area, block) {
@@ -1307,27 +1414,50 @@ function computeLayout(config) {
   result.approxFullRows = result.halfStepsY / 2.0;
 
   const totalRowsAvailable = result.approxFullRows;
-  let headerRows = result.headerRows;
-  let bottomRows = result.bottomRows;
-  if (headerRows + bottomRows > totalRowsAvailable) {
-    const scale = totalRowsAvailable / (headerRows + bottomRows);
-    let hCandidate = headerRows * scale;
-    let bCandidate = bottomRows * scale;
-    if (hCandidate < 0.5) {
-      hCandidate = 0.5;
-      const leftover = totalRowsAvailable - hCandidate;
-      bCandidate = Math.max(0, Math.min(bottomRows, leftover));
+  const rawHeaderMin = Math.max(getDockMinimumSize('header'), AUTO_DOCK_MIN_SIZE);
+  const rawBottomMin = Math.max(getDockMinimumSize('bottom'), AUTO_DOCK_MIN_SIZE);
+  let headerRows = 0;
+  let bottomRows = 0;
+  if (totalRowsAvailable > 0) {
+    const headerTarget = Math.max(result.headerRows, rawHeaderMin);
+    const bottomTarget = Math.max(result.bottomRows, rawBottomMin);
+    if (headerTarget + bottomTarget <= totalRowsAvailable + 1e-6) {
+      headerRows = headerTarget;
+      bottomRows = bottomTarget;
+    } else {
+      let scaledHeaderMin = rawHeaderMin;
+      let scaledBottomMin = rawBottomMin;
+      const minSum = rawHeaderMin + rawBottomMin;
+      if (minSum > totalRowsAvailable && minSum > 0) {
+        const minScale = totalRowsAvailable / minSum;
+        scaledHeaderMin = rawHeaderMin * minScale;
+        scaledBottomMin = rawBottomMin * minScale;
+      }
+      const flexAvailable = Math.max(0, totalRowsAvailable - (scaledHeaderMin + scaledBottomMin));
+      const headerFlex = Math.max(0, headerTarget - scaledHeaderMin);
+      const bottomFlex = Math.max(0, bottomTarget - scaledBottomMin);
+      const totalFlex = headerFlex + bottomFlex;
+      if (totalFlex > 1e-6 && flexAvailable > 1e-6) {
+        const flexScale = Math.min(1, flexAvailable / totalFlex);
+        headerRows = scaledHeaderMin + headerFlex * flexScale;
+        bottomRows = scaledBottomMin + bottomFlex * flexScale;
+      } else {
+        headerRows = scaledHeaderMin;
+        bottomRows = scaledBottomMin;
+      }
     }
-    headerRows = hCandidate;
-    bottomRows = bCandidate;
   }
 
-  let leftCols = result.leftCols;
-  let rightCols = result.rightCols;
+  let leftCols = Math.max(result.leftCols, Math.max(getDockMinimumSize('left'), AUTO_DOCK_MIN_SIZE));
+  let rightCols = Math.max(result.rightCols, Math.max(getDockMinimumSize('right'), AUTO_DOCK_MIN_SIZE));
   if (leftCols + rightCols > result.columns) {
     const scale = result.columns / (leftCols + rightCols);
     leftCols *= scale;
     rightCols *= scale;
+    const minLeft = Math.max(getDockMinimumSize('left'), AUTO_DOCK_MIN_SIZE);
+    const minRight = Math.max(getDockMinimumSize('right'), AUTO_DOCK_MIN_SIZE);
+    leftCols = Math.max(leftCols, minLeft);
+    rightCols = Math.max(rightCols, minRight);
   }
 
   result.headerRows = headerRows;
@@ -1617,11 +1747,12 @@ function recompute() {
   });
 
   const inputs = readInputs();
+  const manualInputs = { ...inputs };
   let adjustedInputs = { ...inputs };
   let layout = computeLayout(adjustedInputs);
   let iterations = 0;
   while (iterations < 3) {
-    const { overrides, changed } = computeDockSizeAdjustments(layout);
+    const { overrides, changed } = computeDockSizeAdjustments(layout, manualInputs);
     if (!changed) break;
     adjustedInputs = { ...adjustedInputs, ...overrides };
     layout = computeLayout(adjustedInputs);
@@ -1709,7 +1840,7 @@ function handleDragMove(e) {
   if (!snapTarget) {
     const fallback = dragAnchorCandidate || draggedBlock.anchor || {
       targetType: 'dock',
-      targetId: draggedBlock.area === 'header' ? 'header' : 'work',
+      targetId: getDockTargetIdForBlock(draggedBlock),
       offsetX: 0,
       offsetY: 0
     };
@@ -1793,7 +1924,8 @@ if (modalSaveBtn) {
       closePanelSettings();
       return;
     }
-    const rawValue = modalTargetSelect.value || 'dock:work';
+    const fallbackTargetId = getDockTargetIdForBlock(currentModalBlock);
+    const rawValue = modalTargetSelect.value || `dock:${fallbackTargetId}`;
     const [targetType, targetId] = rawValue.split(':');
     const offsetX = clamp(parseFloat(modalAnchorXInput.value) / 100 || 0, 0, 1);
     const offsetY = clamp(parseFloat(modalAnchorYInput.value) / 100 || 0, 0, 1);

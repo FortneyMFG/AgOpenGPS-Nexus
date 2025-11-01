@@ -431,8 +431,8 @@
       Header Dock Height (rows)
       <span id="valHeaderRows"></span>
     </label>
-    <input id="inputHeaderRows" type="range" min="0.5" max="6" step="0.5" value="1.0">
-    <div class="hint">Top dock thickness in grid row units (min 0.5).</div>
+    <input id="inputHeaderRows" type="range" min="0" max="6" step="0.5" value="1.0">
+    <div class="hint">Top dock thickness in grid row units (0.5 min when populated).</div>
   </div>
 
   <div class="row">
@@ -565,7 +565,7 @@ const blocks = [
 ];
 
 const DOCK_METADATA = {
-  header: { orientation: 'horizontal', sizeProp: 'headerRows', minSize: 0.5 },
+  header: { orientation: 'horizontal', sizeProp: 'headerRows', minSize: 0, occupiedMinSize: 0.5 },
   bottom: { orientation: 'horizontal', sizeProp: 'bottomRows', minSize: 0 },
   left: { orientation: 'vertical', sizeProp: 'leftCols', minSize: 0 },
   right: { orientation: 'vertical', sizeProp: 'rightCols', minSize: 0 },
@@ -573,6 +573,17 @@ const DOCK_METADATA = {
 };
 
 const dockModels = {};
+
+function getDockMinimumSize(area) {
+  const meta = DOCK_METADATA[area];
+  if (!meta) return 0;
+  const baseMin = typeof meta.minSize === 'number' ? meta.minSize : 0;
+  const model = dockModels[area] || [];
+  if (model.length > 0 && typeof meta.occupiedMinSize === 'number') {
+    return Math.max(baseMin, meta.occupiedMinSize);
+  }
+  return baseMin;
+}
 
 function initializeDockModels() {
   Object.keys(DOCK_METADATA).forEach(area => {
@@ -1258,7 +1269,7 @@ function computeDockSizeAdjustments(layout) {
       const sizeProp = meta.sizeProp;
       const availableRows = layout[sizeProp];
       const measurement = calculateHorizontalLayout(model, layout.columns);
-      const minSize = meta.minSize ?? 0;
+      const minSize = getDockMinimumSize(area);
       const neededRows = Math.max(roundToHalfStep(measurement.requiredRows), minSize);
       if (Math.abs(neededRows - availableRows) > 1e-6) {
         overrides[sizeProp] = neededRows;
@@ -1268,7 +1279,7 @@ function computeDockSizeAdjustments(layout) {
       const sizeProp = meta.sizeProp;
       const availableCols = layout[sizeProp];
       const measurement = calculateVerticalLayout(model, layout.workRows);
-      const minSize = meta.minSize ?? 0;
+      const minSize = getDockMinimumSize(area);
       const neededCols = Math.max(roundToHalfStep(measurement.requiredCols), minSize);
       if (Math.abs(neededCols - availableCols) > 1e-6) {
         overrides[sizeProp] = neededCols;
@@ -1322,7 +1333,11 @@ function syncInputsToLayout(layout) {
   const bottomInput = document.getElementById('inputBottomRows');
   const leftInput = document.getElementById('inputLeftCols');
   const rightInput = document.getElementById('inputRightCols');
-  if (headerInput) headerInput.value = layout.headerRows;
+  if (headerInput) {
+    const headerMin = getDockMinimumSize('header');
+    headerInput.min = headerMin.toString();
+    headerInput.value = layout.headerRows;
+  }
   if (bottomInput) bottomInput.value = layout.bottomRows;
   if (leftInput) leftInput.value = layout.leftCols;
   if (rightInput) rightInput.value = layout.rightCols;
@@ -1384,19 +1399,38 @@ function computeLayout(config) {
   result.approxFullRows = result.halfStepsY / 2.0;
 
   const totalRowsAvailable = result.approxFullRows;
-  let headerRows = result.headerRows;
-  let bottomRows = result.bottomRows;
-  if (headerRows + bottomRows > totalRowsAvailable) {
-    const scale = totalRowsAvailable / (headerRows + bottomRows);
-    let hCandidate = headerRows * scale;
-    let bCandidate = bottomRows * scale;
-    if (hCandidate < 0.5) {
-      hCandidate = 0.5;
-      const leftover = totalRowsAvailable - hCandidate;
-      bCandidate = Math.max(0, Math.min(bottomRows, leftover));
+  const rawHeaderMin = getDockMinimumSize('header');
+  const rawBottomMin = getDockMinimumSize('bottom');
+  let headerRows = 0;
+  let bottomRows = 0;
+  if (totalRowsAvailable > 0) {
+    const headerTarget = Math.max(result.headerRows, rawHeaderMin);
+    const bottomTarget = Math.max(result.bottomRows, rawBottomMin);
+    if (headerTarget + bottomTarget <= totalRowsAvailable + 1e-6) {
+      headerRows = headerTarget;
+      bottomRows = bottomTarget;
+    } else {
+      let scaledHeaderMin = rawHeaderMin;
+      let scaledBottomMin = rawBottomMin;
+      const minSum = rawHeaderMin + rawBottomMin;
+      if (minSum > totalRowsAvailable && minSum > 0) {
+        const minScale = totalRowsAvailable / minSum;
+        scaledHeaderMin = rawHeaderMin * minScale;
+        scaledBottomMin = rawBottomMin * minScale;
+      }
+      const flexAvailable = Math.max(0, totalRowsAvailable - (scaledHeaderMin + scaledBottomMin));
+      const headerFlex = Math.max(0, headerTarget - scaledHeaderMin);
+      const bottomFlex = Math.max(0, bottomTarget - scaledBottomMin);
+      const totalFlex = headerFlex + bottomFlex;
+      if (totalFlex > 1e-6 && flexAvailable > 1e-6) {
+        const flexScale = Math.min(1, flexAvailable / totalFlex);
+        headerRows = scaledHeaderMin + headerFlex * flexScale;
+        bottomRows = scaledBottomMin + bottomFlex * flexScale;
+      } else {
+        headerRows = scaledHeaderMin;
+        bottomRows = scaledBottomMin;
+      }
     }
-    headerRows = hCandidate;
-    bottomRows = bCandidate;
   }
 
   let leftCols = result.leftCols;

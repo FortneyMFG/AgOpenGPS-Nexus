@@ -565,10 +565,10 @@ const blocks = [
 ];
 
 const DOCK_METADATA = {
-  header: { orientation: 'horizontal', sizeProp: 'headerRows' },
-  bottom: { orientation: 'horizontal', sizeProp: 'bottomRows' },
-  left: { orientation: 'vertical', sizeProp: 'leftCols' },
-  right: { orientation: 'vertical', sizeProp: 'rightCols' },
+  header: { orientation: 'horizontal', sizeProp: 'headerRows', minSize: 0.5 },
+  bottom: { orientation: 'horizontal', sizeProp: 'bottomRows', minSize: 0 },
+  left: { orientation: 'vertical', sizeProp: 'leftCols', minSize: 0 },
+  right: { orientation: 'vertical', sizeProp: 'rightCols', minSize: 0 },
   work: { orientation: 'free' }
 };
 
@@ -587,14 +587,63 @@ function initializeDockModels() {
       block,
       footprint: { cols: block.cols, rows: block.rows },
       dockIndex: dockModels[area].length,
-      position: { col: block.col, row: block.row }
+      position: { col: block.col, row: block.row },
+      area
     };
     block.dockIndex = entry.dockIndex;
+    block.dockEntry = entry;
     dockModels[area].push(entry);
   });
 }
 
 initializeDockModels();
+
+function ensureDockModel(area) {
+  if (!dockModels[area]) {
+    dockModels[area] = [];
+  }
+  return dockModels[area];
+}
+
+function reindexDockModel(area) {
+  const model = dockModels[area];
+  if (!model) return;
+  model.forEach((entry, idx) => {
+    entry.dockIndex = idx;
+    entry.block.dockIndex = idx;
+  });
+}
+
+function moveBlockDockEntry(block, nextArea) {
+  if (!block) return;
+  const entry = block.dockEntry;
+  if (!entry) return;
+  const previousArea = entry.area || block.area || 'work';
+  if (previousArea === nextArea) {
+    return;
+  }
+  const previousModel = dockModels[previousArea];
+  if (previousModel) {
+    const index = previousModel.indexOf(entry);
+    if (index !== -1) {
+      previousModel.splice(index, 1);
+    }
+    reindexDockModel(previousArea);
+  }
+  const nextModel = ensureDockModel(nextArea);
+  entry.area = nextArea;
+  nextModel.push(entry);
+  reindexDockModel(nextArea);
+}
+
+function getDockTargetIdForBlock(block) {
+  if (!block) return 'work';
+  const area = block.area;
+  if (area && DOCK_METADATA[area]) {
+    return area;
+  }
+  return 'work';
+}
 
 function getDockRectById(id, layout) {
   if (!layout) return null;
@@ -648,7 +697,7 @@ function computeAnchorFromBlockPosition(block, layout) {
   if (block.anchor && block.anchor.targetType === 'block') {
     return { ...block.anchor };
   }
-  const targetId = block.area === 'header' ? 'header' : 'work';
+  const targetId = getDockTargetIdForBlock(block);
   const anchorRect = getDockRectById(targetId, layout) || layout.workArea;
   const widthPx = block.cols * layout.gridSizeX;
   const heightPx = block.rows * layout.gridSizeY;
@@ -733,12 +782,29 @@ function computeBlockRectForAnchor(block, layout, anchorOverride) {
 function updateBlockParent(block, anchorOverride = null) {
   if (!block.el) return;
   const anchor = anchorOverride || block.anchor;
-  const targetId = anchor && anchor.targetType === 'dock' ? anchor.targetId : null;
-  const desiredParent = targetId === 'header' ? headerContainer : blockLayer;
+  let targetArea = block.area || 'work';
+  if (anchor && anchor.targetType === 'dock') {
+    targetArea = DOCK_METADATA[anchor.targetId] ? anchor.targetId : 'work';
+  } else if (anchor && anchor.targetType === 'block') {
+    const targetBlock = blocks.find(b => b.id === anchor.targetId);
+    if (targetBlock && targetBlock !== block) {
+      targetArea = targetBlock.area || targetArea;
+    }
+  }
+  if (!DOCK_METADATA[targetArea]) {
+    targetArea = 'work';
+  }
+  const desiredParent = targetArea === 'header' ? headerContainer : blockLayer;
   if (block.el.parentElement !== desiredParent) {
     desiredParent.appendChild(block.el);
   }
-  block.area = targetId === 'header' ? 'header' : 'work';
+  if (block.el) {
+    block.el.classList.toggle('header-block', targetArea === 'header');
+  }
+  if (block.area !== targetArea) {
+    moveBlockDockEntry(block, targetArea);
+  }
+  block.area = targetArea;
 }
 
 function ensureSnapIndicator() {
@@ -1038,10 +1104,12 @@ function openPanelSettings(block) {
   currentModalBlock = block;
   buildModalTargetOptions(block);
   ensureBlockAnchor(block, layoutState || computeLayout(readInputs()));
-  const anchor = block.anchor || { targetType: 'dock', targetId: block.area === 'header' ? 'header' : 'work', offsetX: 0, offsetY: 0 };
+  const fallbackTargetId = getDockTargetIdForBlock(block);
+  const anchor = block.anchor || { targetType: 'dock', targetId: fallbackTargetId, offsetX: 0, offsetY: 0 };
   const value = `${anchor.targetType}:${anchor.targetId}`;
   const optionMatch = Array.from(modalTargetSelect.options).some(opt => opt.value === value);
-  modalTargetSelect.value = optionMatch ? value : `dock:${anchor.targetType === 'dock' ? anchor.targetId : 'work'}`;
+  const defaultDock = anchor.targetType === 'dock' ? anchor.targetId : fallbackTargetId;
+  modalTargetSelect.value = optionMatch ? value : `dock:${defaultDock}`;
   modalAnchorXInput.value = Math.round((anchor.offsetX ?? 0) * 100);
   modalAnchorYInput.value = Math.round((anchor.offsetY ?? 0) * 100);
   modalEl.classList.add('open');
@@ -1119,6 +1187,14 @@ function readInputs() {
   };
 }
 
+function roundToHalfStep(value) {
+  if (!isFinite(value) || value <= 0) {
+    return 0;
+  }
+  const adjusted = Math.ceil((value - 1e-6) * 2);
+  return Math.max(0, adjusted / 2);
+}
+
 function calculateHorizontalLayout(model, availableCols) {
   const placements = [];
   const colLimit = Math.max(availableCols, 0.0001);
@@ -1177,24 +1253,25 @@ function computeDockSizeAdjustments(layout) {
   const overrides = {};
   let changed = false;
   Object.entries(DOCK_METADATA).forEach(([area, meta]) => {
-    const model = dockModels[area];
-    if (!model || model.length === 0) return;
+    const model = dockModels[area] || [];
     if (meta.orientation === 'horizontal') {
       const sizeProp = meta.sizeProp;
       const availableRows = layout[sizeProp];
       const measurement = calculateHorizontalLayout(model, layout.columns);
-      if (measurement.requiredRows > availableRows + 1e-6) {
-        const grown = Math.max(Math.ceil(measurement.requiredRows), availableRows);
-        overrides[sizeProp] = grown;
+      const minSize = meta.minSize ?? 0;
+      const neededRows = Math.max(roundToHalfStep(measurement.requiredRows), minSize);
+      if (Math.abs(neededRows - availableRows) > 1e-6) {
+        overrides[sizeProp] = neededRows;
         changed = true;
       }
     } else if (meta.orientation === 'vertical') {
       const sizeProp = meta.sizeProp;
       const availableCols = layout[sizeProp];
       const measurement = calculateVerticalLayout(model, layout.workRows);
-      if (measurement.requiredCols > availableCols + 1e-6) {
-        const grown = Math.max(Math.ceil(measurement.requiredCols), availableCols);
-        overrides[sizeProp] = grown;
+      const minSize = meta.minSize ?? 0;
+      const neededCols = Math.max(roundToHalfStep(measurement.requiredCols), minSize);
+      if (Math.abs(neededCols - availableCols) > 1e-6) {
+        overrides[sizeProp] = neededCols;
         changed = true;
       }
     }
@@ -1709,7 +1786,7 @@ function handleDragMove(e) {
   if (!snapTarget) {
     const fallback = dragAnchorCandidate || draggedBlock.anchor || {
       targetType: 'dock',
-      targetId: draggedBlock.area === 'header' ? 'header' : 'work',
+      targetId: getDockTargetIdForBlock(draggedBlock),
       offsetX: 0,
       offsetY: 0
     };
@@ -1793,7 +1870,8 @@ if (modalSaveBtn) {
       closePanelSettings();
       return;
     }
-    const rawValue = modalTargetSelect.value || 'dock:work';
+    const fallbackTargetId = getDockTargetIdForBlock(currentModalBlock);
+    const rawValue = modalTargetSelect.value || `dock:${fallbackTargetId}`;
     const [targetType, targetId] = rawValue.split(':');
     const offsetX = clamp(parseFloat(modalAnchorXInput.value) / 100 || 0, 0, 1);
     const offsetY = clamp(parseFloat(modalAnchorYInput.value) / 100 || 0, 0, 1);

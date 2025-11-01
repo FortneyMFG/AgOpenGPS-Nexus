@@ -665,6 +665,40 @@ function computeAnchorFromBlockPosition(block, layout) {
   };
 }
 
+function resnapDockAnchorToGrid(block, layout) {
+  if (!layout || !block || !block.anchor) return;
+  if (block.anchor.targetType !== 'dock') return;
+  const anchorRect = getDockRectById(block.anchor.targetId, layout);
+  if (!anchorRect) return;
+
+  const gridX = layout.gridSizeX || 1;
+  const gridY = layout.gridSizeY || 1;
+  if (gridX <= 0 || gridY <= 0) return;
+
+  const blockWidth = block.cols * gridX;
+  const blockHeight = block.rows * gridY;
+  const availableWidth = Math.max(anchorRect.x1 - anchorRect.x0 - blockWidth, 0);
+  const availableHeight = Math.max(anchorRect.y1 - anchorRect.y0 - blockHeight, 0);
+
+  const desiredLeft = anchorRect.x0 + (block.anchor.offsetX ?? 0) * availableWidth;
+  const desiredBottom = anchorRect.y0 + (block.anchor.offsetY ?? 0) * availableHeight;
+
+  const snapped = snapPositionToGrid(
+    block,
+    layout,
+    anchorRect,
+    block.anchor.targetType,
+    desiredLeft,
+    desiredBottom
+  );
+
+  const offsetX = availableWidth === 0 ? 0 : (snapped.left - anchorRect.x0) / availableWidth;
+  const offsetY = availableHeight === 0 ? 0 : (snapped.bottom - anchorRect.y0) / availableHeight;
+
+  block.anchor.offsetX = clamp(offsetX, 0, 1);
+  block.anchor.offsetY = clamp(offsetY, 0, 1);
+}
+
 function ensureBlockAnchor(block, layout) {
   if (!block.anchor) {
     block.anchor = computeAnchorFromBlockPosition(block, layout);
@@ -672,6 +706,7 @@ function ensureBlockAnchor(block, layout) {
     block.anchor.offsetX = clamp(block.anchor.offsetX ?? 0, 0, 1);
     block.anchor.offsetY = clamp(block.anchor.offsetY ?? 0, 0, 1);
   }
+  resnapDockAnchorToGrid(block, layout);
 }
 
 function computeBlockRectForAnchor(block, layout, anchorOverride) {
@@ -761,6 +796,38 @@ function distanceToRect(x, y, rect) {
   const dx = x < rect.x0 ? rect.x0 - x : x > rect.x1 ? x - rect.x1 : 0;
   const dy = y < rect.y0 ? rect.y0 - y : y > rect.y1 ? y - rect.y1 : 0;
   return Math.sqrt(dx * dx + dy * dy);
+}
+
+function snapPositionToGrid(block, layout, anchorRect, targetType, desiredLeft, desiredBottom) {
+  if (!layout || !anchorRect) {
+    return { left: desiredLeft, bottom: desiredBottom };
+  }
+  if (targetType !== 'dock') {
+    return { left: desiredLeft, bottom: desiredBottom };
+  }
+
+  const gridX = layout.gridSizeX || 1;
+  const gridY = layout.gridSizeY || 1;
+
+  const blockWidth = block.cols * gridX;
+  const blockHeight = block.rows * gridY;
+
+  const maxLeft = anchorRect.x1 - blockWidth;
+  const maxBottom = anchorRect.y1 - blockHeight;
+
+  const snappedLeft = clamp(
+    anchorRect.x0 + Math.round((desiredLeft - anchorRect.x0) / gridX) * gridX,
+    anchorRect.x0,
+    Math.max(anchorRect.x0, maxLeft)
+  );
+
+  const snappedBottom = clamp(
+    anchorRect.y0 + Math.round((desiredBottom - anchorRect.y0) / gridY) * gridY,
+    anchorRect.y0,
+    Math.max(anchorRect.y0, maxBottom)
+  );
+
+  return { left: snappedLeft, bottom: snappedBottom };
 }
 
 function findBestSnapTarget(block, layout, pointerX, pointerY) {
@@ -1471,10 +1538,19 @@ function handleDragMove(e) {
   const clampedLeft = clamp(rawLeft, anchorRect.x0, Math.max(anchorRect.x0, maxLeft));
   const clampedBottom = clamp(rawBottom, anchorRect.y0, Math.max(anchorRect.y0, maxBottom));
 
+  const snapped = snapPositionToGrid(
+    draggedBlock,
+    layoutState,
+    anchorRect,
+    snapTarget ? snapTarget.type : null,
+    clampedLeft,
+    clampedBottom
+  );
+
   const availableWidth = Math.max(anchorRect.x1 - anchorRect.x0 - blockWidth, 0);
   const availableHeight = Math.max(anchorRect.y1 - anchorRect.y0 - blockHeight, 0);
-  const offsetX = availableWidth === 0 ? 0 : (clampedLeft - anchorRect.x0) / availableWidth;
-  const offsetY = availableHeight === 0 ? 0 : (clampedBottom - anchorRect.y0) / availableHeight;
+  const offsetX = availableWidth === 0 ? 0 : (snapped.left - anchorRect.x0) / availableWidth;
+  const offsetY = availableHeight === 0 ? 0 : (snapped.bottom - anchorRect.y0) / availableHeight;
 
   const candidateAnchor = {
     targetType: snapTarget.type,

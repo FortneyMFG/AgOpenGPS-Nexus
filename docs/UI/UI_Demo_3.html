@@ -538,6 +538,7 @@ const DOCK_ANCHOR_TARGETS = [
 ];
 
 const SNAP_THRESHOLD_PX = 160;
+const RECT_EPSILON = 1e-3;
 
 let currentModalBlock = null;
 let dragAnchorCandidate = null;
@@ -665,6 +666,40 @@ function computeAnchorFromBlockPosition(block, layout) {
   };
 }
 
+function resnapDockAnchorToGrid(block, layout) {
+  if (!layout || !block || !block.anchor) return;
+  if (block.anchor.targetType !== 'dock') return;
+  const anchorRect = getDockRectById(block.anchor.targetId, layout);
+  if (!anchorRect) return;
+
+  const gridX = layout.gridSizeX || 1;
+  const gridY = layout.gridSizeY || 1;
+  if (gridX <= 0 || gridY <= 0) return;
+
+  const blockWidth = block.cols * gridX;
+  const blockHeight = block.rows * gridY;
+  const availableWidth = Math.max(anchorRect.x1 - anchorRect.x0 - blockWidth, 0);
+  const availableHeight = Math.max(anchorRect.y1 - anchorRect.y0 - blockHeight, 0);
+
+  const desiredLeft = anchorRect.x0 + (block.anchor.offsetX ?? 0) * availableWidth;
+  const desiredBottom = anchorRect.y0 + (block.anchor.offsetY ?? 0) * availableHeight;
+
+  const snapped = snapPositionToGrid(
+    block,
+    layout,
+    anchorRect,
+    block.anchor.targetType,
+    desiredLeft,
+    desiredBottom
+  );
+
+  const offsetX = availableWidth === 0 ? 0 : (snapped.left - anchorRect.x0) / availableWidth;
+  const offsetY = availableHeight === 0 ? 0 : (snapped.bottom - anchorRect.y0) / availableHeight;
+
+  block.anchor.offsetX = clamp(offsetX, 0, 1);
+  block.anchor.offsetY = clamp(offsetY, 0, 1);
+}
+
 function ensureBlockAnchor(block, layout) {
   if (!block.anchor) {
     block.anchor = computeAnchorFromBlockPosition(block, layout);
@@ -672,6 +707,7 @@ function ensureBlockAnchor(block, layout) {
     block.anchor.offsetX = clamp(block.anchor.offsetX ?? 0, 0, 1);
     block.anchor.offsetY = clamp(block.anchor.offsetY ?? 0, 0, 1);
   }
+  resnapDockAnchorToGrid(block, layout);
 }
 
 function computeBlockRectForAnchor(block, layout, anchorOverride) {
@@ -761,6 +797,195 @@ function distanceToRect(x, y, rect) {
   const dx = x < rect.x0 ? rect.x0 - x : x > rect.x1 ? x - rect.x1 : 0;
   const dy = y < rect.y0 ? rect.y0 - y : y > rect.y1 ? y - rect.y1 : 0;
   return Math.sqrt(dx * dx + dy * dy);
+}
+
+function snapPositionToGrid(block, layout, anchorRect, targetType, desiredLeft, desiredBottom) {
+  if (!layout || !anchorRect) {
+    return { left: desiredLeft, bottom: desiredBottom };
+  }
+  if (targetType !== 'dock') {
+    return { left: desiredLeft, bottom: desiredBottom };
+  }
+
+  const gridX = layout.gridSizeX || 1;
+  const gridY = layout.gridSizeY || 1;
+
+  const halfStepX = gridX / 2;
+  const halfStepY = gridY / 2;
+
+  const blockWidth = block.cols * gridX;
+  const blockHeight = block.rows * gridY;
+
+  const maxLeft = anchorRect.x1 - blockWidth;
+  const maxBottom = anchorRect.y1 - blockHeight;
+
+  const snappedLeft = clamp(
+    anchorRect.x0 + Math.round((desiredLeft - anchorRect.x0) / halfStepX) * halfStepX,
+    anchorRect.x0,
+    Math.max(anchorRect.x0, maxLeft)
+  );
+
+  const snappedBottom = clamp(
+    anchorRect.y0 + Math.round((desiredBottom - anchorRect.y0) / halfStepY) * halfStepY,
+    anchorRect.y0,
+    Math.max(anchorRect.y0, maxBottom)
+  );
+
+  return { left: snappedLeft, bottom: snappedBottom };
+}
+
+function cloneAnchor(anchor) {
+  if (!anchor) return null;
+  return {
+    targetType: anchor.targetType,
+    targetId: anchor.targetId,
+    offsetX: anchor.offsetX ?? 0,
+    offsetY: anchor.offsetY ?? 0
+  };
+}
+
+function cloneLayout(layout) {
+  if (!layout) return null;
+  return JSON.parse(JSON.stringify(layout));
+}
+
+function rectanglesOverlap(a, b) {
+  if (!a || !b) return false;
+  return !(
+    a.x1 <= b.x0 + RECT_EPSILON ||
+    a.x0 >= b.x1 - RECT_EPSILON ||
+    a.y1 <= b.y0 + RECT_EPSILON ||
+    a.y0 >= b.y1 - RECT_EPSILON
+  );
+}
+
+function isRectWithin(rect, bounds) {
+  return (
+    rect.x0 >= bounds.x0 - RECT_EPSILON &&
+    rect.y0 >= bounds.y0 - RECT_EPSILON &&
+    rect.x1 <= bounds.x1 + RECT_EPSILON &&
+    rect.y1 <= bounds.y1 + RECT_EPSILON
+  );
+}
+
+function findNonOverlappingRect(block, layout, anchorRect, initialRect, placedRects) {
+  const gridX = layout.gridSizeX || 1;
+  const gridY = layout.gridSizeY || 1;
+  const halfStepX = gridX / 2;
+  const halfStepY = gridY / 2;
+  if (halfStepX <= 0 || halfStepY <= 0) {
+    return initialRect;
+  }
+
+  const blockWidth = block.cols * gridX;
+  const blockHeight = block.rows * gridY;
+  const maxStepX = Math.max(0, Math.round((anchorRect.x1 - anchorRect.x0 - blockWidth) / halfStepX));
+  const maxStepY = Math.max(0, Math.round((anchorRect.y1 - anchorRect.y0 - blockHeight) / halfStepY));
+
+  const clampStep = (value, max) => Math.max(0, Math.min(max, value));
+  const startStepX = clampStep(Math.round((initialRect.x0 - anchorRect.x0) / halfStepX), maxStepX);
+  const startStepY = clampStep(Math.round((initialRect.y0 - anchorRect.y0) / halfStepY), maxStepY);
+
+  const queue = [];
+  const visited = new Set();
+  const push = (sx, sy) => {
+    if (sx < 0 || sy < 0 || sx > maxStepX || sy > maxStepY) return;
+    const key = `${sx},${sy}`;
+    if (visited.has(key)) return;
+    visited.add(key);
+    queue.push({ sx, sy });
+  };
+
+  push(startStepX, startStepY);
+
+  const makeRect = (sx, sy) => {
+    const x0 = anchorRect.x0 + sx * halfStepX;
+    const y0 = anchorRect.y0 + sy * halfStepY;
+    return {
+      x0,
+      y0,
+      x1: x0 + blockWidth,
+      y1: y0 + blockHeight
+    };
+  };
+
+  const neighborOffsets = [
+    { dx: -1, dy: 0 },
+    { dx: 1, dy: 0 },
+    { dx: 0, dy: -1 },
+    { dx: 0, dy: 1 },
+    { dx: -1, dy: -1 },
+    { dx: 1, dy: 1 },
+    { dx: 1, dy: -1 },
+    { dx: -1, dy: 1 }
+  ];
+
+  while (queue.length > 0) {
+    const { sx, sy } = queue.shift();
+    const candidate = makeRect(sx, sy);
+    if (isRectWithin(candidate, anchorRect) && placedRects.every(entry => !rectanglesOverlap(candidate, entry.rect))) {
+      return candidate;
+    }
+
+    neighborOffsets.forEach(offset => {
+      push(sx + offset.dx, sy + offset.dy);
+    });
+  }
+
+  return null;
+}
+
+function enforceNonOverlappingAnchors(layout) {
+  const placedByArea = new Map();
+  const orderedBlocks = blocks.slice().sort((a, b) => {
+    const areaA = (a.anchor && a.anchor.targetId) || a.area || '';
+    const areaB = (b.anchor && b.anchor.targetId) || b.area || '';
+    if (areaA !== areaB) return areaA.localeCompare(areaB);
+    const rowDiff = (a.row || 0) - (b.row || 0);
+    if (Math.abs(rowDiff) > 1e-6) return rowDiff;
+    const colDiff = (a.col || 0) - (b.col || 0);
+    if (Math.abs(colDiff) > 1e-6) return colDiff;
+    return a.id.localeCompare(b.id);
+  });
+
+  for (const block of orderedBlocks) {
+    const anchor = block.anchor;
+    if (!anchor || anchor.targetType !== 'dock') continue;
+    const anchorRect = getDockRectById(anchor.targetId, layout);
+    if (!anchorRect) continue;
+
+    const initialRect = computeBlockRectForAnchor(block, layout, anchor);
+    if (!initialRect) continue;
+
+    const areaKey = anchor.targetId;
+    if (!placedByArea.has(areaKey)) {
+      placedByArea.set(areaKey, []);
+    }
+    const placed = placedByArea.get(areaKey);
+
+    const resolvedRect = findNonOverlappingRect(block, layout, anchorRect, initialRect, placed);
+    if (!resolvedRect) {
+      return false;
+    }
+
+    if (Math.abs(initialRect.x0 - resolvedRect.x0) < RECT_EPSILON &&
+        Math.abs(initialRect.y0 - resolvedRect.y0) < RECT_EPSILON) {
+      placed.push({ block, rect: resolvedRect });
+      continue;
+    }
+
+    const blockWidth = block.cols * layout.gridSizeX;
+    const blockHeight = block.rows * layout.gridSizeY;
+    const availableWidth = Math.max(anchorRect.x1 - anchorRect.x0 - blockWidth, 0);
+    const availableHeight = Math.max(anchorRect.y1 - anchorRect.y0 - blockHeight, 0);
+    const offsetX = availableWidth === 0 ? 0 : (resolvedRect.x0 - anchorRect.x0) / availableWidth;
+    const offsetY = availableHeight === 0 ? 0 : (resolvedRect.y0 - anchorRect.y0) / availableHeight;
+    block.anchor.offsetX = clamp(offsetX, 0, 1);
+    block.anchor.offsetY = clamp(offsetY, 0, 1);
+    placed.push({ block, rect: resolvedRect });
+  }
+
+  return true;
 }
 
 function findBestSnapTarget(block, layout, pointerX, pointerY) {
@@ -1308,8 +1533,10 @@ function applyBlockPosition(block, layout, anchorOverride = null) {
       ? getDockRectById(anchor.targetId, layout)
       : layout.workArea;
     if (referenceRect) {
-      block.col = (rect.x0 - referenceRect.x0) / layout.gridSizeX;
-      block.row = (rect.y0 - referenceRect.y0) / layout.gridSizeY;
+      const rawCol = (rect.x0 - referenceRect.x0) / layout.gridSizeX;
+      const rawRow = (rect.y0 - referenceRect.y0) / layout.gridSizeY;
+      block.col = Math.round(rawCol * 2) / 2;
+      block.row = Math.round(rawRow * 2) / 2;
     }
   }
 }
@@ -1379,6 +1606,16 @@ Work area px rect  :
 }
 
 function recompute() {
+  const previousLayout = cloneLayout(layoutState);
+  const previousAnchors = new Map();
+  blocks.forEach(block => {
+    previousAnchors.set(block.id, {
+      anchor: cloneAnchor(block.anchor),
+      col: block.col,
+      row: block.row
+    });
+  });
+
   const inputs = readInputs();
   let adjustedInputs = { ...inputs };
   let layout = computeLayout(adjustedInputs);
@@ -1390,8 +1627,33 @@ function recompute() {
     layout = computeLayout(adjustedInputs);
     iterations += 1;
   }
+
   layoutState = layout;
   applyDockBookOrder(layoutState);
+  blocks.forEach(block => ensureBlockAnchor(block, layoutState));
+
+  const resolved = enforceNonOverlappingAnchors(layoutState);
+  if (!resolved) {
+    if (previousLayout) {
+      layoutState = previousLayout;
+      blocks.forEach(block => {
+        const snapshot = previousAnchors.get(block.id);
+        if (!snapshot) return;
+        block.anchor = cloneAnchor(snapshot.anchor);
+        block.col = snapshot.col;
+        block.row = snapshot.row;
+      });
+      applyDockBookOrder(layoutState);
+      syncInputsToLayout(layoutState);
+      updateLabels(layoutState);
+      applyStaticLayers(layoutState);
+      updateBlocks(layoutState);
+      syncDockModelPositionsFromBlocks();
+      updateMetrics(layoutState);
+    }
+    return;
+  }
+
   syncInputsToLayout(layoutState);
   updateLabels(layoutState);
   applyStaticLayers(layoutState);
@@ -1471,10 +1733,19 @@ function handleDragMove(e) {
   const clampedLeft = clamp(rawLeft, anchorRect.x0, Math.max(anchorRect.x0, maxLeft));
   const clampedBottom = clamp(rawBottom, anchorRect.y0, Math.max(anchorRect.y0, maxBottom));
 
+  const snapped = snapPositionToGrid(
+    draggedBlock,
+    layoutState,
+    anchorRect,
+    snapTarget ? snapTarget.type : null,
+    clampedLeft,
+    clampedBottom
+  );
+
   const availableWidth = Math.max(anchorRect.x1 - anchorRect.x0 - blockWidth, 0);
   const availableHeight = Math.max(anchorRect.y1 - anchorRect.y0 - blockHeight, 0);
-  const offsetX = availableWidth === 0 ? 0 : (clampedLeft - anchorRect.x0) / availableWidth;
-  const offsetY = availableHeight === 0 ? 0 : (clampedBottom - anchorRect.y0) / availableHeight;
+  const offsetX = availableWidth === 0 ? 0 : (snapped.left - anchorRect.x0) / availableWidth;
+  const offsetY = availableHeight === 0 ? 0 : (snapped.bottom - anchorRect.y0) / availableHeight;
 
   const candidateAnchor = {
     targetType: snapTarget.type,

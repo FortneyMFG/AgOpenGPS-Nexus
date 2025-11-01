@@ -431,8 +431,8 @@
       Header Dock Height (rows)
       <span id="valHeaderRows"></span>
     </label>
-    <input id="inputHeaderRows" type="range" min="0" max="6" step="0.5" value="1.0">
-    <div class="hint">Top dock thickness in grid row units (0.5 min when populated).</div>
+    <input id="inputHeaderRows" type="range" min="0.5" max="6" step="0.5" value="1.0">
+    <div class="hint">Top dock thickness in grid row units (auto clamps to ≥0.5 so it stays interactive).</div>
   </div>
 
   <div class="row">
@@ -440,8 +440,8 @@
       Bottom Dock Height (rows)
       <span id="valBottomRows"></span>
     </label>
-    <input id="inputBottomRows" type="range" min="0" max="6" step="0.5" value="1.0">
-    <div class="hint">Bottom dock thickness in grid row units. 0 = hidden.</div>
+    <input id="inputBottomRows" type="range" min="0.5" max="6" step="0.5" value="1.0">
+    <div class="hint">Bottom dock thickness in grid row units (auto clamps to ≥0.5 for usability).</div>
   </div>
 
   <div class="row">
@@ -449,8 +449,8 @@
       Left Dock Width (cols)
       <span id="valLeftCols"></span>
     </label>
-    <input id="inputLeftCols" type="range" min="0" max="6" step="0.5" value="1.0">
-    <div class="hint">Left dock thickness in grid column units. 0 = hidden.</div>
+    <input id="inputLeftCols" type="range" min="0.5" max="6" step="0.5" value="1.0">
+    <div class="hint">Left dock thickness in grid column units (auto clamps to ≥0.5 for usability).</div>
   </div>
 
   <div class="row">
@@ -458,8 +458,8 @@
       Right Dock Width (cols)
       <span id="valRightCols"></span>
     </label>
-    <input id="inputRightCols" type="range" min="0" max="6" step="0.5" value="1.0">
-    <div class="hint">Right dock thickness in grid column units. 0 = hidden.</div>
+    <input id="inputRightCols" type="range" min="0.5" max="6" step="0.5" value="1.0">
+    <div class="hint">Right dock thickness in grid column units (auto clamps to ≥0.5 for usability).</div>
   </div>
 
   <div class="metrics" id="metricsBox"></div>
@@ -571,6 +571,8 @@ const DOCK_METADATA = {
   right: { orientation: 'vertical', sizeProp: 'rightCols', minSize: 0 },
   work: { orientation: 'free' }
 };
+
+const AUTO_DOCK_MIN_SIZE = 0.5;
 
 const dockModels = {};
 
@@ -1260,7 +1262,7 @@ function calculateVerticalLayout(model, availableRows) {
   return { requiredCols, placements };
 }
 
-function computeDockSizeAdjustments(layout) {
+function computeDockSizeAdjustments(layout, manualInputs = {}) {
   const overrides = {};
   let changed = false;
   Object.entries(DOCK_METADATA).forEach(([area, meta]) => {
@@ -1269,7 +1271,9 @@ function computeDockSizeAdjustments(layout) {
       const sizeProp = meta.sizeProp;
       const availableRows = layout[sizeProp];
       const measurement = calculateHorizontalLayout(model, layout.columns);
-      const minSize = getDockMinimumSize(area);
+      const manualTarget = typeof manualInputs[sizeProp] === 'number' ? manualInputs[sizeProp] : 0;
+      const manualMin = Math.max(manualTarget, AUTO_DOCK_MIN_SIZE);
+      const minSize = Math.max(getDockMinimumSize(area), manualMin);
       const neededRows = Math.max(roundToHalfStep(measurement.requiredRows), minSize);
       if (Math.abs(neededRows - availableRows) > 1e-6) {
         overrides[sizeProp] = neededRows;
@@ -1279,7 +1283,9 @@ function computeDockSizeAdjustments(layout) {
       const sizeProp = meta.sizeProp;
       const availableCols = layout[sizeProp];
       const measurement = calculateVerticalLayout(model, layout.workRows);
-      const minSize = getDockMinimumSize(area);
+      const manualTarget = typeof manualInputs[sizeProp] === 'number' ? manualInputs[sizeProp] : 0;
+      const manualMin = Math.max(manualTarget, AUTO_DOCK_MIN_SIZE);
+      const minSize = Math.max(getDockMinimumSize(area), manualMin);
       const neededCols = Math.max(roundToHalfStep(measurement.requiredCols), minSize);
       if (Math.abs(neededCols - availableCols) > 1e-6) {
         overrides[sizeProp] = neededCols;
@@ -1334,13 +1340,22 @@ function syncInputsToLayout(layout) {
   const leftInput = document.getElementById('inputLeftCols');
   const rightInput = document.getElementById('inputRightCols');
   if (headerInput) {
-    const headerMin = getDockMinimumSize('header');
+    const headerMin = Math.max(getDockMinimumSize('header'), AUTO_DOCK_MIN_SIZE);
     headerInput.min = headerMin.toString();
     headerInput.value = layout.headerRows;
   }
-  if (bottomInput) bottomInput.value = layout.bottomRows;
-  if (leftInput) leftInput.value = layout.leftCols;
-  if (rightInput) rightInput.value = layout.rightCols;
+  if (bottomInput) {
+    bottomInput.min = Math.max(getDockMinimumSize('bottom'), AUTO_DOCK_MIN_SIZE);
+    bottomInput.value = layout.bottomRows;
+  }
+  if (leftInput) {
+    leftInput.min = Math.max(getDockMinimumSize('left'), AUTO_DOCK_MIN_SIZE);
+    leftInput.value = layout.leftCols;
+  }
+  if (rightInput) {
+    rightInput.min = Math.max(getDockMinimumSize('right'), AUTO_DOCK_MIN_SIZE);
+    rightInput.value = layout.rightCols;
+  }
 }
 
 function computeBookOrderKey(area, block) {
@@ -1399,8 +1414,8 @@ function computeLayout(config) {
   result.approxFullRows = result.halfStepsY / 2.0;
 
   const totalRowsAvailable = result.approxFullRows;
-  const rawHeaderMin = getDockMinimumSize('header');
-  const rawBottomMin = getDockMinimumSize('bottom');
+  const rawHeaderMin = Math.max(getDockMinimumSize('header'), AUTO_DOCK_MIN_SIZE);
+  const rawBottomMin = Math.max(getDockMinimumSize('bottom'), AUTO_DOCK_MIN_SIZE);
   let headerRows = 0;
   let bottomRows = 0;
   if (totalRowsAvailable > 0) {
@@ -1433,12 +1448,16 @@ function computeLayout(config) {
     }
   }
 
-  let leftCols = result.leftCols;
-  let rightCols = result.rightCols;
+  let leftCols = Math.max(result.leftCols, Math.max(getDockMinimumSize('left'), AUTO_DOCK_MIN_SIZE));
+  let rightCols = Math.max(result.rightCols, Math.max(getDockMinimumSize('right'), AUTO_DOCK_MIN_SIZE));
   if (leftCols + rightCols > result.columns) {
     const scale = result.columns / (leftCols + rightCols);
     leftCols *= scale;
     rightCols *= scale;
+    const minLeft = Math.max(getDockMinimumSize('left'), AUTO_DOCK_MIN_SIZE);
+    const minRight = Math.max(getDockMinimumSize('right'), AUTO_DOCK_MIN_SIZE);
+    leftCols = Math.max(leftCols, minLeft);
+    rightCols = Math.max(rightCols, minRight);
   }
 
   result.headerRows = headerRows;
@@ -1728,11 +1747,12 @@ function recompute() {
   });
 
   const inputs = readInputs();
+  const manualInputs = { ...inputs };
   let adjustedInputs = { ...inputs };
   let layout = computeLayout(adjustedInputs);
   let iterations = 0;
   while (iterations < 3) {
-    const { overrides, changed } = computeDockSizeAdjustments(layout);
+    const { overrides, changed } = computeDockSizeAdjustments(layout, manualInputs);
     if (!changed) break;
     adjustedInputs = { ...adjustedInputs, ...overrides };
     layout = computeLayout(adjustedInputs);

@@ -1,12 +1,12 @@
 # 11 — Operating System Support
 *(Status: drafting)*
 
-**Section ID:** 11
-**Version:** 0.1.0
-**Authors:** Nexus Team (Fortney)
-**Last Updated:** 2025-10-24
-**Related Sections:** 12 — Development Language & Runtime, 14 — Build Environment & Tooling
-**Related Decisions:** `11-ADR-001 — Establish Windows & Linux Support Baseline`, `12-ADR-001 — Adopt .NET 10 LTS Runtime`, `13-ADR-001 — Adopt Avalonia 12 LTS for the Nexus Desktop UI Shell`
+**Section ID:** 11  
+**Version:** 0.1.0  
+**Authors:** Nexus Team (Fortney)  
+**Last Updated:** 2025-10-24  
+**Related Sections:** 12 — Development Language & Runtime, 14 — Build Environment & Tooling  
+**Related Decisions:** `11-ADR-001 — Establish Windows & Linux Support Baseline`, `12-ADR-001 — Adopt .NET 10 LTS Runtime`, `13-ADR-001 — Adopt Avalonia 12 LTS for the Nexus Desktop UI Shell`  
 **Upstream Dependencies:** 2X — System Architecture, 4X — Interprocess Communications  
 **Downstream Impacts:** 5X — Hardware I/O Device Layer, 9X — Frontends & Ops
 

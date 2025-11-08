@@ -1,8 +1,8 @@
 # 11-ADR-001 — Target OS Prioritization  
 *(Status: Accepted — 2025-10-25)*
 
-**Authors:** Nexus Team (Fortney)
-**Reviewers:** Nexus Team
+**Authors:** Nexus Team (Fortney)  
+**Reviewers:** Nexus Team  
 **Created:** 2025-10-20  
 **Last Updated:** 2025-10-24  
 **Related SRS:** `11_OS_Support.md`  
@@ -16,9 +16,7 @@ Section 11 establishes the requirement that Nexus must provide cross-platform bu
 with functional parity across supported operating systems.
 
 Historically, AgOpenGPS releases shipped only **Windows** desktop installers, while
-community forks and experiments provided limited or manual **Linux** builds. Pilot
-work for §11 confirmed that a unified **.NET 10 + Avalonia 12 LTS** stack can generate signed
-**Windows** installers and **Linux** packages from a single solution.
+community forks and experiments provided limited or manual **Linux** builds.
 
 To align platform teams, this ADR codifies the officially supported OS scope,
 tiering, and governance rules for the initial Nexus release. Other operating systems
